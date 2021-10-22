@@ -1,7 +1,9 @@
 name: Run tests
 on:
-  - pull_request
-  - push
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
