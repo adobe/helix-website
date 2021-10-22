@@ -1,0 +1,55 @@
+.sidekick-generator form {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sidekick-generator form label {
+    width: 100%;
+    font-weight: 700;
+}
+
+#giturl {
+    display: block;
+    width: 100%;
+    line-height: 30px;
+    border: 1px solid;
+    border-color: rgb(202, 202, 202);
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 14px;
+    font-family: 'adobe-clean';
+    outline: none !important;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
+    flex: 1 1 0%;
+    margin-right: 12px;
+}
+
+#giturl::placeholder {
+    font-weight: 400;
+    color: #8e8e8e;
+    transition: color 130ms ease-in-out;
+}
+
+#giturl:focus::placeholder,
+#giturl:hover::placeholder {
+  color: #2c2c2c;
+}
+
+#giturl:focus {
+    border-color: rgb(42, 124, 223);
+}
+
+.sidekick-generator button {
+    line-height: 32px;
+    background: rgb(20, 115, 230);
+    color: white;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0 16px;
+    border: none;
+    font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
+    flex: 0 1 auto;
+}

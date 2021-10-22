@@ -1,0 +1,5 @@
+.service-status {
+    background: aliceblue;
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+}

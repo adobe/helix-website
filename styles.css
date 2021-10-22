@@ -1,0 +1,319 @@
+@font-face {
+    font-family: 'Trebuchet MS';
+    size-adjust: 90%;
+    src: local('Trebuchet MS'),
+         local('TrebuchetMS');
+}
+
+@font-face {
+    font-family:"adobe-clean";
+    src:url("/fonts/adobe-clean-400.woff2") format("woff2");
+    font-display:swap;font-style:normal;font-weight:400;
+}
+
+@font-face {
+    font-family:"adobe-clean";
+    src:url("/fonts/adobe-clean-400-italic.woff2") format("woff2");
+    font-display:swap;font-style:italic;font-weight:400;
+}
+
+@font-face {
+    font-family:"adobe-clean";
+    src:url("/fonts/adobe-clean-700.woff2") format("woff2");
+    font-display:swap;font-style:normal;font-weight:700;
+}
+
+@font-face {
+    font-family:"adobe-clean";
+    src:url("/fonts/adobe-clean-900.woff2") format("woff2");
+    font-display:swap;font-style:normal;font-weight:900;
+}
+
+:root {
+    /* Typography */
+    --type-detail-all-weight: 700;
+    --type-detail-m-size: 12px;
+    --type-detail-m-lh: 15px;
+    --type-detail-m-transform: uppercase;
+    --type-heading-all-weight: 700;
+    --type-heading-xxl-size: 44px;
+    --type-heading-xxl-lh: 55px;
+    --type-heading-xl-size: 2.25em;
+    --type-heading-xl-lh: 45px;
+    --type-heading-l-size: 28px;
+    --type-heading-l-lh: 35px;
+    --type-heading-m-size: 24px;
+    --type-heading-m-lh: 30px;
+    --type-body-l-size: 18px;
+    --type-body-l-lh: 27px;
+    --type-body-m-size: 16px;
+    --type-body-m-lh: 1.6875;
+
+    /* Spacing */
+    --spacing-s: 16px;
+    --spacing-m: 24px;
+    --spacing-l: 48px;
+    --spacing-xl: 56px;
+    --spacing-xxl: 80px;
+
+    /* Colors */
+    --spectrum-blue: rgb(20, 115, 230);
+
+    /* Grid */
+    --grid-mobile-container-width: 83.4%;
+    --grid-desktop-container-width: 1200px;
+}
+
+body {
+    font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
+    margin: 0;
+    padding-top: 64px;
+    font-size: var(--type-body-m-size);
+    line-height: var(--type-body-m-lh);
+}
+
+body.has-Template {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+[data-block-select] {
+    opacity: 0;
+}
+
+[data-block-select].is-Loaded {
+    opacity: 1;
+}
+
+header {
+    transform: translate3d(0,0,0);
+    display: flex;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 65px;
+    background-color: #FFF;
+    z-index: 2;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    margin: 0;
+}
+
+h1 strong,
+h2 strong,
+h3 strong,
+h4 strong,
+h5 strong,
+h6 strong {
+    font-weight: 900;
+}
+
+/* Heading XXL */
+h1 u {
+    font-size: 60px;
+    line-height: 1.3;
+    text-decoration: none;
+}
+
+/* Heading XL */
+h1 {
+    font-size: 45px;
+    line-height: 1.3;
+}
+
+/* Heading L */
+h2 {
+    font-size: 28px;
+    line-height: 1.3;
+}
+
+/* Heading M */
+h3 {
+    font-size: var(--type-heading-m-size);
+    line-height: var(--type-heading-m-lh);
+}
+
+/* Themes */
+.dark {
+    color: white;
+}
+
+/* Columns */
+.columns.three.contained > div {
+    max-width: 83.4%;
+    margin: 0 auto;
+    padding: var(--spacing-xxl) 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    text-align: center;
+}
+
+.columns.three.contained > div > div > p:first-of-type {
+    margin: 0;
+}
+
+.columns.three.contained img {
+    max-height: 200px;
+}
+
+/* Button */
+a.button {
+    color: white;
+    border: 2px solid var(--spectrum-blue);
+    background-color: var(--spectrum-blue);
+    border-radius: 16px;
+    display: inline-block;
+    line-height: 28px;
+    padding: 0 14px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+a.over-background {
+    border: 2px solid white;
+    background-color: transparent;
+    border-radius: 16px;
+    display: inline-block;
+    line-height: 28px;
+    padding: 0 14px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+strong a {
+    background: rgb(20, 115, 230);
+    color: white;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 32px;
+    padding: 0 16px;
+    border: none;
+    flex: 0 1 auto;
+    font-weight: 400;
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* Above the fold */
+.marquee {
+    position: relative;
+    padding: var(--spacing-l) 0 var(--spacing-l) 0;
+}
+
+.marquee .background img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.marquee .background {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.marquee .container {
+    position: relative;
+    max-width: var(--grid-mobile-container-width);
+    margin: 0 auto;
+}
+
+.marquee .container .text {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.marquee .container .text > * {
+    width: 100%;
+}
+
+.marquee .container .text p:first-of-type {
+    font-size: var(--type-detail-m-size);
+    text-transform: var(--type-detail-m-transform);
+    line-height: var(--type-detail-m-lh);
+    font-weight: var(--type-detail-all-weight);
+    margin: 0 0 var(--spacing-s) 0;
+}
+
+.marquee .container .text h1 {
+    font-size: var(--type-heading-xl-size);
+    line-height: var(--type-heading-xl-lh);
+    font-weight: var(--type-heading-all-weight);
+    margin: 0 0 var(--spacing-s) 0;
+}
+
+.marquee .container .text h1 + p {
+    font-size: var(--type-body-m-size);
+    line-height: var(--type-body-m-lh);
+    margin: 0 0 var(--spacing-m) 0;
+}
+
+.marquee .container .text h1 + p + p {
+    margin: 0;
+}
+
+.marquee .container .image {
+    text-align: right;
+}
+
+.marquee .container div {
+    flex: 1 1 auto;
+}
+
+.marquee .container img {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+}
+
+@media screen and (min-width: 900px) {
+    .columns.three.contained > div {
+        max-width: var(--grid-desktop-container-width);
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: var(--spacing-xxl);
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .marquee .container {
+        min-height: 360px;
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+    }
+
+    .marquee .container .text,
+    .marquee .container .image {
+        flex: 0 1 auto;
+    }
+
+    .marquee .container .text {
+        width: 40%;
+    }
+
+    .marquee .container .image {
+        width: 50%;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .marquee .container {
+        max-width: var(--grid-desktop-container-width);
+    }
+}
