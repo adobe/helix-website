@@ -1,0 +1,45 @@
+.z-pattern {
+    padding: var(--spacing-xxl) 0;
+}
+
+.z-pattern > div {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.z-pattern > .z-pattern-heading {
+    text-align: center;
+    margin: 0 auto var(--spacing-l) auto;
+}
+
+.z-pattern h2 {
+    margin: 0;
+}
+
+.z-pattern > div[class^="z-row"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:  var(--spacing-m);
+    margin-bottom: var(--spacing-m);
+}
+
+.z-pattern > div[class^="z-row"] > div {
+    flex: 0 0 40%;
+}
+
+.z-pattern > div[class^="z-row"] > div {
+    max-width: 500px;
+}
+
+.z-pattern > div[class^="z-row"] > div:first-of-type {
+    margin-right: var(--spacing-m);
+}
+
+.z-pattern > div.z-row-odd > div:first-child {
+    order: 2;
+}
+
+.z-pattern-cta {
+    text-align: center;
+}

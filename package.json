@@ -1,0 +1,25 @@
+{
+  "name": "aem-pages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scripts.js",
+  "scripts": {
+    "test": "wtr \"./**/__tests__/*.test.js\" --node-resolve --port=2000 --coverage",
+    "test:watch": "npm test -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auniverseaway/aem-pages.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/auniverseaway/aem-pages/issues"
+  },
+  "homepage": "https://github.com/auniverseaway/aem-pages#readme",
+  "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@web/test-runner": "^0.13.20",
+    "@web/test-runner-commands": "^0.5.13"
+  }
+}
