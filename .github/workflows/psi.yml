@@ -1,0 +1,17 @@
+name: Run Helix PSI audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - main
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use repo PSI action
+        uses: adobe-rnd/helix-psi-github-action@main
+        with:
+          psi-key: ${{ secrets.PSI_KEY }}
