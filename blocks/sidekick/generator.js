@@ -104,6 +104,7 @@ export default function decorate(el) {
     const em = createTag('em', null, bookmark);
     installContainer.append(em);
     installContainer.id = 'install-container';
+    installContainer.style.paddingTop = '20px';
     installContainer.classList.add('hidden');
 
     init();
