@@ -34,9 +34,9 @@ class Gnav {
       nav.append(mainNav);
     }
 
-    const search = this.decorateSearch();
-    if (search) {
-      nav.append(search);
+    this.search = this.decorateSearch();
+    if (this.search) {
+      nav.append(this.search);
     }
 
     const profile = this.decorateProfile();
@@ -70,7 +70,7 @@ class Gnav {
         nav.classList.add(IS_OPEN);
         this.desktop.addEventListener('change', onMediaChange);
         this.curtain.classList.add(IS_OPEN);
-        this.loadSearch();
+        if (this.search) { this.loadSearch(); }
       }
     });
     return toggle;

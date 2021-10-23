@@ -1,4 +1,5 @@
-import { createEl, fetchBlogArticleIndex, createOptimizedPicture } from '../../scripts.js';
+import { fetchBlogArticleIndex, createOptimizedPicture } from '../../scripts.js';
+import createTag from '../../utils/tag.js';
 
 function decorateCard(hit) {
   const {
@@ -13,9 +14,7 @@ function decorateCard(hit) {
         <h3>${title}</h3>
         <p>${description}</p>
       </div>`;
-  return createEl({
-    tag: 'a', className: 'article-card', html, attributes: { href: path },
-  });
+  return createTag('a', { href: path, class: 'article-card' }, html);
 }
 
 function highlightTextElements(terms, elements) {
