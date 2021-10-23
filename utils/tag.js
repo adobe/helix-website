@@ -6,18 +6,18 @@
  * @returns {HTMLElement} the element created
  */
 export default function createTag(tag, attributes, html) {
-    const el = document.createElement(tag);
-    if (html) {
-      if (html instanceof HTMLElement) {
-        el.append(html);
-      } else {
-        el.insertAdjacentHTML('beforeend', html);
-      }
+  const el = document.createElement(tag);
+  if (html) {
+    if (html instanceof HTMLElement) {
+      el.append(html);
+    } else {
+      el.insertAdjacentHTML('beforeend', html);
     }
-    if (attributes) {
-      Object.keys(attributes).forEach((key) => {
-        el.setAttribute(key, attributes[key]);
-      });
-    }
-    return el;
+  }
+  if (attributes) {
+    Object.keys(attributes).forEach((key) => {
+      el.setAttribute(key, attributes[key]);
+    });
+  }
+  return el;
 }

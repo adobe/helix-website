@@ -1,4 +1,6 @@
-import { loadScript, getMetadata, cleanVariations, decorateAnchors } from '../../scripts.js';
+import {
+  loadScript, getMetadata, cleanVariations, decorateAnchors,
+} from '../../scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
 
