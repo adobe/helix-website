@@ -87,25 +87,25 @@ function init() {
 }
 
 export default function decorate(el) {
-    const formContainer = el.querySelector(':scope > div:first-of-type > div');
-    const form = createTag('form');
-    const label = createTag('label', { for: 'giturl' }, 'Repository URL:');
-    const gitInput = createTag('input', { id: 'giturl', placeholder: 'https://github.com/...' });
-    const project = createTag('input', { id: 'project', type: 'hidden' });
-    const hlx3 = createTag('input', { id: 'hlx3', type: 'hidden' });
-    const button = createTag('button', { id: 'generator' }, 'Generate Bookmarklet');
-    button.onclick = run;
-    form.append(label, gitInput, project, hlx3, button);
-    formContainer.append(form);
-    formContainer.id = 'form-container';
+  const formContainer = el.querySelector(':scope > div:first-of-type > div');
+  const form = createTag('form');
+  const label = createTag('label', { for: 'giturl' }, 'Repository URL:');
+  const gitInput = createTag('input', { id: 'giturl', placeholder: 'https://github.com/...' });
+  const project = createTag('input', { id: 'project', type: 'hidden' });
+  const hlx3 = createTag('input', { id: 'hlx3', type: 'hidden' });
+  const button = createTag('button', { id: 'generator' }, 'Generate Bookmarklet');
+  button.onclick = run;
+  form.append(label, gitInput, project, hlx3, button);
+  formContainer.append(form);
+  formContainer.id = 'form-container';
 
-    const installContainer = el.querySelector(':scope > div:last-of-type > div');
-    const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
-    const em = createTag('em', null, bookmark);
-    installContainer.append(em);
-    installContainer.id = 'install-container';
-    installContainer.style.paddingTop = '20px';
-    installContainer.classList.add('hidden');
+  const installContainer = el.querySelector(':scope > div:last-of-type > div');
+  const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
+  const em = createTag('em', null, bookmark);
+  installContainer.append(em);
+  installContainer.id = 'install-container';
+  installContainer.style.paddingTop = '20px';
+  installContainer.classList.add('hidden');
 
-    init();
+  init();
 }
