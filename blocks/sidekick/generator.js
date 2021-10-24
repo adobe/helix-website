@@ -71,14 +71,13 @@ function init() {
   });
   const from = params.has('from') && params.get('from');
   if (from) {
-    const backLink = document.createElement('a');
-    backLink.href = encodeURI(from);
-    backLink.textContent = from;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'back';
-    wrapper.appendChild(backLink);
-    document.getElementById('book').appendChild(wrapper);
-    document.getElementById('update').style.display = 'unset';
+    const href = encodeURI(from);
+    const backLink = createTag('a', {
+      class: 'back-link',
+      title: href,
+      href,
+    }, href);
+    document.getElementById('install-container').append(createTag('p', null, backLink));
   }
   if (autorun) {
     document.getElementById('form-container').classList.add('hidden');
@@ -101,8 +100,7 @@ export default function decorate(el) {
 
   const installContainer = el.querySelector(':scope > div:last-of-type > div');
   const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
-  const em = createTag('em', null, bookmark);
-  installContainer.append(em);
+  installContainer.append(createTag('p', null, createTag('em', null, bookmark)));
   installContainer.id = 'install-container';
   installContainer.style.paddingTop = '20px';
   installContainer.classList.add('hidden');
