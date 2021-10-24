@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-expressions */
+/* global describe it */
+
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
-import decorate from '../generator.js';
 import { spy } from 'sinon';
+import decorate from '../generator.js';
 
 const mock = await readFile({ path: './generator.mock.html' });
 document.body.innerHTML = mock;
@@ -40,8 +43,8 @@ describe('Sidekick Generator', () => {
   });
 
   it('autoruns with query parameters', () => {
-    history.pushState({}, '',
-      `${window.location.href}&from=https%3A%2F%2Fwww.adobe.com%2F&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo&hlx3=true`)
+    window.history.pushState({}, '',
+      `${window.location.href}&from=https%3A%2F%2Fwww.adobe.com%2F&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo&hlx3=true`);
     const generator = document.querySelector('.sidekick-generator');
     decorate(generator);
     const formContainer = generator.querySelector('#form-container');
@@ -54,9 +57,9 @@ describe('Sidekick Generator', () => {
     expect(backLink.href).to.equal('https://www.adobe.com/');
   });
 
-  it('displays help if sidkeick bookmarklet link is clicked', () => {
-    history.pushState({}, '',
-      `${window.location.href}&&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo`)
+  it('displays help if sidekick bookmarklet link is clicked', () => {
+    window.history.pushState({}, '',
+      `${window.location.href}&&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo`);
     const generator = document.querySelector('.sidekick-generator');
     decorate(generator);
     const bookmark = generator.querySelector('#bookmark');

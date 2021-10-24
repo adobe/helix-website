@@ -5,7 +5,8 @@
   "main": "scripts.js",
   "scripts": {
     "test": "wtr \"./**/__tests__/*.test.js\" --node-resolve --port=2000 --coverage",
-    "test:watch": "npm test -- --watch"
+    "test:watch": "npm test -- --watch",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,11 @@
   },
   "homepage": "https://github.com/auniverseaway/aem-pages#readme",
   "devDependencies": {
+    "@babel/core": "7.15.5",
+    "@babel/eslint-parser": "7.15.4",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-plugin-import": "2.24.2",
     "@esm-bundle/chai": "4.3.4-fix.0",
     "@web/test-runner": "0.13.20",
     "@web/test-runner-commands": "0.5.13",

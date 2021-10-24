@@ -1,4 +1,4 @@
 export default function foo() {
-    window.feature = { loaded: true };
+  window.feature = { loaded: true };
 }
 foo();

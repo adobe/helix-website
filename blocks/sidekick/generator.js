@@ -3,6 +3,7 @@ import createTag from '../../utils/tag.js';
 function help(e) {
   e.preventDefault();
   e.stopPropagation();
+  // eslint-disable-next-line no-alert
   alert('Instead of clicking this button, you need to drag it to your browser\'s bookmark bar.');
   return false;
 }
@@ -15,6 +16,7 @@ function run(evt) {
   const project = document.querySelector('input#project').value;
   const hlx3 = document.querySelector('input#hlx3').value;
   if (!giturl) {
+    // eslint-disable-next-line no-alert
     alert('Repository URL is mandatory.');
     return;
   }
@@ -35,19 +37,20 @@ function run(evt) {
 
   const bm = document.getElementById('bookmark');
   bm.href = [
+    // eslint-disable-next-line no-script-url
     'javascript:',
     '/* ** Helix Sidekick Bookmarklet ** */',
     '(() => {',
-      `const c=${JSON.stringify(config)};`,
-      'const s=document.createElement(\'script\');',
-      's.id=\'hlx-sk-app\';',
-      `s.src='${window.location.origin}/tools/sidekick/app.js';`,
-      's.dataset.config=JSON.stringify(c);',
-      'if(document.getElementById(\'hlx-sk-app\')){',
-        'document.getElementById(\'hlx-sk-app\').replaceWith(s);',
-      '} else {',
-        'document.head.append(s);',
-      '}',
+    `const c=${JSON.stringify(config)};`,
+    'const s=document.createElement(\'script\');',
+    's.id=\'hlx-sk-app\';',
+    `s.src='${window.location.origin}/tools/sidekick/app.js';`,
+    's.dataset.config=JSON.stringify(c);',
+    'if(document.getElementById(\'hlx-sk-app\')){',
+    'document.getElementById(\'hlx-sk-app\').replaceWith(s);',
+    '} else {',
+    'document.head.append(s);',
+    '}',
     '})();',
   ].join('');
   let title = 'Sidekick';
@@ -63,7 +66,7 @@ function run(evt) {
 function init() {
   let autorun = false;
   const params = new URLSearchParams(window.location.search);
-  params.forEach((v,k) => {
+  params.forEach((v, k) => {
     const field = document.querySelector(`input#${k}`);
     if (!field) return;
     field.value = v;
