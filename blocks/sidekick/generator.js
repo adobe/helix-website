@@ -66,7 +66,7 @@ function init() {
   params.forEach((v,k) => {
     const field = document.querySelector(`input#${k}`);
     if (!field) return;
-    field.type === 'checkbox' ? field.checked = (v === 'true') : field.value = v;
+    field.value = v;
     autorun = true;
   });
   const from = params.has('from') && params.get('from');
