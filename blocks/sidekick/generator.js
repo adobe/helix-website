@@ -1,35 +1,20 @@
 import createTag from '../../utils/tag.js';
 
-export default function decorate(el) {
-  const formContainer = el.querySelector(':scope > div:first-of-type > div');
-  const form = createTag('form');
-  const label = createTag('label', { for: 'giturl' }, 'Repository URL:');
-  const gitInput = createTag('input', { id: 'giturl', placeholder: 'https://github.com/...' }, 'Repository URL:');
-  const project = createTag('input', { id: 'project', type: 'hidden' });
-  const hlx3 = createTag('input', { id: 'hlx3', type: 'hidden' });
-  const button = createTag('button', null, 'Generate Bookmarklet');
-  form.append(label, gitInput, project, hlx3, button);
-  formContainer.append(form);
-}
-
-// eslint-disable-next-line no-unused-vars
-function copy() {
-  const text = document.getElementById('bookmark').href;
-  navigator.clipboard.writeText(text);
-}
-
 function help(e) {
   e.preventDefault();
   e.stopPropagation();
   // eslint-disable-next-line no-alert
-  alert('Instead of clicking the Helix logo, drag it to your browser\'s bookmark bar.');
+  alert('Instead of clicking this button, you need to drag it to your browser\'s bookmark bar.');
   return false;
 }
 
-function run() {
-  let giturl = document.getElementById('giturl').value;
-  const project = document.getElementById('project').value;
-  const hlx3 = document.getElementById('hlx3').value;
+function run(evt) {
+  if (evt) {
+    evt.preventDefault();
+  }
+  let giturl = document.querySelector('input#giturl').value;
+  const project = document.querySelector('input#project').value;
+  const hlx3 = document.querySelector('input#hlx3').value;
   if (!giturl) {
     // eslint-disable-next-line no-alert
     alert('Repository URL is mandatory.');
@@ -72,41 +57,56 @@ function run() {
   if (project) {
     title = `${project} ${title}`;
   }
-  bm.setAttribute('title', title);
-  bm.firstElementChild.setAttribute('alt', title);
   bm.onclick = help;
-  document.getElementById('book').style.display = 'block';
+  bm.textContent = title;
+  bm.setAttribute('title', title);
+  document.getElementById('install-container').classList.remove('hidden');
 }
 
-// eslint-disable-next-line no-unused-vars
 function init() {
   let autorun = false;
   const params = new URLSearchParams(window.location.search);
   params.forEach((v, k) => {
-    const field = document.getElementById(k);
+    const field = document.querySelector(`input#${k}`);
     if (!field) return;
-    if (field.type === 'checkbox') {
-      field.checked = (v === 'true');
-    } else {
-      field.value = v;
-    }
+    field.value = v;
     autorun = true;
   });
   const from = params.has('from') && params.get('from');
   if (from) {
-    const backLink = document.createElement('a');
-    backLink.href = encodeURI(from);
-    backLink.textContent = from;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'back';
-    wrapper.appendChild(backLink);
-    document.getElementById('book').appendChild(wrapper);
-    document.getElementById('update').style.display = 'unset';
+    const href = encodeURI(from);
+    const backLink = createTag('a', {
+      class: 'back-link',
+      title: href,
+      href,
+    }, href);
+    document.getElementById('install-container').append(createTag('p', null, backLink));
   }
   if (autorun) {
-    document.getElementById('form').style.display = 'none';
+    document.getElementById('form-container').classList.add('hidden');
     run();
   }
 }
 
-// init();
+export default function decorate(el) {
+  const formContainer = el.querySelector(':scope > div:first-of-type > div');
+  const form = createTag('form');
+  const label = createTag('label', { for: 'giturl' }, 'Repository URL:');
+  const gitInput = createTag('input', { id: 'giturl', placeholder: 'https://github.com/...' });
+  const project = createTag('input', { id: 'project', type: 'hidden' });
+  const hlx3 = createTag('input', { id: 'hlx3', type: 'hidden' });
+  const button = createTag('button', { id: 'generator' }, 'Generate Bookmarklet');
+  button.onclick = run;
+  form.append(label, gitInput, project, hlx3, button);
+  formContainer.append(form);
+  formContainer.id = 'form-container';
+
+  const installContainer = el.querySelector(':scope > div:last-of-type > div');
+  const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
+  installContainer.append(createTag('p', null, createTag('em', null, bookmark)));
+  installContainer.id = 'install-container';
+  installContainer.style.paddingTop = '20px';
+  installContainer.classList.add('hidden');
+
+  init();
+}
