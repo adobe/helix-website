@@ -8,6 +8,12 @@
     font-weight: 700;
 }
 
+.sidekick-generator a.back-link::before {
+  content: "< Back to ";
+  padding-right: 8px;
+  display: inline-block;
+}
+
 #giturl {
     display: block;
     width: 100%;

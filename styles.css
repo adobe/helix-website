@@ -170,19 +170,23 @@ h3 {
     display: inline-block;
 }
 
+em a {
+  color: black;
+  border: 2px solid;
+  background-color: transparent;
+  border-radius: 16px;
+  display: inline-block;
+  line-height: 28px;
+  padding: 0 14px;
+  text-decoration: none;
+  font-size: 14px;
+  font-style: normal;
+}
+
 /* Primary button over background */
 
 .dark em a {
     color: #FFF;
-    border: 2px solid;
-    background-color: transparent;
-    border-radius: 16px;
-    display: inline-block;
-    line-height: 28px;
-    padding: 0 14px;
-    text-decoration: none;
-    font-size: 14px;
-    font-style: normal;
 }
 
 strong a {
@@ -277,6 +281,10 @@ strong a {
     object-fit: contain;
     height: 100%;
     width: 100%;
+}
+
+.hidden {
+  display: none;
 }
 
 @media screen and (min-width: 900px) {
