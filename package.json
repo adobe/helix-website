@@ -18,8 +18,9 @@
   },
   "homepage": "https://github.com/auniverseaway/aem-pages#readme",
   "devDependencies": {
-    "@esm-bundle/chai": "^4.3.4-fix.0",
-    "@web/test-runner": "^0.13.20",
-    "@web/test-runner-commands": "^0.5.13"
+    "@esm-bundle/chai": "4.3.4-fix.0",
+    "@web/test-runner": "0.13.20",
+    "@web/test-runner-commands": "0.5.13",
+    "sinon": "11.1.2"
   }
 }
