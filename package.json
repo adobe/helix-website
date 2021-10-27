@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/auniverseaway/aem-pages.git"
+    "url": "git+https://github.com/adobe/helix-website.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/auniverseaway/aem-pages/issues"
+    "url": "https://github.com/adobe/helix-website/issues"
   },
-  "homepage": "https://github.com/auniverseaway/aem-pages#readme",
+  "homepage": "https://github.com/adobe/helix-website#readme",
   "devDependencies": {
     "@babel/core": "7.15.5",
     "@babel/eslint-parser": "7.15.4",
