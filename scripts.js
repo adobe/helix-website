@@ -7,9 +7,10 @@ export const config = {
       scripts: 'header.js',
       styles: 'header.css',
     },
-    '.marquee': {
-      location: '/blocks/marquee/',
-      scripts: 'marquee.js',
+    '.marquee': {},
+    '.columns': {
+      location: '/blocks/columns/',
+      styles: 'columns.css',
     },
     '.feature-list': {
       location: '/blocks/feature-list/',
@@ -227,7 +228,7 @@ export async function loadBlocks(blocks, cfg) {
     });
   };
 
-  const options = { rootMargin: cfg.lazyMargin || '1600px 0px' };
+  const options = { rootMargin: cfg.lazyMargin || '1200px 0px' };
   const observer = new IntersectionObserver(onIntersection, options);
   return Promise.all(blocks.map(async (block) => {
     const { blockSelect } = block.dataset;
@@ -241,20 +242,23 @@ export async function loadBlocks(blocks, cfg) {
   }));
 }
 
-function postLCP(type) { window[type] = true; }
+function postLCP(type, blocks) {
+  window[type] = true;
+  loadBlocks(blocks, config);
+  loadStyle('/fonts/fonts.css');
+}
 
-export function setLCPTrigger(lcp) {
+export function setLCPTrigger(lcp, blocks) {
   if (lcp) {
-    if (lcp.complete) { postLCP('lcpComplete'); return; }
-    lcp.addEventListener('load', () => { postLCP('lcpLoad'); });
-    lcp.addEventListener('error', () => { postLCP('lcpError'); });
+    if (lcp.complete) { postLCP('lcpComplete', blocks); return; }
+    lcp.addEventListener('load', () => { postLCP('lcpLoad', blocks); });
+    lcp.addEventListener('error', () => { postLCP('lcpError', blocks); });
     return;
   }
-  postLCP('noLcp');
+  postLCP('noLcp', blocks);
 }
-decorateAnchors(document);
 loadTemplate(config);
+decorateAnchors(document);
 const blocks = decorateBlocks(document);
-loadBlocks(blocks, config);
-const lcp = document.querySelector('img');
-setLCPTrigger(lcp);
+const lcp = document.querySelector('.marquee img');
+setLCPTrigger(lcp, blocks);

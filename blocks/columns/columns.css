@@ -1,0 +1,25 @@
+.columns.three.contained > div {
+    max-width: 83.4%;
+    margin: 0 auto;
+    padding: var(--spacing-xxl) 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    text-align: center;
+}
+
+.columns.three.contained > div > div > p:first-of-type {
+    margin: 0;
+}
+
+.columns.three.contained img {
+    height: 200px;
+    display: inline-block;
+}
+
+@media screen and (min-width: 900px) {
+    .columns.three.contained > div {
+        max-width: var(--grid-desktop-container-width);
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: var(--spacing-xxl);
+    }
+}
