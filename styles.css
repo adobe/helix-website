@@ -1,32 +1,17 @@
 @font-face {
     font-family: 'Trebuchet MS';
-    size-adjust: 90%;
+    size-adjust: 95%;
     src: local('Trebuchet MS'),
          local('TrebuchetMS');
+         font-weight: 700;
 }
 
 @font-face {
-    font-family:"adobe-clean";
-    src:url("/fonts/adobe-clean-400.woff2") format("woff2");
-    font-display:swap;font-style:normal;font-weight:400;
-}
-
-@font-face {
-    font-family:"adobe-clean";
-    src:url("/fonts/adobe-clean-400-italic.woff2") format("woff2");
-    font-display:swap;font-style:italic;font-weight:400;
-}
-
-@font-face {
-    font-family:"adobe-clean";
-    src:url("/fonts/adobe-clean-700.woff2") format("woff2");
-    font-display:swap;font-style:normal;font-weight:700;
-}
-
-@font-face {
-    font-family:"adobe-clean";
-    src:url("/fonts/adobe-clean-900.woff2") format("woff2");
-    font-display:swap;font-style:normal;font-weight:900;
+    font-family: 'Trebuchet MS';
+    size-adjust: 87%;
+    src: local('Trebuchet MS'),
+         local('TrebuchetMS');
+         font-weight: 400;
 }
 
 :root {
@@ -67,7 +52,7 @@
 body {
     font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
     margin: 0;
-    padding-top: 64px;
+    padding-top: 65px;
     font-size: var(--type-body-m-size);
     line-height: var(--type-body-m-lh);
 }
@@ -151,23 +136,9 @@ h3 {
     color: white;
 }
 
-/* Columns */
-.columns.three.contained > div {
-    max-width: 83.4%;
-    margin: 0 auto;
-    padding: var(--spacing-xxl) 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    text-align: center;
-}
-
-.columns.three.contained > div > div > p:first-of-type {
-    margin: 0;
-}
-
-.columns.three.contained img {
-    height: 200px;
-    display: inline-block;
+/* Utilities */
+.hidden {
+    display: none;
 }
 
 em a {
@@ -206,21 +177,9 @@ strong a {
 /* Above the fold */
 .marquee {
     position: relative;
-    padding: var(--spacing-l) 0 var(--spacing-l) 0;
-}
-
-.marquee > div:first-of-type > div img {
-    object-fit: cover;
-    height: 100%;
-    width: 100%;
-}
-
-.marquee > div:first-of-type > div {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    padding: var(--spacing-l) 0;
+    background: rgb(192,11,0);
+    background: linear-gradient(66deg, rgba(192,11,0,1) 0%, rgba(252,14,1,1) 100%);
 }
 
 .marquee > div:last-of-type {
@@ -229,13 +188,13 @@ strong a {
     margin: 0 auto;
 }
 
-.marquee .container .text {
+.marquee > div:last-of-type > div:first-of-type {
     display: flex;
     flex-wrap: wrap;
     align-content: center;
 }
 
-.marquee .container .text > * {
+.marquee > div:last-of-type > div:first-of-type > * {
     width: 100%;
 }
 
@@ -269,56 +228,44 @@ strong a {
     display: inline-block;
 }
 
-.marquee .container .image {
+.marquee > div:last-of-type > div:last-of-type {
     text-align: right;
 }
 
-.marquee .container div {
+.marquee > div:last-of-type div {
     flex: 1 1 auto;
 }
 
-.marquee .container img {
+.marquee > div:last-of-type img {
     object-fit: contain;
     height: 100%;
     width: 100%;
 }
 
-.hidden {
-  display: none;
-}
-
-@media screen and (min-width: 900px) {
-    .columns.three.contained > div {
-        max-width: var(--grid-desktop-container-width);
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-gap: var(--spacing-xxl);
-    }
-}
-
 @media screen and (min-width: 1200px) {
-    .marquee .container {
+    .marquee > div:last-of-type {
         min-height: 360px;
         display: flex;
         justify-content: space-between;
         align-items: stretch;
     }
 
-    .marquee .container .text,
-    .marquee .container .image {
+    .marquee > div:last-of-type > div:first-of-type,
+    .marquee > div:last-of-type > div:last-of-type {
         flex: 0 1 auto;
     }
 
-    .marquee .container .text {
+    .marquee > div:last-of-type > div:first-of-type {
         width: 40%;
     }
 
-    .marquee .container .image {
+    .marquee > div:last-of-type > div:last-of-type {
         width: 50%;
     }
 }
 
 @media screen and (min-width: 1440px) {
-    .marquee .container {
+    .marquee > div:last-of-type {
         max-width: var(--grid-desktop-container-width);
     }
 }

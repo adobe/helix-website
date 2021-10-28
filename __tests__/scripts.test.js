@@ -150,16 +150,17 @@ describe('Block loading', async () => {
 describe('Post LCP', () => {
   const img = document.createElement('img');
   document.body.append(img);
+  const blocks = decorateBlocks(document);
 
   it('LCP loads when there is no image', () => {
     const lcp = document.querySelector('img');
-    setLCPTrigger(lcp);
+    setLCPTrigger(lcp, blocks);
     expect(window.lcpComplete).to.be.true;
   });
 
   it('LCP loads when there is a bad image', async () => {
     img.src = '/__tests__/nope.mock.png';
-    setLCPTrigger(img);
+    setLCPTrigger(img, blocks);
     const lcpError = await getObjectProperty('lcpError', ms);
     expect(lcpError).to.be.true;
   });
@@ -190,6 +191,7 @@ const getLazyElement = (selector, timeout) => new Promise((resolve) => {
 describe('Lazy loading', async () => {
   it('youtube is loaded', async () => {
     const blocks = decorateBlocks(document);
+    config.lazyMargin = '2000px 0px';
     await loadBlocks(blocks, config);
     const iframe = await getLazyElement('iframe', ms);
     expect(iframe).to.exist;
