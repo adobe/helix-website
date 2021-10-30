@@ -12,16 +12,35 @@ function run(evt) {
   if (evt) {
     evt.preventDefault();
   }
-  let giturl = document.querySelector('input#giturl').value;
-  const project = document.querySelector('input#project').value;
-  const hlx3 = document.querySelector('input#hlx3').value;
+  // retrieve config
+  const formData = {};
+  document.querySelectorAll('#form-container input').forEach((field) => {
+    if (field.type === 'checkbox' || field.type === 'radio') {
+      formData[field.id] = field.checked;
+    } else {
+      formData[field.id] = field.value;
+    }
+  });
+
+  const {
+    giturl, project, token, hlx3,
+  } = formData;
+
   if (!giturl) {
     // eslint-disable-next-line no-alert
     alert('Repository URL is mandatory.');
     return;
   }
-  giturl = new URL(giturl);
-  const segs = giturl.pathname.substring(1).split('/');
+
+  // update URL
+  const url = new URL(window.location.href);
+  const usp = url.searchParams;
+  Object.keys(formData).forEach((name) => usp.set(name, formData[name]));
+  url.search = usp.toString();
+  window.history.pushState({}, null, url.href);
+
+  // assemble bookmarklet config
+  const segs = new URL(giturl).pathname.substring(1).split('/');
   const owner = segs[0];
   const repo = segs[1];
   const ref = segs[3] || 'main';
@@ -30,11 +49,15 @@ function run(evt) {
     owner,
     repo,
     ref,
+    hlx3,
   };
 
-  // bake hlx3 flag into bookmarklet (default: true)
-  config.hlx3 = hlx3 !== 'false';
+  // pass token
+  if (token) {
+    config.token = token;
+  }
 
+  // update bookmarklet link
   const bm = document.getElementById('bookmark');
   bm.href = [
     // eslint-disable-next-line no-script-url
@@ -65,11 +88,16 @@ function run(evt) {
 
 function init() {
   let autorun = false;
+  // pre-fill form
   const params = new URLSearchParams(window.location.search);
   params.forEach((v, k) => {
     const field = document.querySelector(`input#${k}`);
     if (!field) return;
-    field.value = v;
+    if (field.type === 'checkbox' || field.type === 'radio') {
+      field.checked = v !== 'false';
+    } else {
+      field.value = v;
+    }
     autorun = true;
   });
   const from = params.has('from') && params.get('from');
@@ -88,18 +116,31 @@ function init() {
   }
 }
 
-export default function decorate(el) {
+export default async function decorate(el) {
   const formContainer = el.querySelector(':scope > div:first-of-type > div');
   const form = createTag('form');
-  const label = createTag('label', { for: 'giturl' }, 'Repository URL:');
-  const gitInput = createTag('input', { id: 'giturl', placeholder: 'https://github.com/...' });
-  const project = createTag('input', { id: 'project', type: 'hidden' });
-  const hlx3 = createTag('input', { id: 'hlx3', type: 'hidden' });
-  const button = createTag('button', { id: 'generator' }, 'Generate Bookmarklet');
-  button.onclick = run;
-  form.append(label, gitInput, project, hlx3, button);
+  const resp = await fetch('./generator.json');
+  if (resp.ok) {
+    const json = await resp.json();
+    json.data.forEach(({
+      label, type, required, name, placeholder, checked,
+    }) => {
+      if (label) {
+        form.append(createTag('label', { for: name }, `${label}${required ? '*' : ''}`));
+      }
+      const elem = createTag('input', { type, id: name, placeholder: placeholder || '' });
+      if (type === 'checkbox' && checked) {
+        elem.checked = true;
+      }
+      form.append(elem);
+    });
+  }
   formContainer.append(form);
   formContainer.id = 'form-container';
+
+  const button = createTag('button', { id: 'generator' }, 'Generate Bookmarklet');
+  button.onclick = run;
+  formContainer.append(createTag('div', {}, button));
 
   const installContainer = el.querySelector(':scope > div:last-of-type > div');
   const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');

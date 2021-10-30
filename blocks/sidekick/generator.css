@@ -14,7 +14,8 @@
   display: inline-block;
 }
 
-#giturl {
+.sidekick-generator input[type="text"],
+.sidekick-generator input[type="password"] {
     display: block;
     width: 100%;
     line-height: 30px;
@@ -29,33 +30,44 @@
     box-sizing: border-box;
     transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
     flex: 1 1 0%;
-    margin-right: 12px;
 }
 
-#giturl::placeholder {
+.sidekick-generator input[type="checkbox"] {
+  border: 1px solid;
+  border-color: rgb(202, 202, 202);
+  border-radius: 4px;
+  transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
+}
+
+.sidekick-generator input[type="text"]::placeholder {
     font-weight: 400;
     color: #8e8e8e;
     transition: color 130ms ease-in-out;
 }
 
-#giturl:focus::placeholder,
-#giturl:hover::placeholder {
+.sidekick-generator input[type="text"]:focus::placeholder,
+.sidekick-generator input[type="text"]:hover::placeholder {
   color: #2c2c2c;
 }
 
-#giturl:focus {
+.sidekick-generator input[type="text"]:focus,
+.sidekick-generator input[type="password"]:focus {
     border-color: rgb(42, 124, 223);
 }
 
 .sidekick-generator button {
-    line-height: 32px;
-    background: rgb(20, 115, 230);
-    color: white;
-    border-radius: 16px;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 0 16px;
-    border: none;
-    font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
-    flex: 0 1 auto;
+  line-height: 32px;
+  background: rgb(20, 115, 230);
+  color: white;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 16px;
+  border: none;
+  font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
+  flex: 0 1 auto;
+}
+
+.sidekick-generator #form-container > div {
+  margin: 1rem 0;
 }
