@@ -67,7 +67,3 @@
   font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
   flex: 0 1 auto;
 }
-
-.sidekick-generator #form-container > div {
-  margin: 1rem 0;
-}

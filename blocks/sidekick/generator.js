@@ -118,6 +118,16 @@ function init() {
 
 export default async function decorate(el) {
   const formContainer = el.querySelector(':scope > div:first-of-type > div');
+
+  const submitLink = formContainer.querySelector(':scope a');
+  const button = createTag('button', { id: 'generator' }, submitLink ? submitLink.textContent : 'Go');
+  button.onclick = run;
+  if (submitLink) {
+    submitLink.replaceWith(button);
+  } else {
+    formContainer.append(createTag('p', {}, button));
+  }
+
   const form = createTag('form');
   const resp = await fetch('./generator.json');
   if (resp.ok) {
@@ -135,12 +145,8 @@ export default async function decorate(el) {
       form.append(elem);
     });
   }
-  formContainer.append(form);
+  formContainer.insertBefore(form, formContainer.querySelector(':scope p:last-of-type'));
   formContainer.id = 'form-container';
-
-  const button = createTag('button', { id: 'generator' }, 'Generate Bookmarklet');
-  button.onclick = run;
-  formContainer.append(createTag('div', {}, button));
 
   const installContainer = el.querySelector(':scope > div:last-of-type > div');
   const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
