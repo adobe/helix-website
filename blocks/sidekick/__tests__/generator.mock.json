@@ -17,6 +17,12 @@
       "name": "project"
     },
     {
+      "label": "Shared Key",
+      "type": "password",
+      "required": "",
+      "name": "token"
+    },
+    {
       "label": "Helix 3",
       "type": "checkbox",
       "required": "",
