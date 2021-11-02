@@ -91,12 +91,22 @@ export function setSVG(anchor) {
   }
 }
 
+export function forceDownload(anchor) {
+  const { href } = anchor;
+  const filename = href.split('/').pop();
+  const ext = filename.split('.')[1];
+  if (ext && ['crx'].includes(ext)) {
+    anchor.setAttribute('download', filename);
+  }
+}
+
 export function decorateAnchors(element) {
   const anchors = element.getElementsByTagName('a');
   const currentDomain = getCurrentDomain();
   return Array.from(anchors).map((anchor) => {
     setDomain(anchor, currentDomain);
     setSVG(anchor);
+    forceDownload(anchor);
     return anchor;
   });
 }
