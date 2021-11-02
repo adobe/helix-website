@@ -128,8 +128,17 @@ export default async function decorate(el) {
     formContainer.append(createTag('p', {}, button));
   }
 
+  let formPath = './generator';
+  const pars = formContainer.querySelectorAll(':scope p');
+  if (pars.length > 1) {
+    // first of multiple <p> expected to contain path to form
+    const p = pars[0];
+    formPath = p.textContent.split(':')[1]?.trim();
+    p.remove();
+  }
+
   const form = createTag('form');
-  const resp = await fetch('./generator.json');
+  const resp = await fetch(`${encodeURI(formPath)}.json`);
   if (resp.ok) {
     const json = await resp.json();
     json.data.forEach(({
