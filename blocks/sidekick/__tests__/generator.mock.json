@@ -1,0 +1,35 @@
+{
+  "total": 3,
+  "offset": 0,
+  "limit": 3,
+  "data": [
+    {
+      "label": "Repository URL",
+      "type": "text",
+      "required": "x",
+      "name": "giturl",
+      "placeholder": "https://github.com/..."
+    },
+    {
+      "label": "Project Name",
+      "type": "text",
+      "required": "",
+      "name": "project"
+    },
+    {
+      "label": "Shared Key",
+      "type": "password",
+      "required": "",
+      "name": "token"
+    },
+    {
+      "label": "Helix 3",
+      "type": "checkbox",
+      "required": "",
+      "name": "hlx3",
+      "placeholder": "",
+      "checked": "x"
+    }
+  ],
+  ":type": "sheet"
+}
