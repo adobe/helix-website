@@ -50,6 +50,11 @@ describe('Anchors', () => {
     const currentDomain = getCurrentDomain(location);
     expect(currentDomain).to.equal('http://localhost');
   });
+
+  it('crx link has download attribute', () => {
+    const crxAnchor = document.getElementById('crx');
+    expect(crxAnchor.download).to.equal('extension.crx');
+  });
 });
 
 describe('Block variations', () => {
