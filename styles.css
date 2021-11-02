@@ -196,6 +196,7 @@ strong a {
 
 .marquee > div:last-of-type > div:first-of-type > * {
     width: 100%;
+    text-align: center;
 }
 
 .marquee > div:last-of-type > div:first-of-type p:first-of-type {
@@ -230,6 +231,7 @@ strong a {
 
 .marquee > div:last-of-type > div:last-of-type {
     text-align: right;
+    margin-top: var(--spacing-l);
 }
 
 .marquee > div:last-of-type div {
@@ -250,6 +252,10 @@ strong a {
         align-items: stretch;
     }
 
+    .marquee > div:last-of-type > div:first-of-type > * {
+      text-align: left;
+    }
+  
     .marquee > div:last-of-type > div:first-of-type,
     .marquee > div:last-of-type > div:last-of-type {
         flex: 0 1 auto;
@@ -261,8 +267,9 @@ strong a {
 
     .marquee > div:last-of-type > div:last-of-type {
         width: 50%;
+        margin-top: 0;
     }
-}
+  }
 
 @media screen and (min-width: 1440px) {
     .marquee > div:last-of-type {

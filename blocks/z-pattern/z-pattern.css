@@ -18,6 +18,7 @@
 
 .z-pattern > div[class^="z-row"] {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap:  var(--spacing-m);
@@ -25,21 +26,31 @@
 }
 
 .z-pattern > div[class^="z-row"] > div {
-    flex: 0 0 40%;
+  max-width: 83.4%;
+  text-align: center;
 }
 
-.z-pattern > div[class^="z-row"] > div {
-    max-width: 500px;
-}
-
-.z-pattern > div[class^="z-row"] > div:first-of-type {
-    margin-right: var(--spacing-m);
-}
-
-.z-pattern > div.z-row-odd > div:first-child {
-    order: 2;
+.z-pattern > div[class^="z-row"] > div img {
+  margin: 0 auto;
 }
 
 .z-pattern-cta {
     text-align: center;
+}
+
+@media (min-width: 900px) {
+  .z-pattern > div[class^="z-row"] {
+    flex-direction: row;
+  }
+  .z-pattern > div[class^="z-row"] > div:first-of-type {
+    margin-right: var(--spacing-m);
+  }
+  .z-pattern > div[class^="z-row"] > div {
+    flex: 0 0 40%;
+    text-align: left;
+    max-width: 500px;
+  }
+  .z-pattern > div.z-row-odd > div:first-child {
+    order: 2;
+  }
 }
