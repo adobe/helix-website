@@ -4,7 +4,7 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import { spy } from 'sinon';
-import decorate from '../generator.js';
+import decorate from '../../../blocks/sidekick/generator.js';
 
 const mock = await readFile({ path: './generator.mock.html' });
 

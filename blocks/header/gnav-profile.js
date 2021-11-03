@@ -1,4 +1,4 @@
-import { createEl, getHelixEnv } from '../../scripts.js';
+import { createEl, getHelixEnv } from '../../scripts/scripts.js';
 
 function decorateEmail(email) {
   const MAX_CHAR = 12;

@@ -1,4 +1,4 @@
-import { loadScript } from '../../scripts.js';
+import { loadScript } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
 
 export default async function init(el) {
