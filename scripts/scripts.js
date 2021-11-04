@@ -197,6 +197,7 @@ async function initJs(element, block) {
   if (block.module) {
     block.module.default(element);
   }
+  return element;
 }
 
 /**
@@ -204,21 +205,23 @@ async function initJs(element, block) {
  * @param {HTMLElement} element
  */
 export async function loadElement(element, blockConf) {
-  if (blockConf) {
+  return new Promise((resolve) => {
+    function blockLoaded() {
+      blockConf.loaded = true;
+      element.classList.add('is-Loaded');
+      resolve(element);
+    }
     if (blockConf.scripts) {
-      await initJs(element, blockConf);
+      initJs(element, blockConf);
     }
     if (blockConf.styles) {
       loadStyle(`${blockConf.location}${blockConf.styles}`, () => {
-        blockConf.loaded = true;
-        element.classList.add('is-Loaded');
+        blockLoaded();
       });
     } else {
-      blockConf.loaded = true;
-      element.classList.add('is-Loaded');
+      blockLoaded();
     }
-  }
-  return element;
+  });
 }
 
 export async function loadBlocks(blocks, cfg) {

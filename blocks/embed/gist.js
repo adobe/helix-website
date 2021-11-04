@@ -1,4 +1,4 @@
-import { loadStyle } from '../../scripts.js';
+import { loadStyle } from '../../scripts/scripts.js';
 
 const jsonpGist = (url, callback) => {
   // Setup a unique name that cane be called & destroyed

@@ -4,7 +4,7 @@
   "description": "",
   "main": "scripts.js",
   "scripts": {
-    "test": "wtr \"./**/__tests__/*.test.js\" --node-resolve --port=2000 --coverage",
+    "test": "wtr \"./tests/**/*.test.js\" --node-resolve --port=2000 --coverage",
     "test:watch": "npm test -- --watch",
     "lint": "eslint ."
   },
