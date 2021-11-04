@@ -196,7 +196,6 @@ strong a {
 
 .marquee > div:last-of-type > div:first-of-type > * {
     width: 100%;
-    text-align: center;
 }
 
 .marquee > div:last-of-type > div:first-of-type p:first-of-type {
@@ -252,10 +251,6 @@ strong a {
         align-items: stretch;
     }
 
-    .marquee > div:last-of-type > div:first-of-type > * {
-      text-align: left;
-    }
-  
     .marquee > div:last-of-type > div:first-of-type,
     .marquee > div:last-of-type > div:last-of-type {
         flex: 0 1 auto;
