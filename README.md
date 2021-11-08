@@ -15,10 +15,14 @@ Run it in this repo:
     hlx up
     
 ## Testing
-Install dependencies:
+### Install dependencies:
 
     npm install
-
-Run tests:
+### Run tests:
 
     npm test
+### Watch tests:
+
+    npm test:watch
+    
+This will run through all your tests, but then only run against any changed tests.

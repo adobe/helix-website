@@ -1,6 +1,6 @@
 import {
   loadScript, getMetadata, cleanVariations, decorateAnchors,
-} from '../../scripts.js';
+} from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
 

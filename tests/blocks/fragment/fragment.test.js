@@ -3,7 +3,7 @@
 
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
-import setFragment from '../fragment.js';
+import setFragment from '../../../blocks/fragment/fragment.js';
 
 const mock = await readFile({ path: './fragment.mock.html' });
 document.body.innerHTML = mock;

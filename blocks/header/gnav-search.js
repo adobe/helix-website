@@ -1,4 +1,4 @@
-import { fetchBlogArticleIndex, createOptimizedPicture } from '../../scripts.js';
+import { fetchBlogArticleIndex, createOptimizedPicture } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
 
 function decorateCard(hit) {

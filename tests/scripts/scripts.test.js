@@ -14,8 +14,8 @@ import {
   loadStyle,
   loadTemplate,
   setLCPTrigger,
-} from '../scripts.js';
-import getObjectProperty from '../utils/property.js';
+} from '../../scripts/scripts.js';
+import getObjectProperty from '../../utils/property.js';
 
 const ms = 100;
 
@@ -67,7 +67,7 @@ describe('Block variations', () => {
 
 describe('Script loading', async () => {
   function callback() { window.scriptCallback = true; }
-  const script = await loadScript('/__tests__/block.mock.js', callback, 'module');
+  const script = await loadScript('/tests/scripts/block.mock.js', callback, 'module');
   it('script element exists', () => {
     expect(script).to.exist;
   });
@@ -86,7 +86,7 @@ describe('Script loading', async () => {
 describe('Style loading', async () => {
   function callback() { window.styleCallback = true; }
   function callbackTwo() { window.styleCallbackTwo = true; }
-  const style = await loadStyle('/__tests__/block.mock.css', callback);
+  const style = await loadStyle('/tests/scripts/block.mock.css', callback);
   it('style element exists', () => {
     expect(style).to.exist;
   });
@@ -97,7 +97,7 @@ describe('Style loading', async () => {
   });
 
   it('only one style', async () => {
-    const oneStyle = await loadStyle('/__tests__/block.mock.css', callbackTwo);
+    const oneStyle = await loadStyle('/tests/scripts/block.mock.css', callbackTwo);
     expect(oneStyle).to.exist;
     expect(window.styleCallbackTwo).to.be.true;
   });
@@ -134,6 +134,7 @@ describe('Template loading', async () => {
 
 describe('Block loading', async () => {
   const marquee = document.querySelector('.marquee');
+  const columns = document.querySelector('.columns');
 
   it('block has a block select', () => {
     const { blockSelect } = marquee.dataset;
@@ -146,9 +147,8 @@ describe('Block loading', async () => {
   });
 
   it('block is loaded with css', async () => {
-    config.blocks['.marquee'].styles = 'marquee.css';
-    await loadElement(marquee, config.blocks['.marquee']);
-    expect(marquee.classList.contains('is-Loaded')).to.be.true;
+    await loadElement(columns, config.blocks['.columns']);
+    expect(columns.classList.contains('is-Loaded')).to.be.true;
   });
 });
 
@@ -164,14 +164,14 @@ describe('Post LCP', () => {
   });
 
   it('LCP loads when there is a bad image', async () => {
-    img.src = '/__tests__/nope.mock.png';
+    img.src = '/tests/scripts/nope.mock.png';
     setLCPTrigger(img, blocks);
     const lcpError = await getObjectProperty('lcpError', ms);
     expect(lcpError).to.be.true;
   });
 
   it('LCP loads when there is a good image', async () => {
-    img.src = '/__tests__/block.mock.png';
+    img.src = '/tests/scripts/block.mock.png';
     const lcpLoad = await getObjectProperty('lcpLoad', ms);
     expect(lcpLoad).to.be.true;
   });

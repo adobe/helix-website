@@ -1,4 +1,4 @@
-import { decorateAnchors } from '../../scripts.js';
+import { decorateAnchors } from '../../scripts/scripts.js';
 
 async function fetchFragment(path) {
   const resp = await fetch(`${path}.plain.html`);

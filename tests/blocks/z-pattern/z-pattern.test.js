@@ -3,7 +3,7 @@
 
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
-import init from '../z-pattern.js';
+import init from '../../../blocks/z-pattern/z-pattern.js';
 
 const mock = await readFile({ path: './z-pattern.mock.html' });
 document.body.innerHTML = mock;
