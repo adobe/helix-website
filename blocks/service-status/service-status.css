@@ -3,3 +3,7 @@
     padding: var(--spacing-xl) 0;
     text-align: center;
 }
+
+.service-status statuspage-widget {
+  margin: var(--spacing-m) 0;
+}

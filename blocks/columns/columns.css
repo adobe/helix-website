@@ -1,7 +1,7 @@
 .columns.three.contained > div {
     max-width: 83.4%;
     margin: 0 auto;
-    padding: var(--spacing-xxl) 0;
+    padding: var(--spacing-xxl) var(--spacing-m);
     display: grid;
     grid-template-columns: 1fr;
     text-align: center;
