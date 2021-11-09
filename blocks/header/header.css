@@ -7,8 +7,8 @@ header .gnav {
   background: #FFF;
   width: 100%;
   height: 64px;
-  border-bottom: 1px solid #EAEAEA;
   display: flex;
+  border-bottom: 1px solid #EAEAEA;
 }
 
 .gnav {
@@ -85,7 +85,7 @@ button.gnav-toggle:after {
   margin: 0;
   padding: 0;
   list-style: none;
-  background: #FAFAFA;
+  background: #FFF;
 }
 
 .gnav.is-Open .gnav-mainnav {
@@ -96,17 +96,51 @@ button.gnav-toggle:after {
   font-size: 14px;
 }
 
+.gnav-navitem.has-Menu.is-Open:before {
+  background: #969796;
+  position: absolute;
+  width: 4px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  content: '';
+  z-index: 1;
+}
+
 .gnav-navitem a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 20px;
+  padding: 20px 12px;
   color: rgb(44, 44, 44);
   transition: background-color .1s ease;
 }
 
+.gnav-navitem.has-Menu.is-Open > a {
+  padding: 20px 24px;
+  font-weight: 700;
+  position: relative;
+  border-bottom: none;
+  background-color: #FAFAFA;
+}
+
+.gnav-navitem.has-Menu.is-Open > a:before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  display: block;
+  border-bottom: 1px solid #D1D1D1;
+}
+
 .gnav-navitem > a:hover {
   background-color: #FAFAFA;
+}
+
+.gnav-navitem > a {
+  border-bottom: solid 1px #f3f3f3;
 }
 
 .gnav-navitem.has-Menu > a:after {
@@ -137,6 +171,10 @@ button.gnav-toggle:after {
   background-color: #FAFAFA;
 }
 
+.gnav-navitem.has-Menu.is-Open {
+  position: relative;
+}
+
 .gnav-navitem.has-Menu.is-Open .gnav-navitem-menu {
   display: block;
 }
@@ -148,7 +186,7 @@ button.gnav-toggle:after {
 }
 
 .gnav-navitem-menu a {
-  padding: 12px 20px;
+  padding: 12px 36px;
   white-space: nowrap;
 }
 
@@ -158,8 +196,24 @@ button.gnav-toggle:after {
 }
 
 .gnav-promo {
-  grid-area: promo;
   width: 260px;
+  border: 1px solid #D8D8D8;
+  background: #FFF;
+  margin: 12px 0px 0px 36px;
+}
+
+.gnav-promo p:nth-child(2) {
+  font-weight: 700;
+  margin: 24px 24px 12px 24px;
+}
+
+.gnav-promo p:nth-child(3) {
+  margin: 0px 24px 12px 24px;
+}
+
+.gnav-promo p:first-of-type,
+.gnav-promo p:last-of-type {
+  margin: 0;
 }
 
 .gnav-promo picture,
@@ -169,6 +223,12 @@ button.gnav-toggle:after {
 
 .gnav-promo img {
   width: 100%;
+}
+
+.gnav-promo a {
+  color: #1473E6;
+  font-weight: 700;
+  padding: 24px;
 }
 
 .gnav-search {
@@ -234,7 +294,7 @@ button.gnav-toggle:after {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-gap: 20px;
-  padding: 0 20px;
+  padding: 0 12px;
   box-sizing: border-box;
 }
 
@@ -243,7 +303,7 @@ button.gnav-toggle:after {
   height: 20px;
   position: absolute;
   top: 6px;
-  left: 26px;
+  left: 18px;
   fill: rgb(110, 110, 110);
   transition: fill 130ms ease-in-out;
 }
@@ -318,6 +378,7 @@ button.gnav-toggle:after {
 }
 
 .gnav-search-highlight {
+  background-color: transparent;
   position: relative;
   z-index: 1;
 }
@@ -369,13 +430,14 @@ button.gnav-toggle:after {
 
 .gnav-profile .gnav-profile-menu {
   display: none;
-  position: absolute;
+  position: fixed;
   right: 0;
-  top: 100%;
+  top: 64px;
   min-width: 320px;
   background: #FFF;
   border: 1px solid #E1E1E1;
   border-radius: 0 0 4px 4px;
+  overflow: hidden;
 }
 
 .gnav-profile.is-Open .gnav-profile-menu {
@@ -440,7 +502,7 @@ button.gnav-toggle:after {
   color: #4b4b4b;
 }
 
-.gnav-profile-actions a:hover {
+.gnav-profile-menu a:hover {
   background-color: #FAFAFA;
 }
 
@@ -484,13 +546,49 @@ button.gnav-toggle:after {
     position: relative;
   }
 
+  .gnav-navitem.has-Menu.is-Open:before {
+    all: unset;
+  }
+
+  .gnav-navitem.has-Menu > a {
+    border-bottom: unset;
+  }
+
+  .gnav-navitem.has-Menu.is-Open > a {
+    font-weight: unset;
+    padding: 20px;
+  }
+  
+
+  .gnav-navitem.has-Menu.is-Open > a:before {
+    all: unset;
+  }
+
   .gnav-navitem a {
     justify-content: unset;
     line-height: unset;
+    padding: 20px;
+    border-bottom: unset;
+  }
+
+  .gnav-navitem-menu.medium-Variant {
+    padding: 30px 40px 40px 20px;
+  }
+
+  .gnav-navitem-menu > * {
+    grid-row: 1;
   }
 
   .gnav-navitem-menu a {
     padding: 6px 20px;
+  }
+
+  .gnav-promo {
+    margin: 10px 0px 0px 36px;
+  }
+
+  .gnav-promo a {
+    padding: 24px;
   }
 
   .gnav-navitem.has-Menu.is-Open .gnav-navitem-menu {
@@ -528,7 +626,12 @@ button.gnav-toggle:after {
 
   .gnav-search-results .article-card:first-of-type {
     margin-top: unset;
-}
+  }
+
+  .gnav-profile .gnav-profile-menu {
+    position: absolute;
+    top: 100%;
+  }
 }
 
 @media (min-width: 1440px) {

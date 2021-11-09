@@ -84,7 +84,6 @@ body.docs-template ol {
 }
 
 header {
-    transform: translate3d(0,0,0);
     display: flex;
     position: fixed;
     top: 0;
