@@ -6,7 +6,7 @@ import { expect } from '@esm-bundle/chai';
 import {
   config,
   decorateAnchors,
-  decorateBlocks,
+  setupBlocks,
   getCurrentDomain,
   loadBlocks,
   loadElement,
@@ -21,6 +21,9 @@ const ms = 100;
 
 const mock = await readFile({ path: './scripts.mock.html' });
 document.body.innerHTML = mock;
+
+const variations = document.querySelector('.variations');
+const variationBlocks = setupBlocks(variations, config);
 
 describe('Anchors', () => {
   const parent = document.querySelector('.anchors');
@@ -57,11 +60,38 @@ describe('Anchors', () => {
   });
 });
 
+describe('Post LCP', () => {
+  const img = document.createElement('img');
+  document.body.append(img);
+
+  it('LCP loads when there is no selector', () => {
+    setLCPTrigger(null, []);
+    expect(window.lcp.none).to.be.true;
+  });
+
+  it('LCP loads when there is no image src', () => {
+    setLCPTrigger(img, []);
+    expect(window.lcp.complete).to.be.true;
+  });
+
+  it('LCP loads when there is a bad image', async () => {
+    img.src = '/tests/scripts/nope.mock.png';
+    setLCPTrigger(img, []);
+    const error = await getObjectProperty('lcp.error', ms);
+    expect(error).to.be.true;
+  });
+
+  it('LCP loads when there is a good image', async () => {
+    img.src = '/tests/scripts/block.mock.png';
+    setLCPTrigger(img, []);
+    const load = await getObjectProperty('lcp.load', ms);
+    expect(load).to.be.true;
+  });
+});
+
 describe('Block variations', () => {
-  const parent = document.querySelector('.variations');
-  const blocks = decorateBlocks(parent);
   it('url maps to localhost', () => {
-    expect(blocks[0].classList.contains('marquee')).to.be.true;
+    expect(variationBlocks[0].classList.contains('columns')).to.be.true;
   });
 });
 
@@ -103,31 +133,18 @@ describe('Style loading', async () => {
   });
 });
 
-describe('Template loading', async () => {
-  const meta = document.createElement('meta');
-  meta.setAttribute('name', 'template');
-  meta.setAttribute('content', 'product');
-  document.head.append(meta);
-
+describe('Template loading', () => {
   it('template doesnt exist', () => {
-    const noTemplate = loadTemplate({});
+    const noTemplate = loadTemplate();
     expect(noTemplate).to.not.exist;
   });
 
-  it('template conf doesnt exist', () => {
-    const template = loadTemplate(config);
-    expect(template).to.not.exist;
-  });
-
-  it('template conf exists', () => {
-    meta.setAttribute('content', 'docs');
-    loadTemplate(config);
-    expect(document.body.classList.contains('has-Template')).to.be.true;
-  });
-
   it('template has name', () => {
+    const meta = document.createElement('meta');
+    meta.setAttribute('name', 'template');
     meta.setAttribute('content', 'docs');
-    loadTemplate(config);
+    document.head.append(meta);
+    loadTemplate();
     expect(document.body.classList.contains('docs-template')).to.be.true;
   });
 });
@@ -137,43 +154,24 @@ describe('Block loading', async () => {
   const columns = document.querySelector('.columns');
 
   it('block has a block select', () => {
-    const { blockSelect } = marquee.dataset;
+    const { blockSelect } = columns.dataset;
     expect(blockSelect).to.exist;
   });
 
   it('block is loaded with only js', async () => {
+    config.blocks['.marquee'] = {};
     await loadElement(marquee, config.blocks['.marquee']);
-    expect(marquee.classList.contains('is-Loaded')).to.be.true;
+    expect(marquee.dataset.blockLoaded).to.exist;
   });
 
   it('block is loaded with css', async () => {
     await loadElement(columns, config.blocks['.columns']);
-    expect(columns.classList.contains('is-Loaded')).to.be.true;
-  });
-});
-
-describe('Post LCP', () => {
-  const img = document.createElement('img');
-  document.body.append(img);
-  const blocks = decorateBlocks(document);
-
-  it('LCP loads when there is no image', () => {
-    const lcp = document.querySelector('img');
-    setLCPTrigger(lcp, blocks);
-    expect(window.lcpComplete).to.be.true;
+    expect(columns.dataset.blockLoaded).to.exist;
   });
 
-  it('LCP loads when there is a bad image', async () => {
-    img.src = '/tests/scripts/nope.mock.png';
-    setLCPTrigger(img, blocks);
-    const lcpError = await getObjectProperty('lcpError', ms);
-    expect(lcpError).to.be.true;
-  });
-
-  it('LCP loads when there is a good image', async () => {
-    img.src = '/tests/scripts/block.mock.png';
-    const lcpLoad = await getObjectProperty('lcpLoad', ms);
-    expect(lcpLoad).to.be.true;
+  it('a block is attempted to load a second time', async () => {
+    await loadElement(columns, config.blocks['.columns']);
+    expect(columns.dataset.blockLoaded).to.exist;
   });
 });
 
@@ -193,10 +191,19 @@ const getLazyElement = (selector, timeout) => new Promise((resolve) => {
   }, interval);
 });
 
+describe('non lazy block loading', async () => {
+  it('feature list is loaded', async () => {
+    const wrapper = document.querySelector('.get-started-wrapper');
+    const blocks = setupBlocks(wrapper, config);
+    const loadedBlocks = await loadBlocks(blocks, config);
+    expect(loadedBlocks[0]).to.exist;
+  });
+});
+
 describe('Lazy loading', async () => {
   it('youtube is loaded', async () => {
-    const blocks = decorateBlocks(document);
-    config.lazyMargin = '2000px 0px';
+    const wrapper = document.querySelector('.youtube-wrapper');
+    const blocks = setupBlocks(wrapper, config);
     await loadBlocks(blocks, config);
     const iframe = await getLazyElement('iframe', ms);
     expect(iframe).to.exist;

@@ -7,7 +7,6 @@ export const config = {
       scripts: 'header.js',
       styles: 'header.css',
     },
-    '.marquee': {},
     '.columns': {
       location: '/blocks/columns/',
       styles: 'columns.css',
@@ -51,13 +50,6 @@ export const config = {
       location: '/blocks/embed/',
       styles: 'gist.css',
       scripts: 'gist.js',
-    },
-  },
-  templates: {
-    docs: {
-      location: '/templates/docs/',
-      styles: 'docs.css',
-      class: 'docs-template',
     },
   },
 };
@@ -158,27 +150,18 @@ export function cleanVariations(parent) {
   });
 }
 
-export function loadTemplate(cfg) {
-  if (!cfg.templates) return;
+export function loadTemplate() {
   const template = getMetadata('template');
   if (!template) return;
-  const templateConf = cfg.templates[template];
-  if (!templateConf) return;
-  document.body.classList.add('has-Template');
-  if (templateConf.class) {
-    document.body.classList.add(templateConf.class);
-  }
-  if (templateConf.styles) {
-    loadStyle(`${templateConf.location}${templateConf.styles}`);
-  }
+  document.body.classList.add(`${template}-template`);
 }
 
-export function decorateBlocks(element) {
+export function setupBlocks(element, cfg) {
   const isDoc = element instanceof Document;
   const parent = isDoc ? document.body : element;
   cleanVariations(parent);
-
-  const bls = Object.keys(config.blocks).reduce((decoratedBlocks, block) => {
+  // Return the elements that match each block config
+  return Object.keys(cfg.blocks).reduce((decoratedBlocks, block) => {
     const elements = parent.querySelectorAll(block);
     elements.forEach((el) => {
       el.setAttribute('data-block-select', block);
@@ -186,7 +169,6 @@ export function decorateBlocks(element) {
     });
     return decoratedBlocks;
   }, []);
-  return bls;
 }
 
 async function initJs(element, block) {
@@ -204,27 +186,31 @@ async function initJs(element, block) {
  * Load each element
  * @param {HTMLElement} element
  */
-export async function loadElement(element, blockConf) {
+export async function loadElement(el, blockConf) {
   return new Promise((resolve) => {
     function blockLoaded() {
       blockConf.loaded = true;
-      element.classList.add('is-Loaded');
-      resolve(element);
+      el.dataset.blockLoaded = true;
+      resolve(el);
     }
-    if (blockConf.scripts) {
-      initJs(element, blockConf);
-    }
-    if (blockConf.styles) {
-      loadStyle(`${blockConf.location}${blockConf.styles}`, () => {
-        blockLoaded();
-      });
+    if (el.dataset.blockLoaded) {
+      resolve(el);
     } else {
-      blockLoaded();
+      if (blockConf.scripts) {
+        initJs(el, blockConf);
+      }
+      if (blockConf.styles) {
+        loadStyle(`${blockConf.location}${blockConf.styles}`, () => {
+          blockLoaded();
+        });
+      } else {
+        blockLoaded();
+      }
     }
   });
 }
 
-export async function loadBlocks(blocks, cfg) {
+export async function loadBlocks(blocks) {
   /**
      * Iterate through all entries to determine if they are intersecting.
      * @param {IntersectionObserverEntry} entries
@@ -234,18 +220,18 @@ export async function loadBlocks(blocks, cfg) {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const { blockSelect } = entry.target.dataset;
-        const blockConf = cfg.blocks[blockSelect];
+        const blockConf = config.blocks[blockSelect];
         observer.unobserve(entry.target);
         loadElement(entry.target, blockConf);
       }
     });
   };
 
-  const options = { rootMargin: cfg.lazyMargin || '1200px 0px' };
+  const options = { rootMargin: config.lazyMargin || '1200px 0px' };
   const observer = new IntersectionObserver(onIntersection, options);
   return Promise.all(blocks.map(async (block) => {
     const { blockSelect } = block.dataset;
-    const blockConf = cfg.blocks[blockSelect];
+    const blockConf = config.blocks[blockSelect];
     if (blockConf?.lazy) {
       observer.observe(block);
     } else {
@@ -255,23 +241,24 @@ export async function loadBlocks(blocks, cfg) {
   }));
 }
 
-function postLCP(type, blocks) {
-  window[type] = true;
-  loadBlocks(blocks, config);
+function postLCP(blocks, message) {
+  loadBlocks(blocks);
   loadStyle('/fonts/fonts.css');
+  window.lcp = window.lcp || {};
+  window.lcp[message] = true;
 }
 
 export function setLCPTrigger(lcp, blocks) {
   if (lcp) {
-    if (lcp.complete) { postLCP('lcpComplete', blocks); return; }
-    lcp.addEventListener('load', () => { postLCP('lcpLoad', blocks); });
-    lcp.addEventListener('error', () => { postLCP('lcpError', blocks); });
+    if (lcp.complete) { postLCP(blocks, 'complete'); return; }
+    lcp.addEventListener('load', () => { postLCP(blocks, 'load'); });
+    lcp.addEventListener('error', () => { postLCP(blocks, 'error'); });
     return;
   }
-  postLCP('noLcp', blocks);
+  postLCP(blocks, 'none');
 }
-loadTemplate(config);
+loadTemplate();
 decorateAnchors(document);
-const blocks = decorateBlocks(document);
-const lcp = document.querySelector('.marquee img');
+const blocks = setupBlocks(document, config);
+const lcp = document.querySelector(config.lcp);
 setLCPTrigger(lcp, blocks);
