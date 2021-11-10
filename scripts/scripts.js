@@ -15,6 +15,11 @@ export const config = {
       location: '/blocks/feature-list/',
       styles: 'feature-list.css',
     },
+    '.accordion': {
+      location: '/blocks/accordion/',
+      scripts: 'accordion.js',
+      styles: 'accordion.css',
+    },
     '.get-started': {
       location: '/blocks/get-started/',
       styles: 'get-started.css',
