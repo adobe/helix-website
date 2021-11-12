@@ -1,0 +1,63 @@
+/*
+ * Copyright 2020 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+
+.hlx-sk.hlx-sk-empty::before {
+  content: "Aucune action disponible pour cette page";
+}
+
+.hlx-sk.hlx-sk-loading::before {
+  content: 'Chargement...';
+}
+
+.hlx-sk > .share::before {
+  content: "Partager le Sidekick";
+}
+
+.hlx-sk .close::before {
+  content: "Fermer";
+}
+
+.hlx-sk-overlay div.modal.wait:empty::before {
+  content: "Veuillez patienter..."
+}
+
+.hlx-sk .edit button::before {
+  content: "Edition";
+}
+
+.hlx-sk .preview button::before {
+  content: "Aperçu";
+}
+
+.hlx-sk .live button::before {
+  content: "Live";
+}
+
+.hlx-sk .prod button::before {
+  content: "Production";
+}
+
+.hlx-sk .reload button::before {
+  content: "Actualiser";
+}
+
+.hlx-sk .delete button::before {
+  content: "Effacer";
+}
+
+.hlx-sk .publish button::before {
+  content: "Publier";
+}
+
+.hlx-sk .unpublish button::before {
+  content: "Dépublier";
+}
