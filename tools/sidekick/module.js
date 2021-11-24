@@ -960,18 +960,44 @@
         this.status.apiUrl = apiUrl.toString();
       }
       fetch(this.status.apiUrl, { cache: 'no-store' })
-        .then((resp) => resp.json())
+        .then((resp) => {
+          // check for error status
+          if (!resp.ok) {
+            let msg = '';
+            switch (resp.status) {
+              case 401:
+                msg = 'You are not authorized to access this page. Check your login or network status.';
+                break;
+              case 404:
+                msg = this.isEditor()
+                  ? 'Page not found. Check your Sidekick configuration and make sure Helix has access to this document.'
+                  : 'Page not found. Check your Sidekick configuration or URL.';
+                break;
+              default:
+                msg = 'Failed to fetch the page status. Please try again later.';
+            }
+            throw new Error(`${resp.status}: ${msg}`);
+          }
+          return resp;
+        })
+        .then(async (resp) => {
+          try {
+            return resp.json();
+          } catch (e) {
+            throw new Error('Invalid server response. Check your Sidekick configuration or URL.');
+          }
+        })
         .then((json) => Object.assign(this.status, json))
         .then((json) => fireEvent(this, 'statusfetched', json))
         .catch((e) => {
           this.status.error = e.message;
-          this.showModal('Failed to fetch status. Please try again later', false, 0, () => {
+          this.showModal(e.message, true, 0, () => {
             // this error is fatal, hide and delete sidekick
             window.hlx.sidekick.hide();
             window.hlx.sidekick.replaceWith(''); // remove() doesn't work for custom element
             delete window.hlx.sidekick;
           });
-          console.error('failed to fetch status', e);
+          console.error('failed to fetch status', e.message);
         });
       return this;
     }
