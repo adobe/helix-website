@@ -26,7 +26,7 @@
     return window.hlx.initSidekick();
   }
 
-  if (!window.customElements.get('helix-sidekick')) {
+  if (!window.hlx || !window.hlx.sidekick) {
     window.hlx = window.hlx || {};
     const appScript = document.getElementById('hlx-sk-app');
     // load sidekick module

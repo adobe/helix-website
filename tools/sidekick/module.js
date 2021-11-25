@@ -993,9 +993,11 @@
           this.status.error = e.message;
           this.showModal(e.message, true, 0, () => {
             // this error is fatal, hide and delete sidekick
-            window.hlx.sidekick.hide();
-            window.hlx.sidekick.replaceWith(''); // remove() doesn't work for custom element
-            delete window.hlx.sidekick;
+            if (window.hlx.sidekick) {
+              window.hlx.sidekick.hide();
+              window.hlx.sidekick.replaceWith(''); // remove() doesn't work for custom element
+              delete window.hlx.sidekick;
+            }
           });
           console.error('failed to fetch status', e.message);
         });
@@ -1056,7 +1058,9 @@
       if (!this.root.classList.contains('hlx-sk-hidden')) {
         this.root.classList.add('hlx-sk-hidden');
       }
-      this.hideModal();
+      if (this._modal && !this._modal.parentNode.classList.contains('hlx-sk-hidden')) {
+        this.hideModal();
+      }
       if (this.config.pushDown
         && this.hasAttribute('pushdown')
         && this.location.host !== 'docs.google.com') {
@@ -1284,6 +1288,7 @@
      */
     // eslint-disable-next-line default-param-last
     showModal(msg, sticky = false, level = 2, callback) {
+      this._modalCallback = callback;
       if (!this._modal) {
         const $spinnerWrap = appendTag(this.shadowRoot, {
           tag: 'div',
@@ -1314,9 +1319,6 @@
         const sk = this;
         window.setTimeout(() => {
           sk.hideModal();
-          if (callback && typeof callback === 'function') {
-            callback(sk);
-          }
         }, 3000);
       } else {
         this._modal.classList.add('wait');
@@ -1336,6 +1338,10 @@
         this._modal.className = '';
         this._modal.parentNode.classList.add('hlx-sk-hidden');
         fireEvent(this, 'modalhidden');
+      }
+      if (typeof this._modalCallback === 'function') {
+        this._modalCallback(this);
+        delete this._modalCallback;
       }
       return this;
     }
