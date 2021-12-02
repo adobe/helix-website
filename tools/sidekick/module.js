@@ -529,7 +529,7 @@
    */
   function getAdminUrl({ owner, repo, ref }, api, path) {
     return new URL([
-      'https://admin.hlx3.page/',
+      'https://admin.hlx.page/',
       api,
       `/${owner}`,
       `/${repo}`,
@@ -1407,7 +1407,10 @@
         window.setTimeout(() => this.switchEnv(targetEnv, open), 1000);
         return this;
       }
-      const envUrl = `https://${config[hostType]}${status.webPath}${search}${hash}`;
+      let envUrl = `https://${config[hostType]}${status.webPath}`;
+      if (!this.isEditor()) {
+        envUrl += `${search}${hash}`;
+      }
       if (config.hlx3 && targetEnv === 'preview' && this.isEditor()) {
         await this.update();
       }
