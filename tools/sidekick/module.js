@@ -510,11 +510,9 @@
     console.log(editLastMod, previewLastMod, liveLastMod);
     if (editLastMod && previewLastMod && new Date(editLastMod) > new Date(previewLastMod)) {
       sidekick.get('reload').classList.add('update');
-      sidekick.get('reload').firstElementChild.textContent = '*';
     }
     if (liveLastMod && previewLastMod && new Date(liveLastMod) < new Date(previewLastMod)) {
       sidekick.get('publish').classList.add('update');
-      sidekick.get('publish').firstElementChild.textContent = '*';
     }
   }
 
