@@ -501,12 +501,21 @@
    * @private
    * @param {Sidekick} sidekick The sidekick
    */
-  async function checkLastModified({ detail = {} }) {
-    const { data: status = {} } = detail;
-    const pLastMod = (status.preview && status.preview.lastModified) || null;
-    const sLastMod = (status.source && status.source.lastModified) || null;
-    console.log('preview up to date?', new Date(pLastMod) > new Date(sLastMod));
-    // TODO: do something with it
+  async function checkLastModified(sidekick) {
+    const { status } = sidekick;
+    console.log(status);
+    const editLastMod = (status.edit && status.edit.lastModified) || null;
+    const previewLastMod = (status.preview && status.preview.lastModified) || null;
+    const liveLastMod = (status.live && status.live.lastModified) || null;
+    console.log(editLastMod, previewLastMod, liveLastMod);
+    if (editLastMod && previewLastMod && new Date(editLastMod) > new Date(previewLastMod)) {
+      sidekick.get('reload').classList.add('update');
+      sidekick.get('reload').firstElementChild.textContent = '*';
+    }
+    if (liveLastMod && previewLastMod && new Date(liveLastMod) < new Date(previewLastMod)) {
+      sidekick.get('publish').classList.add('update');
+      sidekick.get('publish').firstElementChild.textContent = '*';
+    }
   }
 
   /**
@@ -678,7 +687,8 @@
     sk.add({
       id: 'delete',
       condition: (sidekick) => sidekick.isHelix()
-        && (!sidekick.status.edit || !sidekick.status.edit.url), // show if no edit url
+        && (!sidekick.status.edit || !sidekick.status.edit.url) // show if no edit url
+        && (sidekick.status.preview && sidekick.status.preview.status !== 404), // preview exists
       button: {
         action: async () => {
           const { location, status } = sk;
@@ -692,9 +702,7 @@
           // have user confirm deletion
           if (window.confirm(`${sk.isContent()
             ? 'This page no longer has a source document'
-            : 'This file no longer exists in the repository'}
-            , deleting it cannot be undone!\n\n
-            Are you sure you want to delete it?`)) {
+            : 'This file no longer exists in the repository'}, deleting it cannot be undone!\n\nAre you sure you want to delete it?`)) {
             try {
               const resp = await sk.delete();
               if (!resp.ok && resp.status >= 400) {
@@ -1041,6 +1049,10 @@
             newMarginTop += currentMarginTop;
           }
           elem.style.marginTop = `${newMarginTop}px`;
+          if (elem.id === 'WebApplicationFrame') {
+            // adjust height of office online frame
+            elem.style.height = `calc(100% - ${newMarginTop}px)`;
+          }
         });
       }
       fireEvent(this, 'shown');
@@ -1066,6 +1078,10 @@
         this.removeAttribute('pushdown');
         this.config.pushDownElements.forEach((elem) => {
           elem.style.marginTop = 'initial';
+          if (elem.id === 'WebApplicationFrame') {
+            // adjust height of office online frame
+            elem.style.height = '';
+          }
         });
       }
       fireEvent(this, 'hidden');
