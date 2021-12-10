@@ -169,6 +169,10 @@
   background-color: var(--hlx-sk-button-disabled-hover-bg);
 }
 
+.hlx-sk .update button::after {
+  content: "*";
+}
+
 .hlx-sk .env {
   display: flex;
   flex-direction: row;
