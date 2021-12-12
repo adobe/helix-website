@@ -7,7 +7,6 @@ import {
   config,
   decorateAnchors,
   setupBlocks,
-  getCurrentDomain,
   loadBlocks,
   loadElement,
   loadScript,
@@ -46,12 +45,6 @@ describe('Anchors', () => {
     const svg = parent.querySelector(':scope > a > img');
     expect(svg).to.exist;
     expect(svgAnchor.href).to.equal('http://localhost:2000/my-awesome-link');
-  });
-
-  it('domain respects port', () => {
-    const location = { protocol: 'http:', hostname: 'localhost' };
-    const currentDomain = getCurrentDomain(location);
-    expect(currentDomain).to.equal('http://localhost');
   });
 
   it('crx link has download attribute', () => {

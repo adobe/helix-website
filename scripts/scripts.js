@@ -1,4 +1,5 @@
-const LIVE_DOMAIN = 'https://www.hlx.live';
+const LIVE_ORIGIN = 'https://www.hlx.live';
+const DEV_ORIGIN = 'http://localhost:3000';
 
 export const config = {
   blocks: {
@@ -59,17 +60,16 @@ export const config = {
   },
 };
 
-export function getCurrentDomain(location) {
-  const { protocol, hostname, port } = location || window.location;
-  const domain = `${protocol}//${hostname}`;
-  return port ? `${domain}:${port}` : domain;
-}
-
-export function setDomain(anchor, currentDomain) {
+export function makeRelative(anchor) {
   const { href, textContent } = anchor;
-  if (!href.includes(LIVE_DOMAIN)) return href;
-  anchor.href = href.replace(LIVE_DOMAIN, currentDomain);
-  anchor.textContent = textContent.replace(LIVE_DOMAIN, currentDomain);
+  const url = new URL(href);
+  if (url.origin !== LIVE_ORIGIN && url.origin !== DEV_ORIGIN) {
+    // external link
+    anchor.target = '_blank';
+    return href;
+  }
+  anchor.href = href.replace(LIVE_ORIGIN, '');
+  anchor.textContent = textContent.replace(LIVE_ORIGIN, '');
   return anchor.href;
 }
 
@@ -99,9 +99,8 @@ export function forceDownload(anchor) {
 
 export function decorateAnchors(element) {
   const anchors = element.getElementsByTagName('a');
-  const currentDomain = getCurrentDomain();
   return Array.from(anchors).map((anchor) => {
-    setDomain(anchor, currentDomain);
+    makeRelative(anchor);
     setSVG(anchor);
     forceDownload(anchor);
     return anchor;
