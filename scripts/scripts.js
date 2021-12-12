@@ -68,13 +68,14 @@ export function makeRelative(anchor) {
     anchor.target = '_blank';
     return href;
   }
-  anchor.href = href.replace(LIVE_ORIGIN, '');
+  anchor.setAttribute('href', href.replace(LIVE_ORIGIN, ''));
   anchor.textContent = textContent.replace(LIVE_ORIGIN, '');
   return anchor.href;
 }
 
 export function setSVG(anchor) {
-  const { href, textContent } = anchor;
+  const { textContent } = anchor;
+  const href = anchor.getAttribute('href');
   const ext = textContent.substr(textContent.lastIndexOf('.') + 1);
   if (ext !== 'svg') return;
   const img = document.createElement('img');

@@ -27,12 +27,13 @@ const variationBlocks = setupBlocks(variations, config);
 describe('Anchors', () => {
   const parent = document.querySelector('.anchors');
   const anchors = decorateAnchors(parent);
-  it('url maps to localhost', () => {
-    expect(anchors[0].href).to.equal('http://localhost:2000/my-content');
+  it('internal url is relative', () => {
+    expect(anchors[0].getAttribute('href')).to.equal('/my-content');
   });
 
-  it('url does not map to localhost', () => {
+  it('external url opens in new window', () => {
     expect(anchors[1].href).to.equal('https://www.adobe.com/');
+    expect(anchors[1].getAttribute('target')).to.equal('_blank');
   });
 
   it('svg image will unwrap anchor', () => {
