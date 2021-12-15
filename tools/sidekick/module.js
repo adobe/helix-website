@@ -507,11 +507,10 @@
     const editLastMod = (status.edit && status.edit.lastModified) || null;
     const previewLastMod = (status.preview && status.preview.lastModified) || null;
     const liveLastMod = (status.live && status.live.lastModified) || null;
-    console.log(editLastMod, previewLastMod, liveLastMod);
     if (editLastMod && previewLastMod && new Date(editLastMod) > new Date(previewLastMod)) {
       sidekick.get('reload').classList.add('update');
     }
-    if (liveLastMod && previewLastMod && new Date(liveLastMod) < new Date(previewLastMod)) {
+    if (!liveLastMod || (previewLastMod && new Date(liveLastMod) < new Date(previewLastMod))) {
       sidekick.get('publish').classList.add('update');
     }
   }
