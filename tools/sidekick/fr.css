@@ -30,6 +30,10 @@
   content: "Veuillez patienter..."
 }
 
+.hlx-sk .env button.toggle::before {
+  content: "Environnements";
+}
+
 .hlx-sk .edit button::before {
   content: "Edition";
 }

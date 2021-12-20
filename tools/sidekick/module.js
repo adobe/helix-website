@@ -854,10 +854,12 @@
           },
         });
       }
+      sk.pushDownContent();
       setTimeout(() => {
         if (sk.root.querySelectorAll(':scope > div > *').length === 0) {
           // add empty text
           sk.root.classList.replace('hlx-sk-loading', 'hlx-sk-empty');
+          sk.pushDownContent();
         }
       }, 5000);
     } else {
@@ -877,6 +879,47 @@
         }
       });
     }
+  }
+
+  /**
+   * Pushes down the page content to make room for the sidekick.
+   * @private
+   * @see {@link sidekickConfig.noPushDown}
+   * @param {Sidekick} sk The sidekick
+   */
+  function pushDownContent(sk) {
+    const sidekickHeight = parseFloat(window.getComputedStyle(sk.root).height, 10);
+    sk.setAttribute('pushdown', '');
+    sk.config.pushDownElements.forEach((elem) => {
+      // sidekick shown, push element down
+      const currentMarginTop = parseInt(elem.style.marginTop, 10);
+      let newMarginTop = sidekickHeight;
+      if (!Number.isNaN(currentMarginTop)) {
+        // add element's non-zero top value
+        newMarginTop += currentMarginTop;
+      }
+      elem.style.marginTop = `${newMarginTop}px`;
+      if (elem.id === 'WebApplicationFrame') {
+        // adjust height of office online frame
+        elem.style.height = `calc(100% - ${newMarginTop}px)`;
+      }
+    });
+  }
+
+  /**
+   * Reverts the pushing down of page content.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function revertPushDownContent(sk) {
+    sk.removeAttribute('pushdown');
+    sk.config.pushDownElements.forEach((elem) => {
+      elem.style.marginTop = 'initial';
+      if (elem.id === 'WebApplicationFrame') {
+        // adjust height of office online frame
+        elem.style.height = '';
+      }
+    });
   }
 
   /**
@@ -1024,6 +1067,20 @@
     }
 
     /**
+     * Calculates the height of the sidekick and pushes down the
+     * page content by that amount to make room for the sidekick.
+     * @returns {Sidekick} The sidekick
+     */
+    pushDownContent() {
+      const sk = this instanceof Sidekick ? this : window.hlx.sidekick;
+      if (sk.hasAttribute('pushdown')) {
+        revertPushDownContent(sk);
+        pushDownContent(sk);
+      }
+      return this;
+    }
+
+    /**
      * Shows the sidekick.
      * @fires Sidekick#shown
      * @returns {Sidekick} The sidekick
@@ -1035,22 +1092,8 @@
       if (this.config.pushDown
         && !this.hasAttribute('pushdown')
         && this.location.host !== 'docs.google.com') {
-        // push down content
-        this.setAttribute('pushdown', '');
-        this.config.pushDownElements.forEach((elem) => {
-          // sidekick shown, push element down
-          const currentMarginTop = parseInt(elem.style.marginTop, 10);
-          let newMarginTop = 49;
-          if (!Number.isNaN(currentMarginTop)) {
-            // add element's non-zero top value
-            newMarginTop += currentMarginTop;
-          }
-          elem.style.marginTop = `${newMarginTop}px`;
-          if (elem.id === 'WebApplicationFrame') {
-            // adjust height of office online frame
-            elem.style.height = `calc(100% - ${newMarginTop}px)`;
-          }
-        });
+        setTimeout(() => pushDownContent(this), 100);
+        window.addEventListener('resize', this.pushDownContent);
       }
       fireEvent(this, 'shown');
       return this;
@@ -1071,15 +1114,13 @@
       if (this.config.pushDown
         && this.hasAttribute('pushdown')
         && this.location.host !== 'docs.google.com') {
-        // revert push down of content
-        this.removeAttribute('pushdown');
-        this.config.pushDownElements.forEach((elem) => {
-          elem.style.marginTop = 'initial';
-          if (elem.id === 'WebApplicationFrame') {
-            // adjust height of office online frame
-            elem.style.height = '';
-          }
-        });
+        revertPushDownContent(this);
+        window.removeEventListener('resize', this.pushDownContent);
+      }
+      try {
+        this.root.querySelector(':scope .env').classList.remove('expanded');
+      } catch (e) {
+        // ignore
       }
       fireEvent(this, 'hidden');
       return this;
@@ -1119,6 +1160,18 @@
               tag: 'div',
               attrs: {
                 class: 'env',
+              },
+            });
+            appendTag($pluginContainer, {
+              tag: 'button',
+              attrs: {
+                class: 'toggle',
+              },
+              lstnrs: {
+                click: () => {
+                  $pluginContainer.classList.toggle('expanded');
+                  this.pushDownContent();
+                },
               },
             });
           }
