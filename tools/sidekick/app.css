@@ -13,7 +13,6 @@
 :host,
 :root {
   --hlx-sk-bg: #e0e0e0;
-  --hlx-sk-logo: url("helix.svg");
   --hlx-sk-color: #505050;
   --hlx-sk-border: none;
   --hlx-sk-border-radius: 10px;
@@ -68,7 +67,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   background-color: var(--hlx-sk-bg);
-  background-image: var(--hlx-sk-logo);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 216 216'><defs><style>.cls-1{fill:%23f15a3a;}.cls-2{fill:%23c71f3d;}.cls-3{fill:%23ffc40c;}</style></defs><circle class='cls-1' cx='22.5' cy='108' r='22.5'/><circle class='cls-1' cx='193.5' cy='108' r='22.5'/><circle class='cls-2' cx='63' cy='27' r='27'/><circle class='cls-3' cx='162' cy='27' r='18'/><circle class='cls-2' cx='162' cy='189' r='27'/><circle class='cls-3' cx='63' cy='189' r='18'/></svg>");
   background-repeat: no-repeat;
   background-position: 10px 14px;
   background-size: 22px;
@@ -179,21 +178,36 @@
   margin-right: 8px;
 }
 
-.hlx-sk .env button,
-.hlx-sk .env button.pressed {
+.hlx-sk .env button.toggle {
+  display: none;
+  max-height: 28px;
+  font-size: 0;
+  line-height: 0;
+  margin-right: 0;
+}
+
+.hlx-sk .env button.toggle::after {
+  content: "...";
+  font-size: var(--hlx-sk-button-font-size);
+  line-height: 1;
+}
+
+
+.hlx-sk .env > div > button,
+.hlx-sk .env > div > button.pressed {
   margin-right: 0;
   border-right-width: 0;
   border-radius: 0;
 }
 
-.hlx-sk .env > div:first-child button,
-.hlx-sk .env > div:first-child button.pressed {
+.hlx-sk .env > div:first-of-type button,
+.hlx-sk .env > div:first-of-type button.pressed {
   border-top-left-radius: var(--hlx-sk-button-border-radius);
   border-bottom-left-radius: var(--hlx-sk-button-border-radius);
 }
 
-.hlx-sk .env > div:last-child button,
-.hlx-sk .env > div:last-child button.pressed {
+.hlx-sk .env > div:last-of-type button,
+.hlx-sk .env > div:last-of-type button.pressed {
   border-top-right-radius: var(--hlx-sk-button-border-radius);
   border-bottom-right-radius: var(--hlx-sk-button-border-radius);
   border-right-width: 1px;
@@ -268,6 +282,35 @@
   }
 }
 
+@media(max-width:768px) {
+  .hlx-sk {
+    background-image: none;
+    padding-left: 10px;
+  }
+
+  .hlx-sk {
+    padding-right: 40px;
+  }
+
+  .hlx-sk > .share {
+    display: none;
+  }
+}
+
+@media(max-width:650px) {
+  .hlx-sk .env button.toggle {
+    display: inline-block;
+  }
+
+  .hlx-sk .env.expanded button.toggle {
+    display: none;
+  }
+
+  .hlx-sk .env:not(.expanded):not(:empty) > div {
+    display: none;
+  }
+}
+
 /* i18n */
 
 .hlx-sk.hlx-sk-empty::before {
@@ -288,6 +331,10 @@
 
 .hlx-sk-overlay div.modal.wait:empty::before {
   content: "Please wait..."
+}
+
+.hlx-sk .env button.toggle::before {
+  content: "Environments";
 }
 
 .hlx-sk .preview button::before {
