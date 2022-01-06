@@ -65,3 +65,11 @@
 .hlx-sk .unpublish button::before {
   content: "Depublizieren";
 }
+
+.hlx-sk-special-view .description::before {
+  content: "Benutzerfreundliche Datenanzeige."
+}
+
+.hlx-sk-special-view button.close::before {
+  content: "Ausschalten"
+}
