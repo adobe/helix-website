@@ -378,6 +378,7 @@
 
 .hlx-sk-special-view table td > div img {
   width: 100%;
+  max-width: 240px;
 }
 
 .hlx-sk-special-view table td > div ul {
