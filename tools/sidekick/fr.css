@@ -65,3 +65,11 @@
 .hlx-sk .unpublish button::before {
   content: "Dépublier";
 }
+
+.hlx-sk-special-view .description::before {
+  content: "Aperçu des données."
+}
+
+.hlx-sk-special-view button.close::before {
+  content: "Arrêter"
+}

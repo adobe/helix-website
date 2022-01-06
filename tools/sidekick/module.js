@@ -56,9 +56,23 @@
    */
 
   /**
+   * A callback function to render a view.
+   * @callback viewCallback
+   * @param {HTMLELement} viewContainer The view container
+   * @param {Object} data The data to display
+   */
+
+  /**
+   * @typedef {Object} viewConfig
+   * @description A custom view configuration.
+   * @prop {string|viewCallback} js The URL of a JS module or a function to render this view
+   * @prop {string} path The path or globbing pattern where to apply this view
+   * @prop {string} css The URL of a CSS file or inline CSS to render this view (optional)
+   */
+
+  /**
    * @typedef {Object} sidekickConfig
    * @description The sidekick configuration.
-   * before creating the {@link Sidekick}.
    * @prop {string} owner The GitHub owner or organization (mandatory)
    * @prop {string} repo The GitHub owner or organization (mandatory)
    * @prop {string} ref=main The Git reference or branch (optional)
@@ -71,6 +85,7 @@
    * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
    * @prop {boolean} pushDown=true <pre>false</pre> to have the sidekick overlay page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
+   * @prop {viewConfig[]} specialViews An array of custom view configurations (optional)
    */
 
   /**
@@ -209,12 +224,30 @@
   }
 
   /**
+   * Turns a globbing into a regular expression.
+   * @private
+   * @param {string} glob The globbing
+   * @returns The regular expression
+   */
+  function globToRegExp(glob) {
+    if (!glob) {
+      glob = '**';
+    }
+    const reString = glob
+      .replace(/\*\*/g, '_')
+      .replace(/\*/g, '[0-9a-z-.]*')
+      .replace(/_/g, '.*');
+    return new RegExp(`^${reString}$`);
+  }
+
+  /**
    * Returns the sidekick configuration.
    * @private
    * @param {sidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
+   * @param {Location} location The current location
    * @returns {Object} The sidekick configuration
    */
-  function initConfig(cfg) {
+  function initConfig(cfg, location) {
     const config = cfg || (window.hlx && window.hlx.sidekickConfig) || {};
     const {
       owner,
@@ -225,6 +258,7 @@
       project,
       pushDown = true,
       pushDownSelector,
+      specialViews,
       hlx3 = false,
     } = config;
     const innerPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
@@ -269,6 +303,21 @@
         `html, iframe#WebApplicationFrame${pushDownSelector ? `, ${pushDownSelector}` : ''}`,
       ).forEach((elem) => pushDownElements.push(elem));
     }
+    // default views
+    const defaultSpecialViews = [
+      {
+        path: '**.json',
+        js: './view/json.js',
+      },
+    ];
+    // try custom views first
+    const allSpecialViews = Array.isArray(specialViews)
+      ? specialViews.concat(defaultSpecialViews)
+      : defaultSpecialViews;
+    // find view based on path
+    const { pathname } = location;
+    const specialView = allSpecialViews.find(({ path }) => globToRegExp(path).test(pathname));
+
     return {
       ...config,
       ref,
@@ -279,6 +328,7 @@
       project: project || '',
       pushDown,
       pushDownElements,
+      specialView,
       hlx3,
     };
   }
@@ -341,7 +391,7 @@
       const ensureTitle = (tag) => {
         if (!tag.title) {
           // wait for computed style to be available
-          setTimeout(() => {
+          window.setTimeout(() => {
             let title = window.getComputedStyle(tag, ':before').getPropertyValue('content');
             title = title !== 'normal' && title !== 'none'
               ? title.substring(1, title.length - 1)
@@ -503,14 +553,15 @@
    */
   async function checkLastModified(sidekick) {
     const { status } = sidekick;
-    console.log(status);
     const editLastMod = (status.edit && status.edit.lastModified) || null;
     const previewLastMod = (status.preview && status.preview.lastModified) || null;
     const liveLastMod = (status.live && status.live.lastModified) || null;
-    if (editLastMod && previewLastMod && new Date(editLastMod) > new Date(previewLastMod)) {
+    if (sidekick.get('reload')
+      && editLastMod && previewLastMod && new Date(editLastMod) > new Date(previewLastMod)) {
       sidekick.get('reload').classList.add('update');
     }
-    if (!liveLastMod || (previewLastMod && new Date(liveLastMod) < new Date(previewLastMod))) {
+    if (sidekick.get('publish')
+      && (!liveLastMod || (previewLastMod && new Date(liveLastMod) < new Date(previewLastMod)))) {
       sidekick.get('publish').classList.add('update');
     }
   }
@@ -854,12 +905,12 @@
           },
         });
       }
-      sk.pushDownContent();
-      setTimeout(() => {
+      sk.checkPushDownContent();
+      window.setTimeout(() => {
         if (sk.root.querySelectorAll(':scope > div > *').length === 0) {
           // add empty text
           sk.root.classList.replace('hlx-sk-loading', 'hlx-sk-empty');
-          sk.pushDownContent();
+          sk.checkPushDownContent();
         }
       }, 5000);
     } else {
@@ -886,24 +937,35 @@
    * @private
    * @see {@link sidekickConfig.noPushDown}
    * @param {Sidekick} sk The sidekick
+   * @param {number} skHeight The current height of the sidekick (optional)
    */
-  function pushDownContent(sk) {
-    const sidekickHeight = parseFloat(window.getComputedStyle(sk.root).height, 10);
-    sk.setAttribute('pushdown', '');
-    sk.config.pushDownElements.forEach((elem) => {
-      // sidekick shown, push element down
-      const currentMarginTop = parseInt(elem.style.marginTop, 10);
-      let newMarginTop = sidekickHeight;
-      if (!Number.isNaN(currentMarginTop)) {
-        // add element's non-zero top value
-        newMarginTop += currentMarginTop;
-      }
-      elem.style.marginTop = `${newMarginTop}px`;
-      if (elem.id === 'WebApplicationFrame') {
-        // adjust height of office online frame
-        elem.style.height = `calc(100% - ${newMarginTop}px)`;
-      }
-    });
+  function pushDownContent(sk, skHeight) {
+    const { config, location } = sk;
+    if (config.pushDown
+      && !sk.hasAttribute('pushdown')
+      && location.host !== 'docs.google.com') {
+      window.setTimeout(() => {
+        if (!skHeight) {
+          skHeight = parseFloat(window.getComputedStyle(sk.root).height, 10);
+        }
+        sk.setAttribute('pushdown', skHeight);
+        config.pushDownElements.forEach((elem) => {
+          // sidekick shown, push element down
+          const currentMarginTop = parseInt(elem.style.marginTop, 10);
+          let newMarginTop = skHeight;
+          if (!Number.isNaN(currentMarginTop)) {
+            // add element's non-zero top value
+            newMarginTop += currentMarginTop;
+          }
+          elem.style.marginTop = `${newMarginTop}px`;
+          if (elem.id === 'WebApplicationFrame') {
+            // adjust height of office online frame
+            elem.style.height = `calc(100% - ${newMarginTop}px)`;
+          }
+        });
+      }, 100);
+      window.addEventListener('resize', sk.checkPushDownContent);
+    }
   }
 
   /**
@@ -912,14 +974,128 @@
    * @param {Sidekick} sk The sidekick
    */
   function revertPushDownContent(sk) {
-    sk.removeAttribute('pushdown');
-    sk.config.pushDownElements.forEach((elem) => {
-      elem.style.marginTop = 'initial';
-      if (elem.id === 'WebApplicationFrame') {
-        // adjust height of office online frame
-        elem.style.height = '';
+    const { config, location } = sk;
+    if (config.pushDown
+      && sk.hasAttribute('pushdown')
+      && location.host !== 'docs.google.com') {
+      sk.removeAttribute('pushdown');
+      config.pushDownElements.forEach((elem) => {
+        elem.style.marginTop = 'initial';
+        if (elem.id === 'WebApplicationFrame') {
+          // adjust height of office online frame
+          elem.style.height = '';
+        }
+      });
+      window.removeEventListener('resize', sk.checkPushDownContent);
+    }
+  }
+
+  /**
+   * Creates and/or returns a special view.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {boolean} create Create the special view if none exists
+   * @returns {HTMLELement} The special view
+   */
+  function getSpecialView(sk, create) {
+    const view = sk.shadowRoot.querySelector('.hlx-sk-special-view')
+      || (create
+        ? appendTag(sk.shadowRoot, {
+          tag: 'div',
+          attrs: { class: 'hlx-sk-special-view' },
+        })
+        : null);
+    if (create && view) {
+      const description = appendTag(view, {
+        tag: 'div',
+        attrs: { class: 'description' },
+      });
+      appendTag(description, {
+        tag: 'button',
+        attrs: { class: 'close' },
+        // eslint-disable-next-line no-use-before-define
+        lstnrs: { click: () => hideSpecialView(sk) },
+      });
+      appendTag(view, {
+        tag: 'div',
+        attrs: {
+          class: 'container',
+        },
+      });
+    }
+    return view;
+  }
+
+  /**
+   * Shows the view.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  async function showSpecialView(sk) {
+    const {
+      config: {
+        specialView,
+        pushDownElements,
+      },
+      location: {
+        href,
+        pathname,
+      },
+    } = sk;
+    if (specialView) {
+      try {
+        const { js, css, cssLoaded } = specialView;
+        if (css && !cssLoaded) {
+          if (css.startsWith('https://')) {
+            // load external css file
+            sk.loadCSS(css);
+          } else {
+            // load inline css
+            const style = appendTag(sk.shadowRoot, {
+              tag: 'style',
+              attrs: {
+                type: 'text/css',
+              },
+            });
+            style.textContent = css;
+          }
+          specialView.cssLoaded = true;
+        }
+        const view = getSpecialView(sk, true);
+        view.classList.add(pathname.split('.').pop());
+        pushDownElements.push(view);
+
+        const resp = await fetch(href);
+        const data = await resp.text();
+        let callback;
+        if (typeof js === 'function') {
+          callback = js;
+        } else if (typeof js === 'string') {
+          const mod = await import(js);
+          callback = mod.default;
+        } else {
+          throw new Error('invalid view callback');
+        }
+        callback(view.querySelector(':scope .container'), data);
+      } catch (e) {
+        console.log('failed to draw view', e);
       }
-    });
+    }
+    return null;
+  }
+
+  /**
+   * Hides the special view.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function hideSpecialView(sk) {
+    const { config } = sk;
+    const view = getSpecialView(sk);
+    if (view) {
+      config.pushDownElements = config.pushDownElements.filter((el) => el !== view);
+      view.replaceWith('');
+    }
   }
 
   /**
@@ -943,6 +1119,14 @@
           statusfetched: () => {
             checkPlugins(this);
             checkLastModified(this);
+          },
+          shown: async () => {
+            await showSpecialView(this);
+            pushDownContent(this);
+          },
+          hidden: () => {
+            hideSpecialView(this);
+            revertPushDownContent(this);
           },
         },
       });
@@ -1057,8 +1241,8 @@
      * @returns {Sidekick} The sidekick
      */
     loadContext(cfg) {
-      this.config = initConfig(cfg);
       this.location = getLocation();
+      this.config = initConfig(cfg, this.location);
       fireEvent(this, 'contextloaded', {
         config: this.config,
         location: this.location,
@@ -1067,15 +1251,16 @@
     }
 
     /**
-     * Calculates the height of the sidekick and pushes down the
+     * Recalculates the height of the sidekick and pushes down the
      * page content by that amount to make room for the sidekick.
      * @returns {Sidekick} The sidekick
      */
-    pushDownContent() {
+    checkPushDownContent() {
       const sk = this instanceof Sidekick ? this : window.hlx.sidekick;
-      if (sk.hasAttribute('pushdown')) {
+      const skHeight = parseFloat(window.getComputedStyle(sk.root).height, 10);
+      if (sk.hasAttribute('pushdown') && +sk.getAttribute('pushdown') !== skHeight) {
         revertPushDownContent(sk);
-        pushDownContent(sk);
+        pushDownContent(sk, skHeight);
       }
       return this;
     }
@@ -1088,12 +1273,6 @@
     show() {
       if (this.root.classList.contains('hlx-sk-hidden')) {
         this.root.classList.remove('hlx-sk-hidden');
-      }
-      if (this.config.pushDown
-        && !this.hasAttribute('pushdown')
-        && this.location.host !== 'docs.google.com') {
-        setTimeout(() => pushDownContent(this), 100);
-        window.addEventListener('resize', this.pushDownContent);
       }
       fireEvent(this, 'shown');
       return this;
@@ -1110,12 +1289,6 @@
       }
       if (this._modal && !this._modal.parentNode.classList.contains('hlx-sk-hidden')) {
         this.hideModal();
-      }
-      if (this.config.pushDown
-        && this.hasAttribute('pushdown')
-        && this.location.host !== 'docs.google.com') {
-        revertPushDownContent(this);
-        window.removeEventListener('resize', this.pushDownContent);
       }
       try {
         this.root.querySelector(':scope .env').classList.remove('expanded');
@@ -1170,7 +1343,7 @@
               lstnrs: {
                 click: () => {
                   $pluginContainer.classList.toggle('expanded');
-                  this.pushDownContent();
+                  this.checkPushDownContent();
                 },
               },
             });
@@ -1435,7 +1608,7 @@
         },
       });
       // i18n
-      if (!navigator.language.startsWith('en')) {
+      if (!path && !navigator.language.startsWith('en')) {
         // look for language file in same directory
         const langHref = `${href.substring(0, href.lastIndexOf('/'))}/${navigator.language.split('-')[0]}.css`;
         appendTag(this.shadowRoot, {
