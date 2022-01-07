@@ -21,6 +21,11 @@ export const config = {
       scripts: 'accordion.js',
       styles: 'accordion.css',
     },
+    '.faq': {
+      location: '/blocks/faq/',
+      scripts: 'faq.js',
+      styles: 'faq.css',
+    },
     '.get-started': {
       location: '/blocks/get-started/',
       styles: 'get-started.css',
