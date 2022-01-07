@@ -7,7 +7,7 @@ export default async function decorateFaq($block) {
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
     const $a = document.createElement('a');
-    $a.id = i + 1;
+    $a.id = 'q' + (i + 1);
     $dt.innerText = row['Question'];
     const $dd = document.createElement('dd');
     $dd.innerText = row['Answer'];
