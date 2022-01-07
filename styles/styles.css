@@ -93,6 +93,10 @@ header {
     z-index: 2;
 }
 
+header .header {
+    width: 100%;
+}
+
 img {
     max-width: 100%;
 }
@@ -295,3 +299,8 @@ strong a {
         max-width: var(--grid-desktop-container-width);
     }
 }
+
+
+main .section-wrapper[data-section-status='loading'], main .section-wrapper[data-section-status='initialized'] {
+    display: none;
+  }
