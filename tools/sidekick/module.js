@@ -1046,7 +1046,7 @@
       try {
         const { js, css, cssLoaded } = specialView;
         if (css && !cssLoaded) {
-          if (css.startsWith('https://')) {
+          if (css.startsWith('https://') || css.startsWith('/')) {
             // load external css file
             sk.loadCSS(css);
           } else {
@@ -1061,6 +1061,18 @@
           }
           specialView.cssLoaded = true;
         }
+
+        // hide original content
+        [...sk.parentElement.children].forEach((el) => {
+          if (el !== sk) {
+            try {
+              el.style.display = 'none';
+            } catch (e) {
+              // ignore
+            }
+          }
+        });
+
         const view = getSpecialView(sk, true);
         view.classList.add(pathname.split('.').pop());
         pushDownElements.push(view);
@@ -1071,6 +1083,7 @@
         if (typeof js === 'function') {
           callback = js;
         } else if (typeof js === 'string') {
+          // load external module
           const mod = await import(js);
           callback = mod.default;
         } else {
@@ -1095,6 +1108,17 @@
     if (view) {
       config.pushDownElements = config.pushDownElements.filter((el) => el !== view);
       view.replaceWith('');
+
+      // show original content
+      [...sk.parentElement.children].forEach((el) => {
+        if (el !== sk) {
+          try {
+            el.style.display = '';
+          } catch (e) {
+            // ignore
+          }
+        }
+      });
     }
   }
 
