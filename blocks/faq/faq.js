@@ -6,11 +6,19 @@ export default async function decorateFaq($block) {
   const $dl = document.createElement('dl');
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
-    $dt.id = i + 1;
+    const $a = document.createElement('a');
+    $a.id = i + 1;
     $dt.innerText = row['Question'];
     const $dd = document.createElement('dd');
     $dd.innerText = row['Answer'];
-    $dl.append($dt, $dd);
+    
+    $a.append($dt, $dd);
+    $dl.append($a);
   })
   $block.append($dl);
+
+  const selected = document.getElementById(window.location.hash.slice(1));
+  if (selected) {
+    selected.scrollIntoView();
+  }
 }
