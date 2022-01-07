@@ -333,7 +333,7 @@
 
 .hlx-sk-special-view .container {
   max-width: 100vw;
-  max-height: calc(100% - 40px);
+  max-height: calc(100% - 99px);
   overflow: auto;
 }
 
@@ -364,12 +364,6 @@
 .hlx-sk-special-view table td > div {
   padding: 5px;
   font-size: 0.875rem;
-  word-break: break-all;
-}
-
-.hlx-sk-special-view table td > div.list,
-.hlx-sk-special-view table td > div.number {
-  word-break: keep-all;
 }
 
 .hlx-sk-special-view table td > div.image  {

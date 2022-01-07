@@ -10,6 +10,9 @@
  * governing permissions and limitations under the License.
  */
 
+const nearFuture = new Date().setUTCFullYear(new Date().getUTCFullYear() + 20);
+const recentPast = new Date().setUTCFullYear(new Date().getUTCFullYear() - 20);
+
 function drawHeader(table, rowData) {
   const thead = table.appendChild(document.createElement('thead'));
   const row = document.createElement('tr');
@@ -46,10 +49,22 @@ function drawValue(cell, value) {
       const item = list.appendChild(document.createElement('li'));
       item.textContent = v;
     });
-  } else {
-    if (!Number.isNaN(value)) {
+  } else if (!Number.isNaN(+value)) {
+    // check for date
+    const date = value.length > 5
+      ? new Date(+value * 1000)
+      : new Date(Math.round((+value - (1 + 25567 + 1)) * 86400 * 1000)); // excel date
+    if (date.toString() !== 'Invalid Date'
+      && nearFuture > date.valueOf() && recentPast < date.valueOf()) {
+      valueContainer.classList.add('date');
+      valueContainer.textContent = date.toUTCString();
+    } else {
+      // number
       valueContainer.classList.add('number');
+      valueContainer.textContent = value;
     }
+  } else {
+    // text
     valueContainer.textContent = value;
   }
 }
