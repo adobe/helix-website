@@ -9,6 +9,6 @@ async function loadWidget(el) {
 
 export default async function init(el) {
   setTimeout(() => {
-    loadWidget(el)
+    loadWidget(el);
   }, 3000);
 }

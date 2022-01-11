@@ -4,9 +4,9 @@
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
 import { spy } from 'sinon';
-import decorate from '../../../blocks/sidekick/generator.js';
+import decorate from '../../../blocks/sidekick-generator/sidekick-generator.js';
 
-const mock = await readFile({ path: './generator.mock.html' });
+const mock = await readFile({ path: './sidekick-generator.mock.html' });
 
 document.body.innerHTML = mock;
 window.alert = spy();

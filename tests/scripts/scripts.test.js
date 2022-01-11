@@ -1,210 +1,190 @@
 /* eslint-disable no-unused-expressions */
-/* global describe it */
+/* global describe before it */
 
 import { readFile } from '@web/test-runner-commands';
 import { expect } from '@esm-bundle/chai';
-import {
-  config,
-  decorateAnchors,
-  setupBlocks,
-  loadBlocks,
-  loadElement,
-  loadScript,
-  loadStyle,
-  loadTemplate,
-  setLCPTrigger,
-} from '../../scripts/scripts.js';
-import getObjectProperty from '../../utils/property.js';
+import sinon from 'sinon';
 
-const ms = 100;
+const scripts = {};
 
-const mock = await readFile({ path: './scripts.mock.html' });
-document.body.innerHTML = mock;
+document.body.innerHTML = await readFile({ path: './dummy.html' });
+document.head.innerHTML = await readFile({ path: './head.html' });
 
-const variations = document.querySelector('.variations');
-const variationBlocks = setupBlocks(variations, config);
-
-describe('Anchors', () => {
-  const parent = document.querySelector('.anchors');
-  const anchors = decorateAnchors(parent);
-  it('internal url is relative', () => {
-    expect(anchors[0].getAttribute('href')).to.equal('/my-content');
+describe('Core Helix features', () => {
+  before(async () => {
+    const mod = await import('../../scripts/scripts.js');
+    Object
+      .keys(mod)
+      .forEach((func) => {
+        scripts[func] = mod[func];
+      });
+    document.body.innerHTML = await readFile({ path: './body.html' });
   });
 
-  it('external url opens in new window', () => {
-    expect(anchors[1].href).to.equal('https://www.adobe.com/');
-    expect(anchors[1].getAttribute('target')).to.equal('_blank');
+  it('Initializes window.hlx', async () => {
+    // simulate code base path and turn on lighthouse
+    document.head.appendChild(document.createElement('script')).src = '/foo/scripts/scripts.js';
+    window.history.pushState({}, '', `${window.location.href}&lighthouse=on`);
+
+    scripts.initHlx();
+    expect(window.hlx.codeBasePath).to.equal('/foo');
+    expect(window.hlx.lighthouse).to.equal(true);
+
+    // test error handling
+    const url = sinon.stub(window, 'URL');
+    scripts.initHlx();
+
+    // cleanup
+    url.restore();
+    window.hlx.codeBasePath = '';
+    window.hlx.lighthouse = false;
+    Array.from(document.querySelectorAll('script')).pop().remove();
   });
 
-  it('svg image will unwrap anchor', () => {
-    const svg = parent.querySelector(':scope > img');
-    expect(svg).to.exist;
+  it('Sanitizes class name', async () => {
+    expect(scripts.toClassName('Hello world')).to.equal('hello-world');
+    expect(scripts.toClassName(null)).to.equal('');
   });
 
-  it('svg image will keep anchor', () => {
-    const svgAnchor = anchors.pop();
-    const svg = parent.querySelector(':scope > a > img');
-    expect(svg).to.exist;
-    expect(svgAnchor.href).to.equal('http://localhost:2000/my-awesome-link');
+  it('Extracts metadata', async () => {
+    expect(scripts.getMetadata('description')).to.equal('Lorem ipsum dolor sit amet.');
+    expect(scripts.getMetadata('og:title')).to.equal('Foo');
   });
 
-  it('crx link has download attribute', () => {
-    const crxAnchor = document.getElementById('crx');
-    expect(crxAnchor.download).to.equal('extension.crx');
-  });
-});
-
-describe('Post LCP', () => {
-  const img = document.createElement('img');
-  document.body.append(img);
-
-  it('LCP loads when there is no selector', () => {
-    setLCPTrigger(null, []);
-    expect(window.lcp.none).to.be.true;
+  it('Adds favicon', async () => {
+    scripts.addFavIcon('/foo.svg');
+    const $favIcon = document.querySelector('link[rel="icon"]');
+    expect($favIcon.getAttribute('href')).to.equal('/foo.svg');
   });
 
-  it('LCP loads when there is no image src', () => {
-    setLCPTrigger(img, []);
-    expect(window.lcp.complete).to.be.true;
+  it('Loads CSS', async () => {
+    // loads a css file and calls callback
+    const load = await new Promise((resolve) => {
+      scripts.loadCSS('/tests/scripts/test.css', (e) => resolve(e));
+    });
+    expect(load).to.equal('load');
+    expect(getComputedStyle(document.body).color).to.equal('rgb(255, 0, 0)');
+
+    // does nothing if css already loaded
+    const noop = await new Promise((resolve) => {
+      scripts.loadCSS('/tests/scripts/test.css', (e) => resolve(e));
+    });
+    expect(noop).to.equal('noop');
+
+    // calls callback in case of error
+    const error = await new Promise((resolve) => {
+      scripts.loadCSS('/tests/scripts/nope.css', (e) => resolve(e));
+    });
+    expect(error).to.equal('error');
   });
 
-  it('LCP loads when there is a bad image', async () => {
-    img.src = '/tests/scripts/nope.mock.png';
-    setLCPTrigger(img, []);
-    const error = await getObjectProperty('lcp.error', ms);
-    expect(error).to.be.true;
+  it('Collects RUM data', async () => {
+    const sendBeacon = sinon.stub(navigator, 'sendBeacon');
+    // turn on RUM
+    window.history.pushState({}, '', `${window.location.href}&rum=on`);
+    delete window.hlx;
+
+    // sends checkpoint beacon
+    await scripts.sampleRUM('test', { foo: 'bar' });
+    expect(sendBeacon.called).to.be.true;
+    sendBeacon.resetHistory();
+
+    // sends cwv beacon
+    await scripts.sampleRUM('cwv', { foo: 'bar' });
+    expect(sendBeacon.called).to.be.true;
+
+    // test error handling
+    sendBeacon.throws();
+    await scripts.sampleRUM('error', { foo: 'bar' });
+
+    sendBeacon.restore();
   });
 
-  it('LCP loads when there is a good image', async () => {
-    img.src = '/tests/scripts/block.mock.png';
-    setLCPTrigger(img, []);
-    const load = await getObjectProperty('lcp.load', ms);
-    expect(load).to.be.true;
-  });
-});
+  it('Adds publish dependencies', async () => {
+    // adds single dependency
+    scripts.addPublishDependencies('/foo');
+    expect(window.hlx.dependencies).to.include('/foo');
 
-describe('Block variations', () => {
-  it('url maps to localhost', () => {
-    expect(variationBlocks[0].classList.contains('columns')).to.be.true;
-  });
-});
-
-describe('Script loading', async () => {
-  function callback() { window.scriptCallback = true; }
-  const script = await loadScript('/tests/scripts/block.mock.js', callback, 'module');
-  it('script element exists', () => {
-    expect(script).to.exist;
+    // adds multiple dependencies
+    scripts.addPublishDependencies(['/bar', '/baz']);
+    expect(window.hlx.dependencies).to.deep.equal(['/foo', '/bar', '/baz']);
   });
 
-  it('script calls back', async () => {
-    const loaded = await getObjectProperty('scriptCallback', ms);
-    expect(loaded).to.be.true;
+  it('Creates optimized picture', async () => {
+    const $picture = scripts.createOptimizedPicture('/test/scripts/mock.png');
+    expect($picture.querySelector(':scope source[type="image/webp"]')).to.exist; // webp
+    expect($picture.querySelector(':scope source:not([type="image/webp"])')).to.exist; // fallback
+    expect($picture.querySelector(':scope img').src).to.include('format=png&optimize=medium'); // default
   });
 
-  it('block mock can run', async () => {
-    const loaded = await getObjectProperty('feature.loaded', ms);
-    expect(loaded).to.be.true;
-  });
-});
-
-describe('Style loading', async () => {
-  function callback() { window.styleCallback = true; }
-  function callbackTwo() { window.styleCallbackTwo = true; }
-  const style = await loadStyle('/tests/scripts/block.mock.css', callback);
-  it('style element exists', () => {
-    expect(style).to.exist;
+  it('Decorates pictures', async () => {
+    // add styling to picture and test its removal
+    document.querySelector('main picture')
+      .parentElement
+      .appendChild(document.createElement('strong'))
+      .appendChild(document.querySelector('main picture'));
+    scripts.decoratePictures(document.querySelector('main'));
+    expect(document.querySelectorAll('strong > picture').length).to.equal(0);
   });
 
-  it('style calls back', async () => {
-    const loaded = await getObjectProperty('styleCallback', ms);
-    expect(loaded).to.be.true;
+  it('Decorates anchors', async () => {
+    scripts.decorateAnchors(document.querySelector('main'));
+    // check if links have been made relative
+    document.querySelectorAll('main a').forEach(($a) => expect($a.getAttribute('href').startsWith('/')).to.be.true);
+    // check if icon links have been turned into SVGs
+    expect(document.querySelectorAll('main img[src$=".svg"]').length).to.equal(2);
   });
 
-  it('only one style', async () => {
-    const oneStyle = await loadStyle('/tests/scripts/block.mock.css', callbackTwo);
-    expect(oneStyle).to.exist;
-    expect(window.styleCallbackTwo).to.be.true;
-  });
-});
-
-describe('Template loading', () => {
-  it('template doesnt exist', () => {
-    const noTemplate = loadTemplate();
-    expect(noTemplate).to.not.exist;
-  });
-
-  it('template has name', () => {
-    const meta = document.createElement('meta');
-    meta.setAttribute('name', 'template');
-    meta.setAttribute('content', 'docs');
-    document.head.append(meta);
-    loadTemplate();
-    expect(document.body.classList.contains('docs-template')).to.be.true;
-  });
-});
-
-describe('Block loading', async () => {
-  const marquee = document.querySelector('.marquee');
-  const columns = document.querySelector('.columns');
-
-  it('block has a block select', () => {
-    const { blockSelect } = columns.dataset;
-    expect(blockSelect).to.exist;
-  });
-
-  it('block is loaded with only js', async () => {
-    config.blocks['.marquee'] = {};
-    await loadElement(marquee, config.blocks['.marquee']);
-    expect(marquee.dataset.blockLoaded).to.exist;
-  });
-
-  it('block is loaded with css', async () => {
-    await loadElement(columns, config.blocks['.columns']);
-    expect(columns.dataset.blockLoaded).to.exist;
-  });
-
-  it('a block is attempted to load a second time', async () => {
-    await loadElement(columns, config.blocks['.columns']);
-    expect(columns.dataset.blockLoaded).to.exist;
+  it('Normalizes headings', async () => {
+    const numHeadings = document.querySelectorAll('h1, h2, h3, h4, h5, h6').length;
+    scripts.normalizeHeadings(document.querySelector('main'), ['h1', 'h2', 'h3']);
+    expect(document.querySelectorAll('h1, h2, h3, h4, h5, h6').length).to.equal(numHeadings);
+    expect(document.querySelectorAll('h4, h5, h6').length).to.equal(0);
   });
 });
 
-const getLazyElement = (selector, timeout) => new Promise((resolve) => {
-  let i = 0;
-  const interval = 10;
-  const refreshId = setInterval(() => {
-    const el = document.querySelector(selector);
-    if (el !== null && typeof el !== 'undefined') {
-      resolve(el);
-      clearInterval(refreshId);
-    } else if (i >= timeout) {
-      resolve(null);
-      clearInterval(refreshId);
-    }
-    i += interval;
-  }, interval);
-});
-
-describe('non lazy block loading', async () => {
-  it('feature list is loaded', async () => {
-    const wrapper = document.querySelector('.get-started-wrapper');
-    const blocks = setupBlocks(wrapper, config);
-    const loadedBlocks = await loadBlocks(blocks, config);
-    expect(loadedBlocks[0]).to.exist;
+describe('Sections and blocks', () => {
+  it('Decorates sections', async () => {
+    scripts.decorateSections(document.querySelector('main'));
+    expect(document.querySelectorAll('main .section-wrapper').length).to.equal(2);
   });
-});
 
-describe('Lazy loading', async () => {
-  it('youtube is loaded', async () => {
-    const wrapper = document.querySelector('.youtube-wrapper');
-    const blocks = setupBlocks(wrapper, config);
-    await loadBlocks(blocks, config);
-    const iframe = await getLazyElement('iframe', ms);
-    expect(iframe).to.exist;
+  it('Decorates blocks', async () => {
+    scripts.decorateBlocks(document.querySelector('main'));
+    expect(document.querySelectorAll('main .block').length).to.equal(6);
   });
-});
 
-describe('Object property', async () => {
-  const loaded = await getObjectProperty('nope', ms);
-  expect(loaded).to.be.null;
+  it('Loads blocks', async () => {
+    scripts.initHlx();
+    await scripts.loadBlocks(document.querySelector('main'));
+    document.querySelectorAll('main .block').forEach(($block) => {
+      expect($block.dataset.blockStatus).to.equal('loaded');
+    });
+  });
+
+  it('Updates section status', async () => {
+    scripts.updateSectionsStatus(document.querySelector('main'));
+    document.querySelectorAll('main .section-wrapper').forEach(($section) => {
+      expect($section.dataset.sectionStatus).to.equal('loaded');
+    });
+
+    // test section with block still loading
+    const $section = document.querySelector('main .section-wrapper');
+    delete $section.dataset.sectionStatus;
+    $section.querySelector(':scope .block').dataset.blockStatus = 'loading';
+    scripts.updateSectionsStatus(document.querySelector('main'));
+    expect($section.dataset.sectionStatus).to.equal('loading');
+  });
+
+  it('Reads block config', async () => {
+    document.querySelector('main .section-wrapper > div').innerHTML += await readFile({ path: './config.html' });
+    const cfg = scripts.readBlockConfig(document.querySelector('main .config'));
+    expect(cfg).to.deep.include({
+      'prop-0': 'Plain text',
+      'prop-1': 'Paragraph',
+      'prop-2': ['First paragraph', 'Second paragraph'],
+      'prop-3': 'https://www.adobe.com/',
+      'prop-4': ['https://www.adobe.com/', 'https://www.hlx.live/'],
+    });
+  });
 });
