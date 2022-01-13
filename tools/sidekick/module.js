@@ -657,7 +657,8 @@
     sk.add({
       id: 'live',
       condition: (sidekick) => (sidekick.config.hlx3 || sidekick.config.outerHost)
-        && (sidekick.isEditor() || sidekick.isHelix()),
+        && (sidekick.isEditor() || sidekick.isHelix())
+        && sidekick.status.live && sidekick.status.live.lastModified,
       button: {
         action: async (evt) => {
           if (evt.target.classList.contains('pressed')) {
@@ -674,7 +675,8 @@
       id: 'prod',
       condition: (sidekick) => sidekick.config.host
         && sidekick.config.host !== sidekick.config.outerHost
-        && (sidekick.isEditor() || sidekick.isHelix()),
+        && (sidekick.isEditor() || sidekick.isHelix())
+        && sidekick.status.live && sidekick.status.live.lastModified,
       button: {
         action: async (evt) => {
           if (evt.target.classList.contains('pressed')) {
@@ -1817,6 +1819,14 @@
         ok = resp.ok && Array.isArray(json) && json.every((e) => e.status === 'ok');
         status = resp.status;
       }
+      // bust client cache for live and production
+      if (config.outerHost) {
+        await fetch(`https://${config.outerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
+      }
+      if (config.host) {
+        await fetch(`https://${config.host}${path}`, { cache: 'reload', mode: 'no-cors' });
+      }
+
       fireEvent(this, 'published', path);
       return {
         ok,
