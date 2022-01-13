@@ -370,6 +370,7 @@
 
 .hlx-sk-special-view table td > div {
   padding: 5px;
+  min-height: 0.875rem;
   font-size: 0.875rem;
 }
 

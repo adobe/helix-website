@@ -1044,7 +1044,7 @@
         pathname,
       },
     } = sk;
-    if (specialView) {
+    if (specialView && !getSpecialView(sk)) {
       try {
         const { js, css, cssLoaded } = specialView;
         if (css && !cssLoaded) {
