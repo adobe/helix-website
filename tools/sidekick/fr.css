@@ -73,3 +73,7 @@
 .hlx-sk-special-view button.close::before {
   content: "Arrêter"
 }
+
+.hlx-sk-special-view h2.helix-default::before {
+  content: "Feuille par défaut";
+}

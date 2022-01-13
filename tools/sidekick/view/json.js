@@ -84,11 +84,29 @@ function drawBody(table, data) {
 
 export default function draw(viewContainer, rawData) {
   const json = JSON.parse(rawData);
-  const { data } = json;
-  if (!data || data.length === 0) {
-    return;
+  const sheets = {};
+  if (json[':type'] === 'multi-sheet' && json[':names']) {
+    json[':names'].forEach((name) => {
+      const { data } = json[name];
+      if (data && data.length > 0) {
+        sheets[name] = data;
+      }
+    });
+  } else {
+    const { data } = json;
+    if (data && data.length > 0) {
+      sheets['helix-default'] = data;
+    }
   }
-  const table = viewContainer.appendChild(document.createElement('table'));
-  drawHeader(table, data[0]);
-  drawBody(table, data);
+  Object.keys(sheets).forEach((name) => {
+    const sheet = sheets[name];
+    const title = viewContainer.appendChild(document.createElement('h2'));
+    if (name !== 'helix-default') {
+      title.textContent = name;
+    }
+    title.classList.add(name);
+    const table = viewContainer.appendChild(document.createElement('table'));
+    drawHeader(table, sheet[0]);
+    drawBody(table, sheet);
+  });
 }

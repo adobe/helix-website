@@ -337,11 +337,18 @@
   overflow: auto;
 }
 
+.hlx-sk-special-view h2 {
+  margin: 10px 0;
+  font-size: 1.25rem;
+  min-height: 1.25rem;
+}
+
 .hlx-sk-special-view table {
   width: calc(100vw - 40px);
-  height: calc(100vh - 40px);
+  max-height: calc(100vh - 80px);
   border-collapse: collapse;
   text-align: left;
+  margin-bottom: 20px;
 }
 
 .hlx-sk-special-view table tr {
@@ -466,9 +473,13 @@
 }
 
 .hlx-sk-special-view .description::before {
-  content: "User-friendly data rendition."
+  content: "User-friendly data rendition.";
 }
 
 .hlx-sk-special-view button.close::before {
-  content: "Turn off"
+  content: "Turn off";
+}
+
+.hlx-sk-special-view h2.helix-default::before {
+  content: "Default sheet";
 }
