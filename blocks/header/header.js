@@ -350,7 +350,9 @@ export default async function init(blockEl) {
       gnav.init();
     } catch (e) {
       const { debug } = await import('../../utils/console.js');
-      debug('Could not great global navigation', e);
+      if (debug) {
+        debug('Could not great global navigation', e);
+      }
     }
   }
 }
