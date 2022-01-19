@@ -1046,6 +1046,10 @@
     } = sk;
     if (specialView && !getSpecialView(sk)) {
       try {
+        const resp = await fetch(href);
+        if (!resp.ok) {
+          return;
+        }
         const { js, css, cssLoaded } = specialView;
         if (css && !cssLoaded) {
           if (css.startsWith('https://') || css.startsWith('/')) {
@@ -1079,7 +1083,6 @@
         view.classList.add(pathname.split('.').pop());
         pushDownElements.push(view);
 
-        const resp = await fetch(href);
         const data = await resp.text();
         let callback;
         if (typeof js === 'function') {
@@ -1096,7 +1099,6 @@
         console.log('failed to draw view', e);
       }
     }
-    return null;
   }
 
   /**
@@ -1678,6 +1680,11 @@
       }
       if (config.hlx3 && targetEnv === 'preview' && this.isEditor()) {
         await this.update();
+      }
+      // handle special case /.helix/config.json
+      if (status.webPath === '/.helix/config.json') {
+        this.notify('Helix configuration successfully activated');
+        return this;
       }
       fireEvent(this, 'envswitched', {
         sourceUrl: href,
