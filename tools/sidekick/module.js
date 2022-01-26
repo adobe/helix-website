@@ -81,7 +81,6 @@
    * @prop {string} outerHost The outer CDN's host name (optional)
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
-   * @prop {boolean} hlx3=false <pre>true</pre> if the project is running on Helix 3
    * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
    * @prop {boolean} pushDown=true <pre>false</pre> to have the sidekick overlay page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
@@ -259,16 +258,12 @@
       pushDown = true,
       pushDownSelector,
       specialViews,
-      hlx3 = false,
     } = config;
     const innerPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
     const publicHost = host && host.startsWith('http') ? new URL(host).host : host;
     const scriptUrl = (window.hlx.sidekickScript && window.hlx.sidekickScript.src)
       || 'https://www.hlx.live/tools/sidekick/module.js';
-    let innerHost;
-    if (hlx3) {
-      innerHost = 'hlx3.page';
-    }
+    let innerHost = 'hlx3.page';
     if (!innerHost && scriptUrl) {
       // get hlx domain from script src (used for branch deployment testing)
       const scriptHost = new URL(scriptUrl).host;
@@ -281,20 +276,11 @@
           .join('.');
       }
     }
-    if (!innerHost) {
-      // fall back to hlx.page
-      innerHost = 'hlx.page';
-    }
     innerHost = innerPrefix ? `${innerPrefix}.${innerHost}` : null;
     let liveHost = outerHost;
     if (!liveHost && owner && repo) {
-      if (hlx3) {
-        // hlx3 sites automatically have an outer CDN (including the ref)
-        liveHost = `${ref}--${repo}--${owner}.hlx.live`;
-      } else if (publicHost) {
-        // hlx2 sites require a production host to be defined
-        liveHost = `${repo}--${owner}.hlx.live`;
-      }
+      // use default hlx3 outer CDN including the ref
+      liveHost = `${ref}--${repo}--${owner}.hlx.live`;
     }
     // define elements to push down
     const pushDownElements = [];
@@ -329,7 +315,6 @@
       pushDown,
       pushDownElements,
       specialView,
-      hlx3,
     };
   }
 
@@ -353,24 +338,12 @@
       hash, host, hostname, href, origin, pathname, port, protocol, search,
     } = window.location;
 
-    // replace single - with 2
-    const makeHostHelixCompliant = (ahost) => {
-      if (!/.*\.hlx.*\.(live|page)/.test(ahost) || ahost.match(/^.*?--.*?--.*?\./gm)) {
-        return ahost;
-      }
-      return ahost
-        .replace(/^([^-.]+)-([^-.]+)-([^-.]+)\./gm, '$1-$2--$3.')
-        .replace(/^([^-.]+)-([^-.]+)\./gm, '$1--$2.');
-    };
-
-    const newHost = makeHostHelixCompliant(hostname);
-
     return {
       hash,
-      host: host.replace(hostname, newHost),
-      hostname: newHost,
-      href: href.replace(hostname, newHost),
-      origin: origin.replace(hostname, newHost),
+      host,
+      hostname,
+      href,
+      origin,
       pathname,
       port,
       protocol,
@@ -477,7 +450,6 @@
       ['project', config.project || ''],
       ['from', from || ''],
       ['giturl', `https://github.com/${config.owner}/${config.repo}/tree/${config.ref}`],
-      ['hlx3', config.hlx3],
     ]).toString();
     return shareUrl.toString();
   }
@@ -504,30 +476,6 @@
   }
 
   /**
-   * Checks for sidekick updates and informs the user.
-   * @private
-   * @param {Sidekick} sk The sidekick
-   */
-  function checkForUpdates(sk) {
-    const indicators = [
-      // legacy config
-      typeof window.hlxSidekickConfig === 'object' || sk.config.compatMode,
-      // legacy script host
-      !sk.config.scriptUrl || new URL(sk.config.scriptUrl).host === 'www.hlx.page',
-      // update flag
-      sk.updateRequired = false,
-    ];
-    if (indicators.includes(true)) {
-      window.setTimeout(() => {
-        if (window.confirm('Apologies, but your Helix Sidekick Bookmarklet needs to be updated one more time …\n\nThis time we made sure we will never have to ask you again. Promised! :)')) {
-          sk.showModal('Please wait …', true);
-          window.location.href = getShareUrl(sk.config, sk.location.href);
-        }
-      }, 1000);
-    }
-  }
-
-  /**
    * Fires an event with the given name.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -543,6 +491,27 @@
       }));
     } catch (e) {
       console.warn('failed to fire event', name, data);
+    }
+  }
+
+  /**
+   * Check for issues.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  async function checkForIssues(sk) {
+    // check if current inner cdn url is hlx3 url
+    if (sk.location.hostname.endsWith('.page')
+      && !sk.location.hostname.endsWith('hlx3.page')) {
+      sk.showModal([
+        'Unfortunately, your website is no longer compatible with Helix Sidekick. ',
+        'If you are the owner, you may find the following link useful:',
+        'https://www.hlx.live/docs/migrate-from-hlx2',
+      ], true, 1, () => {
+        window.hlx.sidekick.hide();
+        window.hlx.sidekick.replaceWith(''); // remove() doesn't work for custom element
+        delete window.hlx.sidekick;
+      });
     }
   }
 
@@ -596,22 +565,6 @@
   }
 
   /**
-   * Check for Helix 3 related issues.
-   * @private
-   * @param {Sidekick} sk The sidekick
-   */
-  async function checkForHelix3(sk) {
-    // check if current inner cdn url is hlx3 url
-    if (sk.config.hlx3
-      && sk.location.hostname.endsWith('.page')
-      && !sk.location.hostname.endsWith('hlx3.page')) {
-      if (window.confirm('This Helix Sidekick Bookmarklet can only work on a Helix 3 site.\n\nPress OK to be taken to the Helix 3 version of this page now.')) {
-        sk.switchEnv('preview');
-      }
-    }
-  }
-
-  /**
    * Adds the edit plugin to the sidekick.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -656,7 +609,7 @@
     // live
     sk.add({
       id: 'live',
-      condition: (sidekick) => (sidekick.config.hlx3 || sidekick.config.outerHost)
+      condition: (sidekick) => sidekick.config.outerHost
         && (sidekick.isEditor() || sidekick.isHelix())
         && sidekick.status.live && sidekick.status.live.lastModified,
       button: {
@@ -800,7 +753,7 @@
           if (results.every((res) => res && res.ok)) {
             sk.showModal('Please wait …', true);
             // fetch and redirect to production
-            const redirectHost = config.byocdn || (config.hlx3 && !config.host)
+            const redirectHost = config.byocdn || !config.host
               ? config.outerHost
               : config.host;
             const prodURL = `https://${redirectHost}${path}`;
@@ -1191,8 +1144,7 @@
           click: () => this.hide(),
         },
       });
-      checkForHelix3(this);
-      checkForUpdates(this);
+      checkForIssues(this);
     }
 
     /**
@@ -1571,10 +1523,23 @@
       if (msg) {
         if (Array.isArray(msg)) {
           this._modal.textContent = '';
-          msg.forEach((line) => appendTag(this._modal, {
-            tag: 'p',
-            text: line,
-          }));
+          msg.forEach((line) => {
+            const isURL = line.startsWith('http');
+            const p = appendTag(this._modal, {
+              tag: 'p',
+              text: !isURL ? line : '',
+            });
+            if (isURL) {
+              appendTag(p, {
+                tag: 'a',
+                text: line,
+                attrs: {
+                  href: line,
+                  target: '_blank',
+                },
+              });
+            }
+          });
         } else {
           this._modal.textContent = msg;
         }
@@ -1585,8 +1550,6 @@
         window.setTimeout(() => {
           sk.hideModal();
         }, 3000);
-      } else {
-        this._modal.classList.add('wait');
       }
       fireEvent(this, 'modalshown', this._modal);
       return this;
@@ -1678,7 +1641,7 @@
       if (!this.isEditor()) {
         envUrl += `${search}${hash}`;
       }
-      if (config.hlx3 && targetEnv === 'preview' && this.isEditor()) {
+      if (targetEnv === 'preview' && this.isEditor()) {
         await this.update();
       }
       // handle special case /.helix/config.json
@@ -1711,15 +1674,11 @@
       const path = status.webPath;
       let resp;
       try {
-        if (config.hlx3) {
-          // update preview
-          resp = await fetch(
-            getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-            { method: 'POST' },
-          );
-        } else {
-          resp = await this.publish(path, true);
-        }
+        // update preview
+        resp = await fetch(
+          getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
+          { method: 'POST' },
+        );
         if (this.isEditor() || this.isInner() || this.isDev()) {
           // bust client cache
           await fetch(`https://${config.innerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
@@ -1745,17 +1704,14 @@
       const path = status.webPath;
       let resp;
       try {
-        if (config.hlx3) {
-          // delete preview
-          resp = await fetch(
-            getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-            { method: 'DELETE' },
-          );
-          if (status.live && status.live.lastModified) {
-            await this.unpublish(path);
-          }
-        } else {
-          resp = await this.update(path);
+        // delete preview
+        resp = await fetch(
+          getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
+          { method: 'DELETE' },
+        );
+        // also unpublish if published
+        if (status.live && status.live.lastModified) {
+          await this.unpublish(path);
         }
         fireEvent(this, 'deleted', path);
       } catch (e) {
@@ -1769,78 +1725,36 @@
     }
 
     /**
-     * @typedef {Object} publishResponse
-     * @description The response object for a publish action.
-     * @prop {boolean} ok     True if publish action was successful, else false
-     * @prop {string}  status The status text returned by the publish action
-     * @prop {Object}  json   The JSON object returned by the publish action
-     * @prop {string}  path   The path of the published page
-     */
-
-    /**
      * Publishes the page at the specified path if <pre>config.host</pre> is defined.
      * @param {string} path The path of the page to publish
-     * @param {boolean} innerOnly <pre>true</pre> to only refresh inner CDN, else <pre>false</pre>
      * @fires Sidekick#published
-     * @return {publishResponse} The response object
+     * @return {Response} The response object
      */
-    async publish(path, innerOnly = false) {
+    async publish(path) {
       const { config, location } = this;
 
-      if ((!innerOnly && !config.hlx3 && !config.host) // non-hlx3 without host
-        || (config.byocdn && location.host === config.host) // byocdn and prod host
-        || !this.isContent()) {
+      // publish content only
+      if (!this.isContent()) {
         return null;
       }
 
       const purgeURL = new URL(path, this.isEditor() ? `https://${config.innerHost}/` : location.href);
-      let ok;
-      let status;
-      let json;
-
-      if (config.hlx3) {
-        console.log(`publishing ${purgeURL.pathname}`);
-        const resp = await fetch(getAdminUrl(config, 'live', purgeURL.pathname), { method: 'POST' });
-        ok = resp.ok;
-        status = resp.status;
-      } else {
-        console.log(`purging ${purgeURL.href}`);
-        const xfh = [config.innerHost];
-        if (!innerOnly) {
-          if (config.outerHost) {
-            xfh.push(config.outerHost);
-          }
-          if (config.host && !config.byocdn) {
-            xfh.push(config.host);
-          }
+      console.log(`publishing ${purgeURL.pathname}`);
+      let resp = {};
+      try {
+        resp = await fetch(getAdminUrl(config, 'live', purgeURL.pathname), { method: 'POST' });
+        // bust client cache for live and production
+        if (config.outerHost) {
+          await fetch(`https://${config.outerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
         }
-        const resp = await fetch(purgeURL, {
-          method: 'POST',
-          headers: {
-            'X-Method-Override': 'HLXPURGE',
-            'X-Forwarded-Host': xfh.join(', '),
-          },
-        });
-        json = await resp.json();
-        console.log(JSON.stringify(json));
-        ok = resp.ok && Array.isArray(json) && json.every((e) => e.status === 'ok');
-        status = resp.status;
+        if (config.host) {
+          await fetch(`https://${config.host}${path}`, { cache: 'reload', mode: 'no-cors' });
+        }
+        fireEvent(this, 'published', path);
+      } catch (e) {
+        console.error('failed to unpublish', path, e);
       }
-      // bust client cache for live and production
-      if (config.outerHost) {
-        await fetch(`https://${config.outerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
-      }
-      if (config.host) {
-        await fetch(`https://${config.host}${path}`, { cache: 'reload', mode: 'no-cors' });
-      }
-
-      fireEvent(this, 'published', path);
-      return {
-        ok,
-        status,
-        json: json || {},
-        path,
-      };
+      return resp;
     }
 
     /**
@@ -1856,19 +1770,13 @@
       const path = status.webPath;
       let resp;
       try {
-        if (config.hlx3) {
-          // delete live
-          resp = await fetch(getAdminUrl(config, 'live', path), { method: 'DELETE' });
-          fireEvent(this, 'unpublished', path);
-        }
+        // delete live
+        resp = await fetch(getAdminUrl(config, 'live', path), { method: 'DELETE' });
+        fireEvent(this, 'unpublished', path);
       } catch (e) {
         console.error('failed to unpublish', path, e);
       }
-      return {
-        ok: (resp && resp.ok) || false,
-        status: (resp && resp.status) || 0,
-        path,
-      };
+      return resp;
     }
 
     /**

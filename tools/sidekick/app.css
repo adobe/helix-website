@@ -42,7 +42,6 @@
   --hlx-sk-modal-font-size: 1.5rem;
   --hlx-sk-special-view-button-color: rgba(0,0,0, 0.5);
   --hlx-sk-special-view-table-border: rgba(0,0,0, 0.5);
-  --wait-animation: hlx-sk-heartbeat 2s ease-in-out infinite both;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -141,6 +140,7 @@
   color: var(--hlx-sk-button-color);
   font-size: var(--hlx-sk-button-font-size);
   line-height: var(--hlx-sk-line-height);
+  font-family: var(--hlx-sk-font-family);
   font-weight: var(--hlx-sk-button-font-weight);
   text-align: center;
   text-decoration: none;
@@ -193,7 +193,7 @@
 .hlx-sk .env button.toggle::after {
   content: "...";
   font-size: var(--hlx-sk-button-font-size);
-  line-height: 1;
+  line-height: var(--hlx-sk-line-height);
 }
 
 
@@ -235,6 +235,8 @@
   font-size: var(--hlx-sk-modal-font-size);
   border-radius: 32px;
   padding: 12px 32px;
+  width: 60vw;
+  max-width: 800px;
   background-color: var(--hlx-sk-bg);
   color: var(--hlx-sk-color);
   box-shadow: var(--hlx-sk-shadow);
@@ -242,6 +244,11 @@
 
 .hlx-sk-overlay .modal * {
   font-size: var(--hlx-sk-modal-font-size);
+}
+
+.hlx-sk-overlay .modal a:any-link {
+  color: currentColor;
+  word-break: break-all;
 }
 
 .hlx-sk-overlay .level-0 {
@@ -254,36 +261,8 @@
   color: var(--hlx-sk-modal-color);
 }
 
-.hlx-sk-overlay .wait {
-  animation: var(--wait-animation);
-}
-
 .hlx-sk-hidden {
   display: none !important;
-}
-
-@keyframes hlx-sk-heartbeat {
-  from {
-            transform: scale(1);
-            transform-origin: center center;
-            animation-timing-function: ease-out;
-  }
-  10% {
-            transform: scale(0.91);
-            animation-timing-function: ease-in;
-  }
-  17% {
-            transform: scale(0.98);
-            animation-timing-function: ease-out;
-  }
-  33% {
-            transform: scale(0.87);
-            animation-timing-function: ease-in;
-  }
-  45% {
-            transform: scale(1);
-            animation-timing-function: ease-out;
-  }
 }
 
 @media(max-width:768px) {
@@ -402,7 +381,7 @@
 }
 
 @media(max-width:650px) {
-  .hlx-sk .env button.toggle {
+  .hlx-sk:not(.hlx-sk-loading) .env button.toggle {
     display: inline-block;
   }
 
