@@ -629,7 +629,7 @@ async function loadLazy(doc) {
   loadBlock(header);
 
   loadCSS('/fonts/fonts.css');
-  addFavIcon(`${window.hlx.codeBasePath}/styles/favicon.svg`);
+  addFavIcon(`${window.hlx.codeBasePath}/img/icon-helix.svg`);
 }
 
 /**
