@@ -59,7 +59,7 @@
             configOrigin = 'http://localhost:3000';
           } else if (!new RegExp(`${repo}\\-\\-${owner}\\.hlx(\\-\\d|3)?\\.page$`).test(window.location.hostname)) {
             // load config from inner CDN
-            configOrigin = `https://${ref}--${repo}--${owner}.hlx.page`;
+            configOrigin = `https://${ref}--${repo}--${owner}.hlx.live`;
           }
           const configScript = document.createElement('script');
           configScript.id = 'hlx-sk-config';
