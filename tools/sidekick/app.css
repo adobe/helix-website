@@ -235,8 +235,7 @@
   font-size: var(--hlx-sk-modal-font-size);
   border-radius: 32px;
   padding: 12px 32px;
-  width: 60vw;
-  max-width: 800px;
+  max-width: 60vw;
   background-color: var(--hlx-sk-bg);
   color: var(--hlx-sk-color);
   box-shadow: var(--hlx-sk-shadow);
