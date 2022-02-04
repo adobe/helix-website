@@ -1,9 +1,13 @@
+.footnotes {
+  margin: 40px 0;
+}
+
 .footnotes > div {
   display: flex;
   margin: 0 40px;
   font-size: 80%;
   max-width: 600px;
-  margin: 40px auto 40px auto;
+  margin: 10px auto;
 }
 
 .footnotes .footnote-num {
