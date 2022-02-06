@@ -37,7 +37,7 @@ function run(evt) {
   const usp = url.searchParams;
   Object.keys(formData).forEach((name) => usp.set(name, formData[name]));
   url.search = usp.toString();
-  window.history.pushState({}, null, url.href);
+  window.history.pushState({ giturl, project }, null, url.href);
 
   // assemble bookmarklet config
   const segs = new URL(giturl).pathname.substring(1).split('/');
@@ -83,7 +83,14 @@ function run(evt) {
   bm.onclick = help;
   bm.textContent = title;
   bm.setAttribute('title', title);
-  document.getElementById('install-container').classList.remove('hidden');
+  document.getElementById('sidekick-generator-bookmarklet').parentElement.classList.remove('hidden');
+
+  window.dispatchEvent(new CustomEvent('sidekickGeneratorReady', {
+    detail: {
+      giturl: new URLSearchParams(window.location.search).get('giturl'),
+      project: new URLSearchParams(window.location.search).get('project'),
+    },
+  }));
 }
 
 function init() {
@@ -108,7 +115,7 @@ function init() {
       title: href,
       href,
     }, href);
-    document.getElementById('install-container').append(createTag('p', null, backLink));
+    document.getElementById('sidekick-generator-bookmarklet').append(createTag('p', null, backLink));
   }
   if (autorun) {
     document.getElementById('form-container').classList.add('hidden');
@@ -157,12 +164,27 @@ export default async function decorate(el) {
   formContainer.insertBefore(form, formContainer.querySelector(':scope p:last-of-type'));
   formContainer.id = 'form-container';
 
-  const installContainer = el.querySelector(':scope > div:last-of-type > div');
+  const bookmarkletContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
   const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
-  installContainer.append(createTag('p', null, createTag('em', null, bookmark)));
-  installContainer.id = 'install-container';
-  installContainer.style.paddingTop = '20px';
-  installContainer.classList.add('hidden');
+  bookmarkletContainer.append(createTag('p', null, createTag('em', null, bookmark)));
+  bookmarkletContainer.id = 'sidekick-generator-bookmarklet';
+  bookmarkletContainer.style.paddingTop = '20px';
+  bookmarkletContainer.parentElement.classList.add('hidden');
+
+  const webStoreLink = bookmarkletContainer.querySelector('a[href^="https://chrome.google.com/"]');
+  const webStoreIcon = document.createElement('img');
+  webStoreIcon.src = '/img/chrome.svg';
+  webStoreLink.prepend(webStoreIcon);
+
+  const extensionAddContainer = el.querySelector(':scope > div:nth-of-type(3) > div');
+  extensionAddContainer.id = 'sidekick-generator-extension-add-project';
+  extensionAddContainer.querySelector('a').removeAttribute('href');
+  extensionAddContainer.parentElement.classList.add('hidden');
+
+  const extensionDeleteContainer = el.querySelector(':scope > div:nth-of-type(4) > div');
+  extensionDeleteContainer.id = 'sidekick-generator-extension-delete-project';
+  extensionDeleteContainer.querySelector('a').removeAttribute('href');
+  extensionDeleteContainer.parentElement.classList.add('hidden');
 
   init();
 }
