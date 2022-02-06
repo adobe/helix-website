@@ -132,6 +132,7 @@ h1 u {
 h1 {
     font-size: 45px;
     line-height: 1.3;
+    margin-bottom: 20px;
 }
 
 /* Heading L */
@@ -167,6 +168,7 @@ em a {
   text-decoration: none;
   font-size: 14px;
   font-style: normal;
+  cursor: pointer;
 }
 
 /* Primary button over background */
@@ -187,6 +189,18 @@ strong a {
     font-weight: 400;
     text-decoration: none;
     display: inline-block;
+    cursor: pointer;
+}
+
+/* Icon on button */
+
+em a img,
+strong a img {
+  position: relative;
+  height: 24px;
+  left: -6px;
+  margin-top: 4px;
+  float: left;
 }
 
 /* Above the fold */
