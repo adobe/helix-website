@@ -23,7 +23,7 @@ function run(evt) {
   });
 
   const {
-    giturl, project, token, hlx3,
+    giturl, project, token,
   } = formData;
 
   if (!giturl) {
@@ -49,7 +49,6 @@ function run(evt) {
     owner,
     repo,
     ref,
-    hlx3,
   };
 
   // pass token
