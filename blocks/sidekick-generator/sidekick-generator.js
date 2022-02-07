@@ -163,7 +163,10 @@ export default async function decorate(el) {
   formContainer.insertBefore(form, formContainer.querySelector(':scope p:last-of-type'));
   formContainer.id = 'form-container';
 
-  const bookmarkletContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
+  let bookmarkletContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
+  if (!bookmarkletContainer) {
+    bookmarkletContainer = el.appendChild(createTag('div', createTag('div')));
+  }
   const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
   bookmarkletContainer.append(createTag('p', null, createTag('em', null, bookmark)));
   bookmarkletContainer.id = 'sidekick-generator-bookmarklet';
@@ -171,19 +174,25 @@ export default async function decorate(el) {
   bookmarkletContainer.parentElement.classList.add('hidden');
 
   const webStoreLink = bookmarkletContainer.querySelector('a[href^="https://chrome.google.com/"]');
-  const webStoreIcon = document.createElement('img');
-  webStoreIcon.src = '/img/chrome.svg';
-  webStoreLink.prepend(webStoreIcon);
+  if (webStoreLink) {
+    const webStoreIcon = document.createElement('img');
+    webStoreIcon.src = '/img/chrome.svg';
+    webStoreLink.prepend(webStoreIcon);
+  }
 
   const extensionAddContainer = el.querySelector(':scope > div:nth-of-type(3) > div');
-  extensionAddContainer.id = 'sidekick-generator-extension-add-project';
-  extensionAddContainer.querySelector('a').removeAttribute('href');
-  extensionAddContainer.parentElement.classList.add('hidden');
+  if (extensionAddContainer) {
+    extensionAddContainer.id = 'sidekick-generator-extension-add-project';
+    extensionAddContainer.querySelector('a').removeAttribute('href');
+    extensionAddContainer.parentElement.classList.add('hidden');
+  }
 
   const extensionDeleteContainer = el.querySelector(':scope > div:nth-of-type(4) > div');
-  extensionDeleteContainer.id = 'sidekick-generator-extension-delete-project';
-  extensionDeleteContainer.querySelector('a').removeAttribute('href');
-  extensionDeleteContainer.parentElement.classList.add('hidden');
+  if (extensionDeleteContainer) {
+    extensionDeleteContainer.id = 'sidekick-generator-extension-delete-project';
+    extensionDeleteContainer.querySelector('a').removeAttribute('href');
+    extensionDeleteContainer.parentElement.classList.add('hidden');
+  }
 
   init();
 }
