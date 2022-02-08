@@ -82,7 +82,6 @@ function run(evt) {
   bm.onclick = help;
   bm.textContent = title;
   bm.setAttribute('title', title);
-  document.getElementById('sidekick-generator-bookmarklet').parentElement.classList.remove('hidden');
 
   window.dispatchEvent(new CustomEvent('sidekickGeneratorReady'));
 }
@@ -112,7 +111,7 @@ function init() {
     document.getElementById('sidekick-generator-bookmarklet').append(createTag('p', null, backLink));
   }
   if (autorun) {
-    document.getElementById('form-container').classList.add('hidden');
+    document.getElementById('form-container').parentElement.classList.add('hidden');
     run();
   }
 }
@@ -188,6 +187,11 @@ export default async function decorate(el) {
     extensionDeleteContainer.querySelector('a').removeAttribute('href');
     extensionDeleteContainer.parentElement.classList.add('hidden');
   }
+
+  window.addEventListener('sidekickGeneratorReady', () => {
+    // show bookmarklet container (default)
+    bookmarkletContainer.parentElement.classList.remove('hidden');
+  });
 
   init();
 }
