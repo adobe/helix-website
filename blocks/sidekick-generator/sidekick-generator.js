@@ -85,7 +85,6 @@ function run(evt) {
   document.getElementById('sidekick-generator-bookmarklet').parentElement.classList.remove('hidden');
 
   window.dispatchEvent(new CustomEvent('sidekickGeneratorReady'));
-  window.sidekickGeneratorReady = true;
 }
 
 function init() {
