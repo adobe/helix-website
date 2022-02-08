@@ -49,7 +49,7 @@ describe('Sidekick Generator', () => {
     const generator = document.querySelector('.sidekick-generator');
     await decorate(generator);
     const formContainer = generator.querySelector('#form-container');
-    expect(formContainer.classList.contains('hidden')).to.be.true;
+    expect(formContainer.parentElement.classList.contains('hidden')).to.be.true;
     const bookmark = generator.querySelector('#bookmark');
     expect(bookmark).to.exist;
     expect(bookmark.textContent).to.equal('Foo Sidekick');
