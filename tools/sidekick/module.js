@@ -981,7 +981,7 @@
       window.setTimeout(() => {
         if (sk.pluginContainer.querySelectorAll(':scope > div > *').length === 0) {
           // add empty text
-          sk.$pluginContainer.classList.replace('loading', 'empty');
+          sk.pluginContainer.classList.replace('loading', 'empty');
           sk.checkPushDownContent();
         }
       }, 5000);
