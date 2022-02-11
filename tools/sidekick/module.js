@@ -71,6 +71,20 @@
    */
 
   /**
+   * @typedef {Object} helpStep
+   * @description The definition of a help step inside a {@link helpTopic}.
+   * @prop {string} message The help message
+   * @prop {string} selector The CSS selector of the target element
+   */
+
+  /**
+   * @typedef {Object} helpTopic
+   * @description The definition of a help topic.
+   * @prop {string} id The ID of the help topic
+   * @prop {helpStep[]} steps An array of {@link helpStep}s
+   */
+
+  /**
    * @typedef {Object} sidekickConfig
    * @description The sidekick configuration.
    * @prop {string} owner The GitHub owner or organization (mandatory)
@@ -173,6 +187,18 @@
    * @event Sidekick#unpublished
    * @type {string} The unpublished path
    * @description This event is fired when a path has been unpublished.
+   */
+
+  /**
+   * @event Sidekick#helpdismissed
+   * @type {string} The help topic
+   * @description This event is fired when a help dialog has been dismissed.
+   */
+
+  /**
+   * @event Sidekick#helpacknowledged
+   * @type {string} The help topic
+   * @description This event is fired when a help dialog has been acknowledged.
    */
 
   /**
@@ -439,6 +465,54 @@
   }
 
   /**
+   * Aligns an element with another and keeps it there.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {string} elemSelector The CSS selector for the element to align
+   * @param {string} targetSelector The CSS selector for the target element
+   */
+  function stickTo(sk, elemSelector, targetSelector) {
+    // if no selector, stick to sidekick root
+    if (!targetSelector) targetSelector = `.${sk.root.className}`;
+    const listener = () => {
+      const elem = sk.shadowRoot.querySelector(elemSelector);
+      const target = sk.shadowRoot.querySelector(targetSelector);
+      if (elem && target) {
+        const elemRect = elem.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        // define alignment
+        const alignments = [
+          'bottom-center',
+          'botttom-left',
+          'bottom-right',
+        ];
+        let align = target === sk.root ? alignments[0] : alignments[1];
+        if (targetRect.left + elemRect.width >= window.innerWidth) {
+          [, , align] = alignments;
+        }
+        alignments.forEach((a) => elem.classList.remove(a));
+        elem.classList.add(align);
+        elem.style.top = `${Math.round(targetRect.bottom)}px`;
+        switch (align) {
+          case alignments[0]:
+            elem.style.left = '';
+            break;
+          case alignments[1]:
+            elem.style.left = `${Math.round(targetRect.left) + (targetRect.width / 2) - 45}px`;
+            break;
+          case alignments[2]:
+          default:
+            elem.style.left = `${Math.round(targetRect.left) + (targetRect.width / 2) - (elemRect.width - 45)}px`;
+        }
+      } else {
+        window.removeEventListener('resize', listener);
+      }
+    };
+    listener();
+    window.addEventListener('resize', listener);
+  }
+
+  /**
    * Returns the share URL for the sidekick bookmarklet.
    * @private
    * @param {Object} config The sidekick configuration
@@ -601,7 +675,8 @@
     // preview
     sk.add({
       id: 'preview',
-      condition: (sidekick) => sidekick.isEditor() || sidekick.isHelix(),
+      condition: (sidekick) => (sidekick.isEditor() || sidekick.isHelix())
+        && sidekick.status.preview && sidekick.status.preview.lastModified,
       button: {
         action: async (evt) => {
           if (evt.target.classList.contains('pressed')) {
@@ -645,6 +720,40 @@
           sk.switchEnv('prod', newTab(evt));
         },
         isPressed: (sidekick) => sidekick.isProd(),
+      },
+    });
+
+    // keep empty env switcher hidden
+    if (sk.root.querySelectorAll(':scope .feature-container .env .dropdown-container > div').length === 0) {
+      sk.root.querySelector(':scope .feature-container .env').classList.add('hlx-sk-hidden');
+    }
+  }
+
+  /**
+   * Adds the preview plugin to the sidekick.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function addPreviewPlugin(sk) {
+    sk.add({
+      id: 'edit-preview',
+      condition: (sidekick) => sidekick.isEditor(),
+      button: {
+        action: async (evt) => {
+          const { status } = sk;
+          // update preview
+          const resp = await sk.update();
+          if (!resp.ok && resp.status >= 400) {
+            console.error(resp);
+            throw new Error(resp);
+          }
+          // handle special case /.helix/config.json
+          if (status.webPath === '/.helix/config.json') {
+            sk.notify('Helix configuration successfully activated');
+            return;
+          }
+          sk.switchEnv('preview', newTab(evt));
+        },
       },
     });
   }
@@ -840,6 +949,7 @@
       // default plugins
       addEditPlugin(sk);
       addEnvPlugins(sk);
+      addPreviewPlugin(sk);
       addReloadPlugin(sk);
       addDeletePlugin(sk);
       addPublishPlugin(sk);
@@ -869,9 +979,9 @@
       }
       sk.checkPushDownContent();
       window.setTimeout(() => {
-        if (sk.root.querySelectorAll(':scope > div > *').length === 0) {
+        if (sk.pluginContainer.querySelectorAll(':scope > div > *').length === 0) {
           // add empty text
-          sk.root.classList.replace('hlx-sk-loading', 'hlx-sk-empty');
+          sk.$pluginContainer.classList.replace('loading', 'empty');
           sk.checkPushDownContent();
         }
       }, 5000);
@@ -1101,7 +1211,7 @@
       this.root = appendTag(this.shadowRoot, {
         tag: 'div',
         attrs: {
-          class: 'hlx-sk hlx-sk-hidden hlx-sk-loading',
+          class: 'hlx-sk hlx-sk-hidden',
         },
         lstnrs: {
           statusfetched: () => {
@@ -1123,10 +1233,21 @@
       this.loadContext(cfg);
       this.fetchStatus();
       this.loadCSS();
+      this.pluginContainer = appendTag(this.root, {
+        tag: 'div',
+        attrs: {
+          class: 'plugin-container loading',
+        },
+      });
+      this.featureContainer = appendTag(this.root, {
+        tag: 'div',
+        attrs: {
+          class: 'feature-container',
+        },
+      });
       // share button
-      const share = appendTag(this.root, {
+      const share = appendTag(this.featureContainer, {
         tag: 'button',
-        text: '<',
         attrs: {
           class: 'share',
         },
@@ -1134,16 +1255,10 @@
           click: () => shareSidekick(this),
         },
       });
-      appendTag(share, {
-        tag: 'span',
-        attrs: {
-          class: 'dots',
-        },
-      });
+      appendTag(share, { tag: 'i' });
       // close button
-      appendTag(this.root, {
+      appendTag(this.featureContainer, {
         tag: 'button',
-        text: '✕',
         attrs: {
           class: 'close',
         },
@@ -1309,27 +1424,47 @@
           || (typeof plugin.condition === 'function' && plugin.condition(this));
         // find existing plugin
         let $plugin = this.get(plugin.id);
-        let $pluginContainer = this.root;
+        let $pluginContainer = this.pluginContainer;
         if (ENVS[plugin.id]) {
           // find or create environment plugin container
-          $pluginContainer = this.root.querySelector(':scope .env');
+          $pluginContainer = this.root.querySelector(':scope .env .dropdown-container');
           if (!$pluginContainer) {
-            $pluginContainer = appendTag(this.root, {
+            const $envContainer = appendTag(this.featureContainer, {
               tag: 'div',
               attrs: {
-                class: 'env',
+                class: 'env dropdown',
               },
-            });
-            appendTag($pluginContainer, {
+            }, this.featureContainer.firstElementChild);
+            if (this.isInner()) $envContainer.classList.add('preview');
+            if (this.isOuter()) $envContainer.classList.add('live');
+            if (this.isProd()) $envContainer.classList.add('prod');
+            appendTag($envContainer, {
               tag: 'button',
               attrs: {
-                class: 'toggle',
+                class: 'dropdown-toggle',
               },
               lstnrs: {
-                click: () => {
-                  $pluginContainer.classList.toggle('expanded');
+                click: (evt) => {
+                  // collapse env listener
+                  const collapseEnv = () => {
+                    $envContainer.classList.remove('dropdown-expanded');
+                    document.removeEventListener('click', collapseEnv);
+                  };
+                  $envContainer.classList.toggle('dropdown-expanded');
+                  if ($envContainer.classList.contains('dropdown-expanded')) {
+                    evt.stopPropagation();
+                    window.setTimeout(() => {
+                      document.addEventListener('click', collapseEnv);
+                    }, 100);
+                  }
                   this.checkPushDownContent();
                 },
+              },
+            });
+            $pluginContainer = appendTag($envContainer, {
+              tag: 'div',
+              attrs: {
+                class: 'dropdown-container',
               },
             });
           }
@@ -1344,8 +1479,8 @@
           // add new plugin
           $plugin = appendTag($pluginContainer, pluginCfg);
           // remove loading text
-          if (this.root.classList.contains('hlx-sk-loading')) {
-            this.root.classList.remove('hlx-sk-loading');
+          if (this.pluginContainer.classList.contains('loading')) {
+            this.pluginContainer.classList.remove('loading');
           }
         } else if ($plugin) {
           if (!plugin.enabled) {
@@ -1387,6 +1522,7 @@
           if ((typeof plugin.button.isPressed === 'boolean' && !!plugin.button.isPressed)
             || (typeof plugin.button.isPressed === 'function' && plugin.button.isPressed(this))) {
             $button.classList.add('pressed');
+            $button.removeAttribute('tabindex');
           }
           // fire event when plugin button is clicked
           $button.addEventListener('click', () => fireEvent(this, 'pluginused', {
@@ -1408,7 +1544,7 @@
      * @returns {HTMLElement} The plugin
      */
     get(id) {
-      return this.root.querySelector(`:scope .${id}`);
+      return this.root.querySelector(`:scope div:not(.env).${id}`);
     }
 
     /**
@@ -1569,6 +1705,7 @@
       if (this._modal) {
         this._modal.innerHTML = '';
         this._modal.className = '';
+        this._modal.style = {};
         this._modal.parentNode.classList.add('hlx-sk-hidden');
         fireEvent(this, 'modalhidden');
       }
@@ -1577,6 +1714,95 @@
         delete this._modalCallback;
       }
       return this;
+    }
+
+    /**
+     * Displays a balloon with help content.
+     * @param {helpTopic} topic The topic
+     * @param {number} step The step number to display (starting with 0)
+     */
+    showHelp(topic, step = 0) {
+      const { id, steps } = topic;
+      // contextualize and consolidate help steps
+      const cSteps = steps.filter(({ selector }) => {
+        if (!selector) return true;
+        const target = this.shadowRoot.querySelector(selector);
+        return target && window.getComputedStyle(target).display !== 'none';
+      });
+      const numSteps = cSteps.length;
+      if (!numSteps) return;
+      const { message, selector } = cSteps[step];
+      this.showModal([message], true);
+
+      // add controls
+      const controls = appendTag(this._modal, {
+        tag: 'p',
+        attrs: {
+          class: 'help-controls',
+        },
+      });
+      const stepControls = appendTag(controls, {
+        tag: 'div',
+        attrs: {
+          class: 'help-steps',
+        },
+      });
+      if (cSteps.length > 1) {
+        cSteps.forEach((_, num) => {
+          let type = 'current';
+          if (num < step) {
+            type = 'previous';
+          } else if (num > step) {
+            type = 'next';
+          }
+          const stepButton = appendTag(stepControls, {
+            tag: 'a',
+            attrs: {
+              class: `help-step help-${type}`,
+            },
+            lstnrs: {
+              click: (evt) => {
+                evt.stopPropagation();
+                this.showHelp(topic, num);
+              },
+            },
+          });
+          appendTag(stepButton, {
+            tag: 'div',
+            attrs: {
+              class: 'circle',
+            },
+          });
+        });
+      }
+      if (cSteps[step + 1]) {
+        appendTag(controls, {
+          tag: 'button',
+          attrs: {
+            class: 'help-dismiss',
+          },
+          lstnrs: {
+            click: () => {
+              fireEvent(this, 'helpdismissed', id);
+            },
+          },
+        });
+      } else {
+        appendTag(controls, {
+          tag: 'button',
+          attrs: {
+            class: 'help-acknowledge',
+          },
+          lstnrs: {
+            click: () => {
+              fireEvent(this, 'helpacknowledged', id);
+            },
+          },
+        });
+      }
+
+      this._modal.classList.add('help');
+      stickTo(this, '.modal.help', selector);
     }
 
     /**

@@ -10,15 +10,15 @@
  * governing permissions and limitations under the License.
  */
 
-.hlx-sk.hlx-sk-empty::before {
+.hlx-sk .plugin-container.empty::before {
   content: "Aucune action disponible pour cette page";
 }
 
-.hlx-sk.hlx-sk-loading::before {
+.hlx-sk .plugin-container.loading::before {
   content: 'Chargement...';
 }
 
-.hlx-sk > .share::before {
+.hlx-sk .share::before {
   content: "Partager le Sidekick";
 }
 
@@ -30,23 +30,27 @@
   content: "Veuillez patienter..."
 }
 
-.hlx-sk .env button.toggle::before {
-  content: "Environnements";
-}
-
 .hlx-sk .edit button::before {
   content: "Edition";
 }
 
-.hlx-sk .preview button::before {
+.hlx-sk .env button.toggle::before {
+  content: "Avis";
+}
+
+.hlx-sk .env.preview .dropdown-toggle::before,
+.hlx-sk .env .preview button::before,
+.hlx-sk .edit-preview button::before {
   content: "Aperçu";
 }
 
-.hlx-sk .live button::before {
+.hlx-sk .env.live .dropdown-toggle::before,
+.hlx-sk .env .live button::before {
   content: "Live";
 }
 
-.hlx-sk .prod button::before {
+.hlx-sk .env.prod .dropdown-toggle::before,
+.hlx-sk .env .prod button::before {
   content: "Production";
 }
 
@@ -76,4 +80,24 @@
 
 .hlx-sk-special-view h2.helix-default::before {
   content: "Feuille par défaut";
+}
+
+.hlx-sk-overlay .modal.help .help-acknowledge::before {
+  content: "Got it!";
+}
+
+.hlx-sk-overlay .modal.help .help-dismiss::before {
+  content: "Not now";
+}
+
+.hlx-sk-overlay .modal.help .help-previous::before {
+  content: "Previous tip";
+}
+
+.hlx-sk-overlay .modal.help .help-current::before {
+  content: "This tip";
+}
+
+.hlx-sk-overlay .modal.help .help-next::before {
+  content: "Next tip";
 }
