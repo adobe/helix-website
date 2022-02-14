@@ -96,7 +96,7 @@
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
    * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
-   * @prop {boolean} pushDown=true <pre>false</pre> to have the sidekick overlay page content
+   * @prop {boolean} pushDown=false <pre>true</pre> to have the sidekick push down page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
    * @prop {viewConfig[]} specialViews An array of custom view configurations (optional)
    * @prop {number} adminVersion The specific version of admin service to use (optional)
@@ -282,7 +282,7 @@
       outerHost,
       host,
       project,
-      pushDown = true,
+      pushDown,
       pushDownSelector,
       specialViews,
     } = config;
@@ -502,7 +502,8 @@
             break;
           case alignments[2]:
           default:
-            elem.style.left = `${Math.round(targetRect.left) + (targetRect.width / 2) - (elemRect.width - 45)}px`;
+            elem.style.left = `${Math.round(targetRect.left) + (targetRect.width / 2)
+              - (elemRect.width - 45)}px`;
         }
       } else {
         window.removeEventListener('resize', listener);
@@ -659,7 +660,10 @@
         action: async () => {
           const { config, status } = sk;
           const editUrl = status.edit && status.edit.url;
-          window.open(editUrl, `hlx-sk-edit--${config.owner}/${config.repo}/${config.ref}${status.webPath}`);
+          window.open(
+            editUrl,
+            `hlx-sk-edit--${config.owner}/${config.repo}/${config.ref}${status.webPath}`,
+          );
         },
       },
     });
