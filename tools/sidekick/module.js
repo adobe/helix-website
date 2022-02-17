@@ -1211,7 +1211,9 @@
      */
     constructor(cfg) {
       super();
-      this.attachShadow({ mode: 'open' });
+      if (!this.shadowRoot) {
+        this.attachShadow({ mode: 'open' });
+      }
       this.root = appendTag(this.shadowRoot, {
         tag: 'div',
         attrs: {
@@ -2049,8 +2051,10 @@
       // merge base config with extended config
       window.hlx.sidekickConfig = Object.assign(window.hlx.sidekickConfig || {}, cfg);
       // init and show sidekick
-      if (!window.customElements.get('helix-sidekick')) {
+      try {
         window.customElements.define('helix-sidekick', Sidekick);
+      } catch (e) {
+        // ignore
       }
       // make sure there is only one sidekick
       document.querySelectorAll('helix-sidekick').forEach((sk) => sk.replaceWith(''));

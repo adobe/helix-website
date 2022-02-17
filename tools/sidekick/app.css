@@ -344,7 +344,7 @@
 .hlx-sk-overlay .modal {
   font-family: var(--hlx-sk-font-family);
   font-size: var(--hlx-sk-modal-font-size);
-  border-radius: 32px;
+  border-radius: 4px;
   padding: 12px 32px;
   max-width: 60vw;
   background-color: var(--hlx-sk-bg);
