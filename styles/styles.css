@@ -427,17 +427,13 @@ p.button-container > a.button {
 }
 /* section styling */
 
-main .section:first-child {
-    padding-top: 0;
-}
-
-main .section:last-child {
-    padding-bottom: 0;
-}
-
 main .section {
     padding: 4rem 0;
     text-align: center;
+}
+
+main .section:empty {
+    display: none;
 }
 
 .docs-template main .section {
@@ -466,6 +462,13 @@ main .section.light {
 /* Above the fold */
 
 main .section[data-section-status='loading'], main .section[data-section-status='initialized'] {
+    display: none;
+}
+
+body.no-header-template {
+    padding: 0;
+}
+.no-header-template header {
     display: none;
 }
 
