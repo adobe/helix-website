@@ -116,24 +116,6 @@ export function toClassName(name) {
 }
 
 /**
- * Wraps each section in an additional {@code div}.
- * @param {[Element]} $sections The sections
- */
-function wrapSections($sections) {
-  $sections.forEach(($div) => {
-    if ($div.childNodes.length === 0) {
-      // remove empty sections
-      $div.remove();
-    } else if (!$div.id) {
-      const $wrapper = document.createElement('div');
-      $wrapper.className = 'section-wrapper';
-      $div.parentNode.appendChild($wrapper);
-      $wrapper.appendChild($div);
-    }
-  });
-}
-
-/**
  * Decorates a block.
  * @param {Element} block The block element
  */
@@ -142,7 +124,7 @@ export function decorateBlock(block) {
   const classes = Array.from(block.classList.values());
   const blockName = classes[0];
   if (!blockName) return;
-  const section = block.closest('.section-wrapper');
+  const section = block.closest('.section');
   if (section) {
     section.classList.add(`${blockName}-container`.replace(/--/g, '-'));
   }
@@ -155,6 +137,47 @@ export function decorateBlock(block) {
   block.classList.add('block');
   block.setAttribute('data-block-name', shortBlockName);
   block.setAttribute('data-block-status', 'initialized');
+
+  const blockWrapper = block.parentElement;
+  blockWrapper.classList.add(`${shortBlockName}-wrapper`);
+}
+
+/**
+ * Extracts the config from a block.
+ * @param {Element} $block The block element
+ * @returns {object} The block config
+ */
+export function readBlockConfig($block) {
+  const config = {};
+  $block.querySelectorAll(':scope>div').forEach(($row) => {
+    if ($row.children) {
+      const $cols = [...$row.children];
+      if ($cols[1]) {
+        const $value = $cols[1];
+        const name = toClassName($cols[0].textContent);
+        let value = '';
+        if ($value.querySelector('a')) {
+          const $as = [...$value.querySelectorAll('a')];
+          if ($as.length === 1) {
+            value = $as[0].href;
+          } else {
+            value = $as.map(($a) => $a.href);
+          }
+        } else if ($value.querySelector('p')) {
+          const $ps = [...$value.querySelectorAll('p')];
+          if ($ps.length === 1) {
+            value = $ps[0].textContent;
+          } else {
+            value = $ps.map(($p) => $p.textContent);
+          }
+        } else if ($value.querySelector('img')) {
+          value = $value.querySelector('img').src;
+        } else value = $row.children[1].textContent;
+        config[name] = value;
+      }
+    }
+  });
+  return config;
 }
 
 /**
@@ -162,18 +185,40 @@ export function decorateBlock(block) {
  * @param {Element} $main The container element
  */
 export function decorateSections($main) {
-  wrapSections($main.querySelectorAll(':scope > div'));
-  $main.querySelectorAll(':scope > div.section-wrapper').forEach((section) => {
+  $main.querySelectorAll(':scope > div').forEach((section) => {
+    const wrappers = [];
+    let defaultContent = false;
+    [...section.children].forEach((e) => {
+      if (e.tagName === 'DIV' || !defaultContent) {
+        const wrapper = document.createElement('div');
+        wrappers.push(wrapper);
+        defaultContent = e.tagName !== 'DIV';
+      }
+      wrappers[wrappers.length - 1].append(e);
+    });
+    wrappers.forEach((wrapper) => section.append(wrapper));
+    section.classList.add('section');
     section.setAttribute('data-section-status', 'initialized');
+
+    /* process section metadata */
+    const sectionMeta = section.querySelector('div.section-metadata');
+    if (sectionMeta) {
+      const meta = readBlockConfig(sectionMeta);
+      const keys = Object.keys(meta);
+      keys.forEach((key) => {
+        if (key === 'style') section.classList.add(toClassName(meta.style));
+        else section.dataset[key] = meta[key];
+      });
+      sectionMeta.remove();
+    }
   });
 }
-
 /**
  * Updates all section status in a container element.
  * @param {Element} $main The container element
  */
 export function updateSectionsStatus($main) {
-  const sections = [...$main.querySelectorAll(':scope > div.section-wrapper')];
+  const sections = [...$main.querySelectorAll(':scope > div.section')];
   for (let i = 0; i < sections.length; i += 1) {
     const section = sections[i];
     const status = section.getAttribute('data-section-status');
@@ -195,7 +240,7 @@ export function updateSectionsStatus($main) {
  */
 export function decorateBlocks($main) {
   $main
-    .querySelectorAll('div.section-wrapper > div div')
+    .querySelectorAll('div.section > div > div')
     .forEach(($block) => decorateBlock($block));
 }
 
@@ -204,7 +249,7 @@ export function decorateBlocks($main) {
  * @param {string} blockName name of the block
  * @param {any} content two dimensional array or string or object of content
  */
-function buildBlock(blockName, content) {
+export function buildBlock(blockName, content) {
   const table = Array.isArray(content) ? content : [[content]];
   const blockEl = document.createElement('div');
   // build image block nested div structure
@@ -280,42 +325,6 @@ export async function loadBlocks($main) {
 }
 
 /**
- * Extracts the config from a block.
- * @param {Element} $block The block element
- * @returns {object} The block config
- */
-export function readBlockConfig($block) {
-  const config = {};
-  $block.querySelectorAll(':scope>div').forEach(($row) => {
-    if ($row.children) {
-      const $cols = [...$row.children];
-      if ($cols[1]) {
-        const $value = $cols[1];
-        const name = toClassName($cols[0].textContent);
-        let value = '';
-        if ($value.querySelector('a')) {
-          const $as = [...$value.querySelectorAll('a')];
-          if ($as.length === 1) {
-            value = $as[0].href;
-          } else {
-            value = $as.map(($a) => $a.href);
-          }
-        } else if ($value.querySelector('p')) {
-          const $ps = [...$value.querySelectorAll('p')];
-          if ($ps.length === 1) {
-            value = $ps[0].textContent;
-          } else {
-            value = $ps.map(($p) => $p.textContent);
-          }
-        } else value = $row.children[1].textContent;
-        config[name] = value;
-      }
-    }
-  });
-  return config;
-}
-
-/**
  * Returns a picture element with webp and fallbacks
  * @param {string} src The image URL
  * @param {boolean} eager load image eager
@@ -345,10 +354,10 @@ export function createOptimizedPicture(src, alt = '', eager = false, breakpoints
       picture.appendChild(source);
     } else {
       const img = document.createElement('img');
-      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
       img.setAttribute('loading', eager ? 'eager' : 'lazy');
       img.setAttribute('alt', alt);
       picture.appendChild(img);
+      img.setAttribute('src', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
     }
   });
 
@@ -430,6 +439,7 @@ async function waitForLCP() {
   const lcpCandidate = document.querySelector('main img');
   await new Promise((resolve) => {
     if (lcpCandidate && !lcpCandidate.complete) {
+      lcpCandidate.setAttribute('loading', 'eager');
       lcpCandidate.addEventListener('load', () => resolve());
       lcpCandidate.addEventListener('error', () => resolve());
     } else {
@@ -474,7 +484,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['marquee']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['marquee', 'columns']; // add your LCP blocks to the list
 const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
 
 const LIVE_ORIGIN = 'https://www.hlx.live';
@@ -485,6 +495,39 @@ window.addEventListener('load', () => sampleRUM('load'));
 document.addEventListener('click', () => sampleRUM('click'));
 
 loadPage(document);
+
+export function decorateButtons(block = document) {
+  const noButtonBlocks = ['cards'];
+  block.querySelectorAll(':scope a').forEach(($a) => {
+    $a.title = $a.title || $a.textContent;
+    const $block = $a.closest('div.section > div > div');
+    let blockName;
+    if ($block) {
+      blockName = $block.className;
+    }
+    if (!noButtonBlocks.includes(blockName)
+      && $a.href !== $a.textContent) {
+      const $up = $a.parentElement;
+      const $twoup = $a.parentElement.parentElement;
+      if (!$a.querySelector('img')) {
+        if ($up.childNodes.length === 1 && ($up.tagName === 'P' || $up.tagName === 'DIV')) {
+          $a.className = 'button accent'; // default
+          $up.classList.add('button-container');
+        }
+        if ($up.childNodes.length === 1 && $up.tagName === 'STRONG'
+            && $twoup.childNodes.length === 1 && $twoup.tagName === 'P') {
+          $a.className = 'button accent';
+          $twoup.classList.add('button-container');
+        }
+        if ($up.childNodes.length === 1 && $up.tagName === 'EM'
+            && $twoup.childNodes.length === 1 && $twoup.tagName === 'P') {
+          $a.className = 'button accent light';
+          $twoup.classList.add('button-container');
+        }
+      }
+    }
+  });
+}
 
 export function makeRelative(anchor) {
   const { href, textContent } = anchor;
@@ -601,6 +644,7 @@ export function decorateMain(main) {
   decorateAnchors(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateButtons(main);
   decorateBlocks(main);
 }
 

@@ -1,3 +1,71 @@
+.columns {
+    text-align: left;
+}
+
+.columns.bleed > div {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 0;
+}
+
+.columns.bleed div.columns-content {
+    padding: 2rem;
+    flex: 1 1 400px;
+}
+
+.columns.bleed div.columns-image {
+    flex: 1 1 400px;
+}
+
+.columns.bleed div.columns-image img {
+    object-fit: cover;
+    height: 100vw;
+    width: 100%;
+    object-position: left;
+    opacity: 0;
+    transform: translate(50px, 0);
+    transition: transform 0.5s ease-out, opacity 1s;
+}
+
+.columns.bleed div.columns-image.columns-left img {
+    object-position: right;
+    transform: translate(-50px, 0);
+}
+
+.columns.bleed div.columns-image img.enter {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+
+
+@media (min-width: 900px) {
+    .columns.bleed > div {
+        flex-direction: unset;
+        margin: auto;    
+        align-items: center;
+    }    
+    .columns.bleed div.columns-image img {
+        object-fit: cover;
+        height: 50vw;
+        max-height: 600px;
+        width: 100%;
+        object-position: left;
+    }
+
+    .columns.bleed div.columns-content-wrapper {
+        max-width: 500px;
+        float: right;
+    }
+
+    .columns.bleed div.columns-right div.columns-content-wrapper {
+        max-width: 500px;
+        float: unset;
+    }
+    
+}
+
+
 .columns.contained > div {
     margin: 0 auto;
     padding: var(--spacing-m);
