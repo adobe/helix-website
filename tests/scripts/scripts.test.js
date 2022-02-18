@@ -146,12 +146,12 @@ describe('Core Helix features', () => {
 describe('Sections and blocks', () => {
   it('Decorates sections', async () => {
     scripts.decorateSections(document.querySelector('main'));
-    expect(document.querySelectorAll('main .section').length).to.equal(2);
+    expect(document.querySelectorAll('main .section').length).to.equal(3);
   });
 
   it('Decorates blocks', async () => {
     scripts.decorateBlocks(document.querySelector('main'));
-    expect(document.querySelectorAll('main .block').length).to.equal(6);
+    expect(document.querySelectorAll('main .block').length).to.equal(7);
   });
 
   it('Loads blocks', async () => {
