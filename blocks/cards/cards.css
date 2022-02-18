@@ -56,7 +56,7 @@
   }
 
   .cards .cards-card.enter:hover {
-    transform: scale(1.02, 1.02) translate(0, 0);
+    transform: scale(calc(100% + 1rem), calc(100% + 1rem)) translate(0, 0);
   }
   
   /* Fade in the pseudo-element with the bigger shadow */

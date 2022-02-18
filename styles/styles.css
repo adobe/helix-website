@@ -29,9 +29,9 @@
     --type-heading-l-lh: 35px;
     --type-heading-m-size: 24px;
     --type-heading-m-lh: 30px;
-    --type-body-l-size: 18px;
+    --type-body-l-size: 24px;
     --type-body-l-lh: 27px;
-    --type-body-m-size: 16px;
+    --type-body-m-size: 20px;
     --type-body-m-lh: 1.6875;
 
     /* Spacing */
@@ -215,7 +215,7 @@ strong a img {
 
 a.button:any-link {
     text-decoration: none;
-    border-radius: 18px;
+    border-radius: 25px;
     padding: 5px 1.2em 6px 1.2em;
     text-align: center;
     font-size: var(--body-font-size-s);
@@ -436,6 +436,17 @@ p.button-container > a.button {
 main .section {
     padding: 4rem 0;
     text-align: center;
+}
+
+.default-content-wrapper, .quote-wrapper {
+    max-width: 900px;
+    margin: auto;
+}
+
+
+
+main .section ul {
+    text-align: left;
 }
 
 main .section:empty {
