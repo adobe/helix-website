@@ -445,7 +445,7 @@ main .section {
 }
 
 
-main .section .block {
+.block {
     text-align: left;
 }
 
