@@ -240,7 +240,7 @@ export function updateSectionsStatus($main) {
  */
 export function decorateBlocks($main) {
   $main
-    .querySelectorAll('div.section > div > div')
+    .querySelectorAll('div.section > div div')
     .forEach(($block) => decorateBlock($block));
 }
 

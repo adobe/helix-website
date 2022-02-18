@@ -194,6 +194,12 @@ strong a {
     cursor: pointer;
 }
 
+pre {
+    overflow-x: scroll;
+    background-color: #eee;
+    padding: 2rem;
+}
+
 /* Icon on button */
 
 em a img,
