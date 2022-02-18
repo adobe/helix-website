@@ -451,7 +451,7 @@ main .section.highlight {
 }
 
 main .section.dark {
-    background: black;
+    background: #444;
     color: white;
 }
 

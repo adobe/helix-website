@@ -39,7 +39,33 @@
     opacity: 0;
     transform: translate(0, 50px);
     transition: transform 0.5s ease-out, opacity 1s;
+    position: relative;
 }
+
+.cards .cards-card::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .cards .cards-card.enter:hover {
+    transform: scale(1.02, 1.02) translate(0, 0);
+  }
+  
+  /* Fade in the pseudo-element with the bigger shadow */
+  .cards .cards-card:hover::after {
+    opacity: 1;
+  }
+
+
+  
 
 .cards .cards-card.enter {
     opacity: 1;
@@ -48,7 +74,7 @@
 
 
 .section.dark .cards .cards-card {
-    background-color: #222;
+    background-color: #555;
 }
 
 .section.light .cards .cards-card {
