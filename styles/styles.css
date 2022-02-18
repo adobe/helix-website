@@ -463,7 +463,6 @@ main .section.light {
     background: #eee;
 }
 
-
 /* Above the fold */
 
 main .section[data-section-status='loading'], main .section[data-section-status='initialized'] {

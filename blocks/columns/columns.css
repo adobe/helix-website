@@ -22,11 +22,22 @@
     height: 100vw;
     width: 100%;
     object-position: left;
+    opacity: 0;
+    transform: translate(50px, 0);
+    transition: transform 0.5s ease-out, opacity 1s;
 }
 
 .columns.bleed div.columns-image.columns-left img {
     object-position: right;
+    transform: translate(-50px, 0);
 }
+
+.columns.bleed div.columns-image img.enter {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+
 
 @media (min-width: 900px) {
     .columns.bleed > div {

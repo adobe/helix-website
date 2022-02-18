@@ -1,4 +1,12 @@
 export default function decorate(block) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('enter');
+      }
+    });
+  });
+
   const classes = ['one', 'two', 'three', 'four', 'five'];
   const row = block.children[0];
   if (row) {
@@ -17,6 +25,7 @@ export default function decorate(block) {
         cell.classList.add('cards-card-highlight');
       }
       cell.append(details);
+      observer.observe(cell);
     }
   });
 }

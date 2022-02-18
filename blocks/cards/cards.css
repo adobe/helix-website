@@ -36,6 +36,14 @@
     margin: 0.5rem;
     background-color: #eee;
     min-height: 160px;
+    opacity: 0;
+    transform: translate(0, 50px);
+    transition: transform 0.5s ease-out, opacity 1s;
+}
+
+.cards .cards-card.enter {
+    opacity: 1;
+    transform: translate(0, 0);
 }
 
 
