@@ -440,6 +440,11 @@ main .section {
     text-align: center;
 }
 
+.docs-template main .section {
+    text-align: left;
+}
+
+
 main .section .block {
     text-align: left;
 }
