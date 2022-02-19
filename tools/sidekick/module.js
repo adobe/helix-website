@@ -856,7 +856,6 @@
     sk.add({
       id: 'publish',
       condition: (sidekick) => sidekick.isHelix() && sidekick.config.outerHost
-        && !(sidekick.config.byocdn && sidekick.location.host === sidekick.config.host)
         && (sidekick.status.edit && sidekick.status.edit.url) // show if edit url exists
         && sk.isContent(),
       button: {
@@ -873,9 +872,7 @@
           if (results.every((res) => res && res.ok)) {
             sk.showModal('Please wait …', true);
             // fetch and redirect to production
-            const redirectHost = config.byocdn || !config.host
-              ? config.outerHost
-              : config.host;
+            const redirectHost = config.host || config.outerHost;
             const prodURL = `https://${redirectHost}${path}`;
             await fetch(prodURL, { cache: 'reload', mode: 'no-cors' });
             console.log(`redirecting to ${prodURL}`);
@@ -903,7 +900,6 @@
     sk.add({
       id: 'unpublish',
       condition: (sidekick) => sidekick.isHelix() && sidekick.config.outerHost
-        && !(sidekick.config.byocdn && sidekick.location.host === sidekick.config.host)
         && (!sidekick.status.edit || !sidekick.status.edit.url) // show if no edit url
         && sidekick.status.live && sidekick.status.live.lastModified // show if published
         && sk.isContent(),
