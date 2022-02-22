@@ -8,13 +8,13 @@
   --hlx-importer-border: none;
   --hlx-importer-border-radius: 10px;
   --hlx-importer-font-family: arial, helvetica, sans-serif;
-  --hlx-importer-font-size: 1rem;
+  --hlx-importer-font-size: 16px;
   --hlx-importer-line-height: 1;
   --hlx-importer-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 10px 20px 0 rgba(0, 0, 0, 0.3);
   --hlx-importer-button-color: #707070;
   --hlx-importer-button-bg: transparent;
   --hlx-importer-button-border: solid 1px var(--hlx-importer-button-color);
-  --hlx-importer-button-font-size: 1rem;
+  --hlx-importer-button-font-size: 16px;
   --hlx-importer-button-font-weight: 500;
   --hlx-importer-button-padding: 5px 8px;
   --hlx-importer-button-hover-bg: #707070;
@@ -30,7 +30,7 @@
   --hlx-importer-modal-bg-0: #e60016;
   --hlx-importer-modal-bg-1: #e67316;
   --hlx-importer-modal-color: white;
-  --hlx-importer-modal-font-size: 1.5rem;
+  --hlx-importer-modal-font-size: 20px;
   --hlx-importer-special-view-button-color: rgba(0,0,0, 0.5);
   --hlx-importer-special-view-table-border: rgba(0,0,0, 0.5);
   --wait-animation: hlx-importer-heartbeat 2s ease-in-out infinite both;
