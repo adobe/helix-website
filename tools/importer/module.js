@@ -171,6 +171,11 @@
     }
 
     async loadSequence() {
+      // UMD from CodeMirror and import-bundle are broken because of potential define.amd on the site
+      // -> just kill it
+      if (window.define && window.define.amd) {
+        window.define.amd = null;
+      }
       this.loadCSS();
       await this.loadScripts();
       await this.initProjectTransformPolling();
