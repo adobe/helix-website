@@ -10,8 +10,7 @@
  * governing permissions and limitations under the License.
  */
 /* eslint-disable no-console, no-alert */
-
-'use strict';
+/* global CodeMirror, showdown, html_beautify, WebImporter */
 
 (() => {
   const setup = {
@@ -39,14 +38,14 @@
       </div>
     </div>
     <div class="right markdown">
-      <h2>Markdown - Preview <input type="checkbox" id="mdPreviewCheckbox" checked><button id="save">Save as Word</button></h2>
+      <h2>Markdown - Preview <input type="checkbox" id="mdPreviewCheckbox" checked><div class="menu"><button id="save">Save as Word</button></div></h2>
       <div class="code hidden">
         <textarea id="markdownSource" rows="4" cols="10"></textarea>
       </div>
       <div id="markdownPreview"></div>
     </div>
-  </div>`
-  }
+  </div>`,
+  };
 
   /**
    * Makes the given element accessible by setting a title attribute
@@ -134,29 +133,26 @@
       : parent.appendChild(createTag(config)));
   }
 
-   /**
-   * Returns the sidekick configuration.
+  /**
+   * Returns the importer configuration.
    * @private
-   * @param {sidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
-   * @param {Location} location The current location
-   * @returns {Object} The sidekick configuration
+   * @returns {Object} The importer configuration
    */
-    function initConfig() {
-      const config = window.hlx && window.hlx.importerConfig || {};
-      return config;
-    }
-
+  function initConfig() {
+    const config = (window.hlx && window.hlx.importerConfig) || {};
+    return config;
+  }
 
   /**
    * The importer provides helper tools for authors.
    * @augments HTMLElement
    */
-   class Importer extends HTMLElement {
+  class Importer extends HTMLElement {
     /**
      * Creates a new importer.
      * @param {importerConfig} cfg The importer config
      */
-     constructor(cfg) {
+    constructor() {
       super();
       this.config = initConfig();
       this.attachShadow({ mode: 'open' });
@@ -171,7 +167,8 @@
     }
 
     async loadSequence() {
-      // UMD from CodeMirror and import-bundle are broken because of potential define.amd on the site
+      // UMD from CodeMirror and import-bundle are broken
+      // because of potential define.amd on the site
       // -> just kill it
       if (window.define && window.define.amd) {
         window.define.amd = null;
@@ -183,14 +180,15 @@
     }
 
     async loadScripts() {
-      const shadowRoot = this.shadowRoot;
-      for (let i=0; i < setup.scripts.length; i++) {
+      for (let i = 0; i < setup.scripts.length; i += 1) {
         const script = setup.scripts[i];
+        // eslint-disable-next-line no-await-in-loop
         await this.loadJS(script.src);
-        
+
         if (script.deps) {
-          for (let j=0; j < script.deps.length; j++) {
-            const sub = script.deps[j]
+          for (let j = 0; j < script.deps.length; j += 1) {
+            const sub = script.deps[j];
+            // eslint-disable-next-line no-await-in-loop
             await this.loadJS(sub);
           }
         }
@@ -200,15 +198,15 @@
     async initProjectTransformPolling() {
       const $this = this;
       const loadModule = async (projectTransformFileURL) => {
-        try { 
+        try {
           const mod = await import(`${projectTransformFileURL}?cf=${new Date().getTime()}`);
           if (mod.default) {
             this.projectTransform = mod.default;
           }
         } catch (err) {
-          console.warn(`failed to load project transform module`, err);
+          console.warn('failed to load project transform module', err);
         }
-      }
+      };
       const poll = async () => {
         const projectTransformFileURL = this.config.importFileURL;
         try {
@@ -222,11 +220,10 @@
           }
         } catch (err) {
           if ($this.lastProjectTransformFileBody !== 'nofilefound') {
-            console.warn(`failed to poll project transform module`, err);
+            console.warn('failed to poll project transform module', err);
             $this.lastProjectTransformFileBody = 'nofilefound';
             $this.transform();
           }
-          
         }
       };
 
@@ -238,14 +235,14 @@
 
     init() {
       this.root.innerHTML = setup.template;
-      
+
       this.transformedEditor = CodeMirror.fromTextArea(this.shadowRoot.getElementById('transformed'), {
         lineNumbers: true,
         mode: 'htmlmixed',
         theme: 'base16-dark',
       });
       this.transformedEditor.setSize('100%', '440');
-      
+
       this.markdownSource = this.shadowRoot.getElementById('markdownSource');
       this.markdownEditor = CodeMirror.fromTextArea(this.markdownSource, {
         lineNumbers: true,
@@ -257,7 +254,7 @@
       this.showdownConverter = new showdown.Converter();
       this.markdownPreview = this.shadowRoot.getElementById('markdownPreview');
 
-      this.shadowRoot.getElementById('mdPreviewCheckbox').addEventListener('click',  ((evt) => {
+      this.shadowRoot.getElementById('mdPreviewCheckbox').addEventListener('click', ((evt) => {
         if (evt.target.checked) {
           this.markdownSource.parentElement.classList.add('hidden');
           this.markdownPreview.classList.remove('hidden');
@@ -266,10 +263,14 @@
           this.markdownSource.parentElement.classList.remove('hidden');
           this.markdownEditor.refresh();
         }
-      }).bind(this));
+      }));
 
-      this.shadowRoot.getElementById('save').addEventListener('click',  (async (evt) => {
-        const out = await WebImporter.html2docx(window.location.href, document.documentElement.outerHTML, this.projectTransform);
+      this.shadowRoot.getElementById('save').addEventListener('click', (async () => {
+        const out = await WebImporter.html2docx(
+          window.location.href,
+          document.documentElement.outerHTML,
+          this.projectTransform,
+        );
         const { docx, name } = out;
         let filename = window.location.pathname
           .replace(/^\//, '')
@@ -281,17 +282,21 @@
         }
 
         const a = document.createElement('a');
-        const blob = new Blob([ docx ], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const blob = new Blob([docx], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
         a.setAttribute('href', URL.createObjectURL(blob));
         a.setAttribute('download', filename);
-        a.click()
-      }).bind(this));
+        a.click();
+      }));
     }
 
     async transform() {
-      const out = await WebImporter.html2md(window.location.href, document.documentElement.outerHTML, this.projectTransform);
+      const out = await WebImporter.html2md(
+        window.location.href,
+        document.documentElement.outerHTML,
+        this.projectTransform,
+      );
       const { md, html: outputHTML } = out;
-      
+
       this.transformedEditor.setValue(html_beautify(outputHTML));
       this.markdownEditor.setValue(md || '');
 
@@ -303,7 +308,6 @@
         t.removeAttribute('class');
         t.removeAttribute('style');
       });
-        
     }
 
     /**
@@ -338,10 +342,8 @@
       let href = path;
       if (!path) {
         href = `${this.config.host}/app.css`;
-      } else {
-        if (!path.startsWith('http')) {
-          href = `${this.config.host}${path}`;
-        }
+      } else if (!path.startsWith('http')) {
+        href = `${this.config.host}${path}`;
       }
       appendTag(this.shadowRoot, {
         tag: 'link',
@@ -366,7 +368,7 @@
           },
           lstnrs: {
             load: () => resolve(),
-          }
+          },
         });
       });
     }
@@ -374,7 +376,10 @@
 
   function initImporter(cfg = {}) {
     if (!window.hlx.importer) {
-      window.hlx.importerConfig = Object.assign(window.hlx.importerConfig || {}, cfg);
+      window.hlx.importerConfig = {
+        ...window.hlx.importerConfig || {},
+        ...cfg,
+      };
 
       // init and show importer
       if (!window.customElements.get('helix-importer')) {

@@ -27,21 +27,20 @@
     const moduleScript = document.createElement('script');
     moduleScript.id = 'hlx-importer-module';
     moduleScript.src = `${host}/module.js`;
-    const config = JSON.parse(appScript.dataset['config'] || "{}");
+    const config = JSON.parse(appScript.dataset.config || '{}');
     moduleScript.addEventListener('load', () => {
-      window.hlx.initImporter(Object.assign({
+      window.hlx.initImporter({
         importFileURL: 'http://localhost:3000/tools/importer/import.js', // default
-        host
-      }, config));
+        host,
+        ...config,
+      });
     });
 
     moduleScript.addEventListener('error', () => {
       console.error('failed to load importer module');
     });
     document.head.append(moduleScript);
-
-} else if (window.hlx.importer) {
-  window.hlx.importer.toggle();
-}
-
+  } else if (window.hlx.importer) {
+    window.hlx.importer.toggle();
+  }
 })();
