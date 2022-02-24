@@ -268,7 +268,7 @@
       this.shadowRoot.getElementById('save').addEventListener('click', (async () => {
         const out = await WebImporter.html2docx(
           window.location.href,
-          document.documentElement.outerHTML,
+          document,
           this.projectTransform,
         );
         const { docx, name } = out;
@@ -292,7 +292,7 @@
     async transform() {
       const out = await WebImporter.html2md(
         window.location.href,
-        document.documentElement.outerHTML,
+        document,
         this.projectTransform,
       );
       const { md, html: outputHTML } = out;
