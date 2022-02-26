@@ -431,6 +431,13 @@ a.button:any-link {
 p.button-container > a.button {
     margin-left: 0;
 }
+
+main p em strong, main p strong em {
+  background-color: #FE833F;
+  padding: 0px 10px;
+  display: inline-block;
+} 
+
 /* section styling */
 
 main .section {
