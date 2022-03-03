@@ -40,6 +40,7 @@
    * @prop {string}   text   The button text
    * @prop {Function} action The click listener
    * @prop {boolean|Function} isPressed Determines whether the button is pressed
+   * @prop {boolean}  isDropdown=false True to turn this button into a dropdown
    */
 
   /**
@@ -47,7 +48,8 @@
    * @description The plugin configuration.
    * @prop {string}       id        The plugin ID (mandatory)
    * @prop {pluginButton} button    A button configuration object (optional)
-   * @prop {boolean}      override=false  True to replace an existing plugin (optional)
+   * @prop {string}       container The ID of a dropdown to add this plugin to (optional)
+   * @prop {boolean}      override=false True to replace an existing plugin (optional)
    * @prop {elemConfig[]} elements  An array of elements to add (optional)
    * @prop {Function}     condition Determines whether to show this plugin (optional).
    * This function is expected to return a boolean when called with the sidekick as argument.
@@ -454,14 +456,61 @@
    * and appends it to the parent element.
    * @private
    * @param {HTMLElement} parent The parent element
-   * @param {elemConfig}  config The tag configuration
+   * @param {HTMLElement|elemConfig}  config The tag (configuration)
    * @param {HTMLElement} before The element to insert before (optional)
    * @returns {HTMLElement} The new tag
    */
   function appendTag(parent, config, before) {
+    const tag = config instanceof HTMLElement ? config : createTag(config);
     return makeAccessible(before
-      ? parent.insertBefore(createTag(config), before)
-      : parent.appendChild(createTag(config)));
+      ? parent.insertBefore(tag, before)
+      : parent.appendChild(tag));
+  }
+
+  /**
+   * Creates a dropdown as a container for other plugins.
+   * @private
+   * @param {pluginConfig} config The plugin configuration
+   * @returns {HTMLElement} The dropdown
+   */
+  function createDropdown(config) {
+    const { id = '', button = {} } = config;
+    const dropdown = createTag({
+      tag: 'div',
+      attrs: {
+        class: `${id} dropdown`,
+      },
+    });
+    appendTag(dropdown, {
+      tag: 'button',
+      attrs: {
+        class: 'dropdown-toggle',
+      },
+      lstnrs: {
+        click: (evt) => {
+          // collapse env listener
+          const collapseEnv = () => {
+            dropdown.classList.remove('dropdown-expanded');
+            document.removeEventListener('click', collapseEnv);
+          };
+          dropdown.classList.toggle('dropdown-expanded');
+          if (dropdown.classList.contains('dropdown-expanded')) {
+            evt.stopPropagation();
+            window.setTimeout(() => {
+              document.addEventListener('click', collapseEnv);
+            }, 100);
+          }
+        },
+      },
+      ...button,
+    });
+    appendTag(dropdown, {
+      tag: 'div',
+      attrs: {
+        class: 'dropdown-container',
+      },
+    });
+    return dropdown;
   }
 
   /**
@@ -856,7 +905,6 @@
     sk.add({
       id: 'publish',
       condition: (sidekick) => sidekick.isHelix() && sidekick.config.outerHost
-        && !(sidekick.config.byocdn && sidekick.location.host === sidekick.config.host)
         && (sidekick.status.edit && sidekick.status.edit.url) // show if edit url exists
         && sk.isContent(),
       button: {
@@ -873,9 +921,7 @@
           if (results.every((res) => res && res.ok)) {
             sk.showModal('Please wait …', true);
             // fetch and redirect to production
-            const redirectHost = config.byocdn || !config.host
-              ? config.outerHost
-              : config.host;
+            const redirectHost = config.host || config.outerHost;
             const prodURL = `https://${redirectHost}${path}`;
             await fetch(prodURL, { cache: 'reload', mode: 'no-cors' });
             console.log(`redirecting to ${prodURL}`);
@@ -903,7 +949,6 @@
     sk.add({
       id: 'unpublish',
       condition: (sidekick) => sidekick.isHelix() && sidekick.config.outerHost
-        && !(sidekick.config.byocdn && sidekick.location.host === sidekick.config.host)
         && (!sidekick.status.edit || !sidekick.status.edit.url) // show if no edit url
         && sidekick.status.live && sidekick.status.live.lastModified // show if published
         && sk.isContent(),
@@ -1430,49 +1475,25 @@
           || (typeof plugin.condition === 'function' && plugin.condition(this));
         // find existing plugin
         let $plugin = this.get(plugin.id);
-        let $pluginContainer = this.pluginContainer;
+        let $pluginContainer = (plugin.container
+          && this.pluginContainer
+            .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
+          || this.pluginContainer;
         if (ENVS[plugin.id]) {
           // find or create environment plugin container
           $pluginContainer = this.root.querySelector(':scope .env .dropdown-container');
           if (!$pluginContainer) {
-            const $envContainer = appendTag(this.featureContainer, {
-              tag: 'div',
-              attrs: {
-                class: 'env dropdown',
-              },
-            }, this.featureContainer.firstElementChild);
-            if (this.isInner()) $envContainer.classList.add('preview');
-            if (this.isOuter()) $envContainer.classList.add('live');
-            if (this.isProd()) $envContainer.classList.add('prod');
-            appendTag($envContainer, {
-              tag: 'button',
-              attrs: {
-                class: 'dropdown-toggle',
-              },
-              lstnrs: {
-                click: (evt) => {
-                  // collapse env listener
-                  const collapseEnv = () => {
-                    $envContainer.classList.remove('dropdown-expanded');
-                    document.removeEventListener('click', collapseEnv);
-                  };
-                  $envContainer.classList.toggle('dropdown-expanded');
-                  if ($envContainer.classList.contains('dropdown-expanded')) {
-                    evt.stopPropagation();
-                    window.setTimeout(() => {
-                      document.addEventListener('click', collapseEnv);
-                    }, 100);
-                  }
-                  this.checkPushDownContent();
-                },
-              },
-            });
-            $pluginContainer = appendTag($envContainer, {
-              tag: 'div',
-              attrs: {
-                class: 'dropdown-container',
-              },
-            });
+            const $envDropdown = appendTag(
+              this.featureContainer,
+              createDropdown({
+                id: 'env',
+              }),
+              this.featureContainer.firstElementChild,
+            );
+            if (this.isInner()) $envDropdown.classList.add('preview');
+            if (this.isOuter()) $envDropdown.classList.add('live');
+            if (this.isProd()) $envDropdown.classList.add('prod');
+            $pluginContainer = $envDropdown.querySelector(':scope .dropdown-container');
           }
         }
         const pluginCfg = {
@@ -1483,6 +1504,10 @@
         };
         if (!$plugin && plugin.enabled) {
           // add new plugin
+          if (plugin.button && plugin.button.isDropdown) {
+            // add dropdown
+            return appendTag($pluginContainer, createDropdown(plugin));
+          }
           $plugin = appendTag($pluginContainer, pluginCfg);
           // remove loading text
           if (this.pluginContainer.classList.contains('loading')) {

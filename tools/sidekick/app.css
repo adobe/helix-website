@@ -247,11 +247,10 @@
 .hlx-sk .dropdown-container {
   display: none;
   position: absolute;
-  width: 120px;
+  min-width: 120px;
   top: 40px;
   background-color: var(--hlx-sk-dropdown-container-bg);
-  border-bottom-left-radius: var(--hlx-sk-button-border-radius);
-  border-bottom-right-radius: var(--hlx-sk-button-border-radius);
+  border-radius: var(--hlx-sk-button-border-radius);
   box-shadow: var(--hlx-sk-shadow);
 }
 
@@ -270,13 +269,13 @@
   border-width: 1px 1px 0 0;
   content: '';
   display: inline-block;
-  height: 0.45em;
-  left: 0.15em;
+  height: 7px;
+  left: 1px;
   position: relative;
   top: 2px;
   transform: rotate(135deg);
   vertical-align: top;
-  width: 0.45em;
+  width: 7px;
   margin-left: 4px;
 }
 
@@ -344,7 +343,7 @@
 .hlx-sk-overlay .modal {
   font-family: var(--hlx-sk-font-family);
   font-size: var(--hlx-sk-modal-font-size);
-  border-radius: 4px;
+  border-radius: 32px;
   padding: 12px 32px;
   max-width: 60vw;
   background-color: var(--hlx-sk-bg);
@@ -374,6 +373,7 @@
 .hlx-sk-overlay .modal.help {
   margin-top: 15px;
   position: absolute;
+  border-radius: 4px;
   padding: 12px 24px;
   background-color: var(--hlx-sk-modal-help-bg);
   color: var(--hlx-sk-modal-help-color);

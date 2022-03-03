@@ -7,14 +7,13 @@ export default async function decorateFaq($block) {
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
     const $a = document.createElement('a');
-    $a.id = 'q' + (i + 1);
-    $dt.innerText = row['Question'];
+    $a.id = `q${(i + 1)}`;
+    $dt.innerText = row.Question;
     const $dd = document.createElement('dd');
-    $dd.innerText = row['Answer'];
-    
+    $dd.innerText = row.Answer;
     $a.append($dt, $dd);
     $dl.append($a);
-  })
+  });
   $block.append($dl);
 
   const selected = document.getElementById(window.location.hash.slice(1));
