@@ -40,8 +40,9 @@ main .form-container select:hover {
 
 main .form-container label {
   width: 100%;
-  font-size: var(--type-body-m-size);
-  line-height: var(--type-body-m-lh);
+  display: block;
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
   padding-bottom: var(--spacing-xs);
   text-transform: uppercase;
   box-sizing: border-box;
@@ -96,7 +97,7 @@ main .form-container .button {
   background: rgb(20, 115, 230);
   color: white;
   border-radius: 16px;
-  font-size: var(--type-body-m-size);
+  font-size: var(--type-body-s-size);
   font-weight: 300;
   padding: 6px 16px;
   border: none;
