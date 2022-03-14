@@ -39,8 +39,9 @@
    * a shorthand for {@link elemConfig}.
    * @prop {string}   text   The button text
    * @prop {Function} action The click listener
-   * @prop {boolean|Function} isPressed Determines whether the button is pressed
-   * @prop {boolean}  isDropdown=false True to turn this button into a dropdown
+   * @prop {Function} isPressed=false Determines whether the button is pressed
+   * @prop {Function} isEnabled=true Determines whether to enable the button
+   * @prop {boolean}  isDropdown=false Determines whether to turn this button into a dropdown
    */
 
   /**
@@ -703,8 +704,7 @@
   function addEditPlugin(sk) {
     sk.add({
       id: 'edit',
-      condition: (sidekick) => !sidekick.isEditor() && sidekick.isHelix()
-        && sidekick.status.edit && sidekick.status.edit.url,
+      condition: (sidekick) => !sidekick.isEditor() && sidekick.isHelix(),
       button: {
         action: async () => {
           const { config, status } = sk;
@@ -714,6 +714,7 @@
             `hlx-sk-edit--${config.owner}/${config.repo}/${config.ref}${status.webPath}`,
           );
         },
+        isEnabled: (sidekick) => sidekick.status.edit && sidekick.status.edit.url,
       },
     });
   }
@@ -728,8 +729,7 @@
     // preview
     sk.add({
       id: 'preview',
-      condition: (sidekick) => (sidekick.isEditor() || sidekick.isHelix())
-        && sidekick.status.preview && sidekick.status.preview.lastModified,
+      condition: (sidekick) => sidekick.isEditor() || sidekick.isHelix(),
       button: {
         action: async (evt) => {
           if (evt.target.classList.contains('pressed')) {
@@ -738,6 +738,8 @@
           sk.switchEnv('preview', newTab(evt));
         },
         isPressed: (sidekick) => sidekick.isInner(),
+        isEnabled: (sidekick) => sidekick.isInner()
+          || (sidekick.status.preview && sidekick.status.preview.lastModified),
       },
     });
 
@@ -745,8 +747,7 @@
     sk.add({
       id: 'live',
       condition: (sidekick) => sidekick.config.outerHost
-        && (sidekick.isEditor() || sidekick.isHelix())
-        && sidekick.status.live && sidekick.status.live.lastModified,
+        && (sidekick.isEditor() || sidekick.isHelix()),
       button: {
         action: async (evt) => {
           if (evt.target.classList.contains('pressed')) {
@@ -755,6 +756,8 @@
           sk.switchEnv('live', newTab(evt));
         },
         isPressed: (sidekick) => sidekick.isOuter(),
+        isEnabled: (sidekick) => sidekick.isOuter()
+          || (sidekick.status.live && sidekick.status.live.lastModified),
       },
     });
 
@@ -763,8 +766,7 @@
       id: 'prod',
       condition: (sidekick) => sidekick.config.host
         && sidekick.config.host !== sidekick.config.outerHost
-        && (sidekick.isEditor() || sidekick.isHelix())
-        && sidekick.status.live && sidekick.status.live.lastModified,
+        && (sidekick.isEditor() || sidekick.isHelix()),
       button: {
         action: async (evt) => {
           if (evt.target.classList.contains('pressed')) {
@@ -773,6 +775,8 @@
           sk.switchEnv('prod', newTab(evt));
         },
         isPressed: (sidekick) => sidekick.isProd(),
+        isEnabled: (sidekick) => sidekick.isProd()
+          || (sidekick.status.live && sidekick.status.live.lastModified),
       },
     });
 
@@ -794,6 +798,7 @@
       button: {
         action: async (evt) => {
           const { status } = sk;
+          sk.showModal('Please wait …', true);
           // update preview
           const resp = await sk.update();
           if (!resp.ok && resp.status >= 400) {
@@ -819,8 +824,7 @@
   function addReloadPlugin(sk) {
     sk.add({
       id: 'reload',
-      condition: (s) => s.config.innerHost && (s.isInner() || s.isDev())
-        && (s.status.edit && s.status.edit.url), // show if edit url exists
+      condition: (s) => s.config.innerHost && (s.isInner() || s.isDev()),
       button: {
         action: async (evt) => {
           const { location } = sk;
@@ -846,6 +850,7 @@
             );
           }
         },
+        isEnabled: (s) => s.status.edit && s.status.edit.url, // enable only if edit url exists
       },
     });
   }
@@ -859,7 +864,7 @@
     sk.add({
       id: 'delete',
       condition: (sidekick) => sidekick.isHelix()
-        && (!sidekick.status.edit || !sidekick.status.edit.url) // show if no edit url
+        && (!sidekick.status.edit || !sidekick.status.edit.url) // show only if no edit url and
         && (sidekick.status.preview && sidekick.status.preview.status !== 404), // preview exists
       button: {
         action: async () => {
@@ -905,7 +910,6 @@
     sk.add({
       id: 'publish',
       condition: (sidekick) => sidekick.isHelix() && sidekick.config.outerHost
-        && (sidekick.status.edit && sidekick.status.edit.url) // show if edit url exists
         && sk.isContent(),
       button: {
         action: async (evt) => {
@@ -936,6 +940,8 @@
             sk.showModal('Failed to publish page. Please try again later.', true, 0);
           }
         },
+        isEnabled: (sidekick) => sidekick.status.edit
+          && sidekick.status.edit.url, // enable only if edit url exists
       },
     });
   }
@@ -949,8 +955,8 @@
     sk.add({
       id: 'unpublish',
       condition: (sidekick) => sidekick.isHelix() && sidekick.config.outerHost
-        && (!sidekick.status.edit || !sidekick.status.edit.url) // show if no edit url
-        && sidekick.status.live && sidekick.status.live.lastModified // show if published
+        && (!sidekick.status.edit || !sidekick.status.edit.url) // show only if no edit url and
+        && sidekick.status.live && sidekick.status.live.lastModified // published
         && sk.isContent(),
       button: {
         action: async () => {
@@ -994,63 +1000,14 @@
    * @param {Sidekick} sk The sidekick
    */
   function checkPlugins(sk) {
-    if (sk.plugins.length === 0) {
-      // default plugins
-      addEditPlugin(sk);
-      addEnvPlugins(sk);
-      addPreviewPlugin(sk);
-      addReloadPlugin(sk);
-      addDeletePlugin(sk);
-      addPublishPlugin(sk);
-      addUnpublishPlugin(sk);
-      // custom plugins
-      if (sk.config.plugins && Array.isArray(sk.config.plugins)) {
-        sk.config.plugins.forEach((plugin) => sk.add(plugin));
+    window.setTimeout(() => {
+      if (sk.pluginContainer.querySelectorAll(':scope > div > *').length === 0) {
+        // add empty text
+        sk.pluginContainer.classList.replace('loading', 'empty');
+        sk.checkPushDownContent();
       }
-      if (sk.config.compatMode
-        && (sk.isHelix() || sk.isEditor())
-        && (sk.config.devMode || sk.config.innerHost)) {
-        // load custom plugins in compatibility mode
-        let prefix = (sk.isEditor() ? `https://${sk.config.innerHost}` : '');
-        if (sk.config.devMode || sk.config.pluginHost) {
-          // TODO: remove support for pluginHost
-          if (sk.config.pluginHost) {
-            console.warn('pluginHost is deprecated, use devMode instead');
-          }
-          prefix = sk.config.pluginHost || DEV_URL.origin;
-        }
-        appendTag(document.head, {
-          tag: 'script',
-          attrs: {
-            src: `${prefix}/tools/sidekick/plugins.js`,
-          },
-        });
-      }
-      sk.checkPushDownContent();
-      window.setTimeout(() => {
-        if (sk.pluginContainer.querySelectorAll(':scope > div > *').length === 0) {
-          // add empty text
-          sk.pluginContainer.classList.replace('loading', 'empty');
-          sk.checkPushDownContent();
-        }
-      }, 5000);
-    } else {
-      // re-evaluate plugin conditions
-      sk.plugins.forEach((plugin) => {
-        if (typeof plugin.condition !== 'function') {
-          // nothing to do
-          return;
-        }
-        const $plugin = sk.get(plugin.id);
-        if ($plugin && !plugin.condition(sk)) {
-          // plugin exists but condition now false
-          sk.remove(plugin.id);
-        } else if (!$plugin && plugin.condition(sk)) {
-          // plugin doesn't exist but condition now true
-          sk.add(plugin);
-        }
-      });
-    }
+    }, 5000);
+    sk.checkPushDownContent();
   }
 
   /**
@@ -1265,6 +1222,20 @@
           class: 'hlx-sk hlx-sk-hidden',
         },
         lstnrs: {
+          contextloaded: () => {
+            // add default plugins
+            addEditPlugin(this);
+            addEnvPlugins(this);
+            addPreviewPlugin(this);
+            addReloadPlugin(this);
+            addDeletePlugin(this);
+            addPublishPlugin(this);
+            addUnpublishPlugin(this);
+            // add custom plugins
+            if (this.config.plugins && Array.isArray(this.config.plugins)) {
+              this.config.plugins.forEach((plugin) => this.add(plugin));
+            }
+          },
           statusfetched: () => {
             checkPlugins(this);
             checkLastModified(this);
@@ -1281,9 +1252,6 @@
       });
       this.status = {};
       this.plugins = [];
-      this.loadContext(cfg);
-      this.fetchStatus();
-      this.loadCSS();
       this.pluginContainer = appendTag(this.root, {
         tag: 'div',
         attrs: {
@@ -1317,6 +1285,10 @@
           click: () => this.hide(),
         },
       });
+
+      this.loadContext(cfg);
+      this.fetchStatus();
+      this.loadCSS();
       checkForIssues(this);
     }
 
@@ -1471,7 +1443,7 @@
     add(plugin) {
       if (typeof plugin === 'object') {
         this.plugins.push(plugin);
-        plugin.enabled = typeof plugin.condition === 'undefined'
+        plugin.isShown = typeof plugin.condition === 'undefined'
           || (typeof plugin.condition === 'function' && plugin.condition(this));
         // find existing plugin
         let $plugin = this.get(plugin.id);
@@ -1496,13 +1468,39 @@
             $pluginContainer = $envDropdown.querySelector(':scope .dropdown-container');
           }
         }
+        // re-check plugin once status is fetched
+        this.addEventListener('statusfetched', () => {
+          if (typeof plugin.condition === 'function') {
+            if ($plugin && !plugin.condition(this)) {
+              // plugin exists but condition now false
+              this.remove(plugin.id);
+            } else if (!$plugin && plugin.condition(this)) {
+              // plugin doesn't exist but condition now true
+              this.add(plugin);
+            }
+          }
+          const isEnabled = plugin.button && plugin.button.isEnabled;
+          if (typeof isEnabled === 'function' || typeof isEnabled === 'boolean') {
+            const $button = $plugin && $plugin.querySelector(':scope button');
+            if ($button) {
+              if (typeof isEnabled === 'function' && isEnabled(this)) {
+                // button enabled
+                $plugin.querySelector(':scope button').removeAttribute('disabled');
+              } else {
+                // button disabled
+                $plugin.querySelector(':scope button').setAttribute('disabled', '');
+              }
+            }
+          }
+        });
+
         const pluginCfg = {
           tag: 'div',
           attrs: {
             class: plugin.id,
           },
         };
-        if (!$plugin && plugin.enabled) {
+        if (!$plugin && plugin.isShown) {
           // add new plugin
           if (plugin.button && plugin.button.isDropdown) {
             // add dropdown
@@ -1514,7 +1512,7 @@
             this.pluginContainer.classList.remove('loading');
           }
         } else if ($plugin) {
-          if (!plugin.enabled) {
+          if (!plugin.isShown) {
             // remove existing plugin
             $plugin.remove();
           } else if (plugin.override) {
@@ -1524,7 +1522,7 @@
             $existingPlugin.remove();
           }
         }
-        if (!plugin.enabled) {
+        if (!plugin.isShown) {
           return null;
         }
         // add elements
@@ -1549,9 +1547,12 @@
             // add button
             $button = appendTag($plugin, buttonCfg);
           }
+          // check if button is enabled
+          if (typeof plugin.button.isEnabled === 'function' && !plugin.button.isEnabled(this)) {
+            $button.setAttribute('disabled', '');
+          }
           // check if button is pressed
-          if ((typeof plugin.button.isPressed === 'boolean' && !!plugin.button.isPressed)
-            || (typeof plugin.button.isPressed === 'function' && plugin.button.isPressed(this))) {
+          if (typeof plugin.button.isPressed === 'function' && plugin.button.isPressed(this)) {
             $button.classList.add('pressed');
             $button.removeAttribute('tabindex');
           }
