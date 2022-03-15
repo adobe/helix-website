@@ -801,9 +801,14 @@
           sk.showModal('Please wait …', true);
           // update preview
           const resp = await sk.update();
-          if (!resp.ok && resp.status >= 400) {
+          if (!resp.ok) {
             console.error(resp);
-            throw new Error(resp);
+            sk.showModal(
+              `Failed to preview ${status.webPath}. Please try again later.`,
+              true,
+              0,
+            );
+            return;
           }
           // handle special case /.helix/config.json
           if (status.webPath === '/.helix/config.json') {
@@ -937,7 +942,7 @@
             }
           } else {
             console.error(results);
-            sk.showModal('Failed to publish page. Please try again later.', true, 0);
+            sk.showModal(`Failed to publish ${path}. Please try again later.`, true, 0);
           }
         },
         isEnabled: (sidekick) => sidekick.status.edit
