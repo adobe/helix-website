@@ -236,6 +236,24 @@
   }
 
   /**
+   * Retrieves Helix project details from a host name.
+   * @private
+   * @param {string} host The host name
+   * @returns {string[]} The project details
+   */
+  function getHelixProjectDetails(host) {
+    const details = host.split('.')[0].split('--');
+    if (details.length < 2) {
+      return false;
+    }
+    if (details.length === 3) {
+      // lose ref
+      details.shift();
+    }
+    return details;
+  }
+
+  /**
    * Checks if a Helix host name matches another, regardless of ref.
    * @private
    * @param {string} baseHost The base host
@@ -246,10 +264,20 @@
     if (!baseHost || !host) {
       return false;
     }
-    const compHost = (host.split('--').length === 3)
-      ? host.substring(host.indexOf('--') + 2)
-      : host;
-    return baseHost === compHost || baseHost.endsWith(compHost);
+    // matching helix domains
+    const helixDomains = ['page', 'hlx.live'];
+    if (!helixDomains.find((domain) => baseHost.endsWith(domain)
+      && host.endsWith(domain))) {
+      return false;
+    }
+    // direct match
+    if (baseHost === host) {
+      return true;
+    }
+    // project details
+    const [baseHostRepo, baseHostOwner] = getHelixProjectDetails(baseHost);
+    const [hostRepo, hostOwner] = getHelixProjectDetails(host);
+    return baseHostOwner === hostOwner && baseHostRepo === hostRepo;
   }
 
   /**
@@ -293,7 +321,7 @@
     const publicHost = host && host.startsWith('http') ? new URL(host).host : host;
     const scriptUrl = (window.hlx.sidekickScript && window.hlx.sidekickScript.src)
       || 'https://www.hlx.live/tools/sidekick/module.js';
-    let innerHost = 'hlx3.page';
+    let innerHost = 'hlx.page';
     if (!innerHost && scriptUrl) {
       // get hlx domain from script src (used for branch deployment testing)
       const scriptHost = new URL(scriptUrl).host;
@@ -625,20 +653,8 @@
    * @private
    * @param {Sidekick} sk The sidekick
    */
-  async function checkForIssues(sk) {
-    // check if current inner cdn url is hlx3 url
-    if (sk.location.hostname.endsWith('.page')
-      && !sk.location.hostname.endsWith('hlx3.page')) {
-      sk.showModal([
-        'Unfortunately, your website is no longer compatible with Helix Sidekick. ',
-        'If you are the owner, you may find the following link useful:',
-        'https://www.hlx.live/docs/migrate-from-hlx2',
-      ], true, 1, () => {
-        window.hlx.sidekick.hide();
-        window.hlx.sidekick.replaceWith(''); // remove() doesn't work for custom element
-        delete window.hlx.sidekick;
-      });
-    }
+  async function checkForIssues() {
+    // nothing to check for atm
   }
 
   /**
