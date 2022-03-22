@@ -439,7 +439,31 @@ main p em strong, main p strong em {
   background-color: #FE833F;
   padding: 0px 10px;
   display: inline-block;
-} 
+}
+
+main table,
+main table th,
+main table tr,
+main table td {
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-align: left;
+}
+
+main table th {
+  border-bottom: 1px solid currentColor;
+}
+
+main table td {
+  vertical-align: top;
+}
+
+main table p,
+main table pre {
+  margin: 0;
+  padding: 0.5em;
+  background-color: transparent;
+}
 
 /* section styling */
 
