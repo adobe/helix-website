@@ -83,21 +83,29 @@
 }
 
 .hlx-sk-overlay .modal.help .help-acknowledge::before {
-  content: "Got it!";
+  content: "J'ai compris!";
 }
 
-.hlx-sk-overlay .modal.help .help-dismiss::before {
-  content: "Not now";
+.hlx-sk-overlay .modal.help .help-close-dismiss::before {
+  content: "Revoir l'aide plus tard";
+}
+
+.hlx-sk-overlay .modal.help .help-close-acknowledge::before {
+  content: "Ne plus voir ce sujet";
+}
+
+.hlx-sk-overlay .modal.help .help-close-opt-out::before {
+  content: "Ne plus voir l'aide";
 }
 
 .hlx-sk-overlay .modal.help .help-previous::before {
-  content: "Previous tip";
+  content: "Astuce précédente";
 }
 
 .hlx-sk-overlay .modal.help .help-current::before {
-  content: "This tip";
+  content: "Astuce";
 }
 
 .hlx-sk-overlay .modal.help .help-next::before {
-  content: "Next tip";
+  content: "Astuce suivante";
 }

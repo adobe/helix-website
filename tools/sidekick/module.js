@@ -193,6 +193,12 @@
    */
 
   /**
+   * @event Sidekick#helpnext
+   * @type {string} The help topic
+   * @description This event is fired when a user clicks next on a help dialog.
+   */
+
+  /**
    * @event Sidekick#helpdismissed
    * @type {string} The help topic
    * @description This event is fired when a help dialog has been dismissed.
@@ -202,6 +208,12 @@
    * @event Sidekick#helpacknowledged
    * @type {string} The help topic
    * @description This event is fired when a help dialog has been acknowledged.
+   */
+
+  /**
+   * @event Sidekick#helpoptedout
+   * @type {string} The help topic
+   * @description This event is fired when a user decides to opt out of help content.
    */
 
   /**
@@ -524,11 +536,11 @@
           };
           dropdown.classList.toggle('dropdown-expanded');
           if (dropdown.classList.contains('dropdown-expanded')) {
-            evt.stopPropagation();
             window.setTimeout(() => {
               document.addEventListener('click', collapseEnv);
             }, 100);
           }
+          evt.stopPropagation();
         },
       },
       ...button,
@@ -1800,6 +1812,12 @@
           class: 'help-steps',
         },
       });
+      const buttonControls = appendTag(controls, {
+        tag: 'div',
+        attrs: {
+          class: 'help-actions',
+        },
+      });
       if (cSteps.length > 1) {
         cSteps.forEach((_, num) => {
           let type = 'current';
@@ -1829,10 +1847,19 @@
         });
       }
       if (cSteps[step + 1]) {
-        appendTag(controls, {
+        // more help steps to show
+        const close = appendTag(buttonControls, createDropdown({
+          id: 'help-close',
+          button: {
+            attrs: {
+              class: 'dropdown-toggle close',
+            },
+          },
+        }));
+        appendTag(close.lastElementChild, {
           tag: 'button',
           attrs: {
-            class: 'help-dismiss',
+            class: 'help-close-dismiss',
           },
           lstnrs: {
             click: () => {
@@ -1840,8 +1867,44 @@
             },
           },
         });
+        appendTag(close.lastElementChild, {
+          tag: 'button',
+          attrs: {
+            class: 'help-close-acknowledge',
+          },
+          lstnrs: {
+            click: () => {
+              fireEvent(this, 'helpacknowledged', id);
+            },
+          },
+        });
+        appendTag(close.lastElementChild, {
+          tag: 'button',
+          attrs: {
+            class: 'help-close-opt-out',
+          },
+          lstnrs: {
+            click: () => {
+              fireEvent(this, 'helpoptedout', id);
+            },
+          },
+        });
+        appendTag(buttonControls, {
+          tag: 'button',
+          attrs: {
+            class: 'help-next',
+          },
+          lstnrs: {
+            click: (evt) => {
+              evt.stopPropagation();
+              this.showHelp(topic, step + 1);
+              fireEvent(this, 'helpnext', id);
+            },
+          },
+        });
       } else {
-        appendTag(controls, {
+        // last help step
+        appendTag(buttonControls, {
           tag: 'button',
           attrs: {
             class: 'help-acknowledge',

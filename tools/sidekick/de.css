@@ -86,8 +86,16 @@
   content: "Alles klar!";
 }
 
-.hlx-sk-overlay .modal.help .help-dismiss::before {
-  content: "Nicht jetzt";
+.hlx-sk-overlay .modal.help .help-close-dismiss::before {
+  content: "Hilfethema später anzeigen";
+}
+
+.hlx-sk-overlay .modal.help .help-close-acknowledge::before {
+  content: "Hilfethema nicht mehr anzeigen";
+}
+
+.hlx-sk-overlay .modal.help .help-close-opt-out::before {
+  content: "Gar keine Hilfethemen anzeigen";
 }
 
 .hlx-sk-overlay .modal.help .help-previous::before {
