@@ -43,6 +43,7 @@
   --hlx-sk-modal-color: white;
   --hlx-sk-modal-help-bg: #1473e6;
   --hlx-sk-modal-help-color: white;
+  --hlx-sk-modal-help-dropdown-container-bg: #1473e6be;
   --hlx-sk-modal-font-size: 1.5rem;
   --hlx-sk-special-view-button-color: rgba(0,0,0, 0.5);
   --hlx-sk-special-view-table-border: rgba(0,0,0, 0.5);
@@ -236,15 +237,17 @@
   transform: rotate(-45deg);
 }
 
-.hlx-sk .dropdown {
-  display: none;
+.hlx-sk .dropdown,
+.hlx-sk-overlay .dropdown
+ {
   min-height: 28px;
   max-height: 28px;
   margin-top: 10px;
   position: relative;
 }
 
-.hlx-sk .dropdown-container {
+.hlx-sk .dropdown-container,
+.hlx-sk-overlay .dropdown-container {
   display: none;
   position: absolute;
   min-width: 120px;
@@ -254,17 +257,24 @@
   box-shadow: var(--hlx-sk-shadow);
 }
 
-.hlx-sk .dropdown button:hover {
+.hlx-sk .dropdown button:hover,
+.hlx-sk-overlay .dropdown button:hover {
   color: var(--hlx-sk-button-hover-color);
   background-color: var(--hlx-sk-button-hover-bg);
 }
 
-.hlx-sk:not(.hlx-sk-loading) .dropdown {
+.hlx-sk:not(.hlx-sk-loading) .dropdown,
+.hlx-sk-overlay .dropdown {
   display: block;
   margin-top: 0;
 }
 
-.hlx-sk .dropdown .dropdown-toggle::after {
+.hlx-sk-overlay .dropdown {
+  max-height: unset;
+}
+
+.hlx-sk .dropdown .dropdown-toggle::after,
+.hlx-sk-overlay .dropdown .dropdown-toggle::after {
   border-style: solid;
   border-width: 1px 1px 0 0;
   content: '';
@@ -284,23 +294,28 @@
   color: var(--hlx-sk-button-color);
 }
 
-.hlx-sk .dropdown .dropdown-toggle:hover {
+.hlx-sk .dropdown .dropdown-toggle:hover,
+.hlx-sk-overlay .dropdown .dropdown-toggle:hover {
   background-color: var(--hlx-sk-button-hover-bg);
   color: var(--hlx-sk-button-hover-color);
 }
 
-.hlx-sk .dropdown.dropdown-expanded .dropdown-toggle::after {
+.hlx-sk .dropdown.dropdown-expanded .dropdown-toggle::after,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-toggle::after {
   top: 6px;
   transform: rotate(-45deg);
 }
 
-.hlx-sk .dropdown.dropdown-expanded .dropdown-container {
+.hlx-sk .dropdown.dropdown-expanded .dropdown-container,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container {
   display: flex;
   flex-direction: column;
 }
 
 .hlx-sk .dropdown.dropdown-expanded .dropdown-container button,
-.hlx-sk .dropdown.dropdown-expanded .dropdown-container button.pressed {
+.hlx-sk .dropdown.dropdown-expanded .dropdown-container button.pressed,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container button,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container button.pressed {
   margin-top: 0;
   padding: 8px;
   border: none;
@@ -311,13 +326,17 @@
 }
 
 .hlx-sk .dropdown.dropdown-expanded .dropdown-container > div:first-of-type button,
-.hlx-sk .dropdown.dropdown-expanded .dropdown-container > div:first-of-type button.pressed {
+.hlx-sk .dropdown.dropdown-expanded .dropdown-container > div:first-of-type button.pressed,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container > button:first-of-type,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container > button.pressed:first-of-type {
   border-top-left-radius: var(--hlx-sk-button-border-radius);
   border-top-right-radius: var(--hlx-sk-button-border-radius);
 }
 
 .hlx-sk .dropdown.dropdown-expanded .dropdown-container > div:last-of-type button,
-.hlx-sk .dropdown.dropdown-expanded .dropdown-container > div:last-of-type button.pressed {
+.hlx-sk .dropdown.dropdown-expanded .dropdown-container > div:last-of-type button.pressed,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container > button:last-of-type,
+.hlx-sk-overlay .dropdown.dropdown-expanded .dropdown-container > button.pressed:last-of-type {
   border-bottom-left-radius: var(--hlx-sk-button-border-radius);
   border-bottom-right-radius: var(--hlx-sk-button-border-radius);
 }
@@ -431,20 +450,29 @@
   flex-grow: 0;
 }
 
+.hlx-sk-overlay .modal.help p.help-controls .help-actions {
+  display: flex;
+  justify-content: right;
+}
+
 .hlx-sk-overlay .modal.help button {
   background-color: var(--hlx-sk-modal-help-bg);
   border-color: var(--hlx-sk-modal-help-color);
   color: var(--hlx-sk-modal-help-color);
 }
 
+.hlx-sk-overlay .modal.help .dropdown-container {
+  background-color: var(--hlx-sk-modal-help-dropdown-container-bg);
+}
+
+.hlx-sk-overlay .modal.help .dropdown-container button {
+  background-color: transparent;
+}
+
 .hlx-sk-overlay .modal.help button:hover,
 .hlx-sk-overlay .modal.help button:focus {
   background-color: var(--hlx-sk-modal-help-color);
   color: var(--hlx-sk-modal-help-bg);
-}
-
-.hlx-sk-overlay .modal.help button.help-acknowledge {
-  justify-self: left;
 }
 
 .hlx-sk-overlay .modal.help .help-step {
@@ -611,8 +639,9 @@
   }
 
   .hlx-sk-overlay .modal.help p.help-controls,
-  .hlx-sk-overlay .modal.help p.help-controls .help-steps {
-    justify-content: center;
+  .hlx-sk-overlay .modal.help p.help-controls .help-steps,
+  .hlx-sk-overlay .modal.help p.help-controls .help-actions {
+      justify-content: center;
   }
 }
 
@@ -630,8 +659,9 @@
   content: "Share your Sidekick";
 }
 
-.hlx-sk .close::before {
-  content: "Close";
+.hlx-sk .close::before,
+.hlx-sk-overlay .close::before {
+    content: "Close";
 }
 
 .hlx-sk-overlay div.modal.wait:empty::before {
@@ -694,8 +724,16 @@
   content: "Got it!";
 }
 
-.hlx-sk-overlay .modal.help .help-dismiss::before {
-  content: "Not now";
+.hlx-sk-overlay .modal.help .help-close-dismiss::before {
+  content: "Show help topic again later";
+}
+
+.hlx-sk-overlay .modal.help .help-close-acknowledge::before {
+  content: "Don't show help topic again";
+}
+
+.hlx-sk-overlay .modal.help .help-close-opt-out::before {
+  content: "Never show any help topics";
 }
 
 .hlx-sk-overlay .modal.help .help-previous::before {
