@@ -276,15 +276,15 @@
     if (!baseHost || !host) {
       return false;
     }
+    // direct match
+    if (baseHost === host) {
+      return true;
+    }
     // matching helix domains
     const helixDomains = ['page', 'hlx.live'];
     if (!helixDomains.find((domain) => baseHost.endsWith(domain)
       && host.endsWith(domain))) {
       return false;
-    }
-    // direct match
-    if (baseHost === host) {
-      return true;
     }
     // project details
     const [baseHostRepo, baseHostOwner] = getHelixProjectDetails(baseHost);
