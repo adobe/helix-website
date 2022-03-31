@@ -851,6 +851,7 @@
           }
           sk.switchEnv('preview', newTab(evt));
         },
+        isEnabled: (sidekick) => sidekick.status.webPath,
       },
     });
   }
