@@ -44,9 +44,10 @@
   --hlx-sk-modal-help-bg: #1473e6;
   --hlx-sk-modal-help-color: white;
   --hlx-sk-modal-help-dropdown-container-bg: #1473e6be;
-  --hlx-sk-modal-font-size: 1.5rem;
+  --hlx-sk-modal-font-size: 1.25rem;
   --hlx-sk-special-view-button-color: rgba(0,0,0, 0.5);
   --hlx-sk-special-view-table-border: rgba(0,0,0, 0.5);
+  --hlx-sk-user-bg: #c0c0c0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -66,6 +67,7 @@
     --hlx-sk-modal-overlay-bg: rgba(127, 127, 127, 0.5);
     --hlx-sk-special-view-button-color: rgba(127, 127, 127, 0.8);
     --hlx-sk-special-view-table-border: rgba(127, 127, 127, 0.8);
+    --hlx-sk-user-bg: #909090;
   }
 }
 
@@ -87,7 +89,7 @@
   width: 100vw;
   min-height: 49px;
   box-sizing: border-box;
-  padding: 0 10px 10px 42px;
+  padding: 10px 10px 10px 42px;
   font-family: var(--hlx-sk-font-family);
   font-size: var(--hlx-sk-font-size);
   box-shadow: var(--hlx-sk-shadow);
@@ -112,7 +114,7 @@
   min-width: 28px;
   min-height: 28px;
   max-height: 28px;
-  margin: 10px 8px 0 0;
+  margin: 0 8px 0 0;
 }
 
 .hlx-sk button:hover,
@@ -151,13 +153,12 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: start;
+  row-gap: 8px;
 }
 
 .hlx-sk .plugin-container.loading::before,
-.hlx-sk .plugin-container.empty::before {
-  margin-top: 10px;
-  height: 20px;
-  line-height: 2;
+.hlx-sk .plugin-container:empty::before {
+  line-height: 28px;
 }
 
 .hlx-sk .feature-container {
@@ -169,6 +170,97 @@
 
 .hlx-sk .feature-container button {
   border-color: transparent;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle {
+  position: relative;
+  border: none;
+  padding: 0;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle::before {
+  font-size: 0;
+  line-height: 0;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle:disabled {
+  opacity: 0.8;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle::after {
+  display: none;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle .user-icon {
+  background-color: var(--hlx-sk-user-bg);
+  position: absolute;
+  font-size: 4px;
+  top: 0;
+  height: 28px;
+  width: 28px;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle .user-icon::before {
+  content: " ";
+  display: block;
+  height: 3em;
+  width: 3em;
+  background: currentColor;
+  position: relative;
+  left: 8px;
+  top: 4px;
+  border-radius: 2em;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle .user-icon::after {
+  content: " ";
+  display: block;
+  height: 2.45em;
+  width: 5em;
+  background: currentColor;
+  position: relative;
+  left: 4px;
+  top: 6px;
+  border-radius: 2em 2em 0 0;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle .user-icon-hidden {
+  height: 0;
+  opacity: 0;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle .user-picture {
+  background-color: var(--hlx-sk-user-bg);
+  width: 28px;
+  height: 28px;
+}
+
+.hlx-sk .feature-container .user .dropdown-toggle .user-picture:hover,
+.hlx-sk .feature-container .user .dropdown-toggle .user-picture:focus {
+  transform: scale(1.2);
+  transition: transform .3s ease;
+}
+
+.hlx-sk .feature-container .user .user-info {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: var(--hlx-sk-bg);
+  color: var(--hlx-sk-button-color);
+  padding: 8px 0;
+  cursor: text;
+  user-select: text;
+}
+
+.hlx-sk .feature-container .user .user-info > div {
+  padding: 2px 10px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.hlx-sk .feature-container .user .user-info .profile-name {
+  font-weight: 600; 
 }
 
 .hlx-sk .feature-container .share {
@@ -223,6 +315,7 @@
 .hlx-sk .feature-container .close::after,
 .hlx-sk .feature-container .close::before {
   content: "";
+  font-size: 0;
   display: block;
   position: absolute;
   width: 16px;
@@ -242,7 +335,6 @@
  {
   min-height: 28px;
   max-height: 28px;
-  margin-top: 10px;
   position: relative;
 }
 
@@ -251,7 +343,7 @@
   display: none;
   position: absolute;
   min-width: 120px;
-  top: 40px;
+  top: 30px;
   background-color: var(--hlx-sk-dropdown-container-bg);
   border-radius: var(--hlx-sk-button-border-radius);
   box-shadow: var(--hlx-sk-shadow);
@@ -266,7 +358,7 @@
 .hlx-sk:not(.hlx-sk-loading) .dropdown,
 .hlx-sk-overlay .dropdown {
   display: block;
-  margin-top: 0;
+  /* margin-top: 0; */
 }
 
 .hlx-sk-overlay .dropdown {
@@ -370,8 +462,9 @@
   box-shadow: var(--hlx-sk-shadow);
 }
 
-.hlx-sk-overlay .modal * {
+.hlx-sk-overlay .modal p {
   font-size: var(--hlx-sk-modal-font-size);
+  text-align: center;
 }
 
 .hlx-sk-overlay .modal a:any-link {
@@ -647,7 +740,7 @@
 
 /* i18n */
 
-.hlx-sk .plugin-container.empty::before {
+.hlx-sk .plugin-container:empty::before {
   content: "No actions found for this page";
 }
 
@@ -659,9 +752,9 @@
   content: "Share your Sidekick";
 }
 
-.hlx-sk .close::before,
-.hlx-sk-overlay .close::before {
-    content: "Close";
+.hlx-sk .feature-container .close::before,
+.hlx-sk-overlay .help-close button::before {
+  content: "Close";
 }
 
 .hlx-sk-overlay div.modal.wait:empty::before {
@@ -746,4 +839,94 @@
 
 .hlx-sk-overlay .modal.help .help-next::before {
   content: "Next tip";
+}
+
+.hlx-sk-overlay .modal.modal-login p:first-of-type::before {
+  content: "Please sign in to continue...";
+}
+
+.hlx-sk .feature-container .user-login button::before,
+.hlx-sk-overlay .modal.modal-login button::before {
+  content: "Sign in";
+}
+
+.hlx-sk .feature-container .user-switch button::before,
+.hlx-sk-overlay .modal.modal-user-switch button::before {
+    content: "Switch user";
+}
+
+.hlx-sk .feature-container .user-logout button::before {
+    content: "Sign out";
+}
+
+.hlx-sk .feature-container .user button.dropdown-toggle::before {
+  content: "Anonymous";
+}
+
+.hlx-sk-overlay .modal.modal-wait::before {
+  content: "Please wait...";
+}
+
+.hlx-sk-overlay .modal.modal-share-success::before {
+  content: "Sharing URL copied to clipboard.";
+}
+
+.hlx-sk-overlay .modal.modal-config-success::before {
+  content: "Helix configuration successfully activated.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-failure::before {
+  content: "Previewing failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-reload-failure::before {
+  content: "Reloading failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-publish-failure::before {
+  content: "Publication failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-delete-failure::before {
+  content: "Deletion failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-unpublish-failure::before {
+  content: "Unpublication failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-404-document::before {
+  content: "404 Not found: Check your Sidekick configuration and make sure Helix has access to this document.";
+}
+
+.hlx-sk-overlay .modal.modal-status-404-content::before {
+  content: "404 Not found: Check your Sidekick configuration or URL.";
+}
+
+.hlx-sk-overlay .modal.modal-status-500::before {
+  content: "500 Internal server error: Failed to fetch the page status. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-502::before {
+  content: "502 Bad gateway: Failed to fetch the page status. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-504::before {
+  content: "504 Gateway timeout: Failed to fetch the page status. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-invalid::before {
+  content: "Invalid server response. Check your Sidekick configuration or URL.";
+}
+
+.hlx-sk-overlay .modal.modal-login-timeout::before {
+  content: "Sign in timed out. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-login-aborted::before {
+  content: "Sign in aborted.";
+}
+
+.hlx-sk-overlay .modal.modal-logout-error::before {
+  content: "Sign out failed. Please try again later.";
 }
