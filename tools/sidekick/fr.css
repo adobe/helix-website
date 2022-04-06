@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-.hlx-sk .plugin-container.empty::before {
+.hlx-sk .plugin-container:empty::before {
   content: "Aucune action disponible pour cette page";
 }
 
@@ -22,7 +22,8 @@
   content: "Partager le Sidekick";
 }
 
-.hlx-sk .close::before {
+.hlx-sk .feature-container .close::before,
+.hlx-sk-overlay .help-close button::before {
   content: "Fermer";
 }
 
@@ -108,4 +109,94 @@
 
 .hlx-sk-overlay .modal.help .help-next::before {
   content: "Astuce suivante";
+}
+
+.hlx-sk-overlay .modal.modal-login p:first-of-type::before {
+  content: "Please sign in to continue...";
+}
+
+.hlx-sk .feature-container .user-login button::before,
+.hlx-sk-overlay .modal.modal-login button::before {
+  content: "Sign in";
+}
+
+.hlx-sk .feature-container .user-switch button::before,
+.hlx-sk-overlay .modal.modal-user-switch button::before {
+    content: "Switch user";
+}
+
+.hlx-sk .feature-container .user-logout button::before {
+    content: "Sign out";
+}
+
+.hlx-sk .feature-container .user button.dropdown-toggle::before {
+  content: "Anonymous";
+}
+
+.hlx-sk-overlay .modal.modal-wait::before {
+  content: "Please wait...";
+}
+
+.hlx-sk-overlay .modal.modal-share-success::before {
+  content: "Sharing URL copied to clipboard.";
+}
+
+.hlx-sk-overlay .modal.modal-config-success::before {
+  content: "Helix configuration successfully activated.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-failure::before {
+  content: "Previewing failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-reload-failure::before {
+  content: "Reloading failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-publish-failure::before {
+  content: "Publication failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-delete-failure::before {
+  content: "Deletion failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-unpublish-failure::before {
+  content: "Unpublication failed. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-404-document::before {
+  content: "404 Not found: Check your Sidekick configuration and make sure Helix has access to this document.";
+}
+
+.hlx-sk-overlay .modal.modal-status-404-content::before {
+  content: "404 Not found: Check your Sidekick configuration or URL.";
+}
+
+.hlx-sk-overlay .modal.modal-status-500::before {
+  content: "500 Internal server error: Failed to fetch the page status. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-502::before {
+  content: "504 Bad gateway: Failed to fetch the page status. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-504::before {
+  content: "504 Gateway timeout: Failed to fetch the page status. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-status-invalid::before {
+  content: "Invalid server response. Check your Sidekick configuration or URL.";
+}
+
+.hlx-sk-overlay .modal.modal-login-timeout::before {
+  content: "Sign in timed out. Please try again later.";
+}
+
+.hlx-sk-overlay .modal.modal-login-aborted::before {
+  content: "Sign in aborted.";
+}
+
+.hlx-sk-overlay .modal.modal-logout-error::before {
+  content: "Sign out failed. Please try again later.";
 }

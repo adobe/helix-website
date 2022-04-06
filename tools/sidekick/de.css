@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-.hlx-sk .plugin-container.empty::before {
+.hlx-sk .plugin-container:empty::before {
   content: "Keine Funktionen für diese Seite gefunden";
  }
 
@@ -22,7 +22,8 @@
   content: "Sidekick teilen";
 }
 
-.hlx-sk .close::before {
+.hlx-sk .feature-container .close::before,
+.hlx-sk-overlay .help-close button::before {
   content: "Schließen";
 }
 
@@ -108,4 +109,94 @@
 
 .hlx-sk-overlay .modal.help .help-next::before {
   content: "Nächster Tipp";
+}
+
+.hlx-sk-overlay .modal.modal-login p:first-of-type::before {
+  content: "Bitte melde dich an um fortzufahren...";
+}
+
+.hlx-sk .feature-container .user-login button::before,
+.hlx-sk-overlay .modal.modal-login button::before {
+  content: "Anmelden";
+}
+
+.hlx-sk .feature-container .user-switch button::before,
+.hlx-sk-overlay .modal.modal-user-switch button::before {
+    content: "Benutzer wechseln";
+}
+
+.hlx-sk .feature-container .user-logout button::before {
+    content: "Abmelden";
+}
+
+.hlx-sk .feature-container .user button.dropdown-toggle::before {
+  content: "Anonymer Benutzer";
+}
+
+.hlx-sk-overlay .modal.modal-wait::before {
+  content: "Bitte warten...";
+}
+
+.hlx-sk-overlay .modal.modal-share-success::before {
+  content: "Teilen-URL in die Benutzerablage kopiert.";
+}
+
+.hlx-sk-overlay .modal.modal-config-success::before {
+  content: "Helix-Konnfiguration erfolgreich aktiviert.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-failure::before {
+  content: "Vorschau-Generierung fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-reload-failure::before {
+  content: "Aktualisierung fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-publish-failure::before {
+  content: "Publizieren fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-delete-failure::before {
+  content: "Löschen fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-unpublish-failure::before {
+  content: "Depublizieren fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-status-404-document::before {
+  content: "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration und stelle sicher, dass Helix Zugriff auf dieses Dokument hat.";
+}
+
+.hlx-sk-overlay .modal.modal-status-404-content::before {
+  content: "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration oder URL.";
+}
+
+.hlx-sk-overlay .modal.modal-status-500::before {
+  content: "500 Interner Serverfehler: Statusabfrage fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-status-502::before {
+  content: "502 Fehlerhaftes Gateway: Statusabfrage fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-status-504::before {
+  content: "504 Gateway-Timeout: Statusabfrage fehlgeschlagen. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-status-invalid::before {
+  content: "Ungültige Serverantwort. Prüfe deine Sidekick-Konfiguration oder URL.";
+}
+
+.hlx-sk-overlay .modal.modal-login-timeout::before {
+  content: "Zeitüberschreitung bei der Anmeldung. Bitte versuche es später noch einmal.";
+}
+
+.hlx-sk-overlay .modal.modal-login-aborted::before {
+  content: "Anmeldungsvorgang abgebrochen.";
+}
+
+.hlx-sk-overlay .modal.modal-logout-error::before {
+  content: "Abmeldung fehlgeschlagen. Bitte lade diesen Browser-Tab erneut oder versuche es später noch einmal.";
 }
