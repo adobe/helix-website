@@ -39,6 +39,11 @@
   content: "Ansicht";
 }
 
+.hlx-sk .env.dev .dropdown-toggle::before,
+.hlx-sk .env .dev button::before {
+  content: "Entwicklung";
+}
+
 .hlx-sk .env.preview .dropdown-toggle::before,
 .hlx-sk .env .preview button::before,
 .hlx-sk .edit-preview button::before {

@@ -54,6 +54,8 @@
    * @prop {elemConfig[]} elements  An array of elements to add (optional)
    * @prop {Function}     condition Determines whether to show this plugin (optional).
    * This function is expected to return a boolean when called with the sidekick as argument.
+   * @prop {Function}     advanced  Show this plugin only in advanced mode (optional).
+   * This function is expected to return a boolean when called with the sidekick as argument.
    * @prop {Function}     callback  A function called after adding the plugin (optional).
    * This function is called with the sidekick and the newly added plugin as arguments.
    */
@@ -235,6 +237,7 @@
    * @type {Object}
    */
   const ENVS = {
+    dev: 'localhost',
     preview: 'innerHost',
     live: 'outerHost',
     prod: 'host',
@@ -791,6 +794,25 @@
    * @param {Sidekick} sk The sidekick
    */
   function addEnvPlugins(sk) {
+    // dev
+    sk.add({
+      id: 'dev',
+      container: 'env',
+      condition: (sidekick) => sidekick.isEditor() || sidekick.isHelix(),
+      button: {
+        action: async (evt) => {
+          if (evt.target.classList.contains('pressed')) {
+            return;
+          }
+          sk.switchEnv('dev', newTab(evt));
+        },
+        isPressed: (sidekick) => sidekick.isDev(),
+        isEnabled: (sidekick) => sidekick.isDev()
+          || (sidekick.status.preview && sidekick.status.preview.lastModified),
+      },
+      advanced: (sidekick) => !sidekick.isDev(),
+    });
+
     // preview
     sk.add({
       id: 'preview',
@@ -824,6 +846,7 @@
         isEnabled: (sidekick) => sidekick.isOuter()
           || (sidekick.status.live && sidekick.status.live.lastModified),
       },
+      advanced: (sidekick) => !!sidekick.config.host,
     });
 
     // production
@@ -1514,6 +1537,18 @@
             hideSpecialView(this);
             revertPushDownContent(this);
           },
+          keydown: ({ altKey }) => {
+            if (altKey) {
+              // enable advanced mode
+              this.root.classList.add('hlx-sk-advanced');
+            }
+          },
+          keyup: ({ altKey }) => {
+            if (!altKey) {
+              // disable advanced mode
+              this.root.classList.remove('hlx-sk-advanced');
+            }
+          },
         },
       });
       this.status = {};
@@ -1761,6 +1796,7 @@
               }),
               this.featureContainer.firstElementChild,
             );
+            if (this.isDev()) $envDropdown.classList.add('dev');
             if (this.isInner()) $envDropdown.classList.add('preview');
             if (this.isOuter()) $envDropdown.classList.add('live');
             if (this.isProd()) $envDropdown.classList.add('prod');
@@ -1862,6 +1898,10 @@
             id: plugin.id,
             button: $button,
           }));
+        }
+        // check advanced mode
+        if (plugin.advanced && typeof plugin.advanced === 'function' && plugin.advanced(this)) {
+          $plugin.classList.add('hlx-sk-advanced-only');
         }
         if (typeof plugin.callback === 'function') {
           plugin.callback(this, $plugin);
@@ -2308,7 +2348,7 @@
     /**
      * Switches to (or opens) a given environment.
      * @param {string} targetEnv One of the following environments:
-     *        <pre>edit</pre>, <pre>preview</pre>, <pre>live</pre> or <pre>prod</pre>
+     *        <pre>dev</pre>, <pre>preview</pre>, <pre>live</pre> or <pre>prod</pre>
      * @param {boolean} open=false <pre>true</pre> if environment should be opened in new tab
      * @fires Sidekick#envswitched
      * @returns {Sidekick} The sidekick
@@ -2329,7 +2369,8 @@
         window.setTimeout(() => this.switchEnv(targetEnv, open), 1000);
         return this;
       }
-      let envUrl = `https://${config[hostType]}${status.webPath}`;
+      const envOrigin = targetEnv === 'dev' ? DEV_URL.origin : `https://${config[hostType]}`;
+      let envUrl = `${envOrigin}${status.webPath}`;
       if (!this.isEditor()) {
         envUrl += `${search}${hash}`;
       }
