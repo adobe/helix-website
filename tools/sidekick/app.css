@@ -36,6 +36,8 @@
   --hlx-sk-button-disabled-color: #909090;
   --hlx-sk-button-disabled-border: solid 1px var(--hlx-sk-button-disabled-color);
   --hlx-sk-button-disabled-hover-bg: transparent;
+  --hlx-sk-button-badge: #F15B3A;
+  --hlx-sk-button-badge-hover: #FFC40E;
   --hlx-sk-dropdown-container-bg: rgba(224, 224, 224, .9);
   --hlx-sk-modal-overlay-bg: rgba(0,0,0, 0.5);
   --hlx-sk-modal-bg-0: #e60016;
@@ -63,6 +65,8 @@
     --hlx-sk-button-pressed-color: white;
     --hlx-sk-button-disabled-color: #707070;
     --hlx-sk-button-disabled-border: solid 1px var(--hlx-sk-button-disabled-color);
+    --hlx-sk-button-badge: #F15B3A;
+    --hlx-sk-button-badge-hover: #C71F3D;
     --hlx-sk-dropdown-container-bg: rgba(48, 48, 48, .9);
     --hlx-sk-modal-overlay-bg: rgba(127, 127, 127, 0.5);
     --hlx-sk-special-view-button-color: rgba(127, 127, 127, 0.8);
@@ -143,8 +147,23 @@
   background-color: var(--hlx-sk-button-disabled-hover-bg);
 }
 
+.hlx-sk .update button {
+  position: relative;
+}
+
 .hlx-sk .update button::after {
-  content: "*";
+  content: " ";
+  height: 5px;
+  width: 5px;
+  background-color: var(--hlx-sk-button-badge);
+  border-radius: 50%;
+  top: 2px;
+  right: 2px;
+  position: absolute;
+}
+
+.hlx-sk .update button:hover::after {
+  background-color: var(--hlx-sk-button-badge-hover);
 }
 
 .hlx-sk .plugin-container {
@@ -331,8 +350,7 @@
 }
 
 .hlx-sk .dropdown,
-.hlx-sk-overlay .dropdown
- {
+.hlx-sk-overlay .dropdown {
   min-height: 28px;
   max-height: 28px;
   position: relative;

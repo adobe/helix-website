@@ -719,8 +719,12 @@
     const editLastMod = (status.edit && status.edit.lastModified) || null;
     const previewLastMod = (status.preview && status.preview.lastModified) || null;
     const liveLastMod = (status.live && status.live.lastModified) || null;
+    if (sidekick.get('edit-preview')
+      && editLastMod && (!previewLastMod || new Date(editLastMod) > new Date(previewLastMod))) {
+      sidekick.get('edit-preview').classList.add('update');
+    }
     if (sidekick.get('reload')
-      && editLastMod && previewLastMod && new Date(editLastMod) > new Date(previewLastMod)) {
+      && editLastMod && (!previewLastMod || new Date(editLastMod) > new Date(previewLastMod))) {
       sidekick.get('reload').classList.add('update');
     }
     if (sidekick.get('publish')
