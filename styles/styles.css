@@ -436,7 +436,7 @@ p.button-container > a.button {
 }
 
 main {
-  min-height: calc(100vh - 216px);
+  min-height: calc(100vh - 264px);
 }
 
 main p em strong, main p strong em {
@@ -538,6 +538,15 @@ body.no-header-template {
     body.docs-template main {
         max-width: 600px;
     }
+
+    main {
+      min-height: calc(100vh - 216px);
+    }
+
+    body.no-header-template main {
+      min-height: calc(100vh - 88px);
+    }
+    
 }
 
 
