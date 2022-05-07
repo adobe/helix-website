@@ -621,6 +621,12 @@ function buildHeader() {
   const header = document.querySelector('header');
   header.append(buildBlock('header', ''));
 }
+
+function buildFooter() {
+  const footer = document.querySelector('footer');
+  footer.append(buildBlock('footer', ''));
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -629,6 +635,7 @@ export function buildAutoBlocks(main) {
   try {
     buildHeader();
     buildEmbeds(main);
+    buildFooter();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -667,6 +674,7 @@ async function loadEager(doc) {
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   const header = doc.querySelector('header > div');
+  const footer = doc.querySelector('footer > div');
 
   loadBlocks(main);
 
@@ -675,6 +683,9 @@ async function loadLazy(doc) {
 
   loadCSS('/fonts/fonts.css');
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-helix.svg`);
+
+  decorateBlock(footer);
+  loadBlock(footer);
 }
 
 /**
