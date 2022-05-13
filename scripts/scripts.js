@@ -120,19 +120,7 @@ export function toClassName(name) {
  * @param {Element} block The block element
  */
 export function decorateBlock(block) {
-  const trimDashes = (str) => str.replace(/(^\s*-)|(-\s*$)/g, '');
-  const classes = Array.from(block.classList.values());
-  const blockName = classes[0];
-  if (!blockName) return;
-  const section = block.closest('.section');
-  if (section) {
-    section.classList.add(`${blockName}-container`.replace(/--/g, '-'));
-  }
-  const blockWithVariants = blockName.split('--');
-  const shortBlockName = trimDashes(blockWithVariants.shift());
-  const variants = blockWithVariants.map((v) => trimDashes(v));
-  block.classList.add(shortBlockName);
-  block.classList.add(...variants);
+  const shortBlockName = block.classList[0];
 
   block.classList.add('block');
   block.setAttribute('data-block-name', shortBlockName);
@@ -394,22 +382,6 @@ export function normalizeHeadings($elem, allowedHeadings) {
 }
 
 /**
- * Decorates the picture elements and removes formatting.
- * @param {Element} main The container element
- */
-export function decoratePictures(main) {
-  main.querySelectorAll('img[src*="/media_"').forEach((img, i) => {
-    const newPicture = createOptimizedPicture(img.src, img.alt, !i);
-    const picture = img.closest('picture');
-    if (picture) picture.parentElement.replaceChild(newPicture, picture);
-    if (['EM', 'STRONG'].includes(newPicture.parentElement.tagName)) {
-      const styleEl = newPicture.parentElement;
-      styleEl.parentElement.replaceChild(newPicture, styleEl);
-    }
-  });
-}
-
-/**
  * Adds the favicon.
  * @param {string} href The favicon URL
  */
@@ -530,19 +502,6 @@ export function decorateButtons(block = document) {
   });
 }
 
-export function makeRelative(anchor) {
-  const { href, textContent } = anchor;
-  const url = new URL(href);
-  if (url.origin !== LIVE_ORIGIN && url.origin !== DEV_ORIGIN) {
-    // external link
-    anchor.target = '_blank';
-    return href;
-  }
-  anchor.setAttribute('href', href.replace(LIVE_ORIGIN, ''));
-  anchor.textContent = textContent.replace(LIVE_ORIGIN, '');
-  return anchor.href;
-}
-
 export function setSVG(anchor) {
   const { textContent } = anchor;
   const href = anchor.getAttribute('href');
@@ -571,7 +530,6 @@ export function forceDownload(anchor) {
 export function decorateAnchors(element) {
   const anchors = element.getElementsByTagName('a');
   return Array.from(anchors).map((anchor) => {
-    makeRelative(anchor);
     setSVG(anchor);
     forceDownload(anchor);
     return anchor;
@@ -648,7 +606,6 @@ export function buildAutoBlocks(main) {
  */
 export function decorateMain(main) {
   // forward compatible pictures redecoration
-  decoratePictures(main);
   decorateAnchors(main);
   buildAutoBlocks(main);
   decorateSections(main);
