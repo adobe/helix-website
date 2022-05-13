@@ -121,13 +121,14 @@ export function toClassName(name) {
  */
 export function decorateBlock(block) {
   const shortBlockName = block.classList[0];
-
-  block.classList.add('block');
-  block.setAttribute('data-block-name', shortBlockName);
-  block.setAttribute('data-block-status', 'initialized');
-
-  const blockWrapper = block.parentElement;
-  blockWrapper.classList.add(`${shortBlockName}-wrapper`);
+  if (shortBlockName) {
+    block.classList.add('block');
+    block.setAttribute('data-block-name', shortBlockName);
+    block.setAttribute('data-block-status', 'initialized');
+  
+    const blockWrapper = block.parentElement;
+    blockWrapper.classList.add(`${shortBlockName}-wrapper`);  
+  }
 }
 
 /**
