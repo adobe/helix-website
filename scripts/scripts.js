@@ -399,19 +399,7 @@ export function addFavIcon(href) {
 }
 
 /**
- * Fetches an SVG icon.
- * @param {string} icon The icon name
- * @returns {string} The SVG
- */
-async function fetchSVGIcon(icon) {
-  // eslint-disable-next-line no-use-before-define
-  return fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`)
-    .then((resp) => resp.text())
-    .catch(() => '');
-}
-
-/**
- * Decorates spans with an icon class.
+ * Fills icon spans with an icon.
  */
 export function decorateIcons(block = document) {
   block.querySelectorAll('span.icon').forEach(async (span) => {
@@ -419,7 +407,11 @@ export function decorateIcons(block = document) {
       return;
     }
     const icon = span.classList[1].substring(5);
-    span.innerHTML = await fetchSVGIcon(icon);
+    // eslint-disable-next-line no-use-before-define
+    const resp = await fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`);
+    if (resp.ok) {
+      span.innerHTML = await resp.text();
+    }
   });
 }
 
