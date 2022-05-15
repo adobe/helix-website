@@ -1,5 +1,5 @@
 import {
-  loadScript, getMetadata, cleanVariations, decorateAnchors,
+  loadScript, getMetadata, cleanVariations,
 } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
@@ -345,7 +345,6 @@ export default async function init(blockEl) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       cleanVariations(doc);
-      decorateAnchors(doc);
       const gnav = new Gnav(doc.body, blockEl);
       gnav.init();
     } catch (e) {

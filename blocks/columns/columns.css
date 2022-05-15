@@ -95,7 +95,8 @@
     margin: 0;
 }
 
-.columns.contained img {
+.columns.contained img,
+.columns.contained svg {
     height: 200px;
     display: inline-block;
 }

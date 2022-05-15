@@ -125,9 +125,8 @@ export function decorateBlock(block) {
     block.classList.add('block');
     block.setAttribute('data-block-name', shortBlockName);
     block.setAttribute('data-block-status', 'initialized');
-  
     const blockWrapper = block.parentElement;
-    blockWrapper.classList.add(`${shortBlockName}-wrapper`);  
+    blockWrapper.classList.add(`${shortBlockName}-wrapper`);
   }
 }
 
@@ -400,6 +399,31 @@ export function addFavIcon(href) {
 }
 
 /**
+ * Fetches an SVG icon.
+ * @param {string} icon The icon name
+ * @returns {string} The SVG
+ */
+async function fetchSVGIcon(icon) {
+  // eslint-disable-next-line no-use-before-define
+  return fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`)
+    .then((resp) => resp.text())
+    .catch(() => '');
+}
+
+/**
+ * Decorates spans with an icon class.
+ */
+export function decorateIcons(block = document) {
+  block.querySelectorAll('span.icon').forEach(async (span) => {
+    if (span.classList.length < 2 || !span.classList[1].startsWith('icon-')) {
+      return;
+    }
+    const icon = span.classList[1].substring(5);
+    span.innerHTML = await fetchSVGIcon(icon);
+  });
+}
+
+/**
  * load LCP block and/or wait for LCP in default content.
  */
 async function waitForLCP() {
@@ -460,9 +484,7 @@ initHlx();
 
 const LCP_BLOCKS = ['marquee', 'columns']; // add your LCP blocks to the list
 const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
-
-const LIVE_ORIGIN = 'https://www.hlx.live';
-const DEV_ORIGIN = 'http://localhost:3000';
+const ICON_ROOT = '/img';
 
 sampleRUM('top');
 window.addEventListener('load', () => sampleRUM('load'));
@@ -500,40 +522,6 @@ export function decorateButtons(block = document) {
         }
       }
     }
-  });
-}
-
-export function setSVG(anchor) {
-  const { textContent } = anchor;
-  const href = anchor.getAttribute('href');
-  const ext = textContent.substr(textContent.lastIndexOf('.') + 1);
-  if (ext !== 'svg') return;
-  const img = document.createElement('img');
-  img.src = textContent;
-  if (textContent === href) {
-    anchor.parentElement.append(img);
-    anchor.remove();
-  } else {
-    anchor.textContent = '';
-    anchor.append(img);
-  }
-}
-
-export function forceDownload(anchor) {
-  const { href } = anchor;
-  const filename = href.split('/').pop();
-  const ext = filename.split('.')[1];
-  if (ext && ['crx'].includes(ext)) {
-    anchor.setAttribute('download', filename);
-  }
-}
-
-export function decorateAnchors(element) {
-  const anchors = element.getElementsByTagName('a');
-  return Array.from(anchors).map((anchor) => {
-    setSVG(anchor);
-    forceDownload(anchor);
-    return anchor;
   });
 }
 
@@ -606,8 +594,6 @@ export function buildAutoBlocks(main) {
  * @param {Element} main The main element
  */
 export function decorateMain(main) {
-  // forward compatible pictures redecoration
-  decorateAnchors(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateButtons(main);
@@ -621,6 +607,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     setTemplate();
+    decorateIcons();
     decorateMain(main);
     await waitForLCP();
   }

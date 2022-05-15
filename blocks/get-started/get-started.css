@@ -30,7 +30,8 @@
     color: #FFF;
 }
 
-.get-started img {
+.get-started img,
+.get-started svg {
     max-width: 128px;
 }
 
