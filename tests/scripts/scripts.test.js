@@ -128,17 +128,6 @@ describe('Core Helix features', () => {
     expect(document.querySelectorAll('strong > picture').length).to.equal(0);
   });
 
-  it('Decorates anchors', async () => {
-    scripts.decorateAnchors(document.querySelector('main'));
-    // check if links have been made relative
-    // todo: this doesn't work at all... prod links are not adjusted !?
-    document.querySelectorAll('main a').forEach(($a) => expect($a.getAttribute('href').startsWith('/')).to.be.true);
-
-    // check if icon links have been turned into SVGs
-    // todo: adjust for breaking2022_05
-    // expect(document.querySelectorAll('main img[src$=".svg"]').length).to.equal(2);
-  });
-
   it('Normalizes headings', async () => {
     const numHeadings = document.querySelectorAll('h1, h2, h3, h4, h5, h6').length;
     scripts.normalizeHeadings(document.querySelector('main'), ['h1', 'h2', 'h3']);
