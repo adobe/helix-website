@@ -117,57 +117,57 @@
 }
 
 .hlx-sk-overlay .modal.modal-login p:first-of-type::before {
-  content: "Please sign in to Helix Sidekick to continue...";
+  content: "Veuillez vous connecter au Helix Sidekick pour continuer...";
 }
 
 .hlx-sk .feature-container .user-login button::before,
 .hlx-sk-overlay .modal.modal-login button::before {
-  content: "Sign in";
+  content: "Connexion";
 }
 
 .hlx-sk .feature-container .user-switch button::before,
 .hlx-sk-overlay .modal.modal-user-switch button::before {
-    content: "Switch user";
+    content: "Changer d'utilisateur";
 }
 
 .hlx-sk .feature-container .user-logout button::before {
-    content: "Sign out";
+    content: "Déconnexion";
 }
 
 .hlx-sk .feature-container .user button.dropdown-toggle::before {
-  content: "Anonymous";
+  content: "Anonyme";
 }
 
 .hlx-sk-overlay .modal.modal-wait::before {
-  content: "Please wait...";
+  content: "Veuillez patienter...";
 }
 
 .hlx-sk-overlay .modal.modal-share-success::before {
-  content: "Sharing URL copied to clipboard.";
+  content: "L'URL de partage a été copiée dans le presse-papier.";
 }
 
 .hlx-sk-overlay .modal.modal-config-success::before {
-  content: "Helix configuration successfully activated.";
+  content: "La configuration a été activée.";
 }
 
 .hlx-sk-overlay .modal.modal-preview-failure::before {
-  content: "Previewing failed. Please try again later.";
+  content: "La génération de l'aperçu a échoué. Veuillez essayer plus tard.";
 }
 
 .hlx-sk-overlay .modal.modal-reload-failure::before {
-  content: "Reloading failed. Please try again later.";
+  content: "Le rechargement a échoué. Veuillez essayer plus tard.";
 }
 
 .hlx-sk-overlay .modal.modal-publish-failure::before {
-  content: "Publication failed. Please try again later.";
+  content: "la publication a échoué. Veuillez essayer plus tard.";
 }
 
 .hlx-sk-overlay .modal.modal-delete-failure::before {
-  content: "Deletion failed. Please try again later.";
+  content: "La suppression a échoué. Veuillez essayer plus tard.";
 }
 
 .hlx-sk-overlay .modal.modal-unpublish-failure::before {
-  content: "Unpublication failed. Please try again later.";
+  content: "La dépublication a échoué. Veuillez essayer plus tard.";
 }
 
 .hlx-sk-overlay .modal.modal-status-404-document::before {
@@ -191,17 +191,17 @@
 }
 
 .hlx-sk-overlay .modal.modal-status-invalid::before {
-  content: "Invalid server response. Check your Sidekick configuration or URL.";
+  content: "La réponse du serveur est invalide. Vérifiez la configuration du Sidekick ou l'URL.";
 }
 
 .hlx-sk-overlay .modal.modal-login-timeout::before {
-  content: "Sign in timed out. Please try again later.";
+  content: "Le temps imparti pour se connecter à expirer. Veuillez essayer plus tard.";
 }
 
 .hlx-sk-overlay .modal.modal-login-aborted::before {
-  content: "Sign in aborted.";
+  content: "La connexion a été annulée.";
 }
 
 .hlx-sk-overlay .modal.modal-logout-error::before {
-  content: "Sign out failed. Please try again later.";
+  content: "La déconnexion a échoué. Veuillez essayer plus tard.";
 }
