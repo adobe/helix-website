@@ -1,0 +1,7 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
+  "rules": {
+    "declaration-block-no-redundant-longhand-properties": [true, { "severity": "warning" }],
+    "no-descending-specificity": [true, { "severity": "warning" }]
+  }
+}

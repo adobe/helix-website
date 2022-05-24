@@ -161,7 +161,8 @@ async function createForm(formURL) {
       try {
         rules.push({ fieldId, rule: JSON.parse(fd.Rules) });
       } catch (e) {
-        console.log(`Invalid Rule ${fd.Rules}: ${e}`);
+        // eslint-disable-next-line no-console
+        console.warn(`Invalid Rule ${fd.Rules}: ${e}`);
       }
     }
     form.append(fieldWrapper);

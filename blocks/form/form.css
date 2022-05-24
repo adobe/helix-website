@@ -1,11 +1,11 @@
 main .form-container {
   background-color: white;
   padding: var(--spacing-m);
-  box-shadow: 0px 1px 6px rgb(34 34 34 / 10%);
+  box-shadow: 0 1px 6px rgb(34 34 34 / 10%);
 }
 
 main .form-container h2 {
-  padding: var(--spacing-m) 0px;
+  padding: var(--spacing-m) 0;
   font-size: var(--type-heading-l-lh);
   font-weight: normal;
 }
@@ -20,7 +20,7 @@ main .form-container h3 {
 main .form-container input,
 main .form-container textarea,
 main .form-container select {
-  border: 1px solid rgb(193,193,195);
+  border: 1px solid rgb(193 193 195);
   padding: 11px;
   border-radius: 0;
   width: 100%;
@@ -35,7 +35,7 @@ main .form-container textarea {
 
 main .form-container input:hover,
 main .form-container select:hover {
-  border-color: rgb(90,92,96);
+  border-color: rgb(90 92 96);
 }
 
 main .form-container label {
@@ -68,7 +68,7 @@ main .form-container .form-checkbox-wrapper input[type='checkbox'] {
   display: none;
 }
 
-main .form-container .form-checkbox-wrapper input[type='checkbox'] + label:before {
+main .form-container .form-checkbox-wrapper input[type='checkbox'] + label::before {
   float: left;
   margin-top: 5px;
   margin-right: 5px;
@@ -79,7 +79,7 @@ main .form-container .form-checkbox-wrapper input[type='checkbox'] + label:befor
   background-size: contain;
 }
 
-main .form-container .form-checkbox-wrapper input[type='checkbox']:checked +label:before {
+main .form-container .form-checkbox-wrapper input[type='checkbox']:checked +label::before {
   background: url('./checkbox-checked.svg');
   background-size: contain;
   content: ' ';
@@ -94,14 +94,14 @@ main .form-container .form-checkbox-wrapper label {
 
 main .form-container .button {
   cursor: pointer;
-  background: rgb(20, 115, 230);
+  background: rgb(20 115 230);
   color: white;
   border-radius: 16px;
   font-size: var(--type-body-s-size);
   font-weight: 300;
   padding: 6px 16px;
   border: none;
-  font-family: 'adobe-clean', 'Trebuchet MS', sans-serif;
+  font-family: adobe-clean, 'Trebuchet MS', sans-serif;
 }
 
 main .form-container .form-submit-wrapper {

@@ -42,14 +42,17 @@
   .z-pattern > div[class^="z-row"] {
     flex-direction: row;
   }
+
   .z-pattern > div[class^="z-row"] > div:first-of-type {
     margin-right: var(--spacing-m);
   }
+
   .z-pattern > div[class^="z-row"] > div {
     flex: 0 0 40%;
     text-align: left;
     max-width: 500px;
   }
+
   .z-pattern > div.z-row-odd > div:first-child {
     order: 2;
   }

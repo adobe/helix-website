@@ -1,8 +1,8 @@
 .marquee {
     position: relative;
     padding: var(--spacing-l) 0;
-    background: rgb(192,11,0);
-    background: linear-gradient(66deg, rgba(192,11,0,1) 0%, rgba(252,14,1,1) 100%);
+    background: rgb(192 11 0);
+    background: linear-gradient(66deg, rgb(192 11 0 / 100%) 0%, rgb(252 14 1 / 100%) 100%);
 }
 
 .marquee > div:last-of-type {
@@ -49,6 +49,9 @@
 .marquee > div:last-of-type img {
     min-height: 161px;
     display: inline-block;
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
 }
 
 .marquee > div:last-of-type > div:last-of-type {
@@ -58,12 +61,6 @@
 
 .marquee > div:last-of-type div {
     flex: 1 1 auto;
-}
-
-.marquee > div:last-of-type img {
-    object-fit: contain;
-    height: 100%;
-    width: 100%;
 }
 
 @media screen and (min-width: 1200px) {
