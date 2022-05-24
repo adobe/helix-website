@@ -117,7 +117,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-login p:first-of-type::before {
-  content: "Bitte melde dich an um fortzufahren...";
+  content: "Bitte melde dich beim Helix Sidekick an um fortzufahren...";
 }
 
 .hlx-sk .feature-container .user-login button::before,
