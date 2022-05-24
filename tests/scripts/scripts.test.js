@@ -41,6 +41,8 @@ describe('Core Helix features', () => {
     window.hlx.codeBasePath = '';
     window.hlx.lighthouse = false;
     Array.from(document.querySelectorAll('script')).pop().remove();
+
+    expect.fail('kaputt');
   });
 
   it('Sanitizes class name', async () => {
