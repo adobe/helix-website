@@ -1,5 +1,5 @@
 .get-started {
-    background: linear-gradient(45deg, rgba(0,0,0,1) 0%, rgba(38,18,57,1) 42%, rgba(154,26,10,1) 100%);
+    background: linear-gradient(45deg, rgb(0 0 0 / 100%) 0%, rgb(38 18 57 / 100%) 42%, rgb(154 26 10 / 100%) 100%);
     color: #FFF;
     padding: var(--spacing-xxl) 0; 
     text-align: center;
@@ -23,7 +23,7 @@
 }
 
 .get-started p {
-    margin: 0 0 6px 0;
+    margin: 0 0 6px;
 }
 
 .get-started a {
@@ -39,6 +39,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
+
     .get-started > div + div > div:not(:last-of-type) {
       margin: 0;
     }
