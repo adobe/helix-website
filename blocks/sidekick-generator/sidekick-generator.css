@@ -24,7 +24,7 @@
     border-radius: 4px;
     padding: 0 8px;
     font-size: 14px;
-    font-family: adobe-clean;
+    font-family: adobe-clean, sans-serif;
     outline: none !important;
     appearance: none;
     box-sizing: border-box;

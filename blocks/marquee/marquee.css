@@ -49,6 +49,9 @@
 .marquee > div:last-of-type img {
     min-height: 161px;
     display: inline-block;
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
 }
 
 .marquee > div:last-of-type > div:last-of-type {
@@ -58,12 +61,6 @@
 
 .marquee > div:last-of-type div {
     flex: 1 1 auto;
-}
-
-.marquee > div:last-of-type img {
-    object-fit: contain;
-    height: 100%;
-    width: 100%;
 }
 
 @media screen and (min-width: 1200px) {

@@ -4,7 +4,8 @@
 
 .footnotes > div {
   display: flex;
-  margin: 0 40px;
+
+  /* margin: 0 40px; */
   font-size: 80%;
   max-width: 600px;
   margin: 10px auto;

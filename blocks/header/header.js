@@ -8,7 +8,7 @@ const BRAND_IMG = '<img loading="lazy" alt="Adobe" src="/blocks/header/adobe-log
 const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
 <path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z"></path>
 </svg>`;
-const IS_OPEN = 'is-Open';
+const IS_OPEN = 'is-open';
 
 class Gnav {
   constructor(body, el) {
@@ -118,7 +118,7 @@ class Gnav {
       if (menu.childElementCount > 0) {
         const id = `navmenu-${idx}`;
         menu.id = id;
-        navItem.classList.add('has-Menu');
+        navItem.classList.add('has-menu');
         navLink.setAttribute('role', 'button');
         navLink.setAttribute('aria-expanded', false);
         navLink.setAttribute('aria-controls', id);
@@ -137,7 +137,7 @@ class Gnav {
     if (childCount === 1) {
       menu.classList.add('small-Variant');
     } else if (childCount === 2) {
-      menu.classList.add('medium-Variant');
+      menu.classList.add('medium-variant');
     } else if (childCount >= 3) {
       menu.classList.add('large-Variant');
       const container = createTag('div', { class: 'gnav-menu-container' });
@@ -301,7 +301,7 @@ class Gnav {
   toggleOnSpace = (e) => {
     if (e.code === 'Space') {
       e.preventDefault();
-      const parentEl = e.target.closest('.has-Menu');
+      const parentEl = e.target.closest('.has-menu');
       this.toggleMenu(parentEl);
     }
   };
