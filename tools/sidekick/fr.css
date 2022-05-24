@@ -117,7 +117,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-login p:first-of-type::before {
-  content: "Please sign in to continue...";
+  content: "Please sign in to Helix Sidekick to continue...";
 }
 
 .hlx-sk .feature-container .user-login button::before,
