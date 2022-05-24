@@ -10,6 +10,8 @@ const scripts = {};
 document.body.innerHTML = await readFile({ path: './dummy.html' });
 document.head.innerHTML = await readFile({ path: './head.html' });
 
+console.log('toby was here...');
+
 describe('Core Helix features', () => {
   before(async () => {
     const mod = await import('../../scripts/scripts.js');
