@@ -1,3 +1,5 @@
+// TODO: FIX!!
+// eslint-disable-next-line import/named
 import { fetchBlogArticleIndex, createOptimizedPicture } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
 

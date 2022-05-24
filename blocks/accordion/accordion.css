@@ -1,19 +1,19 @@
 .accordion {
     background: #EFEFEF;
-    border: 1px solid #dddddd;
+    border: 1px solid #ddd;
     border-radius: 6px;
 }
 
 .item-title {
     cursor: pointer;
     padding: 12px;
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid #ddd;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.item-title:after {
+.item-title::after {
     width: 10px;
     height: 10px;
     border-bottom: 2px solid #a7a7a7;
@@ -25,10 +25,10 @@
 }
 
 .item-title.open {
-    background: #dddddd;
+    background: #ddd;
 }
 
-.item-title.open:after {
+.item-title.open::after {
     transform: rotate(-135deg) translateX(50%);
 }
 
@@ -37,7 +37,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     padding: 12px;
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid #ddd;
 }
 
 .item-title.open + .item-content {

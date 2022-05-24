@@ -10,8 +10,6 @@ const scripts = {};
 document.body.innerHTML = await readFile({ path: './dummy.html' });
 document.head.innerHTML = await readFile({ path: './head.html' });
 
-console.log('toby was here...');
-
 describe('Core Helix features', () => {
   before(async () => {
     const mod = await import('../../scripts/scripts.js');
@@ -41,8 +39,6 @@ describe('Core Helix features', () => {
     window.hlx.codeBasePath = '';
     window.hlx.lighthouse = false;
     Array.from(document.querySelectorAll('script')).pop().remove();
-
-    expect.fail('kaputt');
   });
 
   it('Sanitizes class name', async () => {

@@ -49,6 +49,7 @@
         margin: auto;    
         align-items: center;
     }    
+
     .columns.bleed div.columns-image img {
         object-fit: cover;
         height: 50vw;

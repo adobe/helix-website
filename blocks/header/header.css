@@ -46,7 +46,7 @@ button.gnav-toggle {
   background: none;
 }
 
-button.gnav-toggle:after {
+button.gnav-toggle::after {
   content: "\2630";
   font-weight: 700;
 }
@@ -96,7 +96,7 @@ button.gnav-toggle:after {
   font-size: 14px;
 }
 
-.gnav-navitem.has-Menu.is-Open:before {
+.gnav-navitem.has-Menu.is-Open::before {
   background: #969796;
   position: absolute;
   width: 4px;
@@ -113,7 +113,7 @@ button.gnav-toggle:after {
   justify-content: space-between;
   align-items: center;
   padding: 20px 12px;
-  color: rgb(44, 44, 44);
+  color: rgb(44 44 44);
   transition: background-color .1s ease;
 }
 
@@ -125,7 +125,7 @@ button.gnav-toggle:after {
   background-color: #FAFAFA;
 }
 
-.gnav-navitem.has-Menu.is-Open > a:before {
+.gnav-navitem.has-Menu.is-Open > a::before {
   content: '';
   position: absolute;
   left: 20px;
@@ -143,7 +143,7 @@ button.gnav-toggle:after {
   border-bottom: solid 1px #f3f3f3;
 }
 
-.gnav-navitem.has-Menu > a:after {
+.gnav-navitem.has-Menu > a::after {
   display: flex;
   width: 5px;
   height: 5px;
@@ -161,7 +161,7 @@ button.gnav-toggle:after {
   margin-right: 3px;
 }
 
-.gnav-navitem.has-Menu.is-Open > a:after {
+.gnav-navitem.has-Menu.is-Open > a::after {
   transform: rotate(-135deg);
 }
 
@@ -199,16 +199,16 @@ button.gnav-toggle:after {
   width: 260px;
   border: 1px solid #D8D8D8;
   background: #FFF;
-  margin: 12px 0px 0px 36px;
+  margin: 12px 0 0 36px;
 }
 
 .gnav-promo p:nth-child(2) {
   font-weight: 700;
-  margin: 24px 24px 12px 24px;
+  margin: 24px 24px 12px;
 }
 
 .gnav-promo p:nth-child(3) {
-  margin: 0px 24px 12px 24px;
+  margin: 0 24px 12px;
 }
 
 .gnav-promo p:first-of-type,
@@ -258,12 +258,13 @@ button.gnav-toggle:after {
   fill: #2b9af3;
 }
 
-.gnav-search.is-Open .gnav-search-button:after {
+.gnav-search.is-Open .gnav-search-button::after {
   content: "\2715";
   width: 20px;
+
   /* line-height: 1; */
   font-size: 24px;
-  padding: 1px 0 0 0;
+  padding: 1px 0 0;
 }
 
 .gnav-search.is-Open .gnav-search-button svg {
@@ -283,8 +284,8 @@ button.gnav-toggle:after {
   right: 0;
   bottom: 0;
   left: 0;
-  background: rgba(0,0,0,0.75);
-  -webkit-backdrop-filter: blur(1em);
+  background: rgb(0 0 0 / 75%);
+  backdrop-filter: blur(1em);
   backdrop-filter: blur(1em);
 }
 
@@ -304,16 +305,16 @@ button.gnav-toggle:after {
   position: absolute;
   top: 6px;
   left: 18px;
-  fill: rgb(110, 110, 110);
+  fill: rgb(110 110 110);
   transition: fill 130ms ease-in-out;
 }
 
 .gnav-search-field:hover svg {
-  fill: rgb(44, 44, 44);
+  fill: rgb(44 44 44);
 }
 
 .gnav-search-field:hover .gnav-search-input {
-  border-color: rgb(179, 179, 179);
+  border-color: rgb(179 179 179);
 }
 
 .gnav-search-field .gnav-search-input {
@@ -321,20 +322,20 @@ button.gnav-toggle:after {
   width: 100%;
   line-height: 30px;
   border: 1px solid;
-  border-color: rgb(202, 202, 202);
+  border-color: rgb(202 202 202);
   border-radius: 4px;
   padding: 0 30px;
   font-size: 14px;
-  font-family: 'adobe-clean';
+  font-family: adobe-clean;
   outline: none !important;
-  -webkit-appearance: none;
+  appearance: none;
   box-sizing: border-box;
   transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
 }
 
 .gnav-search-field a {
   line-height: 32px;
-  background: rgb(20, 115, 230);
+  background: rgb(20 115 230);
   color: white;
   border-radius: 16px;
   font-size: 14px;
@@ -343,7 +344,7 @@ button.gnav-toggle:after {
 }
 
 .gnav-search-field .gnav-search-input:focus {
-  border-color: rgb(42, 124, 223);
+  border-color: rgb(42 124 223);
 }
 
 .gnav-search-input::placeholder {
@@ -383,7 +384,7 @@ button.gnav-toggle:after {
   z-index: 1;
 }
 
-.gnav-search-highlight:after {
+.gnav-search-highlight::after {
   content: '';
   position: absolute;
   z-index: -1;
@@ -391,7 +392,7 @@ button.gnav-toggle:after {
   bottom: 0;
   left: -4px;
   right: -4px;
-  background-color: rgba(255, 208, 0, 0.3);
+  background-color: rgb(255 208 0 / 30%);
   border-radius: 4px;
 }
 
@@ -546,7 +547,7 @@ button.gnav-toggle:after {
     position: relative;
   }
 
-  .gnav-navitem.has-Menu.is-Open:before {
+  .gnav-navitem.has-Menu.is-Open::before {
     all: unset;
   }
 
@@ -560,7 +561,7 @@ button.gnav-toggle:after {
   }
   
 
-  .gnav-navitem.has-Menu.is-Open > a:before {
+  .gnav-navitem.has-Menu.is-Open > a::before {
     all: unset;
   }
 
@@ -584,7 +585,7 @@ button.gnav-toggle:after {
   }
 
   .gnav-promo {
-    margin: 10px 0px 0px 36px;
+    margin: 10px 0 0 36px;
   }
 
   .gnav-promo a {
@@ -596,7 +597,7 @@ button.gnav-toggle:after {
     position: absolute;
     top: 100%;
     border-top: 1px solid #EAEAEA;
-    box-shadow: 0px 3px 3px rgb(0 0 0 / 20%);
+    box-shadow: 0 3px 3px rgb(0 0 0 / 20%);
   }
 
   .gnav-search {

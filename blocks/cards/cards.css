@@ -17,7 +17,7 @@
 }
 
 .cards a:any-link {
-    color: currentColor;
+    color: currentcolor;
     font-size: 24px;
     text-decoration: none;
     display: block;
@@ -51,7 +51,7 @@
     right: 0;
     bottom: 0;
     opacity: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
     transition: opacity 0.3s ease-in-out;
   }
 
@@ -103,6 +103,7 @@
     .cards.three .cards-card {
         width: calc(33% - 1rem);
     }    
+
     .cards.four .cards-card {
         width: calc(25% - 1rem);
     }    

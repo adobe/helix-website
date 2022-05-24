@@ -1,7 +1,5 @@
-name: Lint Files
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+name: Lint scripts and CSS
+on: [pull_request]
 
 jobs:
   build:
@@ -27,4 +25,4 @@ jobs:
       run: npm install
 
     - name: run the linters
-      run: npm lint
+      run: npm run lint
