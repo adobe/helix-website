@@ -44,8 +44,11 @@ describe('Sidekick Generator', () => {
   });
 
   it('autoruns with query parameters', async () => {
-    window.history.pushState({}, '',
-      `${window.location.href}&from=https%3A%2F%2Fwww.adobe.com%2F&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo&hlx3=true&token=1234`);
+    window.history.pushState(
+      {},
+      '',
+      `${window.location.href}&from=https%3A%2F%2Fwww.adobe.com%2F&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo&hlx3=true&token=1234`,
+    );
     const generator = document.querySelector('.sidekick-generator');
     await decorate(generator);
     const formContainer = generator.querySelector('#form-container');
@@ -59,8 +62,11 @@ describe('Sidekick Generator', () => {
   });
 
   it('displays help if sidekick bookmarklet link is clicked', async () => {
-    window.history.pushState({}, '',
-      `${window.location.href}&&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo`);
+    window.history.pushState(
+      {},
+      '',
+      `${window.location.href}&&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo`,
+    );
     const generator = document.querySelector('.sidekick-generator');
     await decorate(generator);
     const bookmark = generator.querySelector('#bookmark');

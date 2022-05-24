@@ -15,6 +15,7 @@
 
 .columns.bleed div.columns-image {
     flex: 1 1 400px;
+    overflow: hidden;
 }
 
 .columns.bleed div.columns-image img {
@@ -37,18 +38,13 @@
     transform: translate(0, 0);
 }
 
-.columns.bleed div.columns-image {
-    overflow: hidden;
-}
-
-
-
 @media (min-width: 900px) {
     .columns.bleed > div {
         flex-direction: unset;
-        margin: auto;    
+        margin: auto;
         align-items: center;
-    }    
+    }
+    
     .columns.bleed div.columns-image img {
         object-fit: cover;
         height: 50vw;
@@ -66,7 +62,7 @@
         max-width: 500px;
         float: unset;
     }
-    
+
 }
 
 
