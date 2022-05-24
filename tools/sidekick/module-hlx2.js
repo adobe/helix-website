@@ -11,6 +11,8 @@
  */
 /* eslint-disable no-console, no-alert */
 
+'use strict';
+
 (() => {
   /**
    * @typedef {Object.<string, string>} elemAttr

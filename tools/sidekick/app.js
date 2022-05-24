@@ -11,6 +11,8 @@
  */
 /* eslint-disable no-console, no-alert */
 
+'use strict';
+
 (() => {
   /**
    * Initializes the sidekick in compatibility mode.

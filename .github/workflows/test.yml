@@ -1,4 +1,4 @@
-name: Run tests
+name: Run tests and linting
 on: [pull_request]
 
 jobs:
@@ -29,3 +29,6 @@ jobs:
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
+
+    - name: run the linters
+      run: npm run lint
