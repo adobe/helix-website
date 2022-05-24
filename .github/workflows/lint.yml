@@ -1,4 +1,4 @@
-name: Run tests
+name: Lint Files
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
@@ -26,8 +26,5 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run the tests
-      run: xvfb-run -a npm test
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+    - name: run the linters
+      run: npm lint
