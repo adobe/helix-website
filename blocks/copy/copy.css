@@ -22,6 +22,10 @@
     margin: 30px 0;
 }
 
+.copy > div > span {
+    font-size: var(--body-font-size-s);
+}
+
 .copy > div > input {
     border-radius: 5px;
     padding: 5px 10px;
