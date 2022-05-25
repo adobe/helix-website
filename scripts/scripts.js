@@ -411,17 +411,13 @@ export function decorateIcons(block = document) {
     const resp = await fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`);
     if (resp.ok) {
       const iconHTML = await resp.text();
-      let iconSVG;
       if (iconHTML.match(/<style/i)) {
-        const shadow = span.attachShadow({ mode: 'open' });
-        shadow.innerHTML = iconHTML;
-        iconSVG = shadow.querySelector('svg');
+        const img = document.createElement('img');
+        img.src = `data:image/svg+xml,${encodeURIComponent(iconHTML)}`;
+        span.appendChild(img);
       } else {
         span.innerHTML = iconHTML;
-        iconSVG = span.querySelector('svg');
       }
-      iconSVG.style.display = 'inline-block';
-      iconSVG.style.height = '200px';
     }
   });
 }
