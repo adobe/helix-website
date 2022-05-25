@@ -410,7 +410,18 @@ export function decorateIcons(block = document) {
     // eslint-disable-next-line no-use-before-define
     const resp = await fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`);
     if (resp.ok) {
-      span.innerHTML = await resp.text();
+      const iconHTML = await resp.text();
+      let iconSVG;
+      if (iconHTML.match(/<style/i)) {
+        const shadow = span.attachShadow({ mode: 'open' });
+        shadow.innerHTML = iconHTML;
+        iconSVG = shadow.querySelector('svg');
+      } else {
+        span.innerHTML = iconHTML;
+        iconSVG = span.querySelector('svg');
+      }
+      iconSVG.style.display = 'inline-block';
+      iconSVG.style.height = '200px';
     }
   });
 }
