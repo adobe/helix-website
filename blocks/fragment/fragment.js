@@ -1,5 +1,3 @@
-import { decorateAnchors } from '../../scripts/scripts.js';
-
 async function fetchFragment(path) {
   const resp = await fetch(`${path}.plain.html`);
   if (resp.ok) {
@@ -15,5 +13,5 @@ export default async function init(element) {
   element.insertAdjacentHTML('beforeend', html);
   element.querySelector('div').remove();
   element.classList.add('is-Visible');
-  return decorateAnchors(element);
+  return element;
 }

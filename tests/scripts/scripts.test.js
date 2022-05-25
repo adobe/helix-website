@@ -117,7 +117,8 @@ describe('Core Helix features', () => {
     expect($picture.querySelector(':scope img').src).to.include('format=png&optimize=medium'); // default
   });
 
-  it('Decorates pictures', async () => {
+  // todo: no longer needed since breaking2022_05 ?
+  it.skip('Decorates pictures', async () => {
     // add styling to picture and test its removal
     document.querySelector('main picture')
       .parentElement
@@ -125,14 +126,6 @@ describe('Core Helix features', () => {
       .appendChild(document.querySelector('main picture'));
     scripts.decoratePictures(document.querySelector('main'));
     expect(document.querySelectorAll('strong > picture').length).to.equal(0);
-  });
-
-  it('Decorates anchors', async () => {
-    scripts.decorateAnchors(document.querySelector('main'));
-    // check if links have been made relative
-    document.querySelectorAll('main a').forEach(($a) => expect($a.getAttribute('href').startsWith('/')).to.be.true);
-    // check if icon links have been turned into SVGs
-    expect(document.querySelectorAll('main img[src$=".svg"]').length).to.equal(2);
   });
 
   it('Normalizes headings', async () => {

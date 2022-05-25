@@ -120,26 +120,14 @@ export function toClassName(name) {
  * @param {Element} block The block element
  */
 export function decorateBlock(block) {
-  const trimDashes = (str) => str.replace(/(^\s*-)|(-\s*$)/g, '');
-  const classes = Array.from(block.classList.values());
-  const blockName = classes[0];
-  if (!blockName) return;
-  const section = block.closest('.section');
-  if (section) {
-    section.classList.add(`${blockName}-container`.replace(/--/g, '-'));
+  const shortBlockName = block.classList[0];
+  if (shortBlockName) {
+    block.classList.add('block');
+    block.setAttribute('data-block-name', shortBlockName);
+    block.setAttribute('data-block-status', 'initialized');
+    const blockWrapper = block.parentElement;
+    blockWrapper.classList.add(`${shortBlockName}-wrapper`);
   }
-  const blockWithVariants = blockName.split('--');
-  const shortBlockName = trimDashes(blockWithVariants.shift());
-  const variants = blockWithVariants.map((v) => trimDashes(v));
-  block.classList.add(shortBlockName);
-  block.classList.add(...variants);
-
-  block.classList.add('block');
-  block.setAttribute('data-block-name', shortBlockName);
-  block.setAttribute('data-block-status', 'initialized');
-
-  const blockWrapper = block.parentElement;
-  blockWrapper.classList.add(`${shortBlockName}-wrapper`);
 }
 
 /**
@@ -394,22 +382,6 @@ export function normalizeHeadings($elem, allowedHeadings) {
 }
 
 /**
- * Decorates the picture elements and removes formatting.
- * @param {Element} main The container element
- */
-export function decoratePictures(main) {
-  main.querySelectorAll('img[src*="/media_"').forEach((img, i) => {
-    const newPicture = createOptimizedPicture(img.src, img.alt, !i);
-    const picture = img.closest('picture');
-    if (picture) picture.parentElement.replaceChild(newPicture, picture);
-    if (['EM', 'STRONG'].includes(newPicture.parentElement.tagName)) {
-      const styleEl = newPicture.parentElement;
-      styleEl.parentElement.replaceChild(newPicture, styleEl);
-    }
-  });
-}
-
-/**
  * Adds the favicon.
  * @param {string} href The favicon URL
  */
@@ -424,6 +396,34 @@ export function addFavIcon(href) {
   } else {
     document.getElementsByTagName('head')[0].appendChild(link);
   }
+}
+
+/**
+ * Fills icon spans with an icon.
+ */
+export function decorateIcons(block = document) {
+  block.querySelectorAll('span.icon').forEach(async (span) => {
+    if (span.classList.length < 2 || !span.classList[1].startsWith('icon-')) {
+      return;
+    }
+    const icon = span.classList[1].substring(5);
+    // eslint-disable-next-line no-use-before-define
+    const resp = await fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`);
+    if (resp.ok) {
+      const iconHTML = await resp.text();
+      let iconSVG;
+      if (iconHTML.match(/<style/i)) {
+        const shadow = span.attachShadow({ mode: 'open' });
+        shadow.innerHTML = iconHTML;
+        iconSVG = shadow.querySelector('svg');
+      } else {
+        span.innerHTML = iconHTML;
+        iconSVG = span.querySelector('svg');
+      }
+      iconSVG.style.display = 'inline-block';
+      iconSVG.style.height = '200px';
+    }
+  });
 }
 
 /**
@@ -487,9 +487,7 @@ initHlx();
 
 const LCP_BLOCKS = ['marquee', 'columns']; // add your LCP blocks to the list
 const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
-
-const LIVE_ORIGIN = 'https://www.hlx.live';
-const DEV_ORIGIN = 'http://localhost:3000';
+const ICON_ROOT = '/img';
 
 sampleRUM('top');
 window.addEventListener('load', () => sampleRUM('load'));
@@ -527,54 +525,6 @@ export function decorateButtons(block = document) {
         }
       }
     }
-  });
-}
-
-export function makeRelative(anchor) {
-  const { href, textContent } = anchor;
-  const url = new URL(href);
-  if (url.origin !== LIVE_ORIGIN && url.origin !== DEV_ORIGIN) {
-    // external link
-    anchor.target = '_blank';
-    return href;
-  }
-  anchor.setAttribute('href', href.replace(LIVE_ORIGIN, ''));
-  anchor.textContent = textContent.replace(LIVE_ORIGIN, '');
-  return anchor.href;
-}
-
-export function setSVG(anchor) {
-  const { textContent } = anchor;
-  const href = anchor.getAttribute('href');
-  const ext = textContent.substr(textContent.lastIndexOf('.') + 1);
-  if (ext !== 'svg') return;
-  const img = document.createElement('img');
-  img.src = textContent;
-  if (textContent === href) {
-    anchor.parentElement.append(img);
-    anchor.remove();
-  } else {
-    anchor.textContent = '';
-    anchor.append(img);
-  }
-}
-
-export function forceDownload(anchor) {
-  const { href } = anchor;
-  const filename = href.split('/').pop();
-  const ext = filename.split('.')[1];
-  if (ext && ['crx'].includes(ext)) {
-    anchor.setAttribute('download', filename);
-  }
-}
-
-export function decorateAnchors(element) {
-  const anchors = element.getElementsByTagName('a');
-  return Array.from(anchors).map((anchor) => {
-    makeRelative(anchor);
-    setSVG(anchor);
-    forceDownload(anchor);
-    return anchor;
   });
 }
 
@@ -647,9 +597,6 @@ export function buildAutoBlocks(main) {
  * @param {Element} main The main element
  */
 export function decorateMain(main) {
-  // forward compatible pictures redecoration
-  decoratePictures(main);
-  decorateAnchors(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateButtons(main);
@@ -663,6 +610,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     setTemplate();
+    decorateIcons();
     decorateMain(main);
     await waitForLCP();
   }
