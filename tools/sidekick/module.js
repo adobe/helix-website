@@ -892,12 +892,22 @@
           // update preview
           const resp = await sk.update();
           if (!resp.ok) {
-            console.error(resp);
-            sk.showModal({
-              css: 'modal-preview-failure',
-              sticky: true,
-              level: 0,
-            });
+            if (status.webPath.startsWith('/.helix/') && resp.error) {
+              // show detail message only in config update mode
+              sk.showModal({
+                css: 'modal-config-failure',
+                message: resp.error,
+                sticky: true,
+                level: 0,
+              });
+            } else {
+              console.error(resp);
+              sk.showModal({
+                css: 'modal-preview-failure',
+                sticky: true,
+                level: 0,
+              });
+            }
             return;
           }
           // handle special case /.helix/*
@@ -2417,6 +2427,7 @@
       return {
         ok: (resp && resp.ok) || false,
         status: (resp && resp.status) || 0,
+        error: (resp && resp.headers.get('x-error')) || '',
         path,
       };
     }

@@ -907,6 +907,10 @@
   content: "Helix configuration successfully activated.";
 }
 
+.hlx-sk-overlay .modal.modal-config-failure::before {
+  content: "Failed to activate Helix configuration: ";
+}
+
 .hlx-sk-overlay .modal.modal-preview-failure::before {
   content: "Previewing failed. Please try again later.";
 }

@@ -150,6 +150,10 @@
   content: "La configuration a été activée.";
 }
 
+.hlx-sk-overlay .modal.modal-config-failure::before {
+  content: "L'activation de la configuration a échoué: ";
+}
+
 .hlx-sk-overlay .modal.modal-preview-failure::before {
   content: "La génération de l'aperçu a échoué. Veuillez essayer plus tard.";
 }
