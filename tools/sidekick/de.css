@@ -147,7 +147,11 @@
 }
 
 .hlx-sk-overlay .modal.modal-config-success::before {
-  content: "Helix-Konnfiguration erfolgreich aktiviert.";
+  content: "Helix-Konfiguration erfolgreich aktiviert.";
+}
+
+.hlx-sk-overlay .modal.modal-config-failure::before {
+  content: "Aktivierung der Helix-Konfiguration fehlgeschlagen: ";
 }
 
 .hlx-sk-overlay .modal.modal-preview-failure::before {
