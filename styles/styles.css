@@ -578,7 +578,11 @@ body.no-header-template {
     body.no-header-template main {
       min-height: calc(100vh - 88px);
     }
+}
 
+.docs-template a.button.accent:any-link {
+  background-color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
 }
 
 
