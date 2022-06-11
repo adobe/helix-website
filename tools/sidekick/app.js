@@ -30,8 +30,7 @@
     // load sidekick module
     const moduleScript = document.createElement('script');
     moduleScript.id = 'hlx-sk-module';
-    moduleScript.src = (appScript && appScript.getAttribute('src').replace('app.js', 'module.js'))
-      || 'https://www.hlx.live/tools/sidekick/module.js';
+    moduleScript.src = 'https://www.hlx.live/tools/sidekick/module.js';
     moduleScript.addEventListener('load', () => {
       // get base config from script data attribute
       const baseConfig = appScript
