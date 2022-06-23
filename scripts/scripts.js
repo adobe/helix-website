@@ -42,23 +42,85 @@ export function sampleRUM(checkpoint, data = {}) {
       sendPing();
       // special case CWV
       if (checkpoint === 'cwv') {
-        // eslint-disable-next-line import/no-unresolved
-        import('./web-vitals-module-2-1-2.js').then((mod) => {
+        // use classic script to avoid CORS issues
+        const script = document.createElement('script');
+        script.src = 'https://rum.hlx.page/.rum/web-vitals/dist/web-vitals.iife.js';
+        script.onload = () => {
           const storeCWV = (measurement) => {
             data.cwv = {};
             data.cwv[measurement.name] = measurement.value;
             sendPing();
           };
-          mod.getCLS(storeCWV);
-          mod.getFID(storeCWV);
-          mod.getLCP(storeCWV);
-        });
+          // When loading `web-vitals` using a classic script, all the public
+          // methods can be found on the `webVitals` global namespace.
+          window.webVitals.getCLS(storeCWV);
+          window.webVitals.getFID(storeCWV);
+          window.webVitals.getLCP(storeCWV);
+        };
+        document.head.appendChild(script);
       }
     }
   } catch (e) {
     // something went wrong
   }
 }
+
+sampleRUM.blockobserver = (window.IntersectionObserver) ? new IntersectionObserver((entries) => {
+  entries
+    .filter((entry) => entry.isIntersecting)
+    .forEach((entry) => {
+      sampleRUM.blockobserver.unobserve(entry.target); // observe only once
+      const target = sampleRUM.targetselector(entry.target);
+      const source = sampleRUM.sourceselector(entry.target);
+      sampleRUM('viewblock', { target, source });
+    });
+}, { threshold: 0.25 }) : { observe: () => { } };
+
+sampleRUM.mediaobserver = (window.IntersectionObserver) ? new IntersectionObserver((entries) => {
+  entries
+    .filter((entry) => entry.isIntersecting)
+    .forEach((entry) => {
+      sampleRUM.mediaobserver.unobserve(entry.target); // observe only once
+      const target = sampleRUM.targetselector(entry.target);
+      const source = sampleRUM.sourceselector(entry.target);
+      sampleRUM('viewmedia', { target, source });
+    });
+}, { threshold: 0.25 }) : { observe: () => { } };
+
+sampleRUM.observe = ((elements) => {
+  elements.forEach((element) => {
+    if (element.tagName.toLowerCase() === 'img'
+      || element.tagName.toLowerCase() === 'video'
+      || element.tagName.toLowerCase() === 'audio'
+      || element.tagName.toLowerCase() === 'iframe') {
+      sampleRUM.mediaobserver.observe(element);
+    } else {
+      sampleRUM.blockobserver.observe(element);
+    }
+  });
+});
+
+sampleRUM.targetselector = (element) => {
+  let value = element.getAttribute('href') || element.currentSrc || element.getAttribute('src');
+  if (value && value.startsWith('https://')) {
+    // resolve relative links
+    value = new URL(value, window.location).href;
+  }
+  return value;
+};
+
+sampleRUM.sourceselector = (element) => {
+  if (element === document.body || element === document.documentElement || !element) {
+    return undefined;
+  }
+  if (element.id) {
+    return `#${element.id}`;
+  }
+  if (element.getAttribute('data-block-name')) {
+    return `.${element.getAttribute('data-block-name')}`;
+  }
+  return sampleRUM.sourceselector(element.parentElement);
+};
 
 /**
  * Loads a CSS file.
@@ -486,8 +548,20 @@ const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information
 const ICON_ROOT = '/img';
 
 sampleRUM('top');
+
+window.addEventListener('unhandledrejection', (event) => {
+  sampleRUM('error', { source: event.reason.sourceURL, target: event.reason.line });
+});
+
+window.addEventListener('error', (event) => {
+  sampleRUM('error', { source: event.filename, target: event.lineno });
+});
+
 window.addEventListener('load', () => sampleRUM('load'));
-document.addEventListener('click', () => sampleRUM('click'));
+
+document.addEventListener('click', (event) => {
+  sampleRUM('click', { target: sampleRUM.targetselector(event.target), source: sampleRUM.sourceselector(event.target) });
+});
 
 loadPage(document);
 
@@ -597,6 +671,8 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateButtons(main);
   decorateBlocks(main);
+  sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
+  window.setTimeout(() => sampleRUM.observe(main.querySelectorAll('picture > img')), 1000);
 }
 
 /**
