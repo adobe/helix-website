@@ -86,6 +86,11 @@ body {
     padding-top: 65px;
     font-size: var(--type-body-m-size);
     line-height: var(--type-body-m-lh);
+    display: none;
+}
+
+body.appear {
+  display: unset;
 }
 
 /* Templates */
