@@ -1,4 +1,5 @@
 footer {
+  display: none;
   padding: 2rem;
   font-size: var(--type-body-s-size);
 }
@@ -14,4 +15,8 @@ footer .footer p {
 
 footer .footer a:any-link {
   color: currentcolor;
+}
+
+footer.appear {
+  display: unset;
 }

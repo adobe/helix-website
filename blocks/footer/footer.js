@@ -15,6 +15,7 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   footer.innerHTML = html;
   block.append(footer);
+  footer.closest('footer').classList.add('appear');
 
   // open all footer links in new windows
   block.querySelectorAll('a').forEach((a) => {

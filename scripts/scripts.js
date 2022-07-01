@@ -643,3 +643,9 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // load anything that can be postponed to the latest here
 }
+
+if (window.name.includes('performance')) {
+  import('./performance.js').then((mod) => {
+    if (mod.default) mod.default();
+  });
+}
