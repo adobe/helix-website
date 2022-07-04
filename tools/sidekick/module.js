@@ -767,6 +767,23 @@
   }
 
   /**
+   * Returns the fetch options for admin requests
+   * @param {object} config
+   * @returns {object}
+   */
+  function getAdminFetchOptions({ authToken }) {
+    const opts = {
+      cache: 'no-store',
+      credentials: 'include',
+      headers: {},
+    };
+    if (authToken) {
+      opts.headers['x-auth-token'] = authToken;
+    }
+    return opts;
+  }
+
+  /**
    * Adds the edit plugin to the sidekick.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -1119,19 +1136,26 @@
       sk.isEditor() ? '' : sk.location.pathname,
     );
     loginUrl.searchParams.set('loginRedirect', 'https://www.hlx.live/tools/sidekick/login-success');
-    loginUrl.searchParams.set('extensionId', chrome.runtime.id);
+    const extensionId = chrome?.runtime?.id;
+    if (extensionId) {
+      loginUrl.searchParams.set('extensionId', extensionId);
+    }
     if (selectAccount) {
       loginUrl.searchParams.set('selectAccount', true);
     }
+    const profileUrl = new URL('https://admin.hlx.page/profile');
+    if (sk.config.adminVersion) {
+      profileUrl.searchParams.append('hlx-admin-version', sk.config.adminVersion);
+    }
     const loginWindow = window.open(loginUrl.toString());
+
     let seconds = 0;
     let loggedIn = false;
     const loginCheck = window.setInterval(async () => {
       if (seconds < 59) {
         seconds += 1;
-        if ((await fetch('https://admin.hlx.page/profile', {
-          cache: 'no-store',
-          credentials: 'include',
+        if ((await fetch(profileUrl.href, {
+          ...getAdminFetchOptions(sk.config),
         })).ok) {
           // re-fetch status
           loggedIn = true;
@@ -1141,7 +1165,9 @@
           sk.fetchStatus();
           fireEvent(sk, 'loggedin');
           window.setTimeout(() => {
-            // loginWindow.close();
+            if (!loginWindow.closed) {
+              loginWindow.close();
+            }
           }, 500);
         }
       } else {
@@ -1168,9 +1194,13 @@
    * @param {Sidekick} sk The sidekick
    */
   function logout(sk) {
-    fetch('https://admin.hlx.page/logout', {
-      cache: 'no-store',
-      credentials: 'include',
+    const logoutUrl = new URL('https://admin.hlx.page/logout');
+    if (sk.config.adminVersion) {
+      logoutUrl.searchParams.append('hlx-admin-version', sk.config.adminVersion);
+    }
+
+    fetch(logoutUrl.href, {
+      ...getAdminFetchOptions(sk.config),
     })
       .then(() => {
         fireEvent(sk, 'loggedout');
@@ -1644,7 +1674,9 @@
         apiUrl.searchParams.append('editUrl', this.isEditor() ? href : 'auto');
         this.status.apiUrl = apiUrl.toString();
       }
-      fetch(this.status.apiUrl, { cache: 'no-store', credentials: 'include' })
+      fetch(this.status.apiUrl, {
+        ...getAdminFetchOptions(this.config),
+      })
         .then((resp) => {
           // check for error status
           if (!resp.ok) {
@@ -1713,6 +1745,7 @@
     loadContext(cfg) {
       this.location = getLocation();
       this.config = initConfig(cfg, this.location);
+      console.log('load context', this.config);
       fireEvent(this, 'contextloaded', {
         config: this.config,
         location: this.location,
@@ -2415,7 +2448,10 @@
         // update preview
         resp = await fetch(
           getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-          { method: 'POST', credentials: 'include' },
+          {
+            method: 'POST',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         if (this.isEditor() || this.isInner() || this.isDev()) {
           // bust client cache
@@ -2446,7 +2482,10 @@
         // delete preview
         resp = await fetch(
           getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-          { method: 'DELETE', credentials: 'include' },
+          {
+            method: 'DELETE',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         // also unpublish if published
         if (status.live && status.live.lastModified) {
@@ -2483,7 +2522,10 @@
       try {
         resp = await fetch(
           getAdminUrl(config, 'live', purgeURL.pathname),
-          { method: 'POST', credentials: 'include' },
+          {
+            method: 'POST',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         // bust client cache for live and production
         if (config.outerHost) {
@@ -2515,7 +2557,10 @@
         // delete live
         resp = await fetch(
           getAdminUrl(config, 'live', path),
-          { method: 'DELETE', credentials: 'include' },
+          {
+            method: 'DELETE',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         fireEvent(this, 'unpublished', path);
       } catch (e) {
