@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
- .hlx-sk .plugin-container:empty::before {
+.hlx-sk .plugin-container:empty::before {
   content: "Aucune action disponible pour cette page";
 }
 
