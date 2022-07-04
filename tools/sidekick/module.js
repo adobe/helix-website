@@ -1136,7 +1136,7 @@
       sk.isEditor() ? '' : sk.location.pathname,
     );
     loginUrl.searchParams.set('loginRedirect', 'https://www.hlx.live/tools/sidekick/login-success');
-    const extensionId = chrome?.runtime?.id;
+    const extensionId = window.chrome?.runtime?.id;
     if (extensionId) {
       loginUrl.searchParams.set('extensionId', extensionId);
     }
@@ -1150,40 +1150,36 @@
     const loginWindow = window.open(loginUrl.toString());
 
     let seconds = 0;
-    let loggedIn = false;
     const loginCheck = window.setInterval(async () => {
       if (seconds < 59) {
         seconds += 1;
-        if ((await fetch(profileUrl.href, {
-          ...getAdminFetchOptions(sk.config),
-        })).ok) {
+        if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
           // re-fetch status
-          loggedIn = true;
           window.clearInterval(loginCheck);
-          delete sk.status.status;
-          sk.addEventListener('statusfetched', () => sk.hideModal());
-          sk.fetchStatus();
-          fireEvent(sk, 'loggedin');
           window.setTimeout(() => {
             if (!loginWindow.closed) {
               loginWindow.close();
             }
           }, 500);
+          delete sk.status.status;
+          sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
+          sk.fetchStatus();
+          fireEvent(sk, 'loggedin');
+        } else if (loginWindow.closed) {
+          sk.showModal({
+            css: 'modal-login-aborted',
+          });
+          window.clearInterval(loginCheck);
         }
       } else {
         // give up after 1 minute
+        window.clearInterval(loginCheck);
+        loginWindow.close();
         sk.showModal({
           css: 'modal-login-timeout',
           sticky: true,
           level: 1,
         });
-        window.clearInterval(loginCheck);
-      }
-      if (loginWindow.closed && !loggedIn) {
-        sk.showModal({
-          css: 'modal-login-aborted',
-        });
-        window.clearInterval(loginCheck);
       }
     }, 1000);
   }
@@ -1745,7 +1741,6 @@
     loadContext(cfg) {
       this.location = getLocation();
       this.config = initConfig(cfg, this.location);
-      console.log('load context', this.config);
       fireEvent(this, 'contextloaded', {
         config: this.config,
         location: this.location,
@@ -2574,9 +2569,10 @@
      * event is fired.
      * @param {string} type The event type
      * @param {Function} listener The function to call
+     * @param {object} opts options
      */
-    addEventListener(type, listener) {
-      this.root.addEventListener(type, listener);
+    addEventListener(type, listener, opts) {
+      this.root.addEventListener(type, listener, opts);
     }
 
     /**
