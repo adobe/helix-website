@@ -874,7 +874,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-login p:first-of-type::before {
-  content: "Please sign in to continue...";
+  content: "Please sign in to Helix Sidekick to continue...";
 }
 
 .hlx-sk .feature-container .user-login button::before,
@@ -905,6 +905,10 @@
 
 .hlx-sk-overlay .modal.modal-config-success::before {
   content: "Helix configuration successfully activated.";
+}
+
+.hlx-sk-overlay .modal.modal-config-failure::before {
+  content: "Failed to activate Helix configuration: ";
 }
 
 .hlx-sk-overlay .modal.modal-preview-failure::before {
