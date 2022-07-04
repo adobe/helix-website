@@ -11,28 +11,22 @@
  */
 /* eslint-disable no-console, no-alert */
 
+'use strict';
+
 (() => {
   /**
-   * @typedef {Object.<string, string>} elemAttr
-   * @description The name and value of the attribute to set on an element.
-   */
-
-  /**
-   * @typedef {Object.<string, Function>} elemLstnr
-   * @description The event name and listener to register on an element.
-   */
-
-  /**
-   * @typedef {Object} elemConfig
+   * @typedef {Object} ElemConfig
+   * @private
    * @description The configuration of an element to add.
    * @prop {string}      tag    The tag name (mandatory)
    * @prop {string}      text   The text content (optional)
-   * @prop {elemAttr[]}  attrs  The attributes (optional)
-   * @prop {elemLstnr[]} lstnrs The event listeners (optional)
+   * @prop {Object[]}  attrs  The attributes (optional)
+   * @prop {Object[]} lstnrs The event listeners (optional)
    */
 
   /**
-   * @typedef {Object} pluginButton
+   * @typedef {Object} PluginButton
+   * @private
    * @description The configuration for a plugin button. This can be used as
    * a shorthand for {@link elemConfig}.
    * @prop {string}   text   The button text
@@ -43,13 +37,15 @@
    */
 
   /**
-   * @typedef {Object} plugin
-   * @description The plugin configuration.
+   * @typedef {Object} _Plugin
+   * @private
+   * @description The internal plugin configuration.
    * @prop {string}       id        The plugin ID (mandatory)
-   * @prop {pluginButton} button    A button configuration object (optional)
+   * @prop {PluginButton} button    A button configuration object (optional)
    * @prop {string}       container The ID of a dropdown to add this plugin to (optional)
+   * @prop {boolean}      feature=false Determines whether to group this plugin with the features
    * @prop {boolean}      override=false Determines whether to replace an existing plugin
-   * @prop {elemConfig[]} elements  An array of elements to add (optional)
+   * @prop {ElemConfig[]} elements  An array of elements to add (optional)
    * @prop {Function}     condition Determines whether to show this plugin (optional).
    * This function is expected to return a boolean when called with the sidekick as argument.
    * @prop {Function}     advanced  Show this plugin only in advanced mode (optional).
@@ -59,56 +55,60 @@
    */
 
   /**
-   * A callback function to render a view.
-   * @callback viewCallback
-   * @param {HTMLELement} viewContainer The view container
-   * @param {Object} data The data to display
+   * @typedef {Object} Plugin
+   * @description The plugin configuration.
+   * @prop {string} id The plugin ID (mandatory)
+   * @prop {string} title The button text
+   * @prop {Object} i18n_title={} A map of translated button texts
+   * @prop {string} url The URL to open when the button is clicked
+   * @prop {string} container The ID of a dropdown to add this plugin to (optional)
+   * @prop {boolean} is_container Determines whether to turn this plugin into a dropdown
+   * @prop {string[]} environments Specifies when to show this plugin (edit, preview, live, or prod)
    */
 
   /**
-   * @typedef {Object} viewConfig
+   * @typedef {Object} ViewConfig
    * @description A custom view configuration.
-   * @prop {string|viewCallback} js The URL of a JS module or a function to render this view
    * @prop {string} path The path or globbing pattern where to apply this view
    * @prop {string} css The URL of a CSS file or inline CSS to render this view (optional)
    */
 
   /**
-   * @typedef {Object} helpStep
-   * @description The definition of a help step inside a {@link helpTopic}.
+   * @typedef {Object} HelpStep
+   * @description The definition of a help step inside a {@link HelpTopic|help topic}.
    * @prop {string} message The help message
    * @prop {string} selector The CSS selector of the target element
    */
 
   /**
-   * @typedef {Object} helpTopic
+   * @typedef {Object} HelpTopic
    * @description The definition of a help topic.
    * @prop {string} id The ID of the help topic
-   * @prop {helpStep[]} steps An array of {@link helpStep}s
+   * @prop {HelpStep[]} steps An array of {@link HelpStep|help steps}
    */
 
   /**
-   * @typedef {Object} sidekickConfig
+   * @typedef {Object} SidekickConfig
    * @description The sidekick configuration.
    * @prop {string} owner The GitHub owner or organization (mandatory)
    * @prop {string} repo The GitHub owner or organization (mandatory)
    * @prop {string} ref=main The Git reference or branch (optional)
    * @prop {string} project The name of the Helix project used in the sharing link (optional)
-   * @prop {plugin[]} plugins An array of plugin configurations (optional)
+   * @prop {Plugin[]} plugins An array of {@link Plugin|plugin configurations} (optional)
    * @prop {string} outerHost The outer CDN's host name (optional)
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
    * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
    * @prop {boolean} pushDown=false <pre>true</pre> to have the sidekick push down page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
-   * @prop {viewConfig[]} specialViews An array of custom view configurations (optional)
+   * @prop {ViewConfig[]} specialViews An array of custom {@link ViewConfig|view configurations}
    * @prop {number} adminVersion The specific version of admin service to use (optional)
    */
 
   /**
    * @external
    * @name "window.hlx.sidekickConfig"
-   * @type {sidekickConfig}
+   * @type {SidekickConfig}
    * @description The global variable holding the initial sidekick configuration.
    */
 
@@ -149,7 +149,7 @@
   /**
    * @event Sidekick#contextloaded
    * @type {Object} The context object
-   * @property {sidekickConfig} config The sidekick configuration
+   * @property {SidekickConfig} config The sidekick configuration
    * @property {Location} location The sidekick location
    * @description This event is fired when the context has been loaded.
    */
@@ -331,7 +331,7 @@
   /**
    * Returns the sidekick configuration.
    * @private
-   * @param {sidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
+   * @param {SidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
    * @param {Location} location The current location
    * @returns {Object} The sidekick configuration
    */
@@ -681,17 +681,21 @@
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {string} name The name of the event
-   * @param {Object} data The data to pass to event listeners (defaults to {@link Sidekick})
+   * @param {Object} data The data to pass to event listeners (optional)
    */
   function fireEvent(sk, name, data) {
     try {
-      sk.root.dispatchEvent(new CustomEvent(name, {
+      sk.dispatchEvent(new CustomEvent(name, {
         detail: {
-          data: data || sk,
+          data: data || {
+            config: JSON.parse(JSON.stringify(sk.config)),
+            location: sk.location,
+            status: sk.status,
+          },
         },
       }));
     } catch (e) {
-      console.warn('failed to fire event', name, data);
+      console.warn('failed to fire event', name, e);
     }
   }
 
@@ -796,6 +800,21 @@
    * @param {Sidekick} sk The sidekick
    */
   function addEnvPlugins(sk) {
+    // add env container
+    sk.add({
+      id: 'env',
+      feature: true,
+      button: {
+        isDropdown: true,
+      },
+      callback: (sidekick, $env) => {
+        if (sidekick.isDev()) $env.classList.add('dev');
+        if (sidekick.isInner()) $env.classList.add('preview');
+        if (sidekick.isOuter()) $env.classList.add('live');
+        if (sidekick.isProd()) $env.classList.add('prod');
+      },
+    });
+
     // dev
     sk.add({
       id: 'dev',
@@ -818,6 +837,7 @@
     // preview
     sk.add({
       id: 'preview',
+      container: 'env',
       condition: (sidekick) => sidekick.isEditor() || sidekick.isHelix(),
       button: {
         action: async (evt) => {
@@ -835,6 +855,7 @@
     // live
     sk.add({
       id: 'live',
+      container: 'env',
       condition: (sidekick) => sidekick.config.outerHost
         && (sidekick.isEditor() || sidekick.isHelix()),
       button: {
@@ -854,6 +875,7 @@
     // production
     sk.add({
       id: 'prod',
+      container: 'env',
       condition: (sidekick) => sidekick.config.host
         && sidekick.config.host !== sidekick.config.outerHost
         && (sidekick.isEditor() || sidekick.isHelix()),
@@ -1106,6 +1128,101 @@
   }
 
   /**
+   * Adds custom plugins to the sidekick.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function addCustomPlugins(sk) {
+    const { location, config: { plugins, innerHost } = {} } = sk;
+    const language = navigator.language.split('-')[0];
+    if (plugins && Array.isArray(plugins)) {
+      plugins.forEach((cfg, i) => {
+        if (typeof (cfg.button && cfg.button.action) === 'function'
+          || typeof cfg.condition === 'function') {
+          // add legacy plugin
+          sk.add(cfg);
+        } else {
+          const {
+            id,
+            title,
+            title_i18n: i18nTitle,
+            url,
+            event: eventName,
+            environments,
+            exclude_paths: excludePaths,
+            include_paths: includePaths,
+            container,
+            is_container: isDropdown,
+          } = cfg;
+          // check mandatory properties
+          let missingProperty = '';
+          if (!sk.get(id)) {
+            // plugin config not extending existing plugin
+            if (!title) {
+              missingProperty = 'title';
+            } else if (!(url || eventName || isDropdown)) {
+              missingProperty = 'url, event, or is_container';
+            }
+            if (missingProperty) {
+              console.log(`plugin config missing required property ${missingProperty}`);
+              return;
+            }
+          }
+          // assemble plugin config
+          const plugin = {
+            id: id || `custom-plugin-${i}`,
+            condition: (s) => {
+              let excluded = false;
+              if (excludePaths && Array.isArray(excludePaths)
+                && excludePaths.some((glob) => globToRegExp(glob).test(location.pathname))) {
+                excluded = true;
+              }
+              if (includePaths && Array.isArray(includePaths)
+                && includePaths.some((glob) => globToRegExp(glob).test(location.pathname))) {
+                excluded = false;
+              }
+              if (excluded) {
+                // excluding plugin
+                return false;
+              }
+              if (!environments || environments.includes('any')) {
+                return true;
+              }
+              const envChecks = {
+                dev: s.isDev,
+                edit: s.isEditor,
+                preview: s.isInner,
+                live: s.isOuter,
+                prod: s.isProd,
+              };
+              return environments.some((env) => envChecks[env] && envChecks[env].call(s));
+            },
+            button: {
+              text: (i18nTitle && i18nTitle[language]) || title,
+              action: () => {
+                if (url) {
+                  const target = url.startsWith('/')
+                    ? new URL(url, `https://${innerHost}/`)
+                    : url;
+                  // open url in new window
+                  window.open(target, `hlx-sk-${id || `custom-plugin-${i}`}`);
+                } else if (eventName) {
+                  // fire custom event
+                  fireEvent(sk, `custom:${eventName}`);
+                }
+              },
+              isDropdown,
+            },
+            container,
+          };
+          // add plugin
+          sk.add(plugin);
+        }
+      });
+    }
+  }
+
+  /**
    * Logs the user in.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -1119,6 +1236,10 @@
       sk.isEditor() ? '' : sk.location.pathname,
     );
     loginUrl.searchParams.set('loginRedirect', 'https://www.hlx.live/tools/sidekick/login-success');
+    const extensionId = chrome && chrome.runtime && chrome.runtime.id;
+    if (extensionId) {
+      loginUrl.searchParams.set('extensionId', extensionId);
+    }
     if (selectAccount) {
       loginUrl.searchParams.set('selectAccount', true);
     }
@@ -1140,7 +1261,7 @@
           sk.fetchStatus();
           fireEvent(sk, 'loggedin');
           window.setTimeout(() => {
-            loginWindow.close();
+            // loginWindow.close();
           }, 500);
         }
       } else {
@@ -1294,8 +1415,7 @@
   }
 
   /**
-   * Adds the default and custom plugins to the sidekick, or checks existing
-   * plugins based on the status of the current resource.
+   * Checks existing plugins based on the status of the current resource.
    * @private
    * @param {Sidekick} sk The sidekick
    */
@@ -1313,7 +1433,7 @@
   /**
    * Pushes down the page content to make room for the sidekick.
    * @private
-   * @see {@link sidekickConfig.noPushDown}
+   * @see {@link SidekickConfig.noPushDown}
    * @param {Sidekick} sk The sidekick
    * @param {number} skHeight The current height of the sidekick (optional)
    */
@@ -1509,7 +1629,7 @@
   class Sidekick extends HTMLElement {
     /**
      * Creates a new sidekick.
-     * @param {sidekickConfig} cfg The sidekick config
+     * @param {SidekickConfig} cfg The sidekick config
      */
     constructor(cfg) {
       super();
@@ -1522,33 +1642,6 @@
           class: 'hlx-sk hlx-sk-hidden',
         },
         lstnrs: {
-          contextloaded: () => {
-            // add default plugins
-            addEditPlugin(this);
-            addEnvPlugins(this);
-            addPreviewPlugin(this);
-            addReloadPlugin(this);
-            addDeletePlugin(this);
-            addPublishPlugin(this);
-            addUnpublishPlugin(this);
-            // add custom plugins
-            if (this.config.plugins && Array.isArray(this.config.plugins)) {
-              this.config.plugins.forEach((plugin) => this.add(plugin));
-            }
-          },
-          statusfetched: () => {
-            checkUserState(this);
-            checkPlugins(this);
-            checkLastModified(this);
-          },
-          shown: async () => {
-            await showSpecialView(this);
-            pushDownContent(this);
-          },
-          hidden: () => {
-            hideSpecialView(this);
-            revertPushDownContent(this);
-          },
           keydown: ({ altKey }) => {
             if (altKey) {
               // enable advanced mode
@@ -1562,6 +1655,30 @@
             }
           },
         },
+      });
+      this.addEventListener('contextloaded', () => {
+        // add default plugins
+        addEditPlugin(this);
+        addEnvPlugins(this);
+        addPreviewPlugin(this);
+        addReloadPlugin(this);
+        addDeletePlugin(this);
+        addPublishPlugin(this);
+        addUnpublishPlugin(this);
+        addCustomPlugins(this);
+      });
+      this.addEventListener('statusfetched', () => {
+        checkUserState(this);
+        checkPlugins(this);
+        checkLastModified(this);
+      });
+      this.addEventListener('shown', async () => {
+        await showSpecialView(this);
+        pushDownContent(this);
+      });
+      this.addEventListener('hidden', () => {
+        hideSpecialView(this);
+        revertPushDownContent(this);
       });
       this.status = {};
       this.plugins = [];
@@ -1705,7 +1822,7 @@
 
     /**
      * Loads the sidekick configuration and retrieves the location of the current document.
-     * @param {sidekickConfig} cfg The sidekick config
+     * @param {SidekickConfig} cfg The sidekick config
      * @fires Sidekick#contextloaded
      * @returns {Sidekick} The sidekick
      */
@@ -1783,7 +1900,7 @@
 
     /**
      * Adds a plugin to the sidekick.
-     * @param {plugin} plugin The plugin configuration.
+     * @param {_plugin} plugin The plugin configuration.
      * @returns {HTMLElement} The plugin
      */
     add(plugin) {
@@ -1793,28 +1910,11 @@
           || (typeof plugin.condition === 'function' && plugin.condition(this));
         // find existing plugin
         let $plugin = this.get(plugin.id);
-        let $pluginContainer = (plugin.container
-          && this.root
-            .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
+        const $pluginContainer = (plugin.container && this.root
+          .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
+          || (plugin.feature && this.root
+            .querySelector('.feature-container'))
           || this.pluginContainer;
-        if (ENVS[plugin.id]) {
-          // find or create environment plugin container
-          $pluginContainer = this.root.querySelector(':scope .env .dropdown-container');
-          if (!$pluginContainer) {
-            const $envDropdown = appendTag(
-              this.featureContainer,
-              createDropdown(this, {
-                id: 'env',
-              }),
-              this.featureContainer.firstElementChild,
-            );
-            if (this.isDev()) $envDropdown.classList.add('dev');
-            if (this.isInner()) $envDropdown.classList.add('preview');
-            if (this.isOuter()) $envDropdown.classList.add('live');
-            if (this.isProd()) $envDropdown.classList.add('prod');
-            $pluginContainer = $envDropdown.querySelector(':scope .dropdown-container');
-          }
-        }
         // re-check plugin once status is fetched
         this.addEventListener('statusfetched', () => {
           if (typeof plugin.condition === 'function') {
@@ -1848,12 +1948,13 @@
           },
         };
         if (!$plugin && plugin.isShown) {
+          const $before = !!plugin.feature && this.root.querySelector('.feature-container').firstElementChild;
           // add new plugin
           if (plugin.button && plugin.button.isDropdown) {
             // add dropdown
-            return appendTag($pluginContainer, createDropdown(this, plugin));
+            return appendTag($pluginContainer, createDropdown(this, plugin), $before);
           }
-          $plugin = appendTag($pluginContainer, pluginCfg);
+          $plugin = appendTag($pluginContainer, pluginCfg, $before);
           if ($pluginContainer === this.pluginContainer
               && this.pluginContainer.classList.contains('loading')) {
             // remove loading text
@@ -2172,7 +2273,7 @@
 
     /**
      * Displays a balloon with help content.
-     * @param {helpTopic} topic The topic
+     * @param {HelpTopic} topic The topic
      * @param {number} step The step number to display (starting with 0)
      * @returns {Sidekick} The sidekick
      */
@@ -2522,25 +2623,6 @@
       }
       return resp;
     }
-
-    /**
-     * Sets up a function that will be called whenever the specified sidekick
-     * event is fired.
-     * @param {string} type The event type
-     * @param {Function} listener The function to call
-     */
-    addEventListener(type, listener) {
-      this.root.addEventListener(type, listener);
-    }
-
-    /**
-     * Removes an event listener previously registered with {@link addEventListener}.
-     * @param {string} type The event type
-     * @param {Function} listener The function to remove
-     */
-    removeEventListener(name, listener) {
-      this.root.removeEventListener(name, listener);
-    }
   }
 
   /**
@@ -2549,7 +2631,7 @@
    * @type {Function}
    * @description Initializes the sidekick and stores a reference to it in
    *              {@link window.hlx.sidekick}.
-   * @param {sidekickConfig} cfg The sidekick configuration
+   * @param {SidekickConfig} cfg The sidekick configuration
    *        (extends {@link window.hlx.sidekickConfig})
    * @returns {Sidekick} The sidekick
    */
