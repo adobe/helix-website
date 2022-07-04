@@ -2370,7 +2370,10 @@
           rel: 'stylesheet',
           href,
         },
-      });
+      })
+        .addEventListener('load', () => {
+          fireEvent(this, 'cssloaded');
+        });
       // i18n
       if (!path && !navigator.language.startsWith('en')) {
         // look for language file in same directory
@@ -2381,6 +2384,8 @@
             rel: 'stylesheet',
             href: langHref,
           },
+        }).addEventListener('load', () => {
+          fireEvent(this, 'langloaded');
         });
       }
       return this;
@@ -2610,6 +2615,7 @@
       window.hlx.sidekick = document.createElement('helix-sidekick');
       document.body.prepend(window.hlx.sidekick);
       window.hlx.sidekick.show();
+      document.dispatchEvent(new CustomEvent('hlx-sidekick-initialized'));
     } else {
       // toggle sidekick
       window.hlx.sidekick.toggle();
