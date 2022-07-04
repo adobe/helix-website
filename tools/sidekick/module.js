@@ -1176,12 +1176,13 @@
             id: id || `custom-plugin-${i}`,
             condition: (s) => {
               let excluded = false;
+              const pathSearchHash = location.href.replace(location.origin, '');
               if (excludePaths && Array.isArray(excludePaths)
-                && excludePaths.some((glob) => globToRegExp(glob).test(location.pathname))) {
+                && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
                 excluded = true;
               }
               if (includePaths && Array.isArray(includePaths)
-                && includePaths.some((glob) => globToRegExp(glob).test(location.pathname))) {
+                && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
                 excluded = false;
               }
               if (excluded) {
@@ -1741,6 +1742,9 @@
       this.fetchStatus();
       this.loadCSS();
       checkForIssues(this);
+
+      // announce to the document that the sidekick is ready
+      document.dispatchEvent(new CustomEvent('helix-sidekick-ready'));
     }
 
     /**
