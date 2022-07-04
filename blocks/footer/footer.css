@@ -1,5 +1,5 @@
 footer {
-  display: block;
+  display: none;
   padding: 2rem;
   font-size: var(--type-body-s-size);
 }
@@ -18,5 +18,5 @@ footer .footer a:any-link {
 }
 
 footer.appear {
-  display: unset;
+  display: block;
 }
