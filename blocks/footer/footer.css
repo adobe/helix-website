@@ -1,5 +1,5 @@
 footer {
-  display: none;
+  display: block;
   padding: 2rem;
   font-size: var(--type-body-s-size);
 }
