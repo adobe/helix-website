@@ -102,11 +102,10 @@
         }
       },
       "anyOf": [
-          { "required": [ "url" ] },
-          { "required": [ "event" ] },
-          { "required": [ "is_container" ] }
-        ]
-      },
+        { "required": [ "url" ] },
+        { "required": [ "event" ] },
+        { "required": [ "is_container" ] }
+      ],
       "additionalProperties": false
     }
   }
