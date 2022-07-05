@@ -7,6 +7,7 @@ import sinon from 'sinon';
 
 const scripts = {};
 
+window.name = 'performance'; // test performance logging
 document.body.innerHTML = await readFile({ path: './dummy.html' });
 document.head.innerHTML = await readFile({ path: './head.html' });
 
