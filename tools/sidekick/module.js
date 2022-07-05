@@ -767,6 +767,23 @@
   }
 
   /**
+   * Returns the fetch options for admin requests
+   * @param {object} config
+   * @returns {object}
+   */
+  function getAdminFetchOptions({ authToken }) {
+    const opts = {
+      cache: 'no-store',
+      credentials: 'include',
+      headers: {},
+    };
+    if (authToken) {
+      opts.headers['x-auth-token'] = authToken;
+    }
+    return opts;
+  }
+
+  /**
    * Adds the edit plugin to the sidekick.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -1119,44 +1136,50 @@
       sk.isEditor() ? '' : sk.location.pathname,
     );
     loginUrl.searchParams.set('loginRedirect', 'https://www.hlx.live/tools/sidekick/login-success');
+    const extensionId = window.chrome?.runtime?.id;
+    if (extensionId) {
+      loginUrl.searchParams.set('extensionId', extensionId);
+    }
     if (selectAccount) {
       loginUrl.searchParams.set('selectAccount', true);
     }
+    const profileUrl = new URL('https://admin.hlx.page/profile');
+    if (sk.config.adminVersion) {
+      profileUrl.searchParams.append('hlx-admin-version', sk.config.adminVersion);
+    }
     const loginWindow = window.open(loginUrl.toString());
+
     let seconds = 0;
-    let loggedIn = false;
     const loginCheck = window.setInterval(async () => {
       if (seconds < 59) {
         seconds += 1;
-        if ((await fetch('https://admin.hlx.page/profile', {
-          cache: 'no-store',
-          credentials: 'include',
-        })).ok) {
+        if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
           // re-fetch status
-          loggedIn = true;
           window.clearInterval(loginCheck);
+          window.setTimeout(() => {
+            if (!loginWindow.closed) {
+              loginWindow.close();
+            }
+          }, 500);
           delete sk.status.status;
-          sk.addEventListener('statusfetched', () => sk.hideModal());
+          sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
           sk.fetchStatus();
           fireEvent(sk, 'loggedin');
-          window.setTimeout(() => {
-            loginWindow.close();
-          }, 500);
+        } else if (loginWindow.closed) {
+          sk.showModal({
+            css: 'modal-login-aborted',
+          });
+          window.clearInterval(loginCheck);
         }
       } else {
         // give up after 1 minute
+        window.clearInterval(loginCheck);
+        loginWindow.close();
         sk.showModal({
           css: 'modal-login-timeout',
           sticky: true,
           level: 1,
         });
-        window.clearInterval(loginCheck);
-      }
-      if (loginWindow.closed && !loggedIn) {
-        sk.showModal({
-          css: 'modal-login-aborted',
-        });
-        window.clearInterval(loginCheck);
       }
     }, 1000);
   }
@@ -1167,9 +1190,13 @@
    * @param {Sidekick} sk The sidekick
    */
   function logout(sk) {
-    fetch('https://admin.hlx.page/logout', {
-      cache: 'no-store',
-      credentials: 'include',
+    const logoutUrl = new URL('https://admin.hlx.page/logout');
+    if (sk.config.adminVersion) {
+      logoutUrl.searchParams.append('hlx-admin-version', sk.config.adminVersion);
+    }
+
+    fetch(logoutUrl.href, {
+      ...getAdminFetchOptions(sk.config),
     })
       .then(() => {
         fireEvent(sk, 'loggedout');
@@ -1621,6 +1648,9 @@
       this.fetchStatus();
       this.loadCSS();
       checkForIssues(this);
+
+      // announce to the document that the sidekick is ready
+      document.dispatchEvent(new CustomEvent('helix-sidekick-ready'));
     }
 
     /**
@@ -1643,7 +1673,9 @@
         apiUrl.searchParams.append('editUrl', this.isEditor() ? href : 'auto');
         this.status.apiUrl = apiUrl.toString();
       }
-      fetch(this.status.apiUrl, { cache: 'no-store', credentials: 'include' })
+      fetch(this.status.apiUrl, {
+        ...getAdminFetchOptions(this.config),
+      })
         .then((resp) => {
           // check for error status
           if (!resp.ok) {
@@ -2341,7 +2373,10 @@
           rel: 'stylesheet',
           href,
         },
-      });
+      })
+        .addEventListener('load', () => {
+          fireEvent(this, 'cssloaded');
+        });
       // i18n
       if (!path && !navigator.language.startsWith('en')) {
         // look for language file in same directory
@@ -2352,6 +2387,8 @@
             rel: 'stylesheet',
             href: langHref,
           },
+        }).addEventListener('load', () => {
+          fireEvent(this, 'langloaded');
         });
       }
       return this;
@@ -2414,7 +2451,10 @@
         // update preview
         resp = await fetch(
           getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-          { method: 'POST', credentials: 'include' },
+          {
+            method: 'POST',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         if (this.isEditor() || this.isInner() || this.isDev()) {
           // bust client cache
@@ -2445,7 +2485,10 @@
         // delete preview
         resp = await fetch(
           getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-          { method: 'DELETE', credentials: 'include' },
+          {
+            method: 'DELETE',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         // also unpublish if published
         if (status.live && status.live.lastModified) {
@@ -2482,7 +2525,10 @@
       try {
         resp = await fetch(
           getAdminUrl(config, 'live', purgeURL.pathname),
-          { method: 'POST', credentials: 'include' },
+          {
+            method: 'POST',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         // bust client cache for live and production
         if (config.outerHost) {
@@ -2514,7 +2560,10 @@
         // delete live
         resp = await fetch(
           getAdminUrl(config, 'live', path),
-          { method: 'DELETE', credentials: 'include' },
+          {
+            method: 'DELETE',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         fireEvent(this, 'unpublished', path);
       } catch (e) {
@@ -2528,9 +2577,10 @@
      * event is fired.
      * @param {string} type The event type
      * @param {Function} listener The function to call
+     * @param {object} opts options
      */
-    addEventListener(type, listener) {
-      this.root.addEventListener(type, listener);
+    addEventListener(type, listener, opts) {
+      this.root.addEventListener(type, listener, opts);
     }
 
     /**
