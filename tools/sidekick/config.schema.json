@@ -101,15 +101,12 @@
           "description": "The URL to open when the button is clicked"
         }
       },
-      "allOf": [
-        {
-          "anyOf": [
-            { "required": [ "url" ] },
-            { "required": [ "event" ] },
-            { "required": [ "is_container" ] }
-          ]
-        }
-      ],
+      "anyOf": [
+          { "required": [ "url" ] },
+          { "required": [ "event" ] },
+          { "required": [ "is_container" ] }
+        ]
+      },
       "additionalProperties": false
     }
   }
