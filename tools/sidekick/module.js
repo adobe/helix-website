@@ -718,7 +718,7 @@
    */
   async function checkLastModified(sidekick) {
     const { status } = sidekick;
-    if (status.status !== 200 || (status.edit && status.edit.status === 404)) {
+    if ((status.status && status.status !== 200) || (status.edit && status.edit.status === 404)) {
       return;
     }
     const editLastMod = (status.edit && status.edit.lastModified) || null;
