@@ -718,7 +718,7 @@
    */
   async function checkLastModified(sidekick) {
     const { status } = sidekick;
-    if (status.edit && status.edit.status === 404) {
+    if (status.status !== 200 || (status.edit && status.edit.status === 404)) {
       return;
     }
     const editLastMod = (status.edit && status.edit.lastModified) || null;
@@ -1400,20 +1400,9 @@
         },
       });
       if (!sk.isAuthenticated()) {
-        // encourage login
-        sk.showModal({
-          css: 'modal-login',
-          message: [
-            '',
-            createTag({
-              tag: 'button',
-              lstnrs: {
-                click: () => login(sk),
-              },
-            }),
-          ],
-          sticky: true,
-        });
+        // // encourage login
+        toggle.click();
+        toggle.nextElementSibling.classList.add('highlight');
       }
     }
   }
