@@ -1,3 +1,8 @@
+function autoLink(string) {
+  const pattern = /(^|[\s\n]|<[A-Za-z]*\/?>)((?:https?):\/\/[-A-Z0-9+\u0026\u2019@#/%?=()~_|!:,.;]*[-A-Z0-9+\u0026@#/%=~()_|])/gi;
+  return string.replace(pattern, '$1<a href="$2">$2</a>');
+}
+
 export default async function decorateFaq($block) {
   const source = new URL($block.querySelector('a').href).pathname;
   const resp = await fetch(source);
@@ -10,7 +15,9 @@ export default async function decorateFaq($block) {
     $a.id = `q${(i + 1)}`;
     $dt.innerText = row.Question;
     const $dd = document.createElement('dd');
-    $dd.innerText = row.Answer;
+    const answer = autoLink(row.Answer);
+
+    $dd.innerHTML = answer;
     $a.append($dt, $dd);
     $dl.append($a);
   });
