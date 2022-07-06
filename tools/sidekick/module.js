@@ -1149,25 +1149,24 @@
     }
     const loginWindow = window.open(loginUrl.toString());
 
+    async function checkLoggedIn() {
+      if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
+        window.setTimeout(() => {
+          if (!loginWindow.closed) {
+            loginWindow.close();
+          }
+        }, 500);
+        delete sk.status.status;
+        sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
+        sk.fetchStatus();
+        fireEvent(sk, 'loggedin');
+        return true;
+      }
+      return false;
+    }
+
     let seconds = 0;
     const loginCheck = window.setInterval(async () => {
-      async function checkLoggedIn() {
-        if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
-          window.clearInterval(loginCheck);
-          window.setTimeout(() => {
-            if (!loginWindow.closed) {
-              loginWindow.close();
-            }
-          }, 500);
-          delete sk.status.status;
-          sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
-          sk.fetchStatus();
-          fireEvent(sk, 'loggedin');
-          return true;
-        }
-        return false;
-      }
-
       // give up after 2 minutes or window closed
       if (seconds >= 120 || loginWindow.closed) {
         window.clearInterval(loginCheck);
@@ -1191,7 +1190,9 @@
       }
 
       seconds += 1;
-      await checkLoggedIn();
+      if (await checkLoggedIn()) {
+        window.clearInterval(loginCheck);
+      }
     }, 1000);
   }
 
