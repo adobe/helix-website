@@ -1,0 +1,114 @@
+{
+  "$id": "https://ns.adobe.com/helix/sidekick/config",
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "plugin": {
+      "type": "object",
+      "properties": {
+        "container": {
+          "type": "string",
+          "description": "The ID of the container to add this plugin to"
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["any", "edit", "preview", "live", "prod"]
+          },
+          "description": "The environments to display this plugin in",
+          "default": "any"
+        },
+        "event": {
+          "type": "string",
+          "description": "The name of a custom event to fire when the button is clicked"
+        },
+        "exclude_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Exclude the plugin from these paths",
+          "examples": [
+            "/foo/bar",
+            "/foo/**"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique plugin ID"
+        },
+        "include_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Include the plugin on these paths (overrides exclude_paths)",
+          "examples": [
+            "/foo/bar",
+            "/foo/bar/**"
+          ]
+        },
+        "is_container": {
+          "type": "boolean",
+          "description": "Turns the plugin into a container for other plugins"
+        },
+        "title": {
+          "type": "string",
+          "description": "The button text"
+        },
+        "title_i18n": {
+          "type": "object",
+          "description": "The button text in other supported languages",
+          "patternProperties": {
+            "^[a-z]{2}(-[A-Z]{2})?$": {
+              "type": "string",
+              "description": "ISO language code (`en` or `en-US`) with translated button text"
+            }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL to open when the button is clicked"
+        }
+      },
+      "anyOf": [
+        { "required": [ "url" ] },
+        { "required": [ "event" ] },
+        { "required": [ "is_container" ] }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "description": "Helix Sidekick configuration",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to display in the Helix Sidekick"
+    },
+    "host": {
+      "type": "string",
+      "format": "idn-hostname",
+      "description": "The host name of the production website"
+    },
+    "container": {
+      "type": "string",
+      "description": "The ID of the dropdown container to add this plugin to"
+    },
+    "pushDown": {
+      "type": "boolean",
+      "description": "Have Helix Sidekick push down page content instead of overlaying it"
+    },
+    "pushDownSelector": {
+      "type": "string",
+      "description": "The query selector for absolute elements to also push down"
+    },
+    "plugins": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/plugin" }
+    }
+   },
+   "additionalProperties": false
+}
