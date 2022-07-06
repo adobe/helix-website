@@ -774,6 +774,23 @@
   }
 
   /**
+   * Returns the fetch options for admin requests
+   * @param {object} config
+   * @returns {object}
+   */
+  function getAdminFetchOptions({ authToken }) {
+    const opts = {
+      cache: 'no-store',
+      credentials: 'include',
+      headers: {},
+    };
+    if (authToken) {
+      opts.headers['x-auth-token'] = authToken;
+    }
+    return opts;
+  }
+
+  /**
    * Adds the edit plugin to the sidekick.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -1756,7 +1773,9 @@
         apiUrl.searchParams.append('editUrl', this.isEditor() ? href : 'auto');
         this.status.apiUrl = apiUrl.toString();
       }
-      fetch(this.status.apiUrl, { cache: 'no-store', credentials: 'include' })
+      fetch(this.status.apiUrl, {
+        ...getAdminFetchOptions(this.config),
+      })
         .then((resp) => {
           // check for error status
           if (!resp.ok) {
@@ -2438,7 +2457,10 @@
           rel: 'stylesheet',
           href,
         },
-      });
+      })
+        .addEventListener('load', () => {
+          fireEvent(this, 'cssloaded');
+        });
       // i18n
       if (!path && !navigator.language.startsWith('en')) {
         // look for language file in same directory
@@ -2449,6 +2471,8 @@
             rel: 'stylesheet',
             href: langHref,
           },
+        }).addEventListener('load', () => {
+          fireEvent(this, 'langloaded');
         });
       }
       return this;
@@ -2511,7 +2535,10 @@
         // update preview
         resp = await fetch(
           getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-          { method: 'POST', credentials: 'include' },
+          {
+            method: 'POST',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         if (this.isEditor() || this.isInner() || this.isDev()) {
           // bust client cache
@@ -2542,7 +2569,10 @@
         // delete preview
         resp = await fetch(
           getAdminUrl(config, this.isContent() ? 'preview' : 'code', path),
-          { method: 'DELETE', credentials: 'include' },
+          {
+            method: 'DELETE',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         // also unpublish if published
         if (status.live && status.live.lastModified) {
@@ -2579,7 +2609,10 @@
       try {
         resp = await fetch(
           getAdminUrl(config, 'live', purgeURL.pathname),
-          { method: 'POST', credentials: 'include' },
+          {
+            method: 'POST',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         // bust client cache for live and production
         if (config.outerHost) {
@@ -2611,7 +2644,10 @@
         // delete live
         resp = await fetch(
           getAdminUrl(config, 'live', path),
-          { method: 'DELETE', credentials: 'include' },
+          {
+            method: 'DELETE',
+            ...getAdminFetchOptions(this.config),
+          },
         );
         fireEvent(this, 'unpublished', path);
       } catch (e) {
