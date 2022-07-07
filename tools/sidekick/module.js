@@ -1257,47 +1257,61 @@
       sk.isEditor() ? '' : sk.location.pathname,
     );
     loginUrl.searchParams.set('loginRedirect', 'https://www.hlx.live/tools/sidekick/login-success');
-    const extensionId = chrome && chrome.runtime && chrome.runtime.id;
+    const extensionId = window.chrome?.runtime?.id;
     if (extensionId) {
       loginUrl.searchParams.set('extensionId', extensionId);
     }
     if (selectAccount) {
       loginUrl.searchParams.set('selectAccount', true);
     }
+    const profileUrl = new URL('https://admin.hlx.page/profile');
+    if (sk.config.adminVersion) {
+      profileUrl.searchParams.append('hlx-admin-version', sk.config.adminVersion);
+    }
     const loginWindow = window.open(loginUrl.toString());
-    let seconds = 0;
-    let loggedIn = false;
-    const loginCheck = window.setInterval(async () => {
-      if (seconds < 59) {
-        seconds += 1;
-        if ((await fetch('https://admin.hlx.page/profile', {
-          cache: 'no-store',
-          credentials: 'include',
-        })).ok) {
-          // re-fetch status
-          loggedIn = true;
-          window.clearInterval(loginCheck);
-          delete sk.status.status;
-          sk.addEventListener('statusfetched', () => sk.hideModal());
-          sk.fetchStatus();
-          fireEvent(sk, 'loggedin');
-          window.setTimeout(() => {
-            // loginWindow.close();
-          }, 500);
-        }
-      } else {
-        // give up after 1 minute
-        sk.showModal({
-          css: 'modal-login-timeout',
-          sticky: true,
-          level: 1,
-        });
-        window.clearInterval(loginCheck);
+
+    async function checkLoggedIn() {
+      if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
+        window.setTimeout(() => {
+          if (!loginWindow.closed) {
+            loginWindow.close();
+          }
+        }, 500);
+        delete sk.status.status;
+        sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
+        sk.fetchStatus();
+        fireEvent(sk, 'loggedin');
+        return true;
       }
-      if (loginWindow.closed && !loggedIn) {
-        sk.showModal({
-          css: 'modal-login-aborted',
-        });
+      return false;
+    }
+
+    let seconds = 0;
+    const loginCheck = window.setInterval(async () => {
+      // give up after 2 minutes or window closed
+      if (seconds >= 120 || loginWindow.closed) {
+        window.clearInterval(loginCheck);
+        loginWindow.close();
+        // last check
+        if (await checkLoggedIn()) {
+          return;
+        }
+
+        if (seconds >= 120) {
+          sk.showModal({
+            css: 'modal-login-timeout',
+            sticky: true,
+            level: 1,
+          });
+        } else {
+          sk.showModal({
+            css: 'modal-login-aborted',
+          });
+        }
+      }
+
+      seconds += 1;
+      if (await checkLoggedIn()) {
         window.clearInterval(loginCheck);
       }
     }, 1000);
@@ -1309,9 +1323,13 @@
    * @param {Sidekick} sk The sidekick
    */
   function logout(sk) {
-    fetch('https://admin.hlx.page/logout', {
-      cache: 'no-store',
-      credentials: 'include',
+    const logoutUrl = new URL('https://admin.hlx.page/logout');
+    if (sk.config.adminVersion) {
+      logoutUrl.searchParams.append('hlx-admin-version', sk.config.adminVersion);
+    }
+
+    fetch(logoutUrl.href, {
+      ...getAdminFetchOptions(sk.config),
     })
       .then(() => {
         fireEvent(sk, 'loggedout');
