@@ -1938,11 +1938,13 @@
      */
     add(plugin) {
       if (typeof plugin === 'object') {
-        this.plugins.push(plugin);
         plugin.isShown = typeof plugin.condition === 'undefined'
           || (typeof plugin.condition === 'function' && plugin.condition(this));
         // find existing plugin
         let $plugin = this.get(plugin.id);
+        if (!$plugin) {
+          this.plugins.push(plugin);
+        }
         const $pluginContainer = (plugin.container && this.root
           .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
           || (plugin.feature && this.root
@@ -2063,7 +2065,7 @@
      * @returns {HTMLElement} The plugin
      */
     get(id) {
-      return this.root.querySelector(`:scope div:not(.env).${id}`);
+      return this.root.querySelector(`:scope div.${id}`);
     }
 
     /**
