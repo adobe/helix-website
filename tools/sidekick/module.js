@@ -1149,37 +1149,49 @@
     }
     const loginWindow = window.open(loginUrl.toString());
 
+    async function checkLoggedIn() {
+      if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
+        window.setTimeout(() => {
+          if (!loginWindow.closed) {
+            loginWindow.close();
+          }
+        }, 500);
+        delete sk.status.status;
+        sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
+        sk.fetchStatus();
+        fireEvent(sk, 'loggedin');
+        return true;
+      }
+      return false;
+    }
+
     let seconds = 0;
     const loginCheck = window.setInterval(async () => {
-      if (seconds < 59) {
-        seconds += 1;
-        if ((await fetch(profileUrl.href, getAdminFetchOptions(sk.config))).ok) {
-          // re-fetch status
-          window.clearInterval(loginCheck);
-          window.setTimeout(() => {
-            if (!loginWindow.closed) {
-              loginWindow.close();
-            }
-          }, 500);
-          delete sk.status.status;
-          sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
-          sk.fetchStatus();
-          fireEvent(sk, 'loggedin');
-        } else if (loginWindow.closed) {
+      // give up after 2 minutes or window closed
+      if (seconds >= 120 || loginWindow.closed) {
+        window.clearInterval(loginCheck);
+        loginWindow.close();
+        // last check
+        if (await checkLoggedIn()) {
+          return;
+        }
+
+        if (seconds >= 120) {
+          sk.showModal({
+            css: 'modal-login-timeout',
+            sticky: true,
+            level: 1,
+          });
+        } else {
           sk.showModal({
             css: 'modal-login-aborted',
           });
-          window.clearInterval(loginCheck);
         }
-      } else {
-        // give up after 1 minute
+      }
+
+      seconds += 1;
+      if (await checkLoggedIn()) {
         window.clearInterval(loginCheck);
-        loginWindow.close();
-        sk.showModal({
-          css: 'modal-login-timeout',
-          sticky: true,
-          level: 1,
-        });
       }
     }, 1000);
   }
