@@ -100,7 +100,7 @@ body.docs-template {
     padding-top: 128px;
 }
 
-body.docs-template main {
+body.docs-template main .section {
     max-width: 83.4%;
     margin: 0 auto;
 }
@@ -592,6 +592,26 @@ body.no-header-template {
     display: none;
 }
 
+body.docs-template main .section.light,
+body.docs-template main .section.dark {
+  max-width: unset;
+  margin: 0;
+}
+
+body.docs-template main .section.dark {
+  max-width: unset;
+  margin: 0;
+}
+
+body.docs-template main .section.light .default-content-wrapper,
+body.docs-template main .section.dark .default-content-wrapper {
+  margin: auto;
+  max-width: 1200px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+
 @media screen and (min-width: 900px) {
     body.docs-template {
         background-image: url("/img/bg-docs-1080.png");
@@ -600,8 +620,9 @@ body.no-header-template {
         background-position: 50% -128px;
     }
 
-    body.docs-template main {
+    body.docs-template main .section {
         max-width: 600px;
+        margin: auto;
     }
 
     main {
