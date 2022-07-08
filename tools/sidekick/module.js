@@ -541,7 +541,7 @@
     const dropdown = createTag({
       tag: 'div',
       attrs: {
-        class: `${id} dropdown`,
+        class: `${id} plugin dropdown`,
       },
     });
     const toggle = appendTag(dropdown, {
@@ -1958,7 +1958,7 @@
       const getPluginCfg = (p) => ({
         tag: 'div',
         attrs: {
-          class: p.id,
+          class: `${p.id} plugin`,
         },
       });
 
