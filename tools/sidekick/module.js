@@ -1948,7 +1948,7 @@
       }
 
       // find existing plugin
-      let $plugin = this.get(plugin.id, plugin.button && plugin.button.isDropdown);
+      let $plugin = this.get(plugin.id);
       // determine container
       const $pluginContainer = (plugin.container && this.root
         .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
@@ -2063,11 +2063,10 @@
     /**
      * Returns the sidekick plugin with the specified ID.
      * @param {string} id The plugin ID
-     * @param {boolean} isDropdown Look for a dropdown
      * @returns {HTMLElement} The plugin
      */
-    get(id, isDropdown) {
-      return this.root.querySelector(`:scope div.${isDropdown ? 'dropdown.' : ''}${id}`);
+    get(id) {
+      return this.root.querySelector(`:scope div.${id}`);
     }
 
     /**
