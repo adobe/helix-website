@@ -93,7 +93,7 @@
    * @prop {string} owner The GitHub owner or organization (mandatory)
    * @prop {string} repo The GitHub owner or organization (mandatory)
    * @prop {string} ref=main The Git reference or branch (optional)
-   * @prop {string} mountpoint The content source URL
+   * @prop {string} mountpoint The content source URL (optional)
    * @prop {string} project The name of the Helix project used in the sharing link (optional)
    * @prop {plugin[]} plugins An array of plugin configurations (optional)
    * @prop {string} outerHost The outer CDN's host name (optional)
