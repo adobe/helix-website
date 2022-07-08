@@ -93,6 +93,7 @@
    * @prop {string} owner The GitHub owner or organization (mandatory)
    * @prop {string} repo The GitHub owner or organization (mandatory)
    * @prop {string} ref=main The Git reference or branch (optional)
+   * @prop {string} mountpoint The content source URL (optional)
    * @prop {string} project The name of the Helix project used in the sharing link (optional)
    * @prop {plugin[]} plugins An array of plugin configurations (optional)
    * @prop {string} outerHost The outer CDN's host name (optional)
@@ -248,17 +249,6 @@
    * @type {URL}
    */
   const DEV_URL = new URL('http://localhost:3000');
-
-  /**
-   * Checks if the current location is an editor URL (SharePoint or Google Docs).
-   * @private
-   * @param {Location} loc The location object
-   * @returns {boolean} <code>true</code> if editor URL, else <code>false</code>
-   */
-  function isEditor(loc) {
-    return /.*\.sharepoint\.com/.test(loc.host)
-    || loc.host === 'docs.google.com';
-  }
 
   /**
    * Retrieves Helix project details from a host name.
@@ -1994,7 +1984,10 @@
      * @returns {boolean} <code>true</code> if editor URL, else <code>false</code>
      */
     isEditor() {
-      return isEditor(this.location);
+      const { config, location } = this;
+      return /.*\.sharepoint\.com/.test(location.host)
+        || location.host === 'docs.google.com'
+        || (config.mountpoint && new URL(config.mountpoint).host === location.host);
     }
 
     /**
