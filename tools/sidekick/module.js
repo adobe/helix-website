@@ -2066,7 +2066,7 @@
      * @returns {HTMLElement} The plugin
      */
     get(id) {
-      return this.root.querySelector(`:scope div.${id}`);
+      return this.root.querySelector(`:scope div.plugin.${id}`);
     }
 
     /**
