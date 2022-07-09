@@ -1443,13 +1443,51 @@
   }
 
   /**
+   * Registers a plugin for re-evaluation if it should be shown or hidden,
+   * and if its button should be enabled or disabled.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {Plugin} plugin The plugin configuration
+   * @param {HTMLElement} $plugin The plugin
+   * @returns {HTMLElement} The plugin or {@code null}
+   */
+  function registerPlugin(sk, plugin, $plugin) {
+    // re-evaluate plugin when status fetched
+    sk.addEventListener('statusfetched', () => {
+      if (typeof plugin.condition === 'function') {
+        if ($plugin && !plugin.condition(sk)) {
+          // plugin exists but condition now false
+          sk.remove(plugin.id);
+        } else if (!$plugin && plugin.condition(sk)) {
+          // plugin doesn't exist but condition now true
+          sk.add(plugin);
+        }
+      }
+      const isEnabled = plugin.button && plugin.button.isEnabled;
+      if (typeof isEnabled === 'function' || typeof isEnabled === 'boolean') {
+        const $button = $plugin && $plugin.querySelector(':scope button');
+        if ($button) {
+          if (typeof isEnabled === 'function' && isEnabled(sk)) {
+            // button enabled
+            $plugin.querySelector(':scope button').removeAttribute('disabled');
+          } else {
+            // button disabled
+            $plugin.querySelector(':scope button').setAttribute('disabled', '');
+          }
+        }
+      }
+    });
+    return $plugin || null;
+  }
+
+  /**
    * Checks existing plugins based on the status of the current resource.
    * @private
    * @param {Sidekick} sk The sidekick
    */
   function checkPlugins(sk) {
     window.setTimeout(() => {
-      if (sk.pluginContainer.querySelectorAll(':scope > div > *').length === 0) {
+      if (sk.pluginContainer.querySelectorAll(':scope div.plugin').length === 0) {
         // add empty text
         sk.pluginContainer.classList.remove('loading');
         sk.checkPushDownContent();
@@ -1944,7 +1982,7 @@
       plugin.isShown = typeof plugin.condition === 'undefined'
           || (typeof plugin.condition === 'function' && plugin.condition(this));
       if (!plugin.isShown) {
-        return null;
+        return registerPlugin(this, plugin, null);
       }
 
       // find existing plugin
@@ -2032,32 +2070,7 @@
       if (plugin.advanced && typeof plugin.advanced === 'function' && plugin.advanced(this)) {
         $plugin.classList.add('hlx-sk-advanced-only');
       }
-      // re-check plugin once status is fetched
-      this.addEventListener('statusfetched', () => {
-        if (typeof plugin.condition === 'function') {
-          if ($plugin && !plugin.condition(this)) {
-            // plugin exists but condition now false
-            this.remove(plugin.id);
-          } else if (!$plugin && plugin.condition(this)) {
-            // plugin doesn't exist but condition now true
-            this.add(plugin);
-          }
-        }
-        const isEnabled = plugin.button && plugin.button.isEnabled;
-        if (typeof isEnabled === 'function' || typeof isEnabled === 'boolean') {
-          const $button = $plugin && $plugin.querySelector(':scope button');
-          if ($button) {
-            if (typeof isEnabled === 'function' && isEnabled(this)) {
-              // button enabled
-              $plugin.querySelector(':scope button').removeAttribute('disabled');
-            } else {
-              // button disabled
-              $plugin.querySelector(':scope button').setAttribute('disabled', '');
-            }
-          }
-        }
-      });
-      return $plugin || null;
+      return registerPlugin(this, plugin, null);
     }
 
     /**
