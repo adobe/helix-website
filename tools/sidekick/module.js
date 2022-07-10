@@ -1454,10 +1454,10 @@
         }
       }
       const isEnabled = plugin.button && plugin.button.isEnabled;
-      if (typeof isEnabled === 'function' || typeof isEnabled === 'boolean') {
+      if (typeof isEnabled === 'function') {
         const $button = $plugin && $plugin.querySelector(':scope button');
         if ($button) {
-          if (typeof isEnabled === 'function' && isEnabled(sk)) {
+          if (isEnabled(sk)) {
             // button enabled
             $plugin.querySelector(':scope button').removeAttribute('disabled');
           } else {
