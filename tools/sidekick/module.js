@@ -520,6 +520,14 @@
   }
 
   /**
+   * Listener to collapse all dropdowns when document is clicked.
+   * @private
+   */
+  function collapseDropdowns(sk) {
+    sk.root.querySelectorAll('.dropdown').forEach((d) => d.classList.remove('dropdown-expanded'));
+  }
+
+  /**
    * Creates a dropdown as a container for other plugins.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -543,17 +551,8 @@
       },
       lstnrs: {
         click: (evt) => {
-          // collapse env listener
-          const collapseEnv = () => {
-            dropdown.classList.remove('dropdown-expanded');
-            document.removeEventListener('click', collapseEnv);
-          };
+          collapseDropdowns(sk);
           dropdown.classList.toggle('dropdown-expanded');
-          if (dropdown.classList.contains('dropdown-expanded')) {
-            window.setTimeout(() => {
-              document.addEventListener('click', collapseEnv);
-            }, 100);
-          }
           const {
             lastElementChild: container,
           } = dropdown;
@@ -1174,7 +1173,7 @@
               missingProperty = 'url, event, or is_container';
             }
             if (missingProperty) {
-              console.log(`plugin config missing required property ${missingProperty}`);
+              console.log(`plugin config missing required property: ${missingProperty}`, cfg);
               return;
             }
           }
@@ -1757,6 +1756,8 @@
       this.loadCSS();
       checkForIssues(this);
 
+      // collapse dropdowns when document is clicked
+      document.addEventListener('click', () => collapseDropdowns(this));
       // announce to the document that the sidekick is ready
       document.dispatchEvent(new CustomEvent('helix-sidekick-ready'));
     }
