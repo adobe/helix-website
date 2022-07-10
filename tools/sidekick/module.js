@@ -2057,7 +2057,7 @@
         }));
       }
       // check advanced mode
-      if (plugin.advanced && typeof plugin.advanced === 'function' && plugin.advanced(this)) {
+      if (typeof plugin.advanced === 'function' && plugin.advanced(this)) {
         $plugin.classList.add('hlx-sk-advanced-only');
       }
       return registerPlugin(this, plugin, $plugin);
