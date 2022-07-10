@@ -1477,7 +1477,7 @@
    */
   function checkPlugins(sk) {
     window.setTimeout(() => {
-      if (sk.pluginContainer.querySelectorAll(':scope div.plugin').length === 0) {
+      if (!sk.pluginContainer.querySelector(':scope div.plugin')) {
         // add empty text
         sk.pluginContainer.classList.remove('loading');
         sk.checkPushDownContent();
