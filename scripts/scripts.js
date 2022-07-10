@@ -624,7 +624,11 @@ async function loadLazy(doc) {
 
   const { hash } = window.location;
   const element = hash ? main.querySelector(hash) : false;
-  if (hash && element) element.scrollIntoView();
+  if (hash && element) {
+    setTimeout(() => {
+      element.scrollIntoView();
+    }, 500);
+  }
 
   decorateBlock(header);
   loadBlock(header);
