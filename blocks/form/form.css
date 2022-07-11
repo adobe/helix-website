@@ -1,25 +1,25 @@
-main .form-container {
+main .form {
   background-color: white;
   padding: var(--spacing-m);
   box-shadow: 0 1px 6px rgb(34 34 34 / 10%);
 }
 
-main .form-container h2 {
+main .form h2 {
   padding: var(--spacing-m) 0;
   font-size: var(--type-heading-l-lh);
   font-weight: normal;
 }
 
-main .form-container h3 {
+main .form h3 {
   padding-top: var(--spacing-m);
   font-size: var(--type-heading-m-size);
   font-weight: bold;
   text-transform: uppercase;
 }
 
-main .form-container input,
-main .form-container textarea,
-main .form-container select {
+main .form input,
+main .form textarea,
+main .form select {
   border: 1px solid rgb(193 193 195);
   padding: 11px;
   border-radius: 0;
@@ -29,16 +29,16 @@ main .form-container select {
   margin-top: 4px;
 }
 
-main .form-container textarea {
+main .form textarea {
   min-height: 100px;
 }
 
-main .form-container input:hover,
-main .form-container select:hover {
+main .form input:hover,
+main .form select:hover {
   border-color: rgb(90 92 96);
 }
 
-main .form-container label {
+main .form label {
   width: 100%;
   display: block;
   font-size: var(--type-body-s-size);
@@ -49,26 +49,26 @@ main .form-container label {
   font-weight: 800;
 }
 
-main .form-container label.required::after {
+main .form label.required::after {
   content: "*";
   color: red;
   padding-left: 5px;
 }
 
-main .form-container .field-wrapper {
+main .form .field-wrapper {
   margin-bottom: 20px;
 }
 
-main .form-container .form-checkbox-wrapper {
+main .form .form-checkbox-wrapper {
   display: flex;
   margin: var(--spacing-s) 0;
 }
 
-main .form-container .form-checkbox-wrapper input[type='checkbox'] {
+main .form .form-checkbox-wrapper input[type='checkbox'] {
   display: none;
 }
 
-main .form-container .form-checkbox-wrapper input[type='checkbox'] + label::before {
+main .form .form-checkbox-wrapper input[type='checkbox'] + label::before {
   float: left;
   margin-top: 5px;
   margin-right: 5px;
@@ -79,20 +79,20 @@ main .form-container .form-checkbox-wrapper input[type='checkbox'] + label::befo
   background-size: contain;
 }
 
-main .form-container .form-checkbox-wrapper input[type='checkbox']:checked +label::before {
+main .form .form-checkbox-wrapper input[type='checkbox']:checked +label::before {
   background: url('./checkbox-checked.svg');
   background-size: contain;
   content: ' ';
 }
 
-main .form-container .form-checkbox-wrapper label {
+main .form .form-checkbox-wrapper label {
   font-size: var(--type-body-m-size);
   font-weight: normal;
   text-transform: none;
   display: block;
 }
 
-main .form-container .button {
+main .form .button {
   cursor: pointer;
   background: rgb(20 115 230);
   color: white;
@@ -104,7 +104,7 @@ main .form-container .button {
   font-family: adobe-clean, 'Trebuchet MS', sans-serif;
 }
 
-main .form-container .form-submit-wrapper {
+main .form .form-submit-wrapper {
   display: flex;
   justify-content: flex-end;
 }
