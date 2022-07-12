@@ -796,23 +796,23 @@
   content: "View";
 }
 
-.hlx-sk .env.dev .dropdown-toggle::before,
+.hlx-sk .env.is-dev .dropdown-toggle::before,
 .hlx-sk .env .dev button::before {
   content: "Development";
 }
 
-.hlx-sk .env.preview .dropdown-toggle::before,
+.hlx-sk .env.is-preview .dropdown-toggle::before,
 .hlx-sk .env .preview button::before,
 .hlx-sk .edit-preview button::before {
   content: "Preview";
 }
 
-.hlx-sk .env.live .dropdown-toggle::before,
+.hlx-sk .env.is-live .dropdown-toggle::before,
 .hlx-sk .env .live button::before {
   content: "Live";
 }
 
-.hlx-sk .env.prod .dropdown-toggle::before,
+.hlx-sk .env.is-prod .dropdown-toggle::before,
 .hlx-sk .env .prod button::before {
   content: "Production";
 }
