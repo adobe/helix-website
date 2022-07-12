@@ -59,14 +59,14 @@
    * @description The plugin configuration.
    * @prop {string} id The plugin ID (mandatory)
    * @prop {string} title The button text
-   * @prop {Object} i18n_title={} A map of translated button texts
+   * @prop {Object} titleI18n={} A map of translated button texts
    * @prop {string} url The URL to open when the button is clicked
    * @prop {string} event The name of a custom event to fire when the button is clicked
-   * @prop {string} container The ID of a dropdown to add this plugin to (optional)
-   * @prop {boolean} is_container Determines whether to turn this plugin into a dropdown
+   * @prop {string} containerId The ID of a dropdown to add this plugin to (optional)
+   * @prop {boolean} isContainer Determines whether to turn this plugin into a dropdown
    * @prop {string[]} environments Specifies when to show this plugin (edit, preview, live, or prod)
-   * @prop {string[]} exclude_paths Exclude the plugin from these paths (glob patterns supported)
-   * @prop {string[]} include_paths Include the plugin on these paths (glob patterns supported)
+   * @prop {string[]} excludePaths Exclude the plugin from these paths (glob patterns supported)
+   * @prop {string[]} includePaths Include the plugin on these paths (glob patterns supported)
    */
 
   /**
