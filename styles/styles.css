@@ -263,9 +263,20 @@ strong a {
 }
 
 pre {
-    overflow-x: scroll;
-    background-color: #eee;
-    padding: 2rem;
+  overflow-x: scroll;
+  background-color: #eee;
+  padding: 2rem;
+}
+
+code {
+  border: 1px solid #888;
+  background-color: #eee;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+pre code {
+  border: unset;
 }
 
 /* Icon on button */
