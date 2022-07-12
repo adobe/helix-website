@@ -1154,14 +1154,14 @@
           const {
             id,
             title,
-            title_i18n: i18nTitle,
+            titleI18n,
             url,
             event: eventName,
             environments,
-            exclude_paths: excludePaths,
-            include_paths: includePaths,
-            container,
-            is_container: isDropdown,
+            excludePaths,
+            includePaths,
+            containerId,
+            isContainer,
           } = cfg;
           // check mandatory properties
           let missingProperty = '';
@@ -1169,7 +1169,7 @@
             // plugin config not extending existing plugin
             if (!title) {
               missingProperty = 'title';
-            } else if (!(url || eventName || isDropdown)) {
+            } else if (!(url || eventName || isContainer)) {
               missingProperty = 'url, event, or is_container';
             }
             if (missingProperty) {
@@ -1208,7 +1208,7 @@
               return environments.some((env) => envChecks[env] && envChecks[env].call(s));
             },
             button: {
-              text: (i18nTitle && i18nTitle[language]) || title,
+              text: (titleI18n && titleI18n[language]) || title,
               action: () => {
                 if (url) {
                   const target = url.startsWith('/')
@@ -1221,9 +1221,9 @@
                   fireEvent(sk, `custom:${eventName}`);
                 }
               },
-              isDropdown,
+              isDropdown: isContainer,
             },
-            container,
+            container: containerId,
           };
           // add plugin
           sk.add(plugin);
