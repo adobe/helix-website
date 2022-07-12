@@ -5,7 +5,7 @@
     "plugin": {
       "type": "object",
       "properties": {
-        "container": {
+        "containerId": {
           "type": "string",
           "description": "The ID of the container to add this plugin to"
         },
@@ -22,7 +22,7 @@
           "type": "string",
           "description": "The name of a custom event to fire when the button is clicked"
         },
-        "exclude_paths": {
+        "excludePaths": {
           "type": "array",
           "items": {
             "type": "string"
@@ -37,18 +37,18 @@
           "type": "string",
           "description": "The unique plugin ID"
         },
-        "include_paths": {
+        "includePaths": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Include the plugin on these paths (overrides exclude_paths)",
+          "description": "Include the plugin on these paths (overrides excludePaths)",
           "examples": [
             "/foo/bar",
             "/foo/bar/**"
           ]
         },
-        "is_container": {
+        "isContainer": {
           "type": "boolean",
           "description": "Turns the plugin into a container for other plugins"
         },
@@ -56,7 +56,7 @@
           "type": "string",
           "description": "The button text"
         },
-        "title_i18n": {
+        "titleI18n": {
           "type": "object",
           "description": "The button text in other supported languages",
           "patternProperties": {
@@ -69,14 +69,14 @@
           "additionalProperties": false
         },
         "url": {
-          "type": "string",
+          "type": "url",
           "description": "The URL to open when the button is clicked"
         }
       },
       "anyOf": [
         { "required": [ "url" ] },
         { "required": [ "event" ] },
-        { "required": [ "is_container" ] }
+        { "required": [ "isContainer" ] }
       ],
       "additionalProperties": false
     }
