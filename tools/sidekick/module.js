@@ -2045,7 +2045,7 @@
     isContent() {
       const file = this.location.pathname.split('/').pop();
       const ext = file && file.split('.').pop();
-      return this.isEditor() || ext === file || ext === 'html' || ext === 'json';
+      return this.isEditor() || ext === file || ext === 'html' || ext === 'json' || ext === 'pdf';
     }
 
     /**
