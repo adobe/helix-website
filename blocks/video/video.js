@@ -12,7 +12,6 @@ function decorateVideoBlock($block, videoURL) {
 }
 
 export default function decorate($block) {
-  $block.classList.remove('video');
   const $a = $block.querySelector('a');
   const videoURL = $a.href;
   const observer = new IntersectionObserver((entries) => {
