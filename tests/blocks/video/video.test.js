@@ -21,6 +21,8 @@ describe('Video', () => {
   it('has a video', async () => {
     const block = document.querySelector('.video');
     await decorate(block);
+
+    // trigger the intersection observer
     intersect();
 
     // must contain a video tag
