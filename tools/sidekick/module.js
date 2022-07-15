@@ -920,35 +920,40 @@
         action: async (evt) => {
           const { status } = sk;
           sk.showWait();
-          // update preview
-          const resp = await sk.update();
-          if (!resp.ok) {
-            if (status.webPath.startsWith('/.helix/') && resp.error) {
-              // show detail message only in config update mode
-              sk.showModal({
-                css: 'modal-config-failure',
-                message: resp.error,
-                sticky: true,
-                level: 0,
-              });
-            } else {
-              console.error(resp);
-              sk.showModal({
-                css: 'modal-preview-failure',
-                sticky: true,
-                level: 0,
-              });
+          sk.addEventListener('statusfetched', async () => {
+            console.log('status fetched, updating preview now...');
+            // update preview
+            const resp = await sk.update();
+            if (!resp.ok) {
+              if (status.webPath.startsWith('/.helix/') && resp.error) {
+                // show detail message only in config update mode
+                sk.showModal({
+                  css: 'modal-config-failure',
+                  message: resp.error,
+                  sticky: true,
+                  level: 0,
+                });
+              } else {
+                console.error(resp);
+                sk.showModal({
+                  css: 'modal-preview-failure',
+                  sticky: true,
+                  level: 0,
+                });
+              }
+              return;
             }
-            return;
-          }
-          // handle special case /.helix/*
-          if (status.webPath.startsWith('/.helix/')) {
-            sk.showModal({
-              css: 'modal-config-success',
-            });
-            return;
-          }
-          sk.switchEnv('preview', newTab(evt));
+            // handle special case /.helix/*
+            if (status.webPath.startsWith('/.helix/')) {
+              sk.showModal({
+                css: 'modal-config-success',
+              });
+              return;
+            }
+            sk.switchEnv('preview', newTab(evt));
+          }, { once: true });
+          // fetch latest status
+          sk.fetchStatus();
         },
         isEnabled: (sidekick) => sidekick.isAuthorized('preview', 'write')
           && sidekick.status.webPath,
