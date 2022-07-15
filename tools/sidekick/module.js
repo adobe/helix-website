@@ -921,7 +921,6 @@
           const { status } = sk;
           sk.showWait();
           sk.addEventListener('statusfetched', async () => {
-            console.log('status fetched, updating preview now...');
             // update preview
             const resp = await sk.update();
             if (!resp.ok) {
