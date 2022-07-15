@@ -898,8 +898,7 @@
           const updatePreview = async (ranBefore) => {
             const resp = await sk.update();
             if (!resp.ok) {
-              console.log('error', resp.status);
-              if (resp.status === 404 && !ranBefore) {
+              if (!ranBefore) {
                 // assume document has been renamed, re-fetch status and try again
                 sk.addEventListener('statusfetched', async () => {
                   updatePreview(true);
