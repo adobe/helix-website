@@ -19,7 +19,11 @@ window.hlx.initSidekick({
 });
 
 var _sz = _sz || {
-  invisible: true
+  invisible: true,
+  userData: {
+    name: hlx.sidekick.status.profile.name,
+    email: hlx.sidekick.status.profile.email,
+  }
 };
 _sz.appId = "8fa40ef3",
   function () {
