@@ -9,6 +9,13 @@ window.hlx.initSidekick({
       button: {
         text: 'Chat',
         action: (_, sk) => {
+          window._sz = {
+            invisible: true,
+            userData: {
+              name: hlx.sidekick.status.profile.name,
+              email: hlx.sidekick.status.profile.email,
+            }
+          };
           const { config } = sk;
           SignalZen.show();
           SignalZen.expand();
@@ -20,10 +27,6 @@ window.hlx.initSidekick({
 
 var _sz = _sz || {
   invisible: true,
-  userData: {
-    name: hlx.sidekick.status.profile.name,
-    email: hlx.sidekick.status.profile.email,
-  }
 };
 _sz.appId = "8fa40ef3",
   function () {
