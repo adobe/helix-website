@@ -10,20 +10,22 @@ window.hlx.initSidekick({
         text: 'Chat',
         action: (_, sk) => {
           const { config } = sk;
-          window.open(`https://${config.innerHost}/tools/tagger/index.html`, 'hlx-sidekick-chat');
+          SignalZen.show();
         },
       },
     },
   ]
 });
 
-var _sz = _sz || {};
+var _sz = _sz || {
+  invisible: true
+};
 _sz.appId = "8fa40ef3",
   function () {
     var e = document.createElement("script");
-    e.src = "https://cdn.signalzen.com/signalzen.js",
-      e.setAttribute("async", "true"),
-      document.documentElement.firstChild.appendChild(e);
+    e.src = "https://cdn.signalzen.com/signalzen.js";
+    e.setAttribute("async", "true");
+    document.documentElement.firstChild.appendChild(e);
     var t = setInterval(function () {
       "undefined" != typeof SignalZen && (clearInterval(t), new SignalZen(_sz).load());
     }, 10);
