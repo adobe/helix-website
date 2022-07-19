@@ -4,3 +4,4 @@ window.hlx.initSidekick({
   host: 'www.hlx.live',
   pushDownSelector: 'header',
 });
+console.log('sk init');
