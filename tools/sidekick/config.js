@@ -10,6 +10,7 @@ window.hlx.initSidekick({
         text: 'Chat',
         action: (_, sk) => {
           const { config } = sk;
+          console.log('foo');
           SignalZen.show();
         },
       },
