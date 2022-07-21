@@ -510,12 +510,12 @@ export function decorateButtons(block = document) {
           $up.classList.add('button-container');
         }
         if ($up.childNodes.length === 1 && $up.tagName === 'STRONG'
-            && $twoup.childNodes.length === 1 && $twoup.tagName === 'P') {
+          && $twoup.childNodes.length === 1 && $twoup.tagName === 'P') {
           $a.className = 'button accent';
           $twoup.classList.add('button-container');
         }
         if ($up.childNodes.length === 1 && $up.tagName === 'EM'
-            && $twoup.childNodes.length === 1 && $twoup.tagName === 'P') {
+          && $twoup.childNodes.length === 1 && $twoup.tagName === 'P') {
           $a.className = 'button accent light';
           $twoup.classList.add('button-container');
         }
@@ -623,10 +623,13 @@ async function loadLazy(doc) {
   loadBlocks(main);
 
   const { hash } = window.location;
-  const element = hash ? main.querySelector(hash) : false;
-  if (hash && element) {
+
+  if (hash) {
     setTimeout(() => {
-      element.scrollIntoView();
+      const element = hash ? main.querySelector(hash) : false;
+      if (element) {
+        element.scrollIntoView();
+      }
     }, 500);
   }
 
