@@ -895,36 +895,44 @@
       button: {
         action: async (evt) => {
           const { status } = sk;
-          sk.showWait();
-          // update preview
-          const resp = await sk.update();
-          if (!resp.ok) {
-            if (status.webPath.startsWith('/.helix/') && resp.error) {
-              // show detail message only in config update mode
-              sk.showModal({
-                css: 'modal-config-failure',
-                message: resp.error,
-                sticky: true,
-                level: 0,
-              });
-            } else {
-              console.error(resp);
-              sk.showModal({
-                css: 'modal-preview-failure',
-                sticky: true,
-                level: 0,
-              });
+          const updatePreview = async (ranBefore) => {
+            const resp = await sk.update();
+            if (!resp.ok) {
+              if (!ranBefore) {
+                // assume document has been renamed, re-fetch status and try again
+                sk.addEventListener('statusfetched', async () => {
+                  updatePreview(true);
+                }, { once: true });
+                sk.fetchStatus();
+              } else if (status.webPath.startsWith('/.helix/') && resp.error) {
+                // show detail message only in config update mode
+                sk.showModal({
+                  css: 'modal-config-failure',
+                  message: resp.error,
+                  sticky: true,
+                  level: 0,
+                });
+              } else {
+                console.error(resp);
+                sk.showModal({
+                  css: 'modal-preview-failure',
+                  sticky: true,
+                  level: 0,
+                });
+              }
+              return;
             }
-            return;
-          }
-          // handle special case /.helix/*
-          if (status.webPath.startsWith('/.helix/')) {
-            sk.showModal({
-              css: 'modal-config-success',
-            });
-            return;
-          }
-          sk.switchEnv('preview', newTab(evt));
+            // handle special case /.helix/*
+            if (status.webPath.startsWith('/.helix/')) {
+              sk.showModal({
+                css: 'modal-config-success',
+              });
+              return;
+            }
+            sk.switchEnv('preview', newTab(evt));
+          };
+          sk.showWait();
+          updatePreview();
         },
         isEnabled: (sidekick) => sidekick.isAuthorized('preview', 'write')
           && sidekick.status.webPath,
