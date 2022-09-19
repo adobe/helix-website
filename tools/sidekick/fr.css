@@ -117,7 +117,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-login p:first-of-type::before {
-  content: "Veuillez vous connecter au Helix Sidekick pour continuer...";
+  content: "Veuillez vous connecter au Sidekick pour continuer...";
 }
 
 .hlx-sk .feature-container .user-login button::before,
@@ -175,7 +175,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-status-404-document::before {
-  content: "404 Not found: Check your Sidekick configuration and make sure Helix has access to this document.";
+  content: "404 Not found: Check your Sidekick configuration and make sure Franklin has access to this document.";
 }
 
 .hlx-sk-overlay .modal.modal-status-404-content::before {
