@@ -117,7 +117,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-login p:first-of-type::before {
-  content: "Bitte melde dich beim Helix Sidekick an um fortzufahren...";
+  content: "Bitte melde dich beim Sidekick an um fortzufahren...";
 }
 
 .hlx-sk .feature-container .user-login button::before,
@@ -147,11 +147,11 @@
 }
 
 .hlx-sk-overlay .modal.modal-config-success::before {
-  content: "Helix-Konfiguration erfolgreich aktiviert.";
+  content: "Konfiguration erfolgreich aktiviert.";
 }
 
 .hlx-sk-overlay .modal.modal-config-failure::before {
-  content: "Aktivierung der Helix-Konfiguration fehlgeschlagen: ";
+  content: "Aktivierung der Konfiguration fehlgeschlagen: ";
 }
 
 .hlx-sk-overlay .modal.modal-preview-failure::before {
@@ -175,7 +175,7 @@
 }
 
 .hlx-sk-overlay .modal.modal-status-404-document::before {
-  content: "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration und stelle sicher, dass Helix Zugriff auf dieses Dokument hat.";
+  content: "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration und stelle sicher, dass Franklin Zugriff auf dieses Dokument hat.";
 }
 
 .hlx-sk-overlay .modal.modal-status-404-content::before {
