@@ -158,6 +158,10 @@
   content: "La génération de l'aperçu a échoué. Veuillez essayer plus tard.";
 }
 
+.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+  content: "La génération de l'aperçu a échoué. Doit être un document Google ou une feuille de calcul.";
+}
+
 .hlx-sk-overlay .modal.modal-reload-failure::before {
   content: "Le rechargement a échoué. Veuillez essayer plus tard.";
 }
