@@ -158,6 +158,10 @@
   content: "Vorschau-Generierung fehlgeschlagen. Bitte versuche es später noch einmal.";
 }
 
+.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+  content: "Vorschau-Generierung fehlgeschlagen. Muss ein Google-Dokument oder eine Tabelle sein.";
+}
+
 .hlx-sk-overlay .modal.modal-reload-failure::before {
   content: "Aktualisierung fehlgeschlagen. Bitte versuche es später noch einmal.";
 }
