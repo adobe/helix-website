@@ -624,6 +624,13 @@ button.gnav-toggle::after {
     margin-top: unset;
   }
 
+  .gnav-search-results .article-card-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 162px;
+  }
+
   .gnav-profile .gnav-profile-menu {
     position: absolute;
     top: 100%;
