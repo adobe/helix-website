@@ -96,7 +96,6 @@ body.appear {
 /* Templates */
 body.docs-template {
     background-color: rgb(250 250 250);
-    color: rgb(74 74 74);
     padding-top: 128px;
 }
 
@@ -624,15 +623,8 @@ body.docs-template main .section.dark .default-content-wrapper {
 
 
 @media screen and (min-width: 900px) {
-    body.docs-template {
-        background-image: url("/img/bg-docs-1080.png");
-        background-size: 100%;
-        background-repeat: no-repeat;
-        background-position: 50% -128px;
-    }
-
     body.docs-template main .section {
-        max-width: 600px;
+        max-width: 800px;
         margin: auto;
     }
 
