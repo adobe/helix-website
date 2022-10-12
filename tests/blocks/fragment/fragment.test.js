@@ -10,15 +10,17 @@ document.body.innerHTML = mock;
 
 describe('Fragment loading', async () => {
   it('fragment is loaded', async () => {
-    const el = document.querySelector('.fragment');
-    await setFragment(el);
-    const heading = document.querySelector('.fragment h1');
+    const fragment = document.querySelector('.fragment');
+    await setFragment(fragment);
+    const heading = document.querySelector('.h1-from-fragment');
     expect(heading).to.exist;
   });
 
   it('fragment is not loaded', async () => {
     const el = document.querySelector('.fragment.nope');
-    const fragment = await setFragment(el);
-    expect(fragment).to.be.null;
+    await setFragment(el);
+    const a = document.querySelector('.nope a');
+    // fragment not found, not replaced
+    expect(a).to.exist;
   });
 });
