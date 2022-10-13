@@ -292,7 +292,7 @@ button.gnav-toggle::after {
   position: relative;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   grid-gap: 20px;
   padding: 0 12px;
   box-sizing: border-box;
@@ -359,10 +359,10 @@ button.gnav-toggle::after {
 }
 
 .gnav-search-results {
-  padding: 0 20px;
+  padding: 0 12px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   grid-auto-rows: auto;
   grid-gap: 20px;
 }
@@ -371,9 +371,11 @@ button.gnav-toggle::after {
   margin: 0;
   width: unset;
   max-width: unset;
-}
-
-.gnav-search-results .article-card:first-of-type {
+  padding: 1rem;
+  border: 1px solid;
+  border-color: rgb(202 202 202);
+  border-radius: 4px;
+  min-height: 160px;
   margin-top: 20px;
 }
 
@@ -618,10 +620,6 @@ button.gnav-toggle::after {
 
   .gnav-search-results {
     margin: 20px auto;
-  }
-
-  .gnav-search-results .article-card:first-of-type {
-    margin-top: unset;
   }
 
   .gnav-search-results .article-card-image {
