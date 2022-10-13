@@ -46,11 +46,10 @@ class Gnav {
       nav.append(logo);
     }
 
-    // TEMP
+    // TODO: move to content ?
     const div = createTag('div', { class: 'search' });
     div.innerHTML = '<p>Search</p>';
     this.body.append(div);
-    // END TEMP
 
     this.search = this.decorateSearch();
     if (this.search) {
