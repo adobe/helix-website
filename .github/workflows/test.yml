@@ -27,8 +27,8 @@ jobs:
     - name: Run the tests
       run: xvfb-run -a npm test
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+    # - name: Upload coverage to Codecov
+    #   uses: codecov/codecov-action@v2
 
     - name: run the linters
       run: npm run lint
