@@ -46,14 +46,16 @@ class Gnav {
       nav.append(logo);
     }
 
-    // TODO: move to content ?
-    const div = createTag('div', { class: 'search' });
-    div.innerHTML = '<p>Search</p>';
-    this.body.append(div);
+    const enableSearch = getMetadata('enable-search');
+    if (!enableSearch || enableSearch !== 'no') {
+      const div = createTag('div', { class: 'search' });
+      div.innerHTML = '<p>Search</p>';
+      this.body.append(div);
 
-    this.search = this.decorateSearch();
-    if (this.search) {
-      nav.append(this.search);
+      this.search = this.decorateSearch();
+      if (this.search) {
+        nav.append(this.search);
+      }
     }
 
     const wrapper = createTag('div', { class: 'gnav-wrapper' }, nav);
