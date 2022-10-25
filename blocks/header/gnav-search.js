@@ -1,18 +1,27 @@
-// TODO: FIX!!
 // eslint-disable-next-line import/named
-import { fetchBlogArticleIndex, createOptimizedPicture } from '../../scripts/scripts.js';
+import { createOptimizedPicture } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
+
+async function fetchBlogArticleIndex() {
+  const index = '/docpages-index.json';
+  const resp = await fetch(index);
+  const json = await resp.json();
+  const lookup = {};
+  json.data.forEach((row) => {
+    lookup[row.path] = row;
+  });
+  return { data: json.data, lookup };
+}
 
 function decorateCard(hit) {
   const {
-    title, description, image, category,
+    title, description, image,
   } = hit;
   const path = hit.path.split('.')[0];
   const picture = createOptimizedPicture(image, title, false, [{ width: '750' }]);
   const pictureTag = picture.outerHTML;
   const html = `<div class="article-card-image">${pictureTag}</div>
       <div class="article-card-body">
-        <p class="article-card-category">${category}</p>
         <h3>${title}</h3>
         <p>${description}</p>
       </div>`;
@@ -63,7 +72,7 @@ async function populateSearchResults(searchTerms, resultsContainer) {
     let i = 0;
     for (; i < articles.length; i += 1) {
       const e = articles[i];
-      const text = [e.category, e.title, e.teaser].join(' ').toLowerCase();
+      const text = [e.title, e.content].join(' ').toLowerCase();
 
       if (terms.every((term) => text.includes(term))) {
         if (hits.length === limit) {

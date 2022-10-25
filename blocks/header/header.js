@@ -36,11 +36,6 @@ class Gnav {
       nav.append(mainNav);
     }
 
-    this.search = this.decorateSearch();
-    if (this.search) {
-      nav.append(this.search);
-    }
-
     const profile = this.decorateProfile();
     if (profile) {
       nav.append(profile);
@@ -49,6 +44,18 @@ class Gnav {
     const logo = this.decorateLogo();
     if (logo) {
       nav.append(logo);
+    }
+
+    const enableSearch = getMetadata('enable-search');
+    if (!enableSearch || enableSearch !== 'no') {
+      const div = createTag('div', { class: 'search' });
+      div.innerHTML = '<p>Search</p>';
+      this.body.append(div);
+
+      this.search = this.decorateSearch();
+      if (this.search) {
+        nav.append(this.search);
+      }
     }
 
     const wrapper = createTag('div', { class: 'gnav-wrapper' }, nav);
@@ -162,9 +169,8 @@ class Gnav {
     const searchBlock = this.body.querySelector('.search');
     if (searchBlock) {
       const label = searchBlock.querySelector('p').textContent;
-      const advancedLink = searchBlock.querySelector('a');
       const searchEl = createTag('div', { class: 'gnav-search' });
-      const searchBar = this.decorateSearchBar(label, advancedLink);
+      const searchBar = this.decorateSearchBar(label);
       const searchButton = createTag(
         'button',
         {
@@ -185,17 +191,17 @@ class Gnav {
     return null;
   };
 
-  decorateSearchBar = (label, advancedLink) => {
+  decorateSearchBar = (label) => {
     const searchBar = createTag('aside', { id: 'gnav-search-bar', class: 'gnav-search-bar' });
     const searchField = createTag('div', { class: 'gnav-search-field' }, SEARCH_ICON);
     const searchInput = createTag('input', { class: 'gnav-search-input', placeholder: label });
     const searchResults = createTag('div', { class: 'gnav-search-results' });
 
     searchInput.addEventListener('input', (e) => {
-      this.onSearchInput(e.target.value, searchResults, advancedLink);
+      this.onSearchInput(e.target.value, searchResults);
     });
 
-    searchField.append(searchInput, advancedLink);
+    searchField.append(searchInput);
     searchBar.append(searchField, searchResults);
     return searchBar;
   };
