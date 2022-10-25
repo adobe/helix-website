@@ -159,6 +159,7 @@ button.gnav-toggle::after {
   content: '';
   margin-left: 5px;
   margin-right: 3px;
+  margin-bottom: 4px;
 }
 
 .gnav-navitem.has-menu.is-open > a::after {
@@ -554,11 +555,12 @@ button.gnav-toggle::after {
 
   .gnav-navitem.has-menu > a {
     border-bottom: unset;
+    padding: 23px 20px 17px;
   }
 
   .gnav-navitem.has-menu.is-open > a {
     font-weight: unset;
-    padding: 20px;
+    padding: 23px 20px 17px;
   }
 
 
