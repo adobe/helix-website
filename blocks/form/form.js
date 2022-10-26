@@ -130,7 +130,7 @@ async function createForm(formURL) {
     fd.Type = fd.Type || 'text';
     const fieldWrapper = document.createElement('div');
     const style = fd.Style ? ` form-${fd.Style}` : '';
-    const fieldId = `form-${fd.Field}-wrapper${style}`;
+    const fieldId = `form-${fd.Type}-wrapper${style}`;
     fieldWrapper.className = fieldId;
     fieldWrapper.classList.add('field-wrapper');
     switch (fd.Type) {
