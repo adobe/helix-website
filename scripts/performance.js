@@ -1,27 +1,37 @@
 /*
+ * Copyright 2021 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+/*
  * lighthouse performance instrumentation helper
  * (needs a refactor)
  */
 
 function stamp(message, time = new Date() - performance.timing.navigationStart, type = '') {
-  if (window.name.includes('performance')) {
-    // eslint-disable-next-line no-console
-    const colors = {
-      general: '#888',
-      cls: '#c50',
-      lcp: 'green',
-      tbt: 'red',
-    };
-    const color = colors[type] || '#888';
-    // eslint-disable-next-line no-console
-    console.log(
-      `%c${Math.round(time).toString().padStart(5, ' ')}%c %c${type}%c ${message}`,
-      'background-color: #444; padding: 3px; border-radius: 3px;',
-      '',
-      `background-color: ${color}; padding: 3px 5px; border-radius: 3px;`,
-      '',
-    );
-  }
+  // eslint-disable-next-line no-console
+  const colors = {
+    general: '#888',
+    cls: '#c50',
+    lcp: 'green',
+    tbt: 'red',
+    paint: '#b73',
+  };
+  const color = colors[type] || '#888';
+  // eslint-disable-next-line no-console
+  console.log(
+    `%c${Math.round(time).toString().padStart(5, ' ')}%c %c${type}%c ${message}`,
+    'background-color: #444; padding: 3px; border-radius: 3px;',
+    '',
+    `background-color: ${color}; padding: 3px 5px; border-radius: 3px;`,
+    '',
+  );
 }
 
 function registerPerformanceLogger() {
@@ -53,12 +63,21 @@ function registerPerformanceLogger() {
     const polt = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         // Log the entry and all associated details.
-        stamp(JSON.stringify(entry), 'tbt', entry.startTime);
+        stamp(JSON.stringify(entry), entry.startTime, 'tbt');
       });
     });
 
     // Start listening for `longtask` entries to be dispatched.
     polt.observe({ type: 'longtask', buffered: true });
+
+    const popaint = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
+        // Log the entry and all associated details.
+        stamp(JSON.stringify(entry), entry.startTime, 'paint');
+      });
+    });
+    // Start listening for `longtask` entries to be dispatched.
+    popaint.observe({ type: 'paint', buffered: true });
 
     const pores = new PerformanceObserver((entryList) => {
       const entries = entryList.getEntries();

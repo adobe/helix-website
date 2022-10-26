@@ -428,7 +428,7 @@ export function decorateIcons(block = document) {
 async function waitForLCP() {
   // eslint-disable-next-line no-use-before-define
   const lcpBlocks = LCP_BLOCKS;
-  const block = document.querySelector('.block');
+  const block = document.querySelector('.block.form') || document.querySelector('.block');
   const hasLCPBlock = (block && lcpBlocks.includes(block.getAttribute('data-block-name')));
   if (hasLCPBlock) await loadBlock(block, true);
 
@@ -481,7 +481,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['marquee', 'columns']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['marquee', 'columns', 'form']; // add your LCP blocks to the list
 const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
 const ICON_ROOT = '/img';
 
