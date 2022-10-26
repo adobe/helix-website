@@ -1,0 +1,38 @@
+.videotext > div {
+  display: grid;
+  grid-template-columns: 800px 400px;
+  grid-gap: 16px;
+}
+
+.videotext .video-stream
+{
+  left: 0; 
+  width: 100%;
+  height: 0; 
+  position: relative; 
+  padding-bottom: 56.25%;
+}
+
+
+.videotext .video-faq {
+  margin-left: 10px; 
+  width: 100%;
+  height: 0; 
+  position: relative; 
+  padding-bottom: 56.25%;
+   
+  }
+
+.videotext .video-faq ul {
+  list-style: square;    
+  font-size:1rem;
+  text-align: left;
+  font-family: sans-serif;
+
+}
+
+.videotext .video-faq ul li {
+  font-family: sans-serif;
+  font-size:.75rem;
+  text-align: left;
+}
