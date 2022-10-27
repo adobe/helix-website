@@ -9,4 +9,5 @@
 
 .videotext .text {
   font-size: var(--type-body-s-size);
+  padding-left: 10px;
 }
