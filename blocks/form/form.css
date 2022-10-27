@@ -70,7 +70,7 @@ main .form .form-checkbox-wrapper input[type='checkbox'] {
 
 main .form .form-checkbox-wrapper input[type='checkbox'] + label::before {
   float: left;
-  margin-top: 5px;
+  margin-top: 2px;
   margin-right: 5px;
   height: 30px;
   width: 30px;
@@ -87,6 +87,7 @@ main .form .form-checkbox-wrapper input[type='checkbox']:checked +label::before 
 
 main .form .form-checkbox-wrapper label {
   font-size: var(--type-body-m-size);
+  line-height: var(--type-body-m-lh);
   font-weight: normal;
   text-transform: none;
   display: block;
