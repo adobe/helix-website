@@ -16,7 +16,7 @@ main .faq .faq-accordion .faq-question {
     border: none;
     text-align: left;
     outline: none;
-    font-size: 15px;
+    font-size: var(--type-body-m-size);
     transition: 0.4s;
     border-radius: 1000px;
 }
@@ -43,6 +43,7 @@ main .faq .faq-accordion .faq-answer {
   background-color: white;
   overflow: hidden;
   border-left:solid 1px #ccc;
+  font-size: var(--type-body-s-size);
 }
 
 main .faq .faq-accordion .faq-answer.active {
