@@ -1,6 +1,7 @@
 .videotext > div {
   display: grid;
   grid-template-columns: 70% 30%;
+  padding-top:10px;
 }
 
 .videocontent video{
