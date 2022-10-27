@@ -13,6 +13,7 @@ export default async function decorateFaq($block) {
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
     $dt.className='faq-question';
+    const $wrapDiv = document.createElement('div');
     const $a = document.createElement('a');
     $a.id = `q${(i + 1)}`;
     $dt.innerText = row.Question;
@@ -21,8 +22,10 @@ export default async function decorateFaq($block) {
     const answer = autoLink(row.Answer);
 
     $dd.innerHTML = answer;
+    $wrapDiv.append($a);
     $a.append($dt, $dd);
-    $dl.append($a);
+    $dl.append($wrapDiv);
+
   });
   $block.append($dl);
 
