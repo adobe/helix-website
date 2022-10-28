@@ -9,10 +9,10 @@ export default async function decorateFaq($block) {
   const json = await resp.json();
   $block.innerText = '';
   const $dl = document.createElement('dl');
-  $dl.className='faq-accordion';
+  $dl.className = 'faq-accordion';
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
-    $dt.className='faq-question';
+    $dt.className = 'faq-question';
     const $wrapDiv = document.createElement('div');
     const $a = document.createElement('a');
     $a.id = `q${(i + 1)}`;
