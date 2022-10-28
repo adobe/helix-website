@@ -7,7 +7,7 @@ export default function decorate(block) {
     const textEl = [...row.children][1];
     textEl.classList.add('text');
     textEl.querySelectorAll('a').forEach((a) => {
-      a.target = `_blank`;
+      a.target = '_blank';
     });
   });
 }
