@@ -642,4 +642,10 @@ body.docs-template main .section.dark .default-content-wrapper {
   border-color: var(--spectrum-blue);
 }
 
-
+main .section.separator
+{
+  margin: auto;
+  width: 60%;
+  border-top: 2px solid #ccc;
+  padding: 20px 0;
+}

@@ -1,0 +1,22 @@
+/* default rule for mobile */
+.videotext>div {
+  display: grid;
+  padding-top: 10px;
+}
+
+@media screen and (min-width: 900px) {
+  .videotext>div {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    padding-top: 10px;
+  }
+}
+
+.videocontent video {
+  width: 100%;
+}
+
+.videotext .text {
+  font-size: var(--type-body-s-size);
+  padding-left: 10px;
+}
