@@ -27,20 +27,19 @@ export default async function decorateFaq($block) {
   });
   $block.append($dl);
 
-  let acc = document.getElementsByClassName('faq-question');
   const selected = document.getElementById(window.location.hash.slice(1));
   if (selected) {
     selected.scrollIntoView();
   }
-
+  const acc = document.getElementsByClassName('faq-question');
   for (let i = 0; i < acc.length; i += 1) {
     acc[i].addEventListener('click', function a() {
       this.classList.toggle('active');
       const panel = this.nextElementSibling;
-      if (panel.style.display === "block") {
-        panel.style.display = "none";
+      if (panel.style.display === 'block') {
+        panel.style.display = 'none';
       } else {
-        panel.style.display = "block";
+        panel.style.display = 'block';
       }
     });
   }
