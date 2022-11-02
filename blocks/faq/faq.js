@@ -33,11 +33,11 @@ export default async function decorateFaq($block) {
     selected.scrollIntoView();
   }
 
-for (let i = 0; i < acc.length; i+=1) {
-  acc[i].addEventListener('click', function a() {
+  for (let i = 0; i < acc.length; i += 1) {
+    acc[i].addEventListener('click', function a() {
       this.classList.toggle('active');
       const panel = this.nextElementSibling;
-      panel.style.display === 'block' ? panel.style.display = 'none' : panel.style.display = 'block';
+      return panel.style.display === 'block' ? panel.style.display = 'none' : panel.style.display = 'block';
     });
   }
 }
