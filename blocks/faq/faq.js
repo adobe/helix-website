@@ -4,15 +4,14 @@ function autoLink(string) {
 }
 
 export default async function decorateFaq($block) {
-    const source = new URL($block.querySelector('a').href).pathname;
-    const resp = await fetch(source);
-    const json = await resp.json();
-    var acc = document.getElementsByClassName('faq-question');
-    var i;
-    $block.innerText = '';
-    const $dl = document.createElement('dl');
-    $dl.className = 'faq-accordion';
-    json.data.forEach((row, i) => {
+  const source = new URL($block.querySelector('a').href).pathname;
+  const resp = await fetch(source);
+  const json = await resp.json();
+  var acc = document.getElementsByClassName('faq-question');
+  $block.innerText = '';
+  const $dl = document.createElement('dl');
+  $dl.className = 'faq-accordion';
+  json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
     $dt.className = 'faq-question';
     const $wrapDiv = document.createElement('div');
@@ -34,11 +33,11 @@ export default async function decorateFaq($block) {
     selected.scrollIntoView();
   }
 
-for (i = 0; i < acc.length; i+=1) {
-  acc[i].addEventListener('click', function() {
-    this.classList.toggle('active');
-    let panel = this.nextElementSibling;
-    panel.style.display === 'block' ? panel.style.display = 'none' : panel.style.display = 'block';
-  });
-}   
+for (let i = 0; i < acc.length; i+=1) {
+  acc[i].addEventListener('click', function a() {
+      this.classList.toggle('active');
+      const panel = this.nextElementSibling;
+      panel.style.display === 'block' ? panel.style.display = 'none' : panel.style.display = 'block';
+    });
+  }
 }
