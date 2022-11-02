@@ -25,19 +25,9 @@ main .faq .faq-accordion .faq-question:hover,main .faq.faq-accordion .faq-questi
   background-color:#136ff6;
   color:#eee;
 }
-/* 
-main .faq .faq-accordion .faq-question:after {
-  font-family: 'FontAwesome';
-  content: "\f063";    
-  float: right;
-}
-
-main .faq .faq-accordion .faq-question.active:after {    
-    content: "\f062";    
-} */
 
 main .faq .faq-accordion .faq-answer {
-  padding: 0px 18px;
+  padding: 0 18px;
   margin: 8px 20px;
   display: none;
   background-color: white;
