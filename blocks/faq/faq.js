@@ -9,22 +9,38 @@ export default async function decorateFaq($block) {
   const json = await resp.json();
   $block.innerText = '';
   const $dl = document.createElement('dl');
+  $dl.className = 'faq-accordion';
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
+    $dt.className = 'faq-question';
+    const $wrapDiv = document.createElement('div');
     const $a = document.createElement('a');
     $a.id = `q${(i + 1)}`;
     $dt.innerText = row.Question;
     const $dd = document.createElement('dd');
+    $dd.className = 'faq-answer';
     const answer = autoLink(row.Answer);
-
     $dd.innerHTML = answer;
+    $wrapDiv.append($a);
     $a.append($dt, $dd);
-    $dl.append($a);
+    $dl.append($wrapDiv);
   });
   $block.append($dl);
 
   const selected = document.getElementById(window.location.hash.slice(1));
   if (selected) {
     selected.scrollIntoView();
+  }
+  const acc = document.getElementsByClassName('faq-question');
+  for (let i = 0; i < acc.length; i += 1) {
+    acc[i].addEventListener('click', function a() {
+      this.classList.toggle('active');
+      const panel = this.nextElementSibling;
+      if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+      } else {
+        panel.style.display = 'block';
+      }
+    });
   }
 }
