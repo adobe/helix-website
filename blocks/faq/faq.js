@@ -7,7 +7,6 @@ export default async function decorateFaq($block) {
   const source = new URL($block.querySelector('a').href).pathname;
   const resp = await fetch(source);
   const json = await resp.json();
-  var acc = document.getElementsByClassName('faq-question');
   $block.innerText = '';
   const $dl = document.createElement('dl');
   $dl.className = 'faq-accordion';
@@ -28,6 +27,7 @@ export default async function decorateFaq($block) {
   });
   $block.append($dl);
 
+  let acc = document.getElementsByClassName('faq-question');
   const selected = document.getElementById(window.location.hash.slice(1));
   if (selected) {
     selected.scrollIntoView();
@@ -37,7 +37,11 @@ export default async function decorateFaq($block) {
     acc[i].addEventListener('click', function a() {
       this.classList.toggle('active');
       const panel = this.nextElementSibling;
-      return panel.style.display === 'block' ? panel.style.display = 'none' : panel.style.display = 'block';
+      if (panel.style.display === "block") {
+        panel.style.display = "none";
+      } else {
+        panel.style.display = "block";
+      }
     });
   }
 }
