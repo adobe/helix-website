@@ -1,11 +1,11 @@
 {
   "$id": "https://ns.adobe.com/helix/sidekick/config",
-  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$defs": {
     "plugin": {
       "type": "object",
       "properties": {
-        "container": {
+        "containerId": {
           "type": "string",
           "description": "The ID of the container to add this plugin to"
         },
@@ -22,7 +22,7 @@
           "type": "string",
           "description": "The name of a custom event to fire when the button is clicked"
         },
-        "exclude_paths": {
+        "excludePaths": {
           "type": "array",
           "items": {
             "type": "string"
@@ -37,26 +37,36 @@
           "type": "string",
           "description": "The unique plugin ID"
         },
-        "include_paths": {
+        "includePaths": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Include the plugin on these paths (overrides exclude_paths)",
+          "description": "Include the plugin on these paths (overrides excludePaths)",
           "examples": [
             "/foo/bar",
             "/foo/bar/**"
           ]
         },
-        "is_container": {
+        "isContainer": {
           "type": "boolean",
           "description": "Turns the plugin into a container for other plugins"
+        },
+        "isPalette": {
+          "type": "boolean",
+          "description": "Opens the URL in a palette instead of a new tab",
+          "dependentRequired": ["url"]
+        },
+        "paletteRect": {
+          "type": "string",
+          "description": "he dimensions and position of a palette box",
+          "dependentRequired": ["isPalette"]
         },
         "title": {
           "type": "string",
           "description": "The button text"
         },
-        "title_i18n": {
+        "titleI18n": {
           "type": "object",
           "description": "The button text in other supported languages",
           "patternProperties": {
@@ -69,24 +79,28 @@
           "additionalProperties": false
         },
         "url": {
-          "type": "string",
+          "type": "url",
           "description": "The URL to open when the button is clicked"
+        },
+        "passReferrer": {
+          "type": "boolean",
+          "description": "Append the referrer URL as a query param on new URL button click"
         }
       },
       "anyOf": [
         { "required": [ "url" ] },
         { "required": [ "event" ] },
-        { "required": [ "is_container" ] }
+        { "required": [ "isContainer" ] }
       ],
       "additionalProperties": false
     }
   },
-  "description": "Helix Sidekick configuration",
+  "description": "Franklin Sidekick configuration",
   "type": "object",
   "properties": {
     "project": {
       "type": "string",
-      "description": "The name of the project to display in the Helix Sidekick"
+      "description": "The name of the project to display in the Franklin Sidekick"
     },
     "host": {
       "type": "string",
@@ -99,7 +113,7 @@
     },
     "pushDown": {
       "type": "boolean",
-      "description": "Have Helix Sidekick push down page content instead of overlaying it"
+      "description": "Have Franklin Sidekick push down page content instead of overlaying it"
     },
     "pushDownSelector": {
       "type": "string",
