@@ -32,7 +32,7 @@
     moduleScript.id = 'hlx-sk-module';
     moduleScript.src = (appScript && appScript.getAttribute('src').replace('app.js', 'module.js'))
       || 'https://www.hlx.live/tools/sidekick/module.js';
-    moduleScript.addEventListener('load', () => {
+    moduleScript.addEventListener('load', async () => {
       // get base config from script data attribute
       const baseConfig = appScript
         && appScript.dataset.config
@@ -45,13 +45,11 @@
         const {
           owner, repo, ref = 'main', devMode,
         } = baseConfig;
+        baseConfig.scriptUrl = appScript.getAttribute('src');
         if (owner && repo) {
-          // merge base config with potential pre-existing config
-          window.hlx.sidekickConfig = Object.assign(
-            window.hlx.sidekickConfig || {},
-            baseConfig,
-          );
-          // look for extended config in project
+          // init sidekick config
+          window.hlx.sidekickConfig = {};
+          // look for custom config in project
           let configOrigin = '';
           if (devMode) {
             configOrigin = 'http://localhost:3000';
@@ -60,28 +58,23 @@
             // load config from inner CDN
             configOrigin = `https://${ref}--${repo}--${owner}.hlx.live`;
           }
-          const configScript = document.createElement('script');
-          configScript.id = 'hlx-sk-config';
-          configScript.src = `${configOrigin}/tools/sidekick/config.js`;
-          configScript.addEventListener('error', () => {
-            // if no project config, init sidekick with base config
-            console.info(`no sidekick config found at ${configScript.src}`);
-            window.hlx.initSidekick();
-          });
-          // init sidekick via project config
-          if (document.getElementById(configScript.id)) {
-            document.getElementById(configScript.id).replaceWith(configScript);
-          } else {
-            document.head.append(configScript);
+          try {
+            const res = await fetch(`${configOrigin}/tools/sidekick/config.json`);
+            if (res.ok) {
+              console.log(`custom sidekick config loaded from ${configOrigin}/tools/sidekick/config.json`);
+              // apply custom config
+              Object.assign(window.hlx.sidekickConfig, await res.json());
+            }
+          } catch (e) {
+            console.log('error retrieving custom sidekick config', e);
           }
+          // apply base config
+          Object.assign(window.hlx.sidekickConfig, baseConfig);
+          window.hlx.initSidekick();
         }
       }
     });
-    moduleScript.addEventListener('error', () => {
-      console.error('failed to load sidekick module');
-    });
     document.head.append(moduleScript);
-    window.hlx.sidekickScript = moduleScript;
   } else if (window.hlx.sidekick) {
     // sidekick already loaded > toggle
     window.hlx.sidekick.toggle();
