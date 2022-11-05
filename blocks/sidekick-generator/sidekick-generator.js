@@ -61,7 +61,7 @@ function run(evt) {
   bm.href = [
     // eslint-disable-next-line no-script-url
     'javascript:',
-    '/* ** Helix Sidekick Bookmarklet ** */',
+    '/* ** Franklin Sidekick Bookmarklet ** */',
     '(() => {',
     `const c=${JSON.stringify(config)};`,
     'const s=document.createElement(\'script\');',

@@ -39,23 +39,23 @@
   content: "Ansicht";
 }
 
-.hlx-sk .env.dev .dropdown-toggle::before,
+.hlx-sk .env.is-dev .dropdown-toggle::before,
 .hlx-sk .env .dev button::before {
   content: "Entwicklung";
 }
 
-.hlx-sk .env.preview .dropdown-toggle::before,
+.hlx-sk .env.is-preview .dropdown-toggle::before,
 .hlx-sk .env .preview button::before,
 .hlx-sk .edit-preview button::before {
   content: "Vorschau";
 }
 
-.hlx-sk .env.live .dropdown-toggle::before,
+.hlx-sk .env.is-live .dropdown-toggle::before,
 .hlx-sk .env .live button::before {
   content: "Live";
 }
 
-.hlx-sk .env.prod .dropdown-toggle::before,
+.hlx-sk .env.is-prod .dropdown-toggle::before,
 .hlx-sk .env .prod button::before {
   content: "Produktion";
 }
@@ -140,6 +140,22 @@
 
 .hlx-sk-overlay .modal.modal-wait::before {
   content: "Bitte warten...";
+}
+
+.hlx-sk-overlay .modal.modal-preview-onedrive::before {
+  content: "Expertenhinweis: Drücke vor der Vorschau Control + S, um immer die neusten Änderungen zu sehen...";
+}
+
+.hlx-sk-overlay .modal.modal-preview-onedrive-mac::before {
+  content: "Expertenhinweis: Drücke vor der Vorschau Command + S, um immer die neusten Änderungen zu sehen...";
+}
+
+.hlx-sk-overlay .modal.modal-reload-onedrive::before {
+  content: "Expertenhinweis: Drücke vor dem Aktualisieren einer Seite im Editor Ctrl + S...";
+}
+
+.hlx-sk-overlay .modal.modal-reload-onedrive-mac::before {
+  content: "Expertenhinweis: Drücke vor dem Aktualisieren einer Seite im Editor ⌘ + S...";
 }
 
 .hlx-sk-overlay .modal.modal-share-success::before {

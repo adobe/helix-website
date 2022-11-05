@@ -11,28 +11,22 @@
  */
 /* eslint-disable no-console, no-alert */
 
+'use strict';
+
 (() => {
   /**
-   * @typedef {Object.<string, string>} elemAttr
-   * @description The name and value of the attribute to set on an element.
-   */
-
-  /**
-   * @typedef {Object.<string, Function>} elemLstnr
-   * @description The event name and listener to register on an element.
-   */
-
-  /**
-   * @typedef {Object} elemConfig
+   * @typedef {Object} ElemConfig
+   * @private
    * @description The configuration of an element to add.
    * @prop {string}      tag    The tag name (mandatory)
    * @prop {string}      text   The text content (optional)
-   * @prop {elemAttr[]}  attrs  The attributes (optional)
-   * @prop {elemLstnr[]} lstnrs The event listeners (optional)
+   * @prop {Object[]}  attrs  The attributes (optional)
+   * @prop {Object[]} lstnrs The event listeners (optional)
    */
 
   /**
-   * @typedef {Object} pluginButton
+   * @typedef {Object} PluginButton
+   * @private
    * @description The configuration for a plugin button. This can be used as
    * a shorthand for {@link elemConfig}.
    * @prop {string}   text   The button text
@@ -43,13 +37,15 @@
    */
 
   /**
-   * @typedef {Object} plugin
-   * @description The plugin configuration.
+   * @typedef {Object} _Plugin
+   * @private
+   * @description The internal plugin configuration.
    * @prop {string}       id        The plugin ID (mandatory)
-   * @prop {pluginButton} button    A button configuration object (optional)
+   * @prop {PluginButton} button    A button configuration object (optional)
    * @prop {string}       container The ID of a dropdown to add this plugin to (optional)
+   * @prop {boolean}      feature=false Determines whether to group this plugin with the features
    * @prop {boolean}      override=false Determines whether to replace an existing plugin
-   * @prop {elemConfig[]} elements  An array of elements to add (optional)
+   * @prop {ElemConfig[]} elements  An array of elements to add (optional)
    * @prop {Function}     condition Determines whether to show this plugin (optional).
    * This function is expected to return a boolean when called with the sidekick as argument.
    * @prop {Function}     advanced  Show this plugin only in advanced mode (optional).
@@ -59,57 +55,68 @@
    */
 
   /**
-   * A callback function to render a view.
-   * @callback viewCallback
-   * @param {HTMLELement} viewContainer The view container
-   * @param {Object} data The data to display
+   * @typedef {Object} Plugin
+   * @description The plugin configuration.
+   * @prop {string} id The plugin ID (mandatory)
+   * @prop {string} title The button text
+   * @prop {Object} titleI18n={} A map of translated button texts
+   * @prop {string} url The URL to open when the button is clicked
+   * @prop {boolean} passReferrer Append the referrer URL as a query param on new URL button click
+   * @prop {string} event The name of a custom event to fire when the button is clicked.
+   *                      Note: Plugin events get a custom: prefix, e.g. "foo" becomes "custom:foo".
+   * @prop {string} containerId The ID of a dropdown to add this plugin to (optional)
+   * @prop {boolean} isContainer Determines whether to turn this plugin into a dropdown
+   * @prop {boolean} isPalette Determines whether a URL is opened in a palette instead of a new tab
+   * @prop {string} paletteRect The dimensions and position of a palette (optional)
+   * @prop {string[]} environments Specifies when to show this plugin (edit, preview, live, or prod)
+   * @prop {string[]} excludePaths Exclude the plugin from these paths (glob patterns supported)
+   * @prop {string[]} includePaths Include the plugin on these paths (glob patterns supported)
    */
 
   /**
-   * @typedef {Object} viewConfig
+   * @typedef {Object} ViewConfig
    * @description A custom view configuration.
-   * @prop {string|viewCallback} js The URL of a JS module or a function to render this view
    * @prop {string} path The path or globbing pattern where to apply this view
    * @prop {string} css The URL of a CSS file or inline CSS to render this view (optional)
    */
 
   /**
-   * @typedef {Object} helpStep
-   * @description The definition of a help step inside a {@link helpTopic}.
+   * @typedef {Object} HelpStep
+   * @description The definition of a help step inside a {@link HelpTopic|help topic}.
    * @prop {string} message The help message
    * @prop {string} selector The CSS selector of the target element
    */
 
   /**
-   * @typedef {Object} helpTopic
+   * @typedef {Object} HelpTopic
    * @description The definition of a help topic.
    * @prop {string} id The ID of the help topic
-   * @prop {helpStep[]} steps An array of {@link helpStep}s
+   * @prop {HelpStep[]} steps An array of {@link HelpStep|help steps}
    */
 
   /**
-   * @typedef {Object} sidekickConfig
+   * @typedef {Object} SidekickConfig
    * @description The sidekick configuration.
    * @prop {string} owner The GitHub owner or organization (mandatory)
    * @prop {string} repo The GitHub owner or organization (mandatory)
    * @prop {string} ref=main The Git reference or branch (optional)
    * @prop {string} mountpoint The content source URL (optional)
    * @prop {string} project The name of the project used in the sharing link (optional)
-   * @prop {plugin[]} plugins An array of plugin configurations (optional)
+   * @prop {Plugin[]} plugins An array of {@link Plugin|plugin configurations} (optional)
    * @prop {string} outerHost The outer CDN's host name (optional)
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
    * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
    * @prop {boolean} pushDown=false <pre>true</pre> to have the sidekick push down page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
-   * @prop {viewConfig[]} specialViews An array of custom view configurations (optional)
+   * @prop {ViewConfig[]} specialViews An array of custom {@link ViewConfig|view configurations}
    * @prop {number} adminVersion The specific version of admin service to use (optional)
    */
 
   /**
    * @external
    * @name "window.hlx.sidekickConfig"
-   * @type {sidekickConfig}
+   * @type {SidekickConfig}
    * @description The global variable holding the initial sidekick configuration.
    */
 
@@ -150,7 +157,7 @@
   /**
    * @event Sidekick#contextloaded
    * @type {Object} The context object
-   * @property {sidekickConfig} config The sidekick configuration
+   * @property {SidekickConfig} config The sidekick configuration
    * @property {Location} location The sidekick location
    * @description This event is fired when the context has been loaded.
    */
@@ -260,7 +267,7 @@
   function getProjectDetails(host) {
     const details = host.split('.')[0].split('--');
     if (details.length < 2) {
-      throw new Error('Not a project host');
+      throw new Error('not a project host');
     }
     if (details.length === 3) {
       // lose ref
@@ -321,7 +328,7 @@
   /**
    * Returns the sidekick configuration.
    * @private
-   * @param {sidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
+   * @param {SidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
    * @param {Location} location The current location
    * @returns {Object} The sidekick configuration
    */
@@ -517,6 +524,14 @@
   }
 
   /**
+   * Listener to collapse all dropdowns when document is clicked.
+   * @private
+   */
+  function collapseDropdowns(sk) {
+    sk.root.querySelectorAll('.dropdown').forEach((d) => d.classList.remove('dropdown-expanded'));
+  }
+
+  /**
    * Creates a dropdown as a container for other plugins.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -528,7 +543,7 @@
     const dropdown = createTag({
       tag: 'div',
       attrs: {
-        class: `${id} dropdown`,
+        class: `${id} plugin dropdown`,
       },
     });
     const toggle = appendTag(dropdown, {
@@ -540,17 +555,8 @@
       },
       lstnrs: {
         click: (evt) => {
-          // collapse env listener
-          const collapseEnv = () => {
-            dropdown.classList.remove('dropdown-expanded');
-            document.removeEventListener('click', collapseEnv);
-          };
+          collapseDropdowns(sk);
           dropdown.classList.toggle('dropdown-expanded');
-          if (dropdown.classList.contains('dropdown-expanded')) {
-            window.setTimeout(() => {
-              document.addEventListener('click', collapseEnv);
-            }, 100);
-          }
           const {
             lastElementChild: container,
           } = dropdown;
@@ -671,17 +677,21 @@
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {string} name The name of the event
-   * @param {Object} data The data to pass to event listeners (defaults to {@link Sidekick})
+   * @param {Object} data The data to pass to event listeners (optional)
    */
   function fireEvent(sk, name, data) {
     try {
-      sk.root.dispatchEvent(new CustomEvent(name, {
+      sk.dispatchEvent(new CustomEvent(name, {
         detail: {
-          data: data || sk,
+          data: data || {
+            config: JSON.parse(JSON.stringify(sk.config)),
+            location: sk.location,
+            status: sk.status,
+          },
         },
       }));
     } catch (e) {
-      console.warn('failed to fire event', name, data);
+      console.warn('failed to fire event', name, e);
     }
   }
 
@@ -701,7 +711,7 @@
    */
   async function checkLastModified(sidekick) {
     const { status } = sidekick;
-    if (status.edit && status.edit.status === 404) {
+    if ((status.status && status.status !== 200) || (status.edit && status.edit.status === 404)) {
       return;
     }
     const editLastMod = (status.edit && status.edit.lastModified) || null;
@@ -803,6 +813,21 @@
    * @param {Sidekick} sk The sidekick
    */
   function addEnvPlugins(sk) {
+    // add env container
+    sk.add({
+      id: 'env',
+      feature: true,
+      button: {
+        isDropdown: true,
+      },
+      callback: (sidekick, $env) => {
+        if (sidekick.isDev()) $env.classList.add('is-dev');
+        if (sidekick.isInner()) $env.classList.add('is-preview');
+        if (sidekick.isOuter()) $env.classList.add('is-live');
+        if (sidekick.isProd()) $env.classList.add('is-prod');
+      },
+    });
+
     // dev
     sk.add({
       id: 'dev',
@@ -825,6 +850,7 @@
     // preview
     sk.add({
       id: 'preview',
+      container: 'env',
       condition: (sidekick) => sidekick.isEditor() || sidekick.isProject(),
       button: {
         action: async (evt) => {
@@ -842,6 +868,7 @@
     // live
     sk.add({
       id: 'live',
+      container: 'env',
       condition: (sidekick) => sidekick.config.outerHost
         && (sidekick.isEditor() || sidekick.isProject()),
       button: {
@@ -861,6 +888,7 @@
     // production
     sk.add({
       id: 'prod',
+      container: 'env',
       condition: (sidekick) => sidekick.config.host
         && sidekick.config.host !== sidekick.config.outerHost
         && (sidekick.isEditor() || sidekick.isProject()),
@@ -931,17 +959,25 @@
             }
             sk.switchEnv('preview', newTab(evt));
           };
-          if (status.edit.sourceLocation?.startsWith('gdrive:')
-              && status.edit.contentType !== 'application/vnd.google-apps.document'
-              && status.edit.contentType !== 'application/vnd.google-apps.spreadsheet') {
+          if (status.edit && status.edit.sourceLocation
+            && status.edit.sourceLocation.startsWith('onedrive:')) {
+            // show ctrl/cmd + s hint on onedrive docs
+            const mac = navigator.platform.toLowerCase().includes('mac') ? '-mac' : '';
+            sk.showModal({
+              css: `modal-preview-onedrive${mac}`,
+            });
+          } else if (status.edit.sourceLocation?.startsWith('gdrive:')
+            && status.edit.contentType !== 'application/vnd.google-apps.document'
+            && status.edit.contentType !== 'application/vnd.google-apps.spreadsheet') {
             sk.showModal({
               css: 'modal-preview-not-gdoc',
               sticky: true,
               level: 0,
             });
             return;
+          } else {
+            sk.showWait();
           }
-          sk.showWait();
           updatePreview();
         },
         isEnabled: (sidekick) => sidekick.isAuthorized('preview', 'write')
@@ -961,8 +997,17 @@
       condition: (s) => s.config.innerHost && (s.isInner() || s.isDev()),
       button: {
         action: async (evt) => {
-          const { location } = sk;
-          sk.showWait();
+          const { status, location } = sk;
+          if (status.edit && status.edit.sourceLocation
+            && status.edit.sourceLocation.startsWith('onedrive:')) {
+            // show ctrl/cmd + s hint on onedrive docs
+            const mac = navigator.platform.toLowerCase().includes('mac') ? '-mac' : '';
+            sk.showModal({
+              css: `modal-reload-onedrive${mac}`,
+            });
+          } else {
+            sk.showWait();
+          }
           try {
             const resp = await sk.update();
             if (!resp.ok && resp.status >= 400) {
@@ -1128,6 +1173,162 @@
         },
       },
     });
+  }
+
+  /**
+   * Adds custom plugins to the sidekick.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function addCustomPlugins(sk) {
+    const { location, config: { plugins, innerHost } = {} } = sk;
+    const language = navigator.language.split('-')[0];
+    if (plugins && Array.isArray(plugins)) {
+      plugins.forEach((cfg, i) => {
+        if (typeof (cfg.button && cfg.button.action) === 'function'
+          || typeof cfg.condition === 'function') {
+          // add legacy plugin
+          sk.add(cfg);
+        } else {
+          const {
+            id,
+            title,
+            titleI18n,
+            url,
+            passReferrer,
+            isPalette,
+            paletteRect,
+            event: eventName,
+            environments,
+            excludePaths,
+            includePaths,
+            containerId,
+            isContainer,
+          } = cfg;
+          // check mandatory properties
+          let missingProperty = '';
+          if (!sk.get(id)) {
+            // plugin config not extending existing plugin
+            if (!title) {
+              missingProperty = 'title';
+            } else if (!(url || eventName || isContainer)) {
+              missingProperty = 'url, modalUrl, event, or isContainer';
+            }
+            if (missingProperty) {
+              console.log(`plugin config missing required property: ${missingProperty}`, cfg);
+              return;
+            }
+          }
+          // assemble plugin config
+          const plugin = {
+            id: id || `custom-plugin-${i}`,
+            condition: (s) => {
+              let excluded = false;
+              const pathSearchHash = location.href.replace(location.origin, '');
+              if (excludePaths && Array.isArray(excludePaths)
+                && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+                excluded = true;
+              }
+              if (includePaths && Array.isArray(includePaths)
+                && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+                excluded = false;
+              }
+              if (excluded) {
+                // excluding plugin
+                return false;
+              }
+              if (!environments || environments.includes('any')) {
+                return true;
+              }
+              const envChecks = {
+                dev: s.isDev,
+                edit: s.isEditor,
+                preview: s.isInner,
+                live: s.isOuter,
+                prod: s.isProd,
+              };
+              return environments.some((env) => envChecks[env] && envChecks[env].call(s));
+            },
+            button: {
+              text: (titleI18n && titleI18n[language]) || title,
+              action: () => {
+                if (url) {
+                  const target = url.startsWith('/') ? new URL(url, `https://${innerHost}/`) : new URL(url);
+                  if (passReferrer) {
+                    const { searchParams } = target;
+                    searchParams.append('referrer', location.href);
+                  }
+                  if (isPalette) {
+                    let palette = sk.shadowRoot.getElementById(`hlx-sk-palette-${id}`);
+                    const togglePalette = () => {
+                      const button = sk.get(id).querySelector('button');
+                      if (!palette.classList.contains('hlx-sk-hidden')) {
+                        palette.classList.add('hlx-sk-hidden');
+                        button.classList.remove('pressed');
+                      } else {
+                        palette.classList.remove('hlx-sk-hidden');
+                        button.classList.add('pressed');
+                      }
+                    };
+                    if (!palette) {
+                      // draw palette
+                      palette = appendTag(sk.root, {
+                        tag: 'div',
+                        attrs: {
+                          id: `hlx-sk-palette-${id}`,
+                          class: 'hlx-sk-palette hlx-sk-hidden',
+                          style: paletteRect || '',
+                        },
+                      });
+                      const titleBar = appendTag(palette, {
+                        tag: 'div',
+                        text: (titleI18n && titleI18n[language]) || title,
+                        attrs: {
+                          class: 'palette-title',
+                        },
+                      });
+                      appendTag(titleBar, {
+                        tag: 'button',
+                        attrs: {
+                          class: 'close',
+                        },
+                        lstnrs: {
+                          click: togglePalette,
+                        },
+                      });
+                      const container = appendTag(palette, {
+                        tag: 'div',
+                        attrs: {
+                          class: 'palette-content',
+                        },
+                      });
+                      appendTag(container, {
+                        tag: 'iframe',
+                        attrs: {
+                          src: target,
+                          allow: 'clipboard-write',
+                        },
+                      });
+                    }
+                    togglePalette();
+                  } else {
+                    // open url in new window
+                    window.open(target, `hlx-sk-${id || `custom-plugin-${i}`}`);
+                  }
+                } else if (eventName) {
+                  // fire custom event
+                  fireEvent(sk, `custom:${eventName}`);
+                }
+              },
+              isDropdown: isContainer,
+            },
+            container: containerId,
+          };
+          // add plugin
+          sk.add(plugin);
+        }
+      });
+    }
   }
 
   /**
@@ -1322,33 +1523,59 @@
         },
       });
       if (!sk.isAuthenticated()) {
-        // encourage login
-        sk.showModal({
-          css: 'modal-login',
-          message: [
-            '',
-            createTag({
-              tag: 'button',
-              lstnrs: {
-                click: () => login(sk),
-              },
-            }),
-          ],
-          sticky: true,
-        });
+        // // encourage login
+        toggle.click();
+        toggle.nextElementSibling.classList.add('highlight');
       }
     }
   }
 
   /**
-   * Adds the default and custom plugins to the sidekick, or checks existing
-   * plugins based on the status of the current resource.
+   * Registers a plugin for re-evaluation if it should be shown or hidden,
+   * and if its button should be enabled or disabled.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {Plugin} plugin The plugin configuration
+   * @param {HTMLElement} $plugin The plugin
+   * @returns {HTMLElement} The plugin or {@code null}
+   */
+  function registerPlugin(sk, plugin, $plugin) {
+    // re-evaluate plugin when status fetched
+    sk.addEventListener('statusfetched', () => {
+      if (typeof plugin.condition === 'function') {
+        if ($plugin && !plugin.condition(sk)) {
+          // plugin exists but condition now false
+          sk.remove(plugin.id);
+        } else if (!$plugin && plugin.condition(sk)) {
+          // plugin doesn't exist but condition now true
+          sk.add(plugin);
+        }
+      }
+      const isEnabled = plugin.button && plugin.button.isEnabled;
+      if (typeof isEnabled === 'function') {
+        const $button = $plugin && $plugin.querySelector(':scope button');
+        if ($button) {
+          if (isEnabled(sk)) {
+            // button enabled
+            $plugin.querySelector(':scope button').removeAttribute('disabled');
+          } else {
+            // button disabled
+            $plugin.querySelector(':scope button').setAttribute('disabled', '');
+          }
+        }
+      }
+    });
+    return $plugin || null;
+  }
+
+  /**
+   * Checks existing plugins based on the status of the current resource.
    * @private
    * @param {Sidekick} sk The sidekick
    */
   function checkPlugins(sk) {
     window.setTimeout(() => {
-      if (sk.pluginContainer.querySelectorAll(':scope > div > *').length === 0) {
+      if (!sk.pluginContainer.querySelector(':scope div.plugin')) {
         // add empty text
         sk.pluginContainer.classList.remove('loading');
         sk.checkPushDownContent();
@@ -1360,7 +1587,7 @@
   /**
    * Pushes down the page content to make room for the sidekick.
    * @private
-   * @see {@link sidekickConfig.noPushDown}
+   * @see {@link SidekickConfig.noPushDown}
    * @param {Sidekick} sk The sidekick
    * @param {number} skHeight The current height of the sidekick (optional)
    */
@@ -1556,7 +1783,7 @@
   class Sidekick extends HTMLElement {
     /**
      * Creates a new sidekick.
-     * @param {sidekickConfig} cfg The sidekick config
+     * @param {SidekickConfig} cfg The sidekick config
      */
     constructor(cfg) {
       super();
@@ -1569,33 +1796,6 @@
           class: 'hlx-sk hlx-sk-hidden',
         },
         lstnrs: {
-          contextloaded: () => {
-            // add default plugins
-            addEditPlugin(this);
-            addEnvPlugins(this);
-            addPreviewPlugin(this);
-            addReloadPlugin(this);
-            addDeletePlugin(this);
-            addPublishPlugin(this);
-            addUnpublishPlugin(this);
-            // add custom plugins
-            if (this.config.plugins && Array.isArray(this.config.plugins)) {
-              this.config.plugins.forEach((plugin) => this.add(plugin));
-            }
-          },
-          statusfetched: () => {
-            checkUserState(this);
-            checkPlugins(this);
-            checkLastModified(this);
-          },
-          shown: async () => {
-            await showSpecialView(this);
-            pushDownContent(this);
-          },
-          hidden: () => {
-            hideSpecialView(this);
-            revertPushDownContent(this);
-          },
           keydown: ({ altKey }) => {
             if (altKey) {
               // enable advanced mode
@@ -1609,6 +1809,30 @@
             }
           },
         },
+      });
+      this.addEventListener('contextloaded', () => {
+        // add default plugins
+        addEditPlugin(this);
+        addEnvPlugins(this);
+        addPreviewPlugin(this);
+        addReloadPlugin(this);
+        addDeletePlugin(this);
+        addPublishPlugin(this);
+        addUnpublishPlugin(this);
+        addCustomPlugins(this);
+      });
+      this.addEventListener('statusfetched', () => {
+        checkUserState(this);
+        checkPlugins(this);
+        checkLastModified(this);
+      });
+      this.addEventListener('shown', async () => {
+        await showSpecialView(this);
+        pushDownContent(this);
+      });
+      this.addEventListener('hidden', () => {
+        hideSpecialView(this);
+        revertPushDownContent(this);
       });
       this.status = {};
       this.plugins = [];
@@ -1669,9 +1893,8 @@
       this.loadCSS();
       checkForIssues(this);
 
-      // announce to the document that the sidekick is ready
-      document.dispatchEvent(new CustomEvent('sidekick-ready'));
-      document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
+      // collapse dropdowns when document is clicked
+      document.addEventListener('click', () => collapseDropdowns(this));
     }
 
     /**
@@ -1758,7 +1981,7 @@
 
     /**
      * Loads the sidekick configuration and retrieves the location of the current document.
-     * @param {sidekickConfig} cfg The sidekick config
+     * @param {SidekickConfig} cfg The sidekick config
      * @fires Sidekick#contextloaded
      * @returns {Sidekick} The sidekick
      */
@@ -1836,144 +2059,106 @@
 
     /**
      * Adds a plugin to the sidekick.
-     * @param {plugin} plugin The plugin configuration.
+     * @param {_plugin} plugin The plugin configuration.
      * @returns {HTMLElement} The plugin
      */
     add(plugin) {
-      if (typeof plugin === 'object') {
-        this.plugins.push(plugin);
-        plugin.isShown = typeof plugin.condition === 'undefined'
+      if (typeof plugin !== 'object') {
+        return null;
+      }
+      // determine if plugin can be shown
+      plugin.isShown = typeof plugin.condition === 'undefined'
           || (typeof plugin.condition === 'function' && plugin.condition(this));
-        // find existing plugin
-        let $plugin = this.get(plugin.id);
-        let $pluginContainer = (plugin.container
-          && this.root
-            .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
-          || this.pluginContainer;
-        if (ENVS[plugin.id]) {
-          // find or create environment plugin container
-          $pluginContainer = this.root.querySelector(':scope .env .dropdown-container');
-          if (!$pluginContainer) {
-            const $envDropdown = appendTag(
-              this.featureContainer,
-              createDropdown(this, {
-                id: 'env',
-              }),
-              this.featureContainer.firstElementChild,
-            );
-            if (this.isDev()) $envDropdown.classList.add('dev');
-            if (this.isInner()) $envDropdown.classList.add('preview');
-            if (this.isOuter()) $envDropdown.classList.add('live');
-            if (this.isProd()) $envDropdown.classList.add('prod');
-            $pluginContainer = $envDropdown.querySelector(':scope .dropdown-container');
-          }
-        }
-        // re-check plugin once status is fetched
-        this.addEventListener('statusfetched', () => {
-          if (typeof plugin.condition === 'function') {
-            if ($plugin && !plugin.condition(this)) {
-              // plugin exists but condition now false
-              this.remove(plugin.id);
-            } else if (!$plugin && plugin.condition(this)) {
-              // plugin doesn't exist but condition now true
-              this.add(plugin);
-            }
-          }
-          const isEnabled = plugin.button && plugin.button.isEnabled;
-          if (typeof isEnabled === 'function' || typeof isEnabled === 'boolean') {
-            const $button = $plugin && $plugin.querySelector(':scope button');
-            if ($button) {
-              if (typeof isEnabled === 'function' && isEnabled(this)) {
-                // button enabled
-                $plugin.querySelector(':scope button').removeAttribute('disabled');
-              } else {
-                // button disabled
-                $plugin.querySelector(':scope button').setAttribute('disabled', '');
-              }
-            }
-          }
-        });
+      if (!plugin.isShown) {
+        return registerPlugin(this, plugin, null);
+      }
 
-        const pluginCfg = {
-          tag: 'div',
-          attrs: {
-            class: plugin.id,
+      // find existing plugin
+      let $plugin = this.get(plugin.id);
+      // determine container
+      const $pluginContainer = (plugin.container && this.root
+        .querySelector(`.dropdown.${plugin.container} .dropdown-container`))
+        || (plugin.feature && this.root.querySelector('.feature-container'))
+        || this.pluginContainer;
+
+      const getPluginCfg = (p) => ({
+        tag: 'div',
+        attrs: {
+          class: `${p.id} plugin`,
+        },
+      });
+
+      if (!$plugin) {
+        // add feature plugins in reverse order
+        const $before = !!plugin.feature && this.root.querySelector('.feature-container').firstElementChild;
+        if (plugin.button && plugin.button.isDropdown) {
+          // add plugin as dropdown
+          $plugin = appendTag($pluginContainer, createDropdown(this, plugin), $before);
+          if (typeof plugin.callback === 'function') {
+            plugin.callback(this, $plugin);
+          }
+          return $plugin;
+        }
+        // add plugin
+        $plugin = appendTag($pluginContainer, getPluginCfg(plugin), $before);
+        if ($pluginContainer === this.pluginContainer
+            && this.pluginContainer.classList.contains('loading')) {
+          // remove loading text
+          this.pluginContainer.classList.remove('loading');
+        }
+      } else if (!plugin.isShown) {
+        // remove existing plugin
+        $plugin.remove();
+        return null;
+      } else if (plugin.override) {
+        // replace existing plugin
+        const $existingPlugin = $plugin;
+        $plugin = appendTag($existingPlugin.parentElement, getPluginCfg(plugin), $existingPlugin);
+        $existingPlugin.remove();
+      }
+      // add elements
+      if (plugin.elements && Array.isArray(plugin.elements)) {
+        plugin.elements.forEach((elem) => appendTag($plugin, elem));
+      }
+      // add or update button
+      if (plugin.button) {
+        plugin.button.action = plugin.button.action || (() => {});
+        const buttonCfg = {
+          tag: 'button',
+          text: plugin.button.text,
+          lstnrs: {
+            click: (e) => plugin.button.action(e, this),
+            auxclick: (e) => plugin.button.action(e, this),
           },
         };
-        if (!$plugin && plugin.isShown) {
-          // add new plugin
-          if (plugin.button && plugin.button.isDropdown) {
-            // add dropdown
-            return appendTag($pluginContainer, createDropdown(this, plugin));
-          }
-          $plugin = appendTag($pluginContainer, pluginCfg);
-          if ($pluginContainer === this.pluginContainer
-              && this.pluginContainer.classList.contains('loading')) {
-            // remove loading text
-            this.pluginContainer.classList.remove('loading');
-          }
-        } else if ($plugin) {
-          if (!plugin.isShown) {
-            // remove existing plugin
-            $plugin.remove();
-          } else if (plugin.override) {
-            // replace existing plugin
-            const $existingPlugin = $plugin;
-            $plugin = appendTag($existingPlugin.parentElement, pluginCfg, $existingPlugin);
-            $existingPlugin.remove();
-          }
+        let $button = $plugin ? $plugin.querySelector(':scope button') : null;
+        if ($button) {
+          // extend existing button
+          extendTag($button, buttonCfg);
+        } else {
+          // add button
+          $button = appendTag($plugin, buttonCfg);
         }
-        if (!plugin.isShown) {
-          return null;
+        // check if button is enabled
+        if (typeof plugin.button.isEnabled === 'function' && !plugin.button.isEnabled(this)) {
+          $button.setAttribute('disabled', '');
         }
-        // add elements
-        if (Array.isArray(plugin.elements)) {
-          plugin.elements.forEach((elem) => appendTag($plugin, elem));
+        // check if button is pressed
+        if (typeof plugin.button.isPressed === 'function' && plugin.button.isPressed(this)) {
+          $button.classList.add('pressed');
+          $button.removeAttribute('tabindex');
         }
-        // add or update button
-        if (plugin.button) {
-          plugin.button.action = plugin.button.action || (() => {});
-          const buttonCfg = {
-            tag: 'button',
-            text: plugin.button.text,
-            lstnrs: {
-              click: (e) => plugin.button.action(e, this),
-              auxclick: (e) => plugin.button.action(e, this),
-            },
-          };
-          let $button = $plugin ? $plugin.querySelector(':scope button') : null;
-          if ($button) {
-            // extend existing button
-            extendTag($button, buttonCfg);
-          } else {
-            // add button
-            $button = appendTag($plugin, buttonCfg);
-          }
-          // check if button is enabled
-          if (typeof plugin.button.isEnabled === 'function' && !plugin.button.isEnabled(this)) {
-            $button.setAttribute('disabled', '');
-          }
-          // check if button is pressed
-          if (typeof plugin.button.isPressed === 'function' && plugin.button.isPressed(this)) {
-            $button.classList.add('pressed');
-            $button.removeAttribute('tabindex');
-          }
-          // fire event when plugin button is clicked
-          $button.addEventListener('click', () => fireEvent(this, 'pluginused', {
-            id: plugin.id,
-            button: $button,
-          }));
-        }
-        // check advanced mode
-        if (plugin.advanced && typeof plugin.advanced === 'function' && plugin.advanced(this)) {
-          $plugin.classList.add('hlx-sk-advanced-only');
-        }
-        if (typeof plugin.callback === 'function') {
-          plugin.callback(this, $plugin);
-        }
-        return $plugin;
+        // fire event when plugin button is clicked
+        $button.addEventListener('click', () => fireEvent(this, 'pluginused', {
+          id: plugin.id,
+          button: $button,
+        }));
       }
-      return null;
+      // check advanced mode
+      if (typeof plugin.advanced === 'function' && plugin.advanced(this)) {
+        $plugin.classList.add('hlx-sk-advanced-only');
+      }
+      return registerPlugin(this, plugin, $plugin);
     }
 
     /**
@@ -1982,7 +2167,7 @@
      * @returns {HTMLElement} The plugin
      */
     get(id) {
-      return this.root.querySelector(`:scope div:not(.env).${id}`);
+      return this.root.querySelector(`:scope div.plugin.${id}`);
     }
 
     /**
@@ -2106,7 +2291,7 @@
 
     /**
      * Displays a non-sticky notification.
-     * @deprecated Use {@link showModal} instead
+     * @deprecated Use <code>showModal(<Object>)</code> instead
      * @param {string|string[]} message The message (lines) to display
      * @param {number}          level error (0), warning (1), of info (2)
      */
@@ -2237,7 +2422,7 @@
 
     /**
      * Displays a balloon with help content.
-     * @param {helpTopic} topic The topic
+     * @param {HelpTopic} topic The topic
      * @param {number} step The step number to display (starting with 0)
      * @returns {Sidekick} The sidekick
      */
@@ -2489,11 +2674,13 @@
             ...getAdminFetchOptions(this.config),
           },
         );
-        if (this.isEditor() || this.isInner() || this.isDev()) {
-          // bust client cache
-          await fetch(`https://${config.innerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
+        if (resp.ok) {
+          if (this.isEditor() || this.isInner() || this.isDev()) {
+            // bust client cache
+            await fetch(`https://${config.innerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
+          }
+          fireEvent(this, 'updated', path);
         }
-        fireEvent(this, 'updated', path);
       } catch (e) {
         console.error('failed to update', path, e);
       }
@@ -2604,26 +2791,6 @@
       }
       return resp;
     }
-
-    /**
-     * Sets up a function that will be called whenever the specified sidekick
-     * event is fired.
-     * @param {string} type The event type
-     * @param {Function} listener The function to call
-     * @param {object} opts options
-     */
-    addEventListener(type, listener, opts) {
-      this.root.addEventListener(type, listener, opts);
-    }
-
-    /**
-     * Removes an event listener previously registered with {@link addEventListener}.
-     * @param {string} type The event type
-     * @param {Function} listener The function to remove
-     */
-    removeEventListener(name, listener) {
-      this.root.removeEventListener(name, listener);
-    }
   }
 
   /**
@@ -2632,7 +2799,7 @@
    * @type {Function}
    * @description Initializes the sidekick and stores a reference to it in
    *              {@link window.hlx.sidekick}.
-   * @param {sidekickConfig} cfg The sidekick configuration
+   * @param {SidekickConfig} cfg The sidekick configuration
    *        (extends {@link window.hlx.sidekickConfig})
    * @returns {Sidekick} The sidekick
    */
@@ -2651,6 +2818,10 @@
       window.hlx.sidekick = document.createElement('helix-sidekick');
       document.body.prepend(window.hlx.sidekick);
       window.hlx.sidekick.show();
+
+      // announce to the document that the sidekick is ready
+      document.dispatchEvent(new CustomEvent('sidekick-ready'));
+      document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
     } else {
       // toggle sidekick
       window.hlx.sidekick.toggle();
