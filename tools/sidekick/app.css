@@ -49,7 +49,6 @@
   --hlx-sk-modal-font-size: 1.25rem;
   --hlx-sk-special-view-button-color: rgba(0,0,0, 0.5);
   --hlx-sk-special-view-table-border: rgba(0,0,0, 0.5);
-  --hlx-sk-palette-title-bg: rgba(0 0 0 / 10%);
   --hlx-sk-user-bg: #c0c0c0;
 }
 
@@ -72,7 +71,6 @@
     --hlx-sk-modal-overlay-bg: rgba(127, 127, 127, 0.5);
     --hlx-sk-special-view-button-color: rgba(127, 127, 127, 0.8);
     --hlx-sk-special-view-table-border: rgba(127, 127, 127, 0.8);
-    --hlx-sk-palette-title-bg: rgba(127 127 127 / 20%);
     --hlx-sk-user-bg: #909090;
   }
 }
@@ -327,17 +325,14 @@
   transform: rotate(35deg);
 }
 
-.hlx-sk .feature-container .close,
-.hlx-sk-palette .close {
+.hlx-sk .feature-container .close {
   margin-right: 0;
   position: relative;
   display: block;
 }
 
 .hlx-sk .feature-container .close::after,
-.hlx-sk .feature-container .close::before,
-.hlx-sk-palette .close::after,
-.hlx-sk-palette .close::before {
+.hlx-sk .feature-container .close::before {
   content: "";
   font-size: 0;
   display: block;
@@ -350,8 +345,7 @@
   left: 5px;
 }
 
-.hlx-sk .feature-container .close::after,
-.hlx-sk-palette .close::after {
+.hlx-sk .feature-container .close::after {
   transform: rotate(-45deg);
 }
 
@@ -726,50 +720,6 @@
   text-decoration: underline;
 }
 
-.hlx-sk-palette {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  z-index: 9999999;
-  background-color: var(--hlx-sk-bg);
-  color: var(--hlx-sk-color);
-  box-sizing: border-box;
-  font-family: var(--hlx-sk-font-family);
-  font-size: var(--hlx-sk-font-size);
-  box-shadow: var(--hlx-sk-shadow);
-  border-top-left-radius: var(--hlx-sk-button-border-radius);
-  border-top-right-radius: var(--hlx-sk-button-border-radius);
-  width: 200px;
-  height: 500px;
-  top: 200px;
-  left: 20px;
-}
-
-.hlx-sk-palette .palette-title {
-  position: relative;
-  background-color: var(--hlx-sk-palette-title-bg);
-  border-top-left-radius: var(--hlx-sk-button-border-radius);
-  border-top-right-radius: var(--hlx-sk-button-border-radius);
-  padding: 10px;
-}
-
-.hlx-sk-palette .palette-title .close {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  border: none;
-}
-
-.hlx-sk-palette .palette-content {
-  flex-grow: 1;
-}
-
-.hlx-sk-palette .palette-content iframe {
-  border: none;
-  width: 100%;
-  height: 100%;
-}
-
 @media(max-width:600px) {
   .hlx-sk {
     background-image: none;
@@ -830,8 +780,7 @@
 }
 
 .hlx-sk .feature-container .close::before,
-.hlx-sk-overlay .help-close button::before,
-.hlx-sk-palette .close::before {
+.hlx-sk-overlay .help-close button::before {
   content: "Close";
 }
 
@@ -847,23 +796,23 @@
   content: "View";
 }
 
-.hlx-sk .env.is-dev .dropdown-toggle::before,
+.hlx-sk .env.dev .dropdown-toggle::before,
 .hlx-sk .env .dev button::before {
   content: "Development";
 }
 
-.hlx-sk .env.is-preview .dropdown-toggle::before,
+.hlx-sk .env.preview .dropdown-toggle::before,
 .hlx-sk .env .preview button::before,
 .hlx-sk .edit-preview button::before {
   content: "Preview";
 }
 
-.hlx-sk .env.is-live .dropdown-toggle::before,
+.hlx-sk .env.live .dropdown-toggle::before,
 .hlx-sk .env .live button::before {
   content: "Live";
 }
 
-.hlx-sk .env.is-prod .dropdown-toggle::before,
+.hlx-sk .env.prod .dropdown-toggle::before,
 .hlx-sk .env .prod button::before {
   content: "Production";
 }
@@ -948,22 +897,6 @@
 
 .hlx-sk-overlay .modal.modal-wait::before {
   content: "Please wait...";
-}
-
-.hlx-sk-overlay .modal.modal-preview-onedrive::before {
-  content: "Pro tip: Press Ctrl + S before previewing to see the latest changes immediately...";
-}
-
-.hlx-sk-overlay .modal.modal-preview-onedrive-mac::before {
-  content: "Pro tip: Press ⌘ + S before previewing to see the latest changes immediately...";
-}
-
-.hlx-sk-overlay .modal.modal-reload-onedrive::before {
-  content: "Pro tip: Press Ctrl + S in the editor before reloading a page...";
-}
-
-.hlx-sk-overlay .modal.modal-reload-onedrive-mac::before {
-  content: "Pro tip: Press ⌘ + S in the editor before reloading a page...";
 }
 
 .hlx-sk-overlay .modal.modal-share-success::before {
