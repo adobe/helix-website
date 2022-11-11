@@ -82,6 +82,10 @@
           "type": "url",
           "description": "The URL to open when the button is clicked"
         },
+        "passConfig": {
+          "type": "boolean",
+          "description": "Append ref, repo, owner, host, and project as query params on new URL button click"
+        },
         "passReferrer": {
           "type": "boolean",
           "description": "Append the referrer URL as a query param on new URL button click"

@@ -61,6 +61,8 @@
    * @prop {string} title The button text
    * @prop {Object} titleI18n={} A map of translated button texts
    * @prop {string} url The URL to open when the button is clicked
+   * @prop {boolean} passConfig Append additional sk info to the url as query parameters:
+   *                          ref, repo, owner, host, project
    * @prop {boolean} passReferrer Append the referrer URL as a query param on new URL button click
    * @prop {string} event The name of a custom event to fire when the button is clicked.
    *                      Note: Plugin events get a custom: prefix, e.g. "foo" becomes "custom:foo".
@@ -1195,6 +1197,7 @@
             title,
             titleI18n,
             url,
+            passConfig,
             passReferrer,
             isPalette,
             paletteRect,
@@ -1254,9 +1257,15 @@
               action: () => {
                 if (url) {
                   const target = url.startsWith('/') ? new URL(url, `https://${innerHost}/`) : new URL(url);
+                  if (passConfig) {
+                    target.searchParams.append('ref', sk.config.ref);
+                    target.searchParams.append('repo', sk.config.repo);
+                    target.searchParams.append('owner', sk.config.owner);
+                    if (sk.config.host) target.searchParams.append('host', sk.config.host);
+                    if (sk.config.project) target.searchParams.append('project', sk.config.project);
+                  }
                   if (passReferrer) {
-                    const { searchParams } = target;
-                    searchParams.append('referrer', location.href);
+                    target.searchParams.append('referrer', location.href);
                   }
                   if (isPalette) {
                     let palette = sk.shadowRoot.getElementById(`hlx-sk-palette-${id}`);
