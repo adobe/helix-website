@@ -1,0 +1,7 @@
+.table td {
+  color: #768390;
+}
+
+.table td:first-child {
+  color: inherit;
+}
