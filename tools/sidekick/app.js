@@ -24,6 +24,76 @@
     return window.hlx.initSidekick();
   }
 
+  /**
+   * Returns the share URL for the sidekick extension.
+   * @private
+   * @param {Object} config The sidekick configuration
+   * @returns {string} The share URL
+   */
+  function getShareUrl(config) {
+    const { owner, repo, ref } = config;
+    const shareUrl = new URL('https://www.hlx.live/tools/sidekick/');
+    shareUrl.search = new URLSearchParams([
+      ['giturl', `https://github.com/${owner}/${repo}/tree/${ref}`],
+    ]).toString();
+    return shareUrl.toString();
+  }
+
+  /**
+   * Informs the bookmarklet user about the sidekick extension.
+   * @private
+   * @param {Object} hint The hint details
+   * @param {string[]} hint.browsers The supported browsers
+   * @param {string} hint.message The message
+   * @param {string} hint.installUrl The URL to open when the install button is clicked
+   * @param {string} hint.installButtonText The text on the install button
+   * @param {string} hint.laterButtonText The text on the later button
+   */
+  function showExtensionHint({
+    browsers,
+    message,
+    installUrl,
+    installButtonText,
+    laterButtonText,
+  }) {
+    const browser = browsers.find((b) => navigator.userAgent.includes(b));
+    if (!browser) {
+      return;
+    }
+    const EXT_HINT = 'hlxSidekickExtensionHint';
+    // respect user choice
+    const userChoice = window.localStorage.getItem(EXT_HINT);
+    if (userChoice && userChoice * 1 > Date.now()) {
+      return;
+    }
+    // show extension hint
+    window.hlx.sidekick.showHelp({
+      id: EXT_HINT,
+      steps: [{
+        message: message.replace('{{browser}}', browser),
+      }],
+    });
+    const laterHandler = () => window.localStorage
+      .setItem(EXT_HINT, Date.now() + 259200000 /* +3 days */);
+    const ackHandler = () => window.localStorage
+      .setItem(EXT_HINT, Date.now() + 31536000000 /* +1 year */);
+    const installButton = document.createElement('button');
+    installButton.textContent = installButtonText;
+    installButton.addEventListener('click', () => {
+      window.open(installUrl);
+      ackHandler();
+    });
+    const laterButton = document.createElement('button');
+    laterButton.textContent = laterButtonText;
+    laterButton.addEventListener('click', laterHandler);
+
+    const helpActions = window.hlx.sidekick.shadowRoot.querySelector('.hlx-sk-overlay .modal .help-actions');
+    helpActions.prepend(laterButton);
+    helpActions.prepend(installButton);
+    installButton.focus();
+    window.hlx.sidekick.addEventListener('helpacknowledged', ackHandler);
+  }
+
   if (!window.hlx || !window.hlx.sidekick) {
     window.hlx = window.hlx || {};
     const appScript = document.getElementById('hlx-sk-app');
@@ -71,6 +141,14 @@
           // apply base config
           Object.assign(window.hlx.sidekickConfig, baseConfig);
           window.hlx.initSidekick();
+
+          showExtensionHint({
+            browsers: ['Chrome'],
+            message: 'Did you know that the Sidekick is also available as a {{browser}} extension?',
+            installUrl: getShareUrl(baseConfig),
+            installButtonText: 'Show me now',
+            laterButtonText: 'Remind me later',
+          });
         }
       }
     });
