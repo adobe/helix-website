@@ -1208,14 +1208,47 @@
             containerId,
             isContainer,
           } = cfg;
-          // check mandatory properties
-          let missingProperty = '';
-          if (!sk.get(id)) {
+          const condition = (s) => {
+            let excluded = false;
+            const pathSearchHash = location.href.replace(location.origin, '');
+            if (excludePaths && Array.isArray(excludePaths)
+              && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+              excluded = true;
+            }
+            if (includePaths && Array.isArray(includePaths)
+              && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+              excluded = false;
+            }
+            if (excluded) {
+              // excluding plugin
+              return false;
+            }
+            if (!environments || environments.includes('any')) {
+              return true;
+            }
+            const envChecks = {
+              dev: s.isDev,
+              edit: s.isEditor,
+              preview: s.isInner,
+              live: s.isOuter,
+              prod: s.isProd,
+            };
+            return environments.some((env) => envChecks[env] && envChecks[env].call(s));
+          };
+          const existingPlugin = sk.get(id);
+          if (existingPlugin) {
+            // extend existing plugin
+            if (!condition(sk)) {
+              sk.remove(id);
+            }
+          } else {
+            // check mandatory properties
+            let missingProperty = '';
             // plugin config not extending existing plugin
             if (!title) {
               missingProperty = 'title';
             } else if (!(url || eventName || isContainer)) {
-              missingProperty = 'url, modalUrl, event, or isContainer';
+              missingProperty = 'url, event, or isContainer';
             }
             if (missingProperty) {
               console.log(`plugin config missing required property: ${missingProperty}`, cfg);
@@ -1225,33 +1258,7 @@
           // assemble plugin config
           const plugin = {
             id: id || `custom-plugin-${i}`,
-            condition: (s) => {
-              let excluded = false;
-              const pathSearchHash = location.href.replace(location.origin, '');
-              if (excludePaths && Array.isArray(excludePaths)
-                && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
-                excluded = true;
-              }
-              if (includePaths && Array.isArray(includePaths)
-                && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
-                excluded = false;
-              }
-              if (excluded) {
-                // excluding plugin
-                return false;
-              }
-              if (!environments || environments.includes('any')) {
-                return true;
-              }
-              const envChecks = {
-                dev: s.isDev,
-                edit: s.isEditor,
-                preview: s.isInner,
-                live: s.isOuter,
-                prod: s.isProd,
-              };
-              return environments.some((env) => envChecks[env] && envChecks[env].call(s));
-            },
+            condition,
             button: {
               text: (titleI18n && titleI18n[language]) || title,
               action: () => {
