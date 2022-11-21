@@ -1436,10 +1436,15 @@
       ...getAdminFetchOptions(sk.config),
     })
       .then(() => {
-        fireEvent(sk, 'loggedout');
-        window.location.reload();
+        delete sk.config.authToken;
+        sk.status = {
+          loggedOut: true,
+        };
       })
-      .catch(() => {
+      .then(() => fireEvent(sk, 'loggedout'))
+      .then(() => sk.fetchStatus())
+      .catch((e) => {
+        console.error('logout failed', e);
         sk.showModal({
           css: 'modal-logout-error',
           level: 0,
@@ -1455,11 +1460,7 @@
   function checkUserState(sk) {
     const toggle = sk.get('user').firstElementChild;
     toggle.removeAttribute('disabled');
-    const { profile } = sk.status;
-    if (profile) {
-      const { name, email, picture } = profile;
-      toggle.title = name;
-      // user picture
+    const updateUserPicture = (picture) => {
       toggle.querySelectorAll('.user-picture').forEach((img) => img.remove());
       if (picture) {
         toggle.querySelector('.user-icon').classList.add('user-icon-hidden');
@@ -1473,6 +1474,12 @@
       } else {
         toggle.querySelector('.user-icon').classList.remove('user-icon-hidden');
       }
+    };
+    const { profile } = sk.status;
+    if (profile) {
+      const { name, email, picture } = profile;
+      toggle.title = name;
+      updateUserPicture(picture);
       const info = sk.get('user-info');
       if (!info) {
         sk.add({
@@ -1529,16 +1536,19 @@
         },
       });
     } else {
-      // login
-      sk.add({
-        container: 'user',
-        id: 'user-login',
-        condition: (sidekick) => !sidekick.status.profile || !sidekick.isAuthenticated(),
-        button: {
-          action: () => login(sk),
-        },
-      });
-      if (!sk.isAuthenticated()) {
+      updateUserPicture();
+      if (!sk.get('user-login')) {
+        // login
+        sk.add({
+          container: 'user',
+          id: 'user-login',
+          condition: (sidekick) => !sidekick.status.profile || !sidekick.isAuthenticated(),
+          button: {
+            action: () => login(sk),
+          },
+        });
+      }
+      if (!sk.status.loggedOut && !sk.isAuthenticated()) {
         // // encourage login
         toggle.click();
         toggle.nextElementSibling.classList.add('highlight');
@@ -1836,7 +1846,7 @@
         addPublishPlugin(this);
         addUnpublishPlugin(this);
         addCustomPlugins(this);
-      });
+      }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
         checkPlugins(this);
