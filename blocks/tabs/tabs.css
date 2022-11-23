@@ -19,7 +19,7 @@
     --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
   }
   
-  .tabs {
+  .tabs[data-block-status="loaded"] {
     position: relative;
     margin: 10px 0 0;
     color: var(--tabs-active-text-color);
