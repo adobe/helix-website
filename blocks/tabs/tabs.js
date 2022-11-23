@@ -37,7 +37,14 @@ function changeTabs(e) {
     .removeAttribute('hidden');
 }
 
+function showHideFooter(prop){
+  window.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('footer-wrapper').style.display = prop;
+});
+}
+
 function initTabs(e) {
+  showHideFooter('none');
   const tabs = e.querySelectorAll('[role="tab"]');
   const tabLists = e.querySelectorAll('[role="tablist"]');
   tabLists.forEach((tabList) => {
@@ -59,6 +66,7 @@ function initTabs(e) {
       }
     });
   });
+  showHideFooter('block');
   tabs.forEach((tab) => {
     tab.addEventListener('click', changeTabs);
   });
