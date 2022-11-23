@@ -44,7 +44,7 @@ function showHideFooter(prop){
 }
 
 function initTabs(e) {
-  showHideFooter('none');
+ // showHideFooter('none');
   const tabs = e.querySelectorAll('[role="tab"]');
   const tabLists = e.querySelectorAll('[role="tablist"]');
   tabLists.forEach((tabList) => {
@@ -66,7 +66,7 @@ function initTabs(e) {
       }
     });
   });
-  showHideFooter('block');
+ // showHideFooter('block');
   tabs.forEach((tab) => {
     tab.addEventListener('click', changeTabs);
   });
