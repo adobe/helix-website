@@ -79,6 +79,12 @@ export function loadCSS(href, callback) {
   }
 }
 
+/**
+ * Helper function to create DOM elements
+ * @param {string} tag DOM element to be created
+ * @param {array} attributes attributes to be added
+ */
+
 export function createTag(tag, attributes, html) {
   const el = document.createElement(tag);
   if (html) {
