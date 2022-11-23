@@ -80,6 +80,29 @@ export function loadCSS(href, callback) {
 }
 
 /**
+ * Helper function to create DOM elements
+ * @param {string} tag DOM element to be created
+ * @param {array} attributes attributes to be added
+ */
+
+export function createTag(tag, attributes, html) {
+  const el = document.createElement(tag);
+  if (html) {
+    if (html instanceof HTMLElement || html instanceof SVGElement) {
+      el.append(html);
+    } else {
+      el.insertAdjacentHTML('beforeend', html);
+    }
+  }
+  if (attributes) {
+    Object.entries(attributes).forEach(([key, val]) => {
+      el.setAttribute(key, val);
+    });
+  }
+  return el;
+}
+
+/**
  * Retrieves the content of a metadata tag.
  * @param {string} name The metadata name (or property)
  * @returns {string} The metadata value
@@ -481,7 +504,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['marquee', 'columns']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['marquee', 'columns', 'tabs']; // add your LCP blocks to the list
 const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
 const ICON_ROOT = '/img';
 
