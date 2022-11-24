@@ -999,7 +999,7 @@
       condition: (s) => s.config.innerHost && (s.isInner() || s.isDev()),
       button: {
         action: async (evt) => {
-          const { status, location } = sk;
+          const { status } = sk;
           if (status.edit && status.edit.sourceLocation
             && status.edit.sourceLocation.startsWith('onedrive:')) {
             // show ctrl/cmd + s hint on onedrive docs
@@ -1016,7 +1016,7 @@
               console.error(resp);
               throw new Error(resp);
             }
-            console.log(`reloading ${location.href}`);
+            console.log(`reloading ${window.location.href}`);
             if (newTab(evt)) {
               window.open(window.location.href);
               sk.hideModal();
@@ -1460,9 +1460,18 @@
   function checkUserState(sk) {
     const toggle = sk.get('user').firstElementChild;
     toggle.removeAttribute('disabled');
-    const updateUserPicture = (picture) => {
+    const updateUserPicture = async (picture) => {
       toggle.querySelectorAll('.user-picture').forEach((img) => img.remove());
       if (picture) {
+        if (picture.startsWith('https://admin.hlx.page/')) {
+          // fetch the image with auth token
+          const resp = await fetch(picture, {
+            headers: {
+              'x-auth-token': sk.config.authToken,
+            },
+          });
+          picture = URL.createObjectURL(await resp.blob());
+        }
         toggle.querySelector('.user-icon').classList.add('user-icon-hidden');
         appendTag(toggle, {
           tag: 'img',
@@ -2778,10 +2787,14 @@
         );
         // bust client cache for live and production
         if (config.outerHost) {
-          await fetch(`https://${config.outerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
+          // reuse purgeURL to ensure page relative paths (e.g. when publishing dependencies)
+          purgeURL.hostname = config.outerHost;
+          await fetch(purgeURL.href, { cache: 'reload', mode: 'no-cors' });
         }
         if (config.host) {
-          await fetch(`https://${config.host}${path}`, { cache: 'reload', mode: 'no-cors' });
+          // reuse purgeURL to ensure page relative paths (e.g. when publishing dependencies)
+          purgeURL.hostname = config.host;
+          await fetch(purgeURL.href, { cache: 'reload', mode: 'no-cors' });
         }
         fireEvent(this, 'published', path);
       } catch (e) {
