@@ -1,4 +1,4 @@
-footer {
+footer[data-block-status="loaded"] {
   display: none;
   padding: 2rem;
   font-size: var(--type-body-s-size);
