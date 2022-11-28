@@ -137,4 +137,13 @@ const init = (e) => {
   initTabs(e);
   initCount += 1;
 };
-export default init;
+
+export default function decorate(block) {
+  const observer = new IntersectionObserver(async (entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      observer.disconnect();
+      init(block);
+    }
+  }, { threshold: 0 });
+  observer.observe(block);
+}
