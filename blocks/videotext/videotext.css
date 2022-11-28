@@ -10,11 +10,15 @@
     grid-template-columns: 70% 30%;
     padding-top: 10px;
   }
+  
+  .videocontent video {   
+    min-height: 300px;
+  }
 }
 
 .videocontent video {
   width: 100%;
-  min-height: 300px;
+  min-height: 140px;
 }
 
 .videotext .text {
