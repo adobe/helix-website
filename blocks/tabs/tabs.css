@@ -24,6 +24,7 @@
     margin: 10px 0 0;
     color: var(--tabs-active-text-color);
     background-color: var(--tabs-bg-color);
+    min-height: 400px;
   }
   
   .tabs.xxl-spacing {
