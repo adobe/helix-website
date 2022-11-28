@@ -46,7 +46,7 @@
     padding: var(--spacing-xs) 0;
   }
   
-  .tabs [data-block-status="loaded"] div[role="tablist"] {
+  .tabs[data-block-status="loaded"] div[role="tablist"] {
     position: relative;
     display: flex;
     z-index: 2;
