@@ -20,10 +20,10 @@
   }
   
   .section .tabs-section {
-    min-height:400px;
+    min-height:800px;
   }
   
-  .section .tabs-section[data-block-status="loaded"] {
+  .section .tabs-section[data-section-status="loaded"] {
     min-height: unset;
   }
   
