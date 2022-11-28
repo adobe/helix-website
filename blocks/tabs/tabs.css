@@ -19,12 +19,17 @@
     --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
   }
   
+  .tabs {
+    min-height:400px;
+  }
+  
+
   .tabs[data-block-status="loaded"] {
     position: relative;
     margin: 10px 0 0;
     color: var(--tabs-active-text-color);
     background-color: var(--tabs-bg-color);
-    min-height: 400px;
+    min-height: unset;
   }
   
   .tabs.xxl-spacing {
