@@ -19,11 +19,11 @@
     --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
   }
   
-  .section .tabs-section {
+  .section.tabs-section {
     min-height:800px;
   }
   
-  .section .tabs-section[data-section-status="loaded"] {
+  .section.tabs-section[data-section-status="loaded"] {
     min-height: unset;
   }
   
