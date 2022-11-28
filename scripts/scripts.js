@@ -504,7 +504,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['marquee', 'columns']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['marquee', 'columns', 'tabs']; // add your LCP blocks to the list
 const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
 const ICON_ROOT = '/img';
 
