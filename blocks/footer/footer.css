@@ -17,6 +17,6 @@ footer .footer a:any-link {
   color: currentcolor;
 }
 
-footer[data-block-status="loaded"].appear {
+footer.appear[data-block-status="loaded"] {
   display: block;
 }
