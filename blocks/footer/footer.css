@@ -1,4 +1,4 @@
-footer[data-block-status="loaded"] {
+footer {
   display: none;
   padding: 2rem;
   font-size: var(--type-body-s-size);
@@ -17,6 +17,6 @@ footer .footer a:any-link {
   color: currentcolor;
 }
 
-footer.appear {
+footer[data-block-status="loaded"] .appear {
   display: block;
 }
