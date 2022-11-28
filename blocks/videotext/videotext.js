@@ -1,4 +1,4 @@
-export default function decorate(block) {
+export default async function decorate(block) {
   [...block.children].forEach((row) => {
     const videoEl = [...row.children][0];
     videoEl.classList.add('videocontent');
