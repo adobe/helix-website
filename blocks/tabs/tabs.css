@@ -19,8 +19,12 @@
     --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
   }
   
-  .tabs {
-    min-height: 800px;
+  .section .tabs-section {
+    min-height:400px;
+  }
+  
+  .section .tabs-section[data-block-status="loaded"] {
+    min-height: unset;
   }
   
 
