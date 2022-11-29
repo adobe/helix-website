@@ -12,7 +12,7 @@ export default async function decorateFaq($block) {
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
     const $a = document.createElement('a');
-    $a.id = `q${(i + 1)}`;
+    $a.id = row.Id || `q${(i + 1)}`;
     $dt.innerText = row.Question;
     const $dd = document.createElement('dd');
     const answer = autoLink(row.Answer);

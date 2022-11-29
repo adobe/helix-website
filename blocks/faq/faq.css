@@ -2,3 +2,7 @@ main .faq dt {
     margin-top: 64px;
     font-weight: 700;
 }
+
+main .faq a {
+    scroll-margin: calc(var(--nav-height) + 1em);
+}
