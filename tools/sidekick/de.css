@@ -174,8 +174,16 @@
   content: "Vorschau-Generierung fehlgeschlagen. Bitte versuche es später noch einmal.";
 }
 
-.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-generic::before {
   content: "Vorschau-Generierung fehlgeschlagen. Muss ein Google-Dokument oder eine Tabelle sein.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-ms-doc::before {
+  content: "Dies ist ein Microsoft Word-Dokument. Bitte in Google-Dokument umwandeln: Datei > Als Google-Dokument speichern";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gsheet-ms-excel::before {
+  content: "Dies ist ein Microsoft Excel-Dokument. Bitte in Google-Tabelle umwandeln: Datei > Als Google-Tabelle speichern";
 }
 
 .hlx-sk-overlay .modal.modal-reload-failure::before {

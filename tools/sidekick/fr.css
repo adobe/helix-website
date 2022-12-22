@@ -174,8 +174,16 @@
   content: "La génération de l'aperçu a échoué. Veuillez essayer plus tard.";
 }
 
-.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-generic::before {
   content: "La génération de l'aperçu a échoué. Doit être un document Google ou une feuille de calcul.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-ms-doc::before {
+  content: "Ce document est un fichier Microsoft Word, vous devez le convertir en document Google Doc: Fichier > Enregistrer comme Google Docs";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gsheet-ms-excel::before {
+  content: "Ce document est un fichier Microsoft Excel, vous devez le convertir en document Google Sheets: Fichier > Enregistrer comme Google Sheets";
 }
 
 .hlx-sk-overlay .modal.modal-reload-failure::before {

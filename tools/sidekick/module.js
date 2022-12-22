@@ -968,15 +968,30 @@
             sk.showModal({
               css: `modal-preview-onedrive${mac}`,
             });
-          } else if (status.edit.sourceLocation?.startsWith('gdrive:')
-            && status.edit.contentType !== 'application/vnd.google-apps.document'
-            && status.edit.contentType !== 'application/vnd.google-apps.spreadsheet') {
-            sk.showModal({
-              css: 'modal-preview-not-gdoc',
-              sticky: true,
-              level: 0,
-            });
-            return;
+          } else if (status.edit.sourceLocation?.startsWith('gdrive:')) {
+            const { contentType } = status.edit;
+
+            const isGoogleDocMime = contentType === 'application/vnd.google-apps.document';
+            const isGoogleSheetMime = contentType === 'application/vnd.google-apps.spreadsheet';
+            const neitherGdocOrGSheet = !isGoogleDocMime || !isGoogleSheetMime;
+
+            if (neitherGdocOrGSheet) {
+              const isMsDocMime = contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+              const isMsExcelSheet = contentType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+              let css = 'modal-preview-not-gdoc-generic'; // show generic message by default
+              if (isMsDocMime) {
+                css = 'modal-preview-not-gdoc-ms-word';
+              } else if (isMsExcelSheet) {
+                css = 'modal-preview-not-gsheet-ms-excel';
+              }
+              sk.showModal({
+                css,
+                sticky: true,
+                level: 0,
+              });
+
+              return;
+            }
           } else {
             sk.showWait();
           }

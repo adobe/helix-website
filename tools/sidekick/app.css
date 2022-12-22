@@ -982,8 +982,16 @@
   content: "Previewing failed. Please try again later.";
 }
 
-.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-generic::before {
   content: "Previewing failed. Must be Google document or spreadsheet.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-ms-word::before {
+  content: "This is a Microsoft Word document. Please convert it to Google Docs: File > Save as Google Docs";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gsheet-ms-excel::before {
+  content: "This is a Microsoft Excel document. Please convert it to Google Sheets: File > Save as Google Sheets'";
 }
 
 .hlx-sk-overlay .modal.modal-reload-failure::before {
