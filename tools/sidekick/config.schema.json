@@ -13,7 +13,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["any", "edit", "preview", "live", "prod"]
+            "enum": ["any", "admin", "edit", "preview", "live", "prod"]
           },
           "description": "The environments to display this plugin in",
           "default": "any"

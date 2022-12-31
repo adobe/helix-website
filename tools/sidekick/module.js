@@ -70,7 +70,8 @@
    * @prop {boolean} isContainer Determines whether to turn this plugin into a dropdown
    * @prop {boolean} isPalette Determines whether a URL is opened in a palette instead of a new tab
    * @prop {string} paletteRect The dimensions and position of a palette (optional)
-   * @prop {string[]} environments Specifies when to show this plugin (edit, preview, live, or prod)
+   * @prop {string[]} environments Specifies when to show this plugin
+   *                               (admin, edit, preview, live, prod)
    * @prop {string[]} excludePaths Exclude the plugin from these paths (glob patterns supported)
    * @prop {string[]} includePaths Include the plugin on these paths (glob patterns supported)
    */
@@ -439,6 +440,19 @@
   }
 
   /**
+   * Extracts an internationalized text from the CSS of a given element
+   * @private
+   * @param {HTMLElement} elem The HTML element
+   * @returns {string} The text
+   */
+  function getI18nText(elem) {
+    const text = window.getComputedStyle(elem, ':before').getPropertyValue('content');
+    return text !== 'normal' && text !== 'none'
+      ? text.substring(1, text.length - 1)
+      : '';
+  }
+
+  /**
    * Makes the given element accessible by setting a title attribute
    * based on its :before CSS style or text content, and enabling
    * keyboard access.
@@ -452,10 +466,7 @@
         if (!tag.title) {
           // wait for computed style to be available
           window.setTimeout(() => {
-            let title = window.getComputedStyle(tag, ':before').getPropertyValue('content');
-            title = title !== 'normal' && title !== 'none'
-              ? title.substring(1, title.length - 1)
-              : '';
+            let title = getI18nText(tag);
             if (!title) {
               title = tag.textContent;
             }
@@ -541,7 +552,7 @@
    * @returns {HTMLElement} The dropdown
    */
   function createDropdown(sk, config) {
-    const { id = '', button = {} } = config;
+    const { id = '', button = {}, lstnrs = {} } = config;
     const dropdown = createTag({
       tag: 'div',
       attrs: {
@@ -569,6 +580,9 @@
             container.style.marginLeft = `-${cWidth - tWidth}px`;
           }
           evt.stopPropagation();
+          if (lstnrs.click) {
+            lstnrs.click(evt);
+          }
         },
       },
     });
@@ -968,15 +982,30 @@
             sk.showModal({
               css: `modal-preview-onedrive${mac}`,
             });
-          } else if (status.edit.sourceLocation?.startsWith('gdrive:')
-            && status.edit.contentType !== 'application/vnd.google-apps.document'
-            && status.edit.contentType !== 'application/vnd.google-apps.spreadsheet') {
-            sk.showModal({
-              css: 'modal-preview-not-gdoc',
-              sticky: true,
-              level: 0,
-            });
-            return;
+          } else if (status.edit.sourceLocation?.startsWith('gdrive:')) {
+            const { contentType } = status.edit;
+
+            const isGoogleDocMime = contentType === 'application/vnd.google-apps.document';
+            const isGoogleSheetMime = contentType === 'application/vnd.google-apps.spreadsheet';
+            const neitherGdocOrGSheet = !isGoogleDocMime || !isGoogleSheetMime;
+
+            if (neitherGdocOrGSheet) {
+              const isMsDocMime = contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+              const isMsExcelSheet = contentType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+              let css = 'modal-preview-not-gdoc-generic'; // show generic message by default
+              if (isMsDocMime) {
+                css = 'modal-preview-not-gdoc-ms-word';
+              } else if (isMsExcelSheet) {
+                css = 'modal-preview-not-gsheet-ms-excel';
+              }
+              sk.showModal({
+                css,
+                sticky: true,
+                level: 0,
+              });
+
+              return;
+            }
           } else {
             sk.showWait();
           }
@@ -1175,6 +1204,342 @@
         },
       },
     });
+  }
+
+  /**
+   * Adds the bulk plugins to the sidekick.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function addBulkPlugins(sk) {
+    if (sk.isAdmin()) {
+      let bulkSelection = [];
+
+      const isSharePoint = (location) => location.host.match(/\w+\.sharepoint.com/)
+        && location.pathname.endsWith('/Forms/AllItems.aspx');
+
+      const toWebPath = (folder, name) => {
+        const nameParts = name.split('.');
+        const [file] = nameParts;
+        let [, ext] = nameParts;
+        if (isSharePoint(sk.location) && ['docx', 'xlsx'].includes(ext)) {
+          // omit docx and xlsx extension on sharepoint
+          ext = '';
+        }
+        return `${folder}/${file.toLowerCase().replace(/[^0-9a-z]/gi, '-')}${ext ? `.${ext}` : ''}`;
+      };
+
+      const getBulkSelection = () => {
+        const { location } = sk;
+        if (isSharePoint(location)) {
+          return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
+            .filter((row) => !row.querySelector('img').getAttribute('src').endsWith('folder.svg'))
+            .map((row) => ({
+              type: new URL(row.querySelector('img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
+              path: row.querySelector('button').textContent.trim(),
+            }));
+        } else {
+          // gdrive
+          return [...document.querySelectorAll('#drive_main_page [role="row"][aria-selected="true"]')]
+            .filter((row) => row.querySelector(':scope img'))
+            .map((row) => ({
+              type: new URL(row.querySelector('div > img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-2).join('/'),
+              path: row.querySelector(':scope > div > div:nth-of-type(2)').textContent.trim(),
+            }));
+        }
+      };
+
+      const updateBulkInfo = () => {
+        const sel = getBulkSelection(sk);
+        bulkSelection = sel;
+        const label = sk.root.querySelector('#hlx-sk-bulk-info');
+        label.textContent = '';
+        label.className = sel.length > 0 ? `selected-item${sel.length !== 1 ? 's' : ''}` : '';
+        if (sel.length > 1) {
+          label.textContent = getI18nText(label).replace('$1', sel.length);
+        }
+        // update buttons
+        ['preview', 'publish', 'copy-urls'].forEach((action) => {
+          sk.get(`bulk-${action}`).classList[sel.length === 0 ? 'add' : 'remove']('hlx-sk-hidden');
+        });
+        sk.get('bulk-copy-urls').classList[sel.length === 1 ? 'add' : 'remove']('single');
+      };
+
+      const getBulkText = ([num, total], type, action, mod) => {
+        let cls = `hlx-sk-bulk-${type}`;
+        if (num > 0) {
+          cls = `${cls}-${action}-item${(total || num) === 1 ? '' : 's'}${mod ? `-${mod}` : ''}`;
+        }
+        let placeholder = sk.get('bulk-info').querySelector(`.hlx-sk-placeholder.${cls}`);
+        if (!placeholder) {
+          placeholder = createTag({
+            tag: 'span',
+            attrs: {
+              class: `hlx-sk-placeholder ${cls}`,
+            },
+          });
+          sk.get('bulk-info').append(placeholder);
+        }
+        return getI18nText(placeholder)
+          .replace('$1', num)
+          .replace('$2', total);
+      };
+
+      const isChangedUrl = () => {
+        const $test = document.getElementById('sidekick_test_location');
+        if ($test) {
+          return $test.value !== sk.location.href;
+        }
+        return window.location.href !== sk.location.href;
+      };
+
+      sk.addEventListener('statusfetched', () => {
+        // bulk info
+        sk.add({
+          id: 'bulk-info',
+          condition: (sidekick) => sidekick.isAdmin(),
+          elements: [{
+            tag: 'span',
+            attrs: {
+              id: 'hlx-sk-bulk-info',
+              class: 'hlx-sk-label hlx-sk-placeholder',
+            },
+          }],
+          callback: () => {
+            let fetchingStatus = false;
+            window.setInterval(() => {
+              updateBulkInfo();
+              if (isChangedUrl() && !fetchingStatus) {
+                // url changed, refetch status
+                sk.addEventListener('statusfetched', () => {
+                  fetchingStatus = false;
+                }, { once: true });
+                sk.fetchStatus(true);
+                fetchingStatus = true;
+              }
+            }, 500);
+          },
+        });
+
+        // bulk preview
+        sk.add({
+          id: 'bulk-preview',
+          condition: (sidekick) => sidekick.isAdmin(),
+          button: {
+            action: async () => {
+              const confirmText = getBulkText([bulkSelection.length], 'confirm', 'preview');
+              if (bulkSelection.length === 0) {
+                sk.showModal(confirmText);
+              } else if (window.confirm(confirmText)) {
+                sk.showWait();
+                const { status } = sk;
+                const sel = bulkSelection.map((item) => toWebPath(status.webPath, item.path));
+                const results = [];
+                const total = sel.length;
+                const { processQueue } = await import('./lib/process-queue.js');
+                await processQueue(sel, async (file) => {
+                  results.push(await sk.update(file));
+                  if (total > 1) {
+                    sk.showModal(getBulkText([results.length, total], 'progress', 'preview'), true);
+                  }
+                }, 5);
+                const lines = [];
+                const ok = results.filter((res) => res.ok);
+                if (ok.length > 0) {
+                  lines.push(getBulkText([ok.length], 'result', 'preview', 'success'));
+                  lines.push(createTag({
+                    tag: 'button',
+                    attrs: {
+                      class: `hlx-sk-bulk-copy-url${ok.length > 1 ? 's' : ''}`,
+                    },
+                    lstnrs: {
+                      click: (evt) => {
+                        evt.stopPropagation();
+                        const { config } = sk;
+                        const host = config.innerHost;
+                        navigator.clipboard.writeText(ok.map((item) => `https://${host}${item.path}`)
+                          .join('\n'));
+                        sk.hideModal();
+                      },
+                    },
+                  }));
+                }
+                const failed = results.filter((res) => !res.ok);
+                if (failed.length > 0) {
+                  const failureText = getBulkText([failed.length], 'result', 'preview', 'failure');
+                  lines.push(failureText);
+                  lines.push(...failed.map((item) => {
+                    if (item.error.endsWith('docx with google not supported.')) {
+                      item.error = getBulkText([1], 'result', 'preview', 'error-no-docx');
+                    }
+                    if (item.error.endsWith('xlsx with google not supported.')) {
+                      item.error = getBulkText([1], 'result', 'preview', 'error-no-xlsx');
+                    }
+                    return `${item.path.split('/').pop()}: ${item.error}`;
+                  }));
+                }
+                lines.push(createTag({
+                  tag: 'button',
+                  attrs: {
+                    class: 'hlx-sk-bulk-close',
+                  },
+                }));
+                let level = 2;
+                if (failed.length > 0) {
+                  level = 1;
+                  if (ok.length === 0) {
+                    level = 0;
+                  }
+                }
+                sk.showModal(
+                  lines,
+                  true,
+                  level,
+                );
+              }
+            },
+            isEnabled: (s) => s.isAuthorized('preview', 'write') && s.status.webPath,
+          },
+        });
+
+        // bulk publish
+        sk.add({
+          id: 'bulk-publish',
+          condition: (sidekick) => sidekick.isAdmin(),
+          button: {
+            action: async () => {
+              const confirmText = getBulkText([bulkSelection.length], 'confirm', 'publish');
+              if (bulkSelection.length === 0) {
+                sk.showModal(confirmText);
+              } else if (window.confirm(confirmText)) {
+                sk.showWait();
+                const { status } = sk;
+                const sel = bulkSelection.map((item) => toWebPath(status.webPath, item.path));
+                const results = [];
+                const total = sel.length;
+                const { processQueue } = await import('./lib/process-queue.js');
+                await processQueue(sel, async (file) => {
+                  const resp = await sk.publish(file);
+                  results.push({
+                    ok: (resp.ok) || false,
+                    status: (resp.status) || 0,
+                    error: (resp.headers && resp.headers.get('x-error')) || '',
+                    path: (resp.ok && resp.json && (await resp.json()).webPath) || file,
+                  });
+                  if (total > 1) {
+                    sk.showModal(getBulkText([results.length, total], 'progress', 'publish'), true);
+                  }
+                }, 40);
+                const lines = [];
+                const ok = results.filter((res) => res.ok);
+                if (ok.length > 0) {
+                  lines.push(getBulkText([ok.length], 'result', 'publish', 'success'));
+                  lines.push(createTag({
+                    tag: 'button',
+                    attrs: {
+                      class: `hlx-sk-bulk-copy-url${ok.length > 1 ? 's' : ''}`,
+                    },
+                    lstnrs: {
+                      click: (evt) => {
+                        evt.stopPropagation();
+                        const { config } = sk;
+                        const host = config.host || config.outerHost;
+                        navigator.clipboard.writeText(ok.map((item) => `https://${host}${item.path}`)
+                          .join('\n'));
+                        sk.hideModal();
+                      },
+                    },
+                  }));
+                }
+                const failed = results.filter((res) => !res.ok);
+                if (failed.length > 0) {
+                  const failureText = getBulkText([failed.length], 'result', 'publish', 'failure');
+                  lines.push(failureText);
+                  lines.push(...failed.map((item) => {
+                    if (item.error.startsWith('source does not exist')) {
+                      item.error = getBulkText([1], 'result', 'publish', 'error-no-source');
+                    }
+                    return `${item.path.split('/').pop()}: ${item.error}`;
+                  }));
+                }
+                lines.push(createTag({
+                  tag: 'button',
+                  attrs: {
+                    class: 'hlx-sk-bulk-close',
+                  },
+                }));
+                let level = 2;
+                if (failed.length > 0) {
+                  level = 1;
+                  if (ok.length === 0) {
+                    level = 0;
+                  }
+                }
+                sk.showModal(
+                  lines,
+                  true,
+                  level,
+                );
+              }
+            },
+            isEnabled: (s) => s.isAuthorized('live', 'write') && s.status.webPath,
+          },
+        });
+
+        // bulk copy urls
+        sk.add({
+          id: 'bulk-copy-urls',
+          condition: (sidekick) => sidekick.isAdmin(),
+          button: {
+            isDropdown: true,
+          },
+        });
+        [{
+          env: 'preview',
+          hostProperty: 'innerHost',
+          condition: (sidekick) => sidekick.isAdmin(),
+        }, {
+          env: 'live',
+          hostProperty: 'outerHost',
+          condition: (sidekick) => sidekick.isAdmin(),
+          advanced: (sidekick) => !!sidekick.config.host,
+        }, {
+          env: 'prod',
+          hostProperty: 'host',
+          condition: (sidekick) => sidekick.isAdmin() && sidekick.config.host,
+        }].forEach(({
+          env,
+          hostProperty,
+          condition,
+          advanced = () => false,
+        }) => {
+          sk.add({
+            id: `bulk-copy-${env}-urls`,
+            container: 'bulk-copy-urls',
+            condition,
+            advanced,
+            button: {
+              action: async () => {
+                const emptyText = getBulkText([bulkSelection.length], 'confirm');
+                if (bulkSelection.length === 0) {
+                  sk.showModal(emptyText);
+                } else {
+                  sk.showWait();
+                  const { config, status } = sk;
+                  const urls = bulkSelection.map((item) => `https://${config[hostProperty]}${toWebPath(status.webPath, item.path)}`);
+                  navigator.clipboard.writeText(urls.join('\n'));
+                  sk.showModal({
+                    css: `bulk-copied-url${urls.length !== 1 ? 's' : ''}`,
+                  });
+                }
+              },
+            },
+          });
+        });
+
+        updateBulkInfo();
+      }, { once: true });
+    }
   }
 
   /**
@@ -1460,7 +1825,7 @@
   function checkUserState(sk) {
     const toggle = sk.get('user').firstElementChild;
     toggle.removeAttribute('disabled');
-    const updateUserPicture = async (picture) => {
+    const updateUserPicture = async (picture, name) => {
       toggle.querySelectorAll('.user-picture').forEach((img) => img.remove());
       if (picture) {
         if (picture.startsWith('https://admin.hlx.page/')) {
@@ -1478,17 +1843,20 @@
           attrs: {
             class: 'user-picture',
             src: picture,
+            title: name,
           },
         });
       } else {
+        toggle.querySelector('.user-picture')?.remove();
         toggle.querySelector('.user-icon').classList.remove('user-icon-hidden');
       }
     };
     const { profile } = sk.status;
     if (profile) {
       const { name, email, picture } = profile;
-      toggle.title = name;
-      updateUserPicture(picture);
+      updateUserPicture(picture, name);
+      sk.remove('user-login');
+
       const info = sk.get('user-info');
       if (!info) {
         sk.add({
@@ -1526,7 +1894,7 @@
         info.querySelector('.profile-name').textContent = name;
         info.querySelector('.profile-email').textContent = email;
       }
-      // logout
+      // switch user
       sk.add({
         container: 'user',
         id: 'user-switch',
@@ -1544,24 +1912,136 @@
           action: () => logout(sk),
         },
       });
+      // clean up on logout
+      sk.addEventListener('loggedout', () => {
+        sk.remove('user-info');
+        sk.remove('user-switch');
+        sk.remove('user-logout');
+      });
     } else {
       updateUserPicture();
-      if (!sk.get('user-login')) {
-        // login
-        sk.add({
-          container: 'user',
-          id: 'user-login',
-          condition: (sidekick) => !sidekick.status.profile || !sidekick.isAuthenticated(),
-          button: {
-            action: () => login(sk),
-          },
-        });
-      }
+      // login
+      sk.add({
+        container: 'user',
+        id: 'user-login',
+        condition: (sidekick) => !sidekick.status.profile || !sidekick.isAuthenticated(),
+        button: {
+          action: () => login(sk),
+        },
+      });
+      // clean up on login
+      sk.addEventListener('loggedin', () => {
+        sk.remove('user-login');
+      });
       if (!sk.status.loggedOut && !sk.isAuthenticated()) {
         // // encourage login
         toggle.click();
         toggle.nextElementSibling.classList.add('highlight');
       }
+    }
+  }
+
+  function getTimeAgo(dateParam) {
+    if (!dateParam) {
+      return '';
+    }
+    const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
+
+    const today = new Date();
+    const yesterday = new Date(today - 86400000); // 86400000 = ms in a day
+    const seconds = Math.round((today - date) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const isToday = today.toDateString() === date.toDateString();
+    const isYesterday = yesterday.toDateString() === date.toDateString();
+    const isThisYear = today.getFullYear() === date.getFullYear();
+
+    if (seconds < 30) {
+      return '<span class="now">';
+    } else if (seconds < 120) {
+      return `${seconds} <span class="seconds-ago">`;
+    } else if (minutes < 60) {
+      return `${minutes} <span class="minutes-ago">`;
+    } else if (isToday) {
+      return `<span class="today"> ${date.toLocaleTimeString([], { timeStyle: 'short' })}`;
+    } else if (isYesterday) {
+      return `<span class="yesterday"> ${date.toLocaleTimeString([], { timeStyle: 'short' })}`;
+    } else if (isThisYear) {
+      return date.toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+      });
+    }
+
+    return date.toLocaleString([], {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    });
+  }
+
+  function updateModifiedDates(sk) {
+    const infoPlugin = sk.get('info');
+    if (!infoPlugin) {
+      return;
+    }
+
+    const editEl = infoPlugin.querySelector('.edit-date');
+    const previewEl = infoPlugin.querySelector('.preview-date');
+    const publishEl = infoPlugin.querySelector('.publish-date');
+
+    const { status } = sk;
+    const editLastMod = (status.edit && status.edit.lastModified) || null;
+    const previewLastMod = (status.preview && status.preview.lastModified) || null;
+    const liveLastMod = (status.live && status.live.lastModified) || null;
+
+    editEl.innerHTML = getTimeAgo(editLastMod);
+    previewEl.innerHTML = getTimeAgo(previewLastMod);
+    publishEl.innerHTML = getTimeAgo(liveLastMod);
+  }
+
+  /**
+   * Checks info menu.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   */
+  function enableInfoBtn(sk) {
+    if (!sk.isAdmin()) {
+      const info = sk.get('page-info');
+      if (!info) {
+        const toggle = sk.get('info').firstElementChild;
+        toggle.removeAttribute('disabled');
+
+        sk.add({
+          id: 'page-info',
+          container: 'info',
+          condition: () => true,
+          elements: [
+            {
+              tag: 'div',
+              attrs: {
+                class: 'edit-date',
+              },
+            },
+            {
+              tag: 'div',
+              attrs: {
+                class: 'preview-date',
+              },
+            },
+            {
+              tag: 'div',
+              attrs: {
+                class: 'publish-date',
+              },
+            },
+          ],
+        });
+      }
+      updateModifiedDates(sk);
     }
   }
 
@@ -1600,6 +2080,9 @@
         }
       }
     });
+    if (typeof plugin.callback === 'function') {
+      plugin.callback(sk, $plugin);
+    }
     return $plugin || null;
   }
 
@@ -1630,7 +2113,7 @@
     const { config, location } = sk;
     if (config.pushDown
       && !sk.hasAttribute('pushdown')
-      && location.host !== 'docs.google.com') {
+      && !location.host.endsWith('.google.com')) {
       window.setTimeout(() => {
         if (!skHeight) {
           skHeight = parseFloat(window.getComputedStyle(sk.root).height, 10);
@@ -1664,7 +2147,7 @@
     const { config, location } = sk;
     if (config.pushDown
       && sk.hasAttribute('pushdown')
-      && location.host !== 'docs.google.com') {
+      && !location.host.endsWith('.google.com')) {
       sk.removeAttribute('pushdown');
       config.pushDownElements.forEach((elem) => {
         elem.style.marginTop = 'initial';
@@ -1855,11 +2338,13 @@
         addPublishPlugin(this);
         addUnpublishPlugin(this);
         addCustomPlugins(this);
+        addBulkPlugins(this);
       }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
         checkPlugins(this);
         checkLastModified(this);
+        enableInfoBtn(this);
       });
       this.addEventListener('shown', async () => {
         await showSpecialView(this);
@@ -1883,6 +2368,30 @@
           class: 'feature-container',
         },
       });
+      // info button
+      appendTag(
+        this.featureContainer,
+        createDropdown(this, {
+          id: 'info',
+          lstnrs: {
+            click: () => {
+              this.fetchStatus();
+              updateModifiedDates(this);
+            },
+          },
+          button: {
+            attrs: {
+              disabled: '',
+            },
+            elements: [{
+              tag: 'div',
+              attrs: {
+                class: 'info-icon',
+              },
+            }],
+          },
+        }),
+      );
       // user button
       this.userMenu = appendTag(
         this.featureContainer,
@@ -1935,21 +2444,25 @@
     /**
      * Fetches the status for the current resource.
      * @fires Sidekick#statusfetched
+     * @param {boolean} refreshLocation Refresh the sidekick's location (optional)
      * @returns {Sidekick} The sidekick
      */
-    async fetchStatus() {
+    async fetchStatus(refreshLocation) {
+      if (refreshLocation) {
+        this.location = getLocation();
+      }
       const { owner, repo, ref } = this.config;
       if (!owner || !repo || !ref) {
         return this;
       }
-      if (!this.status.apiUrl) {
+      if (!this.status.apiUrl || refreshLocation) {
         const { href, pathname } = this.location;
         const apiUrl = getAdminUrl(
           this.config,
           'status',
-          this.isEditor() ? '' : pathname,
+          (this.isEditor() || this.isAdmin()) ? '' : pathname,
         );
-        apiUrl.searchParams.append('editUrl', this.isEditor() ? href : 'auto');
+        apiUrl.searchParams.append('editUrl', (this.isEditor() || this.isAdmin()) ? href : 'auto');
         this.status.apiUrl = apiUrl.toString();
       }
       fetch(this.status.apiUrl, {
@@ -2224,9 +2737,20 @@
      */
     isEditor() {
       const { config, location } = this;
-      return /.*\.sharepoint\.com/.test(location.host)
+      return (/.*\.sharepoint\.com/.test(location.host) && location.pathname.endsWith('_layouts/15/Doc.aspx'))
         || location.host === 'docs.google.com'
-        || (config.mountpoint && new URL(config.mountpoint).host === location.host);
+        || (config.mountpoint && new URL(config.mountpoint).host === location.host
+          && !this.isAdmin());
+    }
+
+    /**
+     * Checks if the current location is an admin URL (SharePoint or Google Drive).
+     * @returns {boolean} <code>true</code> if admin URL, else <code>false</code>
+     */
+    isAdmin() {
+      const { location } = this;
+      return (location.host === 'drive.google.com')
+        || (location.host.match(/\w+\.sharepoint.com/) && location.pathname.endsWith('/Forms/AllItems.aspx'));
     }
 
     /**
@@ -2293,7 +2817,8 @@
     isContent() {
       const file = this.location.pathname.split('/').pop();
       const ext = file && file.split('.').pop();
-      return this.isEditor() || ext === file || ext === 'html' || ext === 'json' || ext === 'pdf';
+      return this.isEditor() || this.isAdmin() || ext === file || ext === 'html'
+        || ext === 'json' || ext === 'pdf';
     }
 
     /**
@@ -2696,10 +3221,11 @@
      * @fires Sidekick#updated
      * @returns {Response} The response object
      */
-    async update() {
+    async update(path) {
       const { config, status } = this;
-      const path = status.webPath;
+      path = path || status.webPath;
       let resp;
+      let respPath;
       try {
         // update preview
         resp = await fetch(
@@ -2714,7 +3240,8 @@
             // bust client cache
             await fetch(`https://${config.innerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
           }
-          fireEvent(this, 'updated', path);
+          respPath = (await resp.json()).webPath;
+          fireEvent(this, 'updated', respPath);
         }
       } catch (e) {
         console.error('failed to update', path, e);
@@ -2723,7 +3250,7 @@
         ok: (resp && resp.ok) || false,
         status: (resp && resp.status) || 0,
         error: (resp && resp.headers.get('x-error')) || '',
-        path,
+        path: respPath || path,
       };
     }
 
@@ -2798,7 +3325,7 @@
         }
         fireEvent(this, 'published', path);
       } catch (e) {
-        console.error('failed to unpublish', path, e);
+        console.error('failed to publish', path, e);
       }
       return resp;
     }

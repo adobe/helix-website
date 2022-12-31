@@ -38,7 +38,9 @@
   --hlx-sk-button-disabled-hover-bg: transparent;
   --hlx-sk-button-badge: #F15B3A;
   --hlx-sk-button-badge-hover: #FFC40E;
+  --hlx-sk-label-font-size: 14px;
   --hlx-sk-dropdown-container-bg: rgba(224, 224, 224, .9);
+  --hlx-sk-dropdown-container-bg-solid: rgb(224, 224, 224);
   --hlx-sk-modal-overlay-bg: rgba(0,0,0, 0.5);
   --hlx-sk-modal-bg-0: #e60016;
   --hlx-sk-modal-bg-1: #e67316;
@@ -69,6 +71,7 @@
     --hlx-sk-button-badge: #F15B3A;
     --hlx-sk-button-badge-hover: #C71F3D;
     --hlx-sk-dropdown-container-bg: rgba(48, 48, 48, .9);
+    --hlx-sk-dropdown-container-bg-solid: rgb(48, 48, 48);
     --hlx-sk-modal-overlay-bg: rgba(127, 127, 127, 0.5);
     --hlx-sk-special-view-button-color: rgba(127, 127, 127, 0.8);
     --hlx-sk-special-view-table-border: rgba(127, 127, 127, 0.8);
@@ -182,6 +185,12 @@
   line-height: 28px;
 }
 
+.hlx-sk .plugin span {
+  display: inline-block;
+  margin: 7px 8px 0 0;
+  font-size: var(--hlx-sk-label-font-size);
+}
+
 .hlx-sk .feature-container {
   display: flex;
   flex-direction: row;
@@ -191,6 +200,37 @@
 
 .hlx-sk .feature-container button {
   border-color: transparent;
+}
+
+.hlx-sk .feature-container .info {
+  line-height: normal;
+}
+
+.hlx-sk .feature-container .info > button::before {
+    display: none;
+}
+
+.hlx-sk .feature-container .info .dropdown-container {
+  width: 220px;
+  left: -85px;
+  background-color: var(--hlx-sk-dropdown-container-bg-solid);
+}
+
+.hlx-sk .feature-container .info .page-info {
+  position: relative;
+  font-size: 12px;
+  margin: 10px;
+  padding-left: 80px;
+}
+
+.hlx-sk .feature-container .info .page-info > div {
+  padding: 5px 0;
+}
+
+.hlx-sk .feature-container .info .page-info > div::before {
+  position: absolute;
+  font-weight: bold;
+  left: 2px;
 }
 
 .hlx-sk .feature-container .user .dropdown-toggle {
@@ -206,10 +246,15 @@
   line-height: 0;
 }
 
+.hlx-sk .feature-container .info .dropdown-toggle:disabled {
+  opacity: 0.4;
+}
+
 .hlx-sk .feature-container .user .dropdown-toggle:disabled {
   opacity: 0.8;
 }
 
+.hlx-sk .feature-container .info .dropdown-toggle::after,
 .hlx-sk .feature-container .user .dropdown-toggle::after {
   display: none;
 }
@@ -281,7 +326,7 @@
 }
 
 .hlx-sk .feature-container .user .user-info .profile-name {
-  font-weight: 600; 
+  font-weight: 600;
 }
 
 .hlx-sk .feature-container .share {
@@ -353,6 +398,36 @@
 .hlx-sk .feature-container .close::after,
 .hlx-sk-palette .close::after {
   transform: rotate(-45deg);
+}
+
+.hlx-sk .feature-container .info-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' height='18' viewBox='0 0 18 18' width='18'%3E%3Cdefs%3E%3Cstyle%3E .fill { fill: %23707070; } @media (prefers-color-scheme: dark) { .fill { fill: %23dedede; } } %3C/style%3E%3C/defs%3E%3Ctitle%3ES InfoOutline 18 N%3C/title%3E%3Crect id='Canvas' fill='%23fff' opacity='0' width='18' height='18' /%3E%3Cpath class='fill' d='M10.075,6A1.075,1.075,0,1,1,9,4.925H9A1.075,1.075,0,0,1,10.075,6Zm.09173,6H10V8.2A.20005.20005,0,0,0,9.8,8H7.83324S7.25,8.01612,7.25,8.5c0,.48365.58325.5.58325.5H8v3H7.83325s-.58325.01612-.58325.5c0,.48365.58325.5.58325.5h2.3335s.58325-.01635.58325-.5C10.75,12.01612,10.16673,12,10.16673,12ZM9,.5A8.5,8.5,0,1,0,17.5,9,8.5,8.5,0,0,0,9,.5ZM9,15.6748A6.67481,6.67481,0,1,1,15.67484,9,6.67481,6.67481,0,0,1,9,15.6748Z' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 20px;
+  background-position: 3px 3px;
+  border-radius: 5px;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  height: 28px;
+  width: 28px;
+  fill: var(--hlx-sk-button-color);
+}
+
+.hlx-sk .feature-container .info.plugin .dropdown-toggle:focus .info-icon,
+.hlx-sk .feature-container .info.plugin .dropdown-toggle:hover .info-icon {
+  filter: brightness(400%);
+}
+
+.hlx-sk .feature-container .modified-dates {
+  display: flex;
+  font-size: 12px;
+}
+
+.hlx-sk .feature-container .modified-dates > div {
+  line-height: normal;
+  margin: 0 10px;
+  white-space: pre;
 }
 
 .hlx-sk .dropdown,
@@ -507,6 +582,22 @@
   color: var(--hlx-sk-modal-color);
 }
 
+.hlx-sk-overlay .level-0 button,
+.hlx-sk-overlay .level-1 button {
+  border-color: var(--hlx-sk-modal-color);
+  color: var(--hlx-sk-modal-color);
+}
+
+.hlx-sk-overlay .level-0 button:hover {
+  background-color: var(--hlx-sk-modal-color);
+  color: var(--hlx-sk-modal-bg-0);
+}
+
+.hlx-sk-overlay .level-1 button:hover {
+  background-color: var(--hlx-sk-modal-color);
+  color: var(--hlx-sk-modal-bg-1);
+}
+
 .hlx-sk-overlay .modal.help {
   margin-top: 15px;
   position: absolute;
@@ -595,14 +686,14 @@
 
 .hlx-sk-overlay .modal.help .help-step {
   padding: 19px 12px 9px 12px;
-  cursor: pointer;    
+  cursor: pointer;
 }
 
 .hlx-sk-overlay .modal.help .help-step .circle {
   border: 5px solid var(--hlx-sk-modal-help-color);
   border-radius: 50%;
   width: 0;
-  height: 0;  
+  height: 0;
   opacity: 0.45;
 }
 
@@ -770,6 +861,10 @@
   height: 100%;
 }
 
+.hlx-sk span.hlx-sk-placeholder {
+  display: none;
+}
+
 @media(max-width:600px) {
   .hlx-sk {
     background-image: none;
@@ -830,6 +925,7 @@
 }
 
 .hlx-sk .feature-container .close::before,
+.hlx-sk-overlay .hlx-sk-bulk-close::before,
 .hlx-sk-overlay .help-close button::before,
 .hlx-sk-palette .close::before {
   content: "Close";
@@ -854,7 +950,8 @@
 
 .hlx-sk .env.is-preview .dropdown-toggle::before,
 .hlx-sk .env .preview button::before,
-.hlx-sk .edit-preview button::before {
+.hlx-sk .edit-preview button::before,
+.hlx-sk .bulk-preview button::before {
   content: "Preview";
 }
 
@@ -876,7 +973,8 @@
   content: "Delete";
 }
 
-.hlx-sk .publish button::before {
+.hlx-sk .publish button::before,
+.hlx-sk .bulk-publish button::before {
   content: "Publish";
 }
 
@@ -982,8 +1080,16 @@
   content: "Previewing failed. Please try again later.";
 }
 
-.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-generic::before {
   content: "Previewing failed. Must be Google document or spreadsheet.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-ms-word::before {
+  content: "This is a Microsoft Word document. Please convert it to Google Docs: File > Save as Google Docs";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gsheet-ms-excel::before {
+  content: "This is a Microsoft Excel document. Please convert it to Google Sheets: File > Save as Google Sheets'";
 }
 
 .hlx-sk-overlay .modal.modal-reload-failure::before {
@@ -1036,4 +1142,171 @@
 
 .hlx-sk-overlay .modal.modal-logout-error::before {
   content: "Sign out failed. Please try again later.";
+}
+
+.hlx-sk .feature-container .info > button::before {
+  content: "Information";
+}
+
+.hlx-sk .feature-container .info .page-info .edit-date::before {
+  content: "Edited: ";
+}
+
+.hlx-sk .feature-container .info .page-info .preview-date::before {
+  content: "Previewed: ";
+}
+
+.hlx-sk .feature-container .info .page-info .publish-date::before {
+  content: "Published: ";
+}
+
+.hlx-sk .feature-container .info .page-info .now::before {
+  content: "Now";
+}
+
+.hlx-sk .feature-container .info .page-info .seconds-ago::before {
+  content: " seconds ago";
+}
+
+.hlx-sk .feature-container .info .page-info .minutes-ago::before {
+  content: " minutes ago";
+}
+
+.hlx-sk .feature-container .info .page-info .today::before {
+  content: "Today at ";
+}
+
+.hlx-sk .feature-container .info .page-info .yesterday::before {
+  content: "Yesterday at ";
+}
+
+.hlx-sk .feature-container .info .page-info > div:empty::after {
+  content: "Never";
+}
+
+.hlx-sk .bulk-copy-urls.single > button::before,
+.hlx-sk-overlay .modal .hlx-sk-bulk-copy-url::before {
+  content: "Copy URL";
+}
+
+.hlx-sk .bulk-copy-urls > button::before,
+.hlx-sk-overlay .modal .hlx-sk-bulk-copy-urls::before {
+  content: "Copy URLs";
+}
+
+.hlx-sk .bulk-copy-preview-urls button::before {
+  content: "Copy Preview URLs";
+}
+
+.hlx-sk .single .bulk-copy-preview-urls button::before {
+  content: "Copy Preview URL";
+}
+
+.hlx-sk .bulk-copy-live-urls button::before {
+  content: "Copy Live URLs";
+}
+
+.hlx-sk .single .bulk-copy-live-urls button::before {
+  content: "Copy Live URL";
+}
+
+.hlx-sk .bulk-copy-prod-urls button::before {
+  content: "Copy Production URLs";
+}
+
+.hlx-sk .single .bulk-copy-prod-urls button::before {
+  content: "Copy Production URL";
+}
+
+.hlx-sk-overlay .modal.bulk-copied-url::before {
+  content: "URL copied to clipboard.";
+}
+
+.hlx-sk-overlay .modal.bulk-copied-urls::before {
+  content: "URLs copied to clipboard.";
+}
+
+#hlx-sk-bulk-info:empty::before {
+  content: "Select files below";
+}
+
+#hlx-sk-bulk-info.selected-item::before {
+  content: "1 file selected";
+}
+
+#hlx-sk-bulk-info.selected-items::before {
+  content: "$1 files selected";
+  display: none;
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm:empty::before {
+  content: "No file selected";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-preview-item::before {
+  content: "Are you sure you want to preview 1 file?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-preview-items::before {
+  content: "Are you sure you want to preview $1 files?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-progress-preview-items::before {
+  content: "$1 of $2 files previewed...";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-success::before {
+  content: "1 file successfully previewed.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-items-success::before {
+  content: "$1 files successfully previewed.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-failure::before {
+  content: "Failed to preview 1 file:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-items-failure::before {
+  content: "Failed to preview $1 files:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-error-no-docx::before {
+  content: "Microsoft Word document, convert to Google Docs first";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-error-no-xlsx::before {
+  content: "Microsoft Excel document, convert to Google Sheets first";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-publish-item::before {
+  content: "Are you sure you want to publish 1 file?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-publish-items::before {
+  content: "Are you sure you want to publish $1 files?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-progress-publish-items::before {
+  content: "$1 of $2 files published...";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-item-success::before {
+  content: "1 file successfully published.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-items-success::before {
+  content: "$1 files successfully published.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-item-failure::before {
+  content: "Failed to publish 1 file:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-items-failure::before {
+  content: "Failed to publish $1 files:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-item-error-no-source::before {
+  content: "File must be previewed first";
 }
