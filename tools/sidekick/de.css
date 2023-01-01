@@ -46,7 +46,8 @@
 
 .hlx-sk .env.is-preview .dropdown-toggle::before,
 .hlx-sk .env .preview button::before,
-.hlx-sk .edit-preview button::before {
+.hlx-sk .edit-preview button::before,
+.hlx-sk .bulk-preview button::before {
   content: "Vorschau";
 }
 
@@ -68,7 +69,8 @@
   content: "Löschen";
 }
 
-.hlx-sk .publish button::before {
+.hlx-sk .publish button::before,
+.hlx-sk .bulk-preview button::before {
   content: "Publizieren";
 }
 
@@ -174,8 +176,16 @@
   content: "Vorschau-Generierung fehlgeschlagen. Bitte versuche es später noch einmal.";
 }
 
-.hlx-sk-overlay .modal.modal-preview-not-gdoc::before {
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-generic::before {
   content: "Vorschau-Generierung fehlgeschlagen. Muss ein Google-Dokument oder eine Tabelle sein.";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gdoc-ms-doc::before {
+  content: "Dies ist ein Microsoft Word-Dokument. Bitte in Google-Dokument umwandeln: Datei > Als Google-Dokument speichern";
+}
+
+.hlx-sk-overlay .modal.modal-preview-not-gsheet-ms-excel::before {
+  content: "Dies ist ein Microsoft Excel-Dokument. Bitte in Google-Tabelle umwandeln: Datei > Als Google-Tabelle speichern";
 }
 
 .hlx-sk-overlay .modal.modal-reload-failure::before {
@@ -228,4 +238,170 @@
 
 .hlx-sk-overlay .modal.modal-logout-error::before {
   content: "Abmeldung fehlgeschlagen. Bitte lade diesen Browser-Tab erneut oder versuche es später noch einmal.";
+}
+
+.hlx-sk .feature-container .info > button::before {
+  content: "Information";
+}
+
+.hlx-sk .feature-container .info .page-info .edit-date::before {
+  content: "Bearbeitet: ";
+}
+
+.hlx-sk .feature-container .info .page-info .preview-date::before {
+  content: "Vorschau: ";
+}
+
+.hlx-sk .feature-container .info .page-info .publish-date::before {
+  content: "Publiziert: ";
+}
+
+.hlx-sk .feature-container .info .page-info .now::before {
+  content: "Jetzt";
+}
+
+.hlx-sk .feature-container .info .page-info .seconds-ago::before {
+  content: " Sekunden zuvor";
+}
+
+.hlx-sk .feature-container .info .page-info .minutes-ago::before {
+  content: " Minuten zuvor";
+}
+
+.hlx-sk .feature-container .info .page-info .today::before {
+  content: "Heute um ";
+}
+
+.hlx-sk .feature-container .info .page-info .yesterday::before {
+  content: "Gestern um ";
+}
+
+.hlx-sk .feature-container .info .page-info > div:empty::after {
+  content: "Nie";
+}
+
+.hlx-sk .bulk-copy-urls.single > button::before,
+.hlx-sk-overlay .modal .hlx-sk-bulk-copy-url::before {
+  content: "URL kopieren";
+}
+
+.hlx-sk .bulk-copy-urls > button::before,
+.hlx-sk-overlay .modal .hlx-sk-bulk-copy-urls::before {
+  content: "URLs kopieren";
+}
+
+.hlx-sk .bulk-copy-preview-urls button::before {
+  content: "Vorschau-URLs kopieren";
+}
+
+.hlx-sk .single .bulk-copy-preview-urls button::before {
+  content: "Vorschau-URL kopieren";
+}
+
+.hlx-sk .bulk-copy-live-urls button::before {
+  content: "Live-URLs kopieren";
+}
+
+.hlx-sk .single .bulk-copy-live-urls button::before {
+  content: "Live-URL kopieren";
+}
+
+.hlx-sk .bulk-copy-prod-urls button::before {
+  content: "Produktions-URLs kopieren";
+}
+
+.hlx-sk .single .bulk-copy-prod-urls button::before {
+  content: "Produktions-URL kopieren";
+}
+
+.hlx-sk-overlay .modal.bulk-copied-url::before {
+  content: "URL in die Zwischenablage kopiert.";
+}
+
+.hlx-sk-overlay .modal.bulk-copied-urls::before {
+  content: "URLs in die Zwischenablage kopiert.";
+}
+
+#hlx-sk-bulk-info:empty::before {
+  content: "Dateien unten auswählen";
+}
+
+#hlx-sk-bulk-info.selected-item::before {
+  content: "1 Datei ausgewählt";
+}
+
+#hlx-sk-bulk-info.selected-items::before {
+  content: "$1 Dateien ausgewählt";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm:empty::before {
+  content: "Keine Datei ausgewählt";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-preview-item::before {
+  content: "Möchtest du wirklich die Vorschau für 1 Datei generieren?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-preview-items::before {
+  content: "Möchtest du wirklich die Vorschau für $1 Dateien generieren?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-progress-preview-items::before {
+  content: "Vorschau für $1 von $2 Dateien generiert...";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-success::before {
+  content: "Vorschau für 1 Datei erfolgreich generiert.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-items-success::before {
+  content: "Vorschau für $1 Dateien erfolgreich generiert.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-failure::before {
+  content: "Vorschau-Generierung für 1 Datei fehlgeschlagen:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-items-failure::before {
+  content: "Vorschau-Generierung für $1 Dateien fehlgeschlagen:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-error-no-docx::before {
+  content: "Microsoft Word-Dokument, zuerst in Google Docs umwandeln";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-preview-item-error-no-xlsx::before {
+  content: "Microsoft Excel-Dokument, zuerst in Google Sheets umwandeln";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-publish-item::before {
+  content: "Möchtest du wirklich 1 Datei publizieren?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-confirm-publish-items::before {
+  content: "Möchtest du wirklich $1 Dateien publizieren?";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-progress-publish-items::before {
+  content: "$1 von $2 Dateien publiziert...";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-item-success::before {
+  content: "1 Datei erfolgreich publiziert.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-items-success::before {
+  content: "$1 Dateien erfolgreich publiziert.";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-item-failure::before {
+  content: "Publizieren von 1 Datei fehlgeschlagen:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-items-failure::before {
+  content: "Publizieren von $1 Dateien fehlgeschlagen:";
+}
+
+.hlx-sk .bulk-info .hlx-sk-bulk-result-publish-item-error-no-source::before {
+  content: "Für diese Datei muss zuerst Vorschau generiert werden";
 }
