@@ -377,11 +377,13 @@
         `html, iframe#WebApplicationFrame${pushDownSelector ? `, ${pushDownSelector}` : ''}`,
       ).forEach((elem) => pushDownElements.push(elem));
     }
+    // script root url
+    const scriptRoot = scriptUrl.split('/').filter((_, i, arr) => i < arr.length - 1).join('/');
     // default views
     const defaultSpecialViews = [
       {
         path: '**.json',
-        js: './view/json.js',
+        js: `${scriptRoot}/view/json.js`,
       },
     ];
     // try custom views first
@@ -397,7 +399,7 @@
       ref,
       innerHost,
       outerHost: liveHost,
-      scriptUrl,
+      scriptRoot,
       host: publicHost,
       project: project || '',
       pushDown,
@@ -1340,11 +1342,11 @@
                 sk.showModal(confirmText);
               } else if (window.confirm(confirmText)) {
                 sk.showWait();
-                const { status } = sk;
+                const { config, status } = sk;
                 const sel = bulkSelection.map((item) => toWebPath(status.webPath, item));
                 const results = [];
                 const total = sel.length;
-                const { processQueue } = await import('./lib/process-queue.js');
+                const { processQueue } = await import(`${config.scriptRoot}/lib/process-queue.js`);
                 await processQueue(sel, async (file) => {
                   results.push(await sk.update(file));
                   if (total > 1) {
@@ -1363,7 +1365,6 @@
                     lstnrs: {
                       click: (evt) => {
                         evt.stopPropagation();
-                        const { config } = sk;
                         const host = config.innerHost;
                         navigator.clipboard.writeText(ok.map((item) => `https://${host}${item.path}`)
                           .join('\n'));
@@ -1421,11 +1422,11 @@
                 sk.showModal(confirmText);
               } else if (window.confirm(confirmText)) {
                 sk.showWait();
-                const { status } = sk;
+                const { config, status } = sk;
                 const sel = bulkSelection.map((item) => toWebPath(status.webPath, item));
                 const results = [];
                 const total = sel.length;
-                const { processQueue } = await import('./lib/process-queue.js');
+                const { processQueue } = await import(`${config.scriptRoot}/lib/process-queue.js`);
                 await processQueue(sel, async (file) => {
                   const resp = await sk.publish(file);
                   results.push({
@@ -1450,7 +1451,6 @@
                     lstnrs: {
                       click: (evt) => {
                         evt.stopPropagation();
-                        const { config } = sk;
                         const host = config.host || config.outerHost;
                         navigator.clipboard.writeText(ok.map((item) => `https://${host}${item.path}`)
                           .join('\n'));
@@ -3146,8 +3146,8 @@
     loadCSS(path) {
       let href = path;
       if (!href) {
-        if (this.config.scriptUrl) {
-          href = `${this.config.scriptUrl.substring(0, this.config.scriptUrl.lastIndexOf('/'))}/app.css`;
+        if (this.config.scriptRoot) {
+          href = `${this.config.scriptRoot}/app.css`;
         } else {
           const filePath = this.location.pathname;
           href = `${filePath.substring(filePath.lastIndexOf('/') + 1).split('.')[0]}.css`;
