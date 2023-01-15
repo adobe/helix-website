@@ -185,7 +185,7 @@
   line-height: 28px;
 }
 
-.hlx-sk .plugin span {
+.hlx-sk .plugin > span {
   display: inline-block;
   margin: 7px 8px 0 0;
   font-size: var(--hlx-sk-label-font-size);
@@ -211,8 +211,7 @@
 }
 
 .hlx-sk .feature-container .info .dropdown-container {
-  width: 220px;
-  left: -85px;
+  right: 8px;
   background-color: var(--hlx-sk-dropdown-container-bg-solid);
 }
 
@@ -225,6 +224,7 @@
 
 .hlx-sk .feature-container .info .page-info > div {
   padding: 5px 0;
+  white-space: nowrap;
 }
 
 .hlx-sk .feature-container .info .page-info > div::before {
