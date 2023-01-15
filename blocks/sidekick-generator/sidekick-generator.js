@@ -1,5 +1,10 @@
 import createTag from '../../utils/tag.js';
 
+const browserExtensionSupported = [
+  'chrome',
+  'safari',
+].find((b) => window.navigator.userAgent.toLowerCase().includes(b));
+
 function help(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -157,23 +162,39 @@ export default async function decorate(el) {
   formContainer.insertBefore(form, formContainer.querySelector(':scope p:last-of-type'));
   formContainer.id = 'form-container';
 
-  let bookmarkletContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
-  if (!bookmarkletContainer) {
-    bookmarkletContainer = el.appendChild(createTag('div', createTag('div')));
-  }
-  const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
-  bookmarkletContainer.append(createTag('p', null, createTag('em', null, bookmark)));
-  bookmarkletContainer.id = 'sidekick-generator-bookmarklet';
-  bookmarkletContainer.style.paddingTop = '20px';
-  bookmarkletContainer.parentElement.classList.add('hidden');
+  // bookmarklet container
+  const bookmarkletContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
+  if (bookmarkletContainer) {
+    const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
+    bookmarkletContainer.append(createTag('p', null, createTag('em', null, bookmark)));
+    bookmarkletContainer.id = 'sidekick-generator-bookmarklet';
+    bookmarkletContainer.style.paddingTop = '20px';
+    bookmarkletContainer.parentElement.classList.add('hidden');
 
-  const webStoreLink = bookmarkletContainer.querySelector('a[href^="https://chrome.google.com/"]');
-  if (webStoreLink) {
-    const webStoreIcon = document.createElement('img');
-    webStoreIcon.src = '/img/chrome.svg';
-    webStoreLink.prepend(webStoreIcon);
+    // chrome web store
+    const chromeLink = bookmarkletContainer.querySelector('a[title~="Chrome"]');
+    if (chromeLink) {
+      const webStoreIcon = document.createElement('img');
+      webStoreIcon.src = '/img/chrome.svg';
+      chromeLink.prepend(webStoreIcon);
+      if (!['chrome', 'edge'].includes(browserExtensionSupported)) {
+        chromeLink.parentElement.parentElement.classList.add('hidden');
+      }
+    }
+    // apple app store
+    const safariLink = bookmarkletContainer.querySelector('a[title~="Safari"]');
+    if (safariLink) {
+      const appStoreIcon = document.createElement('img');
+      appStoreIcon.src = '/img/safari.svg';
+      safariLink.prepend(appStoreIcon);
+      safariLink.setAttribute('target', '_blank');
+      if (browserExtensionSupported !== 'safari') {
+        safariLink.parentElement.parentElement.classList.add('hidden');
+      }
+    }
   }
 
+  // add project to extension
   const extensionAddContainer = el.querySelector(':scope > div:nth-of-type(3) > div');
   if (extensionAddContainer) {
     extensionAddContainer.id = 'sidekick-generator-extension-add-project';
@@ -181,6 +202,7 @@ export default async function decorate(el) {
     extensionAddContainer.parentElement.classList.add('hidden');
   }
 
+  // remove project from extension
   const extensionDeleteContainer = el.querySelector(':scope > div:nth-of-type(4) > div');
   if (extensionDeleteContainer) {
     extensionDeleteContainer.id = 'sidekick-generator-extension-delete-project';
