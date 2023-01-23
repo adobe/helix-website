@@ -1,5 +1,5 @@
 on: 
-  workflow_dispatch:
+  repository_dispatch:
     inputs:
       logLevel:
         description: 'Log level'     
