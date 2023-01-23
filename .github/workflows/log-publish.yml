@@ -10,6 +10,11 @@ jobs:
         echo "Status: ${{ github.event.client_payload.status }}"
         echo "Path: ${{ github.event.client_payload.path }}"
   slack:
-    uses: slackapi/slack-github-action
-    with:
-      slack-message: ${{ github.event.client_payload.path }} has been published.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          slack-message: ${{ github.event.client_payload.path }} has been published.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
