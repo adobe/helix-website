@@ -39,5 +39,5 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "Just published: https://www.hlx.live/${{ steps.format.outputs.replaced }}"
+              "text": "Just published: https://www.hlx.live${{ steps.format.outputs.replaced }}"
             }
