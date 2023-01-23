@@ -12,7 +12,15 @@ jobs:
   slack:
     runs-on: ubuntu-latest
     steps:
-      - name: Notify Slack
+      - name: Format path
+        id: format
+        uses: frabert/replace-string-action@v2
+        with:
+          pattern: '\.md'
+          string: ${{ github.event.client_payload.path }}
+          replace-with: ''
+      - name: Notify Slack (JSON)
+        if: ${{ endsWith(github.event.client_payload.path, '.json') }}
         uses: slackapi/slack-github-action@v1.23.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -21,4 +29,15 @@ jobs:
           payload: |
             {
               "text": "Just published: `${{ github.event.client_payload.path }}`"
+            }
+      - name: Notify Slack (Markdown)
+        if: ${{ endsWith(github.event.client_payload.path, '.md') }}
+        uses: slackapi/slack-github-action@v1.23.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "Just published: https://www.hlx.live/${{ steps.format.outputs.replaced }}"
             }
