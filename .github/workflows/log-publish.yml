@@ -16,17 +16,18 @@ jobs:
         uses: slackapi/slack-github-action@v1.23.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        # For posting a rich message using Block Kit
-        payload: |
-          {
-            "text": "Franklin publish result: ${{ github.event.client_payload.status }}",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "Franklin publish result: ${{ github.event.client_payload.path }}"
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "Franklin publish result: ${{ github.event.client_payload.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Franklin publish result: ${{ github.event.client_payload.path }}"
+                  }
                 }
-              }
-            ]
-          }
+              ]
+            }
