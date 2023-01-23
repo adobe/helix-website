@@ -14,7 +14,19 @@ jobs:
     steps:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.23.0
-        with:
-          slack-message: ${{ github.event.client_payload.path }} has been published.
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        # For posting a rich message using Block Kit
+        payload: |
+          {
+            "text": "Franklin publish result: ${{ github.event.client_payload.status }}",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Franklin publish result: ${{ github.event.client_payload.path }}"
+                }
+              }
+            ]
+          }
