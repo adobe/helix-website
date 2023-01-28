@@ -233,6 +233,12 @@
   left: 2px;
 }
 
+.hlx-sk .feature-container .info .page-info > div > span {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+}
+
 .hlx-sk .feature-container .user .dropdown-toggle {
   position: relative;
   border: none;
