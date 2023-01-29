@@ -570,8 +570,13 @@
       },
       lstnrs: {
         click: (evt) => {
+          if (dropdown.classList.contains('dropdown-expanded')) {
+            dropdown.classList.remove('dropdown-expanded');
+            return;
+          }
+
           collapseDropdowns(sk);
-          dropdown.classList.toggle('dropdown-expanded');
+          dropdown.classList.add('dropdown-expanded');
           const {
             lastElementChild: container,
           } = dropdown;
