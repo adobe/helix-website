@@ -2750,7 +2750,10 @@
      */
     isEditor() {
       const { config, location } = this;
-      return (/.*\.sharepoint\.com/.test(location.host) && location.pathname.endsWith('_layouts/15/Doc.aspx'))
+      const { host, pathname, search } = location;
+      return (/.*\.sharepoint\.com/.test(host)
+        && pathname.match(/\/_layouts\/15\/[\w]+.aspx$/)
+        && search.includes('sourcedoc='))
         || location.host === 'docs.google.com'
         || (config.mountpoint && new URL(config.mountpoint).host === location.host
           && !this.isAdmin());
