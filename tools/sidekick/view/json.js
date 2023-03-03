@@ -101,10 +101,7 @@ export default function draw(viewContainer, rawData) {
   Object.keys(sheets).forEach((name) => {
     const sheet = sheets[name];
     const title = viewContainer.appendChild(document.createElement('h2'));
-    if (name !== 'helix-default') {
-      title.textContent = name;
-    }
-    title.classList.add(name);
+    title.textContent = name;
     const table = viewContainer.appendChild(document.createElement('table'));
     drawHeader(table, sheet[0]);
     drawBody(table, sheet);
