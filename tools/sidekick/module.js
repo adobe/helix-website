@@ -11,8 +11,6 @@
  */
 /* eslint-disable no-console, no-alert */
 
-'use strict';
-
 (() => {
   /**
    * @typedef {Object} ElemConfig
@@ -2594,9 +2592,8 @@
 
       // load dictionary based on user language
       const lang = this.config.lang || navigator.language.split('-')[0];
-      try {
-        this.dict = await fetchDict(this, lang);
-      } catch (e) {
+      this.dict = await fetchDict(this, lang);
+      if (!this.dict.title) {
         // unsupported language, default to english
         this.dict = await fetchDict(this, 'en');
       }
