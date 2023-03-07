@@ -32,7 +32,7 @@ function* dequeue(queue) {
  * @param {number} [maxConcurrent = 8] Concurrency level
  * @returns {Promise<[]>} the results
  */
-async function processQueue(queue, fn, maxConcurrent = 8) {
+export async function processQueue(queue, fn, maxConcurrent = 8) {
   if (typeof queue !== 'object') {
     throw Error('invalid queue argument: iterable expected');
   }
@@ -77,6 +77,3 @@ async function processQueue(queue, fn, maxConcurrent = 8) {
   await Promise.all(running);
   return results;
 }
-
-// module.exports = processQueue;
-export { processQueue };
