@@ -1350,7 +1350,7 @@
                   if (total > 1) {
                     sk.showModal(getBulkText([results.length, total], 'progress', 'preview'), true);
                   }
-                }, 5);
+                }, 2);
                 const lines = [];
                 const ok = results.filter((res) => res.ok);
                 if (ok.length > 0) {
