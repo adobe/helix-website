@@ -12,14 +12,17 @@
 
 :host,
 :root {
-  --hlx-sk-bg: #e0e0e0;
+  --hlx-sk-bg: #fff;
+  --hlx-sk-logo-url: url(data:image/svg+xml;base64,PHN2ZyBpZD0iQWRvYmVFeHBlcmllbmNlQ2xvdWQiIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iLTUgLTUgMjUwIDI0NCIgd2lkdGg9IjI1MCIgaGVpZ2h0PSIyNDQiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCBoZWlnaHQ9IjIzNCIgcng9IjQyLjUiIHdpZHRoPSIyNDAiIGZpbGw9IiNmYTBmMDAiLz4KICA8cGF0aCBkPSJNMTg2LjYxNyAxNzUuOTVoLTI4LjUwNmE2LjI0MyA2LjI0MyAwIDAgMS01Ljg0Ny0zLjc2OWwtMzAuOTQ3LTcyLjM1OWExLjM2NCAxLjM2NCAwIDAgMC0yLjYxMS0uMDM0TDk5LjQyIDE0NS43MzFhMS42MzUgMS42MzUgMCAwIDAgMS41MDYgMi4yNjloMjEuMmEzLjI3IDMuMjcgMCAwIDEgMy4wMSAxLjk5NGw5LjI4MSAyMC42NTVhMy44MTIgMy44MTIgMCAwIDEtMy41MDcgNS4zMDFINTMuNzM0YTMuNTE4IDMuNTE4IDAgMCAxLTMuMjEzLTQuOTA0bDQ5LjA5LTExNi45MDJBNi42MzkgNi42MzkgMCAwIDEgMTA1Ljg0MyA1MGgyOC4zMTRhNi42MjggNi42MjggMCAwIDEgNi4yMzIgNC4xNDRsNDkuNDMgMTE2LjkwMmEzLjUxNyAzLjUxNyAwIDAgMS0zLjIwMiA0LjkwNHoiIGRhdGEtbmFtZT0iMjU2IiBmaWxsPSIjZmZmIi8+Cjwvc3ZnPg==);
+  --hlx-sk-logo-size: 24px;
+  --hlx-sk-logo-position: 10px 12px;
   --hlx-sk-color: #505050;
   --hlx-sk-border: none;
   --hlx-sk-border-radius: 10px;
   --hlx-sk-font-family: arial, helvetica, sans-serif;
-  --hlx-sk-font-size: 16px;
+  --hlx-sk-font-size: 14px;
   --hlx-sk-line-height: 1;
-  --hlx-sk-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 10px 20px 0 rgba(0, 0, 0, 0.3);
+  --hlx-sk-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 0, 0, 0.3);
   --hlx-sk-button-color: #707070;
   --hlx-sk-button-bg: transparent;
   --hlx-sk-button-border: solid 1px var(--hlx-sk-button-color);
@@ -27,11 +30,14 @@
   --hlx-sk-button-line-height: var(--hlx-sk-line-height);
   --hlx-sk-button-font-weight: 500;
   --hlx-sk-button-padding: 5px 8px;
-  --hlx-sk-button-hover-bg: #707070;
-  --hlx-sk-button-hover-border: #707070;
-  --hlx-sk-button-hover-color: white;
-  --hlx-sk-button-pressed-bg: #c0c0c0;
-  --hlx-sk-button-pressed-color: #505050;
+  --hlx-sk-button-hover-bg: rgba(44, 44, 44, .04);
+  --hlx-sk-button-hover-border: var(--hlx-sk-button-color);
+  --hlx-sk-button-hover-color: var(--hlx-sk-button-color);
+  --hlx-sk-button-focus-bg: rgba(44, 44, 44, .2);
+  --hlx-sk-button-focus-border: var(--hlx-sk-button-hover-border);
+  --hlx-sk-button-focus-color: var(--hlx-sk-button-hover-color);
+  --hlx-sk-button-pressed-bg: rgba(44, 44, 44, .1);
+  --hlx-sk-button-pressed-color: #404040;
   --hlx-sk-button-border-radius: 6px;
   --hlx-sk-button-disabled-color: #909090;
   --hlx-sk-button-disabled-border: solid 1px var(--hlx-sk-button-disabled-color);
@@ -39,8 +45,8 @@
   --hlx-sk-button-badge: #F15B3A;
   --hlx-sk-button-badge-hover: #FFC40E;
   --hlx-sk-label-font-size: 14px;
-  --hlx-sk-dropdown-container-bg: rgba(224, 224, 224, .9);
-  --hlx-sk-dropdown-container-bg-solid: rgb(224, 224, 224);
+  --hlx-sk-dropdown-container-bg: rgba(250, 250, 250, .9);
+  --hlx-sk-dropdown-container-bg-solid: rgb(250, 250, 250);
   --hlx-sk-modal-overlay-bg: rgba(0,0,0, 0.5);
   --hlx-sk-modal-bg-0: #e60016;
   --hlx-sk-modal-bg-1: #e67316;
@@ -61,13 +67,10 @@
     --hlx-sk-bg: rgb(48, 48, 48);
     --hlx-sk-color: #dedede;
     --hlx-sk-button-color: #dedede;
-    --hlx-sk-button-hover-bg: #909090;
-    --hlx-sk-button-hover-border: var(--hlx-sk-color);
-    --hlx-sk-button-hover-color: #303030;
-    --hlx-sk-button-pressed-bg: #505050;
-    --hlx-sk-button-pressed-color: white;
+    --hlx-sk-button-hover-bg: rgba(211, 211, 211, .04);
+    --hlx-sk-button-pressed-bg: rgba(211, 211, 211, .06);
+    --hlx-sk-button-pressed-color: #C0C0C0;
     --hlx-sk-button-disabled-color: #707070;
-    --hlx-sk-button-disabled-border: solid 1px var(--hlx-sk-button-disabled-color);
     --hlx-sk-button-badge: #F15B3A;
     --hlx-sk-button-badge-hover: #C71F3D;
     --hlx-sk-dropdown-container-bg: rgba(48, 48, 48, .9);
@@ -88,10 +91,10 @@
   flex-wrap: nowrap;
   justify-content: start;
   background-color: var(--hlx-sk-bg);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 216 216'><defs><style>.cls-1{fill:%23f15a3a;}.cls-2{fill:%23c71f3d;}.cls-3{fill:%23ffc40c;}</style></defs><circle class='cls-1' cx='22.5' cy='108' r='22.5'/><circle class='cls-1' cx='193.5' cy='108' r='22.5'/><circle class='cls-2' cx='63' cy='27' r='27'/><circle class='cls-3' cx='162' cy='27' r='18'/><circle class='cls-2' cx='162' cy='189' r='27'/><circle class='cls-3' cx='63' cy='189' r='18'/></svg>");
+  background-image: var(--hlx-sk-logo-url);
+  background-position: var(--hlx-sk-logo-position);
+  background-size: var(--hlx-sk-logo-size);
   background-repeat: no-repeat;
-  background-position: 10px 14px;
-  background-size: 22px;
   color: var(--hlx-sk-color);
   top: 0;
   left: 0;
@@ -103,6 +106,20 @@
   font-size: var(--hlx-sk-font-size);
   line-height: var(--hlx-sk-line-height);
   box-shadow: var(--hlx-sk-shadow);
+}
+
+.hlx-sk::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 240px;
+  background-color: #f00;
+  background-image: url('data:image/svg+xml;utf8,<svg id="AdobeExperienceCloud" data-name="Layer 1" viewBox="-5 -5 250 244" width="250" height="244" xmlns="http://www.w3.org/2000/svg"><rect height="234" rx="42.5" width="240" fill="#fa0f00"/><path d="M186.617 175.95h-28.506a6.243 6.243 0 0 1-5.847-3.769l-30.947-72.359a1.364 1.364 0 0 0-2.611-.034L99.42 145.731a1.635 1.635 0 0 0 1.506 2.269h21.2a3.27 3.27 0 0 1 3.01 1.994l9.281 20.655a3.812 3.812 0 0 1-3.507 5.301H53.734a3.518 3.518 0 0 1-3.213-4.904l49.09-116.902A6.639 6.639 0 0 1 105.843 50h28.314a6.628 6.628 0 0 1 6.232 4.144l49.43 116.902a3.517 3.517 0 0 1-3.202 4.904z" data-name="256" fill="#fff"/></svg>');
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 240px;
+  margin: 12px 14px 0 0;
 }
 
 .hlx-sk button,
@@ -128,12 +145,17 @@
 }
 
 .hlx-sk button:hover,
-.hlx-sk button:focus,
-.hlx-sk-overlay button:hover,
-.hlx-sk-overlay button:focus {
+.hlx-sk-overlay button:hover {
   background-color: var(--hlx-sk-button-hover-bg);
   border-color: var(--hlx-sk-button-hover-border);
   color: var(--hlx-sk-button-hover-color);
+}
+
+.hlx-sk button:focus,
+.hlx-sk-overlay button:focus {
+  background-color: var(--hlx-sk-button-focus-bg);
+  border-color: var(--hlx-sk-button-focus-border);
+  color: var(--hlx-sk-button-focus-color);
 }
 
 .hlx-sk button.pressed,
@@ -418,11 +440,6 @@
   height: 28px;
   width: 28px;
   fill: var(--hlx-sk-button-color);
-}
-
-.hlx-sk .feature-container .info.plugin .dropdown-toggle:focus .info-icon,
-.hlx-sk .feature-container .info.plugin .dropdown-toggle:hover .info-icon {
-  filter: brightness(400%);
 }
 
 .hlx-sk .feature-container .modified-dates {

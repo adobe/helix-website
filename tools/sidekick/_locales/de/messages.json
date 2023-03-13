@@ -1,9 +1,9 @@
 {
   "title": {
-    "message": "Franklin Sidekick"
+    "message": "AEM Sidekick"
   },
   "description": {
-    "message": "Franklin Sidekick erlaubt es Autoren in Franklin-Projekten, Inhalte zu publizieren."
+    "message": "AEM Sidekick erlaubt es Autoren von AEM-Sites, Inhalte zu publizieren."
   },
   "description_shortcut": {
     "message": "Sidekick ein-/ausschalten"
@@ -75,7 +75,7 @@
     "message": "Entwicklung"
   },
   "preview": {
-    "message": "Publizieren"
+    "message": "Vorschau"
   },
   "preview_config_success": {
     "message": "Konfiguration erfolgreich aktiviert."
@@ -213,7 +213,7 @@
     "message": "URLs in die Zwischenablage kopiert."
   },
   "error_status_404_document": {
-    "message": "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration und stelle sicher, dass Franklin Zugriff auf dieses Dokument hat."
+    "message": "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration und stelle sicher, dass Zugriff auf dieses Dokument gewährleistet ist."
   },
   "error_status_404_content": {
     "message": "404 Nicht gefunden: Prüfe deine Sidekick-Konfiguration oder URL."
@@ -455,7 +455,7 @@
     "message": "Achtung: unerwartete Nebeneffekte!"
   },
   "admin_version": {
-    "message": "Eine spezifische Version des Franklin Admin API verwenden"
+    "message": "Eine spezifische Version des Admin API verwenden"
   },
   "admin_version_placeholder": {
     "message": "Admin-Version: x.y.z"
