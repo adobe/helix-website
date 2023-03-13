@@ -118,6 +118,15 @@ function applyRules(form, rules) {
   });
 }
 
+function fill(form) {
+  const { action } = form.dataset;
+  if (action === '/tools/bot/register-form') {
+    const loc = new URL(window.location.href);
+    form.querySelector('#owner').value = loc.searchParams.get('owner') || '';
+    form.querySelector('#installationId').value = loc.searchParams.get('id') || '';
+  }
+}
+
 async function createForm(formURL) {
   const { pathname } = new URL(formURL);
   const resp = await fetch(pathname);
@@ -170,7 +179,7 @@ async function createForm(formURL) {
 
   form.addEventListener('change', () => applyRules(form, rules));
   applyRules(form, rules);
-
+  fill(form);
   return (form);
 }
 
