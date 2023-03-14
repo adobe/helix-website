@@ -1,9 +1,9 @@
 {
   "title": {
-    "message": "Franklin Sidekick"
+    "message": "AEM Sidekick"
   },
   "description": {
-    "message": "Franklin Sidekick allows authors in Franklin projects to easily preview and publish content."
+    "message": "AEM Sidekick allows authors of AEM sites to easily preview and publish content."
   },
   "description_shortcut": {
     "message": "Toggle Sidekick"
@@ -213,7 +213,7 @@
     "message": "URLs copied to clipboard."
   },
   "error_status_404_document": {
-    "message": "404 Not found: Check your Sidekick configuration and make sure Franklin has access to this document."
+    "message": "404 Not found: Check your Sidekick configuration and make sure access to this document is granted."
   },
   "error_status_404_content": {
     "message": "404 Not found: Check your Sidekick configuration or URL."
@@ -456,7 +456,7 @@
     "message": "Caution: unexpected side effects!"
   },
   "admin_version": {
-    "message": "Use a specific Franklin Admin API version"
+    "message": "Use a specific Admin API version"
   },
   "admin_version_placeholder": {
     "message": "Admin Version: x.y.z"
