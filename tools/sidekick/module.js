@@ -261,7 +261,7 @@
 
   /**
    * The URL of the development environment.
-   * @see {@link https://github.com/adobe/helix-cli|Franklin CLI}).
+   * @see {@link https://github.com/adobe/helix-cli|AEM CLI}).
    * @private
    * @type {URL}
    */
@@ -621,7 +621,7 @@
         // define alignment
         const alignments = [
           'bottom-center',
-          'botttom-left',
+          'bottom-left',
           'bottom-right',
         ];
         let align = target === sk.root ? alignments[0] : alignments[1];

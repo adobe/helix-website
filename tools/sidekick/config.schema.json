@@ -99,12 +99,12 @@
       "additionalProperties": false
     }
   },
-  "description": "Franklin Sidekick configuration",
+  "description": "Sidekick configuration",
   "type": "object",
   "properties": {
     "project": {
       "type": "string",
-      "description": "The name of the project to display in the Franklin Sidekick"
+      "description": "The name of the project to display in the sidekick"
     },
     "host": {
       "type": "string",
@@ -117,7 +117,7 @@
     },
     "pushDown": {
       "type": "boolean",
-      "description": "Have Franklin Sidekick push down page content instead of overlaying it"
+      "description": "Have the sidekick push down page content instead of overlaying it"
     },
     "pushDownSelector": {
       "type": "string",
