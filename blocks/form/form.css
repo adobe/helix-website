@@ -66,8 +66,12 @@ main .form .form-checkbox-wrapper {
 
 main .form .form-checkbox-wrapper input[type='checkbox'] {
   appearance: none;
+
+  /* stylelint-disable */
   -webkit-appearance: none;
   -moz-appearance: none;
+
+  /* stylelint-enable */
   height: 30px;
   width: 30px;
   position: relative;
