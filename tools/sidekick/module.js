@@ -2014,7 +2014,7 @@
 
   function getTimeAgo(sk, dateParam) {
     if (!dateParam) {
-      return '';
+      return i18n(sk, 'never');
     }
     const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
 
