@@ -65,13 +65,27 @@ main .form .form-checkbox-wrapper {
 }
 
 main .form .form-checkbox-wrapper input[type='checkbox'] {
-  display: none;
+  appearance: none;
+
+  /* stylelint-disable */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* stylelint-enable */
+  height: 30px;
+  width: 30px;
+  position: relative;
+  border: unset;
+  padding: unset;
+  margin-right: 5px;
+  margin-left: 0;
 }
 
-main .form .form-checkbox-wrapper input[type='checkbox'] + label::before {
-  float: left;
-  margin-top: 2px;
-  margin-right: 5px;
+main .form .form-checkbox-wrapper input[type='checkbox']::after {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 30px;
   width: 30px;
   content: ' ';
@@ -79,7 +93,7 @@ main .form .form-checkbox-wrapper input[type='checkbox'] + label::before {
   background-size: contain;
 }
 
-main .form .form-checkbox-wrapper input[type='checkbox']:checked +label::before {
+main .form .form-checkbox-wrapper input[type='checkbox']:checked::after {
   background: url('./checkbox-checked.svg');
   background-size: contain;
   content: ' ';
