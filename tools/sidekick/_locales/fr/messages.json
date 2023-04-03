@@ -158,6 +158,9 @@
   "bulk_result_preview_single_error_no_xlsx": {
     "message": "Microsoft Excel document, convert to Google Sheets first"
   },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "Seuls les lettres minuscules latines normalisées, les chiffres et les traits d'union sont autorisés dans les noms de dossier"
+  },
   "bulk_confirm_publish_single": {
     "message": "Are you sure you want to publish 1 file?"
   },

@@ -158,6 +158,9 @@
   "bulk_result_preview_single_error_no_xlsx": {
     "message": "Microsoft Excel-Dokument, zuerst in Google Sheets umwandeln"
   },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "Nur normalisierte lateinische Kleinbuchstaben, Zahlen und Bindestriche sind in Ordnernamen erlaubt"
+  },
   "bulk_confirm_publish_single": {
     "message": "Möchtest du wirklich 1 Datei publizieren?"
   },
