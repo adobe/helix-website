@@ -158,6 +158,9 @@
   "bulk_result_preview_single_error_no_xlsx": {
     "message": "Microsoft Excel document, convert to Google Sheets first"
   },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "Only normalized, small latin letters, digits and hyphens are allowed in folder names"
+  },
   "bulk_confirm_publish_single": {
     "message": "Are you sure you want to publish 1 file?"
   },

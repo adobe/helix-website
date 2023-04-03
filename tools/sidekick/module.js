@@ -1320,8 +1320,7 @@
         if (folder === '/') {
           folder = '';
         }
-        const [file] = nameParts;
-        let [, ext] = nameParts;
+        let [file, ext] = nameParts;
         if (isSharePoint(sk.location) && ext === 'docx') {
           // omit docx extension on sharepoint
           ext = '';
@@ -1330,7 +1329,13 @@
           // use json extension for spreadsheets
           ext = 'json';
         }
-        return `${folder}/${file.toLowerCase().replace(/[^0-9a-z]/gi, '-')}${ext ? `.${ext}` : ''}`;
+        file = file
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+        return `${folder}/${file}${ext ? `.${ext}` : ''}`;
       };
 
       const getBulkSelection = () => {
@@ -1441,6 +1446,9 @@
             }
             if (item.error.includes('source does not exist')) {
               item.error = getBulkText([1], 'result', operation, 'error_no_source');
+            }
+            if (item.status === 404 && /[^a-z0-9-]/.test(item.path)) {
+              item.error = getBulkText([1], 'result', operation, 'error_invalid_folder_name');
             }
             return `${item.path.split('/').pop()}: ${item.error}`;
           }));
