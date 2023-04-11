@@ -497,7 +497,7 @@
     "message": "View document source"
   },
   "open_preview": {
-    "message": "Open preview",
+    "message": "Open preview URL",
     "description": "Opens the preview URL for a given GitHub branch"
   }
 }
