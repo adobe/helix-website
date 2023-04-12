@@ -632,16 +632,19 @@
       attrs: {
         ...(button.attrs || {}),
         class: 'dropdown-toggle',
+        'aria-expanded': false,
       },
       lstnrs: {
         click: (evt) => {
           if (dropdown.classList.contains('dropdown-expanded')) {
             dropdown.classList.remove('dropdown-expanded');
+            evt.target.setAttribute('aria-expanded', false);
             return;
           }
 
           collapseDropdowns(sk);
           dropdown.classList.add('dropdown-expanded');
+          evt.target.setAttribute('aria-expanded', true);
           const {
             lastElementChild: container,
           } = dropdown;
@@ -1341,11 +1344,17 @@
       const getBulkSelection = () => {
         const { location } = sk;
         if (isSharePoint(location)) {
+          const isGrid = document.querySelector('div[class~="ms-TilesList"]');
           return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
-            .filter((row) => !row.querySelector('img').getAttribute('src').endsWith('folder.svg'))
+            .filter((row) => !row.querySelector('img').getAttribute('src').includes('/foldericons/')
+              && !row.querySelector('img').getAttribute('src').endsWith('folder.svg'))
             .map((row) => ({
-              type: new URL(row.querySelector('img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
-              path: row.querySelector('button').textContent.trim(),
+              type: isGrid
+                ? row.querySelector(':scope i[aria-label]')?.getAttribute('aria-label').trim()
+                : new URL(row.querySelector('img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
+              path: isGrid
+                ? row.querySelector('div[data-automationid="name"]').textContent.trim()
+                : row.querySelector('button')?.textContent.trim(),
             }));
         } else {
           // gdrive
@@ -1353,7 +1362,8 @@
             .filter((row) => row.querySelector(':scope img'))
             .map((row) => ({
               type: new URL(row.querySelector('div > img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-2).join('/'),
-              path: row.querySelector(':scope > div > div:nth-of-type(2)').textContent.trim(),
+              path: row.querySelector(':scope > div > div:nth-of-type(2)').textContent.trim() // list layout
+                || row.querySelector(':scope > div > div > div:nth-of-type(4)').textContent.trim(), // grid layout
             }));
         }
       };
@@ -1446,9 +1456,6 @@
             }
             if (item.error.includes('source does not exist')) {
               item.error = getBulkText([1], 'result', operation, 'error_no_source');
-            }
-            if (item.status === 404 && /[^a-z0-9-]/.test(item.path)) {
-              item.error = getBulkText([1], 'result', operation, 'error_invalid_folder_name');
             }
             return `${item.path.split('/').pop()}: ${item.error}`;
           }));
