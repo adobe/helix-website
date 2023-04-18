@@ -548,7 +548,7 @@ export function decorateButtons(block = document) {
 }
 
 export function decorateHeadings(main) {
-  if (!main.closest('body').classList.contains('docs-template')) return;
+  if (document.body.classList.contains('docs-template')) return;
   main.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
     const link = document.createElement('a');
     link.setAttribute('href', `#${h.id}`);
