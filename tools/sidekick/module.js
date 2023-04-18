@@ -1046,6 +1046,7 @@
         text: i18n(sk, 'preview'),
         action: async (evt) => {
           const { status } = sk;
+          sk.showWait();
           const updatePreview = async (ranBefore) => {
             const resp = await sk.update();
             if (!resp.ok) {
@@ -1082,7 +1083,8 @@
             sk.switchEnv('preview', newTab(evt));
           };
           if (status.edit && status.edit.sourceLocation
-            && status.edit.sourceLocation.startsWith('onedrive:')) {
+            && status.edit.sourceLocation.startsWith('onedrive:')
+            && status.edit.contentType && status.edit.contentType.includes('word')) {
             // show ctrl/cmd + s hint on onedrive docs
             const mac = navigator.platform.toLowerCase().includes('mac') ? '_mac' : '';
             sk.showModal(i18n(sk, `preview_onedrive${mac}`));
@@ -1110,8 +1112,6 @@
 
               return;
             }
-          } else {
-            sk.showWait();
           }
           updatePreview();
         },
@@ -1320,9 +1320,6 @@
       const toWebPath = (folder, item) => {
         const { path, type } = item;
         const nameParts = path.split('.');
-        if (folder === '/') {
-          folder = '';
-        }
         let [file, ext] = nameParts;
         if (isSharePoint(sk.location) && ext === 'docx') {
           // omit docx extension on sharepoint
@@ -1338,7 +1335,7 @@
           .replace(/[\u0300-\u036f]/g, '')
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-|-$/g, '');
-        return `${folder}/${file}${ext ? `.${ext}` : ''}`;
+        return `${folder}${folder.endsWith('/') ? '' : '/'}${file}${ext ? `.${ext}` : ''}`;
       };
 
       const getBulkSelection = () => {
