@@ -547,6 +547,24 @@ export function decorateButtons(block = document) {
   });
 }
 
+export function decorateHeadings(main) {
+  main.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
+    const link = document.createElement('a');
+    link.setAttribute('href', `#${h.id}`);
+    link.setAttribute('title', `Copy link to "${h.textContent}" to clipboard`);
+    link.classList.add('anchor-link');
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigator.clipboard.writeText(link.href);
+      e.target.classList.add('anchor-link-copied');
+      setTimeout(() => e.target.classList.remove('anchor-link-copied'), 1000);
+    });
+    link.innerHTML = h.innerHTML;
+    h.innerHTML = '';
+    h.append(link);
+  });
+}
+
 export function loadScript(url, callback, type) {
   const script = document.createElement('script');
   script.onload = callback;
@@ -619,6 +637,7 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateButtons(main);
+  decorateHeadings(main);
   decorateBlocks(main);
 }
 
