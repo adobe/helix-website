@@ -588,6 +588,29 @@ main .section.light {
     background: #eee;
 }
 
+main a.anchor-link:any-link {
+  position: relative;
+  text-decoration: none;
+  color: currentcolor;
+  transition: color 0.2s;
+}
+
+main a.anchor-link:any-link::before {
+  content: "#";
+  position: absolute;
+  left: -1.5rem;
+  opacity: 0.2;
+}
+
+main a.anchor-link:hover::before {
+  text-decoration: none;
+  opacity: 1;
+}
+
+main a.anchor-link.anchor-link-copied {
+  color: green;
+}
+
 /* Above the fold */
 
 main .section[data-section-status='loading'], main .section[data-section-status='initialized'] {
