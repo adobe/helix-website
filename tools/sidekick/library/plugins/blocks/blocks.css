@@ -1,0 +1,13 @@
+.message-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 65px;
+}
+
+iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
