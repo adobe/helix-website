@@ -1,3 +1,4 @@
-main .section.sidekick-library-container {
+body.docs-template main .section:has(.sidekick-library-wrapper) {
     padding: 0;
+    max-width: 100%;
 }
