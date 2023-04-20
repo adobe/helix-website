@@ -1,5 +1,6 @@
 main .faq dt {
     margin-top: 64px;
+    scroll-margin-top: 64px;
     font-weight: 700;
 }
 
