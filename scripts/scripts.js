@@ -676,11 +676,17 @@ async function loadLazy(doc) {
     }, 500);
   }
 
-  decorateBlock(header);
-  loadBlock(header);
-
   loadCSS('/fonts/fonts.css');
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-helix.svg`);
+
+  if (getMetadata('supressframe')) {
+    doc.querySelector('header').remove();
+    doc.querySelector('footer').remove();
+    return;
+  }
+
+  decorateBlock(header);
+  loadBlock(header);
 
   decorateBlock(footer);
   loadBlock(footer);
