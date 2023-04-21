@@ -555,6 +555,7 @@ export function addAnchorLink(elem) {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     navigator.clipboard.writeText(link.href);
+    window.location.href = link.href;
     e.target.classList.add('anchor-link-copied');
     setTimeout(() => e.target.classList.remove('anchor-link-copied'), 1000);
   });
