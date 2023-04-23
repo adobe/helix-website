@@ -703,6 +703,9 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // load anything that can be postponed to the latest here
+
+  // Core Web Vitals RUM collection
+  sampleRUM('cwv');
 }
 
 if (window.name.includes('performance')) {
