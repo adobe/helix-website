@@ -69,7 +69,7 @@
    * @prop {boolean} isPalette Determines whether a URL is opened in a palette instead of a new tab
    * @prop {string} paletteRect The dimensions and position of a palette (optional)
    * @prop {string[]} environments Specifies when to show this plugin
-   *                               (admin, edit, preview, live, prod)
+   *                               (admin, edit, dev, preview, live, prod)
    * @prop {string[]} excludePaths Exclude the plugin from these paths (glob patterns supported)
    * @prop {string[]} includePaths Include the plugin on these paths (glob patterns supported)
    */
@@ -1766,7 +1766,7 @@
                         tag: 'iframe',
                         attrs: {
                           src: target,
-                          allow: 'clipboard-write',
+                          allow: 'clipboard-write *',
                         },
                       });
                     }
