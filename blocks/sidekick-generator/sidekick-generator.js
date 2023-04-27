@@ -37,40 +37,37 @@ function run(evt) {
     return;
   }
 
-  // update URL
-  const url = new URL(window.location.href);
-  const usp = url.searchParams;
-  Object.keys(formData).forEach((name) => usp.set(name, formData[name]));
-  url.search = usp.toString();
-  window.history.pushState({ giturl, project }, null, url.href);
-
-  // assemble bookmarklet config
+  let finalGitUrl = giturl;
   const giturlAsUrl = new URL(giturl);
-  let config;
   if (giturlAsUrl.hostname.endsWith('hlx.page') || giturlAsUrl.hostname.endsWith('hlx.live')) {
     const segs = giturlAsUrl.hostname.split('.')[0].split('--');
     const owner = segs[2];
     const repo = segs[1];
     const ref = segs[0] || 'main';
 
-    config = {
-      owner,
-      repo,
-      ref,
-    };
-  } else {
-    // assume gh.com
-    const segs = giturlAsUrl.pathname.substring(1).split('/');
-    const owner = segs[0];
-    const repo = segs[1];
-    const ref = segs[3] || 'main';
-
-    config = {
-      owner,
-      repo,
-      ref,
-    };
+    finalGitUrl = `https://github.com/${owner}/${repo}/tree/${ref}`;
   }
+
+  // update URL
+  const url = new URL(window.location.href);
+  const usp = url.searchParams;
+  Object.keys(formData).forEach((name) => usp.set(name, formData[name]));
+  // override giturl in case original was hlx url
+  usp.set('giturl', finalGitUrl);
+  url.search = usp.toString();
+  window.history.pushState({ finalGitUrl, project }, null, url.href);
+
+  // assemble bookmarklet config
+  const segs = new URL(finalGitUrl).pathname.substring(1).split('/');
+  const owner = segs[0];
+  const repo = segs[1];
+  const ref = segs[3] || 'main';
+
+  const config = {
+    owner,
+    repo,
+    ref,
+  };
 
   // pass token
   if (token) {
