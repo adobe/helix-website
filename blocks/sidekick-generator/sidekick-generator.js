@@ -72,7 +72,6 @@ function run(evt) {
     };
   }
 
-
   // pass token
   if (token) {
     config.token = token;
