@@ -45,16 +45,33 @@ function run(evt) {
   window.history.pushState({ giturl, project }, null, url.href);
 
   // assemble bookmarklet config
-  const segs = new URL(giturl).pathname.substring(1).split('/');
-  const owner = segs[0];
-  const repo = segs[1];
-  const ref = segs[3] || 'main';
+  const giturlAsUrl = new URL(giturl);
+  let config;
+  if (giturlAsUrl.hostname.endsWith('hlx.page') || giturlAsUrl.hostname.endsWith('hlx.live')) {
+    const segs = giturlAsUrl.hostname.split('.')[0].split('--');
+    const owner = segs[2];
+    const repo = segs[1];
+    const ref = segs[0] || 'main';
 
-  const config = {
-    owner,
-    repo,
-    ref,
-  };
+    config = {
+      owner,
+      repo,
+      ref,
+    };
+  } else {
+    // assume gh.com
+    const segs = giturlAsUrl.pathname.substring(1).split('/');
+    const owner = segs[0];
+    const repo = segs[1];
+    const ref = segs[3] || 'main';
+
+    config = {
+      owner,
+      repo,
+      ref,
+    };
+  }
+
 
   // pass token
   if (token) {
@@ -124,7 +141,7 @@ function init() {
 export default async function decorate(el) {
   const formContainer = el.querySelector(':scope > div:first-of-type > div');
 
-  const submitLink = formContainer.querySelector(':scope a');
+  const submitLink = formContainer.querySelector(':scope p > a');
   const button = createTag('button', { id: 'generator' }, submitLink ? submitLink.textContent : 'Go');
   button.onclick = run;
   if (submitLink) {
