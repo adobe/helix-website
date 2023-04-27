@@ -32,6 +32,30 @@ describe('Sidekick Generator', () => {
     expect(bookmark.getAttribute('href')).to.equal('#');
   });
 
+  it('works with hlx.page urls', async () => {
+    const generator = document.querySelector('.sidekick-generator');
+    await decorate(generator);
+    generator.querySelector('#giturl').value = 'https://main--a-customer--hlxsites.hlx.page';
+    generator.querySelector('#project').value = 'Helix Page';
+    generator.querySelector('#generator').click();
+
+    const url = new URL(window.location.href);
+    const usp = url.searchParams;
+    expect(usp.get('giturl')).to.equal('https://github.com/hlxsites/a-customer/tree/main');
+  });
+
+  it('works with hlx.live urls', async () => {
+    const generator = document.querySelector('.sidekick-generator');
+    await decorate(generator);
+    generator.querySelector('#giturl').value = 'https://main--a-customer--hlxsites.hlx.live';
+    generator.querySelector('#project').value = 'Helix Page';
+    generator.querySelector('#generator').click();
+
+    const url = new URL(window.location.href);
+    const usp = url.searchParams;
+    expect(usp.get('giturl')).to.equal('https://github.com/hlxsites/a-customer/tree/main');
+  });
+
   it('displays a sidekick bookmarklet link', async () => {
     const generator = document.querySelector('.sidekick-generator');
     await decorate(generator);
