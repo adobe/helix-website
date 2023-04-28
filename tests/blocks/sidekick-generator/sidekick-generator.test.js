@@ -36,7 +36,7 @@ describe('Sidekick Generator', () => {
     const generator = document.querySelector('.sidekick-generator');
     await decorate(generator);
     generator.querySelector('#giturl').value = 'https://main--a-customer--hlxsites.hlx.page';
-    generator.querySelector('#project').value = 'Helix Pages';
+    generator.querySelector('#project').value = 'Helix Page';
     generator.querySelector('#generator').click();
 
     const url = new URL(window.location.href);
@@ -48,7 +48,7 @@ describe('Sidekick Generator', () => {
     const generator = document.querySelector('.sidekick-generator');
     await decorate(generator);
     generator.querySelector('#giturl').value = 'https://main--a-customer--hlxsites.hlx.live';
-    generator.querySelector('#project').value = 'Helix Pages';
+    generator.querySelector('#project').value = 'Helix Page';
     generator.querySelector('#generator').click();
 
     const url = new URL(window.location.href);
