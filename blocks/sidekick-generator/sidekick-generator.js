@@ -37,15 +37,28 @@ function run(evt) {
     return;
   }
 
+  let finalGitUrl = giturl;
+  const giturlAsUrl = new URL(giturl);
+  if (giturlAsUrl.hostname.endsWith('hlx.page') || giturlAsUrl.hostname.endsWith('hlx.live')) {
+    const segs = giturlAsUrl.hostname.split('.')[0].split('--');
+    const owner = segs[2];
+    const repo = segs[1];
+    const ref = segs[0] || 'main';
+
+    finalGitUrl = `https://github.com/${owner}/${repo}/tree/${ref}`;
+  }
+
   // update URL
   const url = new URL(window.location.href);
   const usp = url.searchParams;
   Object.keys(formData).forEach((name) => usp.set(name, formData[name]));
+  // override giturl in case original was hlx url
+  usp.set('giturl', finalGitUrl);
   url.search = usp.toString();
-  window.history.pushState({ giturl, project }, null, url.href);
+  window.history.pushState({ finalGitUrl, project }, null, url.href);
 
   // assemble bookmarklet config
-  const segs = new URL(giturl).pathname.substring(1).split('/');
+  const segs = new URL(finalGitUrl).pathname.substring(1).split('/');
   const owner = segs[0];
   const repo = segs[1];
   const ref = segs[3] || 'main';
@@ -124,7 +137,7 @@ function init() {
 export default async function decorate(el) {
   const formContainer = el.querySelector(':scope > div:first-of-type > div');
 
-  const submitLink = formContainer.querySelector(':scope a');
+  const submitLink = formContainer.querySelector(':scope p > a');
   const button = createTag('button', { id: 'generator' }, submitLink ? submitLink.textContent : 'Go');
   button.onclick = run;
   if (submitLink) {
