@@ -114,34 +114,11 @@
         initSidekickCompatMode();
       } else {
         // extract and validate base config
-        const {
-          owner, repo, ref = 'main', devMode,
-        } = baseConfig;
+        const { owner, repo } = baseConfig;
         baseConfig.scriptUrl = appScript.getAttribute('src');
         if (owner && repo) {
-          // init sidekick config
-          window.hlx.sidekickConfig = {};
-          // look for custom config in project
-          let configOrigin = '';
-          if (devMode) {
-            configOrigin = 'http://localhost:3000';
-          } else if (!new RegExp(`${repo}\\-\\-${owner}\\.hlx(\\-\\d|3)?\\.page$`)
-            .test(window.location.hostname)) {
-            // load config from inner CDN
-            configOrigin = `https://${ref}--${repo}--${owner}.hlx.live`;
-          }
-          try {
-            const res = await fetch(`${configOrigin}/tools/sidekick/config.json`);
-            if (res.ok) {
-              console.log(`custom sidekick config loaded from ${configOrigin}/tools/sidekick/config.json`);
-              // apply custom config
-              Object.assign(window.hlx.sidekickConfig, await res.json());
-            }
-          } catch (e) {
-            console.log('error retrieving custom sidekick config', e);
-          }
-          // apply base config
-          Object.assign(window.hlx.sidekickConfig, baseConfig);
+          // load sidekick
+          window.hlx.sidekickConfig = baseConfig;
           window.hlx.initSidekick();
 
           showExtensionHint({
