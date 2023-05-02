@@ -405,18 +405,87 @@
   }
 
   /**
+   * Creates an Admin URL for an API and path.
+   * @private
+   * @param {Object} config The sidekick configuration
+   * @param {string} api The API endpoint to call
+   * @param {string} path The current path
+   * @returns {URL} The admin URL
+   */
+  function getAdminUrl({
+    owner, repo, ref, adminVersion,
+  }, api, path = '') {
+    const adminUrl = new URL([
+      'https://admin.hlx.page/',
+      api,
+      `/${owner}`,
+      `/${repo}`,
+      `/${ref}`,
+      path,
+    ].join(''));
+    if (adminVersion) {
+      adminUrl.searchParams.append('hlx-admin-version', adminVersion);
+    }
+    return adminUrl;
+  }
+
+  /**
+   * Returns the fetch options for admin requests
+   * @returns {object}
+   */
+  function getAdminFetchOptions() {
+    const opts = {
+      cache: 'no-store',
+      credentials: 'include',
+      headers: {},
+    };
+    return opts;
+  }
+
+  /**
    * Returns the sidekick configuration.
    * @private
    * @param {SidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
    * @param {Location} location The current location
    * @returns {Object} The sidekick configuration
    */
-  function initConfig(cfg, location) {
-    const config = cfg || (window.hlx && window.hlx.sidekickConfig) || {};
+  async function initConfig(cfg, location) {
+    let config = cfg || (window.hlx && window.hlx.sidekickConfig) || {};
     const {
       owner,
       repo,
       ref = 'main',
+      devMode,
+      adminVersion,
+      _extended,
+    } = config;
+    if (owner && repo && !_extended) {
+      // look for custom config in project
+      const configUrl = devMode
+        ? `${DEV_URL.origin}/tools/sidekick/config.json`
+        : getAdminUrl(config, 'sidekick', '/config.json');
+      try {
+        const res = await fetch(configUrl, getAdminFetchOptions());
+        if (res.status === 200) {
+          config = {
+            ...config,
+            ...(await res.json()),
+            // no overriding below
+            owner,
+            repo,
+            ref,
+            devMode,
+            adminVersion,
+            _extended: Date.now(),
+          };
+          console.log('extended config found');
+        }
+      } catch (e) {
+        console.log('error retrieving custom sidekick config', e);
+      }
+    }
+
+    const {
       outerHost,
       host,
       project,
@@ -479,7 +548,6 @@
       scriptRoot,
       host: publicHost,
       project: project || '',
-      pushDown,
       pushDownElements,
       specialView,
     };
@@ -856,45 +924,6 @@
    */
   function newTab(evt) {
     return evt.metaKey || evt.shiftKey || evt.which === 2;
-  }
-
-  /**
-   * Creates an Admin URL for an API and path.
-   * @private
-   * @param {Object} config The sidekick configuration
-   * @param {string} api The API endpoint to call
-   * @param {string} path The current path
-   * @returns {URL} The admin URL
-   */
-  function getAdminUrl({
-    owner, repo, ref, adminVersion,
-  }, api, path = '') {
-    const adminUrl = new URL([
-      'https://admin.hlx.page/',
-      api,
-      `/${owner}`,
-      `/${repo}`,
-      `/${ref}`,
-      path,
-    ].join(''));
-    if (adminVersion) {
-      adminUrl.searchParams.append('hlx-admin-version', adminVersion);
-    }
-    return adminUrl;
-  }
-
-  /**
-   * Returns the fetch options for admin requests
-   * @param {object} config
-   * @returns {object}
-   */
-  function getAdminFetchOptions() {
-    const opts = {
-      cache: 'no-store',
-      credentials: 'include',
-      headers: {},
-    };
-    return opts;
   }
 
   /**
@@ -1381,9 +1410,11 @@
         // update copy url button texts based on selection size
         ['', 'preview', 'live', 'prod'].forEach((env) => {
           const text = i18n(sk, `copy_${env}${env ? '_' : ''}url${sel.length === 1 ? '' : 's'}`);
-          const button = sk.get(`bulk-copy-${env}${env ? '-' : ''}urls`).querySelector('button');
-          button.textContent = text;
-          button.title = text;
+          const button = sk.get(`bulk-copy-${env}${env ? '-' : ''}urls`)?.querySelector('button');
+          if (button) {
+            button.textContent = text;
+            button.title = text;
+          }
         });
       };
 
@@ -1421,7 +1452,6 @@
         }, concurrency);
         const lines = [];
         const ok = results.filter((res) => res.ok);
-        console.log(ok);
         if (ok.length > 0) {
           lines.push(getBulkText([ok.length], 'result', operation, 'success'));
           lines.push(createTag({
@@ -1793,10 +1823,7 @@
     const opts = getAdminFetchOptions(sk.config);
     return fetch(url, opts)
       .then((res) => res.json())
-      .then((json) => {
-        console.log(json);
-        return json.status === status;
-      })
+      .then((json) => (json.status === status))
       .catch(() => false);
   }
 
@@ -1828,12 +1855,15 @@
 
     async function checkLoggedIn() {
       if (loginWindow.closed) {
+        const { config, status, location } = sk;
         attempts += 1;
         // try 5 times after login window has been closed
         if (await checkProfileStatus(sk, 200)) {
           // logged in, stop checking
-          delete sk.status.status;
+          delete status.status;
           sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
+          sk.config = await initConfig(config, location);
+          sk.config.authToken = window.hlx.sidekickConfig.authToken;
           sk.fetchStatus();
           fireEvent(sk, 'loggedin');
           return;
@@ -2467,6 +2497,7 @@
         },
       });
       this.addEventListener('contextloaded', () => {
+        this.loadCSS();
         // containers
         this.pluginContainer = appendTag(this.root, {
           tag: 'div',
@@ -2566,6 +2597,10 @@
         addBulkPlugins(this);
         // fetch status
         this.fetchStatus();
+        // push down content
+        pushDownContent(this);
+        // show special view
+        showSpecialView(this);
       }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
@@ -2574,7 +2609,6 @@
         enableInfoBtn(this);
       });
       this.addEventListener('shown', async () => {
-        await showSpecialView(this);
         pushDownContent(this);
       });
       this.addEventListener('hidden', () => {
@@ -2583,9 +2617,9 @@
       });
       this.status = {};
       this.plugins = [];
+      this.config = {};
 
       this.loadContext(cfg);
-      this.loadCSS();
       checkForIssues(this);
 
       // collapse dropdowns when document is clicked
@@ -2684,7 +2718,7 @@
      */
     async loadContext(cfg) {
       this.location = getLocation();
-      this.config = initConfig(cfg, this.location);
+      this.config = await initConfig(cfg, this.location);
 
       // load dictionary based on user language
       const lang = this.config.lang || navigator.language.split('-')[0];
