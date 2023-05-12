@@ -682,7 +682,7 @@ async function loadLazy(doc) {
   }
 
   loadCSS('/fonts/fonts.css');
-  addFavIcon(`${window.hlx.codeBasePath}/img/icon-helix.svg`);
+  addFavIcon(`${window.hlx.codeBasePath}/img/icon-aeg.svg`);
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
