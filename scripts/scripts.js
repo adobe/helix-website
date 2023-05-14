@@ -411,7 +411,7 @@ export function normalizeHeadings($elem, allowedHeadings) {
 export function addFavIcon(href) {
   const link = document.createElement('link');
   link.rel = 'icon';
-  link.type = 'image/svg+xml';
+  link.type = 'image/png';
   link.href = href;
   const existingLink = document.querySelector('head link[rel="icon"]');
   if (existingLink) {
@@ -682,7 +682,7 @@ async function loadLazy(doc) {
   }
 
   loadCSS('/fonts/fonts.css');
-  addFavIcon(`${window.hlx.codeBasePath}/img/icon-helix.svg`);
+  addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
