@@ -926,6 +926,46 @@
     return evt.metaKey || evt.shiftKey || evt.which === 2;
   }
 
+  async function updatePreview(sk, ranBefore) {
+    console.log('updatePreview');
+    const { status } = sk;
+    const resp = await sk.update();
+    if (!resp.ok) {
+      if (!ranBefore) {
+        console.log('preview failed once');
+        // assume document has been renamed, re-fetch status and try again
+        sk.addEventListener('statusfetched', async () => {
+          updatePreview(sk, true);
+        }, { once: true });
+        sk.fetchStatus();
+      } else if (status.webPath.startsWith('/.helix/') && resp.error) {
+        console.log('preview failed twice');
+        // show detail message only in config update mode
+        sk.showModal({
+          message: `${i18n(sk, 'error_config_failure')}${resp.error}`,
+          sticky: true,
+          level: 0,
+        });
+      } else {
+        console.error(resp);
+        sk.showModal({
+          message: i18n(sk, 'error_preview_failure'),
+          sticky: true,
+          level: 0,
+        });
+      }
+      return;
+    }
+    // handle special case /.helix/*
+    if (status.webPath.startsWith('/.helix/')) {
+      sk.showModal({
+        message: i18n(sk, 'preview_config_success'),
+      });
+      return;
+    }
+    sk.switchEnv('preview');
+  }
+
   /**
    * Adds the edit plugin to the sidekick.
    * @private
@@ -1070,47 +1110,11 @@
       condition: (sidekick) => sidekick.isEditor(),
       button: {
         text: i18n(sk, 'preview'),
-        action: async (evt) => {
-          const { status } = sk;
-          sk.showWait();
-          const updatePreview = async (ranBefore) => {
-            const resp = await sk.update();
-            if (!resp.ok) {
-              if (!ranBefore) {
-                // assume document has been renamed, re-fetch status and try again
-                sk.addEventListener('statusfetched', async () => {
-                  updatePreview(true);
-                }, { once: true });
-                sk.fetchStatus();
-              } else if (status.webPath.startsWith('/.helix/') && resp.error) {
-                // show detail message only in config update mode
-                sk.showModal({
-                  message: `${i18n(sk, 'error_config_failure')}${resp.error}`,
-                  sticky: true,
-                  level: 0,
-                });
-              } else {
-                console.error(resp);
-                sk.showModal({
-                  message: i18n(sk, 'error_preview_failure'),
-                  sticky: true,
-                  level: 0,
-                });
-              }
-              return;
-            }
-            // handle special case /.helix/*
-            if (status.webPath.startsWith('/.helix/')) {
-              sk.showModal({
-                message: i18n(sk, 'preview_config_success'),
-              });
-              return;
-            }
-            sk.switchEnv('preview', newTab(evt));
-          };
+        action: async () => {
+          const { status, location } = sk;
           if (status.edit && status.edit.sourceLocation
             && status.edit.sourceLocation.startsWith('onedrive:')
-            && status.edit.contentType && status.edit.contentType.includes('word')) {
+            && !location.pathname.startsWith('/:x:/')) {
             // show ctrl/cmd + s hint on onedrive docs
             const mac = navigator.platform.toLowerCase().includes('mac') ? '_mac' : '';
             sk.showModal(i18n(sk, `preview_onedrive${mac}`));
@@ -1139,10 +1143,37 @@
               return;
             }
           }
-          updatePreview();
+          if (location.pathname.startsWith('/:x:/')) {
+            // refresh excel with preview param
+            window.sessionStorage.setItem('hlx-sk-preview', JSON.stringify({
+              previewUrl: location.href,
+              previewTimestamp: Date.now(),
+            }));
+            window.location.reload();
+          } else {
+            updatePreview(sk);
+          }
         },
         isEnabled: (sidekick) => sidekick.isAuthorized('preview', 'write')
           && sidekick.status.webPath,
+      },
+      callback: () => {
+        const { location } = sk;
+        const { previewUrl, previewTimestamp } = JSON
+          .parse(window.sessionStorage.getItem('hlx-sk-preview') || '{}');
+        window.sessionStorage.removeItem('hlx-sk-preview');
+        if (previewUrl === location.href && previewTimestamp < Date.now() + 60000) {
+          // preview request detected in session storage, wait for status...
+          sk.showWait();
+          sk.addEventListener('statusfetched', async () => {
+            const { status } = sk;
+            console.log('starting deferred preview', status.webPath, sk.isAuthorized('preview', 'write'));
+            if (status.webPath && sk.isAuthorized('preview', 'write')) {
+              // update preview and remove preview request from session storage
+              updatePreview(sk);
+            }
+          }, { once: true });
+        }
       },
     });
   }
@@ -1260,7 +1291,6 @@
             // fetch and redirect to production
             const redirectHost = config.host || config.outerHost;
             const prodURL = `https://${redirectHost}${path}`;
-            await fetch(prodURL, { cache: 'reload', mode: 'no-cors' });
             console.log(`redirecting to ${prodURL}`);
             if (newTab(evt)) {
               window.open(prodURL);
@@ -1953,16 +1983,18 @@
               'x-auth-token': sk.config.authToken,
             },
           });
-          picture = URL.createObjectURL(await resp.blob());
+          picture = resp.ok ? URL.createObjectURL(await resp.blob()) : null;
         }
-        toggle.querySelector('.user-icon').classList.add('user-icon-hidden');
-        appendTag(toggle, {
-          tag: 'img',
-          attrs: {
-            class: 'user-picture',
-            src: picture,
-          },
-        });
+        if (picture) {
+          toggle.querySelector('.user-icon').classList.add('user-icon-hidden');
+          appendTag(toggle, {
+            tag: 'img',
+            attrs: {
+              class: 'user-picture',
+              src: picture,
+            },
+          });
+        }
         toggle.title = name;
       } else {
         toggle.querySelector('.user-picture')?.remove();
