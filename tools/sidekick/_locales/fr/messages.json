@@ -362,6 +362,9 @@
   "config_manual_project_placeholder": {
     "message": "Nom du projet (facultatif)"
   },
+  "config_manual_devOrigin_placeholder": {
+    "message": "URL du développement locale: http://localhost:3000"
+  },
   "config_manual_devMode": {
     "message": "Tester configuration locale du projet"
   },

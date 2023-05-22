@@ -108,7 +108,8 @@
    * @prop {string} liveHost The host name of a custom live CDN (optional)
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
-   * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
+   * @prop {boolean} devMode=false Loads configuration and plugins from the development environment
+   * @prop {boolean} devOrigin=http://localhost:3000 URL of the local development environment
    * @prop {boolean} pushDown=false <pre>true</pre> to have the sidekick push down page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
    * @prop {ViewConfig[]} specialViews An array of custom {@link ViewConfig|view configurations}
@@ -261,14 +262,6 @@
   ];
 
   /**
-   * The URL of the development environment.
-   * @see {@link https://github.com/adobe/helix-cli|AEM CLI}).
-   * @private
-   * @type {URL}
-   */
-  const DEV_URL = new URL('http://localhost:3000');
-
-  /**
    * Log RUM for sidekick telemetry.
    * @private
    * @param {string} checkpoint identifies the checkpoint in funnel
@@ -308,14 +301,12 @@
       }
       const { weight, id } = window.hlx.rum;
       if (window.hlx && window.hlx.rum && window.hlx.rum.isSelected) {
-        const sendPing = (pdata = data) => {
+        const sendPing = () => {
           // eslint-disable-next-line object-curly-newline, max-len, no-use-before-define
           const body = JSON.stringify({ weight, id, referer: sk.location.href, generation: window.hlx.RUM_GENERATION, checkpoint, ...data });
           const url = `https://rum.hlx.page/.rum/${weight}`;
           // eslint-disable-next-line no-unused-expressions
           navigator.sendBeacon(url, body);
-          // eslint-disable-next-line no-console
-          console.debug(`ping:${checkpoint}`, pdata);
         };
         sampleRUM.cases = sampleRUM.cases || {
           cwv: () => sampleRUM.cwv(data) || true,
@@ -458,13 +449,14 @@
       repo,
       ref = 'main',
       devMode,
+      devOrigin = 'http://localhost:3000',
       adminVersion,
       _extended,
     } = config;
     if (owner && repo && !_extended) {
       // look for custom config in project
       const configUrl = devMode
-        ? `${DEV_URL.origin}/tools/sidekick/config.json`
+        ? `${devOrigin}/tools/sidekick/config.json`
         : getAdminUrl(config, 'sidekick', '/config.json');
       try {
         const res = await fetch(configUrl, getAdminFetchOptions(true));
@@ -506,9 +498,9 @@
     }
     let outerHost = liveHost || legacyLiveHost;
     if (!outerHost) {
-      // use default hlx3 outer CDN including the ref
       outerHost = hostPrefix ? `${hostPrefix}.hlx.live` : null;
     }
+    const devUrl = new URL(devOrigin);
     // define elements to push down
     const pushDownElements = [];
     if (pushDown) {
@@ -543,6 +535,7 @@
       project: project || '',
       pushDownElements,
       specialView,
+      devUrl,
     };
   }
 
@@ -2984,10 +2977,10 @@
      * @returns {boolean} <code>true</code> if development URL, else <code>false</code>
      */
     isDev() {
-      const { location } = this;
+      const { config, location } = this;
       return [
         '', // for unit testing
-        DEV_URL.host, // for development and browser testing
+        config.devUrl.host, // for development and browser testing
       ].includes(location.host);
     }
 
@@ -3399,7 +3392,7 @@
         window.setTimeout(() => this.switchEnv(targetEnv, open), 1000);
         return this;
       }
-      const envOrigin = targetEnv === 'dev' ? DEV_URL.origin : `https://${config[hostType]}`;
+      const envOrigin = targetEnv === 'dev' ? config.devUrl.origin : `https://${config[hostType]}`;
       let envUrl = `${envOrigin}${status.webPath}`;
       if (!this.isEditor()) {
         envUrl += `${search}${hash}`;
