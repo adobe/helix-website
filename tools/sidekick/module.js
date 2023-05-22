@@ -104,7 +104,8 @@
    * @prop {string} mountpoint The content source URL (optional)
    * @prop {string} project The name of the project used in the sharing link (optional)
    * @prop {Plugin[]} plugins An array of {@link Plugin|plugin configurations} (optional)
-   * @prop {string} outerHost The outer CDN's host name (optional)
+   * @prop {string} previewHost The host name of a custom preview CDN (optional)
+   * @prop {string} liveHost The host name of a custom live CDN (optional)
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
    * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
@@ -486,7 +487,9 @@
     }
 
     const {
-      outerHost,
+      previewHost,
+      liveHost,
+      outerHost: legacyLiveHost,
       host,
       project,
       pushDown,
@@ -495,26 +498,16 @@
       scriptUrl = 'https://www.hlx.live/tools/sidekick/module.js',
       scriptRoot = scriptUrl.split('/').filter((_, i, arr) => i < arr.length - 1).join('/'),
     } = config;
-    const innerPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
     const publicHost = host && host.startsWith('http') ? new URL(host).host : host;
-    let innerHost = 'hlx.page';
-    if (!innerHost && scriptUrl) {
-      // get hlx domain from script src (used for branch deployment testing)
-      const scriptHost = new URL(scriptUrl).host;
-      if (scriptHost && scriptHost !== 'www.hlx.live' && !scriptHost.startsWith(DEV_URL.host)) {
-        // keep only 1st and 2nd level domain
-        innerHost = scriptHost.split('.')
-          .reverse()
-          .splice(0, 2)
-          .reverse()
-          .join('.');
-      }
+    const hostPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
+    let innerHost = previewHost;
+    if (!innerHost) {
+      innerHost = hostPrefix ? `${hostPrefix}.hlx.page` : null;
     }
-    innerHost = innerPrefix ? `${innerPrefix}.${innerHost}` : null;
-    let liveHost = outerHost;
-    if (!liveHost && owner && repo) {
+    let outerHost = liveHost || legacyLiveHost;
+    if (!outerHost) {
       // use default hlx3 outer CDN including the ref
-      liveHost = `${ref}--${repo}--${owner}.hlx.live`;
+      outerHost = hostPrefix ? `${hostPrefix}.hlx.live` : null;
     }
     // define elements to push down
     const pushDownElements = [];
@@ -544,7 +537,7 @@
       ...config,
       ref,
       innerHost,
-      outerHost: liveHost,
+      outerHost,
       scriptRoot,
       host: publicHost,
       project: project || '',
