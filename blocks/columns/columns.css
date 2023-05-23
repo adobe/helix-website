@@ -18,6 +18,18 @@
     overflow: hidden;
 }
 
+.columns.contained img,
+.columns.contained:not(.icon-sm) svg {
+    height: 200px;
+    display: inline-block;
+}
+
+.columns.contained.icon-sm img,
+.columns.contained.icon-sm svg {
+    height: 50px;
+    display: inline-block;
+}
+
 .columns.bleed div.columns-image img {
     object-fit: cover;
     height: 100vw;
@@ -36,6 +48,10 @@
 .columns.bleed div.columns-image img.enter {
     opacity: 1;
     transform: translate(0, 0);
+}
+
+.columns-wrapper {
+    margin: var(--spacing-xxl) 0;
 }
 
 @media (min-width: 900px) {
@@ -73,14 +89,18 @@
     grid-template-columns: 1fr;
 }
 
+.columns.contained > div > div {
+    margin-bottom: var(--spacing-l);
+}
+
 .columns.three.contained > div {
     padding: var(--spacing-xxl) var(--spacing-m);
     max-width: 83.4%;
     text-align: center;
 }
 
-.columns.contained > div > div {
-    margin-bottom: var(--spacing-l);
+.columns.lazy-river > div:nth-of-type(even) {
+    flex-direction: column-reverse;
 }
 
 .columns.contained > div > div:last-of-type {
@@ -91,24 +111,20 @@
     margin: 0;
 }
 
-.columns.contained img,
-.columns.contained svg {
-    height: 200px;
-    display: inline-block;
-}
-
-
-.columns.lazy-river > div:nth-of-type(even) {
-    flex-direction: column-reverse;
+@media screen and (min-width: 500px) {
+    .columns.four.contained > div {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
 }
 
 @media screen and (min-width: 900px) {
-    .columns.lazy-river > div:nth-of-type(even) {
-        flex-direction: unset;
-    }
-
     .columns.contained > div > div {
         margin-bottom: 0;
+    }
+    
+    .columns.lazy-river > div:nth-of-type(even) {
+        flex-direction: unset;
     }
 
     .columns.two.contained > div {
@@ -120,6 +136,12 @@
     .columns.three.contained > div {
         max-width: var(--grid-desktop-container-width);
         grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: var(--spacing-xxl);
+    }
+
+    .columns.four.contained > div {
+        max-width: var(--grid-desktop-container-width);
+        grid-template-columns: 1fr 1fr 1fr 1fr;
         grid-gap: var(--spacing-xxl);
     }
 }
