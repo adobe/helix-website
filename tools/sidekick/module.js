@@ -449,10 +449,13 @@
       repo,
       ref = 'main',
       devMode,
-      devOrigin = 'http://localhost:3000',
       adminVersion,
       _extended,
     } = config;
+    let { devOrigin } = config;
+    if (!devOrigin) {
+      devOrigin = 'http://localhost:3000';
+    }
     if (owner && repo && !_extended) {
       // look for custom config in project
       const configUrl = devMode
