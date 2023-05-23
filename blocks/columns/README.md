@@ -7,4 +7,5 @@ Notes: Builds upon the Columns block in the Helix Boilerplate project. See detai
 |--------|------------|
 |  two, three, four  | The number of columns expected  |  
 |  icon-sm | Layout for a small icon (max height 50px) |  
+|  tall | Layout for tall columns with an image in layout |  
 
