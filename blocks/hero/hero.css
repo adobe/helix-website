@@ -1,0 +1,67 @@
+.hero {
+    width: 100%;
+    position: relative; 
+    overflow: hidden;
+    padding: var(--spacing-xxl) 0;
+    padding-bottom: 0;
+    
+    /* default checker-board pattern */
+    background: var(--checkerboard-background);
+    background-size: var(--checkerboard-background-size)
+}
+
+/* background image */
+.background-image-wrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.background-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* text content */
+.inner-content {
+    margin: 0 auto;
+    width: 100%;
+    max-width: var(--content-width);
+    text-align: center;
+    z-index: 2;
+}
+
+.inner-content h3 {
+    font-size: var(--type-body-m-size);
+    padding-bottom: var(--spacing-xs);
+    color: var(--color-accent-blue);
+    text-transform: uppercase;
+    line-height: 100%;
+}
+
+.inner-content h1 {
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.inner-content strong {
+    font-weight: 500;
+    background: var(--color-accent-yellow);
+}
+
+.inner-content a.button:any-link {
+    color: var(--color-black);
+    border: 2px solid var(--color-black);
+}
+
+/* bottom image */
+.bottom-image-wrapper img {
+    display: block;
+    width: 90vw;
+    max-width: var(--grid-desktop-container-width);
+    margin: 0 auto;
+    margin-bottom: -12px;
+}

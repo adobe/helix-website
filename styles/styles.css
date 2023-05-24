@@ -72,12 +72,24 @@
     --color-info-accent-reverse: inherit;
     --color-info-accent-reverse-down: inherit;
 
+    /* Redesign colors */
+    --color-accent-blue: #6870EC;
+    --color-accent-yellow: #E3FA8C;
+
     /* Grid */
     --grid-mobile-container-width: 83.4%;
     --grid-desktop-container-width: 1200px;
 
     /* nav */
     --nav-height: 65px;
+
+    /* Checkerboard pattern */
+    --color-checkerboard-bg-fill: #EBEBEB;
+    --color-checkerboard-bg-border: #d6d5d5;
+    --checkerboard-background: linear-gradient(var(--color-checkerboard-bg-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-checkerboard-bg-border) 1px, transparent 1px),
+    linear-gradient(45deg, var(--color-checkerboard-bg-fill) 50%, var(--color-checkerboard-bg-fill) 51%);
+    --checkerboard-background-size: clamp(15px, 3vw, 25px) clamp(15px, 3vw, 25px);
 }
 
 body {
