@@ -61,6 +61,7 @@
 .bottom-image-wrapper img {
     display: block;
     width: 90vw;
+    height: auto;
     max-width: var(--grid-desktop-container-width);
     margin: 0 auto;
     margin-bottom: -12px;
