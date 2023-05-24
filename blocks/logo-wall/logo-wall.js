@@ -25,7 +25,6 @@ export default function decorate(block) {
             class: 'logo-wall-item-link',
           }, picture);
 
-          // pictureLink.append(picture);
           listItem.append(pictureLink);
         } else {
           listItem.append(picture);
