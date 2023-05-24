@@ -1,28 +1,39 @@
 .z-pattern {
-    padding: var(--spacing-xxl) 0;
+  padding: var(--spacing-xxl) 0;
 }
 
 .z-pattern > div {
-    max-width: 1200px;
-    margin: 0 auto;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .z-pattern > .z-pattern-heading {
-    text-align: center;
-    margin: 0 auto var(--spacing-l) auto;
+  text-align: center;
+  margin: 0 auto var(--spacing-l) auto;
 }
 
 .z-pattern h2 {
-    margin: 0;
+  margin: 0;
+}
+
+.z-pattern-redesign h3 {
+  grid-column: 1 / 3;
+  font-size: var(--type-heading-l-lh);
+  line-height: 1.2;
 }
 
 .z-pattern > div[class^="z-row"] {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap:  var(--spacing-m);
-    margin-bottom: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:  var(--spacing-m);
+  margin-bottom: var(--spacing-m);
+}
+
+.z-pattern.spacing-lg > div[class^="z-row"] {
+  margin-top: 160px;
+  justify-content: space-between;
 }
 
 .z-pattern > div[class^="z-row"] > div {
@@ -35,7 +46,7 @@
 }
 
 .z-pattern-cta {
-    text-align: center;
+  text-align: center;
 }
 
 @media (min-width: 900px) {
@@ -43,8 +54,8 @@
     flex-direction: row;
   }
 
-  .z-pattern > div[class^="z-row"] > div:first-of-type {
-    margin-right: var(--spacing-m);
+  .z-pattern.z-pattern.spacing-lg > div[class^="z-row"] {
+    margin-top: 260px;
   }
 
   .z-pattern > div[class^="z-row"] > div {
@@ -56,4 +67,34 @@
   .z-pattern > div.z-row-odd > div:first-child {
     order: 2;
   }
+
+  .z-pattern > div[class^="z-row"] > div:first-of-type {
+    margin-right: var(--spacing-m);
+  }
+
+  .z-pattern.spacing-lg > div[class^="z-row"]:last-of-type {
+    margin-bottom: 260px;
+  }
+
+  .z-pattern.wide-text > div[class^="z-row"] > div {
+    flex: 0 0 54%;
+    max-width: 600px;
+  }
+
+  .z-pattern.wide-text > div[class^="z-row"] > div:first-of-type {
+    flex: 0 0 42%;
+  }
+}
+
+.z-pattern ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  font-size: var(--type-body-s-size);
+  padding-left: 0;
+  list-style: none;
+}
+
+.z-pattern li strong {
+  font-size: var(--body-font-size-m);
 }
