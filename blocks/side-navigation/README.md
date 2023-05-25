@@ -1,10 +1,6 @@
 ## Side Navigation
 
-Notes: The Side Navigation is a block meant to be used a a fragment on the Documentation Landing and Documentation Detail pages. When used on these pages, this section should contain the following Section Metadata:
-
-`style: aside`
-
-With the Page metadata template set to `guides`.
+Notes: The Side Navigation is a block meant to be used a a fragment on the Documentation Landing and Documentation Detail pages with the Page metadata template set to `guides`.
 
 ##### Custom Classes 
 |  Class | Function   |  
