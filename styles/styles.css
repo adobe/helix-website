@@ -21,6 +21,8 @@
     --type-detail-m-lh: 15px;
     --type-detail-m-transform: uppercase;
     --type-heading-all-weight: 700;
+    --type-heading-xxxl-size: 80px;
+    --type-heading-xxxl-lh: 80px;
     --type-heading-xxl-size: 44px;
     --type-heading-xxl-lh: 55px;
     --type-heading-xl-size: 2.25em;
@@ -35,6 +37,8 @@
     --type-body-m-lh: 1.6875;
     --type-body-s-size: 14px;
     --type-body-s-lh: 1.3875;
+    --type-body-xs-size: 12px;
+    --type-body-xs-lh: 1.5;
 
     /* duplicates of the above ? */
     --body-font-size-s: 14px;
@@ -51,7 +55,7 @@
     --spacing-xxl: 80px;
 
     /* Colors */
-    --spectrum-blue: rgb(20 115 230);
+    --spectrum-blue: #1473E6;
     --highlight-gradient: linear-gradient(75deg, #DB3278, #EE732F);
 
     /* those (background) colors were missing */
@@ -72,9 +76,29 @@
     --color-info-accent-reverse: inherit;
     --color-info-accent-reverse-down: inherit;
 
+    /* Redesign colors */
+    --color-eyebrow-light-grey: #444;
+    --color-eyebrow-highlight: #6870EC;
+    --color-accent-pink-bg: #F0B2F2;
+    --color-accent-pink-content: #98009D;
+    --color-accent-purple-bg: #6870EC;
+    --color-accent-purple-content: #E2E4FF;
+    --color-accent-lightgreen-bg: #E1FA82;
+    --color-accent-lightgreen-content: #6B8700;
+    --color-accent-yellow-bg: #F5E66B;
+    --color-accent-yellow-content: #9F8000;
+
+    /* background colors, TODO: get the checkerboard color variables from another branch */
+    --bg-color-lightgrey: #F8F8F8;
+    --bg-color-grey: #E8E8E8;
+  
     /* Grid */
     --grid-mobile-container-width: 83.4%;
     --grid-desktop-container-width: 1200px;
+
+    /* Border-radius */
+    --image-border-radius-m: 16px;
+    --image-border-radius-s: 8px;
 
     /* nav */
     --nav-height: 65px;
@@ -153,6 +177,13 @@ h6 {
     font-weight: 700;
     margin: 0;
     scroll-margin: calc(var(--nav-height) + 1em);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
 h1 strong,
