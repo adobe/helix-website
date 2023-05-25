@@ -97,6 +97,7 @@ const init = (e) => {
         tabindex: (i > 0) ? '0' : '-1',
         'aria-selected': (i === 0) ? 'true' : 'false',
         'aria-controls': `tab-panel-${initCount}-${tabName}`,
+        'aria-label': item.textContent ? item.textContent.trim() : tabName,
       };
       const tabBtn = createTag('button', tabBtnAttributes);
       tabBtn.innerText = item.textContent;
