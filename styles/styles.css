@@ -671,3 +671,46 @@ main .section.separator
   border-top: 2px solid #ccc;
   padding: 20px 0;
 }
+
+/* Layout for Guide pages  */
+
+body.guides-template main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+body.guides-template .section {
+  box-sizing: border-box;
+}
+
+body.guides-template main .section.heading {
+  width: 100%;
+}
+
+body.guides-template main .section.aside {
+  max-width: calc(1200px * 0.3);
+  margin-top: var(--spacing-xl);
+}
+
+body.guides-template main .section.content {
+  max-width: calc(1200px * 0.7);
+  width: 100%;
+  margin-top: var(--spacing-xl);
+  text-align: left;
+  padding: 4rem 24px;
+}
+
+body.guides-template .icon-icon-caret-right,
+body.guides-template .icon-icon-caret-down {
+  width: 20px;
+  height: 20px;
+}
+
+body.guides-template .icon-icon-caret-right {
+  background-image: url("/img/icon-caret-right.svg");
+}
+
+body.guides-template .icon-icon-caret-down {
+  background-image: url("/img/icon-caret-down.svg");
+}

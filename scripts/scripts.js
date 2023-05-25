@@ -612,7 +612,10 @@ function buildEmbeds() {
 
 function buildHeader() {
   const header = document.querySelector('header');
-  header.append(buildBlock('header', ''));
+  if (!document.querySelector('header > .header')) {
+    header.append(buildBlock('header', ''));
+  }
+  // console.log('appending header')
 }
 
 function buildFooter() {
@@ -642,7 +645,7 @@ export function buildAutoBlocks(main) {
 export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
-  decorateButtons(main);
+  // decorateButtons(main);
   decorateHeadings(main);
   decorateBlocks(main);
 }
