@@ -8,6 +8,10 @@
     --tabs-bg-color: rgb(250 250 250);
     --tabs-active-bg-color: #fff;
     --tabs-list-bg-gradient: linear-gradient(rgba(255 255 255 0%) 60%, rgba(245 245 245 80%));
+
+    /* redesign */
+    --tabs-image-based-border-color: #E8E8E8;
+    --tabs-image-based-active-border-color: #000;
   }
   
   :root .dark {
@@ -201,5 +205,71 @@
     .tabs.quiet div[role="tablist"] button {
       padding-top: 18px;
       padding-bottom: 18px;
+    }
+  }
+
+  /* - Tabs: .image-based - */
+  .tabs.image-based[data-block-status="loaded"] {
+    background: transparent;
+  }
+
+  .tabs.image-based div[role="tablist"] button {
+    border-bottom: 2px solid var(--tabs-image-based-border-color);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .tabs.image-based div[role="tablist"] button:hover,
+  .tabs.image-based div[role="tablist"] button[aria-selected="true"] {
+    border-color: transparent;
+    border-bottom: 2px solid var(--tabs-image-based-active-border-color);
+  }
+
+  .tabs.image-based div[role="tablist"] button picture {
+    pointer-events: none;
+    opacity: 0.3;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .tabs.image-based div[role="tablist"] button:hover picture,
+  .tabs.image-based div[role="tablist"] button[aria-selected="true"] picture {
+    opacity: 1;
+  }
+
+  .tabs.image-based div[role="tablist"] img {
+    width: 100%;
+    height: 100%;
+    max-height: 56px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .tabs.image-based .tabcontent{
+    border-color: transparent;
+    padding: 0;
+  }
+
+  @media screen and (max-width: 600px) {
+    .tabs.image-based div[role="tablist"] button {
+      padding: 7px 8px 6px;
+    }
+  }
+
+  @media screen and (min-width: 900px) {
+    .tabs.image-based div[role="tablist"] {
+      width: 86%;
+      margin: 0 auto;
+    }
+  }
+
+  /* - Tabs: .contained - */
+  .tabs.contained {
+    max-width: var(--grid-mobile-container-width);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media screen and (min-width: 1440px) {
+    .tabs.contained {
+      max-width: var(--grid-desktop-container-width);
     }
   }

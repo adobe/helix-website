@@ -100,6 +100,15 @@ const init = (e) => {
       };
       const tabBtn = createTag('button', tabBtnAttributes);
       tabBtn.innerText = item.textContent;
+
+      // support image in tabs for tabs.image-based
+      if (e.classList.contains('image-based')) {
+        const img = item.querySelector('picture');
+        if (img) {
+          tabBtn.innerHTML = '';
+          tabBtn.append(img);
+        }
+      }
       tabListContainer.append(tabBtn);
 
       const tabContentAttributes = {
