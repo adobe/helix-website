@@ -19,6 +19,7 @@ export default function decorate(block) {
     if (img) {
       cell.classList.add('columns-image');
       observer.observe(img);
+      img.parentElement.closest('p').classList.add('image-wrapper-el');
     } else {
       cell.classList.add('columns-content');
       const wrapper = document.createElement('div');

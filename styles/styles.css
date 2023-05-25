@@ -72,6 +72,13 @@
     --color-info-accent-reverse: inherit;
     --color-info-accent-reverse-down: inherit;
 
+    /* Redesign colors */
+    --color-eyebrow-light: #B6B6B6;
+    --color-accent-blue: #6870EC;
+
+    /* Redesign styles */
+    --image-border-radius-m: 8px;
+
     /* Grid */
     --grid-mobile-container-width: 83.4%;
     --grid-desktop-container-width: 1200px;
@@ -723,4 +730,50 @@ body.guides-template .icon-icon-caret-right {
 
 body.guides-template .icon-icon-caret-down {
   background-image: url("/img/icon-caret-down.svg");
+}
+
+/* redesign styles */
+main .section.title-section {
+  padding-bottom: 0;
+}
+
+main .section.title-section h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-eyebrow-light);
+  font-size: var(--type-body-s-size);
+  text-transform: uppercase;
+  line-height: 1.25;
+  font-style: normal;
+  font-weight: 700;
+  padding-bottom: var(--spacing-s);
+}
+
+main .section.title-section h3 {
+  font-size: var(--type-heading-l-size);
+  font-weight: 500;
+  text-transform: capitalize;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+  width: 60vw;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+main .section.title-section span {
+  display: grid;
+  place-items: center;
+  margin-right: var(--spacing-xs);
+}
+
+@media screen and (min-width: 600px){
+  main .section.title-section h2 {
+    font-size: var(--type-body-m-size);
+  }
+
+  main .section.title-section h3 {
+    font-size: var(--type-heading-xxl-size);
+    width: 80vw;
+  }
 }
