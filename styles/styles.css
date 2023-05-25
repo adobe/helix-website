@@ -84,8 +84,11 @@
     --nav-height: 65px;
 
     /* Checkerboard pattern */
-    --color-checkerboard-bg-fill: #EBEBEB;
-    --color-checkerboard-bg-border: #d6d5d5;
+    --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
+    ;
+
+    /* TODO: original fill grey: #EBEBEB; border grey : #d6d5d5, remove after confirming design  */
+    --color-checkerboard-bg-fill: transparent; 
     --checkerboard-background: linear-gradient(var(--color-checkerboard-bg-border) 1px, transparent 1px),
     linear-gradient(90deg, var(--color-checkerboard-bg-border) 1px, transparent 1px),
     linear-gradient(45deg, var(--color-checkerboard-bg-fill) 50%, var(--color-checkerboard-bg-fill) 51%);

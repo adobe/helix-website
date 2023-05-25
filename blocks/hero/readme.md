@@ -5,7 +5,9 @@ Notes:
 ##### Custom Classes 
 |  Class | Function   |  
 |--------|------------|
-| N/A |  Default Home Hero: text in center, image at bottom, checkerboard pattern background |  
+| N/A |  Default Home Hero: text in center, image at bottom, colorful checkerboard pattern background |  
+| side-by-side | 50% detail, 50% image in same row  |  
+| square-image | image will become 1:1 in aspect ratio  |  
 
 #### Example:
 
@@ -21,7 +23,7 @@ https://docs.google.com/document/d/1LfT3loAme82XIWhWAUOaWK1aPP42XzZ1GVjwHYtk0Zc/
 #### Code:
 - Background Image: display image from 1st table row as cover. If no image provided, it will fallback to default grey checkerboard background
 - Text Content from 2nd table row
-- Bottom Image from 3rd table row
+- Content Image from 3rd table row
 
 [Decoration Code](hero.js)
 
