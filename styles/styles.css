@@ -79,6 +79,8 @@
     /* Redesign colors */
     --color-eyebrow-light-grey: #444;
     --color-eyebrow-highlight: #6870EC;
+    --color-accent-blue: #6870EC;
+    --color-accent-highlight-yellow: #E3FA8C;
     --color-accent-pink-bg: #F0B2F2;
     --color-accent-pink-content: #98009D;
     --color-accent-purple-bg: #6870EC;
@@ -97,11 +99,22 @@
     --grid-desktop-container-width: 1200px;
 
     /* Border-radius */
-    --image-border-radius-m: 16px;
-    --image-border-radius-s: 8px;
+    --image-border-radius-l: 16px;
+    --image-border-radius-m: 8px;
 
     /* nav */
     --nav-height: 65px;
+
+    /* Checkerboard pattern */
+    --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
+    ;
+
+    /* TODO: original fill grey: #EBEBEB; border grey : #d6d5d5, remove after confirming design  */
+    --color-checkerboard-bg-fill: transparent; 
+    --checkerboard-background: linear-gradient(var(--color-checkerboard-bg-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-checkerboard-bg-border) 1px, transparent 1px),
+    linear-gradient(45deg, var(--color-checkerboard-bg-fill) 50%, var(--color-checkerboard-bg-fill) 51%);
+    --checkerboard-background-size: clamp(15px, 3vw, 25px) clamp(15px, 3vw, 25px);
 }
 
 body {
@@ -701,4 +714,103 @@ main .section.separator
   width: 60%;
   border-top: 2px solid #ccc;
   padding: 20px 0;
+}
+
+/* Layout for Guide pages  */
+
+body.guides-template main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+body.guides-template .section {
+  box-sizing: border-box;
+}
+
+body.guides-template main .section.heading {
+  width: 100%;
+}
+
+body.guides-template main .section.content {
+  max-width: 1200px;
+  width: 100%;
+  height: 100%;
+}
+
+@media screen and (min-width: 900px) {
+  body.guides-template main .section.content {
+    display: flex;
+    height: auto;
+  }
+
+  body.guides-template main .section.content .default-content-wrapper {
+    margin-left: 32px;
+  }
+}
+
+body.guides-template main .section.content .default-content-wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: #eee;
+}
+
+body.guides-template .icon-icon-caret-right,
+body.guides-template .icon-icon-caret-down {
+  width: 20px;
+  height: 20px;
+}
+
+body.guides-template .icon-icon-caret-right {
+  background-image: url("/img/icon-caret-right.svg");
+}
+
+body.guides-template .icon-icon-caret-down {
+  background-image: url("/img/icon-caret-down.svg");
+}
+
+/* redesign styles */
+main .section.title-section {
+  padding-bottom: 0;
+}
+
+main .section.title-section h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-eyebrow-light-grey);
+  font-size: var(--type-body-s-size);
+  text-transform: uppercase;
+  line-height: 1.25;
+  font-style: normal;
+  font-weight: 700;
+  padding-bottom: var(--spacing-s);
+}
+
+main .section.title-section h3 {
+  font-size: var(--type-heading-l-size);
+  font-weight: 500;
+  text-transform: capitalize;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+  width: 60vw;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+main .section.title-section span {
+  display: grid;
+  place-items: center;
+  margin-right: var(--spacing-xs);
+}
+
+@media screen and (min-width: 600px){
+  main .section.title-section h2 {
+    font-size: var(--type-body-m-size);
+  }
+
+  main .section.title-section h3 {
+    font-size: var(--type-heading-xxl-size);
+    width: 80vw;
+  }
 }
