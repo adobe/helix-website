@@ -684,7 +684,7 @@ async function loadLazy(doc) {
     }, 500);
   }
 
-  loadCSS('/fonts/fonts.css');
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
 
   if (getMetadata('supressframe')) {
