@@ -515,7 +515,7 @@ document.addEventListener('click', () => sampleRUM('click'));
 loadPage(document);
 
 export function decorateButtons(block = document) {
-  const noButtonBlocks = ['cards', 'pagination'];
+  const noButtonBlocks = ['cards', 'pagination', 'card-list'];
   block.querySelectorAll(':scope a').forEach(($a) => {
     $a.title = $a.title || $a.textContent;
     const $block = $a.closest('div.section > div > div');

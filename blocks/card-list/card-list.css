@@ -1,0 +1,36 @@
+.card-list > ul {
+    list-style: none;
+    margin: 0;
+    padding: 24px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-gap: 16px;
+  }
+  
+  .card-list > ul > li {
+    border: 1px solid var(--highlight-background-color);
+    background-color: var(--background-color)
+  }
+
+  .card-list > ul > li > a {
+    text-decoration: none;
+  }
+  
+  .card-list .cards-card-body {
+    margin: 16px;
+    font-size: var(--body-font-size-s);
+  }
+  
+  .card-list .cards-card-image {
+    line-height: 0;
+  }
+  
+  .card-list.cards-card-body > *:first-child {
+    margin-top: 0;
+  }
+  
+  .card-list > ul > li img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
