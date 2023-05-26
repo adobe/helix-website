@@ -44,7 +44,7 @@ function highlightTextElements(terms, elements) {
     else {
       markedUp = txt.substr(0, matches[0].offset);
       matches.forEach((hit, i) => {
-        markedUp += `<mark class="gnav-search-highlight">${txt.substr(hit.offset, hit.term.length)}</mark>`;
+        markedUp += `<mark class="side-nav-search-highlight">${txt.substr(hit.offset, hit.term.length)}</mark>`;
         if (matches.length - 1 === i) {
           markedUp += txt.substr(hit.offset + hit.term.length);
         } else {

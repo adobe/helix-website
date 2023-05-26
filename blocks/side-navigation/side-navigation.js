@@ -14,7 +14,7 @@ export default function decorate(block) {
   const backBtnInner = '<button>← Back</button>';
   const backBtn = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, backBtnInner);
 
-  const searchInputInner = '<input type="text" name="search" placeholder="Search">';
+  const searchInputInner = '<input type="text" name="search" placeholder="Search...">';
   const searchInput = createTag('div', { class: 'search-input-wrapper' }, searchInputInner);
 
   const searchInputOuter = searchInput.cloneNode(true);
