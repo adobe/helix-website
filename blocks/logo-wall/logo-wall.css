@@ -5,7 +5,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: var(--spacing-l) var(--spacing-m);
+    padding: var(--spacing-l) var(--spacing-s);
 }
 
 .logo-wall .logo-wall-title {
@@ -13,15 +13,15 @@
     font-size: clamp(36px, 4.5vw, 48px);
     font-weight: 500;
     text-align: center;
-    padding-bottom: var(--spacing-m);
+    padding-bottom: var(--spacing-s);
 }
 
 .logo-wall .logo-wall-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    column-gap: var(--spacing-m);
-    row-gap: var(--spacing-m);
+    column-gap: var(--spacing-s);
+    row-gap: var(--spacing-s);
     width: 100%;
     max-width: 740px;
     padding-inline-start: 0;

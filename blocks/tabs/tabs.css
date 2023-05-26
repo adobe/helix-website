@@ -43,11 +43,11 @@
   }
   
   .tabs.s-spacing {
-    padding: var(--spacing-s) 0;
+    padding: var(--spacing-xs) 0;
   }
   
   .tabs.xs-spacing {
-    padding: var(--spacing-xs) 0;
+    padding: var(--spacing-xxs) 0;
   }
   
   .tabs [data-block-status="loaded"] div[role="tablist"] {

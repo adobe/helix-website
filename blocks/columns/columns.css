@@ -83,7 +83,7 @@
 
 .columns.contained > div {
     margin: 0 auto;
-    padding: var(--spacing-m);
+    padding: var(--spacing-s);
     display: grid;
     grid-template-columns: 1fr;
 }
@@ -93,7 +93,7 @@
 }
 
 .columns.three.contained > div {
-    padding: var(--spacing-xxl) var(--spacing-m);
+    padding: var(--spacing-xxl) var(--spacing-s);
     max-width: 83.4%;
 }
 

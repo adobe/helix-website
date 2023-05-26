@@ -1,58 +1,73 @@
 @font-face {
     font-family: 'Trebuchet MS';
+    font-weight: 700;
     size-adjust: 95%;
     src: local('Trebuchet MS'),
          local('TrebuchetMS');
-         font-weight: 700;
 }
 
 @font-face {
     font-family: 'Trebuchet MS';
+    font-weight: 400;
     size-adjust: 87%;
     src: local('Trebuchet MS'),
-         local('TrebuchetMS');
-         font-weight: 400;
+         local('TrebuchetMS');    
 }
 
 :root {
-    /* Typography */
+    /* Fonts */
+    --body-font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+
+    /* Headings (Consonant) */
+    --type-heading-all-weight: 700;
+    --type-heading-xxxl-size: 44px;
+    --type-heading-xxxl-lh: 55px;
+    --type-heading-xxl-size: 36px;
+    --type-heading-xxl-lh: 45px;
+    --type-heading-xl-size: 28px;
+    --type-heading-xl-lh: 35px;
+    --type-heading-l-size: 24px;
+    --type-heading-l-lh: 30px;
+    --type-heading-m-size: 20px;
+    --type-heading-m-lh: 25px;
+    --type-heading-s-size: 16px;
+    --type-heading-s-lh: 20px;
+
+    /* Body (Consonant) */
+    --type-body-l-size: 20px;
+    --type-body-l-lh: 30px;
+    --type-body-m-size: 18px;
+    --type-body-m-lh: 27px;
+    --type-body-s-size: 16px;
+    --type-body-s-lh: 1.5;
+    --type-body-xs-size: 14px;
+    --type-body-xs-lh: 21px;
+    --type-body-xxs-size: 12px;
+    --type-body-xxs-lh: 1.5;
+
+    /* Detail (Consonant) */
     --type-detail-all-weight: 700;
+    --type-detail-m-transform: uppercase;
+    --type-detail-xl-size: 20px;
+    --type-detail-xl-lh: 1.75;
+    --type-detail-l-size: 16px;
+    --type-detail-l-lh: 1.5;
     --type-detail-m-size: 12px;
     --type-detail-m-lh: 15px;
-    --type-detail-m-transform: uppercase;
-    --type-heading-all-weight: 700;
-    --type-heading-xxxl-size: 80px;
-    --type-heading-xxxl-lh: 80px;
-    --type-heading-xxl-size: 44px;
-    --type-heading-xxl-lh: 55px;
-    --type-heading-xl-size: 2.25em;
-    --type-heading-xl-lh: 45px;
-    --type-heading-l-size: 28px;
-    --type-heading-l-lh: 35px;
-    --type-heading-m-size: 24px;
-    --type-heading-m-lh: 30px;
-    --type-body-l-size: 24px;
-    --type-body-l-lh: 27px;
-    --type-body-m-size: 20px;
-    --type-body-m-lh: 1.6875;
-    --type-body-s-size: 14px;
-    --type-body-s-lh: 1.3875;
-    --type-body-xs-size: 12px;
-    --type-body-xs-lh: 1.5;
-
-    /* duplicates of the above ? */
-    --body-font-size-s: 14px;
-    --body-font-size-m: 20px;
-    --body-font-size-xs: 12px;
+    
+    /* Button */
     --body-line-height: 1.6875;
 
-    /* Spacing */
-    --spacing-xs: 8px;
-    --spacing-s: 16px;
-    --spacing-m: 24px;
+    /* Spacing (Consonant) */
+    --spacing-xxs: 8px;
+    --spacing-xs: 16px;
+    --spacing-s: 24px;
+    --spacing-m: 32px;
+    --spacing-ml: 40px; 
     --spacing-l: 48px;
     --spacing-xl: 56px;
     --spacing-xxl: 80px;
+    --spacing-xxxl: 104px;
 
     /* Colors */
     --spectrum-blue: #1473E6;
@@ -90,7 +105,7 @@
     --color-accent-yellow-bg: #F5E66B;
     --color-accent-yellow-content: #9F8000;
 
-    /* background colors, TODO: get the checkerboard color variables from another branch */
+    /* background colors */
     --bg-color-lightgrey: #F8F8F8;
     --bg-color-grey: #E8E8E8;
   
@@ -99,17 +114,14 @@
     --grid-desktop-container-width: 1200px;
 
     /* Border-radius */
-    --image-border-radius-l: 16px;
     --image-border-radius-m: 8px;
+    --image-border-radius-l: 16px;
 
     /* nav */
     --nav-height: 65px;
 
     /* Checkerboard pattern */
     --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
-    ;
-
-    /* TODO: original fill grey: #EBEBEB; border grey : #d6d5d5, remove after confirming design  */
     --color-checkerboard-bg-fill: transparent; 
     --checkerboard-background: linear-gradient(var(--color-checkerboard-bg-border) 1px, transparent 1px),
     linear-gradient(90deg, var(--color-checkerboard-bg-border) 1px, transparent 1px),
@@ -117,12 +129,36 @@
     --checkerboard-background-size: clamp(15px, 3vw, 25px) clamp(15px, 3vw, 25px);
 }
 
+/* desktop variables */
+@media (min-width: 900px) {
+  :root {
+    /* Headings (Consonant) */
+    --type-heading-all-weight: 700;
+    --type-heading-xxxl-size: 80px;
+    --type-heading-xxxl-lh: 0.9;
+    --type-heading-xxl-size: 44px;
+    --type-heading-xxl-lh: 55px;
+    --type-heading-xl-size: 36px;
+    --type-heading-xl-lh: 45px;
+    --type-heading-l-size: 28px;
+    --type-heading-l-lh: 35px;
+    --type-heading-m-size: 24px;
+    --type-heading-m-lh: 30px;
+    --type-heading-s-size: 20px;
+    --type-heading-s-lh: 25px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-    font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+    font-family: var(--body-font-family);
     margin: 0;
-    padding-top: 65px;
-    font-size: var(--type-body-m-size);
-    line-height: var(--type-body-m-lh);
+    padding-top: var(--nav-height);
+    font-size: var(--type-body-l-size);
+    line-height: var(--type-body-l-lh);
     display: none;
 }
 
@@ -215,17 +251,17 @@ h1 u {
   text-decoration: none;
 }
 
-/* Heading XL */
+/* Heading XXL */
 h1 {
-  font-size: 38px;
-  line-height: 1.3;
+  font-size: var(--type-heading-xxl-size);
+  line-height: 1;
   margin-bottom: 20px;
 }
 
-/* Heading L */
+/* Heading XL */
 h2 {
-  font-size: 32px;
-  line-height: 1.3;
+  font-size: var(--type-heading-xl-size);
+  line-height: 1;
   font-weight: normal;
 }
 
@@ -242,21 +278,23 @@ h3 {
     font-size: 60px;
   }
 
-  /* Heading XL */
+  /* Heading XXL */
   h1 {
-    font-size: 45px;
+    font-size: var(--type-heading-xxl-size);
+    line-height: var(--type-heading-xxl-lh);
   }
 
-  /* Heading L */
+  /* Heading XL */
   h2 {
-    font-size: 38px;
+    font-size: var(--type-heading-xl-size);
+    line-height: var(--type-heading-xl-lh);
   }
 
   /* Heading M */
   h3 {
     font-size: var(--type-heading-m-size);
+    line-height: var(--type-heading-m-size);
   }
-
 }
 
 
@@ -339,7 +377,7 @@ a.button:any-link {
     border-radius: 25px;
     padding: 5px 1.2em 6px;
     text-align: center;
-    font-size: var(--body-font-size-s);
+    font-size: var(--type-body-xs-size);
     font-style: normal;
     font-weight: 600;
     line-height: var(--body-line-height);
@@ -357,7 +395,7 @@ a.button:any-link {
   a.button.xlarge:any-link {
     padding: 13px 1.5em;
     border-radius: 27px;
-    font-size: var(--body-font-size-m);
+    font-size: var(--type-body-l-size);
   }
 
   a.button.large:any-link {
@@ -368,7 +406,7 @@ a.button:any-link {
   a.button.small:any-link {
     padding: 4px 1em;
     border-radius: 15px;
-    font-size: var(--body-font-size-xs);
+    font-size: var(--type-body-xxs-size);
   }
 
   a.button:any-link,
@@ -646,6 +684,7 @@ body.no-header-template {
     display: none;
 }
 
+/* docs template */
 body.docs-template main .section.light,
 body.docs-template main .section.dark {
   max-width: unset;
@@ -686,6 +725,31 @@ body.docs-template main a.anchor-link:hover::before {
 
 body.docs-template main a.anchor-link.anchor-link-copied {
   color: green;
+}
+
+/* Documentation page styles */
+body.docs-template main h1 {
+  font-size: var(--type-heading-xxl-size);
+  line-height: var(--type-heading-xxl-lh);
+  margin-bottom: var(--spacing-ml);
+}
+
+body.docs-template main h2 {
+  font-size: var(--type-heading-xl-size);
+  line-height: var(--type-heading-xl-lh);
+  margin-bottom: var(--spacing-s);
+}
+
+body.docs-template main h3 {
+  font-size: var(--type-heading-m-size);
+  line-height: var(--type-heading-m-lh);
+  margin-bottom: var(--spacing-s);
+}
+
+body.docs-template main p {
+  font-size: var(--type-body-l-size);
+  line-height: var(--type-body-l-lh);
+  margin-bottom: var(--spacing-s);
 }
 
 @media screen and (min-width: 900px) {
@@ -769,7 +833,25 @@ body.guides-template .icon-icon-caret-down {
   background-image: url("/img/icon-caret-down.svg");
 }
 
-/* redesign styles */
+
+/* ---- Utility Classes ---- */
+.block.colorful-bg {
+  background: url("../img/colorful-bg.png") center center / cover;
+  background-position: center center;
+}
+
+/* used with above class for colorful background in new design */
+.block .checker-board-guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--checkerboard-background);
+  background-size: var(--checkerboard-background-size);
+  z-index: 0;
+}
+
+/* redesign styles: eyebrow + headline */
 main .section.title-section {
   padding-bottom: 0;
 }
@@ -779,12 +861,12 @@ main .section.title-section h2 {
   align-items: center;
   justify-content: center;
   color: var(--color-eyebrow-light-grey);
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-xs-size);
   text-transform: uppercase;
   line-height: 1.25;
   font-style: normal;
   font-weight: 700;
-  padding-bottom: var(--spacing-s);
+  padding-bottom: var(--spacing-xs);
 }
 
 main .section.title-section h3 {
@@ -801,12 +883,12 @@ main .section.title-section h3 {
 main .section.title-section span {
   display: grid;
   place-items: center;
-  margin-right: var(--spacing-xs);
+  margin-right: var(--spacing-xxs);
 }
 
 @media screen and (min-width: 600px){
   main .section.title-section h2 {
-    font-size: var(--type-body-m-size);
+    font-size: var(--type-body-l-size);
   }
 
   main .section.title-section h3 {

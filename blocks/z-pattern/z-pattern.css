@@ -27,8 +27,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap:  var(--spacing-m);
-  margin-bottom: var(--spacing-m);
+  gap:  var(--spacing-s);
+  margin-bottom: var(--spacing-s);
 }
 
 .z-pattern.spacing-lg > div[class^="z-row"] {
@@ -69,7 +69,7 @@
   }
 
   .z-pattern > div[class^="z-row"] > div:first-of-type {
-    margin-right: var(--spacing-m);
+    margin-right: var(--spacing-s);
   }
 
   .z-pattern.spacing-lg > div[class^="z-row"]:last-of-type {
@@ -90,11 +90,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-xs-size);
   padding-left: 0;
   list-style: none;
 }
 
 .z-pattern li strong {
-  font-size: var(--body-font-size-m);
+  font-size: var(--type-body-l-size);
 }

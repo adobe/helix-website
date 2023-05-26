@@ -1,17 +1,17 @@
 main .form {
   background-color: white;
-  padding: var(--spacing-m);
+  padding: var(--spacing-s);
   box-shadow: 0 1px 6px rgb(34 34 34 / 10%);
 }
 
 main .form h2 {
-  padding: var(--spacing-m) 0;
+  padding: var(--spacing-s) 0;
   font-size: var(--type-heading-l-lh);
   font-weight: normal;
 }
 
 main .form h3 {
-  padding-top: var(--spacing-m);
+  padding-top: var(--spacing-s);
   font-size: var(--type-heading-m-size);
   font-weight: bold;
   text-transform: uppercase;
@@ -41,9 +41,9 @@ main .form select:hover {
 main .form label {
   width: 100%;
   display: block;
-  font-size: var(--type-body-s-size);
-  line-height: var(--type-body-s-lh);
-  padding-bottom: var(--spacing-xs);
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  padding-bottom: var(--spacing-xxs);
   text-transform: uppercase;
   box-sizing: border-box;
   font-weight: 800;
@@ -61,7 +61,7 @@ main .form .field-wrapper {
 
 main .form .form-checkbox-wrapper {
   display: flex;
-  margin: var(--spacing-s) 0;
+  margin: var(--spacing-xs) 0;
 }
 
 main .form .form-checkbox-wrapper input[type='checkbox'] {
@@ -100,8 +100,8 @@ main .form .form-checkbox-wrapper input[type='checkbox']:checked::after {
 }
 
 main .form .form-checkbox-wrapper label {
-  font-size: var(--type-body-m-size);
-  line-height: var(--type-body-m-lh);
+  font-size: var(--type-body-l-size);
+  line-height: var(--type-body-l-lh);
   font-weight: normal;
   text-transform: none;
   display: block;
@@ -112,7 +112,7 @@ main .form .button {
   background: rgb(20 115 230);
   color: white;
   border-radius: 16px;
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-xs-size);
   font-weight: 300;
   padding: 6px 16px;
   border: none;

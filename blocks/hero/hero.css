@@ -9,10 +9,6 @@
     background: url('../../img/colorful-bg.png'); 
     background-size: cover;
     background-position: center;
-
-    /* TODO: remove after confirming design  
-    background: var(--checkerboard-background); 
-    background-size: var(--checkerboard-background-size); */
 }
 
 .hero .checker-board-guide {
@@ -51,8 +47,8 @@
 }
 
 .inner-content h3 {
-    font-size: var(--type-body-m-size);
-    padding-bottom: var(--spacing-xs);
+    font-size: var(--type-body-l-size);
+    padding-bottom: var(--spacing-xxs);
     color: var(--color-accent-blue);
     text-transform: uppercase;
     line-height: 100%;
@@ -66,13 +62,13 @@
 .inner-content p {
     width: 90vw;
     max-width: 600px;
-    margin: var(--spacing-s) auto;
+    margin: var(--spacing-xs) auto;
     line-height: 1.25;
-    font-size: var(--body-font-size-s);
+    font-size: var(--type-body-xs-size);
 }
 
 .inner-content strong {
-    background: var(--color-accent-yellow);
+    background: var(--color-accent-highlight-yellow);
 }
 
 .inner-content a.button:any-link {
@@ -104,7 +100,7 @@
 @media screen and (min-width: 600px) {
     .inner-content p {
         line-height: 1.5;
-        font-size: var(--body-font-size-m);
+        font-size: var(--type-body-l-size);
     }    
 }
 
@@ -130,14 +126,14 @@
 .hero.side-by-side .inner-content h3 {
     display: flex;
     align-items: center;
-    margin-bottom: var(--spacing-s);
+    margin-bottom: var(--spacing-xs);
     color: var(--color-black);
 }
 
 .hero.side-by-side .inner-content h3 span {
     display: flex;
     align-items: center;
-    margin-right: var(--spacing-xs);
+    margin-right: var(--spacing-xxs);
 }
 
 .hero.side-by-side .inner-content h1 {
@@ -156,7 +152,7 @@
         width: 90vw;
         grid-template-columns: 1fr 1fr;
         max-width: var(--grid-desktop-container-width);
-        padding: 0 var(--spacing-m);
+        padding: 0 var(--spacing-s);
     }
 
     .hero.side-by-side .inner-content {
@@ -173,7 +169,7 @@
     }
 
     .hero.side-by-side .inner-content h3 {
-        margin-bottom: var(--spacing-m);
+        margin-bottom: var(--spacing-s);
     }
 }
 

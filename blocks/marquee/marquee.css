@@ -26,20 +26,20 @@
     text-transform: var(--type-detail-m-transform);
     line-height: var(--type-detail-m-lh);
     font-weight: var(--type-detail-all-weight);
-    margin: 0 0 var(--spacing-s) 0;
+    margin: 0 0 var(--spacing-xs) 0;
 }
 
 .marquee > div:last-of-type > div:first-of-type h1 {
     font-size: var(--type-heading-xl-size);
     line-height: var(--type-heading-xl-lh);
     font-weight: var(--type-heading-all-weight);
-    margin: 0 0 var(--spacing-s) 0;
+    margin: 0 0 var(--spacing-xs) 0;
 }
 
 .marquee > div:last-of-type > div:first-of-type h1 + p {
-    font-size: var(--type-body-m-size);
-    line-height: var(--type-body-m-lh);
-    margin: 0 0 var(--spacing-m) 0;
+    font-size: var(--type-body-l-size);
+    line-height: var(--type-body-l-lh);
+    margin: 0 0 var(--spacing-s) 0;
 }
 
 .marquee > div:last-of-type > div:first-of-type h1 + p + p {
@@ -103,7 +103,7 @@
 /* - Marquee: .testimonial - */
 .marquee.testimonial {
     background: transparent;
-    padding: var(--spacing-s) 0;
+    padding: var(--spacing-xs) 0;
 }
 
 .marquee.testimonial > div:last-of-type img {
@@ -121,7 +121,7 @@
 
 .marquee.testimonial .testimonial-info h4 {
     font-weight: 700;
-    font-size: var(--type-body-m-size);
+    font-size: var(--type-body-l-size);
     line-height: 1.25;
     padding-bottom: var(--spacing-l);
 }
@@ -129,7 +129,7 @@
 .marquee.testimonial .testimonial-info > ul {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: var(--spacing-s);
+    grid-gap: var(--spacing-xs);
 }
 
 .marquee.testimonial .testimonial-info ul,
@@ -149,7 +149,7 @@
 
 .marquee.testimonial .testimonial-info ul > li > ul > li {
     color: var(--color-black);
-    font-size: var(--body-font-size-xs);
+    font-size: var(--type-body-xxs-size);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0;
@@ -158,14 +158,14 @@
     padding: 0;
     width: 100%;
     max-width: 115px;
-    margin-top: var(--spacing-xs);
+    margin-top: var(--spacing-xxs);
 }
 
 .marquee.testimonial .customer-info {
     display: grid;
     grid-template-columns: 50px 1fr;
     align-items: center;
-    padding-bottom: var(--spacing-m);
+    padding-bottom: var(--spacing-s);
 }
 
 .marquee.testimonial .testimonial-info img {
@@ -183,7 +183,7 @@
 .marquee.testimonial .testimonial-info .titles em {
     font-weight: 400;
     font-style: normal;
-    font-size: var(--body-font-size-xs);
+    font-size: var(--type-body-xxs-size);
     line-height: 1.5;
 }
 
@@ -201,7 +201,7 @@
     }
 
     .marquee.testimonial .testimonial-info {
-        padding: var(--spacing-m) 0;
+        padding: var(--spacing-s) 0;
     }
 
     .marquee.testimonial .testimonial-info h4 {
