@@ -693,6 +693,10 @@ main .section.separator
 
 /* Layout for Guide pages  */
 
+body.guides-template {
+  display: block;
+}
+
 body.guides-template main {
   display: flex;
   flex-wrap: wrap;
@@ -707,27 +711,17 @@ body.guides-template main .section.heading {
   width: 100%;
 }
 
-body.guides-template main .section.content {
-  max-width: 1200px;
-  width: 100%;
-  height: 100%;
-}
-
 @media screen and (min-width: 900px) {
   body.guides-template main .section.content {
-    display: flex;
-    height: auto;
-  }
-
-  body.guides-template main .section.content .default-content-wrapper {
-    margin-left: 32px;
+    width: calc(100% - 300px);
+    max-width: 900px;
   }
 }
 
-body.guides-template main .section.content .default-content-wrapper {
-  width: 100%;
+body.guides-template main .section.content {
   height: 100%;
-  background-color: #eee;
+  text-align: left;
+  padding: 24px;
 }
 
 body.guides-template .icon-icon-caret-right,

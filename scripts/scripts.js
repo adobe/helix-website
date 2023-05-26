@@ -612,15 +612,45 @@ function buildEmbeds() {
 
 function buildHeader() {
   const header = document.querySelector('header');
-  if (!document.querySelector('header > .header')) {
-    header.append(buildBlock('header', ''));
-  }
-  // console.log('appending header')
+  header.append(buildBlock('header', ''));
 }
 
 function buildFooter() {
   const footer = document.querySelector('footer');
   footer.append(buildBlock('footer', ''));
+}
+
+async function loadSideNavigation(path) {
+  if (path && path.startsWith('/')) {
+    const resp = await fetch(`${path}.plain.html`);
+    if (resp.ok) {
+      const r = await resp.text();
+      return r;
+    }
+  }
+  return null;
+}
+
+async function buildSideNavigation() {
+  if (!document.body.classList.contains('guides-template')) return;
+
+  const path = '/drafts/redesign/blocks/side-navigation';
+  const fragment = await loadSideNavigation(path);
+
+  const temp = document.createElement('div');
+  temp.innerHTML = fragment;
+
+  const tag = createTag('aside');
+  const block = buildBlock('side-navigation', temp.querySelector('.side-navigation ul'));
+  const main = document.querySelector('main');
+
+  tag.append(block);
+  // main.append(tag);
+
+  main.insertBefore(tag, main.querySelector('.section.content'));
+
+  decorateBlock(block);
+  loadBlock(block);
 }
 
 /**
@@ -632,6 +662,7 @@ export function buildAutoBlocks(main) {
     buildHeader();
     buildEmbeds(main);
     buildFooter();
+    // buildSideNavigation();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -698,6 +729,8 @@ async function loadLazy(doc) {
 
   decorateBlock(footer);
   loadBlock(footer);
+
+  buildSideNavigation();
 }
 
 /**
