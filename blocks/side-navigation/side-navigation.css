@@ -1,7 +1,9 @@
 .side-navigation-wrapper {
   width: 100%;
-  max-width: 1200px;
+  max-width: var( --grid-desktop-container-width);
   display: block;
+  padding: 24px;
+
 }
 
 .side-navigation-wrapper.expand + .section.content {
@@ -35,7 +37,7 @@
   display: none;
 }
 
-.side-navigation .search-input-wrapper input {
+.side-navigation-wrapper input[type="text"] {
   width: 100%;
   border: solid 1px lightgray;
   padding: 8px;
@@ -125,6 +127,7 @@
 
 .side-navigation-overlay-btn-wrapper {
   text-align: left;
+  margin-top: 24px;
 }
 
 .side-navigation-overlay-btn-wrapper button {
@@ -138,6 +141,7 @@
 @media screen and (min-width: 900px) {
   .side-navigation-wrapper {
     width: 300px;
+    padding: 0;
   }
 
   .side-navigation-wrapper.expand {
@@ -165,11 +169,15 @@
 
 .results-wrapper {
   list-style: none;
-  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-gap: 16px;
   margin: 0;
   padding: 24px;
+  display: none;
+}
+
+.results-wrapper.open {
+  display: grid;
 }
 
 .results-wrapper .article-card {
