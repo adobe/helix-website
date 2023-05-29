@@ -6,7 +6,7 @@
     padding-bottom: 0;
     
     /* default colorful checker-board pattern */
-    background: url('../../img/colorful-bg.png'); 
+    background: url('../../img/colorful-bg.jpg'); 
     background-size: cover;
     background-position: center;
 }

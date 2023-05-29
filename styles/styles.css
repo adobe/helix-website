@@ -923,7 +923,7 @@ body.guides-template .icon-icon-caret-down {
 
 /* checkerboard background */
 .block.colorful-bg {
-  background: url("../img/colorful-bg.png") center center / cover;
+  background: url("../img/colorful-bg.jpg") center center / cover;
   background-position: center center;
   background-attachment: fixed;
 }
