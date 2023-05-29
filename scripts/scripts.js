@@ -571,6 +571,23 @@ export function decorateHeadings(main) {
   });
 }
 
+export function decorateTitleSection(main) {
+  const titleSections = main.querySelectorAll('.title-section');
+  if (!titleSections) return;
+  titleSections.forEach((section) => {
+    const elements = section.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    if (!elements || elements.length < 2) return;
+    const eyebrow = elements[0];
+    const headline = elements[1];
+    if (eyebrow) {
+      eyebrow.classList.add('icon-eyebrow');
+    }
+    if (headline) {
+      headline.classList.add('main-headline');
+    }
+  });
+}
+
 export function loadScript(url, callback, type) {
   const script = document.createElement('script');
   script.onload = callback;
@@ -648,6 +665,7 @@ export function decorateMain(main) {
   // decorateButtons(main);
   decorateHeadings(main);
   decorateBlocks(main);
+  decorateTitleSection(main);
 }
 
 /**

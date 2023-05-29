@@ -217,6 +217,10 @@
     .marquee.testimonial .testimonial-info a.button:any-link {
         grid-column: span 1;
     }
+
+    .marquee.testimonial > div:last-of-type img {
+        border-radius: var(--image-border-radius-l);
+    }
 }
 
 @media screen and (min-width: 1200px) {

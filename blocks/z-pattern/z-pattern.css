@@ -94,7 +94,3 @@
   padding-left: 0;
   list-style: none;
 }
-
-.z-pattern li strong {
-  font-size: var(--type-body-l-size);
-}

@@ -9,7 +9,8 @@ export default function decorate(block) {
   innerContent.setAttribute('class', 'inner-content');
   const ctaButton = innerContent.querySelector('a');
   if (ctaButton) {
-    ctaButton.classList.add('button');
+    ctaButton.classList.add('button', 'large');
+    ctaButton.closest('p').replaceWith(ctaButton);
   }
 
   const imageWrapper = block.children[2].querySelector('div');

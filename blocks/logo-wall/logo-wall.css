@@ -1,17 +1,15 @@
 .logo-wall {
     position: relative;
-    min-height: 480px;
+    min-height: 550px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: var(--spacing-l) var(--spacing-s);
+    padding: var(--spacing-xl) var(--spacing-s);
 }
 
 .logo-wall .logo-wall-title {
     max-width: 75vw;
-    font-size: clamp(36px, 4.5vw, 48px);
-    font-weight: 500;
     text-align: center;
     padding-bottom: var(--spacing-s);
 }

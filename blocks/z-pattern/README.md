@@ -21,6 +21,9 @@ Z Patten is styled in the block CSS code.
 
 There is Javascript code for decoration purposes primarily to alternate the layout of even and odd rows. 
 
+- Left Side: Image
+- Right Side: Content
+
 [Decoration Code](z-pattern.js)
 
 The CSS Styling is very project specific and gets adjusted as needed for a project or block by block.

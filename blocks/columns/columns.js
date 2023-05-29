@@ -1,3 +1,8 @@
+import { removeOuterElementLayer } from '../../utils/helpers.js';
+
+const ColorIconPattern = ['pink', 'lightgreen', 'purple', 'yellow', 'purple', 'yellow', 'lightgreen', 'pink'];
+const ColorNumberPattern = ['lightgreen', 'pink', 'purple'];
+
 export default function decorate(block) {
   const classes = ['one', 'two', 'three', 'four', 'five'];
   const observer = new IntersectionObserver((entries) => {
@@ -11,7 +16,7 @@ export default function decorate(block) {
   if (row) {
     block.classList.add(classes[row.children.length - 1]);
   }
-  block.querySelectorAll(':scope > div > div').forEach((cell) => {
+  block.querySelectorAll(':scope > div > div').forEach((cell, index) => {
     if (!cell.previousElementSibling) cell.classList.add('columns-left');
     if (!cell.nextElementSibling) cell.classList.add('columns-right');
 
@@ -26,6 +31,17 @@ export default function decorate(block) {
       wrapper.className = 'columns-content-wrapper';
       while (cell.firstChild) wrapper.append(cell.firstChild);
       cell.append(wrapper);
+
+      // colored icons
+      removeOuterElementLayer(cell, '.icon');
+      if (block.classList.contains('colored-icon')) {
+        cell.querySelector('.icon').classList.add('colored-tag', 'circle', ColorIconPattern[index]);
+      }
+    }
+
+    // colored number tag in cards
+    if (block.classList.contains('colored-number')) {
+      cell.querySelector('h4').classList.add('colored-tag', 'number-tag', ColorNumberPattern[index]);
     }
   });
 }
