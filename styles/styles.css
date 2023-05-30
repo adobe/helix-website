@@ -656,7 +656,6 @@ main table pre {
 
 main .section {
     padding: 4rem 0;
-    text-align: center;
 }
 
 .quote-wrapper {
@@ -776,8 +775,7 @@ body.guides-template main h3 {
   margin-bottom: var(--spacing-s);
 }
 
-body.docs-template main p,
-body.guides-template main p {
+body.docs-template main p {
   font-size: var(--type-body-l-size);
   line-height: var(--type-body-l-lh);
   margin-bottom: var(--spacing-s);
@@ -795,6 +793,13 @@ body.guides-template main p {
 
     body.no-header-template main {
       min-height: calc(100vh - 88px);
+    }
+
+    body.docs-template main h1,
+    body.guides-template main h1 {
+      line-height: 55px;
+      margin-top: var(--spacing-s);
+      margin-bottom: var(--spacing-ml);
     }
 }
 
@@ -831,12 +836,41 @@ body.guides-template main .section.content {
   max-width: 1200px;
   width: 100%;
   height: 100%;
+  padding-bottom: var(--spacing-xl);
+}
+
+body.guides-template main h2, 
+body.guides-template main h3, 
+body.guides-template main h4, 
+body.guides-template main h5, 
+body.guides-template main h6 {
+  font-weight: 700;
+  margin-top: var(--spacing-s);
+}
+
+body.guides-template p,
+body.guides-template li,
+body.guides-template a {
+  color: var(--color-black);
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+}
+
+body.guides-template li {
+  margin-bottom: 1em;
+  padding-inline-start: 0.5em;
+}
+
+body.guides-template ul {
+  margin-bottom: 2em;
+  padding-inline-start: 1.5em;
 }
 
 @media screen and (min-width: 900px) {
   body.guides-template main .section.content {
     display: flex;
     height: auto;
+    padding-bottom: var(--spacing-xxxl);
   }
 
   body.guides-template main .section.content .default-content-wrapper {
@@ -847,7 +881,6 @@ body.guides-template main .section.content {
 body.guides-template main .section.content .default-content-wrapper {
   width: 100%;
   height: 100%;
-  background-color: #eee;
 }
 
 body.guides-template .icon-icon-caret-right,
