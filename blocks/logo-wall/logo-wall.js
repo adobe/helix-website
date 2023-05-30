@@ -25,6 +25,7 @@ export default function decorate(block) {
             title: linkEl.title,
             target: '_blank',
             class: 'logo-wall-item-link',
+            'aria-label': linkEl.textContent,
           }, picture);
 
           listItem.append(pictureLink);

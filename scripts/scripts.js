@@ -80,6 +80,34 @@ export function loadCSS(href, callback) {
 }
 
 /**
+ * Loads preload file for LCP.
+ * @param {string} href The path to the CSS file
+ */
+export function loadPreloadLink() {
+  const preloadLinks = [{
+    href: '/img/colorful-bg.jpg',
+    as: 'image',
+  }];
+
+  preloadLinks.forEach((preloadLink) => {
+    if (!document.querySelector(`head > link[href="${preloadLink.href}"]`)) {
+      const link = document.createElement('link');
+      link.setAttribute('rel', 'preload');
+      link.setAttribute('href', preloadLink.href);
+      link.setAttribute('as', preloadLink.as);
+      document.head.appendChild(link);
+    }
+  });
+}
+
+/**
+ * set language in html tag for improving SEO accessibility
+ */
+export function setLanguageForAccessibility() {
+  document.documentElement.lang = 'en';
+}
+
+/**
  * Helper function to create DOM elements
  * @param {string} tag DOM element to be created
  * @param {array} attributes attributes to be added
@@ -704,6 +732,8 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
+  loadPreloadLink();
+  setLanguageForAccessibility();
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
