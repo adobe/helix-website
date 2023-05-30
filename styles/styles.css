@@ -1047,6 +1047,14 @@ body.guides-template .icon-icon-caret-down {
   text-align: center;
 }
 
+.title-section .default-content-wrapper img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+  max-width: 800px;
+}
+
 .icon-eyebrow .icon {
   color: var(--color-eyebrow-light-grey);
   display: grid;
