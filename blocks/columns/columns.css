@@ -18,6 +18,10 @@
     overflow: hidden;
 }
 
+.columns.contained img {
+    filter: var(--image-filter-drop-shadow-small);
+}
+
 .columns.contained img,
 .columns.contained:not(.icon-sm) svg {
     display: inline-block;

@@ -137,6 +137,9 @@
     /* colorful tags */
     --circular-icon-tag-size: 30px;
     --circular-number-tag-size: 60px;
+
+    /* drop-shadow */
+    --image-filter-drop-shadow-small: drop-shadow(10px 25px 50px rgba(0 0 0 / 10%));
 }
 
 /* desktop variables */
@@ -1187,3 +1190,8 @@ body.guides-template .icon-icon-caret-down {
 }
 
 /* -- colored tags end -- */
+
+/* add small drop-shadow to png only */
+.drop-shadow-img-sm img[type="image/png"] {
+  filter: var(--image-filter-drop-shadow-small);
+}

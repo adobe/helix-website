@@ -100,9 +100,9 @@
 
 .image-wrapper img {
     display: block;
-    width: 90vw;
+    width: 80vw;
     height: auto;
-    max-width: var(--grid-desktop-container-width);
+    max-width: 800px;
     margin: 0 auto;
     margin-bottom: -10px;
 }
@@ -127,6 +127,10 @@
     .inner-content a.button:any-link {
         margin-bottom: 0;
     }   
+
+    .image-wrapper img {
+        margin-top: -2.5%;
+    }
 }
 
 /* - hero.side-by-side - */
