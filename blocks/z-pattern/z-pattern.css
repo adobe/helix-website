@@ -121,7 +121,21 @@
     margin-right: inherit;
   }
 
-  .z-pattern.value-props > div.z-row-odd > div:first-child {
+  /* default: left side content go first */
+  .z-pattern > div.z-row-odd > div:first-child {
+    order: 2;
+  }
+
+  /* .right-first: right side content go first */
+  .z-pattern.right-first > div.z-row-even > div:first-child {
+    order: 1;
+  }
+
+  .z-pattern.right-first > div.z-row-odd > div:first-child {
+    order: 1;
+  }
+
+  .z-pattern.right-first > div.z-row-odd > div:last-child {
     order: 2;
   }
 }

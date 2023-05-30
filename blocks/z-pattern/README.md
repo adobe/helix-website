@@ -8,6 +8,7 @@ Notes:
 |  wide-text  |  Used for a more prominent text split.  |  
 |  spacing-lg |  Used to increase the spacing between rows. |  
 |  value-props | Used to add global classes `.icon-eyebrow` and `.main-headline`, and `colored-tag` with color class for props styling. |
+|  right-first |  Default is left-side content first, with this class applied the pattern should begin with right-side content first |
 
 #### Example:
 
