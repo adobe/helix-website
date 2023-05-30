@@ -209,6 +209,10 @@
   }
 
   /* - Tabs: .image-based - */
+  .title-section .tabs-wrapper {
+    margin-top: var(--spacing-s);
+  }
+
   .tabs.image-based[data-block-status="loaded"] {
     background: transparent;
   }
@@ -251,6 +255,13 @@
   @media screen and (max-width: 600px) {
     .tabs.image-based div[role="tablist"] button {
       padding: 7px 8px 6px;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    .tabs.image-based div[role="tablist"] {
+      width: 80%;
+      margin: 0 auto;
     }
   }
 

@@ -59,6 +59,7 @@
     --body-line-height: 1.6875;
 
     /* Spacing (Consonant) */
+    --spacing-xxxs: 4px;
     --spacing-xxs: 8px;
     --spacing-xs: 16px;
     --spacing-s: 24px;
@@ -111,7 +112,7 @@
   
     /* Grid / container width -- 600px, 900px, TODO: update on all responsive section */
     --grid-mobile-container-width: 88%;
-    --grid-tablet-container-width: 83.2%;
+    --grid-tablet-container-width: 83%;
     --grid-desktop-container-width: 1200px;
 
     /* Border-radius */
@@ -180,6 +181,35 @@ body {
 
 body.appear {
   display: unset;
+}
+
+/* block style for container width */
+.block.contained,
+.default-content-wrapper {
+  max-width: var(--grid-mobile-container-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media screen and (min-width: 600px) {
+  .block.contained,
+  .default-content-wrapper {
+    max-width: var(--grid-tablet-container-width);
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .block.contained,
+  .default-content-wrapper {
+    max-width: 90%;
+  }
+}
+
+@media screen and (min-width: 1250px) {
+  .block.contained,
+  .default-content-wrapper {
+    max-width: var(--grid-desktop-container-width);
+  }
 }
 
 /* Templates */
@@ -629,7 +659,7 @@ main .section {
     text-align: center;
 }
 
-.default-content-wrapper, .quote-wrapper {
+.quote-wrapper {
     max-width: 900px;
     margin: auto;
 }
@@ -834,8 +864,9 @@ body.guides-template .icon-icon-caret-down {
   background-image: url("/img/icon-caret-down.svg");
 }
 
-
 /* ---- Utility Classes ---- */
+
+/* padding classes */
 .block.xxxl-spacing {
   padding: var(--spacing-xxxl) 0;
 }
@@ -868,31 +899,39 @@ body.guides-template .icon-icon-caret-down {
   padding: var(--spacing-xxs) 0;
 }
 
-.block.pt-0 {
+.block.pt-0,
+.section.pt-0 {
   padding-top: 0;
 }
 
-.block.pb-0 {
+.block.pb-0,
+.section.pb-0 {
   padding-bottom: 0;
 }
 
-.block.pl-0 {
+.block.pl-0,
+.section.pl-0  {
   padding-left: 0;
 }
 
-.block.pr-0 {
+.block.pr-0,
+.section.pr-0  {
   padding-right: 0;
 }
 
-.block.px-0 {
+.block.px-0,
+.section.px-0  {
   padding-left: 0;
   padding-right: 0;
 }
 
-.block.py-0 {
+.block.py-0,
+.section.py-0  {
   padding-top: 0;
   padding-bottom: 0;
 }
+
+/* padding classes end */
 
 /* margin */
 .block.mt-0 {
@@ -921,6 +960,8 @@ body.guides-template .icon-icon-caret-down {
   margin-bottom: 0;
 }
 
+/* margin classes end */
+
 /* checkerboard background */
 .block.colorful-bg {
   background: url("../img/colorful-bg.jpg") center center / cover;
@@ -939,12 +980,7 @@ body.guides-template .icon-icon-caret-down {
   z-index: 0;
 }
 
-/* redesign styles: eyebrow + headline, classes added when .title-section is used */
-main .section.title-section {
-  padding-bottom: 0;
-
-}
-
+/* redesign styles: icon eyebrow + headline, classes added when .title-section is used */
 .icon-eyebrow {
   display: flex;
   align-items: center;
@@ -954,7 +990,7 @@ main .section.title-section {
   line-height: 1.25;
   font-style: normal;
   font-weight: 700;
-  padding-bottom: var(--spacing-xs);
+  padding-bottom: calc(var(--spacing-xxs) + var(--spacing-xxxs));
   margin: 0;
 }
 
@@ -969,8 +1005,8 @@ main .section.title-section {
   text-align: left;
   text-transform: capitalize;
   letter-spacing: -0.04em;
-  width: 60vw;
-  max-width: 550px;
+  width: 85%;
+  max-width: 540px;
 }
 
 .title-section .main-headline {
@@ -982,25 +1018,50 @@ main .section.title-section {
   color: var(--color-eyebrow-light-grey);
   display: grid;
   place-items: center;
-  margin-right: var(--spacing-xxs);
+  margin-right: var(--spacing-xxxs);
+}
+
+.icon-eyebrow .icon svg {
+  width: var(--type-body-xs-size);
 }
 
 @media screen and (min-width: 600px){
-  .icon-eyebrow {
-    font-size: var(--type-body-l-size);
-    padding-bottom: var(--spacing-s);
-  }
-
   .main-headline {
-    font-size: var(--type-heading-xxl-size);
-    width: 80vw;
-    padding-bottom: var(--spacing-s);
+    font-size: var(--type-heading-xl-size);
+    width: 50%;
   }
 
   .title-section .main-headline {
     padding-bottom: 0;
   }
 }
+
+@media screen and (min-width: 900px){
+  .icon-eyebrow {
+    font-size: var(--type-body-l-size);
+    padding-bottom: var(--spacing-s);
+  }
+
+  .icon-eyebrow .icon {
+    margin-right: var(--spacing-xxs);
+  }
+
+  .icon-eyebrow .icon svg{
+    width: var(--type-body-l-size);
+  }
+
+  .main-headline {
+    font-size: var(--type-heading-xxl-size);
+    width: 80%;
+  }
+
+  .full-width-title .main-headline {
+    width: 100%;
+    max-width: fit-content;
+  }
+}
+
+/* icon eyebrow + headline styles end */
 
 /* -- colored tags -- */
 .colored-tag {
@@ -1010,7 +1071,7 @@ main .section.title-section {
   padding: 4px 8px;
   text-transform: uppercase;
   border-radius: 100px;
-  margin-bottom: var(--spacing-xxs);
+  margin-bottom: 10px;
 }
 
 /* colored tags: circle icon */
@@ -1045,7 +1106,7 @@ main .section.title-section {
             rgb(0 0 0 / 3.5%) 0 13px 19px,
             rgb(0 0 0 / 3%) 0 7px 10px,
             rgb(0 0 0 / 2%) 0 3px 4px;
-  margin-bottom: var(--spacing-s);
+  margin-bottom: var(--spacing-xs);
 }
 
 /* colored tags: color variation */
@@ -1078,4 +1139,10 @@ main .section.title-section {
   .colored-tag {
     padding: 4px 16px;
   }
+
+  .colored-tag.number-tag {
+    margin-bottom: var(--spacing-s);
+  }
 }
+
+/* -- colored tags end -- */

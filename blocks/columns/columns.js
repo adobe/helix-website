@@ -1,4 +1,4 @@
-import { removeOuterElementLayer } from '../../utils/helpers.js';
+import { removeOuterElementLayer, combineChildrenToSingleDiv } from '../../utils/helpers.js';
 
 const ColorIconPattern = ['pink', 'lightgreen', 'purple', 'yellow', 'purple', 'yellow', 'lightgreen', 'pink'];
 const ColorNumberPattern = ['lightgreen', 'pink', 'purple'];
@@ -12,10 +12,12 @@ export default function decorate(block) {
       }
     });
   });
+
   const row = block.children[0];
   if (row) {
     block.classList.add(classes[row.children.length - 1]);
   }
+
   block.querySelectorAll(':scope > div > div').forEach((cell, index) => {
     if (!cell.previousElementSibling) cell.classList.add('columns-left');
     if (!cell.nextElementSibling) cell.classList.add('columns-right');
@@ -44,4 +46,8 @@ export default function decorate(block) {
       cell.querySelector('h4').classList.add('colored-tag', 'number-tag', ColorNumberPattern[index]);
     }
   });
+
+  if (block.classList.contains('single-grid')) {
+    combineChildrenToSingleDiv(block);
+  }
 }

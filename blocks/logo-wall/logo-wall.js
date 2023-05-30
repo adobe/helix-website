@@ -1,6 +1,8 @@
 import createTag from '../../utils/tag.js';
 
 export default function decorate(block) {
+  block.classList.add('contained');
+
   const logoWallList = document.createElement('ul');
   logoWallList.setAttribute('class', 'logo-wall-list');
 

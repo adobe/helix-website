@@ -1,11 +1,10 @@
 .logo-wall {
     position: relative;
-    min-height: 550px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: var(--spacing-xl) var(--spacing-s);
+    padding: var(--spacing-xl) 0;
 }
 
 .logo-wall .logo-wall-title {
@@ -54,7 +53,8 @@
 
 @media (min-width: 900px) {
     .logo-wall {
-        padding: var(--spacing-xl);
+        padding: var(--spacing-xl) 0;
+        min-height: 550px;
     }
 
     .logo-wall .logo-wall-title {

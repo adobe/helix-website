@@ -16,6 +16,15 @@ export default function init(el) {
   zRows.forEach((row, idx) => {
     row.classList.add(isOdd(idx));
 
+    const cells = row.querySelectorAll('div');
+    cells.forEach((cell) => {
+      if (cell.querySelector('img')) {
+        cell.classList.add('image-side');
+      } else {
+        cell.classList.add('content-side');
+      }
+    });
+
     if (el.classList.contains('value-props')) {
       const contentSide = row.querySelector(':scope > div:last-of-type');
       const eyebrow = contentSide.querySelector('p:first-of-type');
