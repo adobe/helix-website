@@ -252,6 +252,14 @@
     padding: 0;
   }
 
+  .tabs.image-based div[role="tablist"] .tablist-container{
+    width: 175%;
+  }
+
+  .tabs.image-based div[role="tablist"] {
+    overflow: scroll;
+  }
+
   @media screen and (max-width: 600px) {
     .tabs.image-based div[role="tablist"] button {
       padding: 7px 8px 6px;
@@ -262,6 +270,11 @@
     .tabs.image-based div[role="tablist"] {
       width: 80%;
       margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .tabs.image-based div[role="tablist"] .tablist-container{
+      width: 100%;
     }
   }
 
