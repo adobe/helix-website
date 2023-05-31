@@ -88,7 +88,7 @@ export default function decorate(block) {
   });
 
   block.querySelectorAll(':scope > div > div > ul > li').forEach((list) => {
-    list.classList.add('list-section', 'closed');
+    list.classList.add('list-section');
 
     list.addEventListener('click', (e) => {
       e.target.classList.toggle('closed');
@@ -97,7 +97,6 @@ export default function decorate(block) {
     list.querySelector(':scope > a').classList.add('heading');
     list.querySelectorAll(':scope > ul').forEach((listInner) => {
       listInner.classList.add('list-section-inner');
-      listInner.classList.add('closed');
 
       listInner.querySelectorAll(':scope > li > ul').forEach((nestedList) => {
         const listTarget = nestedList.parentElement;

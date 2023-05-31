@@ -697,12 +697,6 @@ body.guides-template {
   display: block;
 }
 
-body.guides-template main {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
 body.guides-template .section {
   box-sizing: border-box;
 }
@@ -719,6 +713,12 @@ body.guides-template main .section.content {
 }
 
 @media screen and (min-width: 900px) {
+  body.guides-template main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   body.guides-template main .section.content {
     width: calc(100% - 300px);
     max-width: 900px;

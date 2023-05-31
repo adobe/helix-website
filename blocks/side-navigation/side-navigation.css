@@ -1,5 +1,5 @@
 .side-navigation-wrapper {
-  width: 100%;
+  width: auto;
   max-width: var( --grid-desktop-container-width);
   display: block;
   padding: 24px;
@@ -85,7 +85,6 @@
 .side-navigation .list-section .heading {
   text-decoration: none;
   color: black;
-  pointer-events: none;
   font-size: var(--body-font-size-m);
 }
 
@@ -94,28 +93,11 @@
   width: 100%;
 }
 
-.side-navigation .list-section:not(.closed) > span.icon {
-  transform: rotate(180deg);
-}
-
-.side-navigation .list-section.closed .list-section-inner {
-  display: none;
-}
-
 .side-navigation .list-section .list-section-inner li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-flow: wrap;
-}
-
-.side-navigation .list-section .list-section-inner-nested,
-.side-navigation .list-section .list-section-inner li span {
-  display: none;
-}
-
-.side-navigation .side-navigation-nested-target.closed > a {
-  pointer-events: none;
 }
 
 .side-navigation .list-section .list-section-inner li a {
@@ -131,6 +113,12 @@
 
   /* Temp color */
   background: #d1e5f5;
+}
+
+.side-navigation .list-section .list-section-inner-nested {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
 }
 
 .side-navigation .list-section .side-navigation-nested-target:not(.collapse) .icon {
@@ -178,6 +166,7 @@
   color: black;
   text-align: left;
   box-sizing: border-box;
+  display: block;
 }
 
 .results-wrapper .article-card .article-card-body p {
@@ -185,13 +174,14 @@
 }
 
 .results-wrapper .article-card-image {
-  height: 187px;
+  width: 100%;
+  height: auto;
 }
 
 .results-wrapper .article-card-image img {
   object-fit: contain;
   aspect-ratio: 4 / 3;
-  max-width: 100%;
+  width: 100%;
   height: auto;
 }
 
@@ -225,34 +215,12 @@
     display: block
   }
 
-  .side-navigation .list-section.closed .list-section-inner {
-    display: block;
-  }
-
-  .side-navigation .list-section > span.icon {
-    display: none;
-  }
-
-  .side-navigation .list-section .list-section-inner li.side-navigation-nested-target.collapse > a {
-    pointer-events: none;
-  }
-
-  .side-navigation .list-section .heading {
-    pointer-events: initial;
-  }
-
   .side-navigation .list-section .list-section-inner li span {
     display: flex;
   }
 
   .side-navigation .side-navigation-nested-target ul {
     display: block;
-  }
-
-  .side-navigation .list-section .list-section-inner-nested {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
   }
 
   .results-wrapper {
