@@ -2,7 +2,18 @@ import createTag from '../../utils/tag.js';
 
 let searchFunc;
 let searchTerm;
+
 const searchParams = new URLSearchParams(window.location.search);
+
+const MOBILE_BREAKPOINT = 900;
+
+const debounce = (func, time = 100) => {
+  let timer;
+  return (event) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(func, time, event);
+  };
+};
 
 const loadSearch = async (inputsArray, resultsContainer) => {
   const gnavSearch = await import('./side-navigation-search.js');
@@ -106,4 +117,12 @@ export default function decorate(block) {
       });
     });
   });
+
+  const resizeContent = () => {
+    if (window.innerWidth > MOBILE_BREAKPOINT) {
+      block.classList.remove('overlay');
+    }
+  };
+
+  window.addEventListener('resize', debounce(resizeContent, 200));
 }
