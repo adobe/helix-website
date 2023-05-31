@@ -13,8 +13,8 @@
   width: 300px;
   border-radius: 16px;
   padding: 24px;
-  font-size: var(--type-body-s-size);
   box-sizing: border-box;
+  font-size: var(--type-body-xs-size);
 
   /* Temp color */
   background: #f8f8f8; 
@@ -145,7 +145,6 @@
   border-radius: 6px;
   padding: 8px 16px;
 }
-
 
 .results-wrapper {
   list-style: none;

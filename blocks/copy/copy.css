@@ -13,7 +13,7 @@
 .copy p {
     margin: 0;
     line-height: 1em;
-    font-size: var(--body-font-size-xs);
+    font-size: var(--type-body-xxs-size);
 }
 
 .copy > div {
@@ -23,7 +23,7 @@
 }
 
 .copy > div > span {
-    font-size: var(--body-font-size-s);
+    font-size: var(--type-body-xs-size);
 }
 
 .copy > div > input {

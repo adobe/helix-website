@@ -1,6 +1,8 @@
 import createTag from '../../utils/tag.js';
 
 export default function decorate(block) {
+  block.classList.add('contained');
+
   const logoWallList = document.createElement('ul');
   logoWallList.setAttribute('class', 'logo-wall-list');
 
@@ -23,6 +25,7 @@ export default function decorate(block) {
             title: linkEl.title,
             target: '_blank',
             class: 'logo-wall-item-link',
+            'aria-label': linkEl.textContent,
           }, picture);
 
           listItem.append(pictureLink);

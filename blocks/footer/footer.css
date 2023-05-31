@@ -1,7 +1,7 @@
 footer {
   display: none;
   padding: 2rem;
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-xs-size);
 }
 
 footer .footer {

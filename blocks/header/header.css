@@ -77,6 +77,7 @@ button.gnav-toggle::after {
 
 .gnav .gnav-logo img {
   width: 25px;
+  height: auto;
 }
 
 .gnav .gnav-mainnav {
