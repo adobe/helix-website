@@ -32,6 +32,8 @@
     --type-heading-m-lh: 25px;
     --type-heading-s-size: 16px;
     --type-heading-s-lh: 20px;
+    --type-heading-xs-size: 18px;
+    --type-heading-xs-lh: 22px;
 
     /* Body (Consonant) */
     --type-body-l-size: 20px;
@@ -44,6 +46,8 @@
     --type-body-xs-lh: 21px;
     --type-body-xxs-size: 12px;
     --type-body-xxs-lh: 1.5;
+    --type-body-xxxs-size: 11px;
+    --type-body-xxxs-lh: 14px;
 
     /* Detail (Consonant) */
     --type-detail-all-weight: 700;
@@ -93,6 +97,7 @@
     --color-info-accent-reverse-down: inherit;
 
     /* Redesign colors */
+    --color-font-grey: #2C2C2C;
     --color-eyebrow-light-grey: #444;
     --color-eyebrow-highlight: #6870EC;
     --color-accent-blue: #6870EC;
@@ -159,6 +164,8 @@
     --type-heading-m-lh: 30px;
     --type-heading-s-size: 20px;
     --type-heading-s-lh: 25px;
+    --type-heading-xs-size: 18px;
+    --type-heading-xs-lh: 22px;
 
     /* colorful tags */
     --circular-icon-tag-size: 50px;
