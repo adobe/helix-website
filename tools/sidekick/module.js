@@ -2657,6 +2657,9 @@
      * @returns {Sidekick} The sidekick
      */
     async fetchStatus(refreshLocation) {
+      if (refreshLocation) {
+        this.location = getLocation();
+      }
       const { owner, repo, ref } = this.config;
       if (!owner || !repo || !ref) {
         return this;
