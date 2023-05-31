@@ -18,14 +18,16 @@
     overflow: hidden;
 }
 
+.columns.contained img {
+    filter: var(--image-filter-drop-shadow-small);
+}
+
 .columns.contained img,
 .columns.contained:not(.icon-sm) svg {
-    height: 200px;
     display: inline-block;
 }
 
 .columns.contained.icon-sm svg {
-    height: 50px;
     display: inline-block;
 }
 
@@ -47,10 +49,6 @@
 .columns.bleed div.columns-image img.enter {
     opacity: 1;
     transform: translate(0, 0);
-}
-
-.columns-wrapper {
-    margin: var(--spacing-xxl) 0;
 }
 
 @media (min-width: 900px) {
@@ -78,31 +76,29 @@
         float: unset;
     }
 
+    .columns-wrapper {
+        margin: var(--spacing-xl) 0 0;
+    }
 }
 
 
 .columns.contained > div {
     margin: 0 auto;
-    padding: var(--spacing-m);
+    padding: var(--spacing-s) 0;
     display: grid;
     grid-template-columns: 1fr;
 }
 
 .columns.contained > div > div {
-    margin-bottom: var(--spacing-l);
+    margin-bottom: var(--spacing-s);
 }
 
 .columns.three.contained > div {
-    padding: var(--spacing-xxl) var(--spacing-m);
-    max-width: 83.4%;
+    padding: var(--spacing-ml) 0;
 }
 
 .columns.lazy-river > div:nth-of-type(even) {
     flex-direction: column-reverse;
-}
-
-.columns.contained > div > div:last-of-type {
-    margin-bottom: 0;
 }
 
 .columns.three.contained:not(.tall) > div {
@@ -113,15 +109,130 @@
     margin: 0;
 }
 
-.columns.tall .columns-image .image-wrapper-el {
-    margin-top: auto;
-    padding-top: var(--spacing-l);
+
+.columns.four.contained > div {
+    gap: var(--spacing-s);
 }
 
-@media screen and (min-width: 500px) {
+.columns.four.contained .columns-content-wrapper p {
+    margin-bottom: 0;
+}
+
+.columns.colored-icon h3 {
+    font-weight: 700;
+    font-size: var(--type-heading-s-size);
+    line-height: var(--type-heading-s-lh);
+}
+
+.columns.single-grid > div > div {
+    margin-bottom: 0;
+}
+
+/* -  colunns.tall - 3 card section  - */
+.columns.tall .columns-image .image-wrapper-el {
+    margin-top: auto;
+    padding-top: var(--spacing-s);
+}
+
+.columns.tall > div > div {
+    padding: var(--spacing-xl) var(--spacing-ml) var(--spacing-m);
+    background: var(--bg-color-lightgrey);
+    border-radius: var(--card-border-radius-l);
+    text-align: center;
+}
+
+.columns.tall h3 {
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--type-heading-xl-size);
+    line-height: var(--type-heading-xl-lh);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+}
+
+.columns.tall p {
+    font-size: var(--type-body-s-size);
+    line-height: var(--type-body-s-lh);
+}
+
+.columns.text-sm p {
+    font-size: var(--type-body-xs-size);
+    line-height: var(--type-body-xxs-lh);
+}
+
+.columns.tall .colored-tag.number-tag {
+    color: var(--color-black);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.columns.center .columns-content-wrapper {
+    text-align: center;
+}
+
+.columns.center .columns-content-wrapper .icon {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media screen and (min-width: 768px) {
+    /* adapt for 3 column layout in redesign for 4-columns - Start */
     .columns.four.contained > div {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(6, 1fr);
         gap: 24px;
+    }
+
+    .columns.four.contained .columns-content-wrapper p {
+        margin-top: var(--spacing-xxs);
+    }
+
+    .columns.four.contained > div > div {
+        grid-column: span 2;
+    }
+
+    /* Dealing with 2 orphan items */
+    .columns.four.contained > div > div:last-child:nth-child(3n - 1) {
+        grid-column-end: -2;
+    }
+    
+    .columns.four.contained > div > div:nth-last-child(2):nth-child(3n + 1) {
+        grid-column-end: 4;
+    }
+    
+    /* Dealing with single orphan */
+    .columns.four.contained > div > div:last-child:nth-child(3n - 2) {
+        grid-column-end: 5;
+    }
+
+    /* adapt for 3 column layout in redesign for 4-columns - End */
+
+    .columns.contained .columns-content-wrapper p {
+        margin-bottom: 1em;
+    }
+
+    /* tall cards */
+    .columns.three.tall.contained > div {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: var(--spacing-xs);
+    }
+
+    .columns.tall > div > div {
+        padding: var(--spacing-xl) var(--spacing-s) var(--spacing-m);
+        text-align: left;
+    }
+
+    .columns.tall h3 {
+        font-size: var(--type-heading-s-size);
+        line-height: var(--type-heading-s-lh);
+    }
+
+    .columns.tall p {
+        font-size: var(--type-body-xs-size);
+        line-height: var(--type-body-xs-lh);
+    }
+
+    .columns.tall .colored-tag.number-tag {
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 
@@ -151,10 +262,67 @@
     .columns.four.contained > div {
         max-width: var(--grid-desktop-container-width);
         grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-gap: var(--spacing-xxl);
+        grid-gap:  var(--spacing-xl) var(--spacing-s);
+        padding-top: 0;
+    }
+
+    .columns.four.contained > div > div {
+        grid-column: span 1;
+    }
+
+    /* cancel off previous effect */
+    .columns.four.contained > div > div:last-child:nth-child(3n - 1),
+    .columns.four.contained > div > div:nth-last-child(2):nth-child(3n + 1),
+    .columns.four.contained > div > div:last-child:nth-child(3n - 2) {
+        grid-column-end: auto;
+    }
+    
+    .columns.tall h3 {
+        margin-bottom: var(--spacing-s);
+        font-size: var(--type-heading-m-size);
+        line-height: var(--type-heading-m-lh);
+    }
+
+    .columns.tall .columns-image .image-wrapper-el {
+        padding-top: var(--spacing-l);
+        margin-bottom: 0;
     }
 
     .columns.tall.contained > div {
         grid-gap: 32px;
+    }
+
+    .columns.tall > div > div {
+        padding: var(--spacing-xl) var(--spacing-m);
+        margin-bottom: var(--spacing-s);
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* force image to stick to bottom */
+    .columns.tall > div > div > p {
+        flex: 1;
+        font-size: var(--type-body-s-size);
+        line-height: var(--type-body-s-lh);
+    }
+
+    .columns.three.tall.contained > div {
+        grid-gap: var(--spacing-m);
+        padding: var(--spacing-xs) 0;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .columns.colored-icon h3 {
+        line-height: 1;
+    }
+
+    .columns.tall h3 {
+        font-size: var(--type-heading-l-size);
+        line-height: var(--type-heading-l-lh);
+    }
+
+    .columns.tall > div > div {
+        padding: var(--spacing-xxl) var(--spacing-xl);
     }
 }

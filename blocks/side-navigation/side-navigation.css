@@ -2,7 +2,7 @@
   width: 252px;
   border-radius: 4px;
   padding: 24px;
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-xs-size);
 
   /* Temp color */
   background: aliceblue; 
@@ -26,7 +26,7 @@
 }
 
 .side-navigation .list-section {
-  margin-bottom: var(--spacing-m);
+  margin-bottom: var(--spacing-s);
   
   /* Temp color */
   color: blue;

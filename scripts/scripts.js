@@ -80,6 +80,34 @@ export function loadCSS(href, callback) {
 }
 
 /**
+ * Loads preload file for LCP.
+ * @param {string} href The path to the CSS file
+ */
+export function loadPreloadLink() {
+  const preloadLinks = [{
+    href: '/img/colorful-bg.jpg',
+    as: 'image',
+  }];
+
+  preloadLinks.forEach((preloadLink) => {
+    if (!document.querySelector(`head > link[href="${preloadLink.href}"]`)) {
+      const link = document.createElement('link');
+      link.setAttribute('rel', 'preload');
+      link.setAttribute('href', preloadLink.href);
+      link.setAttribute('as', preloadLink.as);
+      document.head.appendChild(link);
+    }
+  });
+}
+
+/**
+ * set language in html tag for improving SEO accessibility
+ */
+export function setLanguageForAccessibility() {
+  document.documentElement.lang = 'en';
+}
+
+/**
  * Helper function to create DOM elements
  * @param {string} tag DOM element to be created
  * @param {array} attributes attributes to be added
@@ -571,6 +599,23 @@ export function decorateHeadings(main) {
   });
 }
 
+export function decorateTitleSection(main) {
+  const titleSections = main.querySelectorAll('.title-section');
+  if (!titleSections) return;
+  titleSections.forEach((section) => {
+    const elements = section.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    if (!elements || elements.length < 2) return;
+    const eyebrow = elements[0];
+    const headline = elements[1];
+    if (eyebrow) {
+      eyebrow.classList.add('icon-eyebrow');
+    }
+    if (headline) {
+      headline.classList.add('main-headline');
+    }
+  });
+}
+
 export function loadScript(url, callback, type) {
   const script = document.createElement('script');
   script.onload = callback;
@@ -648,6 +693,7 @@ export function decorateMain(main) {
   // decorateButtons(main);
   decorateHeadings(main);
   decorateBlocks(main);
+  decorateTitleSection(main);
 }
 
 /**
@@ -684,8 +730,10 @@ async function loadLazy(doc) {
     }, 500);
   }
 
-  loadCSS('/fonts/fonts.css');
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
+  loadPreloadLink();
+  setLanguageForAccessibility();
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
