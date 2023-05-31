@@ -3,7 +3,6 @@
   max-width: var( --grid-desktop-container-width);
   display: block;
   padding: 24px;
-
 }
 
 .side-navigation-wrapper.expand + .section.content {
@@ -25,13 +24,14 @@
 
 .side-navigation.overlay {
   position: fixed;
-  top: 0;
+  top: var(--spacing-l);
   left: 0;
-  z-index: 10;
-  width: calc(100% - 48px);
+  z-index: 1;
+  width: 100%;
   height: 100%;
   overflow: scroll;
   display: block;
+  background: white;
 }
 
 .side-navigation.overlay .search-input-wrapper {
@@ -70,16 +70,36 @@
 }
 
 .side-navigation .list-section {
-  margin-bottom: var(--spacing-m);
+  padding-bottom: var(--spacing-m);
+  padding-top: var(--spacing-m);
+  border-bottom: solid 1px grey;
+  display: flex;
+  flex-flow: wrap;
+  justify-content: space-between;
+}
+
+.side-navigation .list-section:first-of-type {
+  border-top: solid 1px grey;
 }
 
 .side-navigation .list-section .heading {
   text-decoration: none;
-  color: red;
+  color: black;
+  pointer-events: none;
+  font-size: var(--body-font-size-m);
 }
 
 .side-navigation .list-section .list-section-inner {
   color: initial;
+  width: 100%;
+}
+
+.side-navigation .list-section:not(.closed) > span.icon {
+  transform: rotate(180deg);
+}
+
+.side-navigation .list-section.closed .list-section-inner {
+  display: none;
 }
 
 .side-navigation .list-section .list-section-inner li {
@@ -89,14 +109,13 @@
   flex-flow: wrap;
 }
 
-.side-navigation .list-section .list-section-inner-nested {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
+.side-navigation .list-section .list-section-inner-nested,
+.side-navigation .list-section .list-section-inner li span {
+  display: none;
 }
 
-.side-navigation .list-section .list-section-inner li span {
-  display: flex;
+.side-navigation .side-navigation-nested-target.closed > a {
+  pointer-events: none;
 }
 
 .side-navigation .list-section .list-section-inner li a {
@@ -118,8 +137,8 @@
   transform: rotate(180deg);
 }
 
-.side-navigation .side-navigation-nested-target {
-  position: relative;
+.side-navigation .side-navigation-nested-target ul {
+  display: block;
 }
 
 .side-navigation .side-navigation-nested-target.collapse ul {
@@ -139,34 +158,6 @@
   padding: 8px 16px;
 }
 
-@media screen and (min-width: 900px) {
-  .side-navigation-wrapper {
-    width: 300px;
-    padding: 0;
-  }
-
-  .side-navigation-wrapper.expand {
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .side-navigation-wrapper > .search-input-wrapper {
-    display: none;
-  }
-
-  .side-navigation-overlay-btn-wrapper {
-    display: none;
-  }
-
-  .side-navigation {
-    display: block;
-  }
-
-  .results-wrapper {
-    width: calc(100% - 300px); 
-  }
-}
 
 .results-wrapper {
   list-style: none;
@@ -201,4 +192,69 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+@media screen and (min-width: 900px) {
+  .side-navigation-wrapper {
+    width: 300px;
+    padding: 0;
+  }
+
+  .side-navigation-wrapper.expand {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .side-navigation-wrapper > .search-input-wrapper {
+    display: none;
+  }
+
+  .side-navigation-overlay-btn-wrapper {
+    display: none;
+  }
+
+  .side-navigation {
+    display: block;
+  }
+
+  .side-navigation .list-section,
+  .side-navigation .list-section:first-of-type {
+    border: none;
+    display: block
+  }
+
+  .side-navigation .list-section.closed .list-section-inner {
+    display: block;
+  }
+
+  .side-navigation .list-section > span.icon {
+    display: none;
+  }
+
+  .side-navigation .list-section .list-section-inner li.side-navigation-nested-target.collapse > a {
+    pointer-events: none;
+  }
+
+  .side-navigation .list-section .heading {
+    pointer-events: initial;
+  }
+
+  .side-navigation .list-section .list-section-inner li span {
+    display: flex;
+  }
+
+  .side-navigation .side-navigation-nested-target ul {
+    display: block;
+  }
+
+  .side-navigation .list-section .list-section-inner-nested {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .results-wrapper {
+    width: calc(100% - 300px); 
+  }
 }
