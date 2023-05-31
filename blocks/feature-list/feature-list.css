@@ -14,13 +14,13 @@
     grid-template-columns: 1fr;
     grid-template-areas: "image"
                          "copy";
-    grid-gap: var(--spacing-m);
+    grid-gap: var(--spacing-s);
     align-items: center;
 }
 
 .feature-list h2 {
     text-align: center;
-    margin-bottom: var(--spacing-m);
+    margin-bottom: var(--spacing-s);
 }
 
 .feature-list > div:last-of-type > div:first-of-type {
@@ -38,7 +38,7 @@
 }
 
 .feature-list li {
-    padding-bottom: var(--spacing-s);
+    padding-bottom: var(--spacing-xs);
 }
 
 .feature-list li:last-of-type {

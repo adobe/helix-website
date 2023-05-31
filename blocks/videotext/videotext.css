@@ -17,6 +17,6 @@
 }
 
 .videotext .text {
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-xs-size);
   padding-left: 10px;
 }

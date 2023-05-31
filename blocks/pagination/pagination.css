@@ -28,7 +28,7 @@
 }
 
 .pagination .column p {
-  font-size: var(--body-font-size-s);
+  font-size: var(--type-body-xs-size);
   margin: 8px 0;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .pagination .column p a {
-  font-size: var(--body-font-size-s);
+  font-size: var(--type-body-xs-size);
   color: black;
   text-decoration: none;
 }
@@ -63,6 +63,6 @@
   }
 
   .pagination .column p a {
-    font-size: var(--body-font-size-m);
+    font-size: var(--type-body-l-size);
   }
 }
