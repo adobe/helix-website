@@ -711,17 +711,18 @@ body.guides-template main .section.heading {
   width: 100%;
 }
 
+body.guides-template main .section.content {
+  max-width: 100%;
+  height: auto;
+  text-align: left;
+  padding: 24px;
+}
+
 @media screen and (min-width: 900px) {
   body.guides-template main .section.content {
     width: calc(100% - 300px);
     max-width: 900px;
   }
-}
-
-body.guides-template main .section.content {
-  height: 100%;
-  text-align: left;
-  padding: 24px;
 }
 
 body.guides-template .icon-icon-caret-right,

@@ -14,10 +14,10 @@
 
   .card-list > ul > li > a {
     text-decoration: none;
+    display: block;
   }
   
   .card-list .cards-card-body {
-    /* margin: 16px; */
     font-size: var(--body-font-size-s);
   }
   
@@ -31,6 +31,7 @@
   
   .card-list > ul > li img {
     width: 100%;
+    height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
