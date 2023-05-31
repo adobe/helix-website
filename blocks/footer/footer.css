@@ -4,6 +4,11 @@ footer {
   font-size: var(--type-body-s-size);
 }
 
+footer.appear {
+  display: block;
+}
+
+/* original design styles */
 footer .footer {
   max-width: 768px;
   margin: auto;
@@ -17,6 +22,26 @@ footer .footer a:any-link {
   color: currentcolor;
 }
 
-footer.appear {
-  display: block;
+/* new design styles */
+.redesign footer {
+  padding: 0;
+}
+
+footer .new-footer {
+  max-width: var(--grid-mobile-container-width);
+  margin: auto;
+}
+
+.footer .footer-bottom {
+  text-align: left;
+}
+
+@media screen and (min-width: 900px) {
+  footer .new-footer {
+    max-width: var(--grid-desktop-container-width);
+  }
+
+  .footer .footer-bottom {
+    text-align: right;
+  }  
 }
