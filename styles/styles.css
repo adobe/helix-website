@@ -828,10 +828,8 @@ main .section.separator
 
 /* Layout for Guide pages  */
 
-body.guides-template main {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+body.guides-template {
+  display: block;
 }
 
 body.guides-template .section {
@@ -877,14 +875,17 @@ body.guides-template ul {
 }
 
 @media screen and (min-width: 900px) {
-  body.guides-template main .section.content {
+  body.guides-template main {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     height: auto;
     padding-bottom: var(--spacing-xxxl);
   }
 
-  body.guides-template main .section.content .default-content-wrapper {
-    margin-left: 32px;
+  body.guides-template main .section.content {
+    width: calc(100% - 300px);
+    max-width: 900px;
   }
 }
 

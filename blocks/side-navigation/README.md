@@ -1,6 +1,6 @@
 ## Side Navigation
 
-Notes: The Side Navigation is a block meant to be used a a fragment on the Documentation Landing and Documentation Detail pages with the Page metadata template set to `guides`.
+Notes: The Side Navigation block is built automatically into all pages with the Page metadata template set to `guides`. The search functionality queiries the dopages-index sheet in the root of the project content folder. 
 
 ##### Custom Classes 
 |  Class | Function   |  
