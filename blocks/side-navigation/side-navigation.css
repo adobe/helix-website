@@ -11,10 +11,11 @@
 }
 
 .side-navigation {
-  width: 252px;
+  width: 300px;
   border-radius: 16px;
   padding: 24px;
   font-size: var(--type-body-s-size);
+  box-sizing: border-box;
 
   /* Temp color */
   background: #f8f8f8; 
@@ -174,6 +175,7 @@
   margin: 0;
   padding: 24px;
   display: none;
+  box-sizing: border-box;
 }
 
 .results-wrapper.open {
