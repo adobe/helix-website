@@ -103,7 +103,7 @@ footer .new-footer {
 
 .footer .footer-bottom p {
   color: var(--color-font-grey);
-  font-size: var(--type-body-xxxs-size);
+  font-size: var(--type-body-xxs-size);
   line-height: var(--type-body-xxxs-lh);
   margin-bottom: var(--spacing-xxs);
 }
@@ -155,8 +155,6 @@ footer .new-footer {
   .footer-nav-wrapper.desktop > div:last-of-type{
     display: flex;
   }
-
-
 
   .footer-nav-section h3 {
     margin-bottom: var(--spacing-xxs);
