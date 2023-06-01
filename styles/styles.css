@@ -432,6 +432,7 @@ a.button:any-link {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
+    height: fit-content;
   }
 
   a.button.xlarge:any-link {
@@ -1207,4 +1208,28 @@ body.guides-template .icon-icon-caret-down {
 /* add small drop-shadow to png only */
 .drop-shadow-img-sm img[type="image/png"] {
   filter: var(--image-filter-drop-shadow-small);
+}
+
+/* -- animations class -- */
+.link-underline-effect {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline-effect::before {
+    content: "";
+    position: absolute;
+    background: var(--color-black);
+    height: 1px;
+    left: auto;
+    right: 0;
+    bottom: -1px;
+    width: 0;
+    transition: all .5s cubic-bezier(.23,1,.32,1);
+}
+
+.link-underline-effect:hover::before {
+    width: 100%;
+    right: auto;
+    left: 0;
 }

@@ -123,6 +123,8 @@ footer .new-footer {
 
 .footer .footer-cta-button.button{
   margin-top: 0;
+  margin-left: auto;
+  margin-right: 0;
 }
 
 @media screen and (min-width: 600px) {
@@ -149,6 +151,12 @@ footer .new-footer {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
   }
+
+  .footer-nav-wrapper.desktop > div:last-of-type{
+    display: flex;
+  }
+
+
 
   .footer-nav-section h3 {
     margin-bottom: var(--spacing-xxs);

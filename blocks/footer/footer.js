@@ -35,6 +35,14 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
 
     let nextSibling = h3Element.nextElementSibling;
     while (nextSibling.tagName === 'UL' && nextSibling.tagName !== 'H3') {
+      // add animation effect class
+      const navLinks = nextSibling.querySelectorAll('a');
+      console.log(navLinks);
+      navLinks.forEach((navLink) => {
+        navLink.classList.add('link-underline-effect');
+      });
+
+      // clone the node
       divElement.appendChild(nextSibling.cloneNode(true));
       nextSibling = nextSibling.nextElementSibling;
     }
@@ -100,6 +108,8 @@ const decoratefooterCopyrightSection = (footer) => {
   // open all footer links in new windows
   footerCopyrightSection.querySelectorAll('a').forEach((a) => {
     a.target = '_blank';
+    // add hover effect class
+    a.classList.add('link-underline-effect');
   });
   return footerCopyrightSection;
 };
