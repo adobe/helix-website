@@ -14,7 +14,7 @@ const getENVbyPath = () => {
 const extractCTAButton = (footer) => {
   const ctaButtonWrapper = footer.querySelector('div:first-of-type strong');
   const ctaButton = ctaButtonWrapper.querySelector('a');
-  ctaButton.classList.add('footer-cta-button');
+  ctaButton.classList.add('footer-cta-button', 'button');
 
   if (ctaButton) {
     return ctaButton;
@@ -51,53 +51,29 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
   return desktopFooterNavWrapper;
 };
 
-const addAccordionFunctionality = (mobileFooterNavWrapper) => {
-  const accordions = mobileFooterNavWrapper.querySelectorAll('.accordion-button');
-
-  accordions.forEach((accordion) => {
-    accordion.addEventListener('click', (e) => {
-      e.preventDefault();
-      accordion.classList.toggle('active');
-      const panel = accordion.nextElementSibling;
-
-      if (!panel.classList.contains('panel')) {
-        return;
-      }
-
-      if (panel.style.maxHeight) {
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = `${panel.scrollHeight}px`;
-      }
-    });
-  });
-};
-
 const decorateMobileFooterNav = (desktopFooterNav) => {
   const mobileFooterNavWrapper = createTag('div', {
     class: 'footer-nav-wrapper',
   });
   const footerNavColumns = [...desktopFooterNav.children];
   footerNavColumns.forEach((navColumn) => {
-    const accordionButton = createTag('button', {
-      class: 'accordion',
+    const titleSection = createTag('div', {
+      class: 'footer-nav-title-section',
     });
-    const accordionTitle = navColumn.querySelector('h3');
-    if (accordionTitle) {
-      accordionButton.append(accordionTitle);
-      mobileFooterNavWrapper.append(accordionButton);
+    const title = navColumn.querySelector('h3');
+    if (title) {
+      titleSection.append(title);
+      mobileFooterNavWrapper.append(titleSection);
     }
 
-    const accordionContent = navColumn.querySelector('ul');
-    if (accordionContent) {
-      const accordionPanel = navColumn;
+    const titleSectionContent = navColumn.querySelector('ul');
+    if (titleSectionContent) {
+      const contentPanel = navColumn;
       navColumn.classList.add('panel');
-      mobileFooterNavWrapper.append(accordionPanel);
-      accordionButton.classList.add('accordion-button');
+      mobileFooterNavWrapper.append(contentPanel);
+      titleSection.classList.add('with-panel');
     }
   });
-
-  addAccordionFunctionality(mobileFooterNavWrapper);
 
   return mobileFooterNavWrapper;
 };

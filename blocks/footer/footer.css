@@ -1,5 +1,5 @@
 :root {
-  --footer-accordion-border: 2px solid #4B4B4B;
+  --footer-footer-nav-title-section-border: 2px solid #4B4B4B;
 }
 
 footer {
@@ -59,6 +59,7 @@ footer .new-footer {
 
 .footer-nav-section ul {
   margin-top: 0;
+  margin-bottom: var(--spacing-s);
 }
 
 .footer-nav-section li > a {
@@ -68,55 +69,31 @@ footer .new-footer {
 }
 
 
-/* Mobile accordion styles */
-.accordion {
-  cursor: pointer;
+/* Mobile border section styles */
+.footer-nav-title-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: transparent;
   border: none;
   outline: none;
-  border-top: var(--footer-accordion-border);
+  border-top: var(--footer-footer-nav-title-section-border);
   padding: var(--spacing-s) var(--spacing-xs);
   width: 100%;
   text-align: left;
 }
 
-.accordion a {
+.footer-nav-title-section a {
   text-decoration: none;
-}
-
-.accordion.accordion-button::after {
-  content: '\02795'; /* Unicode character for "plus" sign (+) */
-  font-size: 13px;
-  color: #777;
-  float: right;
-  margin-left: 5px;
-}
-
-.accordion::after {
-  content: ''; /* Unicode character for "plus" sign (+) */
-  font-size: 13px;
-  color: transparent;
-  float: right;
-  margin-left: 5px;
-}
-
-
-.active::after {
-  content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
 
 .panel {
   padding: 0 18px;
   overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.2s ease-out;
 }
 
 .panel:last-of-type {
-  border-bottom: var(--footer-accordion-border);
+  border-bottom: var(--footer-footer-nav-title-section-border);
 }
 
 .footer .footer-bottom {
@@ -140,9 +117,12 @@ footer .new-footer {
   text-decoration: none;
 }
 
-/* footer top */
 .footer-nav-wrapper.desktop {
   display: none;
+}
+
+.footer .footer-cta-button.button{
+  margin-top: 0;
 }
 
 @media screen and (min-width: 600px) {
@@ -170,6 +150,10 @@ footer .new-footer {
     grid-template-columns: repeat(5, 1fr);
   }
 
+  .footer-nav-section h3 {
+    margin-bottom: var(--spacing-xxs);
+  }
+
   /* footer bottom */
   .footer .footer-bottom {
     text-align: right;
@@ -183,6 +167,6 @@ footer .new-footer {
   }
 
   .footer-nav-section {
-    padding-bottom: var(--spacing-xxl);
+    padding-bottom: var(--spacing-xxxl);
   }
 }
