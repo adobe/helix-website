@@ -90,10 +90,6 @@ export default function decorate(block) {
   block.querySelectorAll(':scope > div > div > ul > li').forEach((list) => {
     list.classList.add('list-section');
 
-    list.addEventListener('click', (e) => {
-      e.target.classList.toggle('closed');
-    });
-
     list.querySelector(':scope > a').classList.add('heading');
     list.querySelectorAll(':scope > ul').forEach((listInner) => {
       listInner.classList.add('list-section-inner');
@@ -112,6 +108,11 @@ export default function decorate(block) {
       listInner.querySelectorAll(':scope li a').forEach((link) => {
         if (window.location.pathname === link.getAttribute('href')) {
           link.classList.add('active');
+
+          const nestedParent = link.closest('.side-navigation-nested-target');
+          if (nestedParent) {
+            nestedParent.classList.remove('collapse');
+          }
         }
       });
     });

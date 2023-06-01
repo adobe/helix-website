@@ -115,6 +115,10 @@
   background: #d1e5f5;
 }
 
+.side-navigation-nested-target:has(.list-section-inner-nested li > a.active) {
+  background: aliceblue;
+}
+
 .side-navigation .list-section .list-section-inner-nested {
   display: flex;
   width: 100%;
