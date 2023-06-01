@@ -676,6 +676,16 @@ async function loadSideNavigation(path) {
   return null;
 }
 
+function updateGuideTemplateStyleBasedOnHero() {
+  const isHeroContentExist = document.querySelector('.guides-template .section.heading');
+
+  if (isHeroContentExist) {
+    document.querySelector('main').classList.add('has-full-width-hero');
+  } else {
+    document.querySelector('main').classList.add('without-full-width-hero');
+  }
+}
+
 async function buildSideNavigation() {
   if (!document.body.classList.contains('guides-template')) return;
 
@@ -693,6 +703,8 @@ async function buildSideNavigation() {
   // main.append(tag);
 
   main.insertBefore(tag, main.querySelector('.section.content'));
+
+  updateGuideTemplateStyleBasedOnHero();
 
   decorateBlock(block);
   loadBlock(block);

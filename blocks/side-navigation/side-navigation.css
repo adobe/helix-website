@@ -1,8 +1,24 @@
+:root {
+  --color-nav-sidebar-title: #2C2C2C;
+  --color-nav-sidebar-subtitle: #4B4B4B;
+}
+
 .side-navigation-wrapper {
-  width: auto;
-  max-width: var( --grid-desktop-container-width);
+  width: auto; 
   display: block;
-  padding: 24px;
+  padding: var(--spacing-s) 0;
+
+  /* TODO: see if sticky or not 
+  position: sticky;
+  top: var(--nav-height); */
+
+  background: white;
+}
+
+.side-navigation-wrapper > div {
+  max-width: var(--grid-mobile-container-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .side-navigation-wrapper.expand + .section.content {
@@ -26,7 +42,7 @@
   position: fixed;
   top: var(--spacing-l);
   left: 0;
-  z-index: 1;
+  z-index: var(--sidebar-z-index);
   width: 100%;
   height: 100%;
   overflow: scroll;
@@ -70,12 +86,11 @@
 }
 
 .side-navigation .list-section {
-  padding-bottom: var(--spacing-m);
-  padding-top: var(--spacing-m);
   border-bottom: solid 1px grey;
   display: flex;
   flex-flow: wrap;
   justify-content: space-between;
+  padding: 0 var(--spacing-xs) var(--spacing-xs);
 }
 
 .side-navigation .list-section:first-of-type {
@@ -84,8 +99,21 @@
 
 .side-navigation .list-section .heading {
   text-decoration: none;
-  color: black;
-  font-size: var(--body-font-size-m);
+  font-size: var(--type-heading-s-size);
+  line-height: var(--type-heading-s-lh);
+}
+
+.side-navigation .list-section li,
+.side-navigation .list-section a {
+  font-size: var(--type-detail-m-size);
+  line-height: 20px;
+  color: var(--color-nav-sidebar-subtitle);
+}
+
+.side-navigation .list-section > a:first-of-type {
+  color: var(--color-nav-sidebar-title);
+  padding: var(--spacing-xs) 0;
+  font-weight: 700;
 }
 
 .side-navigation .list-section .list-section-inner {
@@ -98,6 +126,7 @@
   align-items: center;
   justify-content: space-between;
   flex-flow: wrap;
+  padding-bottom: var(--spacing-xxs);
 }
 
 .side-navigation .list-section .list-section-inner li a {
@@ -109,10 +138,8 @@
   width: 100%;
   border-radius: 4px;
   color: black;
-  padding: 0 6px;
-
-  /* Temp color */
-  background: #d1e5f5;
+  padding: 2px 4px;
+  background: var(--bg-color-grey);
 }
 
 .side-navigation .list-section .list-section-inner-nested {
@@ -135,15 +162,29 @@
 
 .side-navigation-overlay-btn-wrapper {
   text-align: left;
-  margin-top: 24px;
+  margin-top: var(--spacing-xs);
 }
 
 .side-navigation-overlay-btn-wrapper button {
   appearance: none;
-  border: solid 1px black;
-  background-color: white;;
+  border: solid 1px black; 
+  background-color: white;
   border-radius: 6px;
   padding: 8px 16px;
+}
+
+.side-navigation-overlay-btn-wrapper button.back-btn {
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  padding: 0;
+  border: none;
+}
+
+/* TODO: replace with svg icon */
+.side-navigation-overlay-btn-wrapper button.back-btn::before {
+  content: '←';
+  font-size: 18px;
+  margin-right: var(--spacing-xxs);
 }
 
 .results-wrapper {
@@ -184,7 +225,27 @@
   height: auto;
 }
 
+@media screen and (min-width: 600px) {
+  .side-navigation-wrapper > div {
+    max-width: var(--grid-tablet-container-width);
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .side-navigation-wrapper > div {
+    max-width: var(--grid-tablet-container-width);
+  }
+
+  .side-navigation {
+    padding: var(--spacing-s) var(--spacing-xl);
+  }
+}
+
 @media screen and (min-width: 900px) {
+  .side-navigation-wrapper > div {
+    max-width: 100%;
+  }
+
   .side-navigation-wrapper {
     width: 300px;
     padding: 0;
@@ -206,12 +267,24 @@
 
   .side-navigation {
     display: block;
+    padding: var(--spacing-ml) var(--spacing-s);
   }
 
   .side-navigation .list-section,
   .side-navigation .list-section:first-of-type {
     border: none;
-    display: block
+    display: block;
+    padding: 0 0 var(--spacing-xs);
+  }
+
+  .side-navigation .list-section li, .side-navigation .list-section a {
+    font-size: var(--type-body-xs-size);
+  }
+
+  .side-navigation .list-section > a:first-of-type {
+    display: inline-block;
+    font-size: var(--type-body-s-size);
+    padding-bottom: var(--spacing-xxs);
   }
 
   .side-navigation .list-section .list-section-inner li span {
@@ -224,5 +297,11 @@
 
   .results-wrapper {
     width: calc(100% - 300px); 
+  }
+}
+
+@media screen and (min-width: 1250px) {
+  .side-navigation-wrapper > div {
+    max-width: var(--grid-desktop-container-width);
   }
 }

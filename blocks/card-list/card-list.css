@@ -35,3 +35,24 @@
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
+
+  .card-list .cards-card-body h3 {
+    font-size: var(--type-heading-m-size);
+    line-height: var(--type-heading-m-lh);
+    margin-top: var(--spacing-s);
+    margin-bottom: var(--spacing-xs);
+  }
+
+@media screen and (min-width: 768px) {
+  .card-list .cards-card-body h3 {
+    font-size: var(--type-heading-l-size);
+    line-height: var(--type-heading-l-lh);
+    margin-top: var(--spacing-m);
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .card-list > ul {
+    grid-gap: var(--spacing-s);
+  }
+}
