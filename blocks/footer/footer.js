@@ -37,7 +37,6 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
     while (nextSibling.tagName === 'UL' && nextSibling.tagName !== 'H3') {
       // add animation effect class
       const navLinks = nextSibling.querySelectorAll('a');
-      console.log(navLinks);
       navLinks.forEach((navLink) => {
         navLink.classList.add('link-underline-effect');
       });
