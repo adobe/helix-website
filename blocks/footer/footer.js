@@ -1,4 +1,5 @@
 import { readBlockConfig } from '../../scripts/scripts.js';
+import createTag from '../../utils/tag.js';
 
 // TODO: mock env handling, update this when it's on production/ launch
 const getENVbyPath = () => {
@@ -10,22 +11,121 @@ const getENVbyPath = () => {
   return 'original-design';
 };
 
-const decorateFooterTopSection = (footer) => {
-  const footerTopSection = footer.querySelector(':scope > div:first-of-type');
-  footerTopSection.classList.add('footer-top');
-  // console.log(footerTopSection)
-  return footerTopSection;
+const extractCTAButton = (footer) => {
+  const ctaButtonWrapper = footer.querySelector('div:first-of-type strong');
+  const ctaButton = ctaButtonWrapper.querySelector('a');
+  ctaButton.classList.add('footer-cta-button');
+
+  if (ctaButton) {
+    return ctaButton;
+  }
+  return null;
 };
 
-const decorateFooterBottomSection = (footer) => {
-  const footerBottomSection = footer.querySelector(':scope > div:nth-child(2)');
-  footerBottomSection.classList.add('footer-bottom');
+const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
+  const desktopFooterNavWrapper = createTag('div', {
+    class: 'footer-nav-wrapper',
+  });
+
+  // create div to wrap around h3 + ul list
+  const h3Elements = footerNavSection.querySelectorAll('h3');
+  h3Elements.forEach((h3Element) => {
+    const divElement = document.createElement('div');
+    divElement.appendChild(h3Element.cloneNode(true));
+
+    let nextSibling = h3Element.nextElementSibling;
+    while (nextSibling.tagName === 'UL' && nextSibling.tagName !== 'H3') {
+      divElement.appendChild(nextSibling.cloneNode(true));
+      nextSibling = nextSibling.nextElementSibling;
+    }
+    desktopFooterNavWrapper.append(divElement);
+  });
+
+  // append div with cta-button if there's one
+  if (ctaButton) {
+    const ctaButtonDivElement = document.createElement('div');
+    ctaButtonDivElement.appendChild(ctaButton.cloneNode(true));
+    desktopFooterNavWrapper.append(ctaButtonDivElement);
+  }
+
+  return desktopFooterNavWrapper;
+};
+
+const addAccordionFunctionality = (mobileFooterNavWrapper) => {
+  const accordions = mobileFooterNavWrapper.querySelectorAll('.accordion-button');
+
+  accordions.forEach((accordion) => {
+    accordion.addEventListener('click', (e) => {
+      e.preventDefault();
+      accordion.classList.toggle('active');
+      const panel = accordion.nextElementSibling;
+
+      if (!panel.classList.contains('panel')) {
+        return;
+      }
+
+      if (panel.style.maxHeight) {
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = `${panel.scrollHeight}px`;
+      }
+    });
+  });
+};
+
+const decorateMobileFooterNav = (desktopFooterNav) => {
+  const mobileFooterNavWrapper = createTag('div', {
+    class: 'footer-nav-wrapper',
+  });
+  const footerNavColumns = [...desktopFooterNav.children];
+  footerNavColumns.forEach((navColumn) => {
+    const accordionButton = createTag('button', {
+      class: 'accordion',
+    });
+    const accordionTitle = navColumn.querySelector('h3');
+    if (accordionTitle) {
+      accordionButton.append(accordionTitle);
+      mobileFooterNavWrapper.append(accordionButton);
+    }
+
+    const accordionContent = navColumn.querySelector('ul');
+    if (accordionContent) {
+      const accordionPanel = navColumn;
+      navColumn.classList.add('panel');
+      mobileFooterNavWrapper.append(accordionPanel);
+      accordionButton.classList.add('accordion-button');
+    }
+  });
+
+  addAccordionFunctionality(mobileFooterNavWrapper);
+
+  return mobileFooterNavWrapper;
+};
+
+const decorateFooterNavSection = (footer, ctaButton) => {
+  const footerNavSection = footer.querySelector(':scope > div:first-of-type');
+  footerNavSection.classList.add('footer-nav-section');
+  const desktopFooterNav = decorateDesktopFooterNav(footerNavSection, ctaButton);
+  const footerNavWithDivs = desktopFooterNav.cloneNode(true);
+  const mobileFooterNav = decorateMobileFooterNav(footerNavWithDivs);
+  desktopFooterNav.classList.add('desktop');
+  mobileFooterNav.classList.add('mobile');
+
+  footerNavSection.innerHTML = '';
+  footerNavSection.append(desktopFooterNav, mobileFooterNav);
+  // decorateMobileFooterNavAccordion(footerNavSection);
+  return footerNavSection;
+};
+
+const decoratefooterCopyrightSection = (footer) => {
+  const footerCopyrightSection = footer.querySelector(':scope > div:nth-child(2)');
+  footerCopyrightSection.classList.add('footer-bottom');
 
   // open all footer links in new windows
-  footerBottomSection.querySelectorAll('a').forEach((a) => {
+  footerCopyrightSection.querySelectorAll('a').forEach((a) => {
     a.target = '_blank';
   });
-  return footerBottomSection;
+  return footerCopyrightSection;
 };
 
 // -------------------- main function -------------------- //
@@ -42,6 +142,8 @@ export default async function decorate(block) {
   // TODO: need to update the logic when move over to production
   if (ENV === 'redesign') {
     document.body.classList.add('redesign');
+    block.classList.add('contained');
+
     const footerPath = cfg.footer || '/drafts/redesign/new-footer';
     const resp = await fetch(`${footerPath}.plain.html`);
     const html = await resp.text();
@@ -52,10 +154,11 @@ export default async function decorate(block) {
     footer.innerHTML = html;
 
     // re-organize the footer into 2 sections
-    const footerTopSection = decorateFooterTopSection(footer);
-    const footerBottomSection = decorateFooterBottomSection(footer);
+    const footerCTAButton = extractCTAButton(footer);
+    const footerNavSection = decorateFooterNavSection(footer, footerCTAButton);
+    const footerCopyrightSection = decoratefooterCopyrightSection(footer);
     footer.innerHTML = '';
-    footer.append(footerTopSection, footerBottomSection);
+    footer.append(footerNavSection, footerCopyrightSection);
 
     block.append(footer);
     block.classList.add('new-footer'); // add class for the styles

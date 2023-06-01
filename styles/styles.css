@@ -46,8 +46,8 @@
     --type-body-xs-lh: 21px;
     --type-body-xxs-size: 12px;
     --type-body-xxs-lh: 1.5;
-    --type-body-xxxs-size: 11px;
-    --type-body-xxxs-lh: 14px;
+    --type-body-xxxs-size: 11.7px;
+    --type-body-xxxs-lh: 15px;
 
     /* Detail (Consonant) */
     --type-detail-all-weight: 700;
@@ -178,6 +178,11 @@
 
 * {
   box-sizing: border-box;
+}
+
+a, button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 body {
