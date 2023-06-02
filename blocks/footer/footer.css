@@ -1,9 +1,18 @@
+:root {
+  --footer-footer-nav-title-section-border: 2px solid #4B4B4B;
+}
+
 footer {
   display: none;
   padding: 2rem;
   font-size: var(--type-body-xs-size);
 }
 
+footer.appear {
+  display: block;
+}
+
+/* original design styles */
 footer .footer {
   max-width: 768px;
   margin: auto;
@@ -17,6 +26,153 @@ footer .footer a:any-link {
   color: currentcolor;
 }
 
-footer.appear {
-  display: block;
+/* new design styles */
+.redesign .footer-wrapper {
+  background: var(--bg-color-lightgrey);
+  padding: var(--spacing-m) 0;
+}
+
+.redesign footer {
+  padding: 0;
+}
+
+footer .new-footer {
+  margin: auto;
+}
+
+.footer-nav-section h3 {
+  color: var(--color-font-grey);
+  font-size: var(--type-heading-xs-size);
+  line-height: var(--type-heading-xs-lh);
+  font-weight: 700;
+}
+
+.footer-nav-section a {
+  text-decoration: none;
+}
+
+.footer-nav-section ul,
+.footer-nav-section li {
+  list-style: none;
+  padding-left: 0;
+}
+
+.footer-nav-section ul {
+  margin-top: 0;
+  margin-bottom: var(--spacing-s);
+}
+
+.footer-nav-section li > a {
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  font-weight: 400;
+}
+
+
+/* Mobile border section styles */
+.footer-nav-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-top: var(--footer-footer-nav-title-section-border);
+  padding: var(--spacing-s) var(--spacing-xs);
+  width: 100%;
+  text-align: left;
+}
+
+.footer-nav-title-section a {
+  text-decoration: none;
+}
+
+.panel {
+  padding: 0 18px;
+  overflow: hidden;
+}
+
+.panel:last-of-type {
+  border-bottom: var(--footer-footer-nav-title-section-border);
+}
+
+.footer .footer-bottom {
+  text-align: left;
+  padding: var(--spacing-xs) 0 0;
+}
+
+.footer .footer-bottom p {
+  color: var(--color-font-grey);
+  font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxxs-lh);
+  margin-bottom: var(--spacing-xxs);
+}
+
+.footer .footer-bottom p:last-of-type {
+  margin-bottom: 0;
+}
+
+.footer .footer-bottom a {
+  color: var(--color-font-grey);
+  text-decoration: none;
+}
+
+.footer-nav-wrapper.desktop {
+  display: none;
+}
+
+.footer .footer-cta-button.button{
+  margin-top: 0;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+@media screen and (min-width: 600px) {
+  footer .new-footer {
+    margin: auto;
+  }
+
+  .footer .footer-bottom p {
+    display: inline-block;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .redesign .footer-wrapper {
+    padding-top: var(--spacing-xxl);
+  }
+
+  /* footer top */
+  .footer-nav-wrapper.mobile {
+    display: none;
+  }
+
+  .footer-nav-wrapper.desktop {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .footer-nav-wrapper.desktop > div:last-of-type{
+    display: flex;
+  }
+
+  .footer-nav-section h3 {
+    margin-bottom: var(--spacing-xxs);
+  }
+
+  /* footer bottom */
+  .footer .footer-bottom {
+    text-align: right;
+    border-top: 1px solid var(--color-font-grey);
+  }  
+
+  .footer .footer-bottom p {
+    font-size: var(--type-body-xxs-size);
+    line-height: var(--type-body-xxs-lh);
+    margin-bottom: 0;
+  }
+
+  .footer-nav-section {
+    padding-bottom: var(--spacing-xxxl);
+  }
 }
