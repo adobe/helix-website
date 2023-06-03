@@ -113,6 +113,7 @@
     /* background colors */
     --bg-color-lightgrey: #F8F8F8;
     --bg-color-grey: #E8E8E8;
+    --bg-color-grey-2: #D6D6D6;
   
     /* Grid / container width -- 600px, 900px, TODO: update on all responsive section */
     --grid-mobile-container-width: 88%;
@@ -910,14 +911,24 @@ body.guides-template .default-content-wrapper ul {
   padding-inline-start: 1.5em;
 }
 
-/* break long link into separate, not overflowing */
+/* break long link </a> into separate lines, not overflowing */
 body.guides-template .default-content-wrapper a {
   overflow-wrap: break-word;
 }
 
-/* for  */
 body.guides-template main .default-content-wrapper > :first-of-type {
   margin-top: 0;
+}
+
+/* for guides-template without hero section (.heading), like documentation detail page */
+
+body.guides-template main.without-full-width-hero .default-content-wrapper h1 {
+  margin-top: var(--spacing-s);
+}
+
+body.guides-template main.without-full-width-hero .default-content-wrapper h2,
+body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
+  letter-spacing: 0;
 }
 
 /* for guides-template with hero section (.heading), like documentation category page */
@@ -925,6 +936,15 @@ body.guides-template main .default-content-wrapper > :first-of-type {
 body.guides-template main.has-full-width-hero .section.heading  {
   padding-bottom: var(--spacing-xs);
 }
+
+body.guides-template main.has-full-width-hero .default-content-wrapper h2 {
+  font-weight: 900;
+}
+
+body.guides-template main.has-full-width-hero .card-list-wrapper {
+  margin-bottom: var(--spacing-m);
+}
+
 
 @media screen and (min-width: 768px) {
   body.guides-template main.has-full-width-hero .section.heading  {
@@ -947,8 +967,21 @@ body.guides-template main.has-full-width-hero .section.heading  {
     max-width: 900px;
   }
 
+  body.guides-template main .default-content-wrapper > p {
+    margin-bottom: var(--spacing-s);
+  }
+
   body.guides-template main.has-full-width-hero .section.heading  {
     padding-bottom: var(--spacing-xxxl);
+  }
+
+  body.guides-template main.has-full-width-hero .card-list-wrapper {
+    margin-bottom: var(--spacing-l);
+  }
+
+  body.guides-template main.without-full-width-hero .default-content-wrapper h1 {
+    margin-top: var(--spacing-ml);
+    margin-bottom: var(--spacing-m);
   }
 }
 

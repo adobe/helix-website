@@ -112,6 +112,12 @@ export default function decorate(block) {
       listInner.querySelectorAll(':scope li a').forEach((link) => {
         if (window.location.pathname === link.getAttribute('href')) {
           link.classList.add('active');
+
+          if (link.closest('ul').classList.contains('list-section-inner-nested')) {
+            const parentListWrapper = link.closest('.side-navigation-nested-target');
+            parentListWrapper.classList.add('active');
+            parentListWrapper.classList.remove('collapse');
+          }
         }
       });
     });

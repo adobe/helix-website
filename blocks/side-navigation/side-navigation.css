@@ -1,17 +1,15 @@
 :root {
   --color-nav-sidebar-title: #2C2C2C;
   --color-nav-sidebar-subtitle: #4B4B4B;
+  --nav-sidebar-indent-spacing: var(--spacing-xxxs);
+  --nav-sidebar-link-border-radius: 4px;
+  --nav-sidebar-transition: all 0.2s ease-in-out;
 }
 
 .side-navigation-wrapper {
   width: auto; 
   display: block;
   padding: var(--spacing-s) 0;
-
-  /* TODO: see if sticky or not 
-  position: sticky;
-  top: var(--nav-height); */
-
   background: white;
 }
 
@@ -112,7 +110,7 @@
 
 .side-navigation .list-section > a:first-of-type {
   color: var(--color-nav-sidebar-title);
-  padding: var(--spacing-xs) 0;
+  padding: var(--spacing-xs) var(--nav-sidebar-indent-spacing);
   font-weight: 700;
 }
 
@@ -126,17 +124,24 @@
   align-items: center;
   justify-content: space-between;
   flex-flow: wrap;
-  padding-bottom: var(--spacing-xxs);
+  margin-bottom: 6px;
 }
 
 .side-navigation .list-section .list-section-inner li a {
   text-decoration: none;
+  padding: 2px var(--nav-sidebar-indent-spacing);
+  width: 100%;
+  border-radius: var(--nav-sidebar-link-border-radius);
+  transition: var(--nav-sidebar-transition);
+}
+
+.side-navigation .list-section .list-section-inner li a:hover {
+  background: var(--bg-color-grey);
 }
 
 .side-navigation .list-section .list-section-inner li a.active {
   display: block;
   width: 100%;
-  border-radius: 4px;
   color: black;
   padding: 2px 4px;
   background: var(--bg-color-grey);
@@ -146,7 +151,54 @@
   display: flex;
   width: 100%;
   flex-direction: column;
+  margin-top: 4px;
 }
+
+.side-navigation .list-section .list-section-inner-nested li {
+  padding: 2px 4px;
+  margin-bottom: 4px;
+}
+
+.side-navigation .list-section .list-section-inner-nested li a.active {
+  padding-bottom: 0;
+  background: transparent;
+}
+
+/* with arrow toggle list layer */
+.side-navigation .list-section:last-of-type .list-section-inner > li {
+  padding: 2px var(--nav-sidebar-indent-spacing);
+  width: 100%;
+  cursor: pointer;
+  transition: var(--nav-sidebar-transition);
+  border-radius: var(--nav-sidebar-link-border-radius);
+}
+
+.side-navigation .list-section:last-of-type .list-section-inner > li:hover {
+  background: var(--bg-color-grey);
+}
+
+.side-navigation-nested-target.active,
+.side-navigation-nested-target.closed {
+  background: var(--bg-color-grey);
+  padding: 4px 4px 0;
+  border-radius: var(--nav-sidebar-link-border-radius);
+}
+
+.side-navigation-nested-target.active li:last-of-type{
+  background: var(--bg-color-grey);
+  margin-bottom: 4px;
+}
+
+.side-navigation .list-section .list-section-inner-nested > li {
+  padding-left: var(--spacing-xs);
+  transition: var(--nav-sidebar-transition);
+}
+
+.side-navigation .list-section .list-section-inner-nested > li:hover a,
+.side-navigation .list-section .list-section-inner-nested > li a.active {
+  background: var(--bg-color-grey-2);
+}
+
 
 .side-navigation .list-section .side-navigation-nested-target:not(.collapse) .icon {
   transform: rotate(180deg);
