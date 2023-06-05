@@ -87,15 +87,20 @@ export function loadPreloadLink() {
   const preloadLinks = [{
     href: `${window.hlx.codeBasePath}/img/colorful-bg.jpg`,
     as: 'image',
+    conditionalSelector: ['.hero', '.colorful-bg'],
   }];
 
   preloadLinks.forEach((preloadLink) => {
     if (!document.querySelector(`head > link[href="${preloadLink.href}"]`)) {
-      const link = document.createElement('link');
-      link.setAttribute('rel', 'preload');
-      link.setAttribute('href', preloadLink.href);
-      link.setAttribute('as', preloadLink.as);
-      document.head.appendChild(link);
+      const shouldPreload = preloadLink.conditionalSelector.some((s) => document.querySelector(s));
+
+      if (shouldPreload) {
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'preload');
+        link.setAttribute('href', preloadLink.href);
+        link.setAttribute('as', preloadLink.as);
+        document.head.appendChild(link);
+      }
     }
   });
 }
@@ -809,9 +814,9 @@ async function loadLazy(doc) {
     }, 500);
   }
 
-  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`, null);
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
-  // loadPreloadLink();
+  loadPreloadLink();
   setLanguageForAccessibility();
 
   if (getMetadata('supressframe')) {
