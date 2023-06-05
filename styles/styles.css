@@ -32,6 +32,8 @@
     --type-heading-m-lh: 25px;
     --type-heading-s-size: 16px;
     --type-heading-s-lh: 20px;
+    --type-heading-xs-size: 18px;
+    --type-heading-xs-lh: 22px;
 
     /* Body (Consonant) */
     --type-body-l-size: 20px;
@@ -44,6 +46,7 @@
     --type-body-xs-lh: 21px;
     --type-body-xxs-size: 12px;
     --type-body-xxs-lh: 1.5;
+    --type-body-xxxs-lh: 15px;
 
     /* Detail (Consonant) */
     --type-detail-all-weight: 700;
@@ -93,6 +96,7 @@
     --color-info-accent-reverse-down: inherit;
 
     /* Redesign colors */
+    --color-font-grey: #2C2C2C;
     --color-eyebrow-light-grey: #444;
     --color-eyebrow-highlight: #6870EC;
     --color-accent-blue: #6870EC;
@@ -159,6 +163,8 @@
     --type-heading-m-lh: 30px;
     --type-heading-s-size: 20px;
     --type-heading-s-lh: 25px;
+    --type-heading-xs-size: 18px;
+    --type-heading-xs-lh: 22px;
 
     /* colorful tags */
     --circular-icon-tag-size: 50px;
@@ -171,6 +177,11 @@
 
 * {
   box-sizing: border-box;
+}
+
+a, button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 body {
@@ -420,6 +431,7 @@ a.button:any-link {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
+    height: fit-content;
   }
 
   a.button.xlarge:any-link {
@@ -1195,4 +1207,28 @@ body.guides-template .icon-icon-caret-down {
 /* add small drop-shadow to png only */
 .drop-shadow-img-sm img[type="image/png"] {
   filter: var(--image-filter-drop-shadow-small);
+}
+
+/* -- animations class -- */
+.link-underline-effect {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline-effect::before {
+    content: "";
+    position: absolute;
+    background: var(--color-black);
+    height: 1px;
+    left: auto;
+    right: 0;
+    bottom: -1px;
+    width: 0;
+    transition: all .5s cubic-bezier(.23,1,.32,1);
+}
+
+.link-underline-effect:hover::before {
+    width: 100%;
+    right: auto;
+    left: 0;
 }
