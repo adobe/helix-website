@@ -149,7 +149,7 @@
 .hero.side-by-side .inner-content {
     text-align: left;
     padding: var(--spacing-xl) 0;
-    
+    padding-top: 0;
 }
 
 .hero.side-by-side .inner-content h3 {

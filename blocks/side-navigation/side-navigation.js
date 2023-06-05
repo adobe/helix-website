@@ -45,7 +45,7 @@ const handleSearchString = (clearQuery) => {
 };
 
 export default function decorate(block) {
-  const docBtnInner = '<button class="documentation-btn">Documentation</button>';
+  const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
   const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
 
   const backBtnInner = '<button class="back-btn">Back</button>';

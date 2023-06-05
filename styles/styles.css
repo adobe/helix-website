@@ -231,11 +231,13 @@ body.appear {
 
 @media screen and (min-width: 900px) {
   .block.contained,
-  .default-content-wrapper {
+  .default-content-wrapper,
+  .side-navigation-wrapper.expand {
     max-width: 90%;
   }
 
-  .section.content > div {
+  .section.content > div,
+  .results-wrapper.open {
     max-width: 100%;
     padding-left: clamp(5%, 2vw, var(--spacing-xxl));
     margin-right: 0;
@@ -245,7 +247,8 @@ body.appear {
 @media screen and (min-width: 1250px) {
   .block.contained,
   .section.content > div,
-  .default-content-wrapper {
+  .default-content-wrapper,
+  .side-navigation-wrapper.expand {
     max-width: var(--grid-desktop-container-width);
   }
 }
@@ -994,6 +997,7 @@ body.guides-template .icon-icon-caret-right,
 body.guides-template .icon-icon-caret-down {
   width: 20px;
   height: 20px;
+  background-repeat: no-repeat;
 }
 
 body.guides-template .icon-icon-caret-right {
