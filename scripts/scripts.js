@@ -85,7 +85,7 @@ export function loadCSS(href, callback) {
  */
 export function loadPreloadLink() {
   const preloadLinks = [{
-    href: '/img/colorful-bg.jpg',
+    href: `${window.hlx.codeBasePath}/img/colorful-bg.jpg`,
     as: 'image',
     conditionalSelector: ['.hero', '.colorful-bg'],
   }];

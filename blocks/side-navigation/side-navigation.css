@@ -11,6 +11,7 @@
   display: block;
   padding: var(--spacing-s) 0;
   background: white;
+  min-height: 135px;
 }
 
 .side-navigation-wrapper > div {
@@ -330,6 +331,7 @@
   .side-navigation-wrapper {
     width: 300px;
     padding: 0;
+    min-height: 80vh;
   }
 
   .side-navigation-wrapper.expand {
