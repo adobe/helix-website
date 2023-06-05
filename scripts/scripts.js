@@ -811,7 +811,7 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
-  // loadPreloadLink();
+  loadPreloadLink();
   setLanguageForAccessibility();
 
   if (getMetadata('supressframe')) {
