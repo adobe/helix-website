@@ -939,6 +939,12 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
   letter-spacing: 0;
 }
 
+body.guides-template main.without-full-width-hero .default-content-wrapper img:first-of-type {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
 /* for guides-template with hero section (.heading), like documentation category page */
 
 body.guides-template main.has-full-width-hero .section.heading  {

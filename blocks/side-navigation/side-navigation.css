@@ -248,10 +248,15 @@
   margin-right: var(--spacing-xs);
 }
 
-/* TODO: replace with svg icon */
 .side-navigation-overlay-btn-wrapper button.back-btn::before {
-  content: '←';
-  font-size: 18px;
+  content: "";
+  display: inline-block;
+  background-image: url("/img/icon-back-arrow.svg");
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 12px;
   margin-right: var(--spacing-xxs);
 }
 

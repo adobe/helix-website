@@ -47,6 +47,7 @@ const handleSearchString = (clearQuery) => {
 export default function decorate(block) {
   const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
   const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
+  const docToggleMenuButton = docButton.querySelector('.documentation-btn');
 
   const backBtnInner = '<button class="back-btn">Back</button>';
   const backBtn = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, backBtnInner);
@@ -67,7 +68,7 @@ export default function decorate(block) {
 
   loadSearch([searchInput, searchInputOuter], resultsContainer);
 
-  [docButton, backBtn].forEach((btn) => {
+  [docToggleMenuButton, backBtn].forEach((btn) => {
     btn.addEventListener('click', () => {
       block.classList.toggle('overlay');
     });

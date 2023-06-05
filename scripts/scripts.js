@@ -708,7 +708,6 @@ async function buildSideNavigation() {
   // main.append(tag);
 
   main.insertBefore(tag, main.querySelector('.section.content'));
-
   updateGuideTemplateStyleBasedOnHero();
 
   decorateBlock(block);
