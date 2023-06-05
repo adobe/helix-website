@@ -914,6 +914,11 @@ body.guides-template .default-content-wrapper ul {
   padding-inline-start: 1.5em;
 }
 
+/* for SEO tap target */
+body.guides-template .default-content-wrapper ul > li > a {
+  margin-bottom: 1em;
+}
+
 /* break long link </a> into separate lines, not overflowing */
 body.guides-template .default-content-wrapper a {
   overflow-wrap: break-word;
