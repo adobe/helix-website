@@ -31,10 +31,10 @@
 
 .breadcrumb ul li a {
   text-decoration: none;
-  color: var(--color-black);
+  color: var(--color-eyebrow-light-grey);
   font-size: var(--type-body-xxs-size);
 }
 
-/* body.guides-template .breadcumb ul {
-  margin: 0;
-} */
+.breadcrumb ul li:last-of-type a {
+  color: var(--color-black);
+}
