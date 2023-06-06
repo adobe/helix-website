@@ -129,6 +129,8 @@
     /* Border-radius */
     --image-border-radius-m: 8px;
     --image-border-radius-l: 16px;
+    --image-border-radius-xl: 24px;
+    --image-border-radius-xxl: 30px;
     --card-border-radius-l: 12px;
 
     /* nav */
@@ -950,6 +952,8 @@ body.guides-template main.without-full-width-hero .default-content-wrapper img:f
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--image-border-radius-l);
 }
 
 /* for guides-template with hero section (.heading), like documentation category page */
@@ -970,6 +974,10 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
 @media screen and (min-width: 768px) {
   body.guides-template main.has-full-width-hero .section.heading  {
     padding-bottom: var(--spacing-s);
+  }
+
+  body.guides-template main.without-full-width-hero .default-content-wrapper img:first-of-type {
+    border-radius: var(--image-border-radius-xxl);
   }
 }
 
