@@ -85,17 +85,22 @@ export function loadCSS(href, callback) {
  */
 export function loadPreloadLink() {
   const preloadLinks = [{
-    href: '/img/colorful-bg.jpg',
+    href: `${window.hlx.codeBasePath}/img/colorful-bg.jpg`,
     as: 'image',
+    conditionalSelector: ['.hero', '.colorful-bg'],
   }];
 
   preloadLinks.forEach((preloadLink) => {
     if (!document.querySelector(`head > link[href="${preloadLink.href}"]`)) {
-      const link = document.createElement('link');
-      link.setAttribute('rel', 'preload');
-      link.setAttribute('href', preloadLink.href);
-      link.setAttribute('as', preloadLink.as);
-      document.head.appendChild(link);
+      const shouldPreload = preloadLink.conditionalSelector.some((s) => document.querySelector(s));
+
+      if (shouldPreload) {
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'preload');
+        link.setAttribute('href', preloadLink.href);
+        link.setAttribute('as', preloadLink.as);
+        document.head.appendChild(link);
+      }
     }
   });
 }
@@ -698,6 +703,55 @@ async function buildSideNavigation() {
   loadBlock(block);
 }
 
+function buildDocumentationBreadcrumb() {
+  if (!document.body.classList.contains('guides-template')) return;
+
+  // TODO: update for launch
+  const root = '/drafts/redesign/';
+  const isDocumentationLanding = window.location.pathname.includes(`${root}documentation`);
+
+  const list = createTag('ul');
+  const home = createTag('li', {}, `<a href="${root}new-home">Home</a>`);
+  const docs = createTag('li', {}, `<a href="${root}documentation">Documentation</a>`);
+
+  list.append(home);
+  list.append(docs);
+
+  const category = getMetadata('category');
+  const title = getMetadata('og:title');
+
+  if (category) {
+    const section = createTag(
+      'li',
+      {},
+      `<a href="${root}documentation#${category.toLowerCase()}">${category}</a>`,
+    );
+    list.append(section);
+  }
+
+  if (!isDocumentationLanding) {
+    const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
+    list.append(article);
+  }
+
+  const tag = createTag('div');
+  const block = buildBlock('breadcrumb', list);
+
+  block.classList.add('contained');
+
+  const main = document.querySelector('main');
+
+  tag.append(block);
+  main.insertBefore(tag, main.querySelectorAll('.section')[0]);
+
+  if (isDocumentationLanding) {
+    block.parentElement.classList.add('no-shadow');
+  }
+
+  decorateBlock(block);
+  loadBlock(block);
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -707,7 +761,6 @@ export function buildAutoBlocks(main) {
     buildHeader();
     buildEmbeds(main);
     buildFooter();
-    // buildSideNavigation();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -761,7 +814,7 @@ async function loadLazy(doc) {
     }, 500);
   }
 
-  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`, null);
   addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
   loadPreloadLink();
   setLanguageForAccessibility();
@@ -779,6 +832,7 @@ async function loadLazy(doc) {
   loadBlock(footer);
 
   buildSideNavigation();
+  buildDocumentationBreadcrumb();
 }
 
 /**
