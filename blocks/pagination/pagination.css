@@ -18,6 +18,12 @@
   border-radius: 16px;
   border: solid 1px var(--bg-color-grey);
   padding: 12px 16px;
+  transition: all 0.3s ease-in-out;
+}
+
+.pagination .column:hover{
+  cursor: pointer;
+  border-color: var(--color-eyebrow-light-grey);
 }
 
 .pagination .column svg{

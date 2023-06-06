@@ -902,9 +902,9 @@ body.guides-template main h6 {
   margin-top: var(--spacing-s);
 }
 
-body.guides-template p,
-body.guides-template li,
-body.guides-template a {
+body.guides-template main p,
+body.guides-template main li,
+body.guides-template main a {
   color: var(--color-black);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
