@@ -118,7 +118,13 @@
     /* Grid / container width -- 600px, 900px, TODO: update on all responsive section */
     --grid-mobile-container-width: 88%;
     --grid-tablet-container-width: 83%;
+    --grid-laptop-container-width: 90%;
     --grid-desktop-container-width: 1200px;
+
+    /* header navbar */
+    --header-container-width: 1440px;
+    --header-container-tablet-x-padding: 24px;
+    --header-container-desktop-x-padding: 20px;
 
     /* Border-radius */
     --image-border-radius-m: 8px;
@@ -844,9 +850,10 @@ body.docs-template main p {
       margin-bottom: var(--spacing-ml);
     }
 
+    /* TODO: remove after confirming with design
     body.guides-template main.without-full-width-hero {
       padding-top: var(--spacing-m);
-    }
+    } */
 }
 
 .docs-template a.button.accent:any-link {
@@ -1316,12 +1323,14 @@ body.guides-template .icon-icon-caret-down {
 }
 
 /* -- animations class -- */
-.link-underline-effect {
+.link-underline-effect,
+.breadcrumb-link-underline-effect {
   position: relative;
   display: inline-block;
 }
 
-.link-underline-effect::before {
+.link-underline-effect::before,
+.breadcrumb-link-underline-effect::before {
     content: "";
     position: absolute;
     background: var(--color-black);
@@ -1337,4 +1346,16 @@ body.guides-template .icon-icon-caret-down {
     width: 100%;
     right: auto;
     left: 0;
+}
+
+.breadcrumb-link-underline-effect::before {
+  width: 0;
+  right: 12px;
+  left: auto;
+}
+
+.breadcrumb-link-underline-effect:hover::before {
+  width: calc(100% - 12px);
+  right: 12px;
+  left: 0;
 }
