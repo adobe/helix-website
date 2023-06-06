@@ -670,86 +670,14 @@ function buildFooter() {
   footer.append(buildBlock('footer', ''));
 }
 
-async function loadSideNavigation(path) {
-  if (path && path.startsWith('/')) {
-    const resp = await fetch(`${path}.plain.html`);
-    if (resp.ok) {
-      const r = await resp.text();
-      return r;
-    }
+function updateGuideTemplateStyleBasedOnHero() {
+  const isHeroContentExist = document.querySelector('.guides-template .section.heading');
+
+  if (isHeroContentExist) {
+    document.querySelector('main').classList.add('has-full-width-hero');
+  } else {
+    document.querySelector('main').classList.add('without-full-width-hero');
   }
-  return null;
-}
-
-async function buildSideNavigation() {
-  if (!document.body.classList.contains('guides-template')) return;
-
-  const path = '/drafts/redesign/blocks/side-navigation';
-  const fragment = await loadSideNavigation(path);
-
-  const temp = document.createElement('div');
-  temp.innerHTML = fragment;
-
-  const tag = createTag('aside');
-  const block = buildBlock('side-navigation', temp.querySelector('.side-navigation ul'));
-  const main = document.querySelector('main');
-
-  tag.append(block);
-  // main.append(tag);
-
-  main.insertBefore(tag, main.querySelector('.section.content'));
-
-  decorateBlock(block);
-  loadBlock(block);
-}
-
-function buildDocumentationBreadcrumb() {
-  if (!document.body.classList.contains('guides-template')) return;
-
-  // TODO: update for launch
-  const root = '/drafts/redesign/';
-  const isDocumentationLanding = window.location.pathname.includes(`${root}documentation`);
-
-  const list = createTag('ul');
-  const home = createTag('li', {}, `<a href="${root}new-home">Home</a>`);
-  const docs = createTag('li', {}, `<a href="${root}documentation">Documentation</a>`);
-
-  list.append(home);
-  list.append(docs);
-
-  const category = getMetadata('category');
-  const title = getMetadata('og:title');
-
-  if (category) {
-    const section = createTag(
-      'li',
-      {},
-      `<a href="${root}documentation#${category.toLowerCase()}">${category}</a>`,
-    );
-    list.append(section);
-  }
-
-  if (!isDocumentationLanding) {
-    const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
-    list.append(article);
-  }
-
-  const tag = createTag('div');
-  const block = buildBlock('breadcrumb', list);
-
-  block.classList.add('contained');
-
-  const main = document.querySelector('main');
-
-  tag.append(block);
-  main.insertBefore(tag, main.querySelectorAll('.section')[0]);
-
-  if (isDocumentationLanding) {
-    block.parentElement.classList.add('no-shadow');
-  }
-
-  decorateBlock(block);
-  loadBlock(block);
 }
 
 /**
@@ -800,6 +728,8 @@ async function loadLazy(doc) {
   const main = doc.querySelector('main');
   const header = doc.querySelector('header > div');
   const footer = doc.querySelector('footer > div');
+  const aside = createTag('aside');
+  main.insertBefore(aside, main.querySelector('.section.content'));
 
   loadBlocks(main);
 
@@ -831,8 +761,23 @@ async function loadLazy(doc) {
   decorateBlock(footer);
   loadBlock(footer);
 
-  buildSideNavigation();
-  buildDocumentationBreadcrumb();
+  // breadcrump setup
+  const breadcrumb = buildBlock('breadcrumb', '');
+  const breadcrumbWrapper = createTag('div');
+  breadcrumbWrapper.append(breadcrumb);
+  main.insertBefore(breadcrumbWrapper, main.querySelectorAll('.section')[0]);
+
+  decorateBlock(breadcrumb);
+  loadBlock(breadcrumb);
+
+  // sidebar + related style setup
+  const sideNav = buildBlock('side-navigation', '');
+  aside.append(sideNav);
+  main.insertBefore(aside, main.querySelector('.section.content'));
+  updateGuideTemplateStyleBasedOnHero();
+
+  decorateBlock(sideNav);
+  loadBlock(sideNav);
 }
 
 /**

@@ -44,11 +44,32 @@ const handleSearchString = (clearQuery) => {
   }
 };
 
-export default function decorate(block) {
-  const docBtnInner = '<button>Documentation</button>';
-  const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
+export default async function decorate(block) {
+  block.textContent = '';
+  const aside = document.querySelector('aside');
 
-  const backBtnInner = '<button>← Back</button>';
+  // side navbar only exist on guide/documentation pages
+  if (!document.body.classList.contains('guides-template')) {
+    aside.classList.remove('side-navigation-wrapper');
+    aside.innerHTML = '';
+    return;
+  }
+
+  // TODO: update path during site migration
+  // fetch content from path
+  const sideNavPath = '/drafts/redesign/blocks/side-navigation';
+  const resp = await fetch(`${sideNavPath}.plain.html`);
+  const html = await resp.text();
+  const sideNavbarContent = document.createElement('div');
+  sideNavbarContent.innerHTML = html;
+  const sideNavbar = sideNavbarContent.querySelector('.side-navigation div');
+  block.append(sideNavbar);
+
+  const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
+  const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
+  const docToggleMenuButton = docButton.querySelector('.documentation-btn');
+
+  const backBtnInner = '<button class="back-btn">Back</button>';
   const backBtn = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, backBtnInner);
 
   const searchInputInner = '<input type="text" name="search" placeholder="Search...">';
@@ -57,17 +78,17 @@ export default function decorate(block) {
   const searchInputOuter = searchInput.cloneNode(true);
   const resultsContainer = createTag('div', { class: 'results-wrapper' });
 
-  block.parentElement.prepend(docButton);
-  block.parentElement.prepend(searchInputOuter);
+  aside.prepend(docButton);
+  aside.prepend(searchInputOuter);
 
   block.prepend(backBtn);
   block.prepend(searchInput);
 
-  block.parentElement.append(resultsContainer);
+  aside.append(resultsContainer);
 
   loadSearch([searchInput, searchInputOuter], resultsContainer);
 
-  [docButton, backBtn].forEach((btn) => {
+  [docToggleMenuButton, backBtn].forEach((btn) => {
     btn.addEventListener('click', () => {
       block.classList.toggle('overlay');
     });
@@ -112,6 +133,12 @@ export default function decorate(block) {
       listInner.querySelectorAll(':scope li a').forEach((link) => {
         if (window.location.pathname === link.getAttribute('href')) {
           link.classList.add('active');
+
+          if (link.closest('ul').classList.contains('list-section-inner-nested')) {
+            const parentListWrapper = link.closest('.side-navigation-nested-target');
+            parentListWrapper.classList.add('active');
+            parentListWrapper.classList.remove('collapse');
+          }
         }
       });
     });
