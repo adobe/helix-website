@@ -51,7 +51,8 @@ export default async function decorate(block) {
   // side navbar only exist on guide/documentation pages
   if (!document.body.classList.contains('guides-template')) {
     aside.classList.remove('side-navigation-wrapper');
-    block.innerHTML = '';
+    aside.innerHTML = '';
+    return;
   }
 
   // TODO: update path during site migration
