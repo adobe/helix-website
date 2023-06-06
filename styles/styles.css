@@ -951,7 +951,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper img:f
   height: auto;
   object-fit: cover;
   aspect-ratio: 16 / 9;
-  border-radius: 50px;
+  border-radius: 20px;
 }
 
 /* for guides-template with hero section (.heading), like documentation category page */
