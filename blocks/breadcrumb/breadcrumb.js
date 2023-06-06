@@ -37,6 +37,13 @@ export default async function decorate(block) {
     list.append(article);
   }
 
+  // make the last item to be unclickable as already on the page
+  const listLinks = list.querySelectorAll('a');
+  const lastLinkItem = listLinks[listLinks.length - 1];
+  lastLinkItem.classList.remove('breadcrumb-link-underline-effect');
+  lastLinkItem.style.cursor = 'default';
+  lastLinkItem.addEventListener('click', (e) => e.preventDefault());
+
   block.classList.add('contained');
   if (isDocumentationLanding) {
     block.parentElement.classList.add('no-shadow');
