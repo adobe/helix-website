@@ -680,55 +680,6 @@ function updateGuideTemplateStyleBasedOnHero() {
   }
 }
 
-function buildDocumentationBreadcrumb() {
-  if (!document.body.classList.contains('guides-template')) return;
-
-  // TODO: update for launch
-  const root = '/drafts/redesign/';
-  const isDocumentationLanding = window.location.pathname.includes(`${root}documentation`);
-
-  const list = createTag('ul');
-  const home = createTag('li', {}, `<a href="${root}new-home" class="breadcrumb-link-underline-effect">Home</a>`);
-  const docs = createTag('li', {}, `<a href="${root}documentation" class="breadcrumb-link-underline-effect">Documentation</a>`);
-
-  list.append(home);
-  list.append(docs);
-
-  const category = getMetadata('category');
-  const title = getMetadata('og:title');
-
-  if (category) {
-    const section = createTag(
-      'li',
-      {},
-      `<a href="${root}documentation#${category.toLowerCase()}" class="breadcrumb-link-underline-effect">${category}</a>`,
-    );
-    list.append(section);
-  }
-
-  if (!isDocumentationLanding) {
-    const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
-    list.append(article);
-  }
-
-  const tag = createTag('div');
-  const block = buildBlock('breadcrumb', list);
-
-  block.classList.add('contained');
-
-  const main = document.querySelector('main');
-
-  tag.append(block);
-  main.insertBefore(tag, main.querySelectorAll('.section')[0]);
-
-  if (isDocumentationLanding) {
-    block.parentElement.classList.add('no-shadow');
-  }
-
-  decorateBlock(block);
-  loadBlock(block);
-}
-
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -810,7 +761,14 @@ async function loadLazy(doc) {
   decorateBlock(footer);
   loadBlock(footer);
 
-  buildDocumentationBreadcrumb();
+  // breadcrump setup
+  const breadcrumb = buildBlock('breadcrumb', '');
+  const breadcrumbWrapper = createTag('div');
+  breadcrumbWrapper.append(breadcrumb);
+  main.insertBefore(breadcrumbWrapper, main.querySelectorAll('.section')[0]);
+
+  decorateBlock(breadcrumb);
+  loadBlock(breadcrumb);
 
   // sidebar + related style setup
   const sideNav = buildBlock('side-navigation', '');
