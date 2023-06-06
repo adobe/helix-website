@@ -106,6 +106,16 @@
       "type": "string",
       "description": "The name of the project to display in the sidekick"
     },
+    "previewHost": {
+      "type": "string",
+      "format": "idn-hostname",
+      "description": "The host name of the preview environment (defaults to *.hlx.page)"
+    },
+    "liveHost": {
+      "type": "string",
+      "format": "idn-hostname",
+      "description": "The host name of the live environment (defaults to *.hlx.live)"
+    },
     "host": {
       "type": "string",
       "format": "idn-hostname",

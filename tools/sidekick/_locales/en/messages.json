@@ -296,6 +296,14 @@
   "config_toggle_menu": {
     "message": "Show/hide menu"
   },
+  "config_filter": {
+    "message": "Search ...",
+    "description": "Filter projects"
+  },
+  "config_filter_clear": {
+    "message": "Reset",
+    "description": "Reset project filter"
+  },
   "config_projects": {
     "message": "Projects"
   },
@@ -357,8 +365,14 @@
   "config_manual_host_placeholder": {
     "message": "Production Hostname (optional)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "Live Hostname (optional)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "Content URL: https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "Preview Hostname (optional)"
   },
   "config_manual_project_placeholder": {
     "message": "Project Name (optional)"

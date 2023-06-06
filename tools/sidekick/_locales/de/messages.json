@@ -296,6 +296,14 @@
   "config_toggle_menu": {
     "message": "Menü anzeigen/verbergen"
   },
+  "config_filter": {
+    "message": "Suchen ...",
+    "description": "Filter projects"
+  },
+  "config_filter_clear": {
+    "message": "Zurücksetzen",
+    "description": "Reset project filter"
+  },
   "config_projects": {
     "message": "Projekte"
   },
