@@ -670,17 +670,6 @@ function buildFooter() {
   footer.append(buildBlock('footer', ''));
 }
 
-async function loadSideNavigation(path) {
-  if (path && path.startsWith('/')) {
-    const resp = await fetch(`${path}.plain.html`);
-    if (resp.ok) {
-      const r = await resp.text();
-      return r;
-    }
-  }
-  return null;
-}
-
 function updateGuideTemplateStyleBasedOnHero() {
   const isHeroContentExist = document.querySelector('.guides-template .section.heading');
 
@@ -689,29 +678,6 @@ function updateGuideTemplateStyleBasedOnHero() {
   } else {
     document.querySelector('main').classList.add('without-full-width-hero');
   }
-}
-
-async function buildSideNavigation() {
-  if (!document.body.classList.contains('guides-template')) return;
-
-  const path = '/drafts/redesign/blocks/side-navigation';
-  const fragment = await loadSideNavigation(path);
-
-  const temp = document.createElement('div');
-  temp.innerHTML = fragment;
-
-  const tag = createTag('aside');
-  const block = buildBlock('side-navigation', temp.querySelector('.side-navigation ul'));
-  const main = document.querySelector('main');
-
-  tag.append(block);
-  // main.append(tag);
-
-  main.insertBefore(tag, main.querySelector('.section.content'));
-  updateGuideTemplateStyleBasedOnHero();
-
-  decorateBlock(block);
-  loadBlock(block);
 }
 
 /**
@@ -723,7 +689,6 @@ export function buildAutoBlocks(main) {
     buildHeader();
     buildEmbeds(main);
     buildFooter();
-    // buildSideNavigation();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -763,6 +728,8 @@ async function loadLazy(doc) {
   const main = doc.querySelector('main');
   const header = doc.querySelector('header > div');
   const footer = doc.querySelector('footer > div');
+  const aside = createTag('aside');
+  main.insertBefore(aside, main.querySelector('.section.content'));
 
   loadBlocks(main);
 
@@ -794,7 +761,14 @@ async function loadLazy(doc) {
   decorateBlock(footer);
   loadBlock(footer);
 
-  buildSideNavigation();
+  // sidebar + related style setup
+  const sideNav = buildBlock('side-navigation', '');
+  aside.append(sideNav);
+  main.insertBefore(aside, main.querySelector('.section.content'));
+  updateGuideTemplateStyleBasedOnHero();
+
+  decorateBlock(sideNav);
+  loadBlock(sideNav);
 }
 
 /**

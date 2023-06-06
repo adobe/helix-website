@@ -44,7 +44,25 @@ const handleSearchString = (clearQuery) => {
   }
 };
 
-export default function decorate(block) {
+export default async function decorate(block) {
+  block.textContent = '';
+  const aside = document.querySelector('aside');
+
+  // side navbar only exist on guide/documentation pages
+  if (!document.body.classList.contains('guides-template')) {
+    aside.classList.remove('side-navigation-wrapper');
+  }
+
+  // TODO: update path during site migration
+  // fetch content from path
+  const sideNavPath = '/drafts/redesign/blocks/side-navigation';
+  const resp = await fetch(`${sideNavPath}.plain.html`);
+  const html = await resp.text();
+  const sideNavbarContent = document.createElement('div');
+  sideNavbarContent.innerHTML = html;
+  const sideNavbar = sideNavbarContent.querySelector('.side-navigation div');
+  block.append(sideNavbar);
+
   const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
   const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
   const docToggleMenuButton = docButton.querySelector('.documentation-btn');
@@ -58,13 +76,13 @@ export default function decorate(block) {
   const searchInputOuter = searchInput.cloneNode(true);
   const resultsContainer = createTag('div', { class: 'results-wrapper' });
 
-  block.parentElement.prepend(docButton);
-  block.parentElement.prepend(searchInputOuter);
+  aside.prepend(docButton);
+  aside.prepend(searchInputOuter);
 
   block.prepend(backBtn);
   block.prepend(searchInput);
 
-  block.parentElement.append(resultsContainer);
+  aside.append(resultsContainer);
 
   loadSearch([searchInput, searchInputOuter], resultsContainer);
 
