@@ -856,6 +856,10 @@ body.docs-template main p {
     } */
 }
 
+body.guides-template main.without-full-width-hero {
+  min-height: 900px;
+} 
+
 .docs-template a.button.accent:any-link {
   background-color: var(--spectrum-blue);
   border-color: var(--spectrum-blue);
