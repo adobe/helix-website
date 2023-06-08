@@ -127,6 +127,7 @@
     --header-container-desktop-x-padding: 20px;
 
     /* Border-radius */
+    --input-border-radius: 4px;
     --image-border-radius-m: 8px;
     --image-border-radius-l: 16px;
     --card-border-radius-l: 12px;
@@ -1024,6 +1025,58 @@ body.guides-template .icon-icon-caret-right {
 
 body.guides-template .icon-icon-caret-down {
   background-image: url("/img/icon-caret-down.svg");
+}
+
+/* Layout for Contact template */
+body.contact-template {
+  display: block;
+}
+
+body.contact-template .section {
+  box-sizing: border-box;
+}
+
+body.contact-template .section:first-of-type {
+  padding-bottom: 0;
+}
+
+body.contact-template .section:first-of-type::before,
+body.contact-template .section:first-of-type::after {
+  width: 100%;
+  height: 700px;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+body.contact-template .section:first-of-type::before {
+  content: '';
+  background: url('../../img/colorful-bg.jpg'); 
+  z-index: -2;
+}
+
+body.contact-template .section:first-of-type::after {
+  content: '';
+  z-index: -1;
+  background: var(--checkerboard-background);
+  background-size: var(--checkerboard-background-size);
+}
+
+body.contact-template .section:last-of-type {
+  padding-bottom: var(--spacing-xxxl);
+}
+
+body.contact-template .default-content-wrapper {
+  text-align: center;
+}
+
+@media screen and (min-width: 900px) {
+  body.contact-template main .section {
+      max-width: 800px;
+      margin: auto;
+  }
 }
 
 /* ---- Utility Classes ---- */
