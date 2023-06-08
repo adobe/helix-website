@@ -1044,7 +1044,7 @@ body.contact-template .section:first-of-type {
 body.contact-template .section:first-of-type::before,
 body.contact-template .section:first-of-type::after {
   width: 100%;
-  height: 720px;
+  height: 780px;
   background-size: cover;
   background-position: center;
   position: absolute;
