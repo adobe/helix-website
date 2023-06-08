@@ -198,6 +198,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -240,7 +244,8 @@ body.appear {
 @media screen and (min-width: 900px) {
   .block.contained,
   .default-content-wrapper,
-  .side-navigation-wrapper.expand {
+  .side-navigation-wrapper.expand,
+  .franklin .gnav .submenu-content {
     max-width: 90%;
   }
 
@@ -256,7 +261,8 @@ body.appear {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
-  .side-navigation-wrapper.expand {
+  .side-navigation-wrapper.expand,
+  .franklin .gnav .submenu-content {
     max-width: var(--grid-desktop-container-width);
   }
 }
@@ -1293,6 +1299,10 @@ body.guides-template .icon-icon-caret-down {
   color: var(--color-accent-pink-content);
 }
 
+.colored-tag.pink svg {
+  color: var(--color-accent-pink-content);
+}
+
 .colored-tag.purple {
   background-color: var(--color-accent-purple-bg);
   color: var(--color-accent-purple-content);
@@ -1306,6 +1316,10 @@ body.guides-template .icon-icon-caret-down {
 .colored-tag.yellow {
   background-color: var(--color-accent-yellow-bg);
   color: var(--color-accent-yellow-content);
+}
+
+.colored-tag.black {
+  background-color: var(--color-black);
 }
 
 .colored-tag-description {

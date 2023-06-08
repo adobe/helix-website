@@ -1,3 +1,5 @@
+import createTag from './tag.js';
+
 /**
  * * @param {HTMLElement} element the element with the parent undesired wrapper, like <p></p>
  * * @param {targetSelector} string selector of the target element
@@ -41,4 +43,12 @@ export function combineChildrenToSingleDiv(element) {
   element.append(singleDiv);
 }
 
-export default { removeOuterElementLayer };
+export function changeTag(element, targetTag, className) {
+  const newElClass = className || '';
+  const innerContent = element.innerHTML;
+  const newTagElement = createTag(targetTag, { class: newElClass }, innerContent);
+
+  return newTagElement;
+}
+
+export default { removeOuterElementLayer, changeTag };

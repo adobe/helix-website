@@ -796,3 +796,16 @@ if (window.name.includes('performance')) {
     if (mod.default) mod.default();
   });
 }
+
+/** TODO: Redesign staging specific function,
+ *  mock env handling,
+ *  update this when it's on production/ launch
+ * */
+export const getENVbyPath = () => {
+  const currentURL = window.location.href;
+  const redesignPath = 'drafts/redesign/';
+  if (currentURL.includes(redesignPath)) {
+    return 'redesign';
+  }
+  return 'original-design';
+};
