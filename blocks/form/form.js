@@ -34,6 +34,7 @@ function constructPayload(form) {
 
 async function submitForm(form) {
   const payload = constructPayload(form);
+  payload.timestamp = new Date().toJSON();
   const resp = await fetch(form.dataset.action, {
     method: 'POST',
     cache: 'no-cache',
@@ -66,8 +67,8 @@ function createButton(fd) {
   return button;
 }
 
-function createHeading(fd) {
-  const heading = document.createElement('h3');
+function createHeading(fd, el) {
+  const heading = document.createElement(el);
   heading.textContent = fd.Label;
   return heading;
 }
@@ -149,7 +150,10 @@ async function createForm(formURL) {
         fieldWrapper.append(createSelect(fd));
         break;
       case 'heading':
-        fieldWrapper.append(createHeading(fd));
+        fieldWrapper.append(createHeading(fd, 'h3'));
+        break;
+      case 'legal':
+        fieldWrapper.append(createHeading(fd, 'p'));
         break;
       case 'checkbox':
         fieldWrapper.append(createInput(fd));
