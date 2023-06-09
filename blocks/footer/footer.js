@@ -1,15 +1,5 @@
-import { readBlockConfig } from '../../scripts/scripts.js';
+import { readBlockConfig, getENVbyPath } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
-
-// TODO: mock env handling, update this when it's on production/ launch
-const getENVbyPath = () => {
-  const currentURL = window.location.href;
-  const redesignPath = 'drafts/redesign/';
-  if (currentURL.includes(redesignPath)) {
-    return 'redesign';
-  }
-  return 'original-design';
-};
 
 const extractCTAButton = (footer) => {
   const ctaButtonWrapper = footer.querySelector('div:first-of-type strong');

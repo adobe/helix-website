@@ -130,6 +130,8 @@
     --input-border-radius: 4px;
     --image-border-radius-m: 8px;
     --image-border-radius-l: 16px;
+    --image-border-radius-xl: 24px;
+    --image-border-radius-xxl: 30px;
     --card-border-radius-l: 12px;
 
     /* nav */
@@ -197,6 +199,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -239,7 +245,8 @@ body.appear {
 @media screen and (min-width: 900px) {
   .block.contained,
   .default-content-wrapper,
-  .side-navigation-wrapper.expand {
+  .side-navigation-wrapper.expand,
+  .franklin .gnav .submenu-content {
     max-width: 90%;
   }
 
@@ -255,7 +262,8 @@ body.appear {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
-  .side-navigation-wrapper.expand {
+  .side-navigation-wrapper.expand,
+  .franklin .gnav .submenu-content {
     max-width: var(--grid-desktop-container-width);
   }
 }
@@ -956,7 +964,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper img:f
   height: auto;
   object-fit: cover;
   aspect-ratio: 16 / 9;
-  border-radius: 20px;
+  border-radius: var(--image-border-radius-l);
 }
 
 /* for guides-template with hero section (.heading), like documentation category page */
@@ -992,6 +1000,10 @@ body.guides-template .guides-back-btn span {
   body.guides-template main.has-full-width-hero .section.heading  {
     padding-bottom: var(--spacing-s);
   }
+
+  body.guides-template main.without-full-width-hero .default-content-wrapper img:first-of-type {
+    border-radius: var(--image-border-radius-xxl);
+  }
 }
 
 @media screen and (min-width: 900px) {
@@ -1026,7 +1038,7 @@ body.guides-template .guides-back-btn span {
   }
 
   body.guides-template .guides-back-btn {
-    margin: -56px 0 var(--spacing-m);
+    margin: 0 0 var(--spacing-m);
   }
 }
 
@@ -1352,9 +1364,19 @@ body.contact-template .default-content-wrapper img {
   padding: 0;
 }
 
-.colored-tag.circle svg {
+.colored-tag.circle svg{
   width: 40%;
   height: 40%;
+}
+
+.submenu .colored-tag.circle span {
+  width: 40%;
+  height: 40%;
+}
+
+.submenu .colored-tag.circle img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 /* colored tags: circle number */
@@ -1383,6 +1405,10 @@ body.contact-template .default-content-wrapper img {
   color: var(--color-accent-pink-content);
 }
 
+.colored-tag.pink svg {
+  color: var(--color-accent-pink-content);
+}
+
 .colored-tag.purple {
   background-color: var(--color-accent-purple-bg);
   color: var(--color-accent-purple-content);
@@ -1396,6 +1422,10 @@ body.contact-template .default-content-wrapper img {
 .colored-tag.yellow {
   background-color: var(--color-accent-yellow-bg);
   color: var(--color-accent-yellow-content);
+}
+
+.colored-tag.black {
+  background-color: var(--color-black);
 }
 
 .colored-tag-description {

@@ -6,7 +6,7 @@
 
 .breadcrumb-wrapper:not(.no-shadow) {
   box-shadow: 0 4px 6px rgba(0 0 0 15%);
-  margin-bottom: var(--spacing-xxxl);
+  margin-bottom: var(--spacing-xxs);
 }
 
 .block.breadcrumb {
@@ -18,7 +18,7 @@
   display: flex;
   flex-flow: wrap;
   list-style: none;
-  padding: var(--spacing-xs) 0;
+  padding: var(--spacing-xxs) 0;
 }
 
 .breadcrumb.contained.block > div > div > ul {
@@ -49,6 +49,20 @@
 @media screen and (min-width: 600px) {
   .block.breadcrumb {
     max-width: none;
+  }
+
+  .breadcrumb ul {
+    padding: var(--spacing-xs) 0;
+  }
+
+  .breadcrumb-wrapper:not(.no-shadow) {
+    margin-bottom: var(--spacing-s);
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .breadcrumb-wrapper:not(.no-shadow) {
+    margin-bottom: var(--spacing-l);
   }
 }
 

@@ -38,12 +38,19 @@ export default async function decorate(block) {
 
     const backBtn = createTag('div', { class: 'guides-back-btn' }, `
         <span class="icon icon-icon-arrow"></span>
-        <a href="${root}documentation" class="breadcrumb-link-underline-effect">
+        <a href="${root}documentation" class="link-underline-effect">
             Back
         </a>
     `);
     document.querySelector('.default-content-wrapper').prepend(backBtn);
   }
+
+  // make the last item to be unclickable as already on the page
+  const listLinks = list.querySelectorAll('a');
+  const lastLinkItem = listLinks[listLinks.length - 1];
+  lastLinkItem.classList.remove('breadcrumb-link-underline-effect');
+  lastLinkItem.style.cursor = 'default';
+  lastLinkItem.addEventListener('click', (e) => e.preventDefault());
 
   block.classList.add('contained');
   if (isDocumentationLanding) {
