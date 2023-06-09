@@ -1268,9 +1268,19 @@ body.guides-template .icon-icon-caret-down {
   padding: 0;
 }
 
-.colored-tag.circle svg {
+.colored-tag.circle svg{
   width: 40%;
   height: 40%;
+}
+
+.submenu .colored-tag.circle span {
+  width: 40%;
+  height: 40%;
+}
+
+.submenu .colored-tag.circle img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 /* colored tags: circle number */

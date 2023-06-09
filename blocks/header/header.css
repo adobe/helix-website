@@ -115,6 +115,8 @@ button.gnav-toggle::after {
 
 .gnav .gnav-brand img {
   margin-right: var(--spacing-xxs);
+  width: 27px;
+  height: 26px;
 }
 
 /* right side logo / cta button */

@@ -8,7 +8,7 @@ import { changeTag } from '../../utils/helpers.js';
 // adobe icon
 const BRAND_IMG = '<img loading="lazy" alt="Adobe" width="25" height="22.12" src="/blocks/header/adobe-logo.svg">';
 const ICON_ROOT = '/img';
-const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.svg">';
+const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.png">';
 const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
 <path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z"></path>
 </svg>`;
@@ -295,15 +295,14 @@ class Gnav {
     return mainNav;
   };
 
+  // NOTE: decorate svg not available in header, using .png directly instead
   // eslint-disable-next-line class-methods-use-this
-  decorateSvgIcon(spanElement) {
-    // TODO: fix svg not loading in
+  decorateIcon(spanElement) {
     const icon = spanElement.classList[1].substring(5);
-    const imgSrc = `${ICON_ROOT}/${icon}.svg`;
-    const object = document.createElement('object');
-    object.data = imgSrc;
-    object.type = 'image/svg+xml';
-    spanElement.appendChild(object);
+    const imgSrc = `${ICON_ROOT}/${icon}.png`;
+    const image = document.createElement('img');
+    image.src = imgSrc;
+    spanElement.appendChild(image);
   }
 
   decorateHeaderSubMenu = (subMenuWrapper, index, navLinkTitle, navMainLink) => {
@@ -335,7 +334,7 @@ class Gnav {
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {
         // TODO: find out why svg is not auto rendering
-        this.decorateSvgIcon(submenuIcon);
+        this.decorateIcon(submenuIcon);
 
         const iconWrapper = createTag('div', {
           class: `icon-wrapper colored-tag circle ${currentColorPattern[idx]}`,
