@@ -180,6 +180,10 @@ button.gnav-toggle::after {
 
 .franklin .gnav .gnav-mainnav {
   background: var(--navmenu-background-color);
+  min-height: calc(100vh - var(--nav-height) + 1px);
+}
+
+.franklin .gnav .gnav-mainnav.with-search {
   min-height: calc(100vh - var(--nav-height) - var(--mobile-searchbar-height));
 }
 
@@ -705,7 +709,8 @@ button.gnav-toggle::after {
     display: grid;
   }
 
-  .franklin .gnav .gnav-mainnav {
+  .franklin .gnav .gnav-mainnav,
+  .franklin .gnav .gnav-mainnav.with-search {
     background: var(--color-white);
     min-height: calc(var(--nav-height) - 2px);
   }

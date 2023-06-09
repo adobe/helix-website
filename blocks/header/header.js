@@ -17,6 +17,7 @@ const MENU_ICON_COLOR_PATTERN = [
   ['lightgreen', 'pink', 'purple'],
   ['black', 'black', 'black', 'black'],
 ];
+const DESKTOP_BREAKPOINT = 1200;
 
 class Gnav {
   constructor(body, el) {
@@ -200,6 +201,8 @@ class Gnav {
 
       this.search = this.decorateSearch();
       if (this.search) {
+        const mainNavWrapper = nav.querySelector('.gnav-mainnav');
+        mainNavWrapper.classList.add('with-search');
         nav.append(this.search);
       }
     }
@@ -207,6 +210,8 @@ class Gnav {
     // used `franklin` to separate the styles
     const wrapper = createTag('div', { class: 'gnav-wrapper franklin' }, nav);
     this.el.append(this.curtain, wrapper);
+
+    window.addEventListener('resize', this.resizeContent);
   };
 
   decorateToggle = (nav) => {
@@ -449,12 +454,17 @@ class Gnav {
   };
 
   closeMenu = () => {
+    const nav = this.el.querySelector('.gnav');
     this.state.openMenu.classList.remove(IS_OPEN);
     document.removeEventListener('click', this.closeOnDocClick);
     window.removeEventListener('keydown', this.closeOnEscape);
     const menuToggle = this.state.openMenu.querySelector('[aria-expanded]');
     menuToggle.setAttribute('aria-expanded', false);
-    this.curtain.classList.remove(IS_OPEN);
+
+    // only close curtain if the main menu is closed
+    if (!nav.classList.contains(IS_OPEN)) {
+      this.curtain.classList.remove(IS_OPEN);
+    }
     this.state.openMenu = null;
   };
 
@@ -509,6 +519,16 @@ class Gnav {
   closeOnEscape = (e) => {
     if (e.code === 'Escape') {
       this.toggleMenu(this.state.openMenu);
+    }
+  };
+
+  resizeContent = () => {
+    if (window.innerWidth < DESKTOP_BREAKPOINT) {
+      const openedMenu = this.el.querySelector('.gnav-navitem.is-open');
+      if (openedMenu) {
+        const mainLink = openedMenu.querySelector('a');
+        mainLink.click();
+      }
     }
   };
 
