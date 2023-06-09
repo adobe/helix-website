@@ -857,6 +857,10 @@ body.docs-template main p {
     } */
 }
 
+body.guides-template main.without-full-width-hero {
+  min-height: 900px;
+} 
+
 .docs-template a.button.accent:any-link {
   background-color: var(--spectrum-blue);
   border-color: var(--spectrum-blue);
@@ -932,7 +936,7 @@ body.guides-template .default-content-wrapper a {
   overflow-wrap: break-word;
 }
 
-body.guides-template main .default-content-wrapper > :first-of-type {
+body.guides-template main .default-content-wrapper > :first-of-type:not(.guides-back-btn) {
   margin-top: 0;
 }
 
@@ -950,7 +954,9 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
 body.guides-template main.without-full-width-hero .default-content-wrapper img:first-of-type {
   width: 100%;
   height: auto;
+  object-fit: cover;
   aspect-ratio: 16 / 9;
+  border-radius: 20px;
 }
 
 /* for guides-template with hero section (.heading), like documentation category page */
@@ -967,13 +973,26 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
   margin-bottom: var(--spacing-m);
 }
 
+/* guides-template back button on documentation detail pages */
+body.guides-template .guides-back-btn {
+  margin: var(--spacing-s) 0;
+  display: flex;
+  align-items: center;
+}
+
+body.guides-template .guides-back-btn a {
+  text-decoration: none;
+}
+
+body.guides-template .guides-back-btn span {
+  margin-right: var(--spacing-xxs);
+}
 
 @media screen and (min-width: 768px) {
   body.guides-template main.has-full-width-hero .section.heading  {
     padding-bottom: var(--spacing-s);
   }
 }
-
 
 @media screen and (min-width: 900px) {
   body.guides-template main {
@@ -1005,6 +1024,10 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
     margin-top: var(--spacing-ml);
     margin-bottom: var(--spacing-m);
   }
+
+  body.guides-template .guides-back-btn {
+    margin: -56px 0 var(--spacing-m);
+  }
 }
 
 body.guides-template main .section.content .default-content-wrapper {
@@ -1013,7 +1036,8 @@ body.guides-template main .section.content .default-content-wrapper {
 }
 
 body.guides-template .icon-icon-caret-right,
-body.guides-template .icon-icon-caret-down {
+body.guides-template .icon-icon-caret-down,
+body.guides-template .icon-icon-arrow {
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
@@ -1025,6 +1049,10 @@ body.guides-template .icon-icon-caret-right {
 
 body.guides-template .icon-icon-caret-down {
   background-image: url("/img/icon-caret-down.svg");
+}
+
+body.guides-template .guides-back-btn .icon-icon-arrow {
+  background-image: url("/img/icon-arrow.svg");
 }
 
 /* Layout for Contact template */
