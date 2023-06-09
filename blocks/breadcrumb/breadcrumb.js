@@ -38,7 +38,7 @@ export default async function decorate(block) {
 
     const backBtn = createTag('div', { class: 'guides-back-btn' }, `
         <span class="icon icon-icon-arrow"></span>
-        <a href="${root}documentation" class="breadcrumb-link-underline-effect">
+        <a href="${root}documentation" class="link-underline-effect">
             Back
         </a>
     `);

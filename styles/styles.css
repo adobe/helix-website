@@ -1037,7 +1037,7 @@ body.guides-template .guides-back-btn span {
   }
 
   body.guides-template .guides-back-btn {
-    margin: -56px 0 var(--spacing-m);
+    margin: 0 0 var(--spacing-m);
   }
 }
 
