@@ -1,0 +1,8 @@
+.cards .cards-card-details dialog[aria-expanded="true"] {
+  display: contents;
+  color: inherit;
+}
+
+.cards .cards-card-details {
+  overflow-x: hidden;
+}
