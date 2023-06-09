@@ -144,6 +144,8 @@ export default async function decorate(block) {
     });
   });
 
+  block.parentElement.classList.add('ready');
+
   const resizeContent = () => {
     if (window.innerWidth > MOBILE_BREAKPOINT) {
       block.classList.remove('overlay');
