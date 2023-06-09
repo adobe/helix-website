@@ -157,6 +157,7 @@ class Gnav {
     this.curtain = createTag('div', { class: 'gnav-curtain' });
     const nav = createTag('nav', { class: 'gnav' });
 
+    // whole mobile menu toggle
     const mobileToggle = this.decorateToggle(nav);
     nav.append(mobileToggle);
 
@@ -165,7 +166,16 @@ class Gnav {
       nav.append(brand);
     }
 
+    const ctaButtonWrapper = this.decorateCTAButton();
+    const mobileCTAButton = ctaButtonWrapper.cloneNode(true);
+    ctaButtonWrapper.classList.add('desktop');
+    if (ctaButtonWrapper) {
+      nav.append(ctaButtonWrapper);
+    }
+
     const mainNav = this.decorateHeaderMainNav();
+    mobileCTAButton.classList.add('mobile');
+    mainNav.append(mobileCTAButton);
     if (mainNav) {
       nav.append(mainNav);
     }
@@ -173,15 +183,14 @@ class Gnav {
     // TODO: kept this for now as unsure about its purpose
     // tbc implement this in redesign if confirmed as neeede
     const profile = this.decorateProfile();
+    const profileWrapper = createTag('div', { class: 'profile' }, '');
     if (profile) {
-      nav.append(profile);
+      profileWrapper.append(profile);
+      nav.append(profileWrapper);
+    } else {
+      nav.append(profileWrapper);
     }
     // above keeping ends
-
-    const ctaButtonWrapper = this.decorateCTAButton();
-    if (ctaButtonWrapper) {
-      nav.append(ctaButtonWrapper);
-    }
 
     const enableSearch = getMetadata('enable-search');
     if (!enableSearch || enableSearch !== 'no') {
@@ -235,18 +244,9 @@ class Gnav {
     return brand;
   };
 
-  // nav menu list TODO: toggle logic
-  // setupToggleMenuBehavior = (navMainLink) => {
-  //   const wrapper = navMainLink.closet('.gnav-navitem');
-  //   navMainLink.addEventListener('mouseenter', (e) => {
-  //     wrapper.classList.add('is-open');
-  //   });
-  // };
-
   decorateHeaderMainNav = () => {
     const mainNavWrapper = this.body.querySelector('div:nth-child(2)');
     const mainNavLinkWrappers = mainNavWrapper.querySelectorAll('h2');
-    // console.log(mainNavLinkWrappers.length)
 
     if (mainNavLinkWrappers.length === 0) {
       return null;
@@ -258,7 +258,6 @@ class Gnav {
       const navItem = createTag('div', { class: 'gnav-navitem' });
       const navMainLink = linkWrapper.querySelector('a');
       const navMainLinkText = navMainLink.textContent ? navMainLink.textContent : '';
-      // console.log(navMainLink);
 
       const subMenuWrapper = createTag('div', { class: 'submenu-wrapper' });
       let nextSibling = linkWrapper.nextElementSibling;
@@ -269,14 +268,22 @@ class Gnav {
       }
 
       if (subMenuWrapper.childElementCount > 0) {
+        // toggle submenu logic
         const id = `navmenu-${index}`;
         subMenuWrapper.id = id;
         navItem.classList.add('has-menu');
         navMainLink.setAttribute('role', 'button');
         navMainLink.setAttribute('aria-expanded', false);
         navMainLink.setAttribute('aria-controls', id);
+        navMainLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.toggleMenu(navItem);
+        });
 
-        const decoratedSubMenu = this.decorateHeaderSubMenu(subMenuWrapper, index, navMainLinkText);
+        // reorganize submenu items
+        // eslint-disable-next-line max-len
+        const decoratedSubMenu = this.decorateHeaderSubMenu(subMenuWrapper, index, navMainLinkText, navMainLink);
         subMenuWrapper.innerHTML = '';
         subMenuWrapper.append(decoratedSubMenu);
       }
@@ -299,7 +306,7 @@ class Gnav {
     spanElement.appendChild(object);
   }
 
-  decorateHeaderSubMenu = (subMenuWrapper, index, navLinkTitle) => {
+  decorateHeaderSubMenu = (subMenuWrapper, index, navLinkTitle, navMainLink) => {
     const currentColorPattern = MENU_ICON_COLOR_PATTERN[index];
     const newSubMenuWrapper = createTag('div', { class: 'submenu-content' }, '');
 
@@ -309,6 +316,9 @@ class Gnav {
       const infoTitle = createTag('h3', {}, navLinkTitle);
       const infoDescription = subMenuWrapper.querySelector('p');
       const infoImage = subMenuWrapper.querySelector('img');
+      infoDiv.addEventListener('click', () => {
+        window.location.href = navMainLink.href;
+      });
       infoDiv.append(infoTitle, infoDescription, infoImage);
       newSubMenuWrapper.append(infoDiv);
     }
@@ -343,6 +353,19 @@ class Gnav {
         submenuLink.append(description);
       }
 
+      // close menu on click
+      submenuLink.addEventListener('click', () => {
+        const navbar = document.querySelector('.gnav');
+        navbar.classList.remove(IS_OPEN);
+        this.closeMenu();
+      });
+
+      // add active status to main link
+      const navUrlObject = new URL(submenuLink.href);
+      if (window.location.pathname.includes(navUrlObject.pathname)) {
+        navMainLink.classList.add('active');
+      }
+
       newSubMenuWrapper.append(submenuLink);
     });
 
@@ -352,14 +375,13 @@ class Gnav {
   // right side cta button
   decorateCTAButton = () => {
     const ctaButton = this.body.querySelector('.adobe-cta a');
-    const mobileImage = this.body.querySelector('.adobe-cta img');
     ctaButton.classList.add('gnav-cta-button');
     ctaButton.setAttribute('aria-label', ctaButton.textContent);
     const ctaText = ctaButton.textContent;
     const ctaTextWrapper = createTag('span', { }, ctaText);
 
     ctaButton.innerHTML = '';
-    ctaButton.append(ctaTextWrapper, mobileImage);
+    ctaButton.append(ctaTextWrapper);
     const ctaButtonWrapper = createTag('div', { class: 'gnav-cta-button-wrapper' }, ctaButton);
     return ctaButtonWrapper;
   };
@@ -446,6 +468,7 @@ class Gnav {
     document.addEventListener('click', this.closeOnDocClick);
     window.addEventListener('keydown', this.closeOnEscape);
     if (!isSearch) {
+      this.curtain.classList.add(IS_OPEN);
       const desktop = window.matchMedia('(min-width: 1200px)');
       if (desktop.matches) {
         document.addEventListener('scroll', this.closeOnScroll, { passive: true });
@@ -490,8 +513,7 @@ class Gnav {
     }
   };
 
-  // TODO: what does this do? tbc confirm with adobe team
-  // if that's needed to keep for tracking or sign-in purposes
+  // TODO: for adobe.com login status purposes, to be confirmed with adobe team if that's working
   decorateProfile = () => {
     const blockEl = this.body.querySelector('.profile');
     if (!blockEl) return null;
