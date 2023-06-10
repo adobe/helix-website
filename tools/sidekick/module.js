@@ -495,14 +495,8 @@
     } = config;
     const publicHost = host && host.startsWith('http') ? new URL(host).host : host;
     const hostPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
-    let innerHost = previewHost;
-    if (!innerHost) {
-      innerHost = hostPrefix ? `${hostPrefix}.hlx.page` : null;
-    }
-    let outerHost = liveHost || legacyLiveHost;
-    if (!outerHost) {
-      outerHost = hostPrefix ? `${hostPrefix}.hlx.live` : null;
-    }
+    const stdInnerHost = hostPrefix ? `${hostPrefix}.hlx.page` : null;
+    const stdOuterHost = hostPrefix ? `${hostPrefix}.hlx.live` : null;
     const devUrl = new URL(devOrigin);
     // define elements to push down
     const pushDownElements = [];
@@ -531,8 +525,10 @@
     return {
       ...config,
       ref,
-      innerHost,
-      outerHost,
+      innerHost: previewHost || stdInnerHost,
+      outerHost: liveHost || legacyLiveHost || stdOuterHost,
+      stdInnerHost,
+      stdOuterHost,
       scriptRoot,
       host: publicHost,
       project: project || '',
@@ -2985,7 +2981,8 @@
      */
     isInner() {
       const { config, location } = this;
-      return matchProjectHost(config.innerHost, location.host);
+      return matchProjectHost(config.innerHost, location.host)
+       || matchProjectHost(config.stdInnerHost, location.host);
     }
 
     /**
@@ -2994,7 +2991,8 @@
      */
     isOuter() {
       const { config, location } = this;
-      return matchProjectHost(config.outerHost, location.host);
+      return matchProjectHost(config.outerHost, location.host)
+        || matchProjectHost(config.stdOuterHost, location.host);
     }
 
     /**
@@ -3492,7 +3490,9 @@
         return null;
       }
 
-      const purgeURL = new URL(path, this.isEditor() ? `https://${config.innerHost}/` : location.href);
+      const purgeURL = new URL(path, this.isEditor()
+        ? `https://${config.innerHost}/`
+        : location.href);
       console.log(`publishing ${purgeURL.pathname}`);
       let resp = {};
       try {
