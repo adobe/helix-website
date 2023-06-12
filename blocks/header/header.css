@@ -463,8 +463,8 @@ button.gnav-toggle::after {
 }
 
 .gnav-curtain.is-open {
-  background: rgb(0 0 0 / 60%);
-  backdrop-filter: blur(0.05em);
+  background: var(--overlay-curtain-bg-color);
+  backdrop-filter: var(--overlay-curtain-bg-filter);
   pointer-events: auto;
 }
 

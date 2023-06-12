@@ -114,6 +114,8 @@
     --bg-color-lightgrey: #F8F8F8;
     --bg-color-grey: #E8E8E8;
     --bg-color-grey-2: #D6D6D6;
+    --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
+    --overlay-curtain-bg-filter: blur(0.05em);
   
     /* Grid / container width -- 600px, 900px, TODO: update on all responsive section */
     --grid-mobile-container-width: 88%;
