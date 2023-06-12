@@ -7,7 +7,6 @@ function toggleVisibility(dialog) {
 
 /**
  * Sanitize and encode all HTML in a user-submitted string
- * https://vanillajstoolkit.com/helpers/sanitizehtml/
  * @param  {String} str  The user-submitted string
  * @return {String} str  The sanitized string
  */
@@ -56,7 +55,7 @@ export default async function decorate(block) {
     decorateBlock(cardsBlock);
     await loadBlock(cardsBlock);
 
-    // add listener to show the description overflow dialog
+    // add listener to hide/show the description overflow dialog
     const dialogs = blockWrapper.querySelectorAll('.cards-card dialog');
     dialogs.forEach((dialog) => {
       const description = dialog.parentElement.querySelector('p.description');
