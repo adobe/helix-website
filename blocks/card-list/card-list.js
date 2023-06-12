@@ -5,6 +5,18 @@ function toggleVisibility(dialog) {
   dialog.setAttribute('aria-expanded', expanded ? 'false' : 'true');
 }
 
+/**
+ * Sanitize and encode all HTML in a user-submitted string
+ * https://vanillajstoolkit.com/helpers/sanitizehtml/
+ * @param  {String} str  The user-submitted string
+ * @return {String} str  The sanitized string
+ */
+function sanitizeHTML(str) {
+	return str.replace(/javascript:/gi, '').replace(/[^\w-_. ]/gi, function (c) {
+		return `&#${c.charCodeAt(0)};`;
+	});
+}
+
 export default async function decorate(block) {
   const endpoint = block.querySelector('a').href;
   block.textContent = '';
@@ -23,13 +35,13 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><a href="${row.githubUrl}">${row.title}</a></p>`;
+      let cardDetails = `<p><a href="${sanitizeHTML(row.githubUrl)}">${sanitizeHTML(row.title)}</a></p>`;
       if (row.showcaseUrl) {
-        cardDetails += `<p><a href="${row.showcaseUrl}">Preview</a></p>`;
+        cardDetails += `<p><a href="${sanitizeHTML(row.showcaseUrl)}">Preview</a></p>`;
       }
-      cardDetails += `<p><em>${row.category}</em></p>
-      <p><em>${row.firstName} ${row.lastName}, ${row.company}</em></p>
-      <p class="description">${row.description}</p>`;
+      cardDetails += `<p><em>${sanitizeHTML(row.category)}</em></p>
+      <p><em>${sanitizeHTML(row.firstName)} ${sanitizeHTML(row.lastName)}, ${sanitizeHTML(row.company)}</em></p>
+      <p class="description">${sanitizeHTML(row.description)}</p>`;
       cardsRow.push(cardDetails);
     });
     cardsArr.push(cardsRow);
