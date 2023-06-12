@@ -149,6 +149,15 @@ export default async function decorate(block) {
     });
   });
 
+  // close overlay when clicked on link, ensure close overlay if link is on same page
+  const allSideNavLinks = block.querySelectorAll('a');
+  allSideNavLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      backdropCurtain.classList.remove('is-open');
+      block.classList.remove('overlay');
+    });
+  });
+
   block.parentElement.classList.add('ready');
 
   const resizeContent = () => {
