@@ -11,9 +11,7 @@ function toggleVisibility(dialog) {
  * @return {String} str  The sanitized string
  */
 function sanitizeHTML(str) {
-	return str.replace(/javascript:/gi, '').replace(/[^\w-_. ]/gi, function (c) {
-		return `&#${c.charCodeAt(0)};`;
-	});
+  return str.replace(/javascript:/gi, '').replace(/[^\w-_. ]/gi, (c) => `&#${c.charCodeAt(0)};`);
 }
 
 export default async function decorate(block) {
@@ -25,9 +23,7 @@ export default async function decorate(block) {
     // create a 2D array to pass to the cards block
     const cardsArr = [];
     let cardsRow = [];
-    const blockPartyList = blockPartyJson.data.filter((row) => {
-      return row.approved === 'true';
-    });
+    const blockPartyList = blockPartyJson.data.filter((row) => row.approved === 'true');
     await blockPartyList.forEach(async (row, i) => {
       // limit each row to only 4 columns, otherwise create a new row
       if ((i !== 0) && (i % 4) === 0) {
@@ -47,7 +43,7 @@ export default async function decorate(block) {
 
     // build out cards using the existing cards block
     const cardsBlock = buildBlock('cards', cardsArr);
-    // replace existing block with the new cards block 
+    // replace existing block with the new cards block
     const blockWrapper = block.parentElement;
     block.remove();
     blockWrapper.append(cardsBlock);
