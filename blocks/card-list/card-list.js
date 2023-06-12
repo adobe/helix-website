@@ -23,7 +23,7 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><a href="${row.githubUrl}">${row.title} Code</a></p>`;
+      let cardDetails = `<p><a href="${row.githubUrl}">${row.title}</a></p>`;
       if (row.showcaseUrl) {
         cardDetails += `<p><a href="${row.showcaseUrl}">Preview</a></p>`;
       }
