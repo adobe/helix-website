@@ -14,7 +14,10 @@ export default async function decorate(block) {
     // create a 2D array to pass to the cards block
     const cardsArr = [];
     let cardsRow = [];
-    await blockPartyJson.data.forEach(async (row, i) => {
+    const blockPartyList = blockPartyJson.data.filter((row) => {
+      return row.approved === 'true';
+    });
+    await blockPartyList.forEach(async (row, i) => {
       // limit each row to only 4 columns, otherwise create a new row
       if ((i !== 0) && (i % 4) === 0) {
         cardsArr.push(cardsRow);
