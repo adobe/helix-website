@@ -3,7 +3,7 @@ import createTag from '../../utils/tag.js';
 const extractCustomerInfo = (detailContainer) => {
   const icon = detailContainer.querySelector('img');
   const cta = detailContainer.querySelector('a');
-  cta.classList.add('button');
+  cta.classList.add('button', 'secondary');
   const titles = detailContainer.querySelectorAll('h5');
 
   let titlesHTML = '';

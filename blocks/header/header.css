@@ -159,12 +159,6 @@ button.gnav-toggle::after {
   font-size: 15px;
   font-weight: 700;
   line-height: 1.27;
-  color: white;
-  background: var(--spectrum-blue);
-  padding: 5.5px 15px;
-  border: 2px solid var(--spectrum-blue);
-  border-radius: 500px;
-  height: fit-content;
 }
 
 
@@ -370,6 +364,7 @@ button.gnav-toggle::after {
   font-size: var(--type-body-xs-size);
   letter-spacing: normal;
   color: var(--color-black);
+  width: fit-content;
 }
 
 .franklin .gnav .submenu-content a.submenu p {
@@ -792,6 +787,10 @@ button.gnav-toggle::after {
     padding: 6px 20px;
   }
 
+  .franklin .gnav-navitem > a {
+    border-top: none;
+  }
+
   .gnav-promo {
     margin: 10px 0 0 36px;
   }
@@ -895,6 +894,7 @@ button.gnav-toggle::after {
   .franklin .gnav .navmenu-info h3 {
     font-size: 16px;
     line-height: 20px;
+    width: fit-content;
   }
 
   .franklin .gnav .navmenu-info p,

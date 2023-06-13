@@ -80,16 +80,8 @@
 }
 
 .inner-content a.button:any-link {
-    color: var(--color-white);
-    border: 2px solid var(--spectrum-blue);
-    background: var(--spectrum-blue);
     margin-top: 0;
     margin-bottom: max(var(--spacing-xl), 10vh);
-}
-
-.inner-content a.button:any-link:hover {
-    background: transparent;
-    color: var(--spectrum-blue);
 }
 
 /* default: image at bottom */

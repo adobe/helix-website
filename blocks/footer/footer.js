@@ -4,7 +4,7 @@ import createTag from '../../utils/tag.js';
 const extractCTAButton = (footer) => {
   const ctaButtonWrapper = footer.querySelector('div:first-of-type strong');
   const ctaButton = ctaButtonWrapper.querySelector('a');
-  ctaButton.classList.add('footer-cta-button', 'button');
+  ctaButton.classList.add('footer-cta-button', 'button', 'secondary');
 
   if (ctaButton) {
     return ctaButton;
@@ -21,6 +21,8 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
   const h3Elements = footerNavSection.querySelectorAll('h3');
   h3Elements.forEach((h3Element) => {
     const divElement = document.createElement('div');
+    const mainLink = h3Element.querySelector('a');
+    mainLink.classList.add('link-highlight-colorful-effect');
     divElement.appendChild(h3Element.cloneNode(true));
 
     let nextSibling = h3Element.nextElementSibling;
@@ -29,6 +31,7 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
       const navLinks = nextSibling.querySelectorAll('a');
       navLinks.forEach((navLink) => {
         navLink.classList.add('link-underline-effect');
+        // navLink.classList.add('highlight-colorful');
       });
 
       // clone the node
@@ -116,6 +119,7 @@ export default async function decorate(block) {
 
   // TODO: need to update the logic when move over to production
   if (ENV === 'redesign') {
+    // '.redesign' class is needed for the redesign styles, keep this during migration
     document.body.classList.add('redesign');
     block.classList.add('contained');
 

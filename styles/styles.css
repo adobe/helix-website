@@ -75,6 +75,9 @@
 
     /* Colors */
     --spectrum-blue: #1473E6;
+    --brand-color-purple: #8A8DF3;
+    --brand-color-pink: #F1BCE7;
+    --brand-color-green-yellow: #EBF3A4;
     --highlight-gradient: linear-gradient(75deg, #DB3278, #EE732F);
 
     /* those (background) colors were missing */
@@ -676,6 +679,82 @@ a.button:any-link {
 p.button-container > a.button {
     margin-left: 0;
 }
+
+/* TODO: redesign button animation */
+
+/* primary button: blue bg */
+.redesign a.button:any-link {
+  cursor: pointer;
+  text-decoration: none;
+  padding: 5.5px 15px;
+  text-align: center;
+  font-size: var(--type-body-xs-size);
+  line-height: var(--body-line-height);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-white);
+  background: transparent;
+  border: 2px solid var(--spectrum-blue);
+  border-radius: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+  position: relative;
+  height: fit-content;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.redesign a.button:any-link span {
+  color: var(--color-white);
+  transition: all 0.3s ease-in-out;
+}
+
+.redesign a.button:any-link:hover {
+  color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
+  transform: translateZ(0);
+}
+
+.redesign a.button:any-link:hover span{
+  color: var(--spectrum-blue);
+}
+
+.redesign a.button:any-link::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+    width: 200%;
+    height: 104%;
+    z-index: -1;
+
+    /* 1st value: hovered color, 2nd value: original color */
+    background: radial-gradient(circle at left, var(--color-white) 50%, var(--spectrum-blue) 50%);
+}
+
+.redesign a.button:any-link:hover::before {
+  left: 0%;
+}
+
+/* secondary button: grey button */
+.redesign a.button.secondary:any-link {
+  color: var(--color-font-grey);
+  border-color: var(--color-font-grey);
+}
+
+.redesign a.button.secondary:any-link:hover {
+  color: var(--color-white);
+}
+
+.redesign a.button.secondary:any-link::before {
+  /* 1st value: hovered color, 2nd value: original color */
+  background: radial-gradient(circle at left, var(--color-font-grey) 50%, transparent 50%);
+}
+
+/* ---- button ends ---- */
 
 main {
   min-height: calc(100vh - 264px);
@@ -1478,6 +1557,7 @@ body.contact-template .default-content-wrapper img {
     left: 0;
 }
 
+/* NOTE: with .breadcrumb prefix would address line length for '/' in breadcrumb, use .link-underline-effect for normal case */
 .breadcrumb-link-underline-effect::before {
   width: 0;
   right: 12px;
@@ -1489,3 +1569,28 @@ body.contact-template .default-content-wrapper img {
   right: 12px;
   left: 0;
 }
+
+/* highlight effect */
+.link-highlight-colorful-effect {
+  position: relative;
+  transform: translateZ(0);
+}
+
+.link-highlight-colorful-effect::before {
+  content: '';
+  width: 0;
+  height: 50%;
+  position: absolute;
+  bottom: 10%;
+  left: 2.5%;
+  background: linear-gradient(90deg, rgba(137 140 242 / 100%) 0%, rgba(242 231 251 / 100%) 50%, rgba(241 188 231 / 100%) 100%);
+  z-index: -1;
+  opacity: 0.6;
+  transition: all 0.3s ease-in-out;
+}
+
+/* can add `.link-highlight-colorful-effect-hover-wrapper` to trigger hover child highlight effect */
+.link-highlight-colorful-effect:hover::before,
+.link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect::before {
+  width: 105%;
+} 

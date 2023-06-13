@@ -316,8 +316,8 @@ class Gnav {
 
     // add a info div if there's description <p/>
     if (subMenuWrapper.querySelector('p')) {
-      const infoDiv = createTag('div', { class: 'navmenu-info' }, '');
-      const infoTitle = createTag('h3', {}, navLinkTitle);
+      const infoDiv = createTag('div', { class: 'navmenu-info link-highlight-colorful-effect-hover-wrapper' }, '');
+      const infoTitle = createTag('h3', { class: 'link-highlight-colorful-effect' }, navLinkTitle);
       const infoDescription = subMenuWrapper.querySelector('p');
       const infoImage = subMenuWrapper.querySelector('img');
       infoDiv.addEventListener('click', () => {
@@ -333,7 +333,7 @@ class Gnav {
     subMenuListItems.forEach((item, idx) => {
       const submenuLink = item.querySelector('a');
       const submenuTitleText = submenuLink.textContent;
-      submenuLink.classList.add('submenu');
+      submenuLink.classList.add('submenu', 'link-highlight-colorful-effect-hover-wrapper');
       submenuLink.innerHTML = '';
 
       const submenuIcon = item.querySelector('span.icon');
@@ -348,7 +348,7 @@ class Gnav {
         submenuLink.append(iconWrapper);
       }
 
-      const title = createTag('h3', {}, submenuTitleText);
+      const title = createTag('h3', { class: 'link-highlight-colorful-effect submenu-title' }, submenuTitleText);
       submenuLink.append(title);
 
       const submenuDescription = item.querySelector('li');
@@ -379,7 +379,7 @@ class Gnav {
   // right side cta button
   decorateCTAButton = () => {
     const ctaButton = this.body.querySelector('.adobe-cta a');
-    ctaButton.classList.add('gnav-cta-button');
+    ctaButton.classList.add('gnav-cta-button', 'button');
     ctaButton.setAttribute('aria-label', ctaButton.textContent);
     const ctaText = ctaButton.textContent;
     const ctaTextWrapper = createTag('span', { }, ctaText);
