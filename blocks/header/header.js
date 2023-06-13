@@ -307,6 +307,7 @@ class Gnav {
     const imgSrc = `${ICON_ROOT}/${icon}.png`;
     const image = document.createElement('img');
     image.src = imgSrc;
+    image.classList.add('bounce-item-effect');
     spanElement.appendChild(image);
   }
 
@@ -333,12 +334,11 @@ class Gnav {
     subMenuListItems.forEach((item, idx) => {
       const submenuLink = item.querySelector('a');
       const submenuTitleText = submenuLink.textContent;
-      submenuLink.classList.add('submenu', 'link-highlight-colorful-effect-hover-wrapper');
+      submenuLink.classList.add('submenu', 'link-highlight-colorful-effect-hover-wrapper', 'bounce-item-effect-hover-wrapper');
       submenuLink.innerHTML = '';
 
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {
-        // TODO: find out why svg is not auto rendering
         this.decorateIcon(submenuIcon);
 
         const iconWrapper = createTag('div', {

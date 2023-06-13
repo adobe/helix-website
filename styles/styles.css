@@ -1594,3 +1594,23 @@ body.contact-template .default-content-wrapper img {
 .link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect::before {
   width: 105%;
 } 
+
+/* hover wrapper and bounce the inner icon */
+.bounce-item-effect-hover-wrapper:hover .bounce-item-effect {
+  animation: bounce 1s ease;
+}
+
+/* bounce effect: for icons */
+@keyframes bounce {
+  0%, 20%, 60%, 100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-4px);
+  }
+
+  80% {
+    transform: translateY(-2px);
+  }
+}
