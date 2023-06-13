@@ -163,6 +163,10 @@
 
     /* guide-templates */
     --side-navigation-bar-gap: var(--spacing-s);
+
+    /* animaiton & transition */
+    --transition-cubic-bezier-1: all .5s cubic-bezier(.23,1,.32,1);
+    --transition-ease-in-out: all 0.4s ease-in-out;
 }
 
 /* desktop variables */
@@ -1548,7 +1552,7 @@ body.contact-template .default-content-wrapper img {
     right: 0;
     bottom: -1px;
     width: 0;
-    transition: all .5s cubic-bezier(.23,1,.32,1);
+    transition: var(--transition-cubic-bezier-1);
 }
 
 .link-underline-effect:hover::before {

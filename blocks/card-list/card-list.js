@@ -14,7 +14,7 @@ export default function decorate(block) {
 
     const link = li.querySelector('a');
     if (link) {
-      const tag = createTag('a', { href: link.getAttribute('href') });
+      const tag = createTag('a', { href: link.getAttribute('href'), class: 'card-wrapper' });
       link.parentElement.innerHTML = link.innerHTML;
       [...li.childNodes].forEach((child) => {
         tag.append(child);

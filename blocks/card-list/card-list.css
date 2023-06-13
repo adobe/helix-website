@@ -22,7 +22,11 @@
   }
   
   .card-list .cards-card-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
     line-height: 0;
+    border-radius: var(--image-border-radius-l);
+    overflow: hidden;
   }
   
   .card-list.cards-card-body > *:first-child {
@@ -31,10 +35,13 @@
   
   .card-list > ul > li img {
     width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
+    height: 100%;
     object-fit: cover;
-    border-radius: var(--image-border-radius-l);
+    transition: var(--transition-ease-in-out);
+  }
+
+  .card-list .card-wrapper:hover img{
+    transform: scale(1.04);
   }
 
   .card-list .cards-card-body h3 {
