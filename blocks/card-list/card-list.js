@@ -32,13 +32,13 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><a href="${stripTags(row.githubUrl, 'a')}" target="_blank">${stripTags(row.title, 'a', 'b', 'i', 'u', 'p', 'br')}</a></p>`;
+      let cardDetails = `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
       if (row.showcaseUrl) {
-        cardDetails += `<p><a href="${stripTags(row.showcaseUrl, 'a')}" target="_blank">Preview</a></p>`;
+        cardDetails += `<p><a href="${stripTags(row.showcaseUrl)}" target="_blank">Preview</a></p>`;
       }
-      cardDetails += `<p><em>${stripTags(row.category, 'a', 'b', 'i', 'u', 'p', 'br')}</em></p>
-      <p><em>${stripTags(row.firstName, 'a', 'b', 'i', 'u', 'p', 'br')} ${stripTags(row.lastName, 'a', 'b', 'i', 'u', 'p', 'br')}, ${stripTags(row.company, 'a', 'b', 'i', 'u', 'p', 'br')}</em></p>
-      <p class="description">${urlify(stripTags(row.description), 'a', 'b', 'i', 'u', 'p', 'br')}</p>`;
+      cardDetails += `<p><em>${stripTags(row.category)}</em></p>
+      <p><em>${stripTags(row.firstName)} ${stripTags(row.lastName)}, ${stripTags(row.company)}</em></p>
+      <p class="description">${urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br')}</p>`;
       cardsRow.push(cardDetails);
     });
     cardsArr.push(cardsRow);
