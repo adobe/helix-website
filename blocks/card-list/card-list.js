@@ -5,13 +5,15 @@ function toggleVisibility(dialog) {
   dialog.setAttribute('aria-expanded', expanded ? 'false' : 'true');
 }
 
-/**
- * Sanitize and encode all HTML in a user-submitted string
- * @param  {String} str  The user-submitted string
- * @return {String} str  The sanitized string
- */
-function sanitizeHTML(str) {
-  return str.replace(/javascript:/gi, '').replace(/[^\w-_. ]/gi, (c) => `&#${c.charCodeAt(0)};`);
+function urlify(str) {
+  return str.replace(/(https:\/\/[^ "]+)/g, (url) => `<a href="${url}" target="_blank">Link</a>`);
+}
+
+function stripTags(html, ...args) {
+  return html.replace(/<(\/?)(\w+)[^>]*\/?>/g, (_, endMark, tag) => {
+    if (args.includes(tag)) return `<${endMark}${tag}>`;
+    return '';
+  }).replace(/<!--.*?-->/g, '');
 }
 
 export default async function decorate(block) {
@@ -30,13 +32,13 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><a href="${sanitizeHTML(row.githubUrl)}">${sanitizeHTML(row.title)}</a></p>`;
+      let cardDetails = `<p><a href="${stripTags(row.githubUrl, 'a')}" target="_blank">${stripTags(row.title, 'a', 'b', 'i', 'u', 'p', 'br')}</a></p>`;
       if (row.showcaseUrl) {
-        cardDetails += `<p><a href="${sanitizeHTML(row.showcaseUrl)}">Preview</a></p>`;
+        cardDetails += `<p><a href="${stripTags(row.showcaseUrl, 'a')}" target="_blank">Preview</a></p>`;
       }
-      cardDetails += `<p><em>${sanitizeHTML(row.category)}</em></p>
-      <p><em>${sanitizeHTML(row.firstName)} ${sanitizeHTML(row.lastName)}, ${sanitizeHTML(row.company)}</em></p>
-      <p class="description">${sanitizeHTML(row.description)}</p>`;
+      cardDetails += `<p><em>${stripTags(row.category, 'a', 'b', 'i', 'u', 'p', 'br')}</em></p>
+      <p><em>${stripTags(row.firstName, 'a', 'b', 'i', 'u', 'p', 'br')} ${stripTags(row.lastName, 'a', 'b', 'i', 'u', 'p', 'br')}, ${stripTags(row.company, 'a', 'b', 'i', 'u', 'p', 'br')}</em></p>
+      <p class="description">${urlify(stripTags(row.description), 'a', 'b', 'i', 'u', 'p', 'br')}</p>`;
       cardsRow.push(cardDetails);
     });
     cardsArr.push(cardsRow);
