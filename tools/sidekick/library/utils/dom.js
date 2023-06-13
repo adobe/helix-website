@@ -47,8 +47,13 @@ export function createTag(tag, attributes, html) {
  * @param {Blob} blob The data
  */
 export function createCopy(blob) {
-  const data = [new ClipboardItem({ [blob.type]: blob })];
-  navigator.clipboard.write(data);
+  try {
+    const data = [new ClipboardItem({ [blob.type]: blob })];
+    navigator.clipboard.write(data);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Unable to write to clipboard', error);
+  }
 }
 
 /**
@@ -92,4 +97,136 @@ export function loadCSS(href, callback) {
  */
 export function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Is the provided string a path?
+ * @param {*} str The string to check
+ * @returns True if yes
+ */
+export function isPath(str) {
+  try {
+    const url = new URL(str);
+    return url.protocol === '' && url.hostname === '';
+  } catch (error) {
+    return true;
+  }
+}
+
+/**
+ * Extracts the config from a block.
+ * @param {Element} block The block element
+ * @returns {object} The block config
+ */
+export function readBlockConfig(block) {
+  const config = {};
+  block.querySelectorAll(':scope > div').forEach((row) => {
+    if (row.children) {
+      const cols = [...row.children];
+      if (cols[1]) {
+        const col = cols[1];
+        const name = toClassName(cols[0].textContent);
+        let value = '';
+        if (col.querySelector('a')) {
+          const as = [...col.querySelectorAll('a')];
+          if (as.length === 1) {
+            value = as[0].href;
+          } else {
+            value = as.map(a => a.href);
+          }
+        } else if (col.querySelector('img')) {
+          const imgs = [...col.querySelectorAll('img')];
+          if (imgs.length === 1) {
+            value = imgs[0].src;
+          } else {
+            value = imgs.map(img => img.src);
+          }
+        } else if (col.querySelector('p')) {
+          const ps = [...col.querySelectorAll('p')];
+          if (ps.length === 1) {
+            value = ps[0].textContent;
+          } else {
+            value = ps.map(p => p.textContent);
+          }
+        } else value = row.children[1].textContent;
+        config[name] = value;
+      }
+    }
+  });
+  return config;
+}
+
+/**
+ * Sanitizes a string for use as class name.
+ * @param {string} name The unsanitized string
+ * @returns {string} The class name
+ */
+export function toClassName(name) {
+  return typeof name === 'string'
+    ? name.toLowerCase().replace(/[^0-9a-z]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    : '';
+}
+
+/**
+ * Sanitizes a string for use as a js property name.
+ * @param {string} name The unsanitized string
+ * @returns {string} The camelCased name
+ */
+export function toCamelCase(name) {
+  return toClassName(name).replace(/-([a-z])/g, g => g[1].toUpperCase());
+}
+
+export function createSideNavItem(
+  label,
+  icon,
+  disclosureArrow,
+  hasAction = false,
+  actionIcon = '',
+) {
+  const childElements = [];
+  if (icon) {
+    childElements.push(createTag(icon, { slot: 'icon', size: 's' }));
+  }
+
+  if (actionIcon) {
+    childElements.push(createTag(actionIcon, { slot: 'action-icon' }));
+  }
+
+  const blockVariant = createTag('sp-sidenav-item', { label }, childElements);
+  if (hasAction) {
+    blockVariant.setAttribute('action', true);
+  }
+
+  if (disclosureArrow) {
+    blockVariant.setAttribute('disclosureArrow', true);
+  }
+  return blockVariant;
+}
+
+export function nextTick(ms = 1) {
+  // eslint-disable-next-line no-promise-executor-return
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Appends the provided url params to the current url
+ * @param {Array} kvs An array of key value pairs
+ */
+export function setURLParams(kvs) {
+  const url = new URL(window.location.href);
+  kvs.forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+  const { href } = url;
+  window.history.pushState({ path: href }, '', decodeURIComponent(href));
+}
+
+/**
+ * Removes all the urlParams
+ * @param {Array} keys An array of keys
+ */
+export function removeAllURLParams() {
+  const url = new URL(window.location.href);
+  const newUrl = `${url.origin}${url.pathname}`;
+  window.history.pushState({ path: newUrl }, '', newUrl);
 }
