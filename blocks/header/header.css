@@ -159,6 +159,8 @@ button.gnav-toggle::after {
   font-size: 15px;
   font-weight: 700;
   line-height: 1.27;
+  padding: 5.5px 15px;
+  margin: 0;
 }
 
 
