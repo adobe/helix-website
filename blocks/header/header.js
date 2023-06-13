@@ -302,11 +302,12 @@ class Gnav {
 
   // NOTE: decorate svg not available in header, using .png directly instead
   // eslint-disable-next-line class-methods-use-this
-  decorateIcon(spanElement) {
+  decorateIcon(spanElement, altText = '') {
     const icon = spanElement.classList[1].substring(5);
     const imgSrc = `${ICON_ROOT}/${icon}.png`;
     const image = document.createElement('img');
     image.src = imgSrc;
+    image.alt = altText;
     image.classList.add('bounce-item-effect');
     spanElement.appendChild(image);
   }
@@ -339,7 +340,7 @@ class Gnav {
 
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {
-        this.decorateIcon(submenuIcon);
+        this.decorateIcon(submenuIcon, submenuTitleText);
 
         const iconWrapper = createTag('div', {
           class: `icon-wrapper colored-tag circle ${currentColorPattern[idx]}`,
