@@ -164,9 +164,13 @@
     /* guide-templates */
     --side-navigation-bar-gap: var(--spacing-s);
 
-    /* animaiton & transition */
+    /* animation & transition */
     --transition-cubic-bezier-1: all .5s cubic-bezier(.23,1,.32,1);
     --transition-ease-in-out: all 0.4s ease-in-out;
+
+    /* clip-paths */
+    --circular-1-clip-path-init: circle(50% at 0 50%);
+    --circular-1-clip-path-full: circle(120% at 0 50%);
 }
 
 /* desktop variables */
@@ -684,7 +688,7 @@ p.button-container > a.button {
     margin-left: 0;
 }
 
-/* TODO: redesign button animation */
+/* Redesign button animation */
 
 /* primary button: blue bg */
 .redesign a.button:any-link {
@@ -943,11 +947,6 @@ body.docs-template main p {
       margin-top: var(--spacing-s);
       margin-bottom: var(--spacing-ml);
     }
-
-    /* TODO: remove after confirming with design
-    body.guides-template main.without-full-width-hero {
-      padding-top: var(--spacing-m);
-    } */
 }
 
 body.guides-template main.without-full-width-hero {
