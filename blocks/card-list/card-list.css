@@ -1,8 +1,8 @@
-.cards .cards-card-details dialog[aria-expanded="true"] {
+.card-list-wrapper .cards .cards-card-details dialog[aria-expanded="true"] {
   display: contents;
   color: inherit;
 }
 
-.cards .cards-card-details {
+.card-list-wrapper .cards .cards-card-details {
   overflow-x: hidden;
 }
