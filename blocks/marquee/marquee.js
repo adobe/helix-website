@@ -1,9 +1,11 @@
 import createTag from '../../utils/tag.js';
+import { returnLinkTarget } from '../../utils/helpers.js';
 
 const extractCustomerInfo = (detailContainer) => {
   const icon = detailContainer.querySelector('img');
   const cta = detailContainer.querySelector('a');
   cta.classList.add('button', 'secondary');
+  cta.setAttribute('target', returnLinkTarget(cta.href));
   const titles = detailContainer.querySelectorAll('h5');
 
   let titlesHTML = '';

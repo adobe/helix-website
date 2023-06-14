@@ -144,12 +144,14 @@
   }
 
   .tabpanel {
+    pointer-events: none;
     position: absolute;
     top: 0;
     opacity: 0;
   }
 
   .tabpanel.active {
+    pointer-events: auto;
     opacity: 1;
     position: relative;
   }
@@ -159,6 +161,7 @@
     clip-path: var(--circular-1-clip-path-init);
     opacity: 0;
     transition: all 0.4s ease-in-out;
+    
   }
 
   .tabpanel.active .image-side {

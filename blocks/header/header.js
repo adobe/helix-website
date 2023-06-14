@@ -3,7 +3,7 @@ import {
 } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
-import { changeTag } from '../../utils/helpers.js';
+import { changeTag, returnLinkTarget } from '../../utils/helpers.js';
 
 // adobe icon
 const BRAND_IMG = '<img loading="lazy" alt="Adobe" width="25" height="22.12" src="/blocks/header/adobe-logo.svg">';
@@ -337,6 +337,7 @@ class Gnav {
       const infoDiv = createTag('a', {
         class: 'navmenu-info link-highlight-colorful-effect-hover-wrapper',
         href: navMainLink.href,
+        target: returnLinkTarget(navMainLink.href),
       }, '');
       const infoTitle = createTag('h3', { class: 'link-highlight-colorful-effect' }, navLinkTitle);
       const infoDescription = subMenuWrapper.querySelector('p');
@@ -353,6 +354,7 @@ class Gnav {
       const submenuTitleText = submenuLink.textContent;
       submenuLink.classList.add('submenu', 'link-highlight-colorful-effect-hover-wrapper', 'bounce-item-effect-hover-wrapper');
       submenuLink.innerHTML = '';
+      submenuLink.setAttribute('target', returnLinkTarget(submenuLink.href));
 
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {

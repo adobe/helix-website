@@ -1,9 +1,11 @@
 import { readBlockConfig, getENVbyPath } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
+import { returnLinkTarget } from '../../utils/helpers.js';
 
 const extractCTAButton = (footer) => {
   const ctaButtonWrapper = footer.querySelector('div:first-of-type strong');
   const ctaButton = ctaButtonWrapper.querySelector('a');
+  ctaButton.setAttribute('target', returnLinkTarget(ctaButton.href));
   ctaButton.classList.add('footer-cta-button', 'button', 'secondary');
 
   if (ctaButton) {
@@ -22,6 +24,7 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
   h3Elements.forEach((h3Element) => {
     const divElement = document.createElement('div');
     const mainLink = h3Element.querySelector('a');
+    mainLink.setAttribute('target', returnLinkTarget(mainLink.href));
     mainLink.classList.add('link-highlight-colorful-effect');
     divElement.appendChild(h3Element.cloneNode(true));
 
@@ -30,8 +33,8 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
       // add animation effect class
       const navLinks = nextSibling.querySelectorAll('a');
       navLinks.forEach((navLink) => {
+        navLink.setAttribute('target', returnLinkTarget(navLink.href));
         navLink.classList.add('link-underline-effect');
-        // navLink.classList.add('highlight-colorful');
       });
 
       // clone the node
