@@ -241,8 +241,15 @@ class Gnav {
   decorateBrandLogo = () => {
     const brandBlock = this.body.querySelector('.gnav-brand');
     if (!brandBlock) return null;
+
     const brand = brandBlock.querySelector('a');
     brand.classList.add('gnav-brand');
+
+    // accessibility
+    const brandAriaLabel = brandBlock.textContent ? brandBlock.textContent.trim() : 'Adobe Franklin';
+    brand.setAttribute('aria-label', brandAriaLabel);
+    brand.setAttribute('tabindex', 1);
+
     if (brandBlock.classList.contains('with-logo')) {
       brand.insertAdjacentHTML('afterbegin', BRAND_LOGO);
     }
@@ -280,10 +287,19 @@ class Gnav {
         navMainLink.setAttribute('role', 'button');
         navMainLink.setAttribute('aria-expanded', false);
         navMainLink.setAttribute('aria-controls', id);
+        navMainLink.setAttribute('aria-label', `${navMainLink.textContent} Submenu`);
+        navMainLink.setAttribute('tabindex', 1);
         navMainLink.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           this.toggleMenu(navItem);
+        });
+        // for keyboard navigation accessibility
+        navMainLink.addEventListener('focus', () => {
+          window.addEventListener('keydown', this.toggleOnSpace);
+        });
+        navMainLink.addEventListener('blur', () => {
+          window.removeEventListener('keydown', this.toggleOnSpace);
         });
 
         // reorganize submenu items
@@ -318,13 +334,13 @@ class Gnav {
 
     // add a info div if there's description <p/>
     if (subMenuWrapper.querySelector('p')) {
-      const infoDiv = createTag('div', { class: 'navmenu-info link-highlight-colorful-effect-hover-wrapper' }, '');
+      const infoDiv = createTag('a', {
+        class: 'navmenu-info link-highlight-colorful-effect-hover-wrapper',
+        href: navMainLink.href,
+      }, '');
       const infoTitle = createTag('h3', { class: 'link-highlight-colorful-effect' }, navLinkTitle);
       const infoDescription = subMenuWrapper.querySelector('p');
       const infoImage = subMenuWrapper.querySelector('img');
-      infoDiv.addEventListener('click', () => {
-        window.location.href = navMainLink.href;
-      });
       infoDiv.append(infoTitle, infoDescription, infoImage);
       newSubMenuWrapper.append(infoDiv);
     }
@@ -533,7 +549,8 @@ class Gnav {
     }
   };
 
-  // TODO: for adobe.com login status purposes, to be confirmed with adobe team if that's working
+  // TODO: for adobe.com login status purposes, out of working scope,
+  // will need Adobe team's help on this to function properly
   decorateProfile = () => {
     const blockEl = this.body.querySelector('.profile');
     if (!blockEl) return null;

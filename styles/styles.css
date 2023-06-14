@@ -120,7 +120,7 @@
     --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
     --overlay-curtain-bg-filter: blur(0.05em);
   
-    /* Grid / container width -- 600px, 900px, TODO: update on all responsive section */
+    /* Grid / container width -- 600px, 900px */
     --grid-mobile-container-width: 88%;
     --grid-tablet-container-width: 83%;
     --grid-laptop-container-width: 90%;
@@ -1534,7 +1534,7 @@ body.contact-template .default-content-wrapper img {
   filter: var(--image-filter-drop-shadow-small);
 }
 
-/* -- animations class -- */
+/* ------- animations classes ------ */
 .link-underline-effect,
 .breadcrumb-link-underline-effect {
   position: relative;
