@@ -705,6 +705,7 @@ export function decorateMain(main) {
   // decorateButtons(main);
   decorateHeadings(main);
   decorateBlocks(main);
+  // addInViewAnimation(main);
   decorateTitleSection(main);
 }
 
@@ -721,6 +722,30 @@ async function loadEager(doc) {
   }
 }
 
+// TODO:
+function addInViewAnimation(main) {
+  const observerOptions = {
+    threshold: 0.10,
+    rootMargin: '-10px 0px -10px 0px',
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  const sections = Array.from(main.querySelectorAll('.fadeup'));
+  sections.forEach((section, i) => {
+    // remove first section (block) from fadeup with a fadeup class
+    if (!i) section.classList.add('in-view');
+    observer.observe(section);
+  });
+}
+
 /**
  * loads everything that doesn't need to be delayed.
  */
@@ -731,7 +756,9 @@ async function loadLazy(doc) {
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
 
+  // TODO: test in view animation
   loadBlocks(main);
+  addInViewAnimation(main);
 
   const { hash } = window.location;
 

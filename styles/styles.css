@@ -1617,3 +1617,15 @@ body.contact-template .default-content-wrapper img {
     transform: translateY(-2px);
   }
 }
+
+/* scroll in-view animation */
+.fadeup {
+  transition: all 1s ease;
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+.in-view {
+  transform: none;
+  opacity: 1;
+}
