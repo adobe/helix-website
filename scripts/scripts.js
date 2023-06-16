@@ -813,6 +813,9 @@ async function loadLazy(doc) {
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
 
+  // NOTE:'.redesign' class is needed for the redesign styles, keep this
+  document.body.classList.add('redesign');
+
   // TODO: test in view animation
   loadBlocks(main);
   addInViewAnimation(main);

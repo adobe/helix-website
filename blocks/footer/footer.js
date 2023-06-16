@@ -120,9 +120,6 @@ export default async function decorate(block) {
   block.textContent = '';
   block.classList.add('contained');
 
-  // NOTE:'.redesign' class is needed for the redesign styles, keep this
-  document.body.classList.add('redesign');
-
   // TODO: need to update the path when migrate
   const footerPath = cfg.footer || '/drafts/redesign/new-footer';
   const resp = await fetch(`${footerPath}.plain.html`);
