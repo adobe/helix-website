@@ -106,18 +106,6 @@ main .form .form-checkbox-wrapper label {
   padding-bottom: 0;
 }
 
-main .form .button {
-  cursor: pointer;
-  background: rgb(20 115 230);
-  color: white;
-  border-radius: 16px;
-  font-size: var(--type-body-xs-size);
-  font-weight: 300;
-  padding: 6px 16px;
-  border: none;
-  font-family: adobe-clean, 'Trebuchet MS', sans-serif;
-}
-
 main .form-legal-wrapper p {
   font-size: var(--type-body-xxs-size);
   line-height: var(--type-body-xxs-lh);
