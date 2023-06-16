@@ -67,6 +67,7 @@ async function populateSearchResults(searchTerms, resultsContainer) {
     }
 
     const articles = window.blogIndex.data;
+    const skipLink = document.querySelector('.skip-link');
 
     const hits = [];
     let i = 0;
@@ -90,10 +91,12 @@ async function populateSearchResults(searchTerms, resultsContainer) {
     if (!hits.length) {
       resultsContainer.classList.add('no-Results');
       resultsContainer.parentElement.classList.remove('expand');
+      skipLink.classList.remove('show');
     } else {
       resultsContainer.classList.remove('no-Results');
       resultsContainer.classList.add('open');
       resultsContainer.parentElement.classList.add('expand');
+      skipLink.classList.add('show');
     }
 
     highlightTextElements(terms, resultsContainer.querySelectorAll('h3, .article-card-category, .article-card-body > p'));

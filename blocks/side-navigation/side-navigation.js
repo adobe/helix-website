@@ -76,10 +76,13 @@ export default async function decorate(block) {
   const searchInput = createTag('div', { class: 'search-input-wrapper' }, searchInputInner);
 
   const searchInputOuter = searchInput.cloneNode(true);
-  const resultsContainer = createTag('div', { class: 'results-wrapper' });
+  const resultsContainer = createTag('div', { class: 'results-wrapper', id: 'search-results' });
+
+  const skipLink = createTag('a', { class: 'skip-link', href: '#search-results' }, 'Skip to results');
 
   aside.prepend(docButton);
   aside.prepend(searchInputOuter);
+  block.prepend(skipLink);
 
   block.prepend(backBtn);
   block.prepend(searchInput);
@@ -99,6 +102,8 @@ export default async function decorate(block) {
       if (event.target.value.length === 0) {
         resultsContainer.classList.remove('open');
         block.parentElement.classList.remove('expand');
+        skipLink.classList.remove('show');
+
         handleSearchString(true);
       } else {
         searchParams.set('q', event.target.value);
@@ -122,11 +127,26 @@ export default async function decorate(block) {
       listInner.querySelectorAll(':scope > li > ul').forEach((nestedList) => {
         const listTarget = nestedList.parentElement;
 
+        const text = [...listTarget.childNodes]
+          .find((child) => child.nodeType === Node.TEXT_NODE);
+
         nestedList.classList.add('list-section-inner-nested');
+
+        const inner = `
+          <span>${text.data}</span>
+          ${listTarget.childNodes[1].outerHTML}
+        `;
+        const textEl = createTag('button', { class: '' }, inner);
+
+        [...listTarget.childNodes].slice(0, 3).forEach((el) => {
+          listTarget.removeChild(el);
+        });
+
+        listTarget.prepend(textEl);
 
         listTarget.classList.add('side-navigation-nested-target', 'collapse');
         listTarget.addEventListener('click', (e) => {
-          e.target.classList.toggle('collapse');
+          e.target.closest('.side-navigation-nested-target').classList.toggle('collapse');
         });
       });
 

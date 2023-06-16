@@ -113,10 +113,31 @@
 }
 
 .side-navigation .list-section li,
-.side-navigation .list-section a {
+.side-navigation .list-section a,
+.side-navigation .skip-link {
   font-size: var(--type-detail-m-size);
   line-height: 20px;
   color: var(--color-nav-sidebar-subtitle);
+}
+
+.side-navigation .skip-link {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  display: none;
+}
+
+.side-navigation .skip-link.show {
+  display: block;
+}
+
+.side-navigation .skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
 }
 
 .side-navigation .list-section > a:first-of-type {
@@ -223,6 +244,18 @@
 
 .side-navigation .side-navigation-nested-target.collapse ul {
   display: none;
+}
+
+.side-navigation .side-navigation-nested-target button {
+  width: 100%;
+  display: flex;
+  border: none;
+  background: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  font: var(--body-font-family);
+  color: var(--color-nav-sidebar-subtitle);
 }
 
 .side-navigation-overlay-btn-wrapper {
@@ -377,7 +410,7 @@
     padding: 0 0 var(--spacing-xs);
   }
 
-  .side-navigation .list-section li, .side-navigation .list-section a {
+  .side-navigation .list-section li, .side-navigation .list-section a, .side-navigation .list-section button {
     font-size: var(--type-body-xs-size);
   }
 
