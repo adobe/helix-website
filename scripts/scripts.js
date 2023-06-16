@@ -604,6 +604,63 @@ export function decorateHeadings(main) {
   });
 }
 
+export function addMessageBoxOnGuideTemplate(main) {
+  if (!document.body.classList.contains('guides-template')) return;
+  const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
+  main.append(messageBox);
+}
+
+export function addHeadingAnchorLink(elem) {
+  const link = document.createElement('a');
+  link.setAttribute('href', `#${elem.id || ''}`);
+  link.setAttribute('title', `Copy link to "${elem.textContent}" to clipboard`);
+  // hover highlight on title
+  if (elem.tagName === 'H2') {
+    link.classList.add('anchor-link', 'link-highlight-colorful-effect');
+  } else {
+    link.classList.add('anchor-link', 'link-highlight-colorful-effect-2');
+  }
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(link.href);
+    window.location.href = link.href;
+    const messageBox = document.querySelector('.message-box');
+    if (messageBox) {
+      messageBox.classList.add('active', 'fill');
+      setTimeout(() => {
+        messageBox.classList.remove('active');
+        setTimeout(() => {
+          messageBox.classList.remove('fill');
+        }, 300);
+      }, 1000);
+    }
+
+    e.target.classList.add('anchor-link-copied');
+    setTimeout(() => {
+      e.target.classList.remove('anchor-link-copied');
+    }, 1000);
+  });
+  link.innerHTML = elem.innerHTML;
+  elem.innerHTML = '';
+  elem.append(link);
+}
+
+export function decorateGuideTemplateHeadings(main) {
+  if (!document.body.classList.contains('guides-template')) return;
+  const contentArea = main.querySelector('.section.content');
+  const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
+  contentSections.forEach((section) => {
+    section.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
+      addHeadingAnchorLink(h);
+    });
+  });
+}
+
+export function decorateGuideTemplate(main) {
+  addMessageBoxOnGuideTemplate(main);
+  decorateGuideTemplateHeadings(main);
+}
+
 export function decorateTitleSection(main) {
   const titleSections = main.querySelectorAll('.title-section');
   if (!titleSections) return;
@@ -704,8 +761,8 @@ export function decorateMain(main) {
   decorateSections(main);
   // decorateButtons(main);
   decorateHeadings(main);
+  decorateGuideTemplate(main);
   decorateBlocks(main);
-  // addInViewAnimation(main);
   decorateTitleSection(main);
 }
 

@@ -966,7 +966,7 @@ main .section.separator
   padding: 20px 0;
 }
 
-/* Layout for Guide pages  */
+/* Layout for Guide Template pages  */
 
 body.guides-template {
   display: block;
@@ -1005,6 +1005,36 @@ body.guides-template main a {
   color: var(--color-black);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
+}
+
+body.guides-template main h1 a, 
+body.guides-template main h2 a, 
+body.guides-template main h3 a, 
+body.guides-template main h4 a, 
+body.guides-template main h5 a, 
+body.guides-template main h6 a{
+  color: var(--color-black);
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: inherit;
+  border: none;
+}
+
+body.guides-template main a.anchor-link {
+  position: relative;
+}
+
+body.guides-template main a.anchor-link:any-link::before {
+  content: "#";
+  position: absolute;
+  left: -1.5rem;
+  opacity: 0.2;
+  transition: var(--transition-ease-in-out);
+}
+
+body.guides-template main a.anchor-link:hover::before {
+  text-decoration: none;
+  opacity: 1;
 }
 
 /* guide template - content side styles */
@@ -1079,6 +1109,66 @@ body.guides-template .guides-back-btn a {
 body.guides-template .guides-back-btn span {
   margin-right: var(--spacing-xxs);
 }
+
+/* guides-template message box for copying url success */
+.message-box {
+  opacity: 0;
+  position: fixed;
+  bottom: 4%;
+  right: 7%;
+  width: 120px;
+  min-height: 50px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  background-color: var(--color-white);
+  border: 1px solid var(--bg-color-grey);
+  border-radius: 8px;
+  box-shadow: 0 0 10px var(--bg-color-grey);
+  display: flex;
+  align-items: center;
+  font-size: var(--type-body-s-size);
+  line-height:  var(--type-body-s-lh);
+  z-index: 999;
+  overflow: hidden;
+  transition: var(--transition-ease-in-out);
+  transform: translateY(20px);
+}
+
+.message-box::before,
+.message-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--bg-color-grey-2);
+}
+
+.message-box::after {
+  width: 0;
+  background: var(--brand-color-purple);
+}
+
+.message-box.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.message-box.fill::after{
+  animation: progress-bar-fill 0.9s linear forwards;
+}
+
+@keyframes progress-bar-fill {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+/* guides-template message box ENDS */
 
 @media screen and (min-width: 768px) {
   body.guides-template main.has-full-width-hero .section.heading  {
@@ -1573,30 +1663,33 @@ body.contact-template .default-content-wrapper img {
   left: 0;
 }
 
-/* highlight effect */
-.link-highlight-colorful-effect {
-  position: relative;
-  transform: translateZ(0);
+/* highlight effect, support line break as well:D */
+.link-highlight-colorful-effect,
+.link-highlight-colorful-effect-2 {
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-box-decoration-break: clone;
+  background-image: linear-gradient(90deg, rgba(137 140 242 / 50%) 0%, rgba(242 231 251 / 50%) 50%, rgba(241 188 231 / 50%) 100%);
+  background-repeat: no-repeat;
+  background-position: 4px 82%;
+  background-size: 0% 50%;
+  transition: background-size 0.3s ease-in-out;
+  padding-right: 4px;
+  box-decoration-break: clone;
 }
 
-.link-highlight-colorful-effect::before {
-  content: '';
-  width: 0;
-  height: 50%;
-  position: absolute;
-  bottom: 10%;
-  left: 2.5%;
-  background: linear-gradient(90deg, rgba(137 140 242 / 100%) 0%, rgba(242 231 251 / 100%) 50%, rgba(241 188 231 / 100%) 100%);
-  z-index: -1;
-  opacity: 0.6;
-  transition: all 0.3s ease-in-out;
+/* effect 2: greenish yellow with pink */
+.link-highlight-colorful-effect-2 {
+  background-image: linear-gradient(90deg, rgba(234 190 248 / 80%) 0%, rgba(255 251 232 / 100%) 50%, rgba(238 246 172 / 100%) 100%);
 }
 
 /* can add `.link-highlight-colorful-effect-hover-wrapper` to trigger hover child highlight effect */
-.link-highlight-colorful-effect:hover::before,
-.link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect::before {
-  width: 105%;
-} 
+.link-highlight-colorful-effect:hover,
+.link-highlight-colorful-effect-2:hover,
+.link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect,
+.link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect-2 {
+  background-size: 100% 50%;
+  color: inherit;
+}
 
 /* hover wrapper and bounce the inner icon */
 .bounce-item-effect-hover-wrapper:hover .bounce-item-effect {

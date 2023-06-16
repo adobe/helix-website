@@ -19,6 +19,13 @@ export default function decorate(block) {
       [...li.childNodes].forEach((child) => {
         tag.append(child);
       });
+
+      // for highlight effect
+      const cardTitle = tag.querySelector('h3');
+      const span = createTag('span', { class: 'link-highlight-colorful-effect-2' }, cardTitle.textContent);
+      cardTitle.replaceChildren(span);
+      tag.classList.add('link-highlight-colorful-effect-hover-wrapper');
+
       li.append(tag);
     }
     ul.append(li);
