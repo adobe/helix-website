@@ -1,12 +1,10 @@
 import {
-  loadScript, getMetadata, cleanVariations, getENVbyPath,
+  loadScript, getMetadata, cleanVariations,
 } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
 import { changeTag, returnLinkTarget } from '../../utils/helpers.js';
 
-// adobe icon
-const BRAND_IMG = '<img loading="lazy" alt="Adobe" width="25" height="22.12" src="/blocks/header/adobe-logo.svg">';
 const ICON_ROOT = '/img';
 const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.svg">';
 const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
@@ -27,132 +25,6 @@ class Gnav {
     this.desktop = window.matchMedia('(min-width: 1200px)');
   }
 
-  init = () => {
-    this.state = {};
-    this.curtain = createTag('div', { class: 'gnav-curtain' });
-    const nav = createTag('nav', { class: 'gnav' });
-
-    const mobileToggle = this.decorateToggle(nav);
-    nav.append(mobileToggle);
-
-    const brand = this.decorateBrand();
-    if (brand) {
-      nav.append(brand);
-    }
-
-    const mainNav = this.decorateMainNav();
-    if (mainNav) {
-      nav.append(mainNav);
-    }
-
-    const profile = this.decorateProfile();
-    if (profile) {
-      nav.append(profile);
-    }
-
-    const logo = this.decorateLogo();
-    if (logo) {
-      nav.append(logo);
-    }
-
-    const enableSearch = getMetadata('enable-search');
-    if (!enableSearch || enableSearch !== 'no') {
-      const div = createTag('div', { class: 'search' });
-      div.innerHTML = '<p>Search</p>';
-      this.body.append(div);
-
-      this.search = this.decorateSearch();
-      if (this.search) {
-        nav.append(this.search);
-      }
-    }
-
-    const wrapper = createTag('div', { class: 'gnav-wrapper' }, nav);
-    this.el.append(this.curtain, wrapper);
-  };
-
-  decorateBrand = () => {
-    const brandBlock = this.body.querySelector('.gnav-brand');
-    if (!brandBlock) return null;
-    const brand = brandBlock.querySelector('a');
-    brand.classList.add('gnav-brand');
-    if (brandBlock.classList.contains('with-logo')) {
-      brand.insertAdjacentHTML('afterbegin', BRAND_IMG);
-    }
-    return brand;
-  };
-
-  decorateLogo = () => {
-    const logo = this.body.querySelector('.adobe-logo a');
-    logo.classList.add('gnav-logo');
-    logo.setAttribute('aria-label', logo.textContent);
-    logo.textContent = '';
-    logo.insertAdjacentHTML('afterbegin', BRAND_IMG);
-    return logo;
-  };
-
-  decorateMainNav = () => {
-    const mainLinks = this.body.querySelectorAll('h2 > a');
-    if (mainLinks.length > 0) {
-      return this.buildMainNav(mainLinks);
-    }
-    return null;
-  };
-
-  buildMainNav = (navLinks) => {
-    const mainNav = createTag('div', { class: 'gnav-mainnav' });
-    navLinks.forEach((navLink, idx) => {
-      const navItem = createTag('div', { class: 'gnav-navitem' });
-
-      const menu = navLink.closest('div');
-      menu.querySelector('h2').remove();
-      navItem.appendChild(navLink);
-
-      if (menu.childElementCount > 0) {
-        const id = `navmenu-${idx}`;
-        menu.id = id;
-        navItem.classList.add('has-menu');
-        navLink.setAttribute('role', 'button');
-        navLink.setAttribute('aria-expanded', false);
-        navLink.setAttribute('aria-controls', id);
-
-        const decoratedMenu = this.decorateMenu(navItem, navLink, menu);
-        navItem.appendChild(decoratedMenu);
-      }
-      mainNav.appendChild(navItem);
-    });
-    return mainNav;
-  };
-
-  decorateMenu = (navItem, navLink, menu) => {
-    menu.className = 'gnav-navitem-menu';
-    const childCount = menu.childElementCount;
-    if (childCount === 1) {
-      menu.classList.add('small-Variant');
-    } else if (childCount === 2) {
-      menu.classList.add('medium-variant');
-    } else if (childCount >= 3) {
-      menu.classList.add('large-Variant');
-      const container = createTag('div', { class: 'gnav-menu-container' });
-      container.append(...Array.from(menu.children));
-      menu.append(container);
-    }
-    navLink.addEventListener('focus', () => {
-      window.addEventListener('keydown', this.toggleOnSpace);
-    });
-    navLink.addEventListener('blur', () => {
-      window.removeEventListener('keydown', this.toggleOnSpace);
-    });
-    navLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.toggleMenu(navItem);
-    });
-    return menu;
-  };
-
-  // TODO: note: new header functions listed below, can cleanup old function after migration
-  // the above function could be removed after migration, keep functions below this line
   initHeader = () => {
     this.state = {};
     this.curtain = createTag('div', { class: 'gnav-curtain' });
@@ -199,12 +71,13 @@ class Gnav {
       div.innerHTML = '<p>Search</p>';
       this.body.append(div);
 
-      this.search = this.decorateSearch();
-      if (this.search) {
-        const mainNavWrapper = nav.querySelector('.gnav-mainnav');
-        mainNavWrapper.classList.add('with-search');
-        nav.append(this.search);
-      }
+      // Disabled search as not in desktop design
+      // this.search = this.decorateSearch();
+      // if (this.search) {
+      //   const mainNavWrapper = nav.querySelector('.gnav-mainnav');
+      //   mainNavWrapper.classList.add('with-search');
+      //   nav.append(this.search);
+      // }
     }
 
     // used `franklin` to separate the styles
@@ -609,18 +482,9 @@ async function fetchGnav(url) {
 }
 
 export default async function init(blockEl) {
-  const ENV = getENVbyPath();
-  let html = '';
-
-  // TODO: need to update the logic when move over to production
-  if (ENV === 'redesign') {
-    const url = '/drafts/redesign/new-nav';
-    html = await fetchGnav(url);
-  } else {
-    const url = getMetadata('gnav') || '/gnav';
-    html = await fetchGnav(url);
-  }
-  // console.log(html);
+  // OLD CODE: const url = getMetadata('gnav') || '/gnav';
+  const url = '/drafts/redesign/new-nav';
+  const html = await fetchGnav(url);
 
   if (html) {
     try {
@@ -628,14 +492,7 @@ export default async function init(blockEl) {
       const doc = parser.parseFromString(html, 'text/html');
       cleanVariations(doc);
       const gnav = new Gnav(doc.body, blockEl);
-
-      // TODO: need to update the logic when move over to production
-      if (ENV === 'redesign') {
-        gnav.initHeader();
-      } else {
-        // original header
-        gnav.init();
-      }
+      gnav.initHeader();
     } catch (e) {
       const { debug } = await import('../../utils/console.js');
       if (debug) {

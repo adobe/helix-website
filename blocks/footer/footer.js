@@ -1,4 +1,4 @@
-import { readBlockConfig, getENVbyPath } from '../../scripts/scripts.js';
+import { readBlockConfig } from '../../scripts/scripts.js';
 import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 
@@ -116,49 +116,31 @@ const decoratefooterCopyrightSection = (footer) => {
  */
 
 export default async function decorate(block) {
-  const ENV = getENVbyPath();
   const cfg = readBlockConfig(block);
   block.textContent = '';
+  block.classList.add('contained');
 
-  // TODO: need to update the logic when move over to production
-  if (ENV === 'redesign') {
-    // '.redesign' class is needed for the redesign styles, keep this during migration
-    document.body.classList.add('redesign');
-    block.classList.add('contained');
+  // NOTE:'.redesign' class is needed for the redesign styles, keep this
+  document.body.classList.add('redesign');
 
-    const footerPath = cfg.footer || '/drafts/redesign/new-footer';
-    const resp = await fetch(`${footerPath}.plain.html`);
-    const html = await resp.text();
-
-    // create a wrapper & allow extract of fetched footer content
-    const footer = document.createElement('div');
-    footer.classList.add('footer-section-wrapper');
-    footer.innerHTML = html;
-
-    // re-organize the footer into 2 sections
-    const footerCTAButton = extractCTAButton(footer);
-    const footerNavSection = decorateFooterNavSection(footer, footerCTAButton);
-    const footerCopyrightSection = decoratefooterCopyrightSection(footer);
-    footer.innerHTML = '';
-    footer.append(footerNavSection, footerCopyrightSection);
-
-    block.append(footer);
-    block.classList.add('new-footer'); // add class for the styles
-    footer.closest('footer').classList.add('appear');
-    return;
-  }
-
-  // original footer:
-  const footerPath = cfg.footer || '/footer';
+  // TODO: need to update the path when migrate
+  const footerPath = cfg.footer || '/drafts/redesign/new-footer';
   const resp = await fetch(`${footerPath}.plain.html`);
   const html = await resp.text();
-  const footer = document.createElement('div');
-  footer.innerHTML = html;
-  block.append(footer);
-  footer.closest('footer').classList.add('appear');
 
-  // open all footer links in new windows
-  block.querySelectorAll('a').forEach((a) => {
-    a.target = '_blank';
-  });
+  // create a wrapper & allow extract of fetched footer content
+  const footer = document.createElement('div');
+  footer.classList.add('footer-section-wrapper');
+  footer.innerHTML = html;
+
+  // re-organize the footer into 2 sections
+  const footerCTAButton = extractCTAButton(footer);
+  const footerNavSection = decorateFooterNavSection(footer, footerCTAButton);
+  const footerCopyrightSection = decoratefooterCopyrightSection(footer);
+  footer.innerHTML = '';
+  footer.append(footerNavSection, footerCopyrightSection);
+
+  block.append(footer);
+  block.classList.add('new-footer'); // add class for the styles
+  footer.closest('footer').classList.add('appear');
 }
