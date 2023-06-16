@@ -54,7 +54,6 @@
 @media (min-width: 900px) {
     .logo-wall {
         padding: var(--spacing-xxl) 0;
-        min-height: 600px;
     }
 
     .logo-wall .logo-wall-title {
@@ -64,6 +63,10 @@
     .logo-wall .logo-wall-list {
         column-gap: var(--spacing-xl);
         row-gap: var(--spacing-l);
+        max-width: 1200px;
+    }
+
+    .logo-wall.technology .logo-wall-list {
         max-width: 970px;
     }
 

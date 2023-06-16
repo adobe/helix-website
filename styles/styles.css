@@ -999,6 +999,13 @@ body.guides-template main h6 {
   margin-top: var(--spacing-s);
 }
 
+/* separation for better readability in long section */
+body.guides-template main h2 {
+  border-bottom: 1px solid lightgrey;
+  padding-bottom: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+}
+
 body.guides-template main p,
 body.guides-template main li,
 body.guides-template main a {
@@ -1027,9 +1034,24 @@ body.guides-template main a.anchor-link {
 body.guides-template main a.anchor-link:any-link::before {
   content: "#";
   position: absolute;
-  left: -1.5rem;
+  left: -0.9rem;
   opacity: 0.2;
   transition: var(--transition-ease-in-out);
+}
+
+body.guides-template main h2 a.anchor-link:any-link::before {
+  left: -1.1rem;
+}
+
+
+@media screen and (min-width: 768px) {
+  body.guides-template main a.anchor-link:any-link::before {
+    left: -1.25rem;
+  }
+
+  body.guides-template main h2 a.anchor-link:any-link::before {
+    left: -1.5rem;
+  }
 }
 
 body.guides-template main a.anchor-link:hover::before {
