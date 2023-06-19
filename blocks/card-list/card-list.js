@@ -40,17 +40,17 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
-      cardDetails += `<p><em>${stripTags(row.category)}</em></p>`;
+      let cardDetails = `<p><em>${stripTags(row.category)}</em></p>`;
       if (row.githubProfile) {
         const ghProfile = stripTags(row.githubProfile).split('/');
         const ghUsername = ghProfile[ghProfile.length - 1];
         if (ghUsername) {
-          cardDetails += `<p><em>${ghUsername}</em></p>`;
+          cardDetails += `<code>${ghUsername}</code>`;
         } else {
-          cardDetails += `<p><em>${stripTags(row.githubProfile)}</em></p>`;
+          cardDetails += `<code>${stripTags(row.githubProfile)}</code>`;
         }
       }
+      cardDetails += `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
       if (row.showcaseUrl) {
         cardDetails += `<p><a href="${stripTags(row.showcaseUrl)}" target="_blank">Preview</a></p>`;
       }
