@@ -1,4 +1,13 @@
-.card-list-wrapper .cards .cards-card-details dialog[aria-expanded="true"] {
+
+.card-list-wrapper .cards .cards-card-details p.description:not([aria-expanded="true"]):not(.noextra)::after {
+  content: '...';
+}
+
+.card-list-wrapper .cards .cards-card-details span.extra:not([aria-expanded="true"]) {
+  display: none;
+}
+
+.card-list-wrapper .cards .cards-card-details span.extra[aria-expanded="true"] {
   display: contents;
   color: inherit;
 }
