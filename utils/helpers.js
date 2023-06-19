@@ -43,6 +43,12 @@ export function combineChildrenToSingleDiv(element) {
   element.append(singleDiv);
 }
 
+/**
+ * * @param {HTMLElement} element
+ * * @param {string} targetTag, like 'ul' or 'div'
+ * * @param {string} className
+ * result: return the new element with inner content of the element, desired tag and css class
+ */
 export function changeTag(element, targetTag, className) {
   const newElClass = className || '';
   const innerContent = element.innerHTML;
@@ -51,4 +57,39 @@ export function changeTag(element, targetTag, className) {
   return newTagElement;
 }
 
-export default { removeOuterElementLayer, changeTag };
+/**
+ * * @param {string} url the href of a link element
+ * result: return `_self` or `_blank` if the link has the same host
+ */
+export function returnLinkTarget(url) {
+  const currentHost = window.location.host;
+  const urlObject = new URL(url);
+  const urlHost = urlObject.host;
+  return urlHost === currentHost ? '_self' : '_blank';
+}
+
+/**
+ * * @param {string} className the target animation class
+ * * @param {string} targetElement
+ * result: when the elements are inview observed by the intersection
+ * observer, it adds `in-view` class which should restore its
+ * original state and add in animation
+ */
+// TODO: review if that's the best way for adding in-view animations
+export function addInViewAnimationToElement(className, targetElement) {
+  targetElement.classList.add(className);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  });
+
+  observer.observe(targetElement);
+}
+
+export default {
+  removeOuterElementLayer, changeTag, returnLinkTarget, addInViewAnimationToElement,
+};

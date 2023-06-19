@@ -352,6 +352,26 @@
   margin-bottom: var(--spacing-xs);
 }
 
+/* black overlay curtain */
+.side-navigation-wrapper > .side-navigation-curtain {
+  pointer-events: none;
+  width: 100vw;
+  max-width: none;
+  height: 100%;
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-curtain-bg-color);
+  backdrop-filter: var(--overlay-curtain-bg-filter);
+  opacity: 0;
+  transition: var(--nav-sidebar-transition);
+}
+
+.side-navigation-wrapper > .side-navigation-curtain.is-open{
+  pointer-events: auto;
+  opacity: 1;
+  z-index: 9990;
+}
+
 @media screen and (min-width: 600px) {
   .side-navigation-wrapper > div {
     max-width: var(--grid-tablet-container-width);

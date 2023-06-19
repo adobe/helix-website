@@ -23,7 +23,7 @@
 
 .pagination .column:hover{
   cursor: pointer;
-  border-color: var(--color-eyebrow-light-grey);
+  box-shadow: 0 0 15px var(--bg-color-grey);
 }
 
 .pagination .column svg{

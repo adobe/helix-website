@@ -91,9 +91,14 @@ export default async function decorate(block) {
 
   loadSearch([searchInput, searchInputOuter], resultsContainer);
 
+  // add backdrop overlay
+  const backdropCurtain = createTag('div', { class: 'side-navigation-curtain' }, '');
+  aside.append(backdropCurtain);
+
   [docToggleMenuButton, backBtn].forEach((btn) => {
     btn.addEventListener('click', () => {
       block.classList.toggle('overlay');
+      backdropCurtain.classList.toggle('is-open');
     });
   });
 
@@ -161,6 +166,15 @@ export default async function decorate(block) {
           }
         }
       });
+    });
+  });
+
+  // close overlay when clicked on link, ensure close overlay if link is on same page
+  const allSideNavLinks = block.querySelectorAll('a');
+  allSideNavLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      backdropCurtain.classList.remove('is-open');
+      block.classList.remove('overlay');
     });
   });
 

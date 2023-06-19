@@ -139,6 +139,8 @@
     background: var(--bg-color-lightgrey);
     border-radius: var(--card-border-radius-l);
     text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .columns.tall h3 {
@@ -152,6 +154,12 @@
 .columns.tall p {
     font-size: var(--type-body-s-size);
     line-height: var(--type-body-s-lh);
+}
+
+.columns.tall img {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: contain;
 }
 
 .columns.text-sm p {
@@ -295,8 +303,6 @@
     .columns.tall > div > div {
         padding: var(--spacing-xl) var(--spacing-m);
         margin-bottom: var(--spacing-s);
-        display: flex;
-        flex-direction: column;
     }
 
     /* force image to stick to bottom */

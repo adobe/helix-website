@@ -604,6 +604,63 @@ export function decorateHeadings(main) {
   });
 }
 
+export function addMessageBoxOnGuideTemplate(main) {
+  if (!document.body.classList.contains('guides-template')) return;
+  const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
+  main.append(messageBox);
+}
+
+export function addHeadingAnchorLink(elem) {
+  const link = document.createElement('a');
+  link.setAttribute('href', `#${elem.id || ''}`);
+  link.setAttribute('title', `Copy link to "${elem.textContent}" to clipboard`);
+  // hover highlight on title
+  if (elem.tagName === 'H2') {
+    link.classList.add('anchor-link', 'link-highlight-colorful-effect');
+  } else {
+    link.classList.add('anchor-link', 'link-highlight-colorful-effect-2');
+  }
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(link.href);
+    window.location.href = link.href;
+    const messageBox = document.querySelector('.message-box');
+    if (messageBox) {
+      messageBox.classList.add('active', 'fill');
+      setTimeout(() => {
+        messageBox.classList.remove('active');
+        setTimeout(() => {
+          messageBox.classList.remove('fill');
+        }, 300);
+      }, 1000);
+    }
+
+    e.target.classList.add('anchor-link-copied');
+    setTimeout(() => {
+      e.target.classList.remove('anchor-link-copied');
+    }, 1000);
+  });
+  link.innerHTML = elem.innerHTML;
+  elem.innerHTML = '';
+  elem.append(link);
+}
+
+export function decorateGuideTemplateHeadings(main) {
+  if (!document.body.classList.contains('guides-template')) return;
+  const contentArea = main.querySelector('.section.content');
+  const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
+  contentSections.forEach((section) => {
+    section.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
+      addHeadingAnchorLink(h);
+    });
+  });
+}
+
+export function decorateGuideTemplate(main) {
+  addMessageBoxOnGuideTemplate(main);
+  decorateGuideTemplateHeadings(main);
+}
+
 export function decorateTitleSection(main) {
   const titleSections = main.querySelectorAll('.title-section');
   if (!titleSections) return;
@@ -704,6 +761,7 @@ export function decorateMain(main) {
   decorateSections(main);
   // decorateButtons(main);
   decorateHeadings(main);
+  decorateGuideTemplate(main);
   decorateBlocks(main);
   decorateTitleSection(main);
 }
@@ -721,6 +779,30 @@ async function loadEager(doc) {
   }
 }
 
+// TODO:
+function addInViewAnimation(main) {
+  const observerOptions = {
+    threshold: 0.10,
+    rootMargin: '-10px 0px -10px 0px',
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  const sections = Array.from(main.querySelectorAll('.fadeup'));
+  sections.forEach((section, i) => {
+    // remove first section (block) from fadeup with a fadeup class
+    if (!i) section.classList.add('in-view');
+    observer.observe(section);
+  });
+}
+
 /**
  * loads everything that doesn't need to be delayed.
  */
@@ -731,7 +813,12 @@ async function loadLazy(doc) {
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
 
+  // NOTE:'.redesign' class is needed for the redesign styles, keep this
+  document.body.classList.add('redesign');
+
+  // TODO: test in view animation
   loadBlocks(main);
+  addInViewAnimation(main);
 
   const { hash } = window.location;
 
@@ -796,16 +883,3 @@ if (window.name.includes('performance')) {
     if (mod.default) mod.default();
   });
 }
-
-/** TODO: Redesign staging specific function,
- *  mock env handling,
- *  update this when it's on production/ launch
- * */
-export const getENVbyPath = () => {
-  const currentURL = window.location.href;
-  const redesignPath = 'drafts/redesign/';
-  if (currentURL.includes(redesignPath)) {
-    return 'redesign';
-  }
-  return 'original-design';
-};

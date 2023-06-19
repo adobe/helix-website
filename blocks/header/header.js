@@ -1,17 +1,20 @@
+// import {
+//   loadScript, getMetadata, cleanVariations,
+// } from '../../scripts/scripts.js';
 import {
-  loadScript, getMetadata, cleanVariations, getENVbyPath,
+  loadScript, cleanVariations,
 } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
-import { changeTag } from '../../utils/helpers.js';
+import { changeTag, returnLinkTarget } from '../../utils/helpers.js';
 
-// adobe icon
-const BRAND_IMG = '<img loading="lazy" alt="Adobe" width="25" height="22.12" src="/blocks/header/adobe-logo.svg">';
 const ICON_ROOT = '/img';
-const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.png">';
-const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
-<path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z"></path>
-</svg>`;
+const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.svg">';
+// const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
+// <path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5
+// 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z">
+// </path>
+// </svg>`;
 const IS_OPEN = 'is-open';
 const MENU_ICON_COLOR_PATTERN = [
   ['lightgreen', 'pink', 'purple'],
@@ -27,132 +30,6 @@ class Gnav {
     this.desktop = window.matchMedia('(min-width: 1200px)');
   }
 
-  init = () => {
-    this.state = {};
-    this.curtain = createTag('div', { class: 'gnav-curtain' });
-    const nav = createTag('nav', { class: 'gnav' });
-
-    const mobileToggle = this.decorateToggle(nav);
-    nav.append(mobileToggle);
-
-    const brand = this.decorateBrand();
-    if (brand) {
-      nav.append(brand);
-    }
-
-    const mainNav = this.decorateMainNav();
-    if (mainNav) {
-      nav.append(mainNav);
-    }
-
-    const profile = this.decorateProfile();
-    if (profile) {
-      nav.append(profile);
-    }
-
-    const logo = this.decorateLogo();
-    if (logo) {
-      nav.append(logo);
-    }
-
-    const enableSearch = getMetadata('enable-search');
-    if (!enableSearch || enableSearch !== 'no') {
-      const div = createTag('div', { class: 'search' });
-      div.innerHTML = '<p>Search</p>';
-      this.body.append(div);
-
-      this.search = this.decorateSearch();
-      if (this.search) {
-        nav.append(this.search);
-      }
-    }
-
-    const wrapper = createTag('div', { class: 'gnav-wrapper' }, nav);
-    this.el.append(this.curtain, wrapper);
-  };
-
-  decorateBrand = () => {
-    const brandBlock = this.body.querySelector('.gnav-brand');
-    if (!brandBlock) return null;
-    const brand = brandBlock.querySelector('a');
-    brand.classList.add('gnav-brand');
-    if (brandBlock.classList.contains('with-logo')) {
-      brand.insertAdjacentHTML('afterbegin', BRAND_IMG);
-    }
-    return brand;
-  };
-
-  decorateLogo = () => {
-    const logo = this.body.querySelector('.adobe-logo a');
-    logo.classList.add('gnav-logo');
-    logo.setAttribute('aria-label', logo.textContent);
-    logo.textContent = '';
-    logo.insertAdjacentHTML('afterbegin', BRAND_IMG);
-    return logo;
-  };
-
-  decorateMainNav = () => {
-    const mainLinks = this.body.querySelectorAll('h2 > a');
-    if (mainLinks.length > 0) {
-      return this.buildMainNav(mainLinks);
-    }
-    return null;
-  };
-
-  buildMainNav = (navLinks) => {
-    const mainNav = createTag('div', { class: 'gnav-mainnav' });
-    navLinks.forEach((navLink, idx) => {
-      const navItem = createTag('div', { class: 'gnav-navitem' });
-
-      const menu = navLink.closest('div');
-      menu.querySelector('h2').remove();
-      navItem.appendChild(navLink);
-
-      if (menu.childElementCount > 0) {
-        const id = `navmenu-${idx}`;
-        menu.id = id;
-        navItem.classList.add('has-menu');
-        navLink.setAttribute('role', 'button');
-        navLink.setAttribute('aria-expanded', false);
-        navLink.setAttribute('aria-controls', id);
-
-        const decoratedMenu = this.decorateMenu(navItem, navLink, menu);
-        navItem.appendChild(decoratedMenu);
-      }
-      mainNav.appendChild(navItem);
-    });
-    return mainNav;
-  };
-
-  decorateMenu = (navItem, navLink, menu) => {
-    menu.className = 'gnav-navitem-menu';
-    const childCount = menu.childElementCount;
-    if (childCount === 1) {
-      menu.classList.add('small-Variant');
-    } else if (childCount === 2) {
-      menu.classList.add('medium-variant');
-    } else if (childCount >= 3) {
-      menu.classList.add('large-Variant');
-      const container = createTag('div', { class: 'gnav-menu-container' });
-      container.append(...Array.from(menu.children));
-      menu.append(container);
-    }
-    navLink.addEventListener('focus', () => {
-      window.addEventListener('keydown', this.toggleOnSpace);
-    });
-    navLink.addEventListener('blur', () => {
-      window.removeEventListener('keydown', this.toggleOnSpace);
-    });
-    navLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.toggleMenu(navItem);
-    });
-    return menu;
-  };
-
-  // TODO: note: new header functions listed below, can cleanup old function after migration
-  // the above function could be removed after migration, keep functions below this line
   initHeader = () => {
     this.state = {};
     this.curtain = createTag('div', { class: 'gnav-curtain' });
@@ -193,19 +70,20 @@ class Gnav {
     }
     // above keeping ends
 
-    const enableSearch = getMetadata('enable-search');
-    if (!enableSearch || enableSearch !== 'no') {
-      const div = createTag('div', { class: 'search' });
-      div.innerHTML = '<p>Search</p>';
-      this.body.append(div);
+    // disabled search as not in desktop design
+    // const enableSearch = getMetadata('enable-search');
+    // if (!enableSearch || enableSearch !== 'no') {
+    //   const div = createTag('div', { class: 'search' });
+    //   div.innerHTML = '<p>Search</p>';
+    //   this.body.append(div);
 
-      this.search = this.decorateSearch();
-      if (this.search) {
-        const mainNavWrapper = nav.querySelector('.gnav-mainnav');
-        mainNavWrapper.classList.add('with-search');
-        nav.append(this.search);
-      }
-    }
+    //   this.search = this.decorateSearch();
+    //   if (this.search) {
+    //     const mainNavWrapper = nav.querySelector('.gnav-mainnav');
+    //     mainNavWrapper.classList.add('with-search');
+    //     nav.append(this.search);
+    //   }
+    // }
 
     // used `franklin` to separate the styles
     const wrapper = createTag('div', { class: 'gnav-wrapper franklin' }, nav);
@@ -231,7 +109,9 @@ class Gnav {
         nav.classList.add(IS_OPEN);
         this.desktop.addEventListener('change', onMediaChange);
         this.curtain.classList.add(IS_OPEN);
-        if (this.search) { this.loadSearch(); }
+
+        // disabled search on mobile
+        // if (this.search) { this.loadSearch(); }
       }
     });
     return toggle;
@@ -241,8 +121,15 @@ class Gnav {
   decorateBrandLogo = () => {
     const brandBlock = this.body.querySelector('.gnav-brand');
     if (!brandBlock) return null;
+
     const brand = brandBlock.querySelector('a');
     brand.classList.add('gnav-brand');
+
+    // accessibility
+    const brandAriaLabel = brandBlock.textContent ? brandBlock.textContent.trim() : 'Adobe Franklin';
+    brand.setAttribute('aria-label', brandAriaLabel);
+    brand.setAttribute('tabindex', 1);
+
     if (brandBlock.classList.contains('with-logo')) {
       brand.insertAdjacentHTML('afterbegin', BRAND_LOGO);
     }
@@ -280,10 +167,19 @@ class Gnav {
         navMainLink.setAttribute('role', 'button');
         navMainLink.setAttribute('aria-expanded', false);
         navMainLink.setAttribute('aria-controls', id);
+        navMainLink.setAttribute('aria-label', `${navMainLink.textContent} Submenu`);
+        navMainLink.setAttribute('tabindex', 1);
         navMainLink.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           this.toggleMenu(navItem);
+        });
+        // for keyboard navigation accessibility
+        navMainLink.addEventListener('focus', () => {
+          window.addEventListener('keydown', this.toggleOnSpace);
+        });
+        navMainLink.addEventListener('blur', () => {
+          window.removeEventListener('keydown', this.toggleOnSpace);
         });
 
         // reorganize submenu items
@@ -302,11 +198,13 @@ class Gnav {
 
   // NOTE: decorate svg not available in header, using .png directly instead
   // eslint-disable-next-line class-methods-use-this
-  decorateIcon(spanElement) {
+  decorateIcon(spanElement, altText = '') {
     const icon = spanElement.classList[1].substring(5);
     const imgSrc = `${ICON_ROOT}/${icon}.png`;
     const image = document.createElement('img');
     image.src = imgSrc;
+    image.alt = altText;
+    image.classList.add('bounce-item-effect');
     spanElement.appendChild(image);
   }
 
@@ -316,13 +214,14 @@ class Gnav {
 
     // add a info div if there's description <p/>
     if (subMenuWrapper.querySelector('p')) {
-      const infoDiv = createTag('div', { class: 'navmenu-info' }, '');
-      const infoTitle = createTag('h3', {}, navLinkTitle);
+      const infoDiv = createTag('a', {
+        class: 'navmenu-info link-highlight-colorful-effect-hover-wrapper',
+        href: navMainLink.href,
+        target: returnLinkTarget(navMainLink.href),
+      }, '');
+      const infoTitle = createTag('h3', { class: 'link-highlight-colorful-effect' }, navLinkTitle);
       const infoDescription = subMenuWrapper.querySelector('p');
       const infoImage = subMenuWrapper.querySelector('img');
-      infoDiv.addEventListener('click', () => {
-        window.location.href = navMainLink.href;
-      });
       infoDiv.append(infoTitle, infoDescription, infoImage);
       newSubMenuWrapper.append(infoDiv);
     }
@@ -333,13 +232,13 @@ class Gnav {
     subMenuListItems.forEach((item, idx) => {
       const submenuLink = item.querySelector('a');
       const submenuTitleText = submenuLink.textContent;
-      submenuLink.classList.add('submenu');
+      submenuLink.classList.add('submenu', 'link-highlight-colorful-effect-hover-wrapper', 'bounce-item-effect-hover-wrapper');
       submenuLink.innerHTML = '';
+      submenuLink.setAttribute('target', returnLinkTarget(submenuLink.href));
 
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {
-        // TODO: find out why svg is not auto rendering
-        this.decorateIcon(submenuIcon);
+        this.decorateIcon(submenuIcon, submenuTitleText);
 
         const iconWrapper = createTag('div', {
           class: `icon-wrapper colored-tag circle ${currentColorPattern[idx]}`,
@@ -348,7 +247,7 @@ class Gnav {
         submenuLink.append(iconWrapper);
       }
 
-      const title = createTag('h3', {}, submenuTitleText);
+      const title = createTag('h3', { class: 'link-highlight-colorful-effect submenu-title' }, submenuTitleText);
       submenuLink.append(title);
 
       const submenuDescription = item.querySelector('li');
@@ -379,7 +278,7 @@ class Gnav {
   // right side cta button
   decorateCTAButton = () => {
     const ctaButton = this.body.querySelector('.adobe-cta a');
-    ctaButton.classList.add('gnav-cta-button');
+    ctaButton.classList.add('gnav-cta-button', 'button');
     ctaButton.setAttribute('aria-label', ctaButton.textContent);
     const ctaText = ctaButton.textContent;
     const ctaTextWrapper = createTag('span', { }, ctaText);
@@ -390,53 +289,53 @@ class Gnav {
     return ctaButtonWrapper;
   };
 
-  // search on mobile menu
-  decorateSearch = () => {
-    const searchBlock = this.body.querySelector('.search');
-    if (searchBlock) {
-      const label = searchBlock.querySelector('p').textContent;
-      const searchEl = createTag('div', { class: 'gnav-search' });
-      const searchBar = this.decorateSearchBar(label);
-      const searchButton = createTag(
-        'button',
-        {
-          class: 'gnav-search-button',
-          'aria-label': label,
-          'aria-expanded': false,
-          'aria-controls': 'gnav-search-bar',
-        },
-        SEARCH_ICON,
-      );
-      searchButton.addEventListener('click', () => {
-        this.loadSearch(searchEl);
-        this.toggleMenu(searchEl);
-      });
-      searchEl.append(searchButton, searchBar);
-      return searchEl;
-    }
-    return null;
-  };
+  // search on mobile menu (Disabled for now)
+  // decorateSearch = () => {
+  //   const searchBlock = this.body.querySelector('.search');
+  //   if (searchBlock) {
+  //     const label = searchBlock.querySelector('p').textContent;
+  //     const searchEl = createTag('div', { class: 'gnav-search' });
+  //     const searchBar = this.decorateSearchBar(label);
+  //     const searchButton = createTag(
+  //       'button',
+  //       {
+  //         class: 'gnav-search-button',
+  //         'aria-label': label,
+  //         'aria-expanded': false,
+  //         'aria-controls': 'gnav-search-bar',
+  //       },
+  //       SEARCH_ICON,
+  //     );
+  //     searchButton.addEventListener('click', () => {
+  //       this.loadSearch(searchEl);
+  //       this.toggleMenu(searchEl);
+  //     });
+  //     searchEl.append(searchButton, searchBar);
+  //     return searchEl;
+  //   }
+  //   return null;
+  // };
 
-  decorateSearchBar = (label) => {
-    const searchBar = createTag('aside', { id: 'gnav-search-bar', class: 'gnav-search-bar' });
-    const searchField = createTag('div', { class: 'gnav-search-field' }, SEARCH_ICON);
-    const searchInput = createTag('input', { class: 'gnav-search-input', placeholder: label });
-    const searchResults = createTag('div', { class: 'gnav-search-results' });
+  // decorateSearchBar = (label) => {
+  //   const searchBar = createTag('aside', { id: 'gnav-search-bar', class: 'gnav-search-bar' });
+  //   const searchField = createTag('div', { class: 'gnav-search-field' }, SEARCH_ICON);
+  //   const searchInput = createTag('input', { class: 'gnav-search-input', placeholder: label });
+  //   const searchResults = createTag('div', { class: 'gnav-search-results' });
 
-    searchInput.addEventListener('input', (e) => {
-      this.onSearchInput(e.target.value, searchResults);
-    });
+  //   searchInput.addEventListener('input', (e) => {
+  //     this.onSearchInput(e.target.value, searchResults);
+  //   });
 
-    searchField.append(searchInput);
-    searchBar.append(searchField, searchResults);
-    return searchBar;
-  };
+  //   searchField.append(searchInput);
+  //   searchBar.append(searchField, searchResults);
+  //   return searchBar;
+  // };
 
-  loadSearch = async () => {
-    if (this.onSearchInput) return;
-    const gnavSearch = await import('./gnav-search.js');
-    this.onSearchInput = gnavSearch.default;
-  };
+  // loadSearch = async () => {
+  //   if (this.onSearchInput) return;
+  //   const gnavSearch = await import('./gnav-search.js');
+  //   this.onSearchInput = gnavSearch.default;
+  // };
 
   /**
    * Toggles menus when clicked directly
@@ -532,7 +431,8 @@ class Gnav {
     }
   };
 
-  // TODO: for adobe.com login status purposes, to be confirmed with adobe team if that's working
+  // TODO: for adobe.com login status purposes, out of working scope,
+  // will need Adobe team's help on this to function properly
   decorateProfile = () => {
     const blockEl = this.body.querySelector('.profile');
     if (!blockEl) return null;
@@ -589,18 +489,9 @@ async function fetchGnav(url) {
 }
 
 export default async function init(blockEl) {
-  const ENV = getENVbyPath();
-  let html = '';
-
-  // TODO: need to update the logic when move over to production
-  if (ENV === 'redesign') {
-    const url = '/drafts/redesign/new-nav';
-    html = await fetchGnav(url);
-  } else {
-    const url = getMetadata('gnav') || '/gnav';
-    html = await fetchGnav(url);
-  }
-  // console.log(html);
+  // OLD CODE: const url = getMetadata('gnav') || '/gnav';
+  const url = '/drafts/redesign/new-nav';
+  const html = await fetchGnav(url);
 
   if (html) {
     try {
@@ -608,14 +499,7 @@ export default async function init(blockEl) {
       const doc = parser.parseFromString(html, 'text/html');
       cleanVariations(doc);
       const gnav = new Gnav(doc.body, blockEl);
-
-      // TODO: need to update the logic when move over to production
-      if (ENV === 'redesign') {
-        gnav.initHeader();
-      } else {
-        // original header
-        gnav.init();
-      }
+      gnav.initHeader();
     } catch (e) {
       const { debug } = await import('../../utils/console.js');
       if (debug) {

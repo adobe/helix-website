@@ -1,3 +1,5 @@
+import { addInViewAnimationToElement } from '../../utils/helpers.js';
+
 function createSelect(fd) {
   const select = document.createElement('select');
   select.id = fd.Field;
@@ -190,6 +192,7 @@ async function createForm(formURL) {
 
 export default async function decorate(block) {
   const form = block.querySelector('a[href$=".json"]');
+  addInViewAnimationToElement('fadeup', block);
   if (form) {
     form.replaceWith(await createForm(form.href));
   }
