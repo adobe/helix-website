@@ -40,7 +40,7 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><strong><em>${stripTags(row.category)}</em></strong></p>`;
+      let cardDetails = `<p><em>${stripTags(row.category)}</em></p>`;
       if (row.githubProfile) {
         const ghProfile = stripTags(row.githubProfile).split('/');
         const ghUsername = ghProfile[ghProfile.length - 1];
