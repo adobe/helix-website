@@ -1,8 +1,8 @@
 import { buildBlock, decorateBlock, loadBlock } from '../../scripts/scripts.js';
 
-function toggleVisibility(dialog) {
-  const expanded = dialog.getAttribute('aria-expanded') === 'true';
-  dialog.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+function toggleVisibility(el) {
+  const expanded = el.getAttribute('aria-expanded') === 'true';
+  el.setAttribute('aria-expanded', expanded ? 'false' : 'true');
 }
 
 function urlify(str) {
@@ -14,6 +14,14 @@ function stripTags(html, ...args) {
     if (args.includes(tag)) return `<${endMark}${tag}>`;
     return '';
   }).replace(/<!--.*?-->/g, '');
+}
+
+function truncate(str, limit) {
+  const words = str.trim().split(' ');
+  const initial = words.slice(0, limit);
+  const extra = words.slice(limit);
+  if (extra.length < 1) return `<p class="description noextra">${initial.join(' ')}</p>`;
+  return `<p class="description">${initial.join(' ')} <span class='extra'>${extra.join(' ')}</span></p>`;
 }
 
 export default async function decorate(block) {
@@ -38,7 +46,7 @@ export default async function decorate(block) {
       }
       cardDetails += `<p><em>${stripTags(row.category)}</em></p>
       <p><em>${stripTags(row.firstName)} ${stripTags(row.lastName)}, ${stripTags(row.company)}</em></p>
-      <p class="description">${urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br')}</p>`;
+      ${truncate(urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br'), 25)}`;
       cardsRow.push(cardDetails);
     });
     cardsArr.push(cardsRow);
@@ -54,11 +62,12 @@ export default async function decorate(block) {
     await loadBlock(cardsBlock);
 
     // add listener to hide/show the description overflow dialog
-    const dialogs = blockWrapper.querySelectorAll('.cards-card dialog');
-    dialogs.forEach((dialog) => {
-      const description = dialog.parentElement.querySelector('p.description');
+    const extras = blockWrapper.querySelectorAll('.cards-card span.extra');
+    extras.forEach((el) => {
+      const description = el.parentElement;
       description.addEventListener('click', (event) => {
-        toggleVisibility(dialog);
+        toggleVisibility(el);
+        toggleVisibility(description);
         event.stopPropagation();
       });
     });
