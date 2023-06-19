@@ -66,10 +66,15 @@
 .side-navigation-wrapper input[type="text"] {
   width: 100%;
   border: solid 1px lightgray;
-  padding: 8px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
   box-sizing: border-box;
   border-radius: 8px;
   font-family: var(--body-font-family);
+  font-size: var(--type-body-xs-size);
+}
+
+.side-navigation-wrapper input[type="text"]::placeholder {
+  color: var(--color-nav-sidebar-subtitle);
 }
 
 .side-nav-search-highlight {
@@ -271,6 +276,7 @@
   background-color: white;
   border-radius: 6px;
   padding: 8px 16px;
+  font-family: var(--body-font-family);
 }
 
 .side-navigation-overlay-btn-wrapper button.back-btn {
@@ -291,7 +297,7 @@
   display: inline-block;
   width: var(--type-body-xs-size);
   height: var(--type-body-xs-size);
-  margin-right: var(--spacing-xs);
+  margin-right: var(--spacing-xxs);
 }
 
 .side-navigation-overlay-btn-wrapper button.back-btn::before {
