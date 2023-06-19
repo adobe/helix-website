@@ -222,7 +222,8 @@ html {
 
 a, button {
   -webkit-tap-highlight-color: transparent;
-  outline: none;
+
+  /* outline: none; */  
 }
 
 body {
@@ -534,7 +535,8 @@ a.button:any-link {
     background-color: var(--color-info-accent-hover);
     border-color: var(--color-info-accent-hover);
     color: var(--color-white);
-    outline: none;
+    
+    /* outline: none; */
     box-shadow:
       0 0 0 2px var(--color-white),
       0 0 0 4px var(--color-info-accent-hover);

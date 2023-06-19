@@ -66,9 +66,15 @@
 .side-navigation-wrapper input[type="text"] {
   width: 100%;
   border: solid 1px lightgray;
-  padding: 8px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
   box-sizing: border-box;
   border-radius: 8px;
+  font-family: var(--body-font-family);
+  font-size: var(--type-body-xs-size);
+}
+
+.side-navigation-wrapper input[type="text"]::placeholder {
+  color: var(--color-nav-sidebar-subtitle);
 }
 
 .side-nav-search-highlight {
@@ -113,10 +119,31 @@
 }
 
 .side-navigation .list-section li,
-.side-navigation .list-section a {
+.side-navigation .list-section a,
+.side-navigation .skip-link {
   font-size: var(--type-detail-m-size);
   line-height: 20px;
   color: var(--color-nav-sidebar-subtitle);
+}
+
+.side-navigation .skip-link {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  display: none;
+}
+
+.side-navigation .skip-link.show {
+  display: block;
+}
+
+.side-navigation .skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
 }
 
 .side-navigation .list-section > a:first-of-type {
@@ -225,6 +252,18 @@
   display: none;
 }
 
+.side-navigation .side-navigation-nested-target button {
+  width: 100%;
+  display: flex;
+  border: none;
+  background: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  font: var(--body-font-family);
+  color: var(--color-nav-sidebar-subtitle);
+}
+
 .side-navigation-overlay-btn-wrapper {
   text-align: left;
   margin-top: var(--spacing-xs);
@@ -237,6 +276,7 @@
   background-color: white;
   border-radius: 6px;
   padding: 8px 16px;
+  font-family: var(--body-font-family);
 }
 
 .side-navigation-overlay-btn-wrapper button.back-btn {
@@ -257,7 +297,7 @@
   display: inline-block;
   width: var(--type-body-xs-size);
   height: var(--type-body-xs-size);
-  margin-right: var(--spacing-xs);
+  margin-right: var(--spacing-xxs);
 }
 
 .side-navigation-overlay-btn-wrapper button.back-btn::before {
@@ -397,7 +437,7 @@
     padding: 0 0 var(--spacing-xs);
   }
 
-  .side-navigation .list-section li, .side-navigation .list-section a {
+  .side-navigation .list-section li, .side-navigation .list-section a, .side-navigation .list-section button {
     font-size: var(--type-body-xs-size);
   }
 

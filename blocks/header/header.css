@@ -959,10 +959,12 @@ button.gnav-toggle::after {
     opacity: 0;
     transition: all 0.3s ease-in-out;
     transition-delay: 0.2s;
+    visibility: hidden;
   }
 
   .franklin .gnav .gnav-navitem.has-menu.is-open .submenu-content{
     opacity: 1;
+    visibility: visible;
   }
 
   .franklin .gnav-navitem.has-menu.is-open > a {
