@@ -75,6 +75,9 @@
 
     /* Colors */
     --spectrum-blue: #1473E6;
+    --brand-color-purple: #8A8DF3;
+    --brand-color-pink: #F1BCE7;
+    --brand-color-green-yellow: #EBF3A4;
     --highlight-gradient: linear-gradient(75deg, #DB3278, #EE732F);
 
     /* those (background) colors were missing */
@@ -114,8 +117,10 @@
     --bg-color-lightgrey: #F8F8F8;
     --bg-color-grey: #E8E8E8;
     --bg-color-grey-2: #D6D6D6;
+    --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
+    --overlay-curtain-bg-filter: blur(0.05em);
   
-    /* Grid / container width -- 600px, 900px, TODO: update on all responsive section */
+    /* Grid / container width -- 600px, 900px */
     --grid-mobile-container-width: 88%;
     --grid-tablet-container-width: 83%;
     --grid-laptop-container-width: 90%;
@@ -158,6 +163,14 @@
 
     /* guide-templates */
     --side-navigation-bar-gap: var(--spacing-s);
+
+    /* animation & transition */
+    --transition-cubic-bezier-1: all .5s cubic-bezier(.23,1,.32,1);
+    --transition-ease-in-out: all 0.4s ease-in-out;
+
+    /* clip-paths */
+    --circular-1-clip-path-init: circle(50% at 0 50%);
+    --circular-1-clip-path-full: circle(120% at 0 50%);
 }
 
 /* desktop variables */
@@ -675,6 +688,90 @@ p.button-container > a.button {
     margin-left: 0;
 }
 
+/* Redesign button animation */
+
+/* primary button: blue bg */
+.redesign a.button:any-link,
+main .form .button {
+  cursor: pointer;
+  text-decoration: none;
+  padding: 5.5px 15px;
+  text-align: center;
+  font-size: var(--type-body-xs-size);
+  line-height: var(--body-line-height);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-white);
+  background: transparent;
+  border: 2px solid var(--spectrum-blue);
+  border-radius: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+  position: relative;
+  height: fit-content;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+main .form .button {
+  font-weight: 500;
+}
+
+.redesign a.button:any-link span {
+  color: var(--color-white);
+  transition: all 0.3s ease-in-out;
+}
+
+.redesign a.button:any-link:hover,
+main .form .button:hover {
+  color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
+  transform: translateZ(0);
+}
+
+.redesign a.button:any-link:hover span{
+  color: var(--spectrum-blue);
+}
+
+.redesign a.button:any-link::before,
+main .form .button::before  {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+    width: 200%;
+    height: 104%;
+    z-index: -1;
+
+    /* 1st value: hovered color, 2nd value: original color */
+    background: radial-gradient(circle at left, var(--color-white) 50%, var(--spectrum-blue) 50%);
+}
+
+.redesign a.button:any-link:hover::before,
+main .form .button:hover::before {
+  left: 0%;
+}
+
+/* secondary button: grey button */
+.redesign a.button.secondary:any-link {
+  color: var(--color-font-grey);
+  border-color: var(--color-font-grey);
+}
+
+.redesign a.button.secondary:any-link:hover {
+  color: var(--color-white);
+}
+
+.redesign a.button.secondary:any-link::before {
+  /* 1st value: hovered color, 2nd value: original color */
+  background: radial-gradient(circle at left, var(--color-font-grey) 50%, transparent 50%);
+}
+
+/* ---- button ends ---- */
+
 main {
   min-height: calc(100vh - 264px);
 }
@@ -858,11 +955,6 @@ body.docs-template main p {
       margin-top: var(--spacing-s);
       margin-bottom: var(--spacing-ml);
     }
-
-    /* TODO: remove after confirming with design
-    body.guides-template main.without-full-width-hero {
-      padding-top: var(--spacing-m);
-    } */
 }
 
 body.guides-template main.without-full-width-hero {
@@ -882,7 +974,7 @@ main .section.separator
   padding: 20px 0;
 }
 
-/* Layout for Guide pages  */
+/* Layout for Guide Template pages  */
 
 body.guides-template {
   display: block;
@@ -915,12 +1007,64 @@ body.guides-template main h6 {
   margin-top: var(--spacing-s);
 }
 
+/* separation for better readability in long section */
+body.guides-template main h2 {
+  border-bottom: 1px solid lightgrey;
+  padding-bottom: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+}
+
 body.guides-template main p,
 body.guides-template main li,
 body.guides-template main a {
   color: var(--color-black);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
+}
+
+body.guides-template main h1 a, 
+body.guides-template main h2 a, 
+body.guides-template main h3 a, 
+body.guides-template main h4 a, 
+body.guides-template main h5 a, 
+body.guides-template main h6 a{
+  color: var(--color-black);
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: inherit;
+  border: none;
+}
+
+body.guides-template main a.anchor-link {
+  position: relative;
+}
+
+body.guides-template main a.anchor-link:any-link::before {
+  content: "#";
+  position: absolute;
+  left: -0.9rem;
+  opacity: 0.2;
+  transition: var(--transition-ease-in-out);
+}
+
+body.guides-template main h2 a.anchor-link:any-link::before {
+  left: -1.1rem;
+}
+
+
+@media screen and (min-width: 768px) {
+  body.guides-template main a.anchor-link:any-link::before {
+    left: -1.25rem;
+  }
+
+  body.guides-template main h2 a.anchor-link:any-link::before {
+    left: -1.5rem;
+  }
+}
+
+body.guides-template main a.anchor-link:hover::before {
+  text-decoration: none;
+  opacity: 1;
 }
 
 /* guide template - content side styles */
@@ -995,6 +1139,66 @@ body.guides-template .guides-back-btn a {
 body.guides-template .guides-back-btn span {
   margin-right: var(--spacing-xxs);
 }
+
+/* guides-template message box for copying url success */
+.message-box {
+  opacity: 0;
+  position: fixed;
+  bottom: 4%;
+  right: 7%;
+  width: 120px;
+  min-height: 50px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  background-color: var(--color-white);
+  border: 1px solid var(--bg-color-grey);
+  border-radius: 8px;
+  box-shadow: 0 0 10px var(--bg-color-grey);
+  display: flex;
+  align-items: center;
+  font-size: var(--type-body-s-size);
+  line-height:  var(--type-body-s-lh);
+  z-index: 999;
+  overflow: hidden;
+  transition: var(--transition-ease-in-out);
+  transform: translateY(20px);
+}
+
+.message-box::before,
+.message-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--bg-color-grey-2);
+}
+
+.message-box::after {
+  width: 0;
+  background: var(--brand-color-purple);
+}
+
+.message-box.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.message-box.fill::after{
+  animation: progress-bar-fill 0.9s linear forwards;
+}
+
+@keyframes progress-bar-fill {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+/* guides-template message box ENDS */
 
 @media screen and (min-width: 768px) {
   body.guides-template main.has-full-width-hero .section.heading  {
@@ -1100,6 +1304,9 @@ body.contact-template .section:only-of-type::after {
 body.contact-template .section:first-of-type::before {
   content: '';
   background: url('../../img/colorful-bg.jpg'); 
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
   z-index: -2;
 }
 
@@ -1130,9 +1337,14 @@ body.contact-template .default-content-wrapper img {
 }
 
 @media screen and (min-width: 900px) {
-  body.contact-template main .section {
+  body.contact-template main .section,
+  body.contact-template main .section:first-of-type p {
       max-width: 800px;
       margin: auto;
+  }
+
+  body.contact-template main .section:first-of-type {
+    max-width: 900px;
   }
 }
 
@@ -1450,7 +1662,7 @@ body.contact-template .default-content-wrapper img {
   filter: var(--image-filter-drop-shadow-small);
 }
 
-/* -- animations class -- */
+/* ------- animations classes ------ */
 .link-underline-effect,
 .breadcrumb-link-underline-effect {
   position: relative;
@@ -1467,7 +1679,7 @@ body.contact-template .default-content-wrapper img {
     right: 0;
     bottom: -1px;
     width: 0;
-    transition: all .5s cubic-bezier(.23,1,.32,1);
+    transition: var(--transition-cubic-bezier-1);
 }
 
 .link-underline-effect:hover::before {
@@ -1476,6 +1688,7 @@ body.contact-template .default-content-wrapper img {
     left: 0;
 }
 
+/* NOTE: with .breadcrumb prefix would address line length for '/' in breadcrumb, use .link-underline-effect for normal case */
 .breadcrumb-link-underline-effect::before {
   width: 0;
   right: 12px;
@@ -1486,4 +1699,64 @@ body.contact-template .default-content-wrapper img {
   width: calc(100% - 12px);
   right: 12px;
   left: 0;
+}
+
+/* highlight effect, support line break as well:D */
+.link-highlight-colorful-effect,
+.link-highlight-colorful-effect-2 {
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-box-decoration-break: clone;
+  background-image: linear-gradient(90deg, rgba(137 140 242 / 50%) 0%, rgba(242 231 251 / 50%) 50%, rgba(241 188 231 / 50%) 100%);
+  background-repeat: no-repeat;
+  background-position: 4px 82%;
+  background-size: 0% 50%;
+  transition: background-size 0.3s ease-in-out;
+  padding-right: 4px;
+  box-decoration-break: clone;
+}
+
+/* effect 2: greenish yellow with pink */
+.link-highlight-colorful-effect-2 {
+  background-image: linear-gradient(90deg, rgba(234 190 248 / 80%) 0%, rgba(255 251 232 / 100%) 50%, rgba(238 246 172 / 100%) 100%);
+}
+
+/* can add `.link-highlight-colorful-effect-hover-wrapper` to trigger hover child highlight effect */
+.link-highlight-colorful-effect:hover,
+.link-highlight-colorful-effect-2:hover,
+.link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect,
+.link-highlight-colorful-effect-hover-wrapper:hover .link-highlight-colorful-effect-2 {
+  background-size: 100% 50%;
+  color: inherit;
+}
+
+/* hover wrapper and bounce the inner icon */
+.bounce-item-effect-hover-wrapper:hover .bounce-item-effect {
+  animation: bounce 1s ease;
+}
+
+/* bounce effect: for icons */
+@keyframes bounce {
+  0%, 20%, 60%, 100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-4px);
+  }
+
+  80% {
+    transform: translateY(-2px);
+  }
+}
+
+/* scroll in-view animation */
+.fadeup {
+  transition: all 1s ease;
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+.in-view {
+  transform: none;
+  opacity: 1;
 }

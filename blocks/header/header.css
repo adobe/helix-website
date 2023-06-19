@@ -159,12 +159,8 @@ button.gnav-toggle::after {
   font-size: 15px;
   font-weight: 700;
   line-height: 1.27;
-  color: white;
-  background: var(--spectrum-blue);
   padding: 5.5px 15px;
-  border: 2px solid var(--spectrum-blue);
-  border-radius: 500px;
-  height: fit-content;
+  margin: 0;
 }
 
 
@@ -370,6 +366,7 @@ button.gnav-toggle::after {
   font-size: var(--type-body-xs-size);
   letter-spacing: normal;
   color: var(--color-black);
+  width: fit-content;
 }
 
 .franklin .gnav .submenu-content a.submenu p {
@@ -463,8 +460,8 @@ button.gnav-toggle::after {
 }
 
 .gnav-curtain.is-open {
-  background: rgb(0 0 0 / 60%);
-  backdrop-filter: blur(0.05em);
+  background: var(--overlay-curtain-bg-color);
+  backdrop-filter: var(--overlay-curtain-bg-filter);
   pointer-events: auto;
 }
 
@@ -792,6 +789,10 @@ button.gnav-toggle::after {
     padding: 6px 20px;
   }
 
+  .franklin .gnav-navitem > a {
+    border-top: none;
+  }
+
   .gnav-promo {
     margin: 10px 0 0 36px;
   }
@@ -895,6 +896,7 @@ button.gnav-toggle::after {
   .franklin .gnav .navmenu-info h3 {
     font-size: 16px;
     line-height: 20px;
+    width: fit-content;
   }
 
   .franklin .gnav .navmenu-info p,
@@ -945,7 +947,7 @@ button.gnav-toggle::after {
     clip-path: inset(0 0 100% 0);
     max-height: none;
     pointer-events: none;
-    transition: all .5s cubic-bezier(.23,1,.32,1);
+    transition: var(--transition-cubic-bezier-1);
   }
 
   .franklin .gnav .gnav-navitem.has-menu.is-open .submenu-wrapper{

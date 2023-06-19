@@ -134,6 +134,53 @@
   .tabpanel .section{
     padding:.5rem 0;
   }
+
+  /* --- redesign adjustment for animation: STARTS --- */
+  .tabcontent-container {
+    position: relative;
+
+    /* ensure longer content not taking up space */
+    overflow: hidden;   
+  }
+
+  .tabpanel {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    opacity: 0;
+  }
+
+  .tabpanel.active {
+    pointer-events: auto;
+    opacity: 1;
+    position: relative;
+  }
+
+  /* see if need to adjust animation, experimenting only */
+  .tabpanel .image-side {
+    clip-path: var(--circular-1-clip-path-init);
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+    
+  }
+
+  .tabpanel.active .image-side {
+    clip-path: var(--circular-1-clip-path-full);
+    opacity: 1;
+  }
+
+  .tabpanel .testimonial-info {
+    transform: translateX(5%);
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+  }
+
+  .tabpanel.active .testimonial-info {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  /* --- redesign adjustment for animation: ENDS --- */
   
   .tabs div[role="tablist"] button {
     background: transparent;
@@ -209,6 +256,10 @@
   }
 
   /* - Tabs: .image-based - */
+  .tablist-container {
+    position: relative;
+  }
+
   .title-section .tabs-wrapper {
     margin-top: var(--spacing-s);
   }
@@ -218,13 +269,14 @@
   }
 
   .tabs.image-based div[role="tablist"] button {
+    position: relative;
+    border: none;
     border-bottom: 2px solid var(--tabs-image-based-border-color);
     transition: all 0.2s ease-in-out;
   }
 
   .tabs.image-based div[role="tablist"] button:hover,
   .tabs.image-based div[role="tablist"] button[aria-selected="true"] {
-    border-color: transparent;
     border-bottom: 2px solid var(--tabs-image-based-active-border-color);
   }
 

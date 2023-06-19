@@ -193,8 +193,6 @@
 }
 
 .marquee.testimonial .testimonial-info a.button:any-link {
-    color: var(--color-black);
-    border: 2px solid var(--color-black);
     width: fit-content;
     grid-column: span 2;
     margin: var(--spacing-m) auto 0;
