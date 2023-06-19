@@ -86,6 +86,14 @@ class Gnav {
     //   }
     // }
 
+    // empty div in nav-menu grid to close mobile menu
+    // when clicked on curtain area
+    const mobileCurtainArea = createTag('div', { class: 'mobile-curtain-area' });
+    mobileCurtainArea.addEventListener('click', () => {
+      mobileToggle.click();
+    });
+    nav.append(mobileCurtainArea);
+
     // used `franklin` to separate the styles
     const wrapper = createTag('div', { class: 'gnav-wrapper franklin' }, nav);
     this.el.append(this.curtain, wrapper);
