@@ -46,16 +46,17 @@ class Gnav {
 
     const ctaButtonWrapper = this.decorateCTAButton();
     const mobileCTAButton = ctaButtonWrapper.cloneNode(true);
-    ctaButtonWrapper.classList.add('desktop');
-    if (ctaButtonWrapper) {
-      nav.append(ctaButtonWrapper);
-    }
 
     const mainNav = this.decorateHeaderMainNav();
     mobileCTAButton.classList.add('mobile');
     mainNav.append(mobileCTAButton);
     if (mainNav) {
       nav.append(mainNav);
+    }
+
+    ctaButtonWrapper.classList.add('desktop');
+    if (ctaButtonWrapper) {
+      nav.append(ctaButtonWrapper);
     }
 
     // TODO: kept this for now as unsure about its purpose
@@ -168,7 +169,7 @@ class Gnav {
         navMainLink.setAttribute('aria-expanded', false);
         navMainLink.setAttribute('aria-controls', id);
         navMainLink.setAttribute('aria-label', `${navMainLink.textContent} Submenu`);
-        navMainLink.setAttribute('tabindex', 1);
+        // navMainLink.setAttribute('tabindex', 1);
         navMainLink.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
