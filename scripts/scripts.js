@@ -654,35 +654,6 @@ export function decorateGuideTemplateHeadings(main) {
   });
 }
 
-export function decorateGuideTemplateCodeBlock() {
-  if (!document.body.classList.contains('guides-template')) return;
-
-  const highlightCSS = createTag('link', {
-    rel: 'stylesheet',
-    href: '/libs/highlight/atom-one-dark.min.css',
-  });
-  document.head.append(highlightCSS);
-
-  const highlightJS = createTag('script', {
-    src: '/libs/highlight/highlight.min.js',
-  });
-  document.body.append(highlightJS);
-
-  highlightJS.onload = () => {
-    // highlight.js is loaded and ready
-    const initScript = createTag('script', {}, 'hljs.highlightAll();');
-    document.body.append(initScript);
-  };
-  document.body.append(highlightJS);
-}
-
-export function decorateGuideTemplate(main) {
-  if (!document.body.classList.contains('guides-template')) return;
-  addMessageBoxOnGuideTemplate(main);
-  decorateGuideTemplateHeadings(main);
-  decorateGuideTemplateCodeBlock();
-}
-
 export function decorateTitleSection(main) {
   const titleSections = main.querySelectorAll('.title-section');
   if (!titleSections) return;
@@ -713,6 +684,28 @@ export function setTemplate() {
   const template = getMetadata('template');
   if (!template) return;
   document.body.classList.add(`${template}-template`);
+}
+
+export async function decorateGuideTemplateCodeBlock() {
+  if (!document.body.classList.contains('guides-template')) return;
+
+  const highlightCSS = createTag('link', {
+    rel: 'stylesheet',
+    href: '/libs/highlight/atom-one-dark.min.css',
+  });
+  document.head.append(highlightCSS);
+
+  await loadScript('/libs/highlight/highlight.min.js', () => {
+    const initScript = createTag('script', {}, 'hljs.highlightAll();');
+    document.body.append(initScript);
+  });
+}
+
+export function decorateGuideTemplate(main) {
+  if (!document.body.classList.contains('guides-template')) return;
+  addMessageBoxOnGuideTemplate(main);
+  decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateCodeBlock();
 }
 
 /**
