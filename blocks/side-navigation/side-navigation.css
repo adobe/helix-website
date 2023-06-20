@@ -284,6 +284,7 @@
   line-height: var(--type-body-xs-lh);
   padding: 0;
   border: none;
+  color: var(--color-font-grey);
 }
 
 .side-navigation-overlay-btn-wrapper button.documentation-btn {
