@@ -76,6 +76,7 @@
     /* Colors */
     --spectrum-blue: #1473E6;
     --brand-color-purple: #8A8DF3;
+    --brand-color-dark-purple: #7473E4;
     --brand-color-pink: #F1BCE7;
     --brand-color-green-yellow: #EBF3A4;
     --highlight-gradient: linear-gradient(75deg, #DB3278, #EE732F);
@@ -119,6 +120,7 @@
     --bg-color-grey-2: #D6D6D6;
     --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
     --overlay-curtain-bg-filter: blur(0.05em);
+    --code-bg-color: #F1F1F1;
   
     /* Grid / container width -- 600px, 900px */
     --grid-mobile-container-width: 88%;
@@ -444,9 +446,12 @@ pre {
 }
 
 code {
-  border: 1px solid #888;
-  background-color: #eee;
-  padding: 0 4px;
+  font-family: var(--body-font-family);
+  letter-spacing: 0.25px;
+  border: 1px solid #e5e5e5;
+  background-color: var(--code-bg-color);
+  color: var(--brand-color-dark-purple);
+  padding: 1px 4px;
   border-radius: 4px;
 }
 
@@ -1021,6 +1026,14 @@ body.guides-template main a {
   line-height: var(--type-body-s-lh);
 }
 
+body.guides-template main .default-content-wrapper a {
+  transition: all 0.2s ease-in-out;
+}
+
+body.guides-template main .default-content-wrapper a:hover {
+  color: var(--spectrum-blue);
+}
+
 body.guides-template main h1 a, 
 body.guides-template main h2 a, 
 body.guides-template main h3 a, 
@@ -1032,6 +1045,16 @@ body.guides-template main h6 a{
   line-height: inherit;
   text-decoration: inherit;
   border: none;
+}
+
+body.guides-template main .default-content-wrapper h1 a:hover, 
+body.guides-template main .default-content-wrapper h2 a:hover, 
+body.guides-template main .default-content-wrapper h3 a:hover, 
+body.guides-template main .default-content-wrapper h4 a:hover, 
+body.guides-template main .default-content-wrapper h5 a:hover, 
+body.guides-template main .default-content-wrapper h6 a:hover {
+  color: var(--color-black);
+  transition: var(--transition-ease-in-out);
 }
 
 body.guides-template main a.anchor-link {

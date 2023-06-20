@@ -605,7 +605,6 @@ export function decorateHeadings(main) {
 }
 
 export function addMessageBoxOnGuideTemplate(main) {
-  if (!document.body.classList.contains('guides-template')) return;
   const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
   main.append(messageBox);
 }
@@ -646,7 +645,6 @@ export function addHeadingAnchorLink(elem) {
 }
 
 export function decorateGuideTemplateHeadings(main) {
-  if (!document.body.classList.contains('guides-template')) return;
   const contentArea = main.querySelector('.section.content');
   const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
   contentSections.forEach((section) => {
@@ -657,6 +655,7 @@ export function decorateGuideTemplateHeadings(main) {
 }
 
 export function decorateGuideTemplate(main) {
+  if (!document.body.classList.contains('guides-template')) return;
   addMessageBoxOnGuideTemplate(main);
   decorateGuideTemplateHeadings(main);
 }
