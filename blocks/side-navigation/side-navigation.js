@@ -102,6 +102,10 @@ export default async function decorate(block) {
     });
   });
 
+  backdropCurtain.addEventListener('click', () => {
+    backBtn.click();
+  });
+
   [searchInput, searchInputOuter].forEach((el) => {
     el.querySelector('input').addEventListener('input', (event) => {
       if (event.target.value.length === 0) {

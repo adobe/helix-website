@@ -22,10 +22,10 @@ function decorateCard(hit) {
   const pictureTag = picture.outerHTML;
   const html = `<div class="article-card-image">${pictureTag}</div>
       <div class="article-card-body">
-        <h3>${title}</h3>
+        <h3><span class="link-highlight-colorful-effect-2">${title}</span></h3>
         <p>${description}</p>
       </div>`;
-  return createTag('a', { href: path, class: 'article-card' }, html);
+  return createTag('a', { href: path, class: 'article-card link-highlight-colorful-effect-hover-wrapper' }, html);
 }
 
 function highlightTextElements(terms, elements) {
@@ -51,6 +51,12 @@ function highlightTextElements(terms, elements) {
           markedUp += txt.substring(hit.offset + hit.term.length, matches[i + 1].offset);
         }
       });
+      if (e.tagName === 'H3') {
+        e.innerHTML = `<span class="link-highlight-colorful-effect-2">
+                        ${markedUp}
+                      </span>`;
+        return;
+      }
       e.innerHTML = markedUp;
     }
   });

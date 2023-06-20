@@ -308,8 +308,14 @@
     width: 175%;
   }
 
+    /* tablist overflow on right side */
   .tabs.image-based div[role="tablist"] {
+    width: calc(100vw - 6vw);
     overflow: scroll;
+  }
+  
+  .tabs.image-based div[role="tablist"] button:last-of-type {
+    margin-right: 6vw;
   }
 
   @media screen and (max-width: 600px) {
@@ -323,6 +329,10 @@
       width: 80%;
       margin: 0 auto;
       overflow: hidden;
+    }
+
+    .tabs.image-based div[role="tablist"] button:last-of-type {
+      margin-right: 0;
     }
 
     .tabs.image-based div[role="tablist"] .tablist-container{

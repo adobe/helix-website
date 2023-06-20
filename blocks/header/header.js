@@ -86,6 +86,14 @@ class Gnav {
     //   }
     // }
 
+    // empty div in nav-menu grid to close mobile menu
+    // when clicked on curtain area
+    const mobileCurtainArea = createTag('div', { class: 'mobile-curtain-area' });
+    mobileCurtainArea.addEventListener('click', () => {
+      mobileToggle.click();
+    });
+    nav.append(mobileCurtainArea);
+
     // used `franklin` to separate the styles
     const wrapper = createTag('div', { class: 'gnav-wrapper franklin' }, nav);
     this.el.append(this.curtain, wrapper);
@@ -124,12 +132,13 @@ class Gnav {
     if (!brandBlock) return null;
 
     const brand = brandBlock.querySelector('a');
-    brand.classList.add('gnav-brand');
+    brand.classList.add('gnav-brand', 'link-highlight-colorful-effect-hover-wrapper');
 
     // accessibility
     const brandAriaLabel = brandBlock.textContent ? brandBlock.textContent.trim() : 'Adobe Franklin';
     brand.setAttribute('aria-label', brandAriaLabel);
     brand.setAttribute('tabindex', 1);
+    brand.innerHTML = `<span class="link-highlight-colorful-effect">${brand.textContent}</span>`;
 
     if (brandBlock.classList.contains('with-logo')) {
       brand.insertAdjacentHTML('afterbegin', BRAND_LOGO);

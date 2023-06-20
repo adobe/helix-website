@@ -605,7 +605,6 @@ export function decorateHeadings(main) {
 }
 
 export function addMessageBoxOnGuideTemplate(main) {
-  if (!document.body.classList.contains('guides-template')) return;
   const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
   main.append(messageBox);
 }
@@ -646,7 +645,6 @@ export function addHeadingAnchorLink(elem) {
 }
 
 export function decorateGuideTemplateHeadings(main) {
-  if (!document.body.classList.contains('guides-template')) return;
   const contentArea = main.querySelector('.section.content');
   const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
   contentSections.forEach((section) => {
@@ -654,11 +652,6 @@ export function decorateGuideTemplateHeadings(main) {
       addHeadingAnchorLink(h);
     });
   });
-}
-
-export function decorateGuideTemplate(main) {
-  addMessageBoxOnGuideTemplate(main);
-  decorateGuideTemplateHeadings(main);
 }
 
 export function decorateTitleSection(main) {
@@ -691,6 +684,28 @@ export function setTemplate() {
   const template = getMetadata('template');
   if (!template) return;
   document.body.classList.add(`${template}-template`);
+}
+
+export async function decorateGuideTemplateCodeBlock() {
+  if (!document.body.classList.contains('guides-template')) return;
+
+  const highlightCSS = createTag('link', {
+    rel: 'stylesheet',
+    href: '/libs/highlight/atom-one-dark.min.css',
+  });
+  document.head.append(highlightCSS);
+
+  await loadScript('/libs/highlight/highlight.min.js', () => {
+    const initScript = createTag('script', {}, 'hljs.highlightAll();');
+    document.body.append(initScript);
+  });
+}
+
+export function decorateGuideTemplate(main) {
+  if (!document.body.classList.contains('guides-template')) return;
+  addMessageBoxOnGuideTemplate(main);
+  decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateCodeBlock();
 }
 
 /**
@@ -759,7 +774,7 @@ export function buildAutoBlocks(main) {
 export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
-  // decorateButtons(main);
+  decorateButtons(main);
   decorateHeadings(main);
   decorateGuideTemplate(main);
   decorateBlocks(main);
