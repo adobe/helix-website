@@ -1,0 +1,517 @@
+{
+  "add": {
+    "message": "追加"
+  },
+  "admin_version": {
+    "message": "特定の管理 API バージョンを使用"
+  },
+  "admin_version_placeholder": {
+    "message": "管理バージョン : x.y.z"
+  },
+  "advanced": {
+    "description": "詳細設定モード",
+    "message": "詳細"
+  },
+  "anonymous": {
+    "message": "匿名"
+  },
+  "bulk_confirm_empty": {
+    "message": "ファイルが選択されていません"
+  },
+  "bulk_confirm_preview_multiple": {
+    "message": "$1 個のファイルのプレビューを生成してもよろしいですか？"
+  },
+  "bulk_confirm_preview_single": {
+    "message": "このファイルのプレビューを生成してもよろしいですか？"
+  },
+  "bulk_confirm_publish_multiple": {
+    "message": "$1 個のファイルを公開してもよろしいですか？"
+  },
+  "bulk_confirm_publish_single": {
+    "message": "このファイルを公開しますか？"
+  },
+  "bulk_progress_preview_multiple": {
+    "message": "$2 個中 $1 個のファイルのプレビューが生成されました..."
+  },
+  "bulk_progress_publish_multiple": {
+    "message": "$2 個のうち $1 個のファイルが公開されました..."
+  },
+  "bulk_result_preview_multiple_failure": {
+    "message": "$1 個のファイルのプレビューの生成に失敗しました :"
+  },
+  "bulk_result_preview_multiple_success": {
+    "message": "$1 個のファイルのプレビューの生成に成功しました。"
+  },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "フォルダー名には、正規化された小文字のラテン文字、数字、ハイフンのみを使用できます"
+  },
+  "bulk_result_preview_single_error_no_docx": {
+    "message": "Microsoft Word ドキュメント、最初に Google ドキュメントに変換"
+  },
+  "bulk_result_preview_single_error_no_xlsx": {
+    "message": "Microsoft Excel ドキュメント、最初に Google スプレッドシートに変換"
+  },
+  "bulk_result_preview_single_failure": {
+    "message": "このファイルのプレビューの生成に失敗しました :"
+  },
+  "bulk_result_preview_single_success": {
+    "message": "このファイルのプレビューの生成に成功しました。"
+  },
+  "bulk_result_publish_multiple_failure": {
+    "message": "$1 個のファイルを公開できませんでした :"
+  },
+  "bulk_result_publish_multiple_success": {
+    "message": "$1 個のファイルが正常に公開されました。"
+  },
+  "bulk_result_publish_single_error_no_source": {
+    "message": "最初にファイルをプレビューする必要があります"
+  },
+  "bulk_result_publish_single_failure": {
+    "message": "1 個のファイルを公開できませんでした :"
+  },
+  "bulk_result_publish_single_success": {
+    "message": "1 個のファイルが正常に公開されました。"
+  },
+  "bulk_selection_empty": {
+    "message": "以下のファイルを選択"
+  },
+  "bulk_selection_multiple": {
+    "message": "$1 個のファイルが選択されました"
+  },
+  "bulk_selection_single": {
+    "message": "1 個のファイルが選択されました"
+  },
+  "cancel": {
+    "message": "キャンセル"
+  },
+  "caution_side_effects": {
+    "message": "注意 : 予期しない副作用です"
+  },
+  "close": {
+    "message": "閉じる"
+  },
+  "config_add_no_mountpoint": {
+    "message": "プロジェクトは Sidekick に追加されましたが ...\n\nコンテンツ URL の取得に失敗したので、まだ編集モードで Sidekick を使用することはできません。手動で追加するには、プロジェクトの設定の横にある「編集」ボタンをクリックします。"
+  },
+  "config_add_success": {
+    "message": "プロジェクトが Sidekick に追加されました"
+  },
+  "config_backup": {
+    "message": "バックアップ"
+  },
+  "config_delete": {
+    "message": "削除"
+  },
+  "config_delete_all": {
+    "message": "すべての設定を削除"
+  },
+  "config_delete_all_confirm": {
+    "message": "すべての設定を削除してもよろしいですか？"
+  },
+  "config_delete_all_description": {
+    "message": "注意 : このアクションは元に戻すことができません。"
+  },
+  "config_delete_confirm": {
+    "message": "このプロジェクトを削除してもよろしいですか？"
+  },
+  "config_development": {
+    "message": "開発"
+  },
+  "config_edit": {
+    "message": "編集"
+  },
+  "config_export": {
+    "message": "設定を書き出し"
+  },
+  "config_export_description": {
+    "message": "設定をコンピューターにバックアップします。"
+  },
+  "config_filter": {
+    "description": "プロジェクトをフィルタリング",
+    "message": "検索..."
+  },
+  "config_filter_clear": {
+    "description": "プロジェクトフィルターをリセット",
+    "message": "リセット"
+  },
+  "config_import": {
+    "message": "設定を読み込み"
+  },
+  "config_import_confirm": {
+    "message": "この設定を読み込んで現在の設定を上書きしてもよろしいですか？"
+  },
+  "config_import_description": {
+    "message": "コンピューターから設定を読み込みます。現在の設定のバックアップがあることを確認してください。"
+  },
+  "config_import_failure": {
+    "message": "設定を読み込むことができませんでした"
+  },
+  "config_import_success": {
+    "message": "設定が正常に読み込まれました"
+  },
+  "config_invalid_export": {
+    "message": "書き出す設定がまだありません"
+  },
+  "config_invalid_giturl": {
+    "message": "無効なリポジトリ URL"
+  },
+  "config_invalid_import": {
+    "message": "読み込む有効なファイルを選択"
+  },
+  "config_invalid_shareurl": {
+    "message": "無効な共有 URL"
+  },
+  "config_manual_devMode": {
+    "message": "プロジェクト設定をローカルでテスト"
+  },
+  "config_manual_devOrigin_placeholder": {
+    "message": "ローカル開発 URL : http://localhost:3000"
+  },
+  "config_manual_giturl_placeholder": {
+    "message": "リポジトリ URL : https://github.com/..."
+  },
+  "config_manual_host_placeholder": {
+    "message": "実稼動ホスト名 (オプション)"
+  },
+  "config_manual_mountpoints_placeholder": {
+    "message": "コンテンツ URL : https://..."
+  },
+  "config_manual_project_placeholder": {
+    "message": "プロジェクト名 (オプション)"
+  },
+  "config_manual_title": {
+    "message": "手動で追加"
+  },
+  "config_picker_button_title": {
+    "message": "$1 を押して $2 を選択"
+  },
+  "config_project_add": {
+    "message": "このプロジェクトを追加"
+  },
+  "config_project_disable": {
+    "message": "このプロジェクトを無効にする"
+  },
+  "config_project_empty": {
+    "message": "まだプロジェクトを追加していません。"
+  },
+  "config_project_enable": {
+    "message": "このプロジェクトを有効にする"
+  },
+  "config_project_exists": {
+    "message": "このプロジェクトの設定は既に存在します。"
+  },
+  "config_project_host": {
+    "message": "実稼動"
+  },
+  "config_project_innerhost": {
+    "message": "プレビュー"
+  },
+  "config_project_mountpoints": {
+    "message": "コンテンツ"
+  },
+  "config_project_pick": {
+    "message": "プロジェクトを選択"
+  },
+  "config_project_pick_more": {
+    "description": "その他の設定",
+    "message": "詳細..."
+  },
+  "config_project_remove": {
+    "message": "このプロジェクトを削除"
+  },
+  "config_projects": {
+    "message": "プロジェクト"
+  },
+  "config_reset": {
+    "message": "リセット"
+  },
+  "config_share": {
+    "message": "共有"
+  },
+  "config_shareurl_copied": {
+    "message": "$1 の共有 URL がクリップボードにコピーされました"
+  },
+  "config_shareurl_description": {
+    "message": "右側の共有アイコンをクリックして、Sidekick を使用しているユーザーにその URL を共有するよう依頼します。"
+  },
+  "config_shareurl_placeholder": {
+    "message": "共有 URL : https://www.hlx.live/sidekick..."
+  },
+  "config_shareurl_share_title": {
+    "message": "$1 の Sidekick 設定"
+  },
+  "config_shareurl_title": {
+    "message": "URL を共有して追加"
+  },
+  "config_toggle_menu": {
+    "message": "メニューを表示 / 非表示"
+  },
+  "config_unsupported_legacy": {
+    "message": "このサイトはサポートされなくなりました"
+  },
+  "config_ux": {
+    "message": "ユーザーエクスペリエンス"
+  },
+  "copied_url": {
+    "message": "URL がクリップボードにコピーされました。"
+  },
+  "copied_urls": {
+    "message": "URL がクリップボードにコピーされました。"
+  },
+  "copy_live_url": {
+    "message": "ライブ URL をコピー"
+  },
+  "copy_live_urls": {
+    "message": "ライブ URL をコピー"
+  },
+  "copy_preview_url": {
+    "message": "プレビュー URL をコピー"
+  },
+  "copy_preview_urls": {
+    "message": "プレビュー URL をコピー"
+  },
+  "copy_prod_url": {
+    "message": "実稼動 URL をコピー"
+  },
+  "copy_prod_urls": {
+    "message": "実稼動 URL をコピー"
+  },
+  "copy_url": {
+    "message": "URL をコピー"
+  },
+  "copy_urls": {
+    "message": "URL をコピー"
+  },
+  "delete": {
+    "message": "削除"
+  },
+  "delete_failure": {
+    "message": "削除に失敗しました。後でもう一度試してください。"
+  },
+  "description": {
+    "message": "AEM Sidekick を使用すると、AEM サイトの作成者はコンテンツを簡単にプレビューおよび公開できます。"
+  },
+  "description_shortcut": {
+    "message": "Sidekick を切り替え"
+  },
+  "development": {
+    "message": "開発"
+  },
+  "docs": {
+    "message": "https://www.hlx.live/docs/sidekick"
+  },
+  "edit": {
+    "message": "編集"
+  },
+  "edit_date": {
+    "message": "編集済み :"
+  },
+  "error_config_failure": {
+    "message": "設定をアクティブ化できませんでした :"
+  },
+  "error_login_aborted": {
+    "message": "ログインが中止されました。"
+  },
+  "error_login_timeout": {
+    "message": "ログインがタイムアウトしました。後でもう一度試してください。"
+  },
+  "error_logout_error": {
+    "message": "ログアウトに失敗しました。後でもう一度試してください。"
+  },
+  "error_preview_failure": {
+    "message": "プレビューの生成に失敗しました。後で再試行してください。"
+  },
+  "error_preview_not_gdoc_generic": {
+    "message": "プレビューの生成に失敗しました。Google ドキュメントまたはスプレッドシートにする必要があります。"
+  },
+  "error_preview_not_gdoc_ms_word": {
+    "message": "これは、Microsoft Word ドキュメントです。[ファイル] > [Google ドキュメントとして保存] を選択し、Google ドキュメントに変換してください"
+  },
+  "error_preview_not_gsheet_ms_excel": {
+    "message": "これは、Microsoft Excel ドキュメントです。[ファイル] > [Google スプレッドシートとして保存] を選択し、Google スプレッドシートに変換してください"
+  },
+  "error_status_404_content": {
+    "message": "404 見つかりません : Sidekick の設定または URL を確認してください。"
+  },
+  "error_status_404_document": {
+    "message": "404 見つかりません : Sidekick の設定を確認し、このドキュメントへのアクセス権が付与されていることを確認してください。"
+  },
+  "error_status_500": {
+    "message": "500 内部サーバーエラー : ページのステータスを取得できませんでした。後でもう一度試してください。"
+  },
+  "error_status_502": {
+    "message": "502 無効なゲートウェイです : ページのステータスを取得できませんでした。後でもう一度試してください。"
+  },
+  "error_status_504": {
+    "message": "504 ゲートウェイタイムアウト : ページのステータスを取得できませんでした。後でもう一度試してください。"
+  },
+  "error_status_fatal": {
+    "message": "申し訳ありませんが、現在問題が発生しているようです。詳細についてはこちらをご確認ください :"
+  },
+  "error_status_invalid": {
+    "message": "無効なサーバー応答です。Sidekick の設定または URL を確認してください。"
+  },
+  "extensions": {
+    "message": "拡張機能"
+  },
+  "help": {
+    "message": "ヘルプ"
+  },
+  "help_acknowledge": {
+    "message": "了解しました。"
+  },
+  "help_close_acknowledge": {
+    "message": "ヘルプトピックを今後表示しない"
+  },
+  "help_close_dismiss": {
+    "message": "後でヘルプトピックを再度表示"
+  },
+  "help_close_opt_out": {
+    "message": "ヘルプトピックを表示しない"
+  },
+  "help_current": {
+    "message": "このヒント"
+  },
+  "help_next": {
+    "message": "次のヒント"
+  },
+  "help_opt_out": {
+    "message": "ヘルプを表示しない"
+  },
+  "help_opt_out_alert": {
+    "message": "ヘルプがオフになりました。オプショ／ユーザーエクスペリエンスでオンに戻すことができます。"
+  },
+  "help_previous": {
+    "message": "前のヒント"
+  },
+  "help_user_status": {
+    "message": "利用可能なヘルプトピック"
+  },
+  "help_user_status_check_all": {
+    "description": "すべてのヘルプトピックを確認",
+    "message": "すべてオンにする"
+  },
+  "help_user_status_description": {
+    "message": "オンにしたトピックは表示されなくなります。もう一度表示するトピックの横にあるチェックマークを解除します。"
+  },
+  "help_user_status_uncheck_all": {
+    "description": "すべてのヘルプトピックのチェックを解除",
+    "message": "すべてのチェックを解除"
+  },
+  "homepage": {
+    "message": "https://www.hlx.live/tools/sidekick/"
+  },
+  "info": {
+    "message": "情報"
+  },
+  "json_view_description": {
+    "message": "ユーザーにわかりやすいデータレンディションです。"
+  },
+  "live": {
+    "message": "ライブ"
+  },
+  "minutes_ago": {
+    "message": "$1 分前"
+  },
+  "never": {
+    "message": "なし"
+  },
+  "now": {
+    "message": "たった今"
+  },
+  "open_preview": {
+    "description": "特定の GitHub ブランチのプレビュー URL を開く",
+    "message": "プレビュー URL を開く"
+  },
+  "open_view_doc_source": {
+    "message": "ドキュメントソースを表示"
+  },
+  "please_wait": {
+    "message": "お待ちください..."
+  },
+  "plugins_empty": {
+    "message": "このページにはアクションが見つかりませんでした"
+  },
+  "plugins_loading": {
+    "message": "アクションを読み込み中..."
+  },
+  "preview": {
+    "message": "プレビュー"
+  },
+  "preview_config_success": {
+    "message": "設定が正常にアクティブ化されました。"
+  },
+  "preview_date": {
+    "message": "プレビュー済み :"
+  },
+  "preview_onedrive": {
+    "message": "プロのヒント : 最新の変更をすぐに確認するには、プレビューを生成する前に Ctrl+S キーを押します..."
+  },
+  "preview_onedrive_mac": {
+    "message": "プロのヒント : 最新の変更をすぐに確認するには、プレビューを生成する前に ⌘+S キーを押します..."
+  },
+  "production": {
+    "message": "実稼動"
+  },
+  "publish": {
+    "message": "公開"
+  },
+  "publish_date": {
+    "message": "公開中のアイテム :"
+  },
+  "publish_failure": {
+    "message": "公開に失敗しました。後でもう一度試してください。"
+  },
+  "push_down_content": {
+    "message": "コンテンツをオーバーレイでなくプッシュダウンする"
+  },
+  "push_down_content_description": {
+    "message": "メモ : サイトの構造によっては、期待どおりに機能するためにカスタムプロジェクト設定が必要になる場合があります。"
+  },
+  "reload": {
+    "message": "リロード"
+  },
+  "reload_failure": {
+    "message": "リロードに失敗しました。後でもう一度試してください。"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "seconds_ago": {
+    "message": "$1 秒前"
+  },
+  "share_description": {
+    "message": "Sidekick を共有"
+  },
+  "standard": {
+    "description": "標準設定モード",
+    "message": "標準"
+  },
+  "switch_view": {
+    "message": "表示"
+  },
+  "title": {
+    "message": "AEM Sidekick"
+  },
+  "today_at": {
+    "message": "今日の $1"
+  },
+  "unpublish": {
+    "message": "非公開"
+  },
+  "unpublish_failure": {
+    "message": "非公開に失敗しました。後でもう一度試してください。"
+  },
+  "user_login": {
+    "message": "ログイン"
+  },
+  "user_logout": {
+    "message": "ログアウト"
+  },
+  "user_switch": {
+    "message": "ユーザーを切り替え"
+  },
+  "yesterday_at": {
+    "message": "昨日の $1"
+  }
+}
