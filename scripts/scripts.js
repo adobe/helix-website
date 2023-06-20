@@ -654,10 +654,32 @@ export function decorateGuideTemplateHeadings(main) {
   });
 }
 
+export function decorateGuideTemplateCodeBlock() {
+  if (!document.body.classList.contains('guides-template')) return;
+
+  const highlightCSS = createTag('link', {
+    rel: 'stylesheet',
+    href: '/libs/highlight/atom-one-dark.min.css',
+  });
+  document.head.append(highlightCSS);
+
+  const highlightJS = createTag('script', {
+    src: '/libs/highlight/highlight.min.js',
+  });
+
+  highlightJS.onload = () => {
+    // highligh.js is loaded and ready
+    const initScript = createTag('script', {}, 'hljs.highlightAll();');
+    document.body.append(initScript);
+  };
+  document.body.append(highlightJS);
+}
+
 export function decorateGuideTemplate(main) {
   if (!document.body.classList.contains('guides-template')) return;
   addMessageBoxOnGuideTemplate(main);
   decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateCodeBlock();
 }
 
 export function decorateTitleSection(main) {
@@ -758,7 +780,7 @@ export function buildAutoBlocks(main) {
 export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
-  // decorateButtons(main);
+  decorateButtons(main);
   decorateHeadings(main);
   decorateGuideTemplate(main);
   decorateBlocks(main);

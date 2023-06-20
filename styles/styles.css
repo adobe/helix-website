@@ -441,11 +441,10 @@ strong a {
 
 pre {
   overflow-x: scroll;
-  background-color: #eee;
-  padding: 2rem;
 }
 
-code {
+/* inline code styles */
+code:not(pre > code) {
   font-family: var(--body-font-family);
   letter-spacing: 0.25px;
   border: 1px solid #e5e5e5;
@@ -456,6 +455,8 @@ code {
 }
 
 pre code {
+  font-family: var(--body-font-family);
+  letter-spacing: 0.25px;
   border: unset;
 }
 
