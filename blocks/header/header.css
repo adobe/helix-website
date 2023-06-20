@@ -88,6 +88,7 @@ button.gnav-toggle {
 button.gnav-toggle::after {
   content: "\2630";
   font-weight: 700;
+  color: var(--bg-color-black);
 }
 
 .gnav.is-open button.gnav-toggle::after {

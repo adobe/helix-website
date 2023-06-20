@@ -40,7 +40,6 @@ main .form select:hover {
 }
 
 main .form label {
-  width: 72%;
   display: block;
   padding-bottom: var(--spacing-xxs);
   box-sizing: border-box;
@@ -77,7 +76,7 @@ main .form .form-checkbox-wrapper input[type='checkbox'] {
   position: relative;
   border: unset;
   padding: unset;
-  margin-right: var(--spacing-xxxs);
+  margin-right: var(--spacing-xxs);
   margin-left: 0;
 }
 
@@ -112,6 +111,10 @@ main .form-legal-wrapper p {
   font-style: italic;
 }
 
+main .form button {
+  font-family: var(--body-font-family);
+}
+
 @media screen and (min-width: 900px) {
   main .form {
     padding: var(--spacing-ml);
@@ -119,5 +122,9 @@ main .form-legal-wrapper p {
   
   main .form .field-wrapper {
     display: flex;
+  }
+
+  main .form label {
+    width: 72%;
   }
 }
