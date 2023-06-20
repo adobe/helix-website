@@ -40,13 +40,21 @@ export default async function decorate(block) {
         cardsArr.push(cardsRow);
         cardsRow = [];
       }
-      let cardDetails = `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
+      let cardDetails = `<p><em>${stripTags(row.category)}</em></p>`;
+      if (row.githubProfile) {
+        const ghProfile = stripTags(row.githubProfile).split('/');
+        const ghUsername = ghProfile[ghProfile.length - 1];
+        if (ghUsername) {
+          cardDetails += `<code>${ghUsername}</code>`;
+        } else {
+          cardDetails += `<code>${stripTags(row.githubProfile)}</code>`;
+        }
+      }
+      cardDetails += `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
       if (row.showcaseUrl) {
         cardDetails += `<p><a href="${stripTags(row.showcaseUrl)}" target="_blank">Preview</a></p>`;
       }
-      cardDetails += `<p><em>${stripTags(row.category)}</em></p>
-      <p><em>${stripTags(row.firstName)} ${stripTags(row.lastName)}, ${stripTags(row.company)}</em></p>
-      ${truncate(urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br'), 25)}`;
+      cardDetails += `${truncate(urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br'), 25)}`;
       cardsRow.push(cardDetails);
     });
     cardsArr.push(cardsRow);
