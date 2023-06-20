@@ -832,7 +832,7 @@ async function loadLazy(doc) {
   }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`, null);
-  addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
+  addFavIcon(`${window.hlx.codeBasePath}/img/franklin-favicon.png`);
   loadPreloadLink();
   setLanguageForAccessibility();
 
