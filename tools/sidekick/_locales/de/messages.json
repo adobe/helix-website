@@ -289,7 +289,7 @@
     "message": "Das Löschen ist fehlgeschlagen. Bitte versuchen Sie es später erneut."
   },
   "description": {
-    "message": "AEM Sidekick ermöglicht Autorinnen und Autoren von AEM-Sites die einfache Vorschau und Veröffentlichung von Inhalten."
+    "message": "AEM Sidekick ermöglicht Autorinnen und Autoren von AEM-Sites die Vorschau und Veröffentlichung von Inhalten."
   },
   "description_shortcut": {
     "message": "Sidekick aktivieren/deaktivieren"
