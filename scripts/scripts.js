@@ -659,12 +659,12 @@ export function decorateGuideTemplateCodeBlock() {
 
   const highlightCSS = createTag('link', {
     rel: 'stylesheet',
-    href: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css',
+    href: '/libs/highlight/atom-one-dark.min.css',
   });
   document.head.append(highlightCSS);
 
   const highlightJS = createTag('script', {
-    src: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js',
+    src: '/libs/highlight/highlight.min.js',
   });
   document.body.append(highlightJS);
 
