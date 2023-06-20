@@ -41,7 +41,7 @@ export default async function decorate(block) {
         cardsRow = [];
       }
       let cardDetails = `<p><em>${stripTags(row.category)}</em></p>`;
-      if (row.githubProfile) {
+      if (row.githubProfile && (row.permission === 'on')) {
         const ghProfile = stripTags(row.githubProfile).split('/');
         const ghUsername = ghProfile[ghProfile.length - 1];
         if (ghUsername) {
