@@ -666,9 +666,10 @@ export function decorateGuideTemplateCodeBlock() {
   const highlightJS = createTag('script', {
     src: '/libs/highlight/highlight.min.js',
   });
+  document.body.append(highlightJS);
 
   highlightJS.onload = () => {
-    // highligh.js is loaded and ready
+    // highlight.js is loaded and ready
     const initScript = createTag('script', {}, 'hljs.highlightAll();');
     document.body.append(initScript);
   };
