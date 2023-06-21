@@ -8,6 +8,7 @@ Notes:
 | N/A |  Default Home Hero: text in center, image at bottom, colorful checkerboard pattern background |  
 | side-by-side | 50% detail, 50% image in same row  |  
 | square-image | image will become 1:1 in aspect ratio  |  
+| mutiple-cta  | decorate multiple cta buttons with different styles (TBC) |
 
 #### Example:
 

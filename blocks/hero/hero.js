@@ -7,10 +7,15 @@ export default function decorate(block) {
 
   const innerContent = block.children[1].querySelector('div');
   innerContent.setAttribute('class', 'inner-content');
-  const ctaButton = innerContent.querySelector('a');
-  if (ctaButton) {
-    ctaButton.classList.add('button', 'large');
-    ctaButton.closest('p').replaceWith(ctaButton);
+
+  if (!block.classList.contains('multiple-cta')) {
+    const ctaButton = innerContent.querySelector('a');
+    if (ctaButton) {
+      ctaButton.classList.add('button', 'large');
+      ctaButton.closest('p').replaceWith(ctaButton);
+    }
+  } else {
+    // TODO: decorate multiple cta buttons here, like doc hero
   }
 
   const imageWrapper = block.children[2].querySelector('div');
