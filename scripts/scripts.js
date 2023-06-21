@@ -17,6 +17,21 @@
  */
 
 export function sampleRUM(checkpoint, data = {}) {
+  sampleRUM.defer = sampleRUM.defer || [];
+  const defer = (fnname) => {
+    sampleRUM[fnname] = sampleRUM[fnname]
+      || ((...args) => sampleRUM.defer.push({ fnname, args }));
+  };
+  sampleRUM.drain = sampleRUM.drain
+    || ((dfnname, fn) => {
+      sampleRUM[dfnname] = fn;
+      sampleRUM.defer
+        .filter(({ fnname }) => dfnname === fnname)
+        .forEach(({ fnname, args }) => sampleRUM[fnname](...args));
+    });
+  sampleRUM.on = (chkpnt, fn) => { sampleRUM.cases[chkpnt] = fn; };
+  defer('observe');
+  defer('cwv');
   try {
     window.hlx = window.hlx || {};
     if (!window.hlx.rum) {
@@ -27,35 +42,39 @@ export function sampleRUM(checkpoint, data = {}) {
       const id = `${hashCode(window.location.href)}-${new Date().getTime()}-${Math.random().toString(16).substr(2, 14)}`;
       const random = Math.random();
       const isSelected = (random * weight < 1);
-      // eslint-disable-next-line object-curly-newline
-      window.hlx.rum = { weight, id, random, isSelected };
+      const urlSanitizers = {
+        full: () => window.location.href,
+        origin: () => window.location.origin,
+        path: () => window.location.href.replace(/\?.*$/, ''),
+      };
+      // eslint-disable-next-line object-curly-newline, max-len
+      window.hlx.rum = { weight, id, random, isSelected, sampleRUM, sanitizeURL: urlSanitizers[window.hlx.RUM_MASK_URL || 'path'] };
     }
-    const { random, weight, id } = window.hlx.rum;
-    if (random && (random * weight < 1)) {
-      const sendPing = () => {
+    const { weight, id } = window.hlx.rum;
+    if (window.hlx && window.hlx.rum && window.hlx.rum.isSelected) {
+      const sendPing = (pdata = data) => {
         // eslint-disable-next-line object-curly-newline, max-len, no-use-before-define
-        const body = JSON.stringify({ weight, id, referer: window.location.href, generation: RUM_GENERATION, checkpoint, ...data });
-        const url = `https://rum.hlx3.page/.rum/${weight}`;
+        const body = JSON.stringify({ weight, id, referer: window.hlx.rum.sanitizeURL(), checkpoint, ...data });
+        const url = `https://rum.hlx.page/.rum/${weight}`;
         // eslint-disable-next-line no-unused-expressions
         navigator.sendBeacon(url, body);
+        // eslint-disable-next-line no-console
+        console.debug(`ping:${checkpoint}`, pdata);
       };
-      sendPing();
-      // special case CWV
-      if (checkpoint === 'cwv') {
-        // eslint-disable-next-line import/no-unresolved
-        import('./web-vitals-module-2-1-2.js').then((mod) => {
-          const storeCWV = (measurement) => {
-            data.cwv = {};
-            data.cwv[measurement.name] = measurement.value;
-            sendPing();
-          };
-          mod.getCLS(storeCWV);
-          mod.getFID(storeCWV);
-          mod.getLCP(storeCWV);
-        });
-      }
+      sampleRUM.cases = sampleRUM.cases || {
+        cwv: () => sampleRUM.cwv(data) || true,
+        lazy: () => {
+          // use classic script to avoid CORS issues
+          const script = document.createElement('script');
+          script.src = 'https://rum.hlx.page/.rum/@adobe/helix-rum-enhancer@^1/src/index.js';
+          document.head.appendChild(script);
+          return true;
+        },
+      };
+      sendPing(data);
+      if (sampleRUM.cases[checkpoint]) { sampleRUM.cases[checkpoint](); }
     }
-  } catch (e) {
+  } catch (error) {
     // something went wrong
   }
 }
@@ -505,13 +524,17 @@ initHlx();
  */
 
 const LCP_BLOCKS = ['marquee', 'columns', 'tabs']; // add your LCP blocks to the list
-const RUM_GENERATION = 'helix-website-1'; // add your RUM generation information here
 const ICON_ROOT = '/img';
 
 sampleRUM('top');
 window.addEventListener('load', () => sampleRUM('load'));
-document.addEventListener('click', () => sampleRUM('click'));
 
+window.addEventListener('unhandledrejection', (event) => {
+  sampleRUM('error', { source: event.reason.sourceURL, target: event.reason.line });
+});
+window.addEventListener('error', (event) => {
+  sampleRUM('error', { source: event.filename, target: event.lineno });
+});
 loadPage(document);
 
 export function decorateButtons(block = document) {
@@ -695,6 +718,8 @@ async function loadLazy(doc) {
 
   decorateBlock(footer);
   loadBlock(footer);
+
+  sampleRUM('lazy');
 }
 
 /**
