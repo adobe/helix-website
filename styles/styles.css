@@ -1515,7 +1515,6 @@ body.contact-template .default-content-wrapper img {
   line-height: var(--type-heading-xxl-lh);
   font-weight: 900;
   text-align: left;
-  text-transform: capitalize;
   letter-spacing: -0.04em;
   width: 85%;
   max-width: 540px;
