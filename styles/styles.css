@@ -17,6 +17,7 @@
 :root {
     /* Fonts */
     --body-font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+    --code-font-family: 'Source Code Pro', source-code-pro, 'Courier New', monospace;
 
     /* Headings (Consonant) */
     --type-heading-all-weight: 700;
@@ -37,7 +38,7 @@
 
     /* Body (Consonant) */
     --type-body-l-size: 20px;
-    --type-body-l-lh: 30px;
+    --type-body-l-lh: 30px;  
     --type-body-m-size: 18px;
     --type-body-m-lh: 27px;
     --type-body-s-size: 16px;
@@ -445,9 +446,14 @@ pre {
 }
 
 /* inline code styles */
+code {
+  font-family: var(--code-font-family);
+  letter-spacing: -0.08px;
+  line-height: 1.8;
+}
+
 code:not(pre > code) {
-  font-family: var(--body-font-family);
-  letter-spacing: 0.25px;
+  font-size: 14px;
   border: 1px solid #e5e5e5;
   background-color: var(--code-bg-color);
   color: var(--brand-color-dark-purple);
@@ -456,9 +462,14 @@ code:not(pre > code) {
 }
 
 pre code {
-  font-family: var(--body-font-family);
-  letter-spacing: 0.25px;
+  font-size: 14px;
   border: unset;
+}
+
+@media screen and (min-width: 600px) {
+  pre code {
+    font-size: 16px;
+  }
 }
 
 /* Icon on button */
