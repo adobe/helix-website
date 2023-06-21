@@ -239,7 +239,8 @@ body.appear {
 /* block style for container width, max-width */
 .block.contained,
 .section.content > div,
-.default-content-wrapper {
+.default-content-wrapper,
+.contained-wrapper {
   max-width: var(--grid-mobile-container-width);
   margin-left: auto;
   margin-right: auto;
@@ -248,7 +249,8 @@ body.appear {
 @media screen and (min-width: 600px) {
   .block.contained,
   .section.content > div,
-  .default-content-wrapper {
+  .default-content-wrapper,
+  .contained-wrapper {
     max-width: var(--grid-tablet-container-width);
   }
 }
@@ -256,7 +258,8 @@ body.appear {
 @media screen and (min-width: 900px) {
   .block.contained,
   .default-content-wrapper,
-  .franklin .gnav .submenu-content {
+  .franklin .gnav .submenu-content,
+  .contained-wrapper {
     max-width: 90%;
   }
   
@@ -277,6 +280,7 @@ body.appear {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
+  .contained-wrapper,
   .side-navigation-wrapper.expand,
   .franklin .gnav .submenu-content {
     max-width: var(--grid-desktop-container-width);
@@ -785,6 +789,29 @@ main .form .button:hover::before {
 .redesign a.button.secondary:any-link::before {
   /* 1st value: hovered color, 2nd value: original color */
   background: radial-gradient(circle at left, var(--color-font-grey) 50%, transparent 50%);
+}
+
+/* larger size */
+.redesign a.button.large:any-link {
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+}
+
+@media screen and (min-width: 900px) {
+  .redesign a.button.large:any-link {
+      font-size: var(--type-body-m-size);
+      line-height: 1.35;
+      padding: 8px 20px;
+      margin-bottom: 0;
+  }  
+}
+
+@media screen and (min-width: 1200px) {
+  .redesign a.button.large:any-link {
+      font-size: 18px;
+      line-height: 24px; 
+      padding: 10px 26px;
+  }  
 }
 
 /* ---- button ends ---- */
@@ -1489,7 +1516,6 @@ body.contact-template .default-content-wrapper img {
 .block.colorful-bg {
   background: url("../img/colorful-bg.jpg") center center / cover;
   background-position: center center;
-  background-attachment: fixed;
 }
 
 /* used with above class for colorful background in new design */
