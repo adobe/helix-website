@@ -146,6 +146,9 @@
     /* nav */
     --nav-height: 65px;
 
+    /* breadcrumb */
+    --breadcrumb-height: 0;
+
     /* Checkerboard pattern */
     --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
     --color-checkerboard-bg-fill: transparent; 
@@ -175,6 +178,13 @@
     /* clip-paths */
     --circular-1-clip-path-init: circle(50% at 0 50%);
     --circular-1-clip-path-full: circle(120% at 0 50%);
+}
+
+@media (min-width: 600px) {
+  :root {
+    /* breadcrumb */
+    --breadcrumb-height: 47px;
+  } 
 }
 
 /* desktop variables */
@@ -1049,6 +1059,7 @@ body.guides-template main h5,
 body.guides-template main h6 {
   font-weight: 700;
   margin-top: var(--spacing-s);
+  scroll-margin: calc(var(--nav-height) + 1em + var(--breadcrumb-height));
 }
 
 /* separation for better readability in long section */
