@@ -56,7 +56,9 @@ export function getBlockName(block, includeVariants = true) {
     return name;
   }
 
-  return classes.length > 0 ? `${name} (${classes.join(', ')})` : name;
+  // Remove the "sidekick-library" class or any empty classes
+  const filteredClasses = classes.filter(blockClass => blockClass !== 'sidekick-library' && blockClass !== '');
+  return filteredClasses.length > 0 ? `${name} (${filteredClasses.join(', ')})` : name;
 }
 
 export function getTable(block, name, path) {
