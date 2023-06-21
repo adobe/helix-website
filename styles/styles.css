@@ -101,6 +101,7 @@
 
     /* Redesign colors */
     --color-font-grey: #2C2C2C;
+    --color-light-grey-600: #686868;
     --color-eyebrow-light-grey: #444;
     --color-eyebrow-highlight: #6870EC;
     --color-accent-blue: #6870EC;
@@ -1282,6 +1283,10 @@ body.guides-template .icon-icon-arrow {
   background-repeat: no-repeat;
 }
 
+body.guides-template .pagination .icon-icon-arrow {
+  height: auto;
+}
+
 body.guides-template .icon-icon-caret-right {
   background-image: url("/img/icon-caret-right.svg");
 }
@@ -1713,6 +1718,7 @@ body.contact-template .default-content-wrapper img {
 
 /* NOTE: with .breadcrumb prefix would address line length for '/' in breadcrumb, use .link-underline-effect for normal case */
 .breadcrumb-link-underline-effect::before {
+  background: var(--color-light-grey-600);
   width: 0;
   right: 12px;
   left: auto;
