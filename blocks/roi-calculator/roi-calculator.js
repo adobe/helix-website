@@ -25,6 +25,7 @@ export default function decorate(block) {
   block.append(checkerBoardGuide);
 
   // TODO: append more content like form & ROI calculator here
+  // const calculatorContent = block.children[1].querySelector('div');
 
   block.append(innerContent);
 }
