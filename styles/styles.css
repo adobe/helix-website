@@ -147,7 +147,7 @@
     --nav-height: 65px;
 
     /* breadcrumb */
-    --breadcrumb-height: 0;
+    --breadcrumb-height: 1px;
 
     /* Checkerboard pattern */
     --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
@@ -786,7 +786,7 @@ main .form .button:hover::before {
   left: 0%;
 }
 
-/* secondary button: grey button */
+/* secondary button: grey border transparent bg -> border button */
 .redesign a.button.secondary:any-link {
   color: var(--color-font-grey);
   border-color: var(--color-font-grey);
@@ -799,6 +799,21 @@ main .form .button:hover::before {
 .redesign a.button.secondary:any-link::before {
   /* 1st value: hovered color, 2nd value: original color */
   background: radial-gradient(circle at left, var(--color-font-grey) 50%, transparent 50%);
+}
+
+/* .black-border button: black border transparent bg -> border button */
+.redesign a.button.black-border:any-link {
+  color: var(--color-black);
+  border-color: var(--color-black);
+}
+
+.redesign a.button.black-border:any-link:hover {
+  color: var(--color-white);
+}
+
+.redesign a.button.black-border:any-link::before {
+  /* 1st value: hovered color, 2nd value: original color */
+  background: radial-gradient(circle at left, rgb(0 0 0 / 50%) 50%, transparent 50%);
 }
 
 /* larger size */
