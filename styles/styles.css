@@ -17,6 +17,7 @@
 :root {
     /* Fonts */
     --body-font-family: 'Adobe Clean', adobe-clean, 'Trebuchet MS', sans-serif;
+    --code-font-family: 'Source Code Pro', source-code-pro, 'Courier New', monospace;
 
     /* Headings (Consonant) */
     --type-heading-all-weight: 700;
@@ -37,7 +38,7 @@
 
     /* Body (Consonant) */
     --type-body-l-size: 20px;
-    --type-body-l-lh: 30px;
+    --type-body-l-lh: 30px;  
     --type-body-m-size: 18px;
     --type-body-m-lh: 27px;
     --type-body-s-size: 16px;
@@ -101,6 +102,7 @@
 
     /* Redesign colors */
     --color-font-grey: #2C2C2C;
+    --color-light-grey-600: #686868;
     --color-eyebrow-light-grey: #444;
     --color-eyebrow-highlight: #6870EC;
     --color-accent-blue: #6870EC;
@@ -144,6 +146,9 @@
     /* nav */
     --nav-height: 65px;
 
+    /* breadcrumb */
+    --breadcrumb-height: 0;
+
     /* Checkerboard pattern */
     --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
     --color-checkerboard-bg-fill: transparent; 
@@ -173,6 +178,13 @@
     /* clip-paths */
     --circular-1-clip-path-init: circle(50% at 0 50%);
     --circular-1-clip-path-full: circle(120% at 0 50%);
+}
+
+@media (min-width: 600px) {
+  :root {
+    /* breadcrumb */
+    --breadcrumb-height: 47px;
+  } 
 }
 
 /* desktop variables */
@@ -237,7 +249,8 @@ body.appear {
 /* block style for container width, max-width */
 .block.contained,
 .section.content > div,
-.default-content-wrapper {
+.default-content-wrapper,
+.contained-wrapper {
   max-width: var(--grid-mobile-container-width);
   margin-left: auto;
   margin-right: auto;
@@ -246,7 +259,8 @@ body.appear {
 @media screen and (min-width: 600px) {
   .block.contained,
   .section.content > div,
-  .default-content-wrapper {
+  .default-content-wrapper,
+  .contained-wrapper {
     max-width: var(--grid-tablet-container-width);
   }
 }
@@ -254,7 +268,8 @@ body.appear {
 @media screen and (min-width: 900px) {
   .block.contained,
   .default-content-wrapper,
-  .franklin .gnav .submenu-content {
+  .franklin .gnav .submenu-content,
+  .contained-wrapper {
     max-width: 90%;
   }
   
@@ -275,6 +290,7 @@ body.appear {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
+  .contained-wrapper,
   .side-navigation-wrapper.expand,
   .franklin .gnav .submenu-content {
     max-width: var(--grid-desktop-container-width);
@@ -444,9 +460,14 @@ pre {
 }
 
 /* inline code styles */
+code {
+  font-family: var(--code-font-family);
+  letter-spacing: -0.08px;
+  line-height: 1.8;
+}
+
 code:not(pre > code) {
-  font-family: var(--body-font-family);
-  letter-spacing: 0.25px;
+  font-size: 14px;
   border: 1px solid #e5e5e5;
   background-color: var(--code-bg-color);
   color: var(--brand-color-dark-purple);
@@ -455,9 +476,14 @@ code:not(pre > code) {
 }
 
 pre code {
-  font-family: var(--body-font-family);
-  letter-spacing: 0.25px;
+  font-size: 14px;
   border: unset;
+}
+
+@media screen and (min-width: 600px) {
+  pre code {
+    font-size: 16px;
+  }
 }
 
 /* Icon on button */
@@ -775,6 +801,29 @@ main .form .button:hover::before {
   background: radial-gradient(circle at left, var(--color-font-grey) 50%, transparent 50%);
 }
 
+/* larger size */
+.redesign a.button.large:any-link {
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+}
+
+@media screen and (min-width: 900px) {
+  .redesign a.button.large:any-link {
+      font-size: var(--type-body-m-size);
+      line-height: 1.35;
+      padding: 8px 20px;
+      margin-bottom: 0;
+  }  
+}
+
+@media screen and (min-width: 1200px) {
+  .redesign a.button.large:any-link {
+      font-size: 18px;
+      line-height: 24px; 
+      padding: 10px 26px;
+  }  
+}
+
 /* ---- button ends ---- */
 
 main {
@@ -1010,6 +1059,7 @@ body.guides-template main h5,
 body.guides-template main h6 {
   font-weight: 700;
   margin-top: var(--spacing-s);
+  scroll-margin: calc(var(--nav-height) + 1em + var(--breadcrumb-height));
 }
 
 /* separation for better readability in long section */
@@ -1282,6 +1332,10 @@ body.guides-template .icon-icon-arrow {
   background-repeat: no-repeat;
 }
 
+body.guides-template .pagination .icon-icon-arrow {
+  height: auto;
+}
+
 body.guides-template .icon-icon-caret-right {
   background-image: url("/img/icon-caret-right.svg");
 }
@@ -1473,7 +1527,6 @@ body.contact-template .default-content-wrapper img {
 .block.colorful-bg {
   background: url("../img/colorful-bg.jpg") center center / cover;
   background-position: center center;
-  background-attachment: fixed;
 }
 
 /* used with above class for colorful background in new design */
@@ -1510,7 +1563,6 @@ body.contact-template .default-content-wrapper img {
   line-height: var(--type-heading-xxl-lh);
   font-weight: 900;
   text-align: left;
-  text-transform: capitalize;
   letter-spacing: -0.04em;
   width: 85%;
   max-width: 540px;
@@ -1713,6 +1765,7 @@ body.contact-template .default-content-wrapper img {
 
 /* NOTE: with .breadcrumb prefix would address line length for '/' in breadcrumb, use .link-underline-effect for normal case */
 .breadcrumb-link-underline-effect::before {
+  background: var(--color-light-grey-600);
   width: 0;
   right: 12px;
   left: auto;

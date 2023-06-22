@@ -194,6 +194,13 @@
     }
 }
 
+@media screen and (min-width: 900px) {
+    .hero.side-by-side .inner-content h1 {
+        font-size: var(--type-heading-xxl-size);
+        margin: var(--spacing-s) 0;
+    }
+}
+
 /* - hero.square-image - */
 .hero.square-image .image-wrapper img{
     width: 100%;

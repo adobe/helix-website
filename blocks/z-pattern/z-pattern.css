@@ -93,6 +93,10 @@
     flex-direction: row;
   }
 
+  .z-pattern.value-props > .z-pattern-heading {
+    padding-bottom: 100px;
+  }
+
   .z-pattern.value-props .z-pattern-heading > div {
     width: 100%;
   }
@@ -186,7 +190,7 @@
   }
 
   .z-pattern.value-props .z-pattern-heading {
-    padding: 60px 0 var(--desktop-section-spacing);
+    padding: 60px 0 90px;
   }
 }
 

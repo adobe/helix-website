@@ -2,6 +2,7 @@
   width: 100%;
   background: var(--color-white);
   box-shadow: 0 4px 6px rgba(0 0 0 / 15%);
+  z-index: 100;
 }
 
 .breadcrumb-wrapper:not(.no-shadow) {
@@ -38,7 +39,7 @@
 
 .breadcrumb ul li a {
   text-decoration: none;
-  color: var(--color-eyebrow-light-grey);
+  color: var(--color-light-grey-600);
   font-size: var(--type-body-xxs-size);
 }
 
@@ -47,12 +48,18 @@
 }
 
 @media screen and (min-width: 600px) {
+  .breadcrumb-wrapper {
+    position: sticky;
+    top: calc(var(--nav-height));
+    left: 0;
+  }
+
   .block.breadcrumb {
     max-width: none;
   }
 
   .breadcrumb ul {
-    padding: var(--spacing-xs) 0;
+    padding: 11px 0 12px;
   }
 
   .breadcrumb-wrapper:not(.no-shadow) {
