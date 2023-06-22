@@ -1386,7 +1386,8 @@
     let bulkSelection = [];
 
     const isSharePoint = (location) => /\w+\.sharepoint.com$/.test(location.host)
-      && location.pathname.endsWith('/Forms/AllItems.aspx');
+      && (location.pathname.endsWith('/Forms/AllItems.aspx')
+      || location.pathname.endsWith('/onedrive.aspx'));
 
     const toWebPath = (folder, item) => {
       const { path, type } = item;
@@ -1399,6 +1400,10 @@
       if (type === 'xlsx' || type.includes('vnd.google-apps.spreadsheet')) {
         // use json extension for spreadsheets
         ext = 'json';
+      }
+      if (file === 'index') {
+        // folder root
+        file = '';
       }
       file = file
         .toLowerCase()
@@ -1681,6 +1686,44 @@
   }
 
   /**
+   * Adds UI to encourage eusers to log in.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {boolean} show Whether to show the login encouragement or not
+   * @param {HTMLElement} toggle The user menu toggle
+   */
+  function encourageLogin(sk, show, toggle) {
+    const openUserMenu = () => {
+      if (toggle) {
+        toggle.click();
+      }
+    };
+    if (show) {
+      openUserMenu();
+      // add overlay
+      sk.pluginContainer.append(createTag({
+        tag: 'div',
+        attrs: {
+          class: 'plugin-container-overlay',
+        },
+        lstnrs: {
+          click: () => {
+            if (sk.status.status === 401) {
+              sk.showModal({
+                message: i18n(sk, 'user_login_hint'),
+                callback: () => openUserMenu(),
+              });
+            }
+          },
+        },
+      }));
+    } else {
+      // remove overlay
+      sk.pluginContainer.querySelector('.plugin-container-overlay')?.remove();
+    }
+  }
+
+  /**
    * Adds custom plugins to the sidekick.
    * @private
    * @param {Sidekick} sk The sidekick
@@ -1892,6 +1935,7 @@
           sk.config = await initConfig(config, location);
           sk.config.authToken = window.hlx.sidekickConfig.authToken;
           addCustomPlugins(sk);
+          encourageLogin(sk, false);
           sk.fetchStatus();
           fireEvent(sk, 'loggedin');
           return;
@@ -2084,9 +2128,8 @@
         sk.remove('user-login');
       });
       if (!sk.status.loggedOut && sk.status.status === 401 && !sk.isAuthenticated()) {
-        // // encourage login
-        toggle.click();
-        toggle.nextElementSibling.classList.add('highlight');
+        // encourage login
+        encourageLogin(sk, true, toggle);
       }
     }
   }
@@ -2993,7 +3036,8 @@
       const { location } = this;
       return (location.host === 'drive.google.com')
         || (/\w+\.sharepoint.com$/.test(location.host)
-        && location.pathname.endsWith('/Forms/AllItems.aspx'));
+        && (location.pathname.endsWith('/Forms/AllItems.aspx')
+        || location.pathname.endsWith('/onedrive.aspx')));
     }
 
     /**

@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URLs copied to clipboard."
   },
+  "copy": {
+    "message": "Copy"
+  },
   "copy_live_url": {
     "message": "Copy Live URL"
   },
@@ -504,6 +507,9 @@
   },
   "user_login": {
     "message": "Sign in"
+  },
+  "user_login_hint": {
+    "message": "You need to sign in before you can use Sidekick."
   },
   "user_logout": {
     "message": "Sign out"

@@ -289,7 +289,7 @@
     "message": "Échec de la suppression. Réessayez plus tard."
   },
   "description": {
-    "message": "AEM Sidekick permet aux créateurs et créatrices de sites d’AEM de prévisualiser et publier du contenu en toute facilité."
+    "message": "AEM Sidekick permet aux créateurs et créatrices de sites d’AEM de prévisualiser et publier du contenu."
   },
   "description_shortcut": {
     "message": "Activer/désactiver Sidekick"
