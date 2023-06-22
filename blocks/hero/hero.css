@@ -208,3 +208,28 @@
     aspect-ratio: 1 / 1;
     object-fit: cover;
 }
+
+/* - hero.multiple-cta - */
+.hero.multiple-cta ul.cta-button-list {
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 30px;
+}
+
+.hero.multiple-cta ul.cta-button-list .button{
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+@media screen and (min-width: 600px) {
+    .hero.multiple-cta ul.cta-button-list {
+        margin-top: 8px;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .hero.multiple-cta ul.cta-button-list {
+        margin-top: 16px;
+    }
+}

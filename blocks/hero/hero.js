@@ -15,7 +15,12 @@ export default function decorate(block) {
       ctaButton.closest('p').replaceWith(ctaButton);
     }
   } else {
-    // TODO: decorate multiple cta buttons here, like doc hero
+    const ctaButtonList = innerContent.querySelector('ul');
+    ctaButtonList.classList.add('cta-button-list');
+    const ctaButtons = ctaButtonList.querySelectorAll('ul a');
+    ctaButtons.forEach((btn) => {
+      btn.classList.add('button', 'large', 'black-border');
+    });
   }
 
   const imageWrapper = block.children[2].querySelector('div');
