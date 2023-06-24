@@ -744,6 +744,9 @@ main .form .button {
   transition: all 0.3s ease-in-out;
   overflow: hidden;
   transform: translateZ(0);
+
+  /* fix for ios overflow with border-radius not working */
+  isolation: isolate;
 }
 
 main .form .button {

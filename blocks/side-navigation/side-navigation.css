@@ -349,6 +349,9 @@
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: var(--image-border-radius-l);
+  
+  /* fix for ios overflow with border-radius not working */
+  isolation: isolate;
 }
 
 .results-wrapper .article-card-image img {
