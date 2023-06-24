@@ -1,4 +1,18 @@
 import createTag from '../../utils/tag.js';
+import { addInViewAnimationToMultipleElements } from '../../utils/helpers.js';
+
+const animationConfig = {
+  staggerTime: 0.4,
+  items: [
+    {
+      selector: '.logo-wall-title',
+      animatedClass: 'fade-in',
+    },
+    {
+      selector: '.logo-wall-list',
+      animatedClass: 'fade-up',
+    }],
+};
 
 export default function decorate(block) {
   block.classList.add('contained');
@@ -39,4 +53,8 @@ export default function decorate(block) {
     });
   });
   block.append(logoWallList);
+
+  if (block.classList.contains('inview-animation')) {
+    addInViewAnimationToMultipleElements(animationConfig.items, block, animationConfig.staggerTime);
+  }
 }

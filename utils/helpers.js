@@ -68,16 +68,22 @@ export function returnLinkTarget(url) {
   return urlHost === currentHost ? '_self' : '_blank';
 }
 
-/**
- * * @param {string} className the target animation class
- * * @param {string} targetElement
- * result: when the elements are inview observed by the intersection
- * observer, it adds `in-view` class which should restore its
- * original state and add in animation
- */
-// TODO: review if that's the best way for adding in-view animations
-export function addInViewAnimationToElement(className, targetElement) {
-  targetElement.classList.add(className);
+// as the blocks are loaded in aysnchronously, we don't have a specific timing
+// that the all blocks are loaded -> cannot use a single observer to
+// observe all blocks, so use functions here in blocks instead
+// eslint-disable-next-line max-len
+export function addAnimatedClassToElement(targetSelector, animatedClass, delayTime, targetSelectorWrapper) {
+  const target = targetSelectorWrapper.querySelector(targetSelector);
+  if (target) {
+    target.classList.add(animatedClass);
+    if (delayTime) target.style.transitionDelay = delayTime;
+  }
+}
+
+export function addInviewObserverToTriggerElement(triggerElement) {
+  const observerOptions = {
+    threshold: 0.45, // show when is 50% in view
+  };
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -85,11 +91,39 @@ export function addInViewAnimationToElement(className, targetElement) {
         observer.unobserve(entry.target);
       }
     });
+  }, observerOptions);
+  observer.observe(triggerElement);
+}
+
+export function addInViewAnimationToSingleElement(targetElement, animatedClass, triggerElement) {
+  // if it's HTML element
+  if (targetElement.nodeType === 1) {
+    targetElement.classList.add(animatedClass);
+  }
+  // if it's string only, which should be a selector
+  if (targetElement.nodeType === 3) {
+    addAnimatedClassToElement(targetElement, animatedClass, triggerElement);
+  }
+  const trigger = triggerElement || targetElement;
+  addInviewObserverToTriggerElement(trigger);
+}
+
+export function addInViewAnimationToMultipleElements(animatedItems, triggerElement, staggerTime) {
+  // set up animation class
+  animatedItems.forEach((el, i) => {
+    const delayTime = staggerTime ? `${i * staggerTime}s` : null;
+    addAnimatedClassToElement(el.selector, el.animatedClass, delayTime, triggerElement);
   });
 
-  observer.observe(targetElement);
+  // add `.in-view` to triggerElement, so the elements inside will start animating
+  addInviewObserverToTriggerElement(triggerElement);
 }
 
 export default {
-  removeOuterElementLayer, changeTag, returnLinkTarget, addInViewAnimationToElement,
+  removeOuterElementLayer,
+  changeTag,
+  returnLinkTarget,
+  addInViewAnimationToSingleElement,
+  addInViewAnimationToMultipleElements,
+  addInviewObserverToTriggerElement,
 };

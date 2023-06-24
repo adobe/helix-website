@@ -32,6 +32,7 @@ export default function decorate(block) {
     block.style.background = 'transparent';
     block.append(backgroundImageWrapper);
   } else {
+    block.classList.add('colorful-bg');
     const checkerBoardGuide = createTag('div', {
       class: 'checker-board-guide',
     });

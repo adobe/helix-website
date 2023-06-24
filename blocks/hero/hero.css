@@ -4,11 +4,7 @@
     overflow: hidden;
     padding: var(--spacing-xxl) 0;
     padding-bottom: 0;
-    
-    /* default colorful checker-board pattern */
-    background: url('../../img/colorful-bg.jpg'); 
-    background-size: cover;
-    background-position: center;
+    max-height: 800px;
 }
 
 .hero .checker-board-guide {
