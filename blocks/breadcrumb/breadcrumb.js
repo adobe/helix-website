@@ -9,7 +9,7 @@ export default async function decorate(block) {
     return;
   }
 
-  const isDocumentationLanding = window.location.pathname === 'docs/';
+  const isDocumentationLanding = window.location.pathname === '/docs/';
 
   const list = createTag('ul');
   const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
