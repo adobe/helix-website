@@ -500,7 +500,7 @@ async function fetchGnav(url) {
 
 export default async function init(blockEl) {
   // OLD CODE: const url = getMetadata('gnav') || '/gnav';
-  const url = '/drafts/redesign/new-nav';
+  const url = '/new-nav';
   const html = await fetchGnav(url);
 
   if (html) {

@@ -120,8 +120,7 @@ export default async function decorate(block) {
   block.textContent = '';
   block.classList.add('contained');
 
-  // TODO: need to update the path when migrate
-  const footerPath = cfg.footer || '/drafts/redesign/new-footer';
+  const footerPath = cfg.footer || '/new-footer';
   const resp = await fetch(`${footerPath}.plain.html`);
   const html = await resp.text();
 

@@ -818,7 +818,6 @@ async function loadEager(doc) {
   }
 }
 
-// TODO:
 function addBlockLevelInViewAnimation(main) {
   const observerOptions = {
     threshold: 0.2, // add `.in-view` class when is 20% in view
@@ -855,7 +854,6 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  // TODO: test in view animation
   loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 
