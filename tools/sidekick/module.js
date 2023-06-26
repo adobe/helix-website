@@ -2679,6 +2679,10 @@
         pushDownContent(this);
         // show special view
         showSpecialView(this);
+
+        // announce to the document that the sidekick is ready
+        document.dispatchEvent(new CustomEvent('sidekick-ready'));
+        document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
       }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
@@ -2768,17 +2772,13 @@
         })
         .then((json) => {
           this.status = json;
-          if (window.hlx.sidekick) {
-            window.hlx.sidekick.setAttribute('status', JSON.stringify(json));
-          }
+          this.setAttribute('status', JSON.stringify(json));
           return json;
         })
         .then((json) => fireEvent(this, 'statusfetched', json))
         .catch(({ message }) => {
           this.status.error = message;
-          if (window.hlx.sidekick) {
-            window.hlx.sidekick.setAttribute('status', JSON.stringify(this.status));
-          }
+          this.setAttribute('status', JSON.stringify(this.status));
           const modal = {
             message: message.startsWith('error_') ? i18n(this, message) : [
               i18n(this, 'error_status_fatal'),
@@ -3652,10 +3652,6 @@
       window.hlx.sidekick = document.createElement('helix-sidekick');
       document.body.prepend(window.hlx.sidekick);
       window.hlx.sidekick.show();
-
-      // announce to the document that the sidekick is ready
-      document.dispatchEvent(new CustomEvent('sidekick-ready'));
-      document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
     } else {
       // toggle sidekick
       window.hlx.sidekick.toggle();
