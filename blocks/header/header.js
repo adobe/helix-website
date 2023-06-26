@@ -278,9 +278,13 @@ class Gnav {
         this.closeMenu();
       });
 
+      const removeTrailingSlash = (url) => url.replace(/\/$/, '');
+
       // add active status to main link
       const navUrlObject = new URL(submenuLink.href);
-      if (window.location.pathname.includes(navUrlObject.pathname)) {
+      const currentPathWithoutTrailingSlash = removeTrailingSlash(window.location.pathname);
+      const linkPathWithoutTrailingSlash = removeTrailingSlash(navUrlObject.pathname);
+      if (currentPathWithoutTrailingSlash === linkPathWithoutTrailingSlash) {
         navMainLink.classList.add('active');
       }
 
