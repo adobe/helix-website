@@ -9,13 +9,11 @@ export default async function decorate(block) {
     return;
   }
 
-  // TODO: update for launch
-  const root = '/drafts/redesign/';
-  const isDocumentationLanding = window.location.pathname.includes(`${root}documentation`);
+  const isDocumentationLanding = window.location.pathname === '/docs/';
 
   const list = createTag('ul');
-  const home = createTag('li', {}, `<a href="${root}new-home" class="breadcrumb-link-underline-effect">Home</a>`);
-  const docs = createTag('li', {}, `<a href="${root}documentation" class="breadcrumb-link-underline-effect">Documentation</a>`);
+  const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
+  const docs = createTag('li', {}, '<a href="/docs/" class="breadcrumb-link-underline-effect">Documentation</a>');
 
   list.append(home);
   list.append(docs);
@@ -27,7 +25,7 @@ export default async function decorate(block) {
     const section = createTag(
       'li',
       {},
-      `<a href="${root}documentation#${category.toLowerCase()}" class="breadcrumb-link-underline-effect">${category}</a>`,
+      `<a href="/docs/#${category.toLowerCase()}" class="breadcrumb-link-underline-effect">${category}</a>`,
     );
     list.append(section);
   }
@@ -38,7 +36,7 @@ export default async function decorate(block) {
 
     const backBtn = createTag('div', { class: 'guides-back-btn' }, `
         <span class="icon icon-icon-arrow"></span>
-        <a href="${root}documentation" class="link-underline-effect">
+        <a href="/docs/" class="link-underline-effect">
             Back
         </a>
     `);
