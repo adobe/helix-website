@@ -15,6 +15,7 @@
  * @param {string} checkpoint identifies the checkpoint in funnel
  * @param {Object} data additional data for RUM sample
  */
+import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements } from '../utils/helpers.js';
 
 export function sampleRUM(checkpoint, data = {}) {
   try {
@@ -654,6 +655,28 @@ export function decorateGuideTemplateHeadings(main) {
   });
 }
 
+function animateTitleSection(section) {
+  const animationConfig = {
+    staggerTime: 0.3,
+    items: [
+      {
+        selector: '.icon-eyebrow',
+        animatedClass: 'clip-path-reveal-short',
+      },
+      {
+        selector: '.main-headline',
+        animatedClass: 'item-fade-in',
+      }],
+  };
+  const trigger = section.querySelector('.default-content-wrapper');
+
+  const image = trigger.querySelector('picture');
+  if (image) {
+    addInViewAnimationToSingleElement(image, 'item-fade-in');
+  }
+  addInViewAnimationToMultipleElements(animationConfig.items, trigger, animationConfig.staggerTime);
+}
+
 export function decorateTitleSection(main) {
   const titleSections = main.querySelectorAll('.title-section');
   if (!titleSections) return;
@@ -668,6 +691,7 @@ export function decorateTitleSection(main) {
     if (headline) {
       headline.classList.add('main-headline');
     }
+    animateTitleSection(section);
   });
 }
 
@@ -795,10 +819,10 @@ async function loadEager(doc) {
 }
 
 // TODO:
-function addInViewAnimation(main) {
+function addBlockLevelInViewAnimation(main) {
   const observerOptions = {
-    threshold: 0.10,
-    rootMargin: '-10px 0px -10px 0px',
+    threshold: 0.2, // add `.in-view` class when is 20% in view
+    // rootMargin: '-10px 0px -10px 0px',
   };
 
   const observer = new IntersectionObserver((entries) => {
@@ -810,10 +834,10 @@ function addInViewAnimation(main) {
     });
   }, observerOptions);
 
-  const sections = Array.from(main.querySelectorAll('.fadeup'));
-  sections.forEach((section, i) => {
-    // remove first section (block) from fadeup with a fadeup class
-    if (!i) section.classList.add('in-view');
+  // support block level animation as well
+  const inviewTriggerClassList = '.fade-up, .fade-in, .fade-left, .fade-right';
+  const sections = Array.from(main.querySelectorAll(inviewTriggerClassList));
+  sections.forEach((section) => {
     observer.observe(section);
   });
 }
@@ -833,7 +857,7 @@ async function loadLazy(doc) {
 
   // TODO: test in view animation
   loadBlocks(main);
-  addInViewAnimation(main);
+  addBlockLevelInViewAnimation(main);
 
   const { hash } = window.location;
 

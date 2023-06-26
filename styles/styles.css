@@ -174,6 +174,7 @@
     /* animation & transition */
     --transition-cubic-bezier-1: all .5s cubic-bezier(.23,1,.32,1);
     --transition-ease-in-out: all 0.4s ease-in-out;
+    --fade-transition: all 0.5s ease-in-out;
 
     /* clip-paths */
     --circular-1-clip-path-init: circle(50% at 0 50%);
@@ -744,6 +745,9 @@ main .form .button {
   transition: all 0.3s ease-in-out;
   overflow: hidden;
   transform: translateZ(0);
+
+  /* fix for ios overflow with border-radius not working */
+  isolation: isolate;
 }
 
 main .form .button {
@@ -841,6 +845,7 @@ main .form .button:hover::before {
 
 /* ---- button ends ---- */
 
+/* cannot use `overflow:hidden` here as position:sticky in breadcrumb */
 main {
   min-height: calc(100vh - 264px);
 }
@@ -1571,6 +1576,8 @@ body.contact-template .default-content-wrapper img {
 
 .title-section .icon-eyebrow {
   justify-content: center;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .main-headline {
@@ -1592,7 +1599,7 @@ body.contact-template .default-content-wrapper img {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 60%;
+  width: 100%;
   max-width: 800px;
 }
 
@@ -1615,6 +1622,10 @@ body.contact-template .default-content-wrapper img {
 
   .title-section .main-headline {
     padding-bottom: 0;
+  }
+
+  .title-section .default-content-wrapper img {
+    width: 70%;
   }
 }
 
@@ -1640,6 +1651,10 @@ body.contact-template .default-content-wrapper img {
   .full-width-title .main-headline {
     width: 100%;
     max-width: fit-content;
+  }
+
+  .title-section .default-content-wrapper img {
+    width: 60%;
   }
 }
 
@@ -1840,14 +1855,100 @@ body.contact-template .default-content-wrapper img {
   }
 }
 
-/* scroll in-view animation */
-.fadeup {
-  transition: all 1s ease;
+/* ---- scroll in-view animation ---- */
+.fade-in,
+.item-fade-in {
+  transition: var(--fade-transition);
+  opacity: 0;
+  will-change: opacity;
+}
+
+.fade-up,
+.item-fade-up {
+  transition: var(--fade-transition);
   transform: translateY(30px);
   opacity: 0;
 }
 
-.in-view {
+.fade-left,
+.item-fade-left {
+  transition: var(--fade-transition);
+  transform: translateX(30px);
+  opacity: 0;
+}
+
+.fade-right,
+.item-fade-left {
+  transition: var(--fade-transition);
+  transform: translateX(-30px);
+  opacity: 0;
+}
+
+.in-view,
+.in-view .fade-in,
+.in-view .fade-up,
+.in-view .fade-left, 
+.in-view .item-fade-in,
+.in-view .item-fade-up,
+.in-view .item-fade-left {
   transform: none;
   opacity: 1;
+}
+
+/* clip-path */
+.clip-path-reveal {
+  transition: var(--fade-transition);
+  clip-path: inset(0 100% 0 0);
+}
+
+.clip-path-reveal-short {
+  transition: clip-path 0.25s ease-in-out;
+  clip-path: inset(0 100% 0 0);
+}
+
+.in-view .clip-path-reveal, 
+.in-view .clip-path-reveal-short {
+  clip-path: inset(0 0 0 0);
+}
+
+/* animation: text scale down & fill up */
+.text-main-reveal {
+  background: linear-gradient(var(--color-black), var(--color-black)) left no-repeat, var(--bg-color-grey-2);
+  background-size: 0% 100%;
+  background-clip: text;
+  -webkit-background-clip: text; /* stylelint-disable-line property-no-vendor-prefix */
+  -webkit-text-fill-color: transparent; /* stylelint-disable-line property-no-vendor-prefix */
+  opacity: 0;
+}
+
+/* active */
+.in-view .text-main-reveal {
+  animation: main-reveal 1s forwards;
+}
+
+@media screen and (min-width: 768px) {
+  .in-view .text-main-reveal {
+    animation: main-reveal 2s forwards;
+  }
+}
+
+@keyframes main-reveal {
+  0%, 10% {
+    opacity: 0;
+    transform: scale(1.5) translateZ(0);
+    background-size: 0% 100%;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  40% {
+    transform: scale(1) translateZ(0);
+  }
+
+  100% {
+    background-size: 100% 100%; 
+    opacity: 1;
+  }
 }

@@ -625,6 +625,9 @@ button.gnav-toggle::after {
   border: 1px solid #E1E1E1;
   border-radius: 0 0 4px 4px;
   overflow: hidden;
+
+  /* fix for ios overflow with border-radius not working */
+  isolation: isolate;
 }
 
 .gnav-profile.is-open .gnav-profile-menu {

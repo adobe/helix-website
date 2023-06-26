@@ -27,6 +27,9 @@
     line-height: 0;
     border-radius: var(--image-border-radius-l);
     overflow: hidden;
+    
+    /* fix for safari overflow with border-radius not working */
+    isolation: isolate;
   }
   
   .card-list.cards-card-body > *:first-child {

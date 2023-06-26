@@ -1,6 +1,44 @@
-function isOdd(num) { return num % 2 ? 'z-row-odd' : 'z-row-even'; }
+import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements } from '../../utils/helpers.js';
 
 const ColorPattern = ['pink', 'purple', 'lightgreen', 'yellow'];
+const animationConfig = {
+  staggerTime: 0.4,
+  items: [
+    {
+      selector: '.icon-eyebrow',
+      animatedClass: 'clip-path-reveal',
+    },
+    {
+      selector: '.main-headline',
+      animatedClass: 'fade-in',
+    },
+    {
+      selector: '.content-side ul',
+      animatedClass: 'fade-left',
+    },
+  ],
+};
+
+function isOdd(num) { return num % 2 ? 'z-row-odd' : 'z-row-even'; }
+
+const animateValueProps = (el) => {
+  // heading animation
+  const heading = el.querySelector('.z-pattern-heading h2');
+  const headingAnimationTrigger = el.querySelector('.z-pattern-heading');
+  const headingAnimatedClass = 'text-main-reveal';
+  if (heading) {
+    addInViewAnimationToSingleElement(heading, headingAnimatedClass, headingAnimationTrigger);
+  }
+
+  // animation sections
+  const valuePropSections = el.querySelectorAll('.z-row-even, .z-row-odd');
+  valuePropSections.forEach((section) => {
+    const image = section.querySelector('.image-side img');
+    addInViewAnimationToSingleElement(image, 'fade-in');
+    // eslint-disable-next-line
+    addInViewAnimationToMultipleElements(animationConfig.items, section, animationConfig.staggerTime);
+  });
+};
 
 export default function init(el) {
   const h2 = el.querySelector('h2');
@@ -44,6 +82,10 @@ export default function init(el) {
           coloredTag.classList.add('colored-tag', ColorPattern[index]);
         }
       });
+
+      if (el.classList.contains('inview-animation')) {
+        animateValueProps(el);
+      }
     }
   });
 }
