@@ -55,9 +55,7 @@ export default async function decorate(block) {
     return;
   }
 
-  // TODO: update path during site migration
-  // fetch content from path
-  const sideNavPath = '/drafts/redesign/blocks/side-navigation';
+  const sideNavPath = '/side-navigation';
   const resp = await fetch(`${sideNavPath}.plain.html`);
   const html = await resp.text();
   const sideNavbarContent = document.createElement('div');
