@@ -15,7 +15,7 @@
  * @param {string} checkpoint identifies the checkpoint in funnel
  * @param {Object} data additional data for RUM sample
  */
-import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements } from '../utils/helpers.js';
+import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements, returnLinkTarget } from '../utils/helpers.js';
 
 export function sampleRUM(checkpoint, data = {}) {
   try {
@@ -655,6 +655,20 @@ export function decorateGuideTemplateHeadings(main) {
   });
 }
 
+export function decorateGuideTemplateHero(main) {
+  if (main.classList.contains('without-full-width-hero'));
+  const contentArea = main.querySelector('.section.content');
+  const firstImage = contentArea.querySelector('.default-content-wrapper img');
+  if (firstImage) firstImage.classList.add('doc-detail-hero-image');
+}
+
+export function decorateGuideTemplateLinks(main) {
+  const links = main.querySelectorAll('.content a');
+  links.forEach((link) => {
+    link.setAttribute('target', returnLinkTarget(link.href));
+  });
+}
+
 function animateTitleSection(section) {
   const animationConfig = {
     staggerTime: 0.3,
@@ -729,6 +743,8 @@ export function decorateGuideTemplate(main) {
   if (!document.body.classList.contains('guides-template')) return;
   addMessageBoxOnGuideTemplate(main);
   decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateHero(main);
+  decorateGuideTemplateLinks(main);
   decorateGuideTemplateCodeBlock();
 }
 
@@ -818,7 +834,6 @@ async function loadEager(doc) {
   }
 }
 
-// TODO:
 function addBlockLevelInViewAnimation(main) {
   const observerOptions = {
     threshold: 0.2, // add `.in-view` class when is 20% in view
@@ -855,7 +870,6 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  // TODO: test in view animation
   loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 

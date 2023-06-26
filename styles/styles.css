@@ -1196,12 +1196,18 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
   letter-spacing: 0;
 }
 
-body.guides-template main.without-full-width-hero .default-content-wrapper img:first-of-type {
+body.guides-template main.without-full-width-hero .doc-detail-hero-image {
   width: 100%;
   height: auto;
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
+}
+
+body.guides-template main.without-full-width-hero .default-content-wrapper img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* for guides-template with hero section (.heading), like documentation category page */
@@ -1298,7 +1304,7 @@ body.guides-template .guides-back-btn span {
     padding-bottom: var(--spacing-s);
   }
 
-  body.guides-template main.without-full-width-hero .default-content-wrapper img:first-of-type {
+  body.guides-template main.without-full-width-hero .doc-detail-hero-image {
     border-radius: var(--image-border-radius-xxl);
   }
 }
