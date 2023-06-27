@@ -1,9 +1,24 @@
 main .faq dt {
-    margin-top: 64px;
-    scroll-margin-top: 64px;
+    margin-top: var(--spacing-m);
+    scroll-margin-top: var(--spacing-m);
     font-weight: 700;
+    margin-bottom: var(--spacing-xxs);
 }
 
 main .faq a {
     scroll-margin: calc(var(--nav-height) + 1em);
+}
+
+main .faq dt > a {
+    font-size: var(--type-heading-s-size);
+    line-height: var(--type-heading-s-lh);
+}
+
+main .faq dd {
+    font-size: var(--type-body-s-size);
+    line-height: var(--type-body-s-lh);
+}
+
+body.guides-template main .faq dt a.anchor-link:any-link::before {
+    top: 0;
 }

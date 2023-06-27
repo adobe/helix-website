@@ -1098,6 +1098,10 @@ body.guides-template main a {
   line-height: var(--type-body-s-lh);
 }
 
+body.guides-template main .section.content a {
+  overflow-wrap: break-word;
+}
+
 body.guides-template main .default-content-wrapper a {
   transition: all 0.2s ease-in-out;
 }

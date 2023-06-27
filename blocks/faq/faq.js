@@ -13,12 +13,14 @@ export default async function decorateFaq($block) {
   const $dl = document.createElement('dl');
   json.data.forEach((row, i) => {
     const $dt = document.createElement('dt');
+    $dt.classList.add('link-highlight-colorful-effect-hover-wrapper');
     $dt.id = row.Id || `q${(i + 1)}`;
     $dt.innerText = row.Question;
     addAnchorLink($dt);
     const $dd = document.createElement('dd');
     const answer = autoLink(row.Answer);
-
+    const titleLink = $dt.querySelector('.anchor-link');
+    if (titleLink) titleLink.classList.add('link-highlight-colorful-effect-2');
     $dd.innerHTML = answer;
     $dl.append($dt, $dd);
   });
