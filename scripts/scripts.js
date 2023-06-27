@@ -787,6 +787,9 @@ function updateGuideTemplateStyleBasedOnHero() {
 
   if (isHeroContentExist) {
     document.querySelector('main').classList.add('has-full-width-hero');
+    const cardListBlocks = document.querySelectorAll('.block.card-list');
+    // make card list in main category page has '.image-card-listing' class
+    cardListBlocks.forEach((block) => block.classList.add('image-card-listing'));
   } else {
     document.querySelector('main').classList.add('without-full-width-hero');
   }
