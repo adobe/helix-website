@@ -469,6 +469,7 @@ code {
 
 code:not(pre > code) {
   font-size: 14px;
+  overflow-wrap: break-word;
   border: 1px solid #e5e5e5;
   background-color: var(--code-bg-color);
   color: var(--brand-color-dark-purple);

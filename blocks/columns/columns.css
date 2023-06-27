@@ -2,6 +2,10 @@
     text-align: left;
 }
 
+.columns .columns-image img {
+    max-width: 100%;
+}
+
 .columns.bleed > div {
     display: flex;
     flex-direction: column;
@@ -331,4 +335,32 @@
     .columns.tall > div > div {
         padding: var(--spacing-xxl) var(--spacing-xl);
     }
+}
+
+/* adjust image size on sidekick extension page */
+.columns.center-image-small > div {
+    padding: 0;
+}
+
+.columns.center-image-small > div > div:last-of-type {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+.columns.center-image-small  > div > div:last-of-type picture {
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.columns.center-image-small  > div > div:last-of-type img {
+    width: 70%;
+    max-width: 360px;
+    filter: none;
+}
+
+main.without-full-width-hero .section.content .columns-wrapper {
+    margin-top: var(--spacing-m);
 }
