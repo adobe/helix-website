@@ -8,7 +8,7 @@ export default async function decorate($block) {
     });
 
   // enumerate footnotes
-  document.querySelector('footer').append($block);
+  document.querySelector('.section.content').append($block);
   [...$block.children].forEach(($footnote, i) => {
     $footnote.firstElementChild.classList.add('footnote-text');
     const $num = document.createElement('div');
