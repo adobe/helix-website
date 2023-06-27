@@ -647,7 +647,9 @@ export function addHeadingAnchorLink(elem) {
 
 export function decorateGuideTemplateHeadings(main) {
   const contentArea = main.querySelector('.section.content');
+  if (!contentArea) return;
   const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
+  if (!contentSections) return;
   contentSections.forEach((section) => {
     section.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
       addHeadingAnchorLink(h);
@@ -657,9 +659,8 @@ export function decorateGuideTemplateHeadings(main) {
 
 export function decorateGuideTemplateHero(main) {
   if (main.classList.contains('without-full-width-hero'));
-  const contentArea = main.querySelector('.section.content');
-  const firstImage = contentArea.querySelector('.default-content-wrapper img');
-  if (firstImage) firstImage.classList.add('doc-detail-hero-image');
+  const firstImageInContentArea = main.querySelector('.section.content .default-content-wrapper img');
+  if (firstImageInContentArea) firstImageInContentArea.classList.add('doc-detail-hero-image');
 }
 
 export function decorateGuideTemplateLinks(main) {
@@ -740,7 +741,7 @@ export async function decorateGuideTemplateCodeBlock() {
 }
 
 export function decorateGuideTemplate(main) {
-  if (!document.body.classList.contains('guides-template')) return;
+  if (!document.body.classList.contains('guides-template') || !main) return;
   addMessageBoxOnGuideTemplate(main);
   decorateGuideTemplateHeadings(main);
   decorateGuideTemplateHero(main);
