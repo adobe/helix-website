@@ -4,13 +4,13 @@
   padding-top: 10px;
 }
 
-@media screen and (min-width: 900px) {
+/* @media screen and (min-width: 900px) {
   .videotext>div {
     display: grid;
     grid-template-columns: 70% 30%;
     padding-top: 10px;
   }
-}
+} */
 
 .videocontent video {
   width: 100%;
