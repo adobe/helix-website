@@ -1906,16 +1906,11 @@
   function login(sk, selectAccount) {
     sk.showWait();
     const loginUrl = getAdminUrl(sk.config, 'login');
-    const extensionId = window.chrome?.runtime?.id;
-    const authHeaderEnabled = extensionId && !window.navigator.vendor.includes('Apple');
-    if (authHeaderEnabled) {
-      loginUrl.searchParams.set('extensionId', extensionId);
-    } else {
-      loginUrl.searchParams.set(
-        'loginRedirect',
-        'https://www.hlx.live/tools/sidekick/login-success',
-      );
+    let extensionId = window.chrome?.runtime?.id;
+    if (!extensionId || window.navigator.vendor.includes('Apple')) { // exclude safari
+      extensionId = 'cookie';
     }
+    loginUrl.searchParams.set('extensionId', extensionId);
     if (selectAccount) {
       loginUrl.searchParams.set('selectAccount', true);
     }
@@ -1964,15 +1959,11 @@
   function logout(sk) {
     sk.showWait();
     const logoutUrl = getAdminUrl(sk.config, 'logout');
-    const extensionId = window.chrome?.runtime?.id;
-    if (extensionId && !window.navigator.vendor.includes('Apple')) { // exclude safari
-      logoutUrl.searchParams.set('extensionId', extensionId);
-    } else {
-      logoutUrl.searchParams.set(
-        'logoutRedirect',
-        'https://www.hlx.live/tools/sidekick/logout-success',
-      );
+    let extensionId = window.chrome?.runtime?.id;
+    if (!extensionId || window.navigator.vendor.includes('Apple')) { // exclude safari
+      extensionId = 'cookie';
     }
+    logoutUrl.searchParams.set('extensionId', extensionId);
     const logoutWindow = window.open(logoutUrl.toString());
 
     let attempts = 0;
@@ -2679,6 +2670,10 @@
         pushDownContent(this);
         // show special view
         showSpecialView(this);
+
+        // announce to the document that the sidekick is ready
+        document.dispatchEvent(new CustomEvent('sidekick-ready'));
+        document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
       }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
@@ -2768,17 +2763,13 @@
         })
         .then((json) => {
           this.status = json;
-          if (window.hlx.sidekick) {
-            window.hlx.sidekick.setAttribute('status', JSON.stringify(json));
-          }
+          this.setAttribute('status', JSON.stringify(json));
           return json;
         })
         .then((json) => fireEvent(this, 'statusfetched', json))
         .catch(({ message }) => {
           this.status.error = message;
-          if (window.hlx.sidekick) {
-            window.hlx.sidekick.setAttribute('status', JSON.stringify(this.status));
-          }
+          this.setAttribute('status', JSON.stringify(this.status));
           const modal = {
             message: message.startsWith('error_') ? i18n(this, message) : [
               i18n(this, 'error_status_fatal'),
@@ -3652,10 +3643,6 @@
       window.hlx.sidekick = document.createElement('helix-sidekick');
       document.body.prepend(window.hlx.sidekick);
       window.hlx.sidekick.show();
-
-      // announce to the document that the sidekick is ready
-      document.dispatchEvent(new CustomEvent('sidekick-ready'));
-      document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
     } else {
       // toggle sidekick
       window.hlx.sidekick.toggle();
