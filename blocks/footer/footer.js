@@ -35,6 +35,12 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
       navLinks.forEach((navLink) => {
         navLink.setAttribute('target', returnLinkTarget(navLink.href));
         navLink.classList.add('link-underline-effect');
+
+        // TODO: temp fix for status.live
+        if (navLink.textContent.toLowerCase() === 'status.live') {
+          navLink.setAttribute('href', 'https://status.hlx.live/');
+          navLink.setAttribute('target', '_blank');
+        }
       });
 
       // clone the node
@@ -120,8 +126,7 @@ export default async function decorate(block) {
   block.textContent = '';
   block.classList.add('contained');
 
-  // TODO: need to update the path when migrate
-  const footerPath = cfg.footer || '/drafts/redesign/new-footer';
+  const footerPath = cfg.footer || '/new-footer';
   const resp = await fetch(`${footerPath}.plain.html`);
   const html = await resp.text();
 

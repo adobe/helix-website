@@ -246,10 +246,15 @@ class Gnav {
       submenuLink.innerHTML = '';
       submenuLink.setAttribute('target', returnLinkTarget(submenuLink.href));
 
+      // TODO: temp fix for status.live, can be remove if subdomain is supported
+      if (submenuTitleText.toLowerCase() === 'status.live') {
+        submenuLink.setAttribute('href', 'https://status.hlx.live/');
+        submenuLink.setAttribute('target', '_blank');
+      }
+
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {
         this.decorateIcon(submenuIcon, submenuTitleText);
-
         const iconWrapper = createTag('div', {
           class: `icon-wrapper colored-tag circle ${currentColorPattern[idx]}`,
         }, '');
@@ -273,9 +278,13 @@ class Gnav {
         this.closeMenu();
       });
 
+      const removeTrailingSlash = (url) => url.replace(/\/$/, '');
+
       // add active status to main link
       const navUrlObject = new URL(submenuLink.href);
-      if (window.location.pathname.includes(navUrlObject.pathname)) {
+      const currentPathWithoutTrailingSlash = removeTrailingSlash(window.location.pathname);
+      const linkPathWithoutTrailingSlash = removeTrailingSlash(navUrlObject.pathname);
+      if (currentPathWithoutTrailingSlash === linkPathWithoutTrailingSlash) {
         navMainLink.classList.add('active');
       }
 
@@ -500,7 +509,7 @@ async function fetchGnav(url) {
 
 export default async function init(blockEl) {
   // OLD CODE: const url = getMetadata('gnav') || '/gnav';
-  const url = '/drafts/redesign/new-nav';
+  const url = '/new-nav';
   const html = await fetchGnav(url);
 
   if (html) {
