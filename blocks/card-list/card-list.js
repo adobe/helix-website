@@ -3,6 +3,7 @@
 import {
   createOptimizedPicture, createTag, buildBlock, decorateBlock, loadBlock,
 } from '../../scripts/scripts.js';
+import { returnLinkTarget } from '../../utils/helpers.js';
 
 // Redesign's version: render image card list
 const decorateCardListByListElement = (block) => {
@@ -19,7 +20,11 @@ const decorateCardListByListElement = (block) => {
 
     const link = li.querySelector('a');
     if (link) {
-      const tag = createTag('a', { href: link.getAttribute('href'), class: 'card-wrapper' });
+      const tag = createTag('a', {
+        href: link.getAttribute('href'),
+        class: 'card-wrapper',
+      });
+      tag.setAttribute('target', returnLinkTarget(tag.href));
       link.parentElement.innerHTML = link.innerHTML;
       [...li.childNodes].forEach((child) => {
         tag.append(child);
@@ -30,6 +35,12 @@ const decorateCardListByListElement = (block) => {
       const span = createTag('span', { class: 'link-highlight-colorful-effect-2' }, cardTitle.textContent);
       cardTitle.replaceChildren(span);
       tag.classList.add('link-highlight-colorful-effect-hover-wrapper');
+
+      // TODO: temp fix for status.live
+      if (cardTitle.textContent.toLowerCase() === 'status.live') {
+        tag.setAttribute('href', 'https://status.hlx.live/');
+        tag.setAttribute('target', '_blank');
+      }
 
       li.append(tag);
     }
