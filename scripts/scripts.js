@@ -740,6 +740,20 @@ export async function decorateGuideTemplateCodeBlock() {
   });
 }
 
+// patch fix for table not being rendered as block in fragment
+export function decorateFragmentTable(main) {
+  if (!main) return;
+  const tables = main.querySelectorAll('table');
+  if (tables) {
+    tables.forEach((table) => {
+      if (table.classList.contains('block')) return;
+      const tableWrapper = createTag('div', { class: 'table' });
+      table.parentNode.insertBefore(tableWrapper, table);
+      tableWrapper.appendChild(table);
+    });
+  }
+}
+
 export function decorateGuideTemplate(main) {
   if (!document.body.classList.contains('guides-template') || !main) return;
   addMessageBoxOnGuideTemplate(main);
@@ -747,6 +761,7 @@ export function decorateGuideTemplate(main) {
   decorateGuideTemplateHero(main);
   decorateGuideTemplateLinks(main);
   decorateGuideTemplateCodeBlock();
+  decorateFragmentTable(main); // ususally only use fragment in doc detail
 }
 
 /**
@@ -823,6 +838,7 @@ export function decorateMain(main) {
   decorateGuideTemplate(main);
   decorateBlocks(main);
   decorateTitleSection(main);
+  // decorateTableBlock(main);
 }
 
 /**

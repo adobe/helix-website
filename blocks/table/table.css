@@ -1,5 +1,37 @@
+.table {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--bg-color-grey);
+  padding: var(--spacing-xxs) var(--spacing-xxs) var(--spacing-xs);
+}
+
+.table tbody {
+  width: 100%;
+}
+
+.table td,
+body main .table td p {
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+  color: var(--color-light-grey-600);
+}
+
 .table td {
-  color: #768390;
+  padding: var(--spacing-xxs) var(--spacing-xxs) 0 var(--spacing-xxs);
+}
+
+body main .table td p {
+  padding-left: 0; 
+}
+
+.table tr:first-of-type {
+  border-bottom: 1px solid var(--bg-color-grey);
+}
+
+.table tr:first-of-type td {
+  text-transform: uppercase;
+  padding-top: var(--spacing-xxs);
+  padding-bottom: var(--spacing-xxs);
 }
 
 .table td:first-child {
