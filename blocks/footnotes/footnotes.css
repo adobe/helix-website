@@ -1,14 +1,15 @@
 .footnotes {
-  margin: 40px 0;
+  margin: var(--spacing-ml) 0;
 }
 
 .footnotes > div {
   display: flex;
+}
 
-  /* margin: 0 40px; */
-  font-size: 80%;
-  max-width: 600px;
-  margin: 10px auto;
+.footnotes > div,
+.footnotes .footnote-text > a {
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
 }
 
 .footnotes .footnote-num {
