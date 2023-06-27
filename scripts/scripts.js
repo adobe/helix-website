@@ -15,7 +15,7 @@
  * @param {string} checkpoint identifies the checkpoint in funnel
  * @param {Object} data additional data for RUM sample
  */
-import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements } from '../utils/helpers.js';
+import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements, returnLinkTarget } from '../utils/helpers.js';
 
 export function sampleRUM(checkpoint, data = {}) {
   try {
@@ -647,11 +647,26 @@ export function addHeadingAnchorLink(elem) {
 
 export function decorateGuideTemplateHeadings(main) {
   const contentArea = main.querySelector('.section.content');
+  if (!contentArea) return;
   const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
+  if (!contentSections) return;
   contentSections.forEach((section) => {
     section.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
       addHeadingAnchorLink(h);
     });
+  });
+}
+
+export function decorateGuideTemplateHero(main) {
+  if (main.classList.contains('without-full-width-hero'));
+  const firstImageInContentArea = main.querySelector('.section.content .default-content-wrapper img');
+  if (firstImageInContentArea) firstImageInContentArea.classList.add('doc-detail-hero-image');
+}
+
+export function decorateGuideTemplateLinks(main) {
+  const links = main.querySelectorAll('.content a');
+  links.forEach((link) => {
+    link.setAttribute('target', returnLinkTarget(link.href));
   });
 }
 
@@ -725,11 +740,28 @@ export async function decorateGuideTemplateCodeBlock() {
   });
 }
 
+// patch fix for table not being rendered as block in fragment
+export function decorateFragmentTable(main) {
+  if (!main) return;
+  const tables = main.querySelectorAll('table');
+  if (tables) {
+    tables.forEach((table) => {
+      if (table.classList.contains('block')) return;
+      const tableWrapper = createTag('div', { class: 'table' });
+      table.parentNode.insertBefore(tableWrapper, table);
+      tableWrapper.appendChild(table);
+    });
+  }
+}
+
 export function decorateGuideTemplate(main) {
-  if (!document.body.classList.contains('guides-template')) return;
+  if (!document.body.classList.contains('guides-template') || !main) return;
   addMessageBoxOnGuideTemplate(main);
   decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateHero(main);
+  decorateGuideTemplateLinks(main);
   decorateGuideTemplateCodeBlock();
+  decorateFragmentTable(main); // ususally only use fragment in doc detail
 }
 
 /**
@@ -771,6 +803,9 @@ function updateGuideTemplateStyleBasedOnHero() {
 
   if (isHeroContentExist) {
     document.querySelector('main').classList.add('has-full-width-hero');
+    const cardListBlocks = document.querySelectorAll('.block.card-list');
+    // make card list in main category page has '.image-card-listing' class
+    cardListBlocks.forEach((block) => block.classList.add('image-card-listing'));
   } else {
     document.querySelector('main').classList.add('without-full-width-hero');
   }
@@ -803,6 +838,7 @@ export function decorateMain(main) {
   decorateGuideTemplate(main);
   decorateBlocks(main);
   decorateTitleSection(main);
+  // decorateTableBlock(main);
 }
 
 /**
@@ -818,7 +854,6 @@ async function loadEager(doc) {
   }
 }
 
-// TODO:
 function addBlockLevelInViewAnimation(main) {
   const observerOptions = {
     threshold: 0.2, // add `.in-view` class when is 20% in view
@@ -855,7 +890,6 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  // TODO: test in view animation
   loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 

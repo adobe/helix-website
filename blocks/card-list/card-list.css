@@ -67,3 +67,25 @@
     grid-gap: var(--spacing-s);
   }
 }
+
+/* block party card list style */
+.card-list-wrapper .cards .cards-card-details p.description:not(.noextra){
+  cursor: pointer;
+}
+
+.card-list-wrapper .cards .cards-card-details p.description:not([aria-expanded="true"]):not(.noextra)::after {
+  content: '...';
+}
+
+.card-list-wrapper .cards .cards-card-details span.extra:not([aria-expanded="true"]) {
+  display: none;
+}
+
+.card-list-wrapper .cards .cards-card-details span.extra[aria-expanded="true"] {
+  display: contents;
+  color: inherit;
+}
+
+.card-list-wrapper .cards .cards-card-details {
+  overflow-x: hidden;
+}

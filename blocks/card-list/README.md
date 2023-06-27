@@ -5,7 +5,8 @@ Notes: This block closely resembles the layout of the cards block in the helix b
 ##### Custom Classes 
 |  Class | Function   |  
 |--------|------------|
-|   - |  -   |  
+|  N/A   | input link only in doc & render `cards` block based on content |  
+| .image-card-listing | decorate the card list using content including image & text |
 
 
 #### Example:

@@ -11,6 +11,12 @@
   }
 }
 
+/* fix for fragment rendering main twice causing extra div
+* can be removed if the fragement bug is fixed */
+.header-wrapper > .header:not(.block) {
+  display: none;
+}
+
 .gnav-wrapper {
   position: relative;
   background: #FFF;
