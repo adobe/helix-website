@@ -6,7 +6,7 @@ const animationConfig = {
   items: [
     {
       selector: '.logo-wall-title',
-      animatedClass: 'fade-in',
+      animatedClass: 'slide-reveal-up',
     },
     {
       selector: '.logo-wall-list',

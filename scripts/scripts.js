@@ -676,11 +676,11 @@ function animateTitleSection(section) {
     items: [
       {
         selector: '.icon-eyebrow',
-        animatedClass: 'clip-path-reveal-short',
+        animatedClass: 'slide-reveal-up',
       },
       {
         selector: '.main-headline',
-        animatedClass: 'item-fade-in',
+        animatedClass: 'slide-reveal-up',
       }],
   };
   const trigger = section.querySelector('.default-content-wrapper');

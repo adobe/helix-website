@@ -72,11 +72,39 @@ export function returnLinkTarget(url) {
 // that the all blocks are loaded -> cannot use a single observer to
 // observe all blocks, so use functions here in blocks instead
 // eslint-disable-next-line max-len
+const requireRevealWrapper = ['slide-reveal-up', 'slide-reveal-up-slow'];
+
+export function addRevealWrapperToAnimationTarget(element) {
+  const revealWrapper = createTag('div', { class: 'slide-reveal-wrapper' });
+  const parent = element.parentNode;
+  // Insert the wrapper before the element
+  parent.insertBefore(revealWrapper, element);
+  revealWrapper.appendChild(element);
+}
+
+// eslint-disable-next-line max-len
 export function addAnimatedClassToElement(targetSelector, animatedClass, delayTime, targetSelectorWrapper) {
   const target = targetSelectorWrapper.querySelector(targetSelector);
   if (target) {
     target.classList.add(animatedClass);
-    if (delayTime) target.style.transitionDelay = delayTime;
+    if (delayTime) target.style.transitionDelay = `${delayTime}s`;
+    if (requireRevealWrapper.indexOf(animatedClass) !== -1) {
+      addRevealWrapperToAnimationTarget(target);
+    }
+  }
+}
+
+// eslint-disable-next-line max-len
+export function addAnimatedClassToMultipleElements(targetSelector, animatedClass, delayTime, targetSelectorWrapper) {
+  const targets = targetSelectorWrapper.querySelectorAll(targetSelector);
+  if (targets) {
+    targets.forEach((target, i) => {
+      target.classList.add(animatedClass);
+      if (delayTime) target.style.transitionDelay = `${delayTime * (i + 1)}s`;
+      if (requireRevealWrapper.indexOf(animatedClass) !== -1) {
+        addRevealWrapperToAnimationTarget(target);
+      }
+    });
   }
 }
 
@@ -95,14 +123,18 @@ export function addInviewObserverToTriggerElement(triggerElement) {
   observer.observe(triggerElement);
 }
 
-export function addInViewAnimationToSingleElement(targetElement, animatedClass, triggerElement) {
+// eslint-disable-next-line max-len
+export function addInViewAnimationToSingleElement(targetElement, animatedClass, triggerElement, delayTime) {
   // if it's HTML element
   if (targetElement.nodeType === 1) {
     targetElement.classList.add(animatedClass);
+    if (requireRevealWrapper.indexOf(animatedClass) !== -1) {
+      addRevealWrapperToAnimationTarget(targetElement);
+    }
   }
   // if it's string only, which should be a selector
   if (targetElement.nodeType === 3) {
-    addAnimatedClassToElement(targetElement, animatedClass, triggerElement);
+    addAnimatedClassToElement(targetElement, animatedClass, triggerElement, delayTime);
   }
   const trigger = triggerElement || targetElement;
   addInviewObserverToTriggerElement(trigger);
@@ -111,8 +143,13 @@ export function addInViewAnimationToSingleElement(targetElement, animatedClass, 
 export function addInViewAnimationToMultipleElements(animatedItems, triggerElement, staggerTime) {
   // set up animation class
   animatedItems.forEach((el, i) => {
-    const delayTime = staggerTime ? `${i * staggerTime}s` : null;
-    addAnimatedClassToElement(el.selector, el.animatedClass, delayTime, triggerElement);
+    const delayTime = staggerTime ? i * staggerTime : null;
+    if (Object.prototype.hasOwnProperty.call(el, 'selector')) {
+      addAnimatedClassToElement(el.selector, el.animatedClass, delayTime, triggerElement);
+    }
+    if (Object.prototype.hasOwnProperty.call(el, 'selectors')) {
+      addAnimatedClassToMultipleElements(el.selectors, el.animatedClass, delayTime, triggerElement);
+    }
   });
 
   // add `.in-view` to triggerElement, so the elements inside will start animating
