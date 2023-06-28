@@ -39,9 +39,16 @@ export function getLibraryMetadata(block) {
  * @returns
  */
 export function getDefaultLibraryMetadata(document) {
+  // Check for a section that just contains library metadata and nothing else
   const defaultLibraryMetadataElement = document.querySelector(':scope > div > .library-metadata:only-child');
   if (defaultLibraryMetadataElement) {
-    return getLibraryMetadata(defaultLibraryMetadataElement.parentElement);
+    // We found some default library metadata, store the parent element
+    const parent = defaultLibraryMetadataElement.parentElement;
+    const defaultLibraryMetadata = getLibraryMetadata(defaultLibraryMetadataElement.parentElement);
+
+    // Remove the parent
+    parent.remove();
+    return defaultLibraryMetadata;
   }
 
   return {};
@@ -64,24 +71,8 @@ export function getBlockName(block, includeVariants = true) {
 export function getTable(block, name, path) {
   const url = new URL(path);
 
-  block.querySelectorAll('span.icon').forEach((icon) => {
-    const classNames = icon.className.split(' ');
+  prepareIconsForCopy(block);
 
-    // Loop through each class
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < classNames.length; i++) {
-      const className = classNames[i];
-
-      // Check if the class starts with "icon-"
-      if (className.startsWith('icon-')) {
-        // Remove the "icon-" prefix
-        const iconName = className.replace('icon-', '');
-        // eslint-disable-next-line no-param-reassign
-        icon.parentElement.textContent = `:${iconName}:`;
-        break;
-      }
-    }
-  });
   const rows = [...block.children];
   const maxCols = rows.reduce(
     (cols, row) => (row.children.length > cols ? row.children.length : cols),
@@ -113,33 +104,7 @@ export function getTable(block, name, path) {
         td.setAttribute('style', `width: ${columnWidthPercentage}%`);
       }
 
-      col.querySelectorAll('img').forEach((img) => {
-        if (!img.src.includes('data:')) {
-          const srcSplit = img.src.split('/');
-          const mediaPath = srcSplit.pop();
-          img.src = `${url.origin}/${mediaPath}`;
-        }
-
-        const maxWidth = Math.min(295, (columnWidthPercentage / 100) * 540);
-        const originalWidth = img.width;
-        const originalHeight = img.height;
-
-        // Calculate the aspect ratio
-        const aspectRatio = originalWidth / originalHeight;
-
-        // Calculate the new width and height based on the maximum width
-        let newWidth = maxWidth;
-        let newHeight = newWidth / aspectRatio;
-
-        // Check if the new height exceeds the maximum height
-        if (newHeight > maxWidth) {
-          newHeight = maxWidth;
-          newWidth = newHeight * aspectRatio;
-        }
-
-        img.width = newWidth;
-        img.height = newHeight;
-      });
+      prepareImagesForCopy(col, url, columnWidthPercentage);
 
       td.innerHTML = col.innerHTML;
 
@@ -148,6 +113,57 @@ export function getTable(block, name, path) {
     table.append(tr);
   });
   return `${table.outerHTML}<br/>`;
+}
+
+export function prepareImagesForCopy(element, url, columnWidthPercentage) {
+  element.querySelectorAll('img').forEach((img) => {
+    if (!img.src.includes('data:')) {
+      const srcSplit = img.src.split('/');
+      const mediaPath = srcSplit.pop();
+      img.src = `${url.origin}/${mediaPath}`;
+    }
+
+    const maxWidth = Math.min(295, (columnWidthPercentage / 100) * 540);
+    const originalWidth = img.width;
+    const originalHeight = img.height;
+
+    // Calculate the aspect ratio
+    const aspectRatio = originalWidth / originalHeight;
+
+    // Calculate the new width and height based on the maximum width
+    let newWidth = maxWidth;
+    let newHeight = newWidth / aspectRatio;
+
+    // Check if the new height exceeds the maximum height
+    if (newHeight > maxWidth) {
+      newHeight = maxWidth;
+      newWidth = newHeight * aspectRatio;
+    }
+
+    img.width = newWidth;
+    img.height = newHeight;
+  });
+}
+
+export function prepareIconsForCopy(element) {
+  element.querySelectorAll('span.icon').forEach((icon) => {
+    const classNames = icon.className.split(' ');
+
+    // Loop through each class
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < classNames.length; i++) {
+      const className = classNames[i];
+
+      // Check if the class starts with "icon-"
+      if (className.startsWith('icon-')) {
+        // Remove the "icon-" prefix
+        const iconName = className.replace('icon-', '');
+        // eslint-disable-next-line no-param-reassign
+        icon.parentElement.innerHTML = icon.parentElement.innerHTML.replace(/<span\b[^>]*>(.*?)<\/span>/, `:${iconName}:`);
+        break;
+      }
+    }
+  });
 }
 
 export async function fetchBlock(path) {
