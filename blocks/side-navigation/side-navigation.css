@@ -209,7 +209,7 @@
 }
 
 /* with arrow toggle list layer */
-.side-navigation .list-section:last-of-type .list-section-inner > li {
+.side-navigation .list-section:last-of-type .list-section-inner > li.side-navigation-nested-target {
   padding: 2px var(--nav-sidebar-indent-spacing);
   width: 100%;
   cursor: pointer;

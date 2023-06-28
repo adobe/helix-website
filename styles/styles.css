@@ -469,6 +469,7 @@ code {
 
 code:not(pre > code) {
   font-size: 14px;
+  overflow-wrap: break-word;
   border: 1px solid #e5e5e5;
   background-color: var(--code-bg-color);
   color: var(--brand-color-dark-purple);
@@ -1097,11 +1098,18 @@ body.guides-template main a {
   line-height: var(--type-body-s-lh);
 }
 
-body.guides-template main .default-content-wrapper a {
-  transition: all 0.2s ease-in-out;
+body.guides-template main .section.content a {
+  overflow-wrap: break-word;
 }
 
-body.guides-template main .default-content-wrapper a:hover {
+body.guides-template main .default-content-wrapper a,
+body main .faq dd a {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+body.guides-template main .default-content-wrapper a:hover,
+main .faq dd a:hover {
   color: var(--spectrum-blue);
 }
 

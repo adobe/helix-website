@@ -1,4 +1,5 @@
 import createTag from '../../utils/tag.js';
+import { returnLinkTarget } from '../../utils/helpers.js';
 
 let searchFunc;
 let searchTerm;
@@ -174,6 +175,13 @@ export default async function decorate(block) {
   // close overlay when clicked on link, ensure close overlay if link is on same page
   const allSideNavLinks = block.querySelectorAll('a');
   allSideNavLinks.forEach((link) => {
+    // open external link in new tab
+    link.setAttribute('target', returnLinkTarget(link.href));
+    // TODO: temp fix for status.live
+    if (link.textContent.toLowerCase() === 'status.live') {
+      link.setAttribute('href', 'https://status.hlx.live/');
+      link.setAttribute('target', '_blank');
+    }
     link.addEventListener('click', () => {
       backdropCurtain.classList.remove('is-open');
       block.classList.remove('overlay');
