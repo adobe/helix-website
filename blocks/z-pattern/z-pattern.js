@@ -15,6 +15,8 @@ const animationConfig = {
     {
       selectors: '.content-side ul li',
       animatedClass: 'slide-reveal-up',
+      staggerTime: 0.1,
+      // staggerTotalTime: 2,
     },
   ],
 };

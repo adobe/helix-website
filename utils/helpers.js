@@ -74,6 +74,20 @@ export function returnLinkTarget(url) {
 // eslint-disable-next-line max-len
 const requireRevealWrapper = ['slide-reveal-up', 'slide-reveal-up-slow'];
 
+// TODO: explore if this is possible
+// export function cubicBezierAnimationCurve(progress) {
+//   const p0 = 0;
+//   const p1 = 0.802;
+//   const p2 = 0.2;
+//   const p3 = 1;
+//   const t = 1 - progress;
+//   const tt = t * t;
+//   const ttt = tt * t;
+//   const curveX = (3 * t * tt * p1) + (3 * tt * t * p2) + (ttt * p3);
+//   const curveY = (3 * tt * t * p1) + (3 * t * t * p2) + (ttt * p3);
+//   return curveY / curveX;
+// }
+
 export function addRevealWrapperToAnimationTarget(element) {
   const revealWrapper = createTag('div', { class: 'slide-reveal-wrapper' });
   const parent = element.parentNode;
@@ -95,12 +109,13 @@ export function addAnimatedClassToElement(targetSelector, animatedClass, delayTi
 }
 
 // eslint-disable-next-line max-len
-export function addAnimatedClassToMultipleElements(targetSelector, animatedClass, delayTime, targetSelectorWrapper) {
+export function addAnimatedClassToMultipleElements(targetSelector, animatedClass, delayTime, targetSelectorWrapper, staggerTime) {
   const targets = targetSelectorWrapper.querySelectorAll(targetSelector);
   if (targets) {
     targets.forEach((target, i) => {
       target.classList.add(animatedClass);
       if (delayTime) target.style.transitionDelay = `${delayTime * (i + 1)}s`;
+      if (staggerTime) target.style.transitionDelay = `${delayTime + staggerTime * (i + 1)}s`;
       if (requireRevealWrapper.indexOf(animatedClass) !== -1) {
         addRevealWrapperToAnimationTarget(target);
       }
@@ -148,7 +163,8 @@ export function addInViewAnimationToMultipleElements(animatedItems, triggerEleme
       addAnimatedClassToElement(el.selector, el.animatedClass, delayTime, triggerElement);
     }
     if (Object.prototype.hasOwnProperty.call(el, 'selectors')) {
-      addAnimatedClassToMultipleElements(el.selectors, el.animatedClass, delayTime, triggerElement);
+      // eslint-disable-next-line max-len
+      addAnimatedClassToMultipleElements(el.selectors, el.animatedClass, el.staggerTime, triggerElement);
     }
   });
 

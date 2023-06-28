@@ -9,8 +9,9 @@ const animationConfig = {
       animatedClass: 'slide-reveal-up',
     },
     {
-      selector: '.logo-wall-list',
+      selectors: '.logo-wall-list-item',
       animatedClass: 'fade-up',
+      staggerTime: '0.15',
     }],
 };
 

@@ -1,7 +1,17 @@
-import { removeOuterElementLayer, combineChildrenToSingleDiv } from '../../utils/helpers.js';
+import { removeOuterElementLayer, combineChildrenToSingleDiv, addInViewAnimationToMultipleElements } from '../../utils/helpers.js';
 
 const ColorIconPattern = ['pink', 'lightgreen', 'purple', 'yellow', 'purple', 'yellow', 'lightgreen', 'pink'];
 const ColorNumberPattern = ['lightgreen', 'pink', 'purple'];
+const animationConfig = {
+  staggerTime: 0.04,
+  items: [
+    {
+      selectors: '.columns-content-wrapper',
+      animatedClass: 'fade-up',
+      staggerTime: 0.15,
+    },
+  ],
+};
 
 export default function decorate(block) {
   const classes = ['one', 'two', 'three', 'four', 'five'];
@@ -49,5 +59,9 @@ export default function decorate(block) {
 
   if (block.classList.contains('single-grid')) {
     combineChildrenToSingleDiv(block);
+  }
+
+  if (block.classList.contains('inview-animation')) {
+    addInViewAnimationToMultipleElements(animationConfig.items, block, animationConfig.staggerTime);
   }
 }

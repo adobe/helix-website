@@ -687,7 +687,16 @@ function animateTitleSection(section) {
 
   const image = trigger.querySelector('picture');
   if (image) {
-    addInViewAnimationToSingleElement(image, 'item-fade-in');
+    // addInViewAnimationToSingleElement(image, 'item-fade-in');
+
+    // udpated logic
+    const imageParent = image.parentElement;
+    imageParent.classList.add('default-content-image-wrapper');
+    addInViewAnimationToSingleElement(imageParent, 'slide-reveal-up');
+    animationConfig.items.unshift({
+      selector: '.default-content-image-wrapper',
+      animatedClass: 'slide-reveal-up',
+    });
   }
   addInViewAnimationToMultipleElements(animationConfig.items, trigger, animationConfig.staggerTime);
 }
