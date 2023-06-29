@@ -50,6 +50,7 @@ export function createCopy(blob) {
   try {
     const data = [new ClipboardItem({ [blob.type]: blob })];
     navigator.clipboard.write(data);
+    /* c8 ignore next 4 */
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Unable to write to clipboard', error);
@@ -82,6 +83,7 @@ export function loadCSS(href, callback) {
     link.setAttribute('href', href);
     if (typeof callback === 'function') {
       link.onload = e => callback(e.type);
+      /* c8 ignore next */
       link.onerror = e => callback(e.type);
     }
     document.head.appendChild(link);
@@ -201,11 +203,6 @@ export function createSideNavItem(
     blockVariant.setAttribute('disclosureArrow', true);
   }
   return blockVariant;
-}
-
-export function nextTick(ms = 1) {
-  // eslint-disable-next-line no-promise-executor-return
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
