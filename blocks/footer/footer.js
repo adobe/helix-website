@@ -41,6 +41,12 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
           navLink.setAttribute('href', 'https://status.hlx.live/');
           navLink.setAttribute('target', '_blank');
         }
+
+        // TODO: temp fix for chat.hlx.live
+        if (navLink.textContent.toLowerCase() === 'support') {
+          navLink.setAttribute('href', 'https://chat.hlx.live/');
+          navLink.setAttribute('target', '_blank');
+        }
       });
 
       // clone the node
