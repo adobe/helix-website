@@ -36,8 +36,8 @@ const animateValueProps = (el) => {
   const valuePropSections = el.querySelectorAll('.z-row-even, .z-row-odd');
   valuePropSections.forEach((section) => {
     const image = section.querySelector('.image-side img');
-    // addInViewAnimationToSingleElement(image, 'fade-up', null, 0.08);
-    addInViewAnimationToSingleElement(image, 'slide-reveal-up-slow', null, 0.08);
+    const imageWrapper = section.querySelector('.image-side');
+    addInViewAnimationToSingleElement(image, 'slide-reveal-up-slow', imageWrapper, null);
     // eslint-disable-next-line
     addInViewAnimationToMultipleElements(animationConfig.items, section, animationConfig.staggerTime);
   });
