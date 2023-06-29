@@ -34,14 +34,20 @@ export default function decorate(block) {
         div.classList.add('info-side');
         // restyle for marquee.testimonial
         if (block.classList.contains('testimonial')) {
-          const description = div.querySelector('h4');
+          const description = div.querySelectorAll('h4');
+          const intro = description[0];
+          const quote = description[1];
+
           const customerInfo = extractCustomerInfo(div);
           const statistics = div.querySelector('ul');
 
           const testimonial = createTag('div', {
             class: 'testimonial-info',
           }, '');
-          testimonial.append(description, customerInfo, statistics);
+          if (intro) { testimonial.append(intro); }
+          if (quote) { testimonial.append(quote); }
+          if (customerInfo) { testimonial.append(customerInfo); }
+          if (statistics) { testimonial.append(statistics); }
           div.replaceWith(testimonial);
         }
       } else if (picture) {

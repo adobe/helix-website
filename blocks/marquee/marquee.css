@@ -121,7 +121,7 @@
 
 .marquee.testimonial .testimonial-info h4 {
     font-weight: 700;
-    font-size: var(--type-body-m-size);
+    font-size: var(--type-body-s-size);
     line-height: 1.25;
     text-align: center;
     padding-bottom: var(--spacing-s);
@@ -243,6 +243,13 @@
         padding-bottom: var(--spacing-s);
     }
 
+    .marquee.testimonial .testimonial-info h4 em {
+        font-size: var(--type-body-xs-size);
+        padding-left: var(--spacing-s);
+        display: block;
+        border-left: solid 1px;
+    }
+
     .marquee.testimonial .customer-info {
         width: 100%;
         grid-template-columns: 50px 1fr auto;
@@ -278,9 +285,13 @@
     }
 
     .marquee.testimonial .testimonial-info h4 {
-        font-size: var(--type-heading-s-size);
+        font-size: var(--type-heading-xs-size);
         line-height: var(--type-heading-s-lh);
         padding: var(--spacing-s) 0 var(--spacing-xl);
+    }
+
+    .marquee.testimonial .testimonial-info h4:nth-of-type(1) {
+        padding-bottom: 0;
     }
 
     .marquee.testimonial .customer-info {

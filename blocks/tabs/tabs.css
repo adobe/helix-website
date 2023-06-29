@@ -98,6 +98,7 @@
   
   .tabs div[role="tablist"] .tablist-container {
     display: flex;
+    justify-content: center;
     width: var(--grid-container-width);
     box-sizing: content-box;
   }
