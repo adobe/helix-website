@@ -1,156 +1,49 @@
 {
-  "title": {
-    "message": "AEM Sidekick"
+  "add": {
+    "message": "Add"
   },
-  "description": {
-    "message": "AEM Sidekick allows authors of AEM sites to easily preview and publish content."
+  "admin_version": {
+    "message": "Use a specific Admin API version"
   },
-  "description_shortcut": {
-    "message": "Toggle Sidekick"
+  "admin_version_placeholder": {
+    "message": "Admin Version: x.y.z"
   },
-  "homepage": {
-    "message": "https://www.hlx.live/tools/sidekick/"
-  },
-  "docs": {
-    "message": "https://www.hlx.live/docs/sidekick"
-  },
-  "plugins_loading": {
-    "message": "Loading actions..."
-  },
-  "plugins_empty": {
-    "message": "No actions found for this page"
+  "advanced": {
+    "message": "Advanced",
+    "description": "Advanced config mode"
   },
   "anonymous": {
     "message": "Anonymous"
   },
-  "user_login": {
-    "message": "Sign in"
-  },
-  "user_switch": {
-    "message": "Switch user"
-  },
-  "user_logout": {
-    "message": "Sign out"
-  },
-  "share_description": {
-    "message": "Share your Sidekick"
-  },
-  "close": {
-    "message": "Close"
-  },
-  "info": {
-    "message": "Information"
-  },
-  "edit_date": {
-    "message": "Edited: "
-  },
-  "preview_date": {
-    "message": "Previewed: "
-  },
-  "publish_date": {
-    "message": "Published: "
-  },
-  "now": {
-    "message": "Now"
-  },
-  "seconds_ago": {
-    "message": "$1 seconds ago"
-  },
-  "minutes_ago": {
-    "message": "$1 minutes ago"
-  },
-  "today_at": {
-    "message": "Today at $1"
-  },
-  "yesterday_at": {
-    "message": "Yesterday at $1"
-  },
-  "never": {
-    "message": "Never"
-  },
-  "switch_view": {
-    "message": "View"
-  },
-  "development": {
-    "message": "Development"
-  },
-  "preview": {
-    "message": "Preview"
-  },
-  "preview_config_success": {
-    "message": "Configuration successfully activated."
-  },
-  "preview_onedrive": {
-    "message": "Pro tip: Press Ctrl + S before previewing to see the latest changes immediately..."
-  },
-  "preview_onedrive_mac": {
-    "message": "Pro tip: Press ⌘ + S before previewing to see the latest changes immediately..."
-  },
-  "live": {
-    "message": "Live"
-  },
-  "production": {
-    "message": "Production"
-  },
-  "edit": {
-    "message": "Edit"
-  },
-  "reload": {
-    "message": "Reload"
-  },
-  "reload_failure": {
-    "message": "Reloading failed. Please try again later."
-  },
-  "delete": {
-    "message": "Delete"
-  },
-  "delete_failure": {
-    "message": "Deletion failed. Please try again later."
-  },
-  "publish": {
-    "message": "Publish"
-  },
-  "publish_failure": {
-    "message": "Publication failed. Please try again later."
-  },
-  "unpublish": {
-    "message": "Unpublish"
-  },
-  "unpublish_failure": {
-    "message": "Unpublication failed. Please try again later."
-  },
-  "bulk_selection_empty": {
-    "message": "Select files below"
-  },
-  "bulk_selection_single": {
-    "message": "1 file selected"
-  },
-  "bulk_selection_multiple": {
-    "message": "$1 files selected"
-  },
   "bulk_confirm_empty": {
     "message": "No file selected"
   },
-  "bulk_confirm_preview_single": {
-    "message": "Are you sure you want to preview 1 file?"
-  },
   "bulk_confirm_preview_multiple": {
-    "message": "Are you sure you want to preview $1 files?"
+    "message": "Are you sure you want to generate the preview of $1 files?"
+  },
+  "bulk_confirm_preview_single": {
+    "message": "Are you sure you want to generate the preview of this file?"
+  },
+  "bulk_confirm_publish_multiple": {
+    "message": "Are you sure you want to publish $1 files?"
+  },
+  "bulk_confirm_publish_single": {
+    "message": "Are you sure you want to publish this file?"
   },
   "bulk_progress_preview_multiple": {
-    "message": "$1 of $2 files previewed..."
+    "message": "Preview for $1 of $2 files generated..."
   },
-  "bulk_result_preview_single_success": {
-    "message": "1 file successfully previewed."
-  },
-  "bulk_result_preview_multiple_success": {
-    "message": "$1 files successfully previewed."
-  },
-  "bulk_result_preview_single_failure": {
-    "message": "Failed to preview 1 file:"
+  "bulk_progress_publish_multiple": {
+    "message": "$1 of $2 files published..."
   },
   "bulk_result_preview_multiple_failure": {
-    "message": "Failed to preview $1 files:"
+    "message": "Failed to generate preview of $1 files:"
+  },
+  "bulk_result_preview_multiple_success": {
+    "message": "Preview of $1 files successfully generated."
+  },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "Only normalized, small latin letters, digits and hyphens are allowed in folder names"
   },
   "bulk_result_preview_single_error_no_docx": {
     "message": "Microsoft Word document, convert to Google Docs first"
@@ -158,149 +51,151 @@
   "bulk_result_preview_single_error_no_xlsx": {
     "message": "Microsoft Excel document, convert to Google Sheets first"
   },
-  "bulk_result_preview_single_error_invalid_folder_name": {
-    "message": "Only normalized, small latin letters, digits and hyphens are allowed in folder names"
+  "bulk_result_preview_single_failure": {
+    "message": "Failed to generate preview of this file:"
   },
-  "bulk_confirm_publish_single": {
-    "message": "Are you sure you want to publish 1 file?"
-  },
-  "bulk_confirm_publish_multiple": {
-    "message": "Are you sure you want to publish $1 files?"
-  },
-  "bulk_progress_publish_multiple": {
-    "message": "$1 of $2 files published..."
-  },
-  "bulk_result_publish_single_success": {
-    "message": "1 file successfully published."
-  },
-  "bulk_result_publish_multiple_success": {
-    "message": "$1 files successfully published."
-  },
-  "bulk_result_publish_single_failure": {
-    "message": "Failed to publish 1 file:"
+  "bulk_result_preview_single_success": {
+    "message": "Preview of this file successfully generated."
   },
   "bulk_result_publish_multiple_failure": {
     "message": "Failed to publish $1 files:"
   },
+  "bulk_result_publish_multiple_success": {
+    "message": "$1 files successfully published."
+  },
   "bulk_result_publish_single_error_no_source": {
     "message": "File must be previewed first"
   },
-  "copy_url": {
-    "message": "Copy URL"
+  "bulk_result_publish_single_failure": {
+    "message": "Failed to publish 1 file:"
   },
-  "copy_urls": {
-    "message": "Copy URLs"
+  "bulk_result_publish_single_success": {
+    "message": "1 file successfully published."
   },
-  "copy_preview_url": {
-    "message": "Copy Preview URL"
+  "bulk_selection_empty": {
+    "message": "Select files below"
   },
-  "copy_preview_urls": {
-    "message": "Copy Preview URLs"
+  "bulk_selection_multiple": {
+    "message": "$1 files selected"
   },
-  "copy_live_url": {
-    "message": "Copy Live URL"
-  },
-  "copy_live_urls": {
-    "message": "Copy Live URLs"
-  },
-  "copy_prod_url": {
-    "message": "Copy Production URL"
-  },
-  "copy_prod_urls": {
-    "message": "Copy Production URLs"
-  },
-  "copied_url": {
-    "message": "URL copied to clipboard."
-  },
-  "copied_urls": {
-    "message": "URLs copied to clipboard."
-  },
-  "error_status_404_document": {
-    "message": "404 Not found: Check your Sidekick configuration and make sure access to this document is granted."
-  },
-  "error_status_404_content": {
-    "message": "404 Not found: Check your Sidekick configuration or URL."
-  },
-  "error_status_500": {
-    "message": "500 Internal server error: Failed to fetch the page status. Please try again later."
-  },
-  "error_status_502": {
-    "message": "502 Bad gateway: Failed to fetch the page status. Please try again later."
-  },
-  "error_status_504": {
-    "message": "504 Gateway timeout: Failed to fetch the page status. Please try again later."
-  },
-  "error_status_invalid": {
-    "message": "Invalid server response. Check your Sidekick configuration or URL."
-  },
-  "error_login_timeout": {
-    "message": "Sign in timed out. Please try again later."
-  },
-  "error_login_aborted": {
-    "message": "Sign in aborted."
-  },
-  "error_logout_error": {
-    "message": "Sign out failed. Please try again later."
-  },
-  "error_config_failure": {
-    "message": "Failed to activate configuration: "
-  },
-  "error_preview_failure": {
-    "message": "Previewing failed. Please try again later."
-  },
-  "error_preview_not_gdoc_generic": {
-    "message": "Previewing failed. Must be Google document or spreadsheet."
-  },
-  "error_preview_not_gdoc_ms_word": {
-    "message": "This is a Microsoft Word document. Please convert it to Google Docs: File > Save as Google Docs"
-  },
-  "error_preview_not_gsheet_ms_excel": {
-    "message": "This is a Microsoft Excel document. Please convert it to Google Sheets: File > Save as Google Sheets'"
-  },
-  "please_wait": {
-    "message": "Please wait..."
-  },
-  "json_view_description": {
-    "message": "User-friendly data rendition."
-  },
-  "help_acknowledge": {
-    "message": "Got it!"
-  },
-  "help_close_dismiss": {
-    "message": "Show help topic again later"
-  },
-  "help_close_acknowledge": {
-    "message": "Don't show help topic again"
-  },
-  "help_close_opt_out": {
-    "message": "Never show any help topics"
-  },
-  "help_previous": {
-    "message": "Previous tip"
-  },
-  "help_current": {
-    "message": "This tip"
-  },
-  "help_next": {
-    "message": "Next tip"
-  },
-  "save": {
-    "message": "Save"
+  "bulk_selection_single": {
+    "message": "1 file selected"
   },
   "cancel": {
     "message": "Cancel"
   },
-  "add": {
-    "message": "Add"
+  "caution_side_effects": {
+    "message": "Caution: unexpected side effects!"
   },
-  "config_toggle_menu": {
-    "message": "Show/hide menu"
+  "close": {
+    "message": "Close"
   },
-  "config_projects": {
-    "message": "Projects"
+  "config_add_no_mountpoint": {
+    "message": "Project added to Sidekick, but ...\n\nRetrieving the content URL has failed, so you won't be able to use Sidekick in edit mode yet. To add it manually, click the Edit button next to the project's configuration."
+  },
+  "config_add_success": {
+    "message": "Project added to Sidekick"
+  },
+  "config_backup": {
+    "message": "Backup"
+  },
+  "config_delete": {
+    "message": "Delete"
+  },
+  "config_delete_all": {
+    "message": "Delete all settings"
+  },
+  "config_delete_all_confirm": {
+    "message": "Do you really want to delete all settings?"
+  },
+  "config_delete_all_description": {
+    "message": "Caution: This action cannot be undone!"
+  },
+  "config_delete_confirm": {
+    "message": "Do you really want to delete this project?"
+  },
+  "config_development": {
+    "message": "Development"
+  },
+  "config_edit": {
+    "message": "Edit"
+  },
+  "config_export": {
+    "message": "Export configuration"
+  },
+  "config_export_description": {
+    "message": "Back up your configuration to your computer."
+  },
+  "config_filter": {
+    "message": "Search ...",
+    "description": "Filter projects"
+  },
+  "config_filter_clear": {
+    "message": "Reset",
+    "description": "Reset project filter"
+  },
+  "config_import": {
+    "message": "Import configuration"
+  },
+  "config_import_confirm": {
+    "message": "Do you really want to import this configuration and overwrite the current one?"
+  },
+  "config_import_description": {
+    "message": "Import a configuration from your computer. Make sure you have a backup of your current configuration!"
+  },
+  "config_import_failure": {
+    "message": "Failed to import configuration"
+  },
+  "config_import_success": {
+    "message": "Configuration successfully imported"
+  },
+  "config_invalid_export": {
+    "message": "You don't have any configuration to export yet"
+  },
+  "config_invalid_giturl": {
+    "message": "Invalid repository URL"
+  },
+  "config_invalid_import": {
+    "message": "Choose a valid file to import"
+  },
+  "config_invalid_shareurl": {
+    "message": "Invalid sharing URL"
+  },
+  "config_manual_devMode": {
+    "message": "Test project configuration locally"
+  },
+  "config_manual_devOrigin_placeholder": {
+    "message": "Local Development URL: http://localhost:3000"
+  },
+  "config_manual_giturl_placeholder": {
+    "message": "Repository URL: https://github.com/..."
+  },
+  "config_manual_host_placeholder": {
+    "message": "Production Hostname (optional)"
+  },
+  "config_manual_mountpoints_placeholder": {
+    "message": "Content URL: https://..."
+  },
+  "config_manual_project_placeholder": {
+    "message": "Project Name (optional)"
+  },
+  "config_manual_title": {
+    "message": "Add manually"
+  },
+  "config_picker_button_title": {
+    "message": "Press $1 to pick $2"
+  },
+  "config_project_add": {
+    "message": "Add this project"
+  },
+  "config_project_disable": {
+    "message": "Disable this project"
   },
   "config_project_empty": {
     "message": "You haven't added any projects yet."
+  },
+  "config_project_enable": {
+    "message": "Enable this project"
   },
   "config_project_exists": {
     "message": "A configuration for this project already exists."
@@ -321,20 +216,20 @@
     "message": "More...",
     "description": "More configurations"
   },
-  "config_project_add": {
-    "message": "Add this project"
-  },
   "config_project_remove": {
     "message": "Remove this project"
   },
-  "config_project_enable": {
-    "message": "Enable this project"
+  "config_projects": {
+    "message": "Projects"
   },
-  "config_project_disable": {
-    "message": "Disable this project"
+  "config_reset": {
+    "message": "Reset"
   },
-  "config_shareurl_title": {
-    "message": "Add via sharing URL"
+  "config_share": {
+    "message": "Share"
+  },
+  "config_shareurl_copied": {
+    "message": "Sharing URL for $1 copied to clipboard"
   },
   "config_shareurl_description": {
     "message": "Ask someone with a Sidekick to share its URL with you by clicking the sharing icon on the right hand side."
@@ -345,98 +240,119 @@
   "config_shareurl_share_title": {
     "message": "Sidekick configuration for $1"
   },
-  "config_shareurl_copied": {
-    "message": "Sharing URL for $1 copied to clipboard"
+  "config_shareurl_title": {
+    "message": "Add via sharing URL"
   },
-  "config_manual_title": {
-    "message": "Add manually"
-  },
-  "config_manual_giturl_placeholder": {
-    "message": "Repository URL: https://github.com/..."
-  },
-  "config_manual_host_placeholder": {
-    "message": "Production Hostname (optional)"
-  },
-  "config_manual_mountpoints_placeholder": {
-    "message": "Content URL: https://..."
-  },
-  "config_manual_project_placeholder": {
-    "message": "Project Name (optional)"
-  },
-  "config_manual_devMode": {
-    "message": "Test project configuration locally"
-  },
-  "config_add_success": {
-    "message": "Project added to Sidekick"
-  },
-  "config_add_no_mountpoint": {
-    "message": "Project added to Sidekick, but ...\n\nRetrieving the content URL has failed, so you won't be able to use Sidekick in edit mode yet. To add it manually, click the Edit button next to the project's configuration."
-  },
-  "config_share": {
-    "message": "Share"
-  },
-  "config_edit": {
-    "message": "Edit"
-  },
-  "config_delete": {
-    "message": "Delete"
-  },
-  "config_delete_confirm": {
-    "message": "Do you really want to delete this project?"
-  },
-  "config_invalid_shareurl": {
-    "message": "Invalid sharing URL"
-  },
-  "config_invalid_giturl": {
-    "message": "Invalid repository URL"
-  },
-  "config_invalid_import": {
-    "message": "Choose a valid file to import"
-  },
-  "config_invalid_export": {
-    "message": "You don't have any configuration to export yet"
-  },
-  "config_backup": {
-    "message": "Backup"
-  },
-  "config_import": {
-    "message": "Import configuration"
-  },
-  "config_import_description": {
-    "message": "Import a configuration from your computer. Make sure you have a backup of your current configuration!"
-  },
-  "config_import_confirm": {
-    "message": "Do you really want to import this configuration and overwrite the current one?"
-  },
-  "config_import_success": {
-    "message": "Configuration successfully imported"
-  },
-  "config_import_failure": {
-    "message": "Failed to import configuration"
-  },
-  "config_export": {
-    "message": "Export configuration"
-  },
-  "config_export_description": {
-    "message": "Back up your configuration to your computer."
-  },
-  "config_reset": {
-    "message": "Reset"
-  },
-  "config_delete_all": {
-    "message": "Delete all settings"
-  },
-  "config_delete_all_description": {
-    "message": "Caution: This action cannot be undone!"
-  },
-  "config_delete_all_confirm": {
-    "message": "Do you really want to delete all settings?"
+  "config_toggle_menu": {
+    "message": "Show/hide menu"
   },
   "config_unsupported_legacy": {
     "message": "This site is no longer supported"
   },
-  "config_picker_button_title": {
-    "message": "Press $1 to pick $2"
+  "config_ux": {
+    "message": "User experience"
+  },
+  "copied_url": {
+    "message": "URL copied to clipboard."
+  },
+  "copied_urls": {
+    "message": "URLs copied to clipboard."
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "copy_live_url": {
+    "message": "Copy Live URL"
+  },
+  "copy_live_urls": {
+    "message": "Copy Live URLs"
+  },
+  "copy_preview_url": {
+    "message": "Copy Preview URL"
+  },
+  "copy_preview_urls": {
+    "message": "Copy Preview URLs"
+  },
+  "copy_prod_url": {
+    "message": "Copy Production URL"
+  },
+  "copy_prod_urls": {
+    "message": "Copy Production URLs"
+  },
+  "copy_url": {
+    "message": "Copy URL"
+  },
+  "copy_urls": {
+    "message": "Copy URLs"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "delete_failure": {
+    "message": "Deletion failed. Please try again later."
+  },
+  "description": {
+    "message": "AEM Sidekick allows authors of AEM sites to easily preview and publish content."
+  },
+  "description_shortcut": {
+    "message": "Toggle Sidekick"
+  },
+  "development": {
+    "message": "Development"
+  },
+  "docs": {
+    "message": "https://www.hlx.live/docs/sidekick"
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "edit_date": {
+    "message": "Edited: "
+  },
+  "error_config_failure": {
+    "message": "Failed to activate configuration: "
+  },
+  "error_login_aborted": {
+    "message": "Sign in aborted."
+  },
+  "error_login_timeout": {
+    "message": "Sign in timed out. Please try again later."
+  },
+  "error_logout_error": {
+    "message": "Sign out failed. Please try again later."
+  },
+  "error_preview_failure": {
+    "message": "Preview generation failed. Please try again later."
+  },
+  "error_preview_not_gdoc_generic": {
+    "message": "Preview generation failed. Must be Google document or spreadsheet."
+  },
+  "error_preview_not_gdoc_ms_word": {
+    "message": "This is a Microsoft Word document. Please convert it to Google Docs: File > Save as Google Docs"
+  },
+  "error_preview_not_gsheet_ms_excel": {
+    "message": "This is a Microsoft Excel document. Please convert it to Google Sheets: File > Save as Google Sheets'"
+  },
+  "error_status_404_content": {
+    "message": "404 Not found: Check your Sidekick configuration or URL."
+  },
+  "error_status_404_document": {
+    "message": "404 Not found: Check your Sidekick configuration and make sure access to this document is granted."
+  },
+  "error_status_500": {
+    "message": "500 Internal server error: Failed to fetch the page status. Please try again later."
+  },
+  "error_status_502": {
+    "message": "502 Bad gateway: Failed to fetch the page status. Please try again later."
+  },
+  "error_status_504": {
+    "message": "504 Gateway timeout: Failed to fetch the page status. Please try again later."
+  },
+  "error_status_fatal": {
+    "message": "Apologies, we seem to be having problems at the moment. Please check here for more information:"
+  },
+  "error_status_invalid": {
+    "message": "Invalid server response. Check your Sidekick configuration or URL."
   },
   "extensions": {
     "message": "Extensions"
@@ -444,40 +360,32 @@
   "help": {
     "message": "Help"
   },
-  "advanced": {
-    "message": "Advanced",
-    "description": "Advanced config mode"
+  "help_acknowledge": {
+    "message": "Got it!"
   },
-  "standard": {
-    "message": "Standard",
-    "description": "Standard config mode"
+  "help_close_acknowledge": {
+    "message": "Don't show help topic again"
   },
-  "config_development": {
-    "message": "Development"
+  "help_close_dismiss": {
+    "message": "Show help topic again later"
   },
-  "caution_side_effects": {
-    "message": "Caution: unexpected side effects!"
+  "help_close_opt_out": {
+    "message": "Never show any help topics"
   },
-  "admin_version": {
-    "message": "Use a specific Admin API version"
+  "help_current": {
+    "message": "This tip"
   },
-  "admin_version_placeholder": {
-    "message": "Admin Version: x.y.z"
-  },
-  "config_ux": {
-    "message": "User experience"
-  },
-  "push_down_content": {
-    "message": "Push down content instead of overlaying"
-  },
-  "push_down_content_description": {
-    "message": "Note: Depending on the site's structure, this may require custom project configuration to work as expected."
+  "help_next": {
+    "message": "Next tip"
   },
   "help_opt_out": {
     "message": "Don't show any help"
   },
   "help_opt_out_alert": {
     "message": "Help turned off. You can turn it back on on under Options > User experience."
+  },
+  "help_previous": {
+    "message": "Previous tip"
   },
   "help_user_status": {
     "message": "Available help topics"
@@ -486,18 +394,130 @@
     "message": "Check all",
     "description": "Check all help topics"
   },
+  "help_user_status_description": {
+    "message": "Checked topics will not be shown anymore. Remove the checkmark next to a topic you wish to see again."
+  },
   "help_user_status_uncheck_all": {
     "message": "Uncheck all",
     "description": "Uncheck all help topics"
   },
-  "help_user_status_description": {
-    "message": "Checked topics will not be shown anymore. Remove the checkmark next to a topic you wish to see again."
+  "homepage": {
+    "message": "https://www.hlx.live/tools/sidekick/"
   },
-  "open_view_doc_source": {
-    "message": "View document source"
+  "info": {
+    "message": "Information"
+  },
+  "json_view_description": {
+    "message": "User-friendly data rendition."
+  },
+  "live": {
+    "message": "Live"
+  },
+  "minutes_ago": {
+    "message": "$1 minutes ago"
+  },
+  "never": {
+    "message": "Never"
+  },
+  "now": {
+    "message": "Now"
   },
   "open_preview": {
     "message": "Open preview URL",
     "description": "Opens the preview URL for a given GitHub branch"
+  },
+  "open_view_doc_source": {
+    "message": "View document source"
+  },
+  "please_wait": {
+    "message": "Please wait..."
+  },
+  "plugins_empty": {
+    "message": "No actions found for this page"
+  },
+  "plugins_loading": {
+    "message": "Loading actions..."
+  },
+  "preview": {
+    "message": "Preview"
+  },
+  "preview_config_success": {
+    "message": "Configuration successfully activated."
+  },
+  "preview_date": {
+    "message": "Previewed: "
+  },
+  "preview_onedrive": {
+    "message": "Pro tip: Press Ctrl + S before generating previewing to see the latest changes immediately..."
+  },
+  "preview_onedrive_mac": {
+    "message": "Pro tip: Press ⌘ + S before generating previewing to see the latest changes immediately..."
+  },
+  "production": {
+    "message": "Production"
+  },
+  "publish": {
+    "message": "Publish"
+  },
+  "publish_date": {
+    "message": "Published: "
+  },
+  "publish_failure": {
+    "message": "Publication failed. Please try again later."
+  },
+  "push_down_content": {
+    "message": "Push down content instead of overlaying"
+  },
+  "push_down_content_description": {
+    "message": "Note: Depending on the site's structure, this may require custom project configuration to work as expected."
+  },
+  "reload": {
+    "message": "Reload"
+  },
+  "reload_failure": {
+    "message": "Reloading failed. Please try again later."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "seconds_ago": {
+    "message": "$1 seconds ago"
+  },
+  "share_description": {
+    "message": "Share your Sidekick"
+  },
+  "standard": {
+    "message": "Standard",
+    "description": "Standard config mode"
+  },
+  "switch_view": {
+    "message": "View"
+  },
+  "title": {
+    "message": "AEM Sidekick"
+  },
+  "today_at": {
+    "message": "Today at $1"
+  },
+  "unpublish": {
+    "message": "Unpublish"
+  },
+  "unpublish_failure": {
+    "message": "Unpublication failed. Please try again later."
+  },
+  "user_login": {
+    "message": "Sign in"
+  },
+  "user_login_hint": {
+    "message": "You need to sign in before you can use Sidekick."
+  },
+  "user_logout": {
+    "message": "Sign out"
+  },
+  "user_switch": {
+    "message": "Switch user"
+  },
+  "yesterday_at": {
+    "message": "Yesterday at $1"
   }
 }

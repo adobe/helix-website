@@ -41,6 +41,6 @@
   "lint-staged": {
     "*.js": "eslint",
     "*.cjs": "eslint",
-    "*.css": "stylelint"
+    "*.css": "stylelint --allow-empty-input"
   }
 }

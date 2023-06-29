@@ -104,10 +104,12 @@
    * @prop {string} mountpoint The content source URL (optional)
    * @prop {string} project The name of the project used in the sharing link (optional)
    * @prop {Plugin[]} plugins An array of {@link Plugin|plugin configurations} (optional)
-   * @prop {string} outerHost The outer CDN's host name (optional)
+   * @prop {string} previewHost The host name of a custom preview CDN (optional)
+   * @prop {string} liveHost The host name of a custom live CDN (optional)
    * @prop {string} host The production host name to publish content to (optional)
    * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
-   * @prop {boolean} devMode=false Loads configuration and plugins from the developmemt environment
+   * @prop {boolean} devMode=false Loads configuration and plugins from the development environment
+   * @prop {boolean} devOrigin=http://localhost:3000 URL of the local development environment
    * @prop {boolean} pushDown=false <pre>true</pre> to have the sidekick push down page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
    * @prop {ViewConfig[]} specialViews An array of custom {@link ViewConfig|view configurations}
@@ -238,6 +240,24 @@
    */
 
   /**
+   * Supported sidekick languages.
+   * @private
+   * @type {string[]}
+   */
+  const LANGS = [
+    'en', // default language, do not reorder
+    'de',
+    'es',
+    'fr',
+    'it',
+    'ja',
+    'ko-kr',
+    'pt-br',
+    'zh-cn',
+    'zh-tw',
+  ];
+
+  /**
    * Mapping between the plugin IDs that will be treated as environments
    * and their corresponding host properties in the config.
    * @private
@@ -258,14 +278,6 @@
   const RESTRICTED_PATHS = [
     '/helix-env.json',
   ];
-
-  /**
-   * The URL of the development environment.
-   * @see {@link https://github.com/adobe/helix-cli|AEM CLI}).
-   * @private
-   * @type {URL}
-   */
-  const DEV_URL = new URL('http://localhost:3000');
 
   /**
    * Log RUM for sidekick telemetry.
@@ -307,14 +319,12 @@
       }
       const { weight, id } = window.hlx.rum;
       if (window.hlx && window.hlx.rum && window.hlx.rum.isSelected) {
-        const sendPing = (pdata = data) => {
+        const sendPing = () => {
           // eslint-disable-next-line object-curly-newline, max-len, no-use-before-define
           const body = JSON.stringify({ weight, id, referer: sk.location.href, generation: window.hlx.RUM_GENERATION, checkpoint, ...data });
           const url = `https://rum.hlx.page/.rum/${weight}`;
           // eslint-disable-next-line no-unused-expressions
           navigator.sendBeacon(url, body);
-          // eslint-disable-next-line no-console
-          console.debug(`ping:${checkpoint}`, pdata);
         };
         sampleRUM.cases = sampleRUM.cases || {
           cwv: () => sampleRUM.cwv(data) || true,
@@ -405,6 +415,18 @@
   }
 
   /**
+   * Retrieves the sidekick language preferred by the user.
+   * The default language is <code>en</code>.
+   * @private
+   * @return {string} The language
+   */
+  function getLanguage() {
+    return navigator.languages
+      .map((prefLang) => LANGS.find((lang) => prefLang.toLowerCase().startsWith(lang)))
+      .filter((lang) => !!lang)[0] || LANGS[0];
+  }
+
+  /**
    * Creates an Admin URL for an API and path.
    * @private
    * @param {Object} config The sidekick configuration
@@ -460,10 +482,14 @@
       adminVersion,
       _extended,
     } = config;
+    let { devOrigin } = config;
+    if (!devOrigin) {
+      devOrigin = 'http://localhost:3000';
+    }
     if (owner && repo && !_extended) {
       // look for custom config in project
       const configUrl = devMode
-        ? `${DEV_URL.origin}/tools/sidekick/config.json`
+        ? `${devOrigin}/tools/sidekick/config.json`
         : getAdminUrl(config, 'sidekick', '/config.json');
       try {
         const res = await fetch(configUrl, getAdminFetchOptions(true));
@@ -486,36 +512,23 @@
     }
 
     const {
-      outerHost,
+      lang,
+      previewHost,
+      liveHost,
+      outerHost: legacyLiveHost,
       host,
-      project,
+      project = '',
       pushDown,
       pushDownSelector,
       specialViews,
       scriptUrl = 'https://www.hlx.live/tools/sidekick/module.js',
       scriptRoot = scriptUrl.split('/').filter((_, i, arr) => i < arr.length - 1).join('/'),
     } = config;
-    const innerPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
     const publicHost = host && host.startsWith('http') ? new URL(host).host : host;
-    let innerHost = 'hlx.page';
-    if (!innerHost && scriptUrl) {
-      // get hlx domain from script src (used for branch deployment testing)
-      const scriptHost = new URL(scriptUrl).host;
-      if (scriptHost && scriptHost !== 'www.hlx.live' && !scriptHost.startsWith(DEV_URL.host)) {
-        // keep only 1st and 2nd level domain
-        innerHost = scriptHost.split('.')
-          .reverse()
-          .splice(0, 2)
-          .reverse()
-          .join('.');
-      }
-    }
-    innerHost = innerPrefix ? `${innerPrefix}.${innerHost}` : null;
-    let liveHost = outerHost;
-    if (!liveHost && owner && repo) {
-      // use default hlx3 outer CDN including the ref
-      liveHost = `${ref}--${repo}--${owner}.hlx.live`;
-    }
+    const hostPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
+    const stdInnerHost = hostPrefix ? `${hostPrefix}.hlx.page` : null;
+    const stdOuterHost = hostPrefix ? `${hostPrefix}.hlx.live` : null;
+    const devUrl = new URL(devOrigin);
     // define elements to push down
     const pushDownElements = [];
     if (pushDown) {
@@ -543,13 +556,17 @@
     return {
       ...config,
       ref,
-      innerHost,
-      outerHost: liveHost,
+      innerHost: previewHost || stdInnerHost,
+      outerHost: liveHost || legacyLiveHost || stdOuterHost,
+      stdInnerHost,
+      stdOuterHost,
       scriptRoot,
       host: publicHost,
-      project: project || '',
+      project,
       pushDownElements,
       specialView,
+      devUrl,
+      lang: lang || getLanguage(),
     };
   }
 
@@ -1366,308 +1383,343 @@
    * @param {Sidekick} sk The sidekick
    */
   function addBulkPlugins(sk) {
-    if (sk.isAdmin()) {
-      let bulkSelection = [];
+    let bulkSelection = [];
 
-      const isSharePoint = (location) => /\w+\.sharepoint.com$/.test(location.host)
-        && location.pathname.endsWith('/Forms/AllItems.aspx');
+    const isSharePoint = (location) => /\w+\.sharepoint.com$/.test(location.host)
+      && (location.pathname.endsWith('/Forms/AllItems.aspx')
+      || location.pathname.endsWith('/onedrive.aspx'));
 
-      const toWebPath = (folder, item) => {
-        const { path, type } = item;
-        const nameParts = path.split('.');
-        let [file, ext] = nameParts;
-        if (isSharePoint(sk.location) && ext === 'docx') {
-          // omit docx extension on sharepoint
-          ext = '';
-        }
-        if (type === 'xlsx' || type.includes('vnd.google-apps.spreadsheet')) {
-          // use json extension for spreadsheets
-          ext = 'json';
-        }
-        file = file
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-|-$/g, '');
-        return `${folder}${folder.endsWith('/') ? '' : '/'}${file}${ext ? `.${ext}` : ''}`;
-      };
+    const toWebPath = (folder, item) => {
+      const { path, type } = item;
+      const nameParts = path.split('.');
+      let [file, ext] = nameParts;
+      if (isSharePoint(sk.location) && ext === 'docx') {
+        // omit docx extension on sharepoint
+        ext = '';
+      }
+      if (type === 'xlsx' || type.includes('vnd.google-apps.spreadsheet')) {
+        // use json extension for spreadsheets
+        ext = 'json';
+      }
+      if (file === 'index') {
+        // folder root
+        file = '';
+      }
+      file = file
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      return `${folder}${folder.endsWith('/') ? '' : '/'}${file}${ext ? `.${ext}` : ''}`;
+    };
 
-      const getBulkSelection = () => {
-        const { location } = sk;
-        if (isSharePoint(location)) {
-          const isGrid = document.querySelector('div[class~="ms-TilesList"]');
-          return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
-            .filter((row) => !row.querySelector('img').getAttribute('src').includes('/foldericons/')
-              && !row.querySelector('img').getAttribute('src').endsWith('folder.svg'))
-            .map((row) => ({
-              type: isGrid
-                ? row.querySelector(':scope i[aria-label]')?.getAttribute('aria-label').trim()
-                : new URL(row.querySelector('img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
-              path: isGrid
-                ? row.querySelector('div[data-automationid="name"]').textContent.trim()
-                : row.querySelector('button')?.textContent.trim(),
-            }));
-        } else {
-          // gdrive
-          return [...document.querySelectorAll('#drive_main_page [role="row"][aria-selected="true"]')]
-            .filter((row) => row.querySelector(':scope img'))
-            .map((row) => ({
-              type: new URL(row.querySelector('div > img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-2).join('/'),
-              path: row.querySelector(':scope > div > div:nth-of-type(2)').textContent.trim() // list layout
-                || row.querySelector(':scope > div > div > div:nth-of-type(4)').textContent.trim(), // grid layout
-            }));
-        }
-      };
-
-      const updateBulkInfo = () => {
-        const sel = getBulkSelection(sk);
-        bulkSelection = sel;
-        // update info
-        const label = sk.root.querySelector('#hlx-sk-bulk-info');
-        if (sel.length === 0) {
-          label.textContent = i18n(sk, 'bulk_selection_empty');
-        } else if (sel.length === 1) {
-          label.textContent = i18n(sk, 'bulk_selection_single');
-        } else {
-          label.textContent = i18n(sk, 'bulk_selection_multiple').replace('$1', sel.length);
-        }
-        // show/hide bulk buttons
-        ['preview', 'publish', 'copy-urls'].forEach((action) => {
-          sk.get(`bulk-${action}`).classList[sel.length === 0 ? 'add' : 'remove']('hlx-sk-hidden');
-        });
-        // update copy url button texts based on selection size
-        ['', 'preview', 'live', 'prod'].forEach((env) => {
-          const text = i18n(sk, `copy_${env}${env ? '_' : ''}url${sel.length === 1 ? '' : 's'}`);
-          const button = sk.get(`bulk-copy-${env}${env ? '-' : ''}urls`)?.querySelector('button');
-          if (button) {
-            button.textContent = text;
-            button.title = text;
-          }
-        });
-      };
-
-      const getBulkText = ([num, total], type, action, mod) => {
-        let i18nKey = `bulk_${type}`;
-        if (num === 0) {
-          i18nKey = `${i18nKey}_empty`;
-        } else {
-          i18nKey = `${i18nKey}_${action}_${(total || num) === 1 ? 'single' : 'multiple'}${mod ? `_${mod}` : ''}`;
-        }
-        return i18n(sk, i18nKey)
-          .replace('$1', num)
-          .replace('$2', total);
-      };
-
-      const isChangedUrl = () => {
-        const $test = document.getElementById('sidekick_test_location');
-        if ($test) {
-          return $test.value !== sk.location.href;
-        }
-        return window.location.href !== sk.location.href;
-      };
-
-      const doBulkOperation = async (operation, method, concurrency, host) => {
-        const { config, status } = sk;
-        const sel = bulkSelection.map((item) => toWebPath(status.webPath, item));
-        const results = [];
-        const total = sel.length;
-        const { processQueue } = await import(`${config.scriptRoot}/lib/process-queue.js`);
-        await processQueue(sel, async (file) => {
-          results.push(await sk[method](file));
-          if (total > 1) {
-            sk.showModal(getBulkText([results.length, total], 'progress', operation), true);
-          }
-        }, concurrency);
-        const lines = [];
-        const ok = results.filter((res) => res.ok);
-        if (ok.length > 0) {
-          lines.push(getBulkText([ok.length], 'result', operation, 'success'));
-          lines.push(createTag({
-            tag: 'button',
-            text: i18n(sk, ok.length === 1 ? 'copy_url' : 'copy_urls'),
-            lstnrs: {
-              click: (evt) => {
-                evt.stopPropagation();
-                navigator.clipboard.writeText(ok.map((item) => `https://${host}${item.path}`)
-                  .join('\n'));
-                sk.hideModal();
-              },
-            },
+    const getBulkSelection = () => {
+      const { location } = sk;
+      if (isSharePoint(location)) {
+        const isGrid = document.querySelector('div[class~="ms-TilesList"]');
+        return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
+          .filter((row) => !row.querySelector('img').getAttribute('src').includes('/foldericons/')
+            && !row.querySelector('img').getAttribute('src').endsWith('folder.svg'))
+          .map((row) => ({
+            type: isGrid
+              ? row.querySelector(':scope i[aria-label]')?.getAttribute('aria-label').trim()
+              : new URL(row.querySelector('img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
+            path: isGrid
+              ? row.querySelector('div[data-automationid="name"]').textContent.trim()
+              : row.querySelector('button')?.textContent.trim(),
           }));
-        }
-        const failed = results.filter((res) => !res.ok);
-        if (failed.length > 0) {
-          const failureText = getBulkText([failed.length], 'result', operation, 'failure');
-          lines.push(failureText);
-          lines.push(...failed.map((item) => {
-            if (item.error.endsWith('docx with google not supported.')) {
-              item.error = getBulkText([1], 'result', operation, 'error_no_docx');
-            }
-            if (item.error.endsWith('xlsx with google not supported.')) {
-              item.error = getBulkText([1], 'result', operation, 'error_no_xlsx');
-            }
-            if (item.error.includes('source does not exist')) {
-              item.error = getBulkText([1], 'result', operation, 'error_no_source');
-            }
-            return `${item.path.split('/').pop()}: ${item.error}`;
+      } else {
+        // gdrive
+        return [...document.querySelectorAll('#drive_main_page [role="row"][aria-selected="true"]')]
+          .filter((row) => row.querySelector(':scope img'))
+          .map((row) => ({
+            type: new URL(row.querySelector('div > img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-2).join('/'),
+            path: row.querySelector(':scope > div > div:nth-of-type(2)').textContent.trim() // list layout
+              || row.querySelector(':scope > div > div > div:nth-of-type(4)').textContent.trim(), // grid layout
           }));
+      }
+    };
+
+    const isChangedUrl = () => {
+      const $test = document.getElementById('sidekick_test_location');
+      if ($test) {
+        return $test.value !== sk.location.href;
+      }
+      return window.location.href !== sk.location.href;
+    };
+
+    const updateBulkInfo = () => {
+      if (!sk.isAdmin()) {
+        return;
+      }
+      const sel = getBulkSelection(sk);
+      bulkSelection = sel;
+      // update info
+      const label = sk.root.querySelector('#hlx-sk-bulk-info');
+      if (sel.length === 0) {
+        label.textContent = i18n(sk, 'bulk_selection_empty');
+      } else if (sel.length === 1) {
+        label.textContent = i18n(sk, 'bulk_selection_single');
+      } else {
+        label.textContent = i18n(sk, 'bulk_selection_multiple').replace('$1', sel.length);
+      }
+      // show/hide bulk buttons
+      const filesSelected = sel.length > 0;
+      if (isChangedUrl()) {
+        // refresh location
+        sk.location = getLocation();
+      }
+      ['preview', 'publish', 'copy-urls'].forEach((action) => {
+        const pluginId = `bulk-${action}`;
+        const plugin = sk.get(pluginId);
+        const customShowPlugin = (sk.customPlugins[action]?.condition || (() => true))(sk);
+        plugin.classList[filesSelected && customShowPlugin ? 'remove' : 'add']('hlx-sk-hidden');
+      });
+      // update copy url button texts based on selection size
+      ['', 'preview', 'live', 'prod'].forEach((env) => {
+        const text = i18n(sk, `copy_${env}${env ? '_' : ''}url${sel.length === 1 ? '' : 's'}`);
+        const button = sk.get(`bulk-copy-${env}${env ? '-' : ''}urls`)?.querySelector('button');
+        if (button) {
+          button.textContent = text;
+          button.title = text;
         }
+      });
+    };
+
+    const getBulkText = ([num, total], type, action, mod) => {
+      let i18nKey = `bulk_${type}`;
+      if (num === 0) {
+        i18nKey = `${i18nKey}_empty`;
+      } else {
+        i18nKey = `${i18nKey}_${action}_${(total || num) === 1 ? 'single' : 'multiple'}${mod ? `_${mod}` : ''}`;
+      }
+      return i18n(sk, i18nKey)
+        .replace('$1', num)
+        .replace('$2', total);
+    };
+
+    const doBulkOperation = async (operation, method, concurrency, host) => {
+      const { config, status } = sk;
+      const sel = bulkSelection.map((item) => toWebPath(status.webPath, item));
+      const results = [];
+      const total = sel.length;
+      const { processQueue } = await import(`${config.scriptRoot}/lib/process-queue.js`);
+      await processQueue(sel, async (file) => {
+        results.push(await sk[method](file));
+        if (total > 1) {
+          sk.showModal(getBulkText([results.length, total], 'progress', operation), true);
+        }
+      }, concurrency);
+      const lines = [];
+      const ok = results.filter((res) => res.ok);
+      if (ok.length > 0) {
+        lines.push(getBulkText([ok.length], 'result', operation, 'success'));
         lines.push(createTag({
           tag: 'button',
-          text: i18n(sk, 'close'),
+          text: i18n(sk, ok.length === 1 ? 'copy_url' : 'copy_urls'),
+          lstnrs: {
+            click: (evt) => {
+              evt.stopPropagation();
+              navigator.clipboard.writeText(ok.map((item) => `https://${host}${item.path}`)
+                .join('\n'));
+              sk.hideModal();
+            },
+          },
         }));
-        let level = 2;
-        if (failed.length > 0) {
-          level = 1;
-          if (ok.length === 0) {
-            level = 0;
+      }
+      const failed = results.filter((res) => !res.ok);
+      if (failed.length > 0) {
+        const failureText = getBulkText([failed.length], 'result', operation, 'failure');
+        lines.push(failureText);
+        lines.push(...failed.map((item) => {
+          if (item.error.endsWith('docx with google not supported.')) {
+            item.error = getBulkText([1], 'result', operation, 'error_no_docx');
           }
+          if (item.error.endsWith('xlsx with google not supported.')) {
+            item.error = getBulkText([1], 'result', operation, 'error_no_xlsx');
+          }
+          if (item.error.includes('source does not exist')) {
+            item.error = getBulkText([1], 'result', operation, 'error_no_source');
+          }
+          return `${item.path.split('/').pop()}: ${item.error}`;
+        }));
+      }
+      lines.push(createTag({
+        tag: 'button',
+        text: i18n(sk, 'close'),
+      }));
+      let level = 2;
+      if (failed.length > 0) {
+        level = 1;
+        if (ok.length === 0) {
+          level = 0;
         }
-        sk.showModal(
-          lines,
-          true,
-          level,
-        );
-      };
+      }
+      sk.showModal(
+        lines,
+        true,
+        level,
+      );
+    };
 
-      const doBulkCopyUrls = async (hostProperty) => {
-        const { config, status } = sk;
-        const urls = bulkSelection.map((item) => `https://${config[hostProperty]}${toWebPath(status.webPath, item)}`);
-        navigator.clipboard.writeText(urls.join('\n'));
-        sk.showModal(i18n(sk, `copied_url${urls.length !== 1 ? 's' : ''}`));
-      };
+    const doBulkCopyUrls = async (hostProperty) => {
+      const { config, status } = sk;
+      const urls = bulkSelection.map((item) => `https://${config[hostProperty]}${toWebPath(status.webPath, item)}`);
+      navigator.clipboard.writeText(urls.join('\n'));
+      sk.showModal(i18n(sk, `copied_url${urls.length !== 1 ? 's' : ''}`));
+    };
 
-      sk.addEventListener('statusfetched', () => {
-        // bulk info
-        sk.add({
-          id: 'bulk-info',
-          condition: (sidekick) => sidekick.isAdmin(),
-          elements: [{
-            tag: 'span',
-            attrs: {
-              id: 'hlx-sk-bulk-info',
-              class: 'hlx-sk-label',
-            },
-          }],
-          callback: () => {
-            window.setInterval(() => {
-              updateBulkInfo();
-            }, 500);
+    // bulk info
+    sk.add({
+      id: 'bulk-info',
+      condition: (sidekick) => sidekick.isAdmin(),
+      elements: [{
+        tag: 'span',
+        attrs: {
+          id: 'hlx-sk-bulk-info',
+          class: 'hlx-sk-label',
+        },
+      }],
+      callback: () => {
+        window.setInterval(() => {
+          updateBulkInfo();
+        }, 500);
+      },
+    });
+
+    // bulk preview
+    sk.add({
+      id: 'bulk-preview',
+      condition: (sidekick) => sidekick.isAdmin(),
+      button: {
+        text: i18n(sk, 'preview'),
+        action: async () => {
+          const confirmText = getBulkText([bulkSelection.length], 'confirm', 'preview');
+          if (bulkSelection.length === 0) {
+            sk.showModal(confirmText);
+          } else if (window.confirm(confirmText)) {
+            sk.showWait();
+            sk.addEventListener('statusfetched', () => {
+              doBulkOperation('preview', 'update', 2, sk.config.innerHost);
+            }, { once: true });
+            sk.fetchStatus(true);
+          }
+        },
+        isEnabled: (s) => s.isAuthorized('preview', 'write') && s.status.webPath,
+      },
+    });
+
+    // bulk publish
+    sk.add({
+      id: 'bulk-publish',
+      condition: (sidekick) => sidekick.isAdmin(),
+      button: {
+        text: i18n(sk, 'publish'),
+        action: async () => {
+          const confirmText = getBulkText([bulkSelection.length], 'confirm', 'publish');
+          if (bulkSelection.length === 0) {
+            sk.showModal(confirmText);
+          } else if (window.confirm(confirmText)) {
+            sk.showWait();
+            sk.addEventListener('statusfetched', () => {
+              doBulkOperation('publish', 'publish', 40, sk.config.host || sk.config.outerHost);
+            }, { once: true });
+            sk.fetchStatus(true);
+          }
+        },
+        isEnabled: (s) => s.isAuthorized('live', 'write') && s.status.webPath,
+      },
+    });
+
+    // bulk copy urls
+    sk.add({
+      id: 'bulk-copy-urls',
+      condition: (sidekick) => sidekick.isAdmin(),
+      button: {
+        isDropdown: true,
+      },
+    });
+    [{
+      env: 'preview',
+      hostProperty: 'innerHost',
+      condition: (sidekick) => sidekick.isAdmin(),
+    }, {
+      env: 'live',
+      hostProperty: 'outerHost',
+      condition: (sidekick) => sidekick.isAdmin(),
+      advanced: (sidekick) => !!sidekick.config.host,
+    }, {
+      env: 'prod',
+      hostProperty: 'host',
+      condition: (sidekick) => sidekick.isAdmin() && sidekick.config.host,
+    }].forEach(({
+      env,
+      hostProperty,
+      condition,
+      advanced = () => false,
+    }) => {
+      sk.add({
+        id: `bulk-copy-${env}-urls`,
+        container: 'bulk-copy-urls',
+        condition,
+        advanced,
+        button: {
+          text: i18n(sk, `copy_${env}_url`),
+          action: async () => {
+            const emptyText = getBulkText([bulkSelection.length], 'confirm');
+            if (bulkSelection.length === 0) {
+              sk.showModal(emptyText);
+            } else {
+              sk.showWait();
+              sk.addEventListener('statusfetched', () => {
+                doBulkCopyUrls(hostProperty);
+              }, { once: true });
+              sk.fetchStatus(true);
+            }
           },
-        });
+        },
+      });
+    });
 
-        // bulk preview
-        sk.add({
-          id: 'bulk-preview',
-          condition: (sidekick) => sidekick.isAdmin(),
-          button: {
-            text: i18n(sk, 'preview'),
-            action: async () => {
-              const confirmText = getBulkText([bulkSelection.length], 'confirm', 'preview');
-              if (bulkSelection.length === 0) {
-                sk.showModal(confirmText);
-              } else if (window.confirm(confirmText)) {
-                sk.showWait();
-                if (isChangedUrl()) {
-                  // url changed, refetch status
-                  sk.addEventListener('statusfetched', () => {
-                    doBulkOperation('preview', 'update', 2, sk.config.innerHost);
-                  }, { once: true });
-                  sk.fetchStatus(true);
-                } else {
-                  doBulkOperation('preview', 'update', 2, sk.config.innerHost);
-                }
-              }
-            },
-            isEnabled: (s) => s.isAuthorized('preview', 'write') && s.status.webPath,
+    updateBulkInfo();
+  }
+
+  /**
+   * Adds UI to encourage eusers to log in.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {boolean} show Whether to show the login encouragement or not
+   * @param {HTMLElement} toggle The user menu toggle
+   */
+  function encourageLogin(sk, show, toggle) {
+    const openUserMenu = () => {
+      if (toggle) {
+        toggle.click();
+      }
+    };
+    if (show) {
+      openUserMenu();
+      // add overlay
+      sk.pluginContainer.append(createTag({
+        tag: 'div',
+        attrs: {
+          class: 'plugin-container-overlay',
+        },
+        lstnrs: {
+          click: () => {
+            if (sk.status.status === 401) {
+              sk.showModal({
+                message: i18n(sk, 'user_login_hint'),
+                callback: () => openUserMenu(),
+              });
+            }
           },
-        });
-
-        // bulk publish
-        sk.add({
-          id: 'bulk-publish',
-          condition: (sidekick) => sidekick.isAdmin(),
-          button: {
-            text: i18n(sk, 'publish'),
-            action: async () => {
-              const confirmText = getBulkText([bulkSelection.length], 'confirm', 'publish');
-              if (bulkSelection.length === 0) {
-                sk.showModal(confirmText);
-              } else if (window.confirm(confirmText)) {
-                sk.showWait();
-                if (isChangedUrl()) {
-                  // url changed, refetch status
-                  sk.addEventListener('statusfetched', () => {
-                    doBulkOperation('publish', 'publish', 40, sk.config.host || sk.config.outerHost);
-                  }, { once: true });
-                  sk.fetchStatus(true);
-                } else {
-                  doBulkOperation('publish', 'publish', 40, sk.config.host || sk.config.outerHost);
-                }
-              }
-            },
-            isEnabled: (s) => s.isAuthorized('live', 'write') && s.status.webPath,
-          },
-        });
-
-        // bulk copy urls
-        sk.add({
-          id: 'bulk-copy-urls',
-          condition: (sidekick) => sidekick.isAdmin(),
-          button: {
-            isDropdown: true,
-          },
-        });
-        [{
-          env: 'preview',
-          hostProperty: 'innerHost',
-          condition: (sidekick) => sidekick.isAdmin(),
-        }, {
-          env: 'live',
-          hostProperty: 'outerHost',
-          condition: (sidekick) => sidekick.isAdmin(),
-          advanced: (sidekick) => !!sidekick.config.host,
-        }, {
-          env: 'prod',
-          hostProperty: 'host',
-          condition: (sidekick) => sidekick.isAdmin() && sidekick.config.host,
-        }].forEach(({
-          env,
-          hostProperty,
-          condition,
-          advanced = () => false,
-        }) => {
-          sk.add({
-            id: `bulk-copy-${env}-urls`,
-            container: 'bulk-copy-urls',
-            condition,
-            advanced,
-            button: {
-              text: i18n(sk, `copy_${env}_url`),
-              action: async () => {
-                const emptyText = getBulkText([bulkSelection.length], 'confirm');
-                if (bulkSelection.length === 0) {
-                  sk.showModal(emptyText);
-                } else {
-                  sk.showWait();
-                  if (isChangedUrl()) {
-                    // url changed, refetch status
-                    sk.addEventListener('statusfetched', () => {
-                      doBulkCopyUrls(hostProperty);
-                    }, { once: true });
-                    sk.fetchStatus(true);
-                  } else {
-                    doBulkCopyUrls(hostProperty);
-                  }
-                }
-              },
-            },
-          });
-        });
-
-        updateBulkInfo();
-      }, { once: true });
+        },
+      }));
+    } else {
+      // remove overlay
+      sk.pluginContainer.querySelector('.plugin-container-overlay')?.remove();
     }
   }
 
@@ -1677,8 +1729,7 @@
    * @param {Sidekick} sk The sidekick
    */
   function addCustomPlugins(sk) {
-    const { location, config: { plugins, innerHost } = {} } = sk;
-    const language = navigator.language.split('-')[0];
+    const { location, config: { lang, plugins, innerHost } = {} } = sk;
     if (plugins && Array.isArray(plugins)) {
       plugins.forEach((cfg, i) => {
         if (typeof (cfg.button && cfg.button.action) === 'function'
@@ -1704,7 +1755,7 @@
           } = cfg;
           const condition = (s) => {
             let excluded = false;
-            const pathSearchHash = location.href.replace(location.origin, '');
+            const pathSearchHash = s.location.href.replace(s.location.origin, '');
             if (excludePaths && Array.isArray(excludePaths)
               && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
               excluded = true;
@@ -1729,33 +1780,13 @@
             };
             return environments.some((env) => envChecks[env] && envChecks[env].call(s));
           };
-          const existingPlugin = sk.get(id);
-          if (existingPlugin) {
-            // extend existing plugin
-            if (!condition(sk)) {
-              sk.remove(id);
-            }
-          } else {
-            // check mandatory properties
-            let missingProperty = '';
-            // plugin config not extending existing plugin
-            if (!title) {
-              missingProperty = 'title';
-            } else if (!(url || eventName || isContainer)) {
-              missingProperty = 'url, event, or isContainer';
-            }
-            if (missingProperty) {
-              console.log(`plugin config missing required property: ${missingProperty}`, cfg);
-              return;
-            }
-          }
           // assemble plugin config
           const plugin = {
             custom: true,
             id: id || `custom-plugin-${i}`,
             condition,
             button: {
-              text: (titleI18n && titleI18n[language]) || title,
+              text: (titleI18n && titleI18n[lang]) || title || '',
               action: () => {
                 if (url) {
                   const target = url.startsWith('/') ? new URL(url, `https://${innerHost}/`) : new URL(url);
@@ -1798,7 +1829,7 @@
                       });
                       const titleBar = appendTag(palette, {
                         tag: 'div',
-                        text: (titleI18n && titleI18n[language]) || title,
+                        text: (titleI18n && titleI18n[lang]) || title,
                         attrs: {
                           class: 'palette-title',
                         },
@@ -1841,8 +1872,17 @@
             },
             container: containerId,
           };
-          // add plugin
-          sk.add(plugin);
+          sk.customPlugins[plugin.id] = plugin;
+          // check and remove existing plugin
+          const existingPlugin = sk.plugins[plugin.id];
+          if (existingPlugin) {
+            if (sk.get(plugin.id) && !condition(sk)) {
+              sk.remove(id);
+            }
+          } else {
+            // add custom plugin
+            sk.add(plugin);
+          }
         }
       });
     }
@@ -1866,16 +1906,11 @@
   function login(sk, selectAccount) {
     sk.showWait();
     const loginUrl = getAdminUrl(sk.config, 'login');
-    const extensionId = window.chrome?.runtime?.id;
-    const authHeaderEnabled = extensionId && !window.navigator.vendor.includes('Apple');
-    if (authHeaderEnabled) {
-      loginUrl.searchParams.set('extensionId', extensionId);
-    } else {
-      loginUrl.searchParams.set(
-        'loginRedirect',
-        'https://www.hlx.live/tools/sidekick/login-success',
-      );
+    let extensionId = window.chrome?.runtime?.id;
+    if (!extensionId || window.navigator.vendor.includes('Apple')) { // exclude safari
+      extensionId = 'cookie';
     }
+    loginUrl.searchParams.set('extensionId', extensionId);
     if (selectAccount) {
       loginUrl.searchParams.set('selectAccount', true);
     }
@@ -1895,6 +1930,7 @@
           sk.config = await initConfig(config, location);
           sk.config.authToken = window.hlx.sidekickConfig.authToken;
           addCustomPlugins(sk);
+          encourageLogin(sk, false);
           sk.fetchStatus();
           fireEvent(sk, 'loggedin');
           return;
@@ -1923,15 +1959,11 @@
   function logout(sk) {
     sk.showWait();
     const logoutUrl = getAdminUrl(sk.config, 'logout');
-    const extensionId = window.chrome?.runtime?.id;
-    if (extensionId && !window.navigator.vendor.includes('Apple')) { // exclude safari
-      logoutUrl.searchParams.set('extensionId', extensionId);
-    } else {
-      logoutUrl.searchParams.set(
-        'logoutRedirect',
-        'https://www.hlx.live/tools/sidekick/logout-success',
-      );
+    let extensionId = window.chrome?.runtime?.id;
+    if (!extensionId || window.navigator.vendor.includes('Apple')) { // exclude safari
+      extensionId = 'cookie';
     }
+    logoutUrl.searchParams.set('extensionId', extensionId);
     const logoutWindow = window.open(logoutUrl.toString());
 
     let attempts = 0;
@@ -2087,9 +2119,8 @@
         sk.remove('user-login');
       });
       if (!sk.status.loggedOut && sk.status.status === 401 && !sk.isAuthenticated()) {
-        // // encourage login
-        toggle.click();
-        toggle.nextElementSibling.classList.add('highlight');
+        // encourage login
+        encourageLogin(sk, true, toggle);
       }
     }
   }
@@ -2487,7 +2518,7 @@
    */
   async function fetchDict(sk, lang) {
     const dict = {};
-    const dictPath = `${sk.config.scriptRoot}/_locales/${lang}/messages.json`;
+    const dictPath = `${sk.config.scriptRoot}/_locales/${lang || sk.config.lang}/messages.json`;
     try {
       const res = await fetch(dictPath);
       const messages = await res.json();
@@ -2631,14 +2662,18 @@
         addDeletePlugin(this);
         addPublishPlugin(this);
         addUnpublishPlugin(this);
-        addCustomPlugins(this);
         addBulkPlugins(this);
+        addCustomPlugins(this);
         // fetch status
         this.fetchStatus();
         // push down content
         pushDownContent(this);
         // show special view
         showSpecialView(this);
+
+        // announce to the document that the sidekick is ready
+        document.dispatchEvent(new CustomEvent('sidekick-ready'));
+        document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
       }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
@@ -2654,7 +2689,8 @@
         revertPushDownContent(this);
       });
       this.status = {};
-      this.plugins = [];
+      this.plugins = {};
+      this.customPlugins = {};
       this.config = {};
 
       this.loadContext(cfg);
@@ -2680,14 +2716,17 @@
       }
       if (!this.status.apiUrl || refreshLocation) {
         const { href, pathname } = this.location;
+        const isDM = this.isEditor() || this.isAdmin(); // is document management
         const apiUrl = getAdminUrl(
           this.config,
           'status',
-          (this.isEditor() || this.isAdmin()) ? '' : pathname,
+          isDM ? '' : pathname,
         );
-        apiUrl.searchParams.append('editUrl', (this.isEditor() || this.isAdmin()) ? href : 'auto');
-        this.status.apiUrl = apiUrl.toString();
+
+        apiUrl.searchParams.append('editUrl', isDM ? href : 'auto');
+        this.status.apiUrl = apiUrl;
       }
+
       fetch(this.status.apiUrl, {
         ...getAdminFetchOptions(),
       })
@@ -2724,13 +2763,18 @@
         })
         .then((json) => {
           this.status = json;
+          this.setAttribute('status', JSON.stringify(json));
           return json;
         })
         .then((json) => fireEvent(this, 'statusfetched', json))
         .catch(({ message }) => {
           this.status.error = message;
+          this.setAttribute('status', JSON.stringify(this.status));
           const modal = {
-            message: message.startsWith('error_') ? i18n(this, message) : message,
+            message: message.startsWith('error_') ? i18n(this, message) : [
+              i18n(this, 'error_status_fatal'),
+              'https://status.hlx.live/',
+            ],
             sticky: true,
             level: 0,
             callback: () => {
@@ -2759,8 +2803,7 @@
       this.config = await initConfig(cfg, this.location);
 
       // load dictionary based on user language
-      const lang = this.config.lang || navigator.language.split('-')[0];
-      this.dict = await fetchDict(this, lang);
+      this.dict = await fetchDict(this);
       if (!this.dict.title) {
         // unsupported language, default to english
         this.dict = await fetchDict(this, 'en');
@@ -2843,6 +2886,7 @@
       if (typeof plugin !== 'object') {
         return null;
       }
+      this.plugins[plugin.id] = plugin;
       // determine if plugin can be shown
       plugin.isShown = typeof plugin.condition === 'undefined'
           || (typeof plugin.condition === 'function' && plugin.condition(this));
@@ -2983,7 +3027,8 @@
       const { location } = this;
       return (location.host === 'drive.google.com')
         || (/\w+\.sharepoint.com$/.test(location.host)
-        && location.pathname.endsWith('/Forms/AllItems.aspx'));
+        && (location.pathname.endsWith('/Forms/AllItems.aspx')
+        || location.pathname.endsWith('/onedrive.aspx')));
     }
 
     /**
@@ -2991,10 +3036,10 @@
      * @returns {boolean} <code>true</code> if development URL, else <code>false</code>
      */
     isDev() {
-      const { location } = this;
+      const { config, location } = this;
       return [
         '', // for unit testing
-        DEV_URL.host, // for development and browser testing
+        config.devUrl.host, // for development and browser testing
       ].includes(location.host);
     }
 
@@ -3004,7 +3049,8 @@
      */
     isInner() {
       const { config, location } = this;
-      return matchProjectHost(config.innerHost, location.host);
+      return matchProjectHost(config.innerHost, location.host)
+       || matchProjectHost(config.stdInnerHost, location.host);
     }
 
     /**
@@ -3013,7 +3059,8 @@
      */
     isOuter() {
       const { config, location } = this;
-      return matchProjectHost(config.outerHost, location.host);
+      return matchProjectHost(config.outerHost, location.host)
+        || matchProjectHost(config.stdOuterHost, location.host);
     }
 
     /**
@@ -3406,7 +3453,7 @@
         window.setTimeout(() => this.switchEnv(targetEnv, open), 1000);
         return this;
       }
-      const envOrigin = targetEnv === 'dev' ? DEV_URL.origin : `https://${config[hostType]}`;
+      const envOrigin = targetEnv === 'dev' ? config.devUrl.origin : `https://${config[hostType]}`;
       let envUrl = `${envOrigin}${status.webPath}`;
       if (!this.isEditor()) {
         envUrl += `${search}${hash}`;
@@ -3511,7 +3558,9 @@
         return null;
       }
 
-      const purgeURL = new URL(path, this.isEditor() ? `https://${config.innerHost}/` : location.href);
+      const purgeURL = new URL(path, this.isEditor()
+        ? `https://${config.innerHost}/`
+        : location.href);
       console.log(`publishing ${purgeURL.pathname}`);
       let resp = {};
       try {
@@ -3525,13 +3574,11 @@
         // bust client cache for live and production
         if (config.outerHost) {
           // reuse purgeURL to ensure page relative paths (e.g. when publishing dependencies)
-          purgeURL.hostname = config.outerHost;
-          await fetch(purgeURL.href, { cache: 'reload', mode: 'no-cors' });
+          await fetch(`https://${config.outerHost}${purgeURL.pathname}`, { cache: 'reload', mode: 'no-cors' });
         }
         if (config.host) {
           // reuse purgeURL to ensure page relative paths (e.g. when publishing dependencies)
-          purgeURL.hostname = config.host;
-          await fetch(purgeURL.href, { cache: 'reload', mode: 'no-cors' });
+          await fetch(`https://${config.host}${purgeURL.pathname}`, { cache: 'reload', mode: 'no-cors' });
         }
         fireEvent(this, 'published', path);
       } catch (e) {
@@ -3596,10 +3643,6 @@
       window.hlx.sidekick = document.createElement('helix-sidekick');
       document.body.prepend(window.hlx.sidekick);
       window.hlx.sidekick.show();
-
-      // announce to the document that the sidekick is ready
-      document.dispatchEvent(new CustomEvent('sidekick-ready'));
-      document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
     } else {
       // toggle sidekick
       window.hlx.sidekick.toggle();
