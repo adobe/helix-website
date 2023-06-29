@@ -2,19 +2,21 @@ import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements
 
 const ColorPattern = ['pink', 'purple', 'lightgreen', 'yellow'];
 const animationConfig = {
-  staggerTime: 0.4,
+  staggerTime: 0.04,
   items: [
     {
       selector: '.icon-eyebrow',
-      animatedClass: 'clip-path-reveal',
+      animatedClass: 'slide-reveal-up',
     },
     {
       selector: '.main-headline',
-      animatedClass: 'fade-in',
+      animatedClass: 'slide-reveal-up',
     },
     {
-      selector: '.content-side ul',
-      animatedClass: 'fade-left',
+      selectors: '.content-side ul li',
+      animatedClass: 'slide-reveal-up',
+      staggerTime: 0.1,
+      // staggerTotalTime: 2,
     },
   ],
 };
@@ -34,7 +36,8 @@ const animateValueProps = (el) => {
   const valuePropSections = el.querySelectorAll('.z-row-even, .z-row-odd');
   valuePropSections.forEach((section) => {
     const image = section.querySelector('.image-side img');
-    addInViewAnimationToSingleElement(image, 'fade-in');
+    // addInViewAnimationToSingleElement(image, 'fade-up', null, 0.08);
+    addInViewAnimationToSingleElement(image, 'slide-reveal-up-slow', null, 0.08);
     // eslint-disable-next-line
     addInViewAnimationToMultipleElements(animationConfig.items, section, animationConfig.staggerTime);
   });
