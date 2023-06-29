@@ -9,6 +9,7 @@ Notes:
 | side-by-side | 50% detail, 50% image in same row  |  
 | square-image | image will become 1:1 in aspect ratio  |  
 | mutiple-cta  | decorate multiple cta buttons with black border styles (ul a) |
+| page-not-found | page not found ui |
 
 #### Example:
 

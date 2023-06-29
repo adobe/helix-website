@@ -229,3 +229,26 @@
         margin-top: 16px;
     }
 }
+
+/* - hero.page-not-found */
+.hero.page-not-found {
+    padding-bottom: var(--spacing-xxl);
+    min-height: 80vh;
+    max-height: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero.page-not-found a.button:any-link{
+    margin-bottom: var(--spacing-l);
+}
+
+.hero.page-not-found h2{
+    font-size: var(--type-heading-xl-size);
+    line-height: var(--type-heading-xl-lh);
+    padding-bottom: var(--spacing-l);
+    width: 88vw;
+    max-width: 480px;
+    margin: 0 auto;
+}
