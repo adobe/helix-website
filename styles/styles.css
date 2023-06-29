@@ -1384,6 +1384,7 @@ body.guides-template .icon-icon-arrow {
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
+  background-position: center center;
 }
 
 body.guides-template .pagination .icon-icon-arrow {

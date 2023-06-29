@@ -378,6 +378,7 @@ button.gnav-toggle::after {
 .franklin .gnav .submenu-content a.submenu h3 {
   font-weight: 400;
   font-size: var(--type-body-xs-size);
+  line-height: 1.7;
   letter-spacing: normal;
   color: var(--color-black);
   width: fit-content;
