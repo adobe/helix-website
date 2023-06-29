@@ -41,7 +41,9 @@ class Gnav {
 
     const brand = this.decorateBrandLogo();
     if (brand) {
-      nav.append(brand);
+      const brandWrapper = createTag('div', { class: 'gnav-brand-wrapper' });
+      brandWrapper.append(brand);
+      nav.append(brandWrapper);
     }
 
     const ctaButtonWrapper = this.decorateCTAButton();
