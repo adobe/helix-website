@@ -1,8 +1,13 @@
 .table {
   max-width: 100%;
   overflow-x: auto;
+}
+
+/* temp fix for table rendering weirdly */
+.content > .table-wrapper > .table {
   border: 1px solid var(--bg-color-grey);
   padding: var(--spacing-xxs) var(--spacing-xxs) var(--spacing-xs);
+  margin-bottom: var(--spacing-s);
 }
 
 .table tbody {

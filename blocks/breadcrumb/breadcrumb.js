@@ -25,7 +25,7 @@ export default async function decorate(block) {
     const section = createTag(
       'li',
       {},
-      `<a href="/docs/#${category.toLowerCase()}" class="breadcrumb-link-underline-effect">${category}</a>`,
+      `<a href="/docs/#${category.toLowerCase()}" class="breadcrumb-link-underline-effect category">${category}</a>`,
     );
     list.append(section);
   }

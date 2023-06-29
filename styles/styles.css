@@ -460,6 +460,10 @@ pre {
   width: 100%;
 }
 
+pre:not(:has(.hljs)) {
+  overflow-x: scroll;
+}
+
 /* inline code styles */
 code {
   font-family: var(--code-font-family);
@@ -887,12 +891,17 @@ main .section {
     padding: 4rem 0;
 }
 
+/* fix for overflow */
+main .section > div:has(.inview-animation),
+main .section > div:has(.fade-left),
+main .section > div:has(.fade-right) {
+  overflow: hidden;
+}
+
 .quote-wrapper {
     max-width: 900px;
     margin: auto;
 }
-
-
 
 main .section ul {
     text-align: left;
@@ -1179,6 +1188,12 @@ body.guides-template .default-content-wrapper ul {
   padding-inline-start: 1.5em;
 }
 
+body.guides-template .default-content-wrapper ol,
+body.guides-template .columns ol {
+  padding-inline-start: 1.5em;
+  margin-top: 0.5em;
+}
+
 /* for SEO tap target */
 body.guides-template .default-content-wrapper ul > li > a {
   margin-bottom: 1em;
@@ -1369,6 +1384,7 @@ body.guides-template .icon-icon-arrow {
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
+  background-position: center center;
 }
 
 body.guides-template .pagination .icon-icon-arrow {
@@ -1385,6 +1401,7 @@ body.guides-template .icon-icon-caret-down {
 
 body.guides-template .guides-back-btn .icon-icon-arrow {
   background-image: url("/img/icon-arrow.svg");
+  filter: invert(38%) sepia(42%) saturate(5895%) hue-rotate(203deg) brightness(94%) contrast(92%);
 }
 
 /* Layout for Contact template */

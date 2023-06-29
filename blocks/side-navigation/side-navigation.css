@@ -243,6 +243,13 @@
   background: var(--bg-color-grey-2);
 }
 
+.side-navigation .list-section .side-navigation-nested-target button {
+  cursor: pointer;
+}
+
+.side-navigation .list-section .side-navigation-nested-target .icon.icon-icon-caret-down {
+  transition: all 0.2s ease-in-out;
+}
 
 .side-navigation .list-section .side-navigation-nested-target:not(.collapse) .icon.icon-icon-caret-down {
   transform: rotate(180deg);
