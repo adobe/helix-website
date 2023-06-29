@@ -47,6 +47,10 @@
   color: var(--color-black);
 }
 
+.breadcrumb .category {
+  text-transform: capitalize;
+}
+
 @media screen and (min-width: 600px) {
   .breadcrumb-wrapper {
     position: sticky;

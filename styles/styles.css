@@ -1401,6 +1401,7 @@ body.guides-template .icon-icon-caret-down {
 
 body.guides-template .guides-back-btn .icon-icon-arrow {
   background-image: url("/img/icon-arrow.svg");
+  filter: invert(38%) sepia(42%) saturate(5895%) hue-rotate(203deg) brightness(94%) contrast(92%);
 }
 
 /* Layout for Contact template */
