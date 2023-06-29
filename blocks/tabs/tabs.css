@@ -345,6 +345,14 @@
       width: 86%;
       margin: 0 auto;
     }
+
+    .tabs div[role="tablist"] button {
+      padding: 24px 16px 18px;
+    }
+
+    .tabs.image-based div[role="tablist"] img {
+      max-height: 63px;
+    }
   }
 
   /* - Tabs: .contained - */
