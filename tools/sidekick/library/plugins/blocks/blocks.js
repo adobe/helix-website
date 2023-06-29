@@ -22,6 +22,8 @@ import {
   getBlockName,
   getTable,
   parseDescription,
+  prepareIconsForCopy,
+  prepareImagesForCopy,
 } from './utils.js';
 import {
   createTag, setURLParams,
@@ -98,7 +100,19 @@ function renderFrameSplitContainer() {
   `;
 }
 
-function copyBlockToClipboard(wrapper, name, blockURL) {
+function removeAllEventListeners(element) {
+  const clone = element.cloneNode(true);
+  element.parentNode.replaceChild(clone, element);
+  return clone;
+}
+
+/**
+ * Copies a block to the clipboard
+ * @param {HTMLElement} wrapper The wrapper element
+ * @param {string} name The name of the block
+ * @param {string} blockURL The URL of the block
+ */
+export function copyBlockToClipboard(wrapper, name, blockURL) {
   // Get the first block element ignoring any section metadata blocks
   const element = wrapper.querySelector(':scope > div:not(.section-metadata)');
   let blockTable = '';
@@ -131,6 +145,35 @@ function copyBlockToClipboard(wrapper, name, blockURL) {
 }
 
 /**
+ * Copies default content to the clipboard
+ * @param {HTMLElement} wrapper The wrapper element
+ * @param {string} blockURL The URL of the block
+ */
+export function copyDefaultContentToClipboard(wrapper, blockURL) {
+  const wrapperClone = wrapper.cloneNode(true);
+  prepareIconsForCopy(wrapperClone);
+  prepareImagesForCopy(wrapperClone, blockURL, 100);
+
+  // Does the block have section metadata?
+  let sectionMetadataTable;
+  const sectionMetadata = wrapperClone.querySelector('.section-metadata');
+  if (sectionMetadata) {
+    // Create a table for the section metadata
+    sectionMetadataTable = getTable(
+      sectionMetadata,
+      'Section metadata',
+      blockURL,
+    );
+    sectionMetadata.remove();
+  }
+
+  copyBlock(wrapperClone.outerHTML, sectionMetadataTable);
+
+  // Track block copy event
+  sampleRUM('library:blockcopied', { target: blockURL });
+}
+
+/**
  * Called when a user tries to load the plugin
  * @param {HTMLElement} container The container to render the plugin in
  * @param {Object} data The data contained in the plugin sheet
@@ -145,8 +188,6 @@ export async function decorate(container, data) {
 
   const blockList = createTag('block-list');
   listContainer.append(blockList);
-
-  await blockList.loadBlocks(data, container);
 
   blockList.addEventListener('PreviewBlock', (e) => {
     window.open(e.details.path, '_blockpreview');
@@ -194,6 +235,7 @@ export async function decorate(container, data) {
 
     const blockRenderer = content.querySelector('block-renderer');
 
+    // If the block element exists, load the block
     blockRenderer.loadBlock(
       blockName,
       blockData,
@@ -204,28 +246,35 @@ export async function decorate(container, data) {
     // Append the path and index of the current block to the url params
     setURLParams([['path', blockData.path], ['index', e.detail.index]]);
 
-    const copyButton = content.querySelector('.copy-button');
-    copyButton?.addEventListener('click', () => {
+    const copyButton = removeAllEventListeners(content.querySelector('.copy-button'));
+    copyButton.addEventListener('click', () => {
       const copyElement = blockRenderer.getBlockElement();
       const copyWrapper = blockRenderer.getBlockWrapper();
       const copyBlockData = blockRenderer.getBlockData();
 
-      copyBlockToClipboard(copyWrapper, getBlockName(copyElement, true), copyBlockData.url);
+      // Are we trying to copy a block or default content?
+      // The copy operation is slightly different depending on which
+      if (blockRenderer.isBlock) {
+        copyBlockToClipboard(copyWrapper, getBlockName(copyElement, true), copyBlockData.url);
+      } else {
+        copyDefaultContentToClipboard(copyWrapper, copyBlockData.url);
+      }
+
       container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block' } }));
     });
 
     const frameView = content.querySelector('.frame-view');
-    const mobileViewButton = content.querySelector('sp-action-button[value="mobile"]');
+    const mobileViewButton = removeAllEventListeners(content.querySelector('sp-action-button[value="mobile"]'));
     mobileViewButton?.addEventListener('click', () => {
       frameView.style.width = '480px';
     });
 
-    const tabletViewButton = content.querySelector('sp-action-button[value="tablet"]');
+    const tabletViewButton = removeAllEventListeners(content.querySelector('sp-action-button[value="tablet"]'));
     tabletViewButton?.addEventListener('click', () => {
       frameView.style.width = '768px';
     });
 
-    const desktopViewButton = content.querySelector('sp-action-button[value="desktop"]');
+    const desktopViewButton = removeAllEventListeners(content.querySelector('sp-action-button[value="desktop"]'));
     desktopViewButton?.addEventListener('click', () => {
       frameView.style.width = '100%';
     });
@@ -236,7 +285,15 @@ export async function decorate(container, data) {
 
   blockList.addEventListener('CopyBlock', (e) => {
     const { blockWrapper: wrapper, blockNameWithVariant: name, blockURL } = e.detail;
-    copyBlockToClipboard(wrapper, name, blockURL);
+
+    // We may not have rendered the block yet, so we need to check for a block to know if
+    // we are dealing with a block or default content
+    const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
+    if (block) {
+      copyBlockToClipboard(wrapper, name, blockURL);
+    } else {
+      copyDefaultContentToClipboard(wrapper, blockURL);
+    }
     container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block' } }));
   });
 
@@ -244,6 +301,8 @@ export async function decorate(container, data) {
   search.addEventListener('input', (e) => {
     blockList.filterBlocks(e.target.value);
   });
+
+  await blockList.loadBlocks(data, container);
 
   // Show blocks and hide loader
   container.dispatchEvent(new CustomEvent('HideLoader'));
