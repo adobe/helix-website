@@ -905,13 +905,6 @@ main .section > div:has(.fade-right) {
   overflow: hidden;
 }
 
-/* fix for overflow */
-main .section > div:has(.inview-animation),
-main .section > div:has(.fade-left),
-main .section > div:has(.fade-right) {
-  overflow: hidden;
-}
-
 .quote-wrapper {
     max-width: 900px;
     margin: auto;

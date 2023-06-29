@@ -2,24 +2,38 @@ import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 
 const extractCustomerInfo = (detailContainer) => {
-  const icon = detailContainer.querySelector('img');
-  const cta = detailContainer.querySelector('a');
-  cta.classList.add('button', 'secondary');
-  cta.setAttribute('target', returnLinkTarget(cta.href));
-  const titles = detailContainer.querySelectorAll('h5');
-
-  let titlesHTML = '';
-  titles.forEach((title) => {
-    titlesHTML += `<h5> ${title.innerHTML} </h5>`;
-  });
-  const titlesDiv = createTag('div', {
-    class: 'titles',
-  }, titlesHTML);
-
   const customerInfo = createTag('div', {
     class: 'customer-info',
   }, '');
-  customerInfo.append(icon, titlesDiv, cta);
+
+  const icon = detailContainer.querySelector('img');
+  if (icon) {
+    customerInfo.append(icon);
+  }
+
+  const titles = detailContainer.querySelectorAll('h5');
+  if (titles) {
+    let titlesHTML = '';
+    titles.forEach((title) => {
+      titlesHTML += `<h5> ${title.innerHTML} </h5>`;
+    });
+    const titlesDiv = createTag('div', {
+      class: 'titles',
+    }, titlesHTML);
+    customerInfo.append(titlesDiv);
+  }
+
+  const cta = detailContainer.querySelector('a');
+  if (cta) {
+    cta.classList.add('button', 'secondary');
+    cta.setAttribute('target', returnLinkTarget(cta.href));
+    customerInfo.append(cta);
+
+    const titleContainer = customerInfo.querySelector('.titles');
+    if (!titleContainer || titleContainer.innerHTML.trim() === '') {
+      cta.classList.add('align-desktop-right');
+    }
+  }
 
   return customerInfo;
 };
