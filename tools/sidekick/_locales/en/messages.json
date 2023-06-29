@@ -291,6 +291,18 @@
   "delete_failure": {
     "message": "Deletion failed. Please try again later."
   },
+  "delete_file_confirm": {
+    "message": "This file no longer exists in the repository, deleting it cannot be undone!\n\nAre you sure you want to delete it?"
+  },
+  "delete_file_source_exists": {
+    "message": "This file still exists in the repository and cannot be deleted."
+  },
+  "delete_page_confirm": {
+    "message": "This page no longer has a source document, deleting it cannot be undone!\n\nAre you sure you want to delete it?"
+  },
+  "delete_page_source_exists": {
+    "message": "This page still has a source document and cannot be deleted."
+  },
   "description": {
     "message": "AEM Sidekick allows authors of AEM sites to easily preview and publish content."
   },
@@ -504,6 +516,12 @@
   },
   "unpublish_failure": {
     "message": "Unpublication failed. Please try again later."
+  },
+  "unpublish_page_confirm": {
+    "message": "This page no longer has a source document, unpublishing it cannot be undone!\n\nAre you sure you want to delete it?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "This page still has a source document and cannot be unpublished."
   },
   "user_login": {
     "message": "Sign in"
