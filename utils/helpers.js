@@ -74,20 +74,6 @@ export function returnLinkTarget(url) {
 // eslint-disable-next-line max-len
 const requireRevealWrapper = ['slide-reveal-up', 'slide-reveal-up-slow'];
 
-// TODO: explore if this is possible
-// export function cubicBezierAnimationCurve(progress) {
-//   const p0 = 0;
-//   const p1 = 0.802;
-//   const p2 = 0.2;
-//   const p3 = 1;
-//   const t = 1 - progress;
-//   const tt = t * t;
-//   const ttt = tt * t;
-//   const curveX = (3 * t * tt * p1) + (3 * tt * t * p2) + (ttt * p3);
-//   const curveY = (3 * tt * t * p1) + (3 * t * t * p2) + (ttt * p3);
-//   return curveY / curveX;
-// }
-
 export function addRevealWrapperToAnimationTarget(element) {
   const revealWrapper = createTag('div', { class: 'slide-reveal-wrapper' });
   const parent = element.parentNode;
