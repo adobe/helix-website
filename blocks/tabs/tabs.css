@@ -274,6 +274,8 @@
     border: none;
     border-bottom: 2px solid var(--tabs-image-based-border-color);
     transition: all 0.2s ease-in-out;
+    padding: 16px 0 8px;
+    width: 100%;
   }
 
   .tabs.image-based div[role="tablist"] button:hover,

@@ -51,6 +51,10 @@
     object-fit: contain;
 }
 
+.logo-wall.meriative-height-adjustment .logo-wall-list-item img {
+    max-height: 80px;
+}
+
 @media (min-width: 900px) {
     .logo-wall {
         padding: var(--spacing-xxl) 0;
@@ -77,5 +81,9 @@
 
     .logo-wall.meriative-height-adjustment .logo-wall-list-item img {
         max-height: 96px;
+    }
+
+    .logo-wall.meriative-height-adjustment .logo-wall-list-item img {
+        max-height: 100px;
     }
 }
