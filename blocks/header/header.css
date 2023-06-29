@@ -63,6 +63,7 @@
     height: calc(var(--nav-height) - 1px);
     border-bottom: 1px solid #EAEAEA;
     z-index: 10;
+    color: var(--bg-color-black);
   }
 }
 
