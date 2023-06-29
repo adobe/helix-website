@@ -1,306 +1,201 @@
 {
-  "title": {
-    "message": "AEM Sidekick"
+  "add": {
+    "message": "Ajouter"
   },
-  "description": {
-    "message": "L'AEM Sidekick permet aux auteurs de simplement visualiser et publier leur contenu."
+  "admin_version": {
+    "message": "Utiliser une version spécifique de l'API Admin"
   },
-  "description_shortcut": {
-    "message": "Afficher/cacher le Sidekick"
+  "admin_version_placeholder": {
+    "message": "Version d'Admin : xyz"
   },
-  "homepage": {
-    "message": "https://www.hlx.live/tools/sidekick/"
-  },
-  "docs": {
-    "message": "https://www.hlx.live/docs/sidekick"
-  },
-  "plugins_loading": {
-    "message": "Chargement..."
-  },
-  "plugins_empty": {
-    "message": "Aucune action disponible pour cette page"
+  "advanced": {
+    "description": "Mode de configuration avancé",
+    "message": "Avancé"
   },
   "anonymous": {
     "message": "Anonyme"
   },
-  "user_login": {
-    "message": "Connexion"
-  },
-  "user_switch": {
-    "message": "Changer d'utilisateur"
-  },
-  "user_logout": {
-    "message": "Déconnexion"
-  },
-  "share_description": {
-    "message": "Partager le Sidekick"
-  },
-  "close": {
-    "message": "Fermer"
-  },
-  "info": {
-    "message": "Information"
-  },
-  "edit_date": {
-    "message": "Édité: "
-  },
-  "preview_date": {
-    "message": "Aperçu: "
-  },
-  "publish_date": {
-    "message": "Publié: "
-  },
-  "now": {
-    "message": "Maintenant"
-  },
-  "seconds_ago": {
-    "message": "$1 secondes dupui"
-  },
-  "minutes_ago": {
-    "message": "$1 minutes dupui"
-  },
-  "today_at": {
-    "message": "Aujourd'hui à $1"
-  },
-  "yesterday_at": {
-    "message": "Hier à $1"
-  },
-  "never": {
-    "message": "Jamais"
-  },
-  "switch_view": {
-    "message": "Voir"
-  },
-  "development": {
-    "message": "Développement"
-  },
-  "preview": {
-    "message": "Aperçu"
-  },
-  "preview_config_success": {
-    "message": "La configuration a été activée."
-  },
-  "preview_onedrive": {
-    "message": "Astuce: Pour voir les derniers changements immédiatement, appuyez sur Ctrl + S avant de générer l'aperçu..."
-  },
-  "preview_onedrive_mac": {
-    "message": "Astuce: Pour voir les derniers changements immédiatement, appuyez sur ⌘; + S avant de générer l'aperçu..."
-  },
-  "live": {
-    "message": "Live"
-  },
-  "production": {
-    "message": "Production"
-  },
-  "edit": {
-    "message": "Edition"
-  },
-  "reload": {
-    "message": "Actualiser"
-  },
-  "reload_failure": {
-    "message": "Le rechargement a échoué. Veuillez essayer plus tard."
-  },
-  "delete": {
-    "message": "Effacer"
-  },
-  "delete_failure": {
-    "message": "La suppression a échoué. Veuillez essayer plus tard."
-  },
-  "publish": {
-    "message": "Publier"
-  },
-  "publish_failure": {
-    "message": "la publication a échoué. Veuillez essayer plus tard."
-  },
-  "unpublish": {
-    "message": "Dépublier"
-  },
-  "unpublish_failure": {
-    "message": "La dépublication a échoué. Veuillez essayer plus tard."
-  },
-  "bulk_selection_empty": {
-    "message": "Select files below"
-  },
-  "bulk_selection_single": {
-    "message": "1 file selected"
-  },
-  "bulk_selection_multiple": {
-    "message": "$1 files selected"
-  },
   "bulk_confirm_empty": {
-    "message": "No file selected"
-  },
-  "bulk_confirm_preview_single": {
-    "message": "Are you sure you want to preview 1 file?"
+    "message": "Aucun fichier sélectionné"
   },
   "bulk_confirm_preview_multiple": {
-    "message": "Are you sure you want to preview $1 files?"
+    "message": "Voulez-vous vraiment générer la prévisualisation de $1 fichiers ?"
   },
-  "bulk_progress_preview_multiple": {
-    "message": "$1 of $2 files previewed..."
-  },
-  "bulk_result_preview_single_success": {
-    "message": "1 file successfully previewed."
-  },
-  "bulk_result_preview_multiple_success": {
-    "message": "$1 files successfully previewed."
-  },
-  "bulk_result_preview_single_failure": {
-    "message": "Failed to preview 1 file:"
-  },
-  "bulk_result_preview_multiple_failure": {
-    "message": "Failed to preview $1 files:"
-  },
-  "bulk_result_preview_single_error_no_docx": {
-    "message": "Microsoft Word document, convert to Google Docs first"
-  },
-  "bulk_result_preview_single_error_no_xlsx": {
-    "message": "Microsoft Excel document, convert to Google Sheets first"
-  },
-  "bulk_result_preview_single_error_invalid_folder_name": {
-    "message": "Seuls les lettres minuscules latines normalisées, les chiffres et les traits d'union sont autorisés dans les noms de dossier"
-  },
-  "bulk_confirm_publish_single": {
-    "message": "Are you sure you want to publish 1 file?"
+  "bulk_confirm_preview_single": {
+    "message": "Voulez-vous vraiment générer la prévisualisation de ce fichier ?"
   },
   "bulk_confirm_publish_multiple": {
-    "message": "Are you sure you want to publish $1 files?"
+    "message": "Voulez-vous vraiment publier $1 fichiers ?"
+  },
+  "bulk_confirm_publish_single": {
+    "message": "Voulez-vous vraiment publier ce fichier ?"
+  },
+  "bulk_progress_preview_multiple": {
+    "message": "Prévisualisation de $1 fichiers sur $2 générée…"
   },
   "bulk_progress_publish_multiple": {
-    "message": "$1 of $2 files published..."
+    "message": "$1 sur $2 fichiers publiés..."
   },
-  "bulk_result_publish_single_success": {
-    "message": "1 file successfully published."
+  "bulk_result_preview_multiple_failure": {
+    "message": "Échec de la génération de la prévisualisation de $1 fichiers :"
   },
-  "bulk_result_publish_multiple_success": {
-    "message": "$1 files successfully published."
+  "bulk_result_preview_multiple_success": {
+    "message": "La prévisualisation de $1 fichiers a bien été générée."
   },
-  "bulk_result_publish_single_failure": {
-    "message": "Failed to publish 1 file:"
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "Les noms de dossiers n'acceptent que les lettres latines normalisées, les chiffres et les traits d'union."
+  },
+  "bulk_result_preview_single_error_no_docx": {
+    "message": "Document Microsoft Word, convertissez-le d'abord au format Google Docs."
+  },
+  "bulk_result_preview_single_error_no_xlsx": {
+    "message": "Document Microsoft Excel, convertissez-le d'abord au format Google Sheets."
+  },
+  "bulk_result_preview_single_failure": {
+    "message": "Échec de la génération de la prévisualisation de ce fichier :"
+  },
+  "bulk_result_preview_single_success": {
+    "message": "La prévisualisation de ce fichier a bien été générée."
   },
   "bulk_result_publish_multiple_failure": {
-    "message": "Failed to publish $1 files:"
+    "message": "Échec de la publication de $1 fichiers :"
+  },
+  "bulk_result_publish_multiple_success": {
+    "message": "$1 fichiers ont été publiés."
   },
   "bulk_result_publish_single_error_no_source": {
-    "message": "File must be previewed first"
+    "message": "Le fichier doit d'abord être prévisualisé."
   },
-  "copy_url": {
-    "message": "Copy URL"
+  "bulk_result_publish_single_failure": {
+    "message": "Échec de la publication d'un fichier :"
   },
-  "copy_urls": {
-    "message": "Copy URLs"
+  "bulk_result_publish_single_success": {
+    "message": "Un fichier a été publié."
   },
-  "copy_preview_url": {
-    "message": "Copy Preview URL"
+  "bulk_selection_empty": {
+    "message": "Sélectionnez les fichiers ci-dessous."
   },
-  "copy_preview_urls": {
-    "message": "Copy Preview URLs"
+  "bulk_selection_multiple": {
+    "message": "$1 fichiers sélectionnés"
   },
-  "copy_live_url": {
-    "message": "Copy Live URL"
-  },
-  "copy_live_urls": {
-    "message": "Copy Live URLs"
-  },
-  "copy_prod_url": {
-    "message": "Copy Production URL"
-  },
-  "copy_prod_urls": {
-    "message": "Copy Production URLs"
-  },
-  "copied_url": {
-    "message": "URL copied to clipboard."
-  },
-  "copied_urls": {
-    "message": "URLs copied to clipboard."
-  },
-  "error_status_404_document": {
-    "message": "404 Not found: Check your Sidekick configuration and make sure access to this document is granted."
-  },
-  "error_status_404_content": {
-    "message": "404 Not found: Check your Sidekick configuration or URL."
-  },
-  "error_status_500": {
-    "message": "500 Internal server error: Failed to fetch the page status. Please try again later."
-  },
-  "error_status_502": {
-    "message": "502 Bad gateway: Failed to fetch the page status. Please try again later."
-  },
-  "error_status_504": {
-    "message": "504 Gateway timeout: Failed to fetch the page status. Please try again later."
-  },
-  "error_status_invalid": {
-    "message": "La réponse du serveur est invalide. Vérifiez la configuration du Sidekick ou l'URL."
-  },
-  "error_login_timeout": {
-    "message": "Le temps imparti pour se connecter à expirer. Veuillez essayer plus tard."
-  },
-  "error_login_aborted": {
-    "message": "La connexion a été annulée."
-  },
-  "error_logout_error": {
-    "message": "La déconnexion a échoué. Veuillez essayer plus tard."
-  },
-  "error_config_failure": {
-    "message": "L'activation de la configuration a échoué: "
-  },
-  "error_preview_failure": {
-    "message": "La génération de l'aperçu a échoué. Veuillez essayer plus tard."
-  },
-  "error_preview_not_gdoc_generic": {
-    "message": "La génération de l'aperçu a échoué. Doit être un document Google ou une feuille de calcul."
-  },
-  "error_preview_not_gdoc_ms_word": {
-    "message": "Ce document est un fichier Microsoft Word, vous devez le convertir en document Google Docs: Fichier > Enregistrer comme Google Docs"
-  },
-  "error_preview_not_gsheet_ms_excel": {
-    "message": "Ce document est un fichier Microsoft Excel, vous devez le convertir en document Google Sheets: Fichier > Enregistrer comme Google Sheets"
-  },
-  "please_wait": {
-    "message": "Veuillez patienter..."
-  },
-  "json_view_description": {
-    "message": "Aperçu des données."
-  },
-  "help_acknowledge": {
-    "message": "J'ai compris!"
-  },
-  "help_close_dismiss": {
-    "message": "Revoir l'aide plus tard"
-  },
-  "help_close_acknowledge": {
-    "message": "Ne plus voir ce sujet"
-  },
-  "help_close_opt_out": {
-    "message": "Ne plus voir l'aide"
-  },
-  "help_previous": {
-    "message": "Astuce précédente"
-  },
-  "help_current": {
-    "message": "Astuce"
-  },
-  "help_next": {
-    "message": "Astuce suivante"
-  },
-  "save": {
-    "message": "Sauvegarger"
+  "bulk_selection_single": {
+    "message": "Un fichier sélectionné"
   },
   "cancel": {
     "message": "Annuler"
   },
-  "add": {
-    "message": "Ajouter"
+  "caution_side_effects": {
+    "message": "Attention : des effets secondaires inattendus peuvent survenir."
   },
-  "config_toggle_menu": {
-    "message": "Afficher/cacher le menu"
+  "close": {
+    "message": "Fermer"
   },
-  "config_projects": {
-    "message": "Projets"
+  "config_add_no_mountpoint": {
+    "message": "Projet ajouté à Sidekick, mais…\n\nLa récupération de l'URL du contenu a échoué, vous ne pourrez donc pas encore utiliser Sidekick en mode d'édition. Pour l'ajouter manuellement, cliquez sur le bouton Modifier à côté de la configuration du projet."
+  },
+  "config_add_success": {
+    "message": "Projet ajouté à Sidekick."
+  },
+  "config_backup": {
+    "message": "Sauvegarde"
+  },
+  "config_delete": {
+    "message": "Supprimer"
+  },
+  "config_delete_all": {
+    "message": "Supprimer tous les paramètres"
+  },
+  "config_delete_all_confirm": {
+    "message": "Voulez-vous vraiment supprimer tous les paramètres ?"
+  },
+  "config_delete_all_description": {
+    "message": "Attention : cette action est irréversible."
+  },
+  "config_delete_confirm": {
+    "message": "Voulez-vous vraiment supprimer ce projet ?"
+  },
+  "config_development": {
+    "message": "Développement"
+  },
+  "config_edit": {
+    "message": "Modifier"
+  },
+  "config_export": {
+    "message": "Exporter la configuration"
+  },
+  "config_export_description": {
+    "message": "Sauvegardez la configuration sur votre ordinateur."
+  },
+  "config_filter": {
+    "description": "Filtrer les projets",
+    "message": "Rechercher..."
+  },
+  "config_filter_clear": {
+    "description": "Réinitialiser le filtre de projet",
+    "message": "Réinitialiser"
+  },
+  "config_import": {
+    "message": "Importer la configuration"
+  },
+  "config_import_confirm": {
+    "message": "Voulez-vous vraiment importer cette configuration et remplacer la configuration actuelle ?"
+  },
+  "config_import_description": {
+    "message": "Importez une configuration à partir de votre ordinateur. Assurez-vous de disposer d'une sauvegarde de votre configuration actuelle."
+  },
+  "config_import_failure": {
+    "message": "Échec de l'importation de la configuration."
+  },
+  "config_import_success": {
+    "message": "La configuration a été importée."
+  },
+  "config_invalid_export": {
+    "message": "Vous n'avez pas encore de configuration à exporter."
+  },
+  "config_invalid_giturl": {
+    "message": "URL de référentiel non valide"
+  },
+  "config_invalid_import": {
+    "message": "Choisissez un fichier valide à importer."
+  },
+  "config_invalid_shareurl": {
+    "message": "URL de partage non valide"
+  },
+  "config_manual_devMode": {
+    "message": "Tester la configuration du projet localement"
+  },
+  "config_manual_devOrigin_placeholder": {
+    "message": "URL de développement local : http://localhost:3000"
+  },
+  "config_manual_giturl_placeholder": {
+    "message": "URL du référentiel : https://github.com/..."
+  },
+  "config_manual_host_placeholder": {
+    "message": "Nom d'hôte de production (facultatif)"
+  },
+  "config_manual_mountpoints_placeholder": {
+    "message": "URL du contenu : https://..."
+  },
+  "config_manual_project_placeholder": {
+    "message": "Nom du projet (facultatif)"
+  },
+  "config_manual_title": {
+    "message": "Ajouter manuellement"
+  },
+  "config_picker_button_title": {
+    "message": "Appuyez sur $1 pour choisir $2."
+  },
+  "config_project_add": {
+    "message": "Ajouter ce projet"
+  },
+  "config_project_disable": {
+    "message": "Désactiver ce projet"
   },
   "config_project_empty": {
-    "message": "Vous n'avez pas encore ajouté de projet."
+    "message": "Vous n'avez pas encore ajouté de projets."
+  },
+  "config_project_enable": {
+    "message": "Activer ce projet"
   },
   "config_project_exists": {
     "message": "Une configuration pour ce projet existe déjà."
@@ -315,187 +210,308 @@
     "message": "Contenu"
   },
   "config_project_pick": {
-    "message": "Choisir un projet"
+    "message": "Choisissez un projet."
   },
   "config_project_pick_more": {
+    "description": "Plus de configurations",
     "message": "Plus..."
-  },
-  "config_project_add": {
-    "message": "Ajouter ce projet"
   },
   "config_project_remove": {
     "message": "Supprimer ce projet"
   },
-  "config_project_enable": {
-    "message": "Activer ce projet"
+  "config_projects": {
+    "message": "Projets"
   },
-  "config_project_disable": {
-    "message": "Désactivater ce projet"
-  },
-  "config_shareurl_title": {
-    "message": "Ajouter via une URL de partage"
-  },
-  "config_shareurl_description": {
-    "message": "Demander à quelqu'un de partager une configuration de son Sidekick: il lui suffit de cliquer sur le bouton partage du côté droit du Sidekick."
-  },
-  "config_shareurl_placeholder": {
-    "message": "URL de partage: https://www.hlx.live/sidekick..."
-  },
-  "config_shareurl_share_title": {
-    "message": "Configuration du Sidekick pour $1"
-  },
-  "config_shareurl_copied": {
-    "message": "L'URL de partage pour $1 a été copiée dans le presse-papiers"
-  },
-  "config_manual_title": {
-    "message": "Ajouter manuellement"
-  },
-  "config_manual_giturl_placeholder": {
-    "message": "URL du code dans GitHub: https://github.com/..."
-  },
-  "config_manual_host_placeholder": {
-    "message": "Nom de l'hôte de production (facultatif)"
-  },
-  "config_manual_mountpoints_placeholder": {
-    "message": "URL du contenu: https://..."
-  },
-  "config_manual_project_placeholder": {
-    "message": "Nom du projet (facultatif)"
-  },
-  "config_manual_devMode": {
-    "message": "Tester configuration locale du projet"
-  },
-  "config_add_success": {
-    "message": "Le projet a été ajouté au Sidekick"
-  },
-  "config_add_no_mountpoint": {
-    "message": "Le projet a été ajouté au Sidekick, mais ...\n\nLe contenu n'a pas pu être récupéré, vous ne pourrez pas utilisé le Sidekick en mode édition pour le moment. Pour l'ajouter manuellement, cliquez sur le bouton Editer dans la configuration du projet."
+  "config_reset": {
+    "message": "Réinitialiser"
   },
   "config_share": {
     "message": "Partager"
   },
-  "config_edit": {
-    "message": "Edition"
+  "config_shareurl_copied": {
+    "message": "L'URL de partage de $1 a été copiée dans le presse-papiers."
   },
-  "config_delete": {
-    "message": "Effacer"
+  "config_shareurl_description": {
+    "message": "Demandez à une personne avec Sidekick de partager son URL avec vous en cliquant sur l'icône de partage sur le côté droit."
   },
-  "config_delete_confirm": {
-    "message": "Voulez-vous vraiment supprimer ce projet ?"
+  "config_shareurl_placeholder": {
+    "message": "URL de partage : https://www.hlx.live/sidekick..."
   },
-  "config_invalid_shareurl": {
-    "message": "URL de partage incorrecte"
+  "config_shareurl_share_title": {
+    "message": "Configuration de Sidekick pour $1"
   },
-  "config_invalid_giturl": {
-    "message": "URL du code dans GitHub incorrecte"
+  "config_shareurl_title": {
+    "message": "Ajouter via l'URL de partage"
   },
-  "config_invalid_import": {
-    "message": "Fichier à importer invalide"
-  },
-  "config_invalid_export": {
-    "message": "Vous n'avez aucune configuration à exporter"
-  },
-  "config_backup": {
-    "message": "Sauvegarder"
-  },
-  "config_import": {
-    "message": "Importer une configuration"
-  },
-  "config_import_description": {
-    "message": "Importer une configuration depuis votre ordinateur. Vérifier d'abord que vous avez une sauvegarde de votre configuration actuelle !"
-  },
-  "config_import_confirm": {
-    "message": "Voulez-vous vraiment importer cette configuration et remplacer votre configuration actuelle ?"
-  },
-  "config_import_success": {
-    "message": "La configuration a été importée"
-  },
-  "config_import_failure": {
-    "message": "Impossible d'importer la configuration"
-  },
-  "config_export": {
-    "message": "Exporter la configuration"
-  },
-  "config_export_description": {
-    "message": "Sauvegarder la configuration actuelle sur votre ordinateur."
-  },
-  "config_reset": {
-    "message": "Reset"
-  },
-  "config_delete_all": {
-    "message": "Supprimer toutes les configurations"
-  },
-  "config_delete_all_description": {
-    "message": "Attention: cette action est irréversible !"
-  },
-  "config_delete_all_confirm": {
-    "message": "Voulez-vous vraiment supprimer toutes les configurations ?"
+  "config_toggle_menu": {
+    "message": "Afficher/masquer le menu"
   },
   "config_unsupported_legacy": {
-    "message": "Ce site n'est plus supporté"
-  },
-  "config_picker_button_title": {
-    "message": "Appuyer sur $1 pour choisir $2"
-  },
-  "extensions": {
-    "message": "Extensions"
-  },
-  "help": {
-    "message": "Aide"
-  },
-  "advanced": {
-    "message": "Avancées",
-    "description": "Configurations avancées."
-  },
-  "standard": {
-    "message": "Standard",
-    "description": "Configurations standards."
-  },
-  "config_development": {
-    "message": "Développement"
-  },
-  "caution_side_effects": {
-    "message": "Attention: effets indésirables!"
-  },
-  "admin_version": {
-    "message": "Utiliser une version spécifique de l'API Admin"
-  },
-  "admin_version_placeholder": {
-    "message": "Version de l'Admin: x.y.z"
+    "message": "Ce site n'est plus pris en charge."
   },
   "config_ux": {
     "message": "Expérience utilisateur"
   },
-  "push_down_content": {
-    "message": "Pousser le contenu de la page vers le bas plutôt que de passer par dessus"
+  "copied_url": {
+    "message": "URL copiée dans le presse-papiers."
   },
-  "push_down_content_description": {
-    "message": "Note: En fonction de la structure du site, cela peut demander une configuration spécifique au projet."
+  "copied_urls": {
+    "message": "Les URL ont été copiées dans le presse-papiers."
+  },
+  "copy_live_url": {
+    "message": "Copier l'URL dynamique"
+  },
+  "copy_live_urls": {
+    "message": "Copier les URL dynamiques"
+  },
+  "copy_preview_url": {
+    "message": "Copier l'URL d'aperçu"
+  },
+  "copy_preview_urls": {
+    "message": "Copier les URL d'aperçu"
+  },
+  "copy_prod_url": {
+    "message": "Copier l'URL de production"
+  },
+  "copy_prod_urls": {
+    "message": "Copier les URL de production"
+  },
+  "copy_url": {
+    "message": "Copier l'URL"
+  },
+  "copy_urls": {
+    "message": "Copier les URL"
+  },
+  "delete": {
+    "message": "Supprimer"
+  },
+  "delete_failure": {
+    "message": "Échec de la suppression. Réessayez plus tard."
+  },
+  "description": {
+    "message": "AEM Sidekick permet aux créateurs et créatrices de sites d’AEM de prévisualiser et publier du contenu."
+  },
+  "description_shortcut": {
+    "message": "Activer/désactiver Sidekick"
+  },
+  "development": {
+    "message": "Développement"
+  },
+  "docs": {
+    "message": "https://www.hlx.live/docs/sidekick"
+  },
+  "edit": {
+    "message": "Modifier"
+  },
+  "edit_date": {
+    "message": "Modifié : "
+  },
+  "error_config_failure": {
+    "message": "Échec de l'activation de la configuration : "
+  },
+  "error_login_aborted": {
+    "message": "Connexion abandonnée."
+  },
+  "error_login_timeout": {
+    "message": "La connexion a expiré. Réessayez plus tard."
+  },
+  "error_logout_error": {
+    "message": "Échec de la déconnexion. Réessayez plus tard."
+  },
+  "error_preview_failure": {
+    "message": "La génération de la prévisualisation a échoué. Veuillez réessayer ultérieurement."
+  },
+  "error_preview_not_gdoc_generic": {
+    "message": "Échec de la génération de la prévisualisation. Il doit s’agir d’un document ou d’une feuille de calcul Google."
+  },
+  "error_preview_not_gdoc_ms_word": {
+    "message": "Il s'agit d'un document Microsoft Word. Convertissez-le au format Google Docs : Fichier > Enregistrer au format Google Docs."
+  },
+  "error_preview_not_gsheet_ms_excel": {
+    "message": "Il s'agit d'un document Microsoft Excel. Convertissez-le au format Google Sheets : Fichier > Enregistrer au format Google Sheets."
+  },
+  "error_status_404_content": {
+    "message": "404 Introuvable : vérifiez la configuration ou l'URL de Sidekick."
+  },
+  "error_status_404_document": {
+    "message": "404 Introuvable : vérifiez votre configuration de Sidekick et assurez-vous que l'accès au document est autorisé."
+  },
+  "error_status_500": {
+    "message": "500 Erreur interne du serveur : échec de la récupération du statut de la page. Réessayez plus tard."
+  },
+  "error_status_502": {
+    "message": "502 Passerelle incorrecte : échec de la récupération du statut de la page. Réessayez plus tard."
+  },
+  "error_status_504": {
+    "message": "504 Délai d'expiration de la passerelle : échec de la récupération du statut de la page. Réessayez plus tard."
+  },
+  "error_status_fatal": {
+    "message": "Nous vous prions de nous excuser pour les problèmes rencontrés actuellement. Vous trouverez plus d’informations ici :"
+  },
+  "error_status_invalid": {
+    "message": "Réponse du serveur non valide. Vérifiez la configuration ou l'URL de Sidekick."
+  },
+  "extensions": {
+    "message": "Mixin"
+  },
+  "help": {
+    "message": "Aide"
+  },
+  "help_acknowledge": {
+    "message": "J'ai compris."
+  },
+  "help_close_acknowledge": {
+    "message": "Ne plus afficher le sujet d'aide"
+  },
+  "help_close_dismiss": {
+    "message": "Afficher à nouveau la rubrique d'aide plus tard"
+  },
+  "help_close_opt_out": {
+    "message": "Ne jamais afficher les rubriques d'aide"
+  },
+  "help_current": {
+    "message": "Ce conseil"
+  },
+  "help_next": {
+    "message": "Prochain conseil"
   },
   "help_opt_out": {
-    "message": "Ne pas montrer l'aide"
+    "message": "Ne pas montrer d'aide"
   },
   "help_opt_out_alert": {
-    "message": "Aide désactivée. Vous pouvez la réactiver dans Options > Expérience utilisateur."
+    "message": "L'aide a été désactivée. Réactivez-la sous Options > Expérience utilisateur."
+  },
+  "help_previous": {
+    "message": "Conseil précédent"
   },
   "help_user_status": {
-    "message": "Sujets d'aide disponibles"
+    "message": "Rubriques d'aide disponibles"
   },
   "help_user_status_check_all": {
-    "message": "Sélectionner tous",
-    "description": "Sélectionner tous les sujets d'aide"
-  },
-  "help_user_status_uncheck_all": {
-    "message": "Annuler tous",
-    "description": "Désélectionner tous les sujets d'aide"
+    "description": "Consulter toutes les rubriques d'aide",
+    "message": "Tout vérifier"
   },
   "help_user_status_description": {
-    "message": "Les sujets sélectionnés ne seront plus affichés. Décochez la case à côté d'un sujet que vous souhaitez revoir."
+    "message": "Les sujets cochés ne seront plus affichés. Enlevez la coche à côté d'un sujet que vous souhaitez voir à nouveau."
   },
-  "open_view_doc_source": {
-    "message": "Voir le document source"
+  "help_user_status_uncheck_all": {
+    "description": "Décocher toutes les rubriques d'aide",
+    "message": "Tout décocher"
+  },
+  "homepage": {
+    "message": "https://www.hlx.live/tools/sidekick/"
+  },
+  "info": {
+    "message": "Informations"
+  },
+  "json_view_description": {
+    "message": "Rendu des données convivial."
+  },
+  "live": {
+    "message": "En direct"
+  },
+  "minutes_ago": {
+    "message": "Il y a $1 minutes"
+  },
+  "never": {
+    "message": "Jamais"
+  },
+  "now": {
+    "message": "Maintenant"
   },
   "open_preview": {
-    "message": "Ouvrir l'URL aperçu"
+    "description": "Permet d'ouvrir l'URL d'aperçu d'une branche GitHub donnée.",
+    "message": "Ouvrir l'URL d'aperçu"
+  },
+  "open_view_doc_source": {
+    "message": "Afficher la source du document"
+  },
+  "please_wait": {
+    "message": "Veuillez patienter..."
+  },
+  "plugins_empty": {
+    "message": "Aucune action n'a été trouvée pour cette page."
+  },
+  "plugins_loading": {
+    "message": "Chargement des actions…"
+  },
+  "preview": {
+    "message": "Aperçu"
+  },
+  "preview_config_success": {
+    "message": "La configuration a été activée."
+  },
+  "preview_date": {
+    "message": "Prévisualisé : "
+  },
+  "preview_onedrive": {
+    "message": "Conseil de pro : appuyez sur Ctrl+S avant de générer la prévisualisation pour voir immédiatement les dernières modifications…"
+  },
+  "preview_onedrive_mac": {
+    "message": "Conseil de pro : appuyez sur ⌘+S avant de générer la prévisualisation pour voir immédiatement les dernières modifications…"
+  },
+  "production": {
+    "message": "Production"
+  },
+  "publish": {
+    "message": "Publier"
+  },
+  "publish_date": {
+    "message": "Publié : "
+  },
+  "publish_failure": {
+    "message": "Échec de la publication. Réessayez plus tard."
+  },
+  "push_down_content": {
+    "message": "Transférer le contenu au lieu de le superposer"
+  },
+  "push_down_content_description": {
+    "message": "Remarque : selon la structure du site, une configuration personnalisée du projet peut s'avérer nécessaire pour obtenir le résultat escompté."
+  },
+  "reload": {
+    "message": "Recharger"
+  },
+  "reload_failure": {
+    "message": "Échec du rechargement. Réessayez plus tard."
+  },
+  "save": {
+    "message": "Enregistrer"
+  },
+  "seconds_ago": {
+    "message": "Il y a $1 secondes"
+  },
+  "share_description": {
+    "message": "Partager votre Sidekick"
+  },
+  "standard": {
+    "description": "Mode de configuration standard",
+    "message": "Standard"
+  },
+  "switch_view": {
+    "message": "Afficher"
+  },
+  "title": {
+    "message": "AEM Sidekick"
+  },
+  "today_at": {
+    "message": "Aujourd'hui à $1"
+  },
+  "unpublish": {
+    "message": "Dépublier"
+  },
+  "unpublish_failure": {
+    "message": "Échec de la dépublication. Réessayez plus tard."
+  },
+  "user_login": {
+    "message": "Se connecter"
+  },
+  "user_logout": {
+    "message": "Se déconnecter"
+  },
+  "user_switch": {
+    "message": "Changer d'utilisateur"
+  },
+  "yesterday_at": {
+    "message": "Hier à $1"
   }
 }

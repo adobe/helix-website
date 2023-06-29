@@ -122,7 +122,7 @@
           window.hlx.initSidekick();
 
           showExtensionHint({
-            browsers: ['Chrome'],
+            browsers: ['Chrome', 'Safari'],
             message: 'Did you know that the Sidekick is also available as a {{browser}} extension?',
             installUrl: getShareUrl(baseConfig),
             installButtonText: 'Show me now',

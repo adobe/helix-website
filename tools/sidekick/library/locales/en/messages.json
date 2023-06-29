@@ -1,6 +1,6 @@
 {
   "appTitle": {
-    "message": "Libraries"
+    "message": "AEM Sidekick Library"
   },
   "unknownPlugin": {
     "message": "Unknown plugin"
@@ -16,5 +16,14 @@
   },
   "errorLoadingLibraryJSON": {
     "message": "Error loading library JSON"
+  },
+  "generativeTextPrompt": {
+    "message": "What would you like to say?"
+  },
+  "generativeTextCTA": {
+    "message": "Generate"
+  },
+  "search": {
+    "message": "Search"
   }
 }

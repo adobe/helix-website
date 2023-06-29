@@ -195,6 +195,7 @@
 }
 
 .hlx-sk .plugin-container {
+  position: relative;
   flex-grow: 1;
   display: flex;
   flex-direction: row;
@@ -206,6 +207,12 @@
 .hlx-sk .plugin-container.loading::before,
 .hlx-sk .plugin-container:empty::before {
   line-height: 28px;
+}
+
+.hlx-sk .plugin-container .plugin-container-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .hlx-sk .hlx-sk-label,
