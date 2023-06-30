@@ -1018,7 +1018,7 @@ body.docs-template main h1,
 body.guides-template main h1 {
   font-size: var(--type-heading-xxl-size);
   line-height: var(--type-heading-xxl-lh);
-  margin-bottom: var(--spacing-ml);
+  margin-bottom: var(--spacing-s);
 }
 
 body.docs-template main h2,
@@ -1247,12 +1247,13 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
   letter-spacing: 0;
 }
 
-body.guides-template main.without-full-width-hero .doc-detail-hero-image {
+body.guides-template main.without-full-width-hero img.doc-detail-hero-image {
   width: 100%;
   height: auto;
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
+  margin: var(--spacing-s) auto;
 }
 
 body.guides-template main.without-full-width-hero .default-content-wrapper img {
@@ -1276,7 +1277,6 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
 
 /* guides-template back button on documentation detail pages */
 body.guides-template .guides-back-btn {
-  margin: var(--spacing-s) 0;
   display: flex;
   align-items: center;
 }
@@ -1388,6 +1388,10 @@ body.guides-template .guides-back-btn span {
   body.guides-template main.without-full-width-hero .default-content-wrapper h1 {
     margin-top: var(--spacing-ml);
     margin-bottom: var(--spacing-m);
+  }
+
+  body.guides-template main.without-full-width-hero img.doc-detail-hero-image {
+    margin-top: 0;
   }
 
   body.guides-template .guides-back-btn {

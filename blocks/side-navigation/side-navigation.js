@@ -5,7 +5,6 @@ let searchFunc;
 let searchTerm;
 
 const searchParams = new URLSearchParams(window.location.search);
-
 const MOBILE_BREAKPOINT = 900;
 
 const debounce = (func, time = 100) => {
@@ -65,7 +64,18 @@ export default async function decorate(block) {
   block.append(sideNavbar);
 
   const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
-  const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
+  const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper in-doc-page' }, docBtnInner);
+  const isDocumentationLanding = window.location.pathname === '/docs/';
+  if (!isDocumentationLanding) {
+    const backDocPageBtn = createTag('div', { class: 'guides-back-btn' }, `
+      <span class="icon icon-icon-arrow"></span>
+      <a href="/docs/" class="link-underline-effect">
+          Back
+      </a>
+    `);
+    docButton.prepend(backDocPageBtn);
+  }
+
   const docToggleMenuButton = docButton.querySelector('.documentation-btn');
 
   const backBtnInner = '<button class="back-btn">Back</button>';
