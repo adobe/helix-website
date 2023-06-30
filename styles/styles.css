@@ -422,14 +422,12 @@ h3 {
   line-height: var(--type-heading-m-lh);
 }
 
-
 @media (min-width: 900px) {
   /* Heading XXL */
   h1 u {
     font-size: 60px;
   }
 }
-
 
 /* Themes */
 .dark {
@@ -492,9 +490,6 @@ code {
 }
 
 code:not(pre > code) {
-  /* color: var(--brand-color-dark-purple)
-  background-color: var(--code-bg-color);
-  original first pass on color */
   font-size: 14px;
   overflow-wrap: break-word;
   border: 1px solid #e5e5e5;
