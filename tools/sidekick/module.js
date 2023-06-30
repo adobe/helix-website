@@ -1253,14 +1253,14 @@
           // double check
           if (status.edit && status.edit.url) {
             window.alert(sk.isContent()
-              ? 'This page still has a source document and cannot be deleted.'
-              : 'This file still exists in the repository and cannot be deleted.');
+              ? i18n(sk, 'delete_page_source_exists')
+              : i18n(sk, 'delete_file_source_exists'));
             return;
           }
           // have user confirm deletion
-          if (window.confirm(`${sk.isContent()
-            ? 'This page no longer has a source document'
-            : 'This file no longer exists in the repository'}, deleting it cannot be undone!\n\nAre you sure you want to delete it?`)) {
+          if (window.confirm(sk.isContent()
+            ? i18n(sk, 'delete_page_confirm')
+            : i18n(sk, 'delete_file_confirm'))) {
             try {
               const resp = await sk.delete();
               if (!resp.ok && resp.status >= 400) {
@@ -1347,11 +1347,11 @@
           const { status } = sk;
           // double check
           if (status.edit && status.edit.url) {
-            window.alert('This page has a source document and cannot be unpublished.');
+            window.alert(i18n(sk, 'unpublish_page_source_exists'));
             return;
           }
           // have user confirm unpublishing
-          if (window.confirm('This page no longer has a source document, unpublishing it cannot be undone!\n\nAre you sure you want to unpublish it?')) {
+          if (window.confirm(i18n(sk, 'unpublish_page_confirm'))) {
             const path = status.webPath;
             try {
               const resp = await sk.unpublish();
