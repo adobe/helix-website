@@ -557,7 +557,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['marquee', 'columns', 'tabs']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
 const ICON_ROOT = '/img';
 
 sampleRUM('top');
@@ -754,7 +754,7 @@ export function loadScript(url, callback, type) {
 export function setTemplate() {
   const template = getMetadata('template');
   if (!template) return;
-  document.body.classList.add(`${template}-template`);
+  document.body.classList.add(`${template.toLowerCase()}-template`);
 }
 
 export async function decorateGuideTemplateCodeBlock() {
@@ -922,7 +922,7 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  loadBlocks(main);
+  await loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 
   const { hash } = window.location;

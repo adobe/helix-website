@@ -35,7 +35,7 @@ const animateValueProps = (el) => {
   // animation sections
   const valuePropSections = el.querySelectorAll('.z-row-even, .z-row-odd');
   valuePropSections.forEach((section) => {
-    const image = section.querySelector('.image-side img');
+    const image = section.querySelector('.image-side picture');
     const imageWrapper = section.querySelector('.image-side');
     addInViewAnimationToSingleElement(image, 'slide-reveal-up-slow', imageWrapper, null);
     // eslint-disable-next-line
