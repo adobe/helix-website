@@ -321,6 +321,22 @@ body.docs-template h1 {
   margin-top: 64px;
 }
 
+body.bumper-template {
+  text-align: center;
+}
+
+body.bumper-template main .section {
+  padding: 0;
+}
+
+body.bumper-template main .section .hero {
+  min-height: 100vh;
+}
+
+body.bumper-template main .section p {
+  color: transparent;
+}
+
 /* End Templates */
 
 [class$="-"],
