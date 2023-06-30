@@ -754,7 +754,7 @@ export function loadScript(url, callback, type) {
 export function setTemplate() {
   const template = getMetadata('template');
   if (!template) return;
-  document.body.classList.add(`${template}-template`);
+  document.body.classList.add(`${template.toLowerCase()}-template`);
 }
 
 export async function decorateGuideTemplateCodeBlock() {

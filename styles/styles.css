@@ -11,7 +11,7 @@
     font-weight: 400;
     size-adjust: 87%;
     src: local('Trebuchet MS'),
-         local('TrebuchetMS');    
+         local('TrebuchetMS');
 }
 
 :root {
@@ -38,7 +38,7 @@
 
     /* Body (Consonant) */
     --type-body-l-size: 20px;
-    --type-body-l-lh: 30px;  
+    --type-body-l-lh: 30px;
     --type-body-m-size: 18px;
     --type-body-m-lh: 27px;
     --type-body-s-size: 16px;
@@ -58,7 +58,7 @@
     --type-detail-l-lh: 1.5;
     --type-detail-m-size: 12px;
     --type-detail-m-lh: 15px;
-    
+
     /* Button */
     --body-line-height: 1.6875;
 
@@ -68,7 +68,7 @@
     --spacing-xs: 16px;
     --spacing-s: 24px;
     --spacing-m: 32px;
-    --spacing-ml: 40px; 
+    --spacing-ml: 40px;
     --spacing-l: 48px;
     --spacing-xl: 56px;
     --spacing-xxl: 80px;
@@ -123,7 +123,7 @@
     --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
     --overlay-curtain-bg-filter: blur(0.05em);
     --code-bg-color: #F1F1F1;
-  
+
     /* Grid / container width -- 600px, 900px */
     --grid-mobile-container-width: 88%;
     --grid-tablet-container-width: 83%;
@@ -151,7 +151,7 @@
 
     /* Checkerboard pattern */
     --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
-    --color-checkerboard-bg-fill: transparent; 
+    --color-checkerboard-bg-fill: transparent;
     --checkerboard-background: linear-gradient(var(--color-checkerboard-bg-border) 1px, transparent 1px),
     linear-gradient(90deg, var(--color-checkerboard-bg-border) 1px, transparent 1px),
     linear-gradient(45deg, var(--color-checkerboard-bg-fill) 50%, var(--color-checkerboard-bg-fill) 51%);
@@ -173,7 +173,7 @@
 
     /* animation & transition */
     --cubic-bezier-1: cubic-bezier(0.802, 0, 0.2, 1);
-    --cubic-bezier-2: cubic-bezier(0.23, 1, 0.32, 1);   
+    --cubic-bezier-2: cubic-bezier(0.23, 1, 0.32, 1);
     --transition-cubic-bezier-1: all .5s var(--cubic-bezier-2);
     --transition-ease-in-out: all 0.4s ease-in-out;
     --fade-transition: all 0.6s var(--cubic-bezier-1);
@@ -189,7 +189,7 @@
   :root {
     /* breadcrumb */
     --breadcrumb-height: 47px;
-  } 
+  }
 }
 
 /* desktop variables */
@@ -235,7 +235,7 @@ html {
 a, button {
   -webkit-tap-highlight-color: transparent;
 
-  /* outline: none; */  
+  /* outline: none; */
 }
 
 body {
@@ -277,7 +277,7 @@ body.appear {
   .contained-wrapper {
     max-width: 90%;
   }
-  
+
   .side-navigation-wrapper.expand {
     margin-left: auto;
     margin-right: auto;
@@ -476,8 +476,8 @@ code {
 }
 
 code:not(pre > code) {
-  /* color: var(--brand-color-dark-purple) 
-  background-color: var(--code-bg-color); 
+  /* color: var(--brand-color-dark-purple)
+  background-color: var(--code-bg-color);
   original first pass on color */
   font-size: 14px;
   overflow-wrap: break-word;
@@ -577,7 +577,7 @@ a.button:any-link {
     background-color: var(--color-info-accent-hover);
     border-color: var(--color-info-accent-hover);
     color: var(--color-white);
-    
+
     /* outline: none; */
     box-shadow:
       0 0 0 2px var(--color-white),
@@ -844,15 +844,15 @@ main .form .button:hover::before {
       line-height: 1.35;
       padding: 8px 20px;
       margin-bottom: 0;
-  }  
+  }
 }
 
 @media screen and (min-width: 1200px) {
   .redesign a.button.large:any-link {
       font-size: 18px;
-      line-height: 24px; 
+      line-height: 24px;
       padding: 10px 26px;
-  }  
+  }
 }
 
 /* ---- button ends ---- */
@@ -1047,9 +1047,10 @@ body.docs-template main p {
     }
 }
 
-body.guides-template main.without-full-width-hero {
+body.guides-template main.without-full-width-hero,
+body.home-template main.without-full-width-hero {
   min-height: 900px;
-} 
+}
 
 .docs-template a.button.accent:any-link {
   background-color: var(--spectrum-blue);
@@ -1088,10 +1089,10 @@ body.guides-template main .section.content {
   padding-bottom: var(--spacing-xl);
 }
 
-body.guides-template main h2, 
-body.guides-template main h3, 
-body.guides-template main h4, 
-body.guides-template main h5, 
+body.guides-template main h2,
+body.guides-template main h3,
+body.guides-template main h4,
+body.guides-template main h5,
 body.guides-template main h6 {
   font-weight: 700;
   margin-top: var(--spacing-s);
@@ -1128,11 +1129,11 @@ main .faq dd a:hover {
   color: var(--spectrum-blue);
 }
 
-body.guides-template main h1 a, 
-body.guides-template main h2 a, 
-body.guides-template main h3 a, 
-body.guides-template main h4 a, 
-body.guides-template main h5 a, 
+body.guides-template main h1 a,
+body.guides-template main h2 a,
+body.guides-template main h3 a,
+body.guides-template main h4 a,
+body.guides-template main h5 a,
 body.guides-template main h6 a{
   color: var(--color-black);
   font-size: inherit;
@@ -1141,11 +1142,11 @@ body.guides-template main h6 a{
   border: none;
 }
 
-body.guides-template main .default-content-wrapper h1 a:hover, 
-body.guides-template main .default-content-wrapper h2 a:hover, 
-body.guides-template main .default-content-wrapper h3 a:hover, 
-body.guides-template main .default-content-wrapper h4 a:hover, 
-body.guides-template main .default-content-wrapper h5 a:hover, 
+body.guides-template main .default-content-wrapper h1 a:hover,
+body.guides-template main .default-content-wrapper h2 a:hover,
+body.guides-template main .default-content-wrapper h3 a:hover,
+body.guides-template main .default-content-wrapper h4 a:hover,
+body.guides-template main .default-content-wrapper h5 a:hover,
 body.guides-template main .default-content-wrapper h6 a:hover {
   color: var(--color-black);
   transition: var(--transition-ease-in-out);
@@ -1442,7 +1443,7 @@ body.contact-template .section:only-of-type::after {
 
 body.contact-template .section:first-of-type::before {
   content: '';
-  background: url('../../img/colorful-bg.jpg'); 
+  background: url('../../img/colorful-bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -1929,7 +1930,7 @@ body.contact-template .default-content-wrapper img {
 .in-view,
 .in-view .fade-in,
 .in-view .fade-up,
-.in-view .fade-left, 
+.in-view .fade-left,
 .in-view .item-fade-in,
 .in-view .item-fade-up,
 .in-view .item-fade-left {
@@ -1942,7 +1943,7 @@ body.contact-template .default-content-wrapper img {
   overflow: hidden;
 
   /* prevent bottom text, like `g` hidden by overflow-hidden */
-  padding-bottom: 4px; 
+  padding-bottom: 4px;
   margin-bottom: -4px;
 }
 
@@ -1972,7 +1973,7 @@ body.contact-template .default-content-wrapper img {
   clip-path: inset(0 100% 0 0);
 }
 
-.in-view .clip-path-reveal, 
+.in-view .clip-path-reveal,
 .in-view .clip-path-reveal-short {
   clip-path: inset(0 0 0 0);
 }
