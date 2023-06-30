@@ -1047,8 +1047,7 @@ body.docs-template main p {
     }
 }
 
-body.guides-template main.without-full-width-hero,
-body.home-template main.without-full-width-hero {
+body.guides-template main.without-full-width-hero {
   min-height: 900px;
 }
 

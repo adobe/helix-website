@@ -922,7 +922,7 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  loadBlocks(main);
+  await loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 
   const { hash } = window.location;
