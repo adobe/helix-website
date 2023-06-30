@@ -15,6 +15,7 @@
  * @param {string} checkpoint identifies the checkpoint in funnel
  * @param {Object} data additional data for RUM sample
  */
+import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements, returnLinkTarget } from '../utils/helpers.js';
 
 export function sampleRUM(checkpoint, data = {}) {
   sampleRUM.defer = sampleRUM.defer || [];
@@ -96,6 +97,39 @@ export function loadCSS(href, callback) {
   } else if (typeof callback === 'function') {
     callback('noop');
   }
+}
+
+/**
+ * Loads preload file for LCP.
+ * @param {string} href The path to the CSS file
+ */
+export function loadPreloadLink() {
+  const preloadLinks = [{
+    href: `${window.hlx.codeBasePath}/img/colorful-bg.jpg`,
+    as: 'image',
+    conditionalSelector: ['.hero', '.colorful-bg'],
+  }];
+
+  preloadLinks.forEach((preloadLink) => {
+    if (!document.querySelector(`head > link[href="${preloadLink.href}"]`)) {
+      const shouldPreload = preloadLink.conditionalSelector.some((s) => document.querySelector(s));
+
+      if (shouldPreload) {
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'preload');
+        link.setAttribute('href', preloadLink.href);
+        link.setAttribute('as', preloadLink.as);
+        document.head.appendChild(link);
+      }
+    }
+  });
+}
+
+/**
+ * set language in html tag for improving SEO accessibility
+ */
+export function setLanguageForAccessibility() {
+  document.documentElement.lang = 'en';
 }
 
 /**
@@ -538,7 +572,7 @@ window.addEventListener('error', (event) => {
 loadPage(document);
 
 export function decorateButtons(block = document) {
-  const noButtonBlocks = ['cards'];
+  const noButtonBlocks = ['cards', 'pagination', 'card-list'];
   block.querySelectorAll(':scope a').forEach(($a) => {
     $a.title = $a.title || $a.textContent;
     const $block = $a.closest('div.section > div > div');
@@ -594,6 +628,120 @@ export function decorateHeadings(main) {
   });
 }
 
+export function addMessageBoxOnGuideTemplate(main) {
+  const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
+  main.append(messageBox);
+}
+
+export function addHeadingAnchorLink(elem) {
+  const link = document.createElement('a');
+  link.setAttribute('href', `#${elem.id || ''}`);
+  link.setAttribute('title', `Copy link to "${elem.textContent}" to clipboard`);
+  // hover highlight on title
+  if (elem.tagName === 'H2') {
+    link.classList.add('anchor-link', 'link-highlight-colorful-effect');
+  } else {
+    link.classList.add('anchor-link', 'link-highlight-colorful-effect-2');
+  }
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigator.clipboard.writeText(link.href);
+    window.location.href = link.href;
+    const messageBox = document.querySelector('.message-box');
+    if (messageBox) {
+      messageBox.classList.add('active', 'fill');
+      setTimeout(() => {
+        messageBox.classList.remove('active');
+        setTimeout(() => {
+          messageBox.classList.remove('fill');
+        }, 300);
+      }, 1000);
+    }
+
+    e.target.classList.add('anchor-link-copied');
+    setTimeout(() => {
+      e.target.classList.remove('anchor-link-copied');
+    }, 1000);
+  });
+  link.innerHTML = elem.innerHTML;
+  elem.innerHTML = '';
+  elem.append(link);
+}
+
+export function decorateGuideTemplateHeadings(main) {
+  const contentArea = main.querySelector('.section.content');
+  if (!contentArea) return;
+  const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
+  if (!contentSections) return;
+  contentSections.forEach((section) => {
+    section.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
+      addHeadingAnchorLink(h);
+    });
+  });
+}
+
+export function decorateGuideTemplateHero(main) {
+  if (main.classList.contains('without-full-width-hero'));
+  const firstImageInContentArea = main.querySelector('.section.content .default-content-wrapper img');
+  if (firstImageInContentArea) firstImageInContentArea.classList.add('doc-detail-hero-image');
+}
+
+export function decorateGuideTemplateLinks(main) {
+  const links = main.querySelectorAll('.content a');
+  links.forEach((link) => {
+    link.setAttribute('target', returnLinkTarget(link.href));
+  });
+}
+
+function animateTitleSection(section) {
+  const animationConfig = {
+    staggerTime: 0.3,
+    items: [
+      {
+        selector: '.icon-eyebrow',
+        animatedClass: 'slide-reveal-up',
+      },
+      {
+        selector: '.main-headline',
+        animatedClass: 'slide-reveal-up',
+      }],
+  };
+  const trigger = section.querySelector('.default-content-wrapper');
+
+  const image = trigger.querySelector('picture');
+  if (image) {
+    // addInViewAnimationToSingleElement(image, 'item-fade-in');
+
+    // udpated logic
+    const imageParent = image.parentElement;
+    imageParent.classList.add('default-content-image-wrapper');
+    addInViewAnimationToSingleElement(imageParent, 'slide-reveal-up');
+    animationConfig.items.unshift({
+      selector: '.default-content-image-wrapper',
+      animatedClass: 'slide-reveal-up',
+    });
+  }
+  addInViewAnimationToMultipleElements(animationConfig.items, trigger, animationConfig.staggerTime);
+}
+
+export function decorateTitleSection(main) {
+  const titleSections = main.querySelectorAll('.title-section');
+  if (!titleSections) return;
+  titleSections.forEach((section) => {
+    const elements = section.querySelectorAll('h1,h2,h3,h4,h5,h6');
+    if (!elements || elements.length < 2) return;
+    const eyebrow = elements[0];
+    const headline = elements[1];
+    if (eyebrow) {
+      eyebrow.classList.add('icon-eyebrow');
+    }
+    if (headline) {
+      headline.classList.add('main-headline');
+    }
+    animateTitleSection(section);
+  });
+}
+
 export function loadScript(url, callback, type) {
   const script = document.createElement('script');
   script.onload = callback;
@@ -607,6 +755,45 @@ export function setTemplate() {
   const template = getMetadata('template');
   if (!template) return;
   document.body.classList.add(`${template}-template`);
+}
+
+export async function decorateGuideTemplateCodeBlock() {
+  if (!document.body.classList.contains('guides-template')) return;
+
+  const highlightCSS = createTag('link', {
+    rel: 'stylesheet',
+    href: '/libs/highlight/atom-one-dark.min.css',
+  });
+  document.head.append(highlightCSS);
+
+  await loadScript('/libs/highlight/highlight.min.js', () => {
+    const initScript = createTag('script', {}, 'hljs.highlightAll();');
+    document.body.append(initScript);
+  });
+}
+
+// patch fix for table not being rendered as block in fragment
+export function decorateFragmentTable(main) {
+  if (!main) return;
+  const tables = main.querySelectorAll('table');
+  if (tables) {
+    tables.forEach((table) => {
+      if (table.classList.contains('block')) return;
+      const tableWrapper = createTag('div', { class: 'table' });
+      table.parentNode.insertBefore(tableWrapper, table);
+      tableWrapper.appendChild(table);
+    });
+  }
+}
+
+export function decorateGuideTemplate(main) {
+  if (!document.body.classList.contains('guides-template') || !main) return;
+  addMessageBoxOnGuideTemplate(main);
+  decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateHero(main);
+  decorateGuideTemplateLinks(main);
+  decorateGuideTemplateCodeBlock();
+  decorateFragmentTable(main); // ususally only use fragment in doc detail
 }
 
 /**
@@ -643,6 +830,19 @@ function buildFooter() {
   footer.append(buildBlock('footer', ''));
 }
 
+function updateGuideTemplateStyleBasedOnHero() {
+  const isHeroContentExist = document.querySelector('.guides-template .section.heading');
+
+  if (isHeroContentExist) {
+    document.querySelector('main').classList.add('has-full-width-hero');
+    const cardListBlocks = document.querySelectorAll('.block.card-list');
+    // make card list in main category page has '.image-card-listing' class
+    cardListBlocks.forEach((block) => block.classList.add('image-card-listing'));
+  } else {
+    document.querySelector('main').classList.add('without-full-width-hero');
+  }
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -667,7 +867,10 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateButtons(main);
   decorateHeadings(main);
+  decorateGuideTemplate(main);
   decorateBlocks(main);
+  decorateTitleSection(main);
+  // decorateTableBlock(main);
 }
 
 /**
@@ -683,6 +886,29 @@ async function loadEager(doc) {
   }
 }
 
+function addBlockLevelInViewAnimation(main) {
+  const observerOptions = {
+    threshold: 0.2, // add `.in-view` class when is 20% in view
+    // rootMargin: '-10px 0px -10px 0px',
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // support block level animation as well
+  const inviewTriggerClassList = '.fade-up, .fade-in, .fade-left, .fade-right';
+  const sections = Array.from(main.querySelectorAll(inviewTriggerClassList));
+  sections.forEach((section) => {
+    observer.observe(section);
+  });
+}
+
 /**
  * loads everything that doesn't need to be delayed.
  */
@@ -690,8 +916,14 @@ async function loadLazy(doc) {
   const main = doc.querySelector('main');
   const header = doc.querySelector('header > div');
   const footer = doc.querySelector('footer > div');
+  const aside = createTag('aside');
+  main.insertBefore(aside, main.querySelector('.section.content'));
+
+  // NOTE:'.redesign' class is needed for the redesign styles, keep this
+  document.body.classList.add('redesign');
 
   loadBlocks(main);
+  addBlockLevelInViewAnimation(main);
 
   const { hash } = window.location;
 
@@ -704,8 +936,10 @@ async function loadLazy(doc) {
     }, 500);
   }
 
-  loadCSS('/fonts/fonts.css');
-  addFavIcon(`${window.hlx.codeBasePath}/img/icon-aec.png`);
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`, null);
+  addFavIcon(`${window.hlx.codeBasePath}/img/franklin-favicon.png`);
+  loadPreloadLink();
+  setLanguageForAccessibility();
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
@@ -718,6 +952,22 @@ async function loadLazy(doc) {
 
   decorateBlock(footer);
   loadBlock(footer);
+
+  // breadcrump setup
+  const breadcrumb = buildBlock('breadcrumb', '');
+  const breadcrumbWrapper = createTag('div');
+  breadcrumbWrapper.append(breadcrumb);
+  main.insertBefore(breadcrumbWrapper, main.querySelectorAll('.section')[0]);
+  decorateBlock(breadcrumb);
+  loadBlock(breadcrumb);
+
+  // sidebar + related style setup
+  const sideNav = buildBlock('side-navigation', '');
+  aside.append(sideNav);
+  main.insertBefore(aside, main.querySelector('.section.content'));
+  updateGuideTemplateStyleBasedOnHero();
+  decorateBlock(sideNav);
+  loadBlock(sideNav);
 
   sampleRUM('lazy');
 }

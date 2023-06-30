@@ -24,6 +24,12 @@ export default function decorate(block) {
       } else if (details.querySelector('h3')) {
         cell.classList.add('cards-card-highlight');
       }
+      // highlight styling
+      const links = details.querySelectorAll('a');
+      links.forEach((link) => {
+        link.classList.add('link-highlight-colorful-effect-hover-wrapper');
+        link.innerHTML = `<span class="link-highlight-colorful-effect-2">${link.textContent}</span>`;
+      });
       cell.append(details);
       observer.observe(cell);
     }

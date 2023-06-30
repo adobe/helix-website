@@ -16,6 +16,7 @@ const isElementInContainerView = (targetEl) => {
 
 const scrollTabIntoView = (e) => {
   const isElInView = isElementInContainerView(e);
+
   /* c8 ignore next */
   if (!isElInView) e.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 };
@@ -31,10 +32,10 @@ function changeTabs(e) {
   scrollTabIntoView(target);
   grandparent
     .querySelectorAll('[role="tabpanel"]')
-    .forEach((p) => p.setAttribute('hidden', true));
+    .forEach((p) => p.classList.remove('active'));
   grandparent.parentNode
     .querySelector(`#${target.getAttribute('aria-controls')}`)
-    .removeAttribute('hidden');
+    .classList.add('active');
 }
 
 function initTabs(e) {
@@ -84,6 +85,7 @@ const init = (e) => {
   tabList.setAttribute('role', 'tablist');
   const tabListContainer = tabList.querySelector(':scope > div');
   tabListContainer.classList.add('tablist-container');
+
   const tabListItems = rows[0].querySelectorAll(':scope li');
   if (tabListItems) {
     const btnClass = [...e.classList].includes('quiet') ? 'heading-XS' : 'heading-XS';
@@ -97,9 +99,20 @@ const init = (e) => {
         tabindex: (i > 0) ? '0' : '-1',
         'aria-selected': (i === 0) ? 'true' : 'false',
         'aria-controls': `tab-panel-${initCount}-${tabName}`,
+        'aria-label': item.textContent ? item.textContent.trim() : tabName,
+        'data-tab-id': i,
       };
       const tabBtn = createTag('button', tabBtnAttributes);
       tabBtn.innerText = item.textContent;
+
+      // support image in tabs for tabs.image-based
+      if (e.classList.contains('image-based')) {
+        const img = item.querySelector('picture');
+        if (img) {
+          tabBtn.innerHTML = '';
+          tabBtn.append(img);
+        }
+      }
       tabListContainer.append(tabBtn);
 
       const tabContentAttributes = {
@@ -111,7 +124,9 @@ const init = (e) => {
       };
       const tabListContent = createTag('div', tabContentAttributes);
       tabListContent.setAttribute('aria-labelledby', `tab-${initCount}-${tabName}`);
-      if (i > 0) tabListContent.setAttribute('hidden', '');
+      // default first tab is active
+      if (i === 0) tabListContent.classList.add('active');
+
       tabContentContainer.append(tabListContent);
     });
     tabListItems[0].parentElement.remove();

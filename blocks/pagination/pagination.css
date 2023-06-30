@@ -1,0 +1,117 @@
+.pagination {
+  max-width: 800px;
+  margin: var(--spacing-xl) auto 0;
+}
+
+.block.pagination {
+  max-width: none;
+}
+
+.pagination > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+}
+
+.pagination .column {
+  background-color: var(--bg-color-lightgrey);
+  border-radius: 16px;
+  border: solid 1px var(--bg-color-grey);
+  padding: 12px 16px;
+  transition: all 0.3s ease-in-out;
+}
+
+.pagination .column:hover{
+  cursor: pointer;
+  box-shadow: 0 0 15px var(--bg-color-grey);
+}
+
+.pagination .column svg{
+  color: var(--spectrum-blue);
+}
+
+.pagination .column.left p > span {
+  margin-right: 8px;
+}
+
+.pagination .column.right p > span {
+  margin-left: 8px;
+}
+
+.pagination .column.right p > span svg {
+  transform: rotate(180deg);
+}
+
+.pagination .column p {
+  font-size: var(--type-body-xs-size);
+  margin: 0 0 var(--spacing-xxs);
+}
+
+.pagination .column p:first-of-type {
+  display: flex;
+  align-items: center;
+}
+
+.pagination .column p:first-of-type span {
+    display: flex;
+}
+
+.pagination .column p:last-of-type span {
+  display: flex;
+  margin-left: 8px;
+}
+
+.pagination .column h3 {
+  margin: 0;
+  line-height: 1;
+}
+
+.pagination .column h3 a {
+  font-size: var(--type-heading-s-size);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: black;
+  text-decoration: none;
+}
+
+@media (min-width: 600px) {
+  .block.pagination {
+    max-width: none;
+  }
+
+  .pagination .column p {
+    font-size: var(--type-body-s-size);
+    margin: 0 0 var(--spacing-xs);
+  }
+
+  .pagination > div {
+    column-gap: 16px;
+  }
+
+  .pagination .column h3 a {
+    font-size: var(--type-heading-m-size);
+  }
+}
+
+@media (min-width: 900px) {
+  .pagination {
+    margin: var(--spacing-xxxl) auto 0;
+  }
+
+  .block.pagination {
+    max-width: none;
+  }
+
+  .pagination > div {
+    column-gap: var(--spacing-m);
+  }
+
+  .pagination .column {
+    padding: var(--spacing-s) var(--spacing-m);
+  }
+
+  .pagination .column p a {
+    font-size: var(--type-body-l-size);
+  }
+}

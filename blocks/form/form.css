@@ -1,32 +1,33 @@
 main .form {
-  background-color: white;
-  padding: var(--spacing-m);
-  box-shadow: 0 1px 6px rgb(34 34 34 / 10%);
+  background-color: var(--color-white);
+  padding: var(--spacing-s);
+  border-radius: var(--card-border-radius-l);
+  filter: var(--image-filter-drop-shadow-small);
+  border: solid 1px var(--bg-color-grey);
 }
 
 main .form h2 {
-  padding: var(--spacing-m) 0;
+  padding: var(--spacing-s) 0;
   font-size: var(--type-heading-l-lh);
-  font-weight: normal;
 }
 
 main .form h3 {
-  padding-top: var(--spacing-m);
+  padding-top: var(--spacing-s);
   font-size: var(--type-heading-m-size);
-  font-weight: bold;
-  text-transform: uppercase;
 }
 
 main .form input,
 main .form textarea,
 main .form select {
-  border: 1px solid rgb(193 193 195);
-  padding: 11px;
-  border-radius: 0;
+  border: solid 1px var(--bg-color-grey);
+  padding: var(--spacing-xxs) var(--spacing-xs);
   width: 100%;
   max-width: 50rem;
   box-sizing: border-box;
-  margin-top: 4px;
+  border-radius: var(--input-border-radius);
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+  font-family: var(--body-font-family);
 }
 
 main .form textarea {
@@ -35,33 +36,31 @@ main .form textarea {
 
 main .form input:hover,
 main .form select:hover {
-  border-color: rgb(90 92 96);
+  border-color: var(--color-font-grey);
 }
 
 main .form label {
-  width: 100%;
   display: block;
+  padding-bottom: var(--spacing-xxs);
+  box-sizing: border-box;
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
-  padding-bottom: var(--spacing-xs);
-  text-transform: uppercase;
-  box-sizing: border-box;
-  font-weight: 800;
 }
 
 main .form label.required::after {
   content: "*";
-  color: red;
-  padding-left: 5px;
+  color: var(--color-black);
+  padding-left: var(--spacing-xxxs);
 }
 
 main .form .field-wrapper {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-m);
 }
 
 main .form .form-checkbox-wrapper {
   display: flex;
-  margin: var(--spacing-s) 0;
+  align-items: center;
+  margin: var(--spacing-xs) 0;
 }
 
 main .form .form-checkbox-wrapper input[type='checkbox'] {
@@ -72,12 +71,12 @@ main .form .form-checkbox-wrapper input[type='checkbox'] {
   -moz-appearance: none;
 
   /* stylelint-enable */
-  height: 30px;
-  width: 30px;
+  height: 20px;
+  width: 20px;
   position: relative;
   border: unset;
   padding: unset;
-  margin-right: 5px;
+  margin-right: var(--spacing-xxs);
   margin-left: 0;
 }
 
@@ -86,8 +85,8 @@ main .form .form-checkbox-wrapper input[type='checkbox']::after {
   position: absolute;
   top: 0;
   left: 0;
-  height: 30px;
-  width: 30px;
+  height: 20px;
+  width: 20px;
   content: ' ';
   background: url('./checkbox.svg');
   background-size: contain;
@@ -100,26 +99,32 @@ main .form .form-checkbox-wrapper input[type='checkbox']:checked::after {
 }
 
 main .form .form-checkbox-wrapper label {
-  font-size: var(--type-body-m-size);
-  line-height: var(--type-body-m-lh);
-  font-weight: normal;
-  text-transform: none;
   display: block;
+  font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
+  padding-bottom: 0;
 }
 
-main .form .button {
-  cursor: pointer;
-  background: rgb(20 115 230);
-  color: white;
-  border-radius: 16px;
-  font-size: var(--type-body-s-size);
-  font-weight: 300;
-  padding: 6px 16px;
-  border: none;
-  font-family: adobe-clean, 'Trebuchet MS', sans-serif;
+main .form-legal-wrapper p {
+  font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
+  font-style: italic;
 }
 
-main .form .form-submit-wrapper {
-  display: flex;
-  justify-content: flex-end;
+main .form button {
+  font-family: var(--body-font-family);
+}
+
+@media screen and (min-width: 900px) {
+  main .form {
+    padding: var(--spacing-ml);
+  }
+  
+  main .form .field-wrapper {
+    display: flex;
+  }
+
+  main .form label {
+    width: 72%;
+  }
 }

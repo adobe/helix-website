@@ -1,3 +1,8 @@
+.video-wrapper {
+    width: 100%;
+    overflow: hidden;       
+}
+
 .video {
     margin: 32px 0;
 }

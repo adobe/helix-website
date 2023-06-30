@@ -1,0 +1,85 @@
+.logo-wall {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.logo-wall .logo-wall-title {
+    max-width: 75vw;
+    text-align: center;
+    padding-bottom: var(--spacing-s);
+}
+
+.logo-wall .logo-wall-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: var(--spacing-s);
+    row-gap: var(--spacing-s);
+    width: 100%;
+    max-width: 740px;
+    padding-inline-start: 0;
+}
+
+.logo-wall .logo-wall-list-item {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    height: 100%;
+}
+
+.logo-wall .logo-wall-list-item a {
+    transition: opacity .3s ease;
+}
+
+.logo-wall .logo-wall-list-item a:hover {
+    opacity: 0.7;
+}
+
+.logo-wall .logo-wall-list-item img {
+    margin: 0 auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 150px;
+    max-height: 54px;
+    object-fit: contain;
+}
+
+.logo-wall.meriative-height-adjustment .logo-wall-list-item img {
+    max-height: 80px;
+}
+
+@media (min-width: 900px) {
+    .logo-wall {
+        padding: var(--spacing-xxl) 0;
+    }
+
+    .logo-wall .logo-wall-title {
+        padding-bottom: var(--spacing-xl);
+    }
+
+    .logo-wall .logo-wall-list {
+        column-gap: var(--spacing-xl);
+        row-gap: var(--spacing-l);
+        max-width: 1200px;
+    }
+
+    .logo-wall.technology .logo-wall-list {
+        max-width: 970px;
+    }
+
+    .logo-wall .logo-wall-list-item img {
+        max-width: clamp(180px, 20vw, 280px);
+        max-height: 63px;
+    }
+
+    .logo-wall.meriative-height-adjustment .logo-wall-list-item img {
+        max-height: 96px;
+    }
+}
