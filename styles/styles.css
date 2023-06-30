@@ -1284,6 +1284,12 @@ body.guides-template .guides-back-btn span {
   margin-right: var(--spacing-xxs);
 }
 
+@media screen and (max-width: 899px) {
+  body.guides-template .guides-back-btn.desktop {
+    display: none;
+  }
+}
+
 /* guides-template message box for copying url success */
 .message-box {
   opacity: 0;

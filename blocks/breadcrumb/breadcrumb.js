@@ -33,6 +33,14 @@ export default async function decorate(block) {
   if (!isDocumentationLanding) {
     const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
     list.append(article);
+
+    const backBtn = createTag('div', { class: 'guides-back-btn desktop' }, `
+        <span class="icon icon-icon-arrow"></span>
+        <a href="/docs/" class="link-underline-effect">
+            Back
+        </a>
+    `);
+    document.querySelector('.default-content-wrapper').prepend(backBtn);
   }
 
   // make the last item to be unclickable as already on the page
