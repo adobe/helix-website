@@ -557,7 +557,7 @@ initHlx();
  * ------------------------------------------------------------
  */
 
-const LCP_BLOCKS = ['marquee', 'columns', 'tabs']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
 const ICON_ROOT = '/img';
 
 sampleRUM('top');
