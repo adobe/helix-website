@@ -172,7 +172,6 @@
 }
 
 .columns.tall .colored-tag.number-tag {
-    color: var(--color-black);
     margin-left: auto;
     margin-right: auto;
 }
