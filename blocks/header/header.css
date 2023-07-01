@@ -965,7 +965,7 @@ button.gnav-toggle::after {
     clip-path: inset(0 0 100% 0);
     max-height: none;
     pointer-events: none;
-    transition: var(--transition-cubic-bezier-1);
+    transition: clip-path .5s var(--cubic-bezier-2);
   }
 
   .franklin .gnav .gnav-navitem.has-menu.is-open .submenu-wrapper{

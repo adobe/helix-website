@@ -36,8 +36,8 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
         navLink.setAttribute('target', returnLinkTarget(navLink.href));
         navLink.classList.add('link-underline-effect');
 
-        // TODO: temp fix for status.live
-        if (navLink.textContent.toLowerCase() === 'status.live') {
+        // TODO: temp fix for status.hlx.live
+        if (navLink.textContent.toLowerCase() === 'status.hlx.live') {
           navLink.setAttribute('href', 'https://status.hlx.live/');
           navLink.setAttribute('target', '_blank');
         }

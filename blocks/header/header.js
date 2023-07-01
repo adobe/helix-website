@@ -249,7 +249,7 @@ class Gnav {
       submenuLink.setAttribute('target', returnLinkTarget(submenuLink.href));
 
       // TODO: temp fix for status.live, can be remove if subdomain is supported
-      if (submenuTitleText.toLowerCase() === 'status.live') {
+      if (submenuTitleText.toLowerCase() === 'status.hlx.live') {
         submenuLink.setAttribute('href', 'https://status.hlx.live/');
         submenuLink.setAttribute('target', '_blank');
       }

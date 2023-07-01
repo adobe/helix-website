@@ -36,8 +36,8 @@ const decorateCardListByListElement = (block) => {
       cardTitle.replaceChildren(span);
       tag.classList.add('link-highlight-colorful-effect-hover-wrapper');
 
-      // TODO: temp fix for status.live
-      if (cardTitle.textContent.toLowerCase() === 'status.live') {
+      // TODO: temp fix for status.hlx.live
+      if (cardTitle.textContent.toLowerCase() === 'status.hlx.live') {
         tag.setAttribute('href', 'https://status.hlx.live/');
         tag.setAttribute('target', '_blank');
       }

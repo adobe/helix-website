@@ -299,6 +299,7 @@
     }
 
     .marquee.testimonial .customer-info {
+        margin-top: var(--spacing-m);
         padding-bottom: var(--spacing-l);
     }
 }
