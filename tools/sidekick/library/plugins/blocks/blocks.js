@@ -138,16 +138,19 @@ export function copyBlockToClipboard(wrapper, name, blockURL) {
     );
   }
 
-  copyBlock(blockTable, sectionMetadataTable);
+  const copied = copyBlock(blockTable, sectionMetadataTable);
 
   // Track block copy event
   sampleRUM('library:blockcopied', { target: blockURL });
+
+  return copied;
 }
 
 /**
  * Copies default content to the clipboard
  * @param {HTMLElement} wrapper The wrapper element
  * @param {string} blockURL The URL of the block
+ * @returns {HTMLElement} The cloned wrapper
  */
 export function copyDefaultContentToClipboard(wrapper, blockURL) {
   const wrapperClone = wrapper.cloneNode(true);
@@ -167,10 +170,12 @@ export function copyDefaultContentToClipboard(wrapper, blockURL) {
     sectionMetadata.remove();
   }
 
-  copyBlock(wrapperClone.outerHTML, sectionMetadataTable);
+  const copied = copyBlock(wrapperClone.outerHTML, sectionMetadataTable);
 
   // Track block copy event
   sampleRUM('library:blockcopied', { target: blockURL });
+
+  return copied;
 }
 
 /**
@@ -252,15 +257,23 @@ export async function decorate(container, data) {
       const copyWrapper = blockRenderer.getBlockWrapper();
       const copyBlockData = blockRenderer.getBlockData();
 
+      // Return the copied DOM in the toast message so it can be tested
+      // Cannot read or write clipboard in tests
+      let copiedDOM;
+
       // Are we trying to copy a block or default content?
       // The copy operation is slightly different depending on which
       if (blockRenderer.isBlock) {
-        copyBlockToClipboard(copyWrapper, getBlockName(copyElement, true), copyBlockData.url);
+        copiedDOM = copyBlockToClipboard(
+          copyWrapper,
+          getBlockName(copyElement, true),
+          copyBlockData.url,
+        );
       } else {
-        copyDefaultContentToClipboard(copyWrapper, copyBlockData.url);
+        copiedDOM = copyDefaultContentToClipboard(copyWrapper, copyBlockData.url);
       }
 
-      container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block' } }));
+      container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: copiedDOM } }));
     });
 
     const frameView = content.querySelector('.frame-view');
@@ -294,7 +307,7 @@ export async function decorate(container, data) {
     } else {
       copyDefaultContentToClipboard(wrapper, blockURL);
     }
-    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block' } }));
+    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: wrapper } }));
   });
 
   const search = content.querySelector('sp-search');

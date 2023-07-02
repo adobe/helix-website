@@ -116,11 +116,12 @@ export function getTable(block, name, path) {
 }
 
 export function prepareImagesForCopy(element, url, columnWidthPercentage) {
+  const blockURL = typeof url === 'string' ? new URL(url) : url;
   element.querySelectorAll('img').forEach((img) => {
     if (!img.src.includes('data:')) {
       const srcSplit = img.src.split('/');
       const mediaPath = srcSplit.pop();
-      img.src = `${url.origin}/${mediaPath}`;
+      img.src = `${blockURL.origin}/${mediaPath}`;
     }
 
     const maxWidth = Math.min(295, (columnWidthPercentage / 100) * 540);
@@ -203,4 +204,6 @@ export function copyBlock(block, sectionMetadata) {
     // eslint-disable-next-line no-console
     console.error('Unable to copy block', error);
   }
+
+  return tables;
 }
