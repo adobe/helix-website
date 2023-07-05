@@ -35,18 +35,6 @@ const decorateDesktopFooterNav = (footerNavSection, ctaButton) => {
       navLinks.forEach((navLink) => {
         navLink.setAttribute('target', returnLinkTarget(navLink.href));
         navLink.classList.add('link-underline-effect');
-
-        // TODO: temp fix for status.hlx.live
-        if (navLink.textContent.toLowerCase() === 'status.hlx.live') {
-          navLink.setAttribute('href', 'https://status.hlx.live/');
-          navLink.setAttribute('target', '_blank');
-        }
-
-        // TODO: temp fix for chat.hlx.live
-        if (navLink.textContent.toLowerCase() === 'support') {
-          navLink.setAttribute('href', 'https://chat.hlx.live/');
-          navLink.setAttribute('target', '_blank');
-        }
       });
 
       // clone the node

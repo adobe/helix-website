@@ -187,11 +187,6 @@ export default async function decorate(block) {
   allSideNavLinks.forEach((link) => {
     // open external link in new tab
     link.setAttribute('target', returnLinkTarget(link.href));
-    // TODO: temp fix for status.hlx.live
-    if (link.textContent.toLowerCase() === 'status.hlx.live') {
-      link.setAttribute('href', 'https://status.hlx.live/');
-      link.setAttribute('target', '_blank');
-    }
     link.addEventListener('click', () => {
       backdropCurtain.classList.remove('is-open');
       block.classList.remove('overlay');
