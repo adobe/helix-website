@@ -9,10 +9,10 @@ const animationConfig = {
       animatedClass: 'slide-reveal-up',
     },
     {
-      selectors: '.logo-wall-list-item',
+      selector: '.logo-wall-list',
       animatedClass: 'fade-up',
-      staggerTime: '0.15',
-    }],
+    },
+  ],
 };
 
 export default function decorate(block) {
