@@ -9,9 +9,9 @@
 .side-navigation-wrapper {
   width: auto; 
   display: block;
-  padding: var(--spacing-xs) 0 0;
+  padding: var(--spacing-xxs) 0 0;
   background: white;
-  min-height: 100px;
+  min-height: 55px;
 }
 
 .side-navigation-wrapper,
@@ -61,6 +61,12 @@
 
 .side-navigation.overlay .search-input-wrapper {
   display: none;
+}
+
+@media screen and (max-width: 899px) {
+  .guides-template .without-full-width-hero .search-input-wrapper {
+    display: none;
+  }
 }
 
 .side-navigation-wrapper input[type="text"] {
@@ -340,6 +346,7 @@
   display: grid;
 }
 
+/* combined header search result styles here for consistency */
 .results-wrapper .article-card {
   text-decoration: none;
   color: black;
@@ -348,11 +355,15 @@
   display: block;
 }
 
-.results-wrapper .article-card .article-card-body p {
+.results-wrapper .article-card .article-card-body p,
+.gnav-search-results .article-card .article-card-body p {
+  color: var(--color-black);
   font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
 }
 
-.results-wrapper .article-card-image {
+.results-wrapper .article-card-image,
+.gnav-search-results .article-card-image {
   width: 100%;
   height: auto;
   aspect-ratio: 4 / 3;
@@ -363,23 +374,31 @@
   isolation: isolate;
 }
 
-.results-wrapper .article-card-image img {
+.results-wrapper .article-card-image img,
+.gnav-search-results .article-card-image img {
   object-fit: cover;
   width: 100%;
   height: 100%;
   transition: var(--transition-ease-in-out);
 }
 
-.results-wrapper .article-card:hover img{
+.results-wrapper .article-card:hover img,
+.gnav-search-results .article-card:hover img {
   transform: scale(1.07);
 }
 
-
-.results-wrapper .article-card-body h3 {
+.results-wrapper .article-card-body h3,
+.gnav-search-results .article-card-body h3 {
   font-size: var(--type-heading-m-size);
   line-height: var(--type-heading-m-lh);
   margin-top: var(--spacing-s);
   margin-bottom: var(--spacing-xs);
+}
+
+.gnav-search-results .article-card-body h3 {
+  overflow: unset;
+  overflow-y: clip;
+  margin-top: var(--spacing-xs);
 }
 
 /* black overlay curtain */
@@ -403,6 +422,10 @@
 }
 
 @media screen and (min-width: 600px) {
+  .side-navigation-wrapper {
+    padding: var(--spacing-xxxs) 0 0;
+  }
+
   .side-navigation-wrapper > div {
     max-width: var(--grid-tablet-container-width);
   }

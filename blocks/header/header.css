@@ -554,21 +554,45 @@ button.gnav-toggle::after {
   padding: 0 12px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   grid-auto-rows: auto;
   grid-gap: 20px;
 }
 
+.clear-results-button {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: 7px;
+  right: 18px;
+  background: none;
+  outline: none;
+  border: none;
+}
+
+.in-search .clear-results-button {
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.gnav-search-results:has(.article-card) {
+  padding-top: 20px;
+}
+
 .gnav-search-results .article-card {
+  background: var(--color-white);
   margin: 0;
   width: unset;
   max-width: unset;
-  padding: 1rem;
-  border: 1px solid;
-  border-color: rgb(202 202 202);
-  border-radius: 4px;
+  padding: var(--spacing-s) var(--spacing-xs);
+  border: 1px solid var(--bg-color-grey);
+  border-radius: 16px;
   min-height: 160px;
-  margin-top: 20px;
+}
+
+.gnav.is-open.in-search .gnav-mainnav.with-search {
+  display: none;
 }
 
 .gnav-search-highlight {
@@ -587,11 +611,6 @@ button.gnav-toggle::after {
   right: -4px;
   background-color: rgb(255 208 0 / 30%);
   border-radius: 4px;
-}
-
-.gnav-search-results .article-card-body h3 {
-  overflow: unset;
-  overflow-y: clip;
 }
 
 .gnav-profile {
