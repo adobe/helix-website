@@ -1403,15 +1403,15 @@ body.guides-template .pagination .icon-icon-arrow {
 }
 
 body.guides-template .icon-icon-caret-right {
-  background-image: url("/img/icon-caret-right.svg");
+  background-image: url("/icons/icon-caret-right.svg");
 }
 
 body.guides-template .icon-icon-caret-down {
-  background-image: url("/img/icon-caret-down.svg");
+  background-image: url("/icons/icon-caret-down.svg");
 }
 
 body.guides-template .guides-back-btn .icon-icon-arrow {
-  background-image: url("/img/icon-arrow.svg");
+  background-image: url("/icons/icon-arrow.svg");
   filter: invert(38%) sepia(42%) saturate(5895%) hue-rotate(203deg) brightness(94%) contrast(92%);
 }
 

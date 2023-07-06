@@ -276,7 +276,7 @@ button.gnav-toggle::after {
   height: 8px;
   transition: transform .1s ease;
   content: '';
-  background: url('/img/icon-caret-up.svg') no-repeat center center;
+  background: url('/icons/icon-caret-up.svg') no-repeat center center;
   background-size: contain;
   transform: rotate(-180deg);
 }

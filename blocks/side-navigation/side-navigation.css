@@ -315,7 +315,7 @@
 .side-navigation-overlay-btn-wrapper button.back-btn::before {
   content: "";
   display: inline-block;
-  background-image: url("/img/icon-back-arrow.svg");
+  background-image: url("/icons/icon-back-arrow.svg");
   background-position: center center;
   background-size: contain;
   background-repeat: no-repeat;
