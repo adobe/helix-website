@@ -1,9 +1,5 @@
-// import {
-//   loadScript, getMetadata, cleanVariations,
-// } from '../../scripts/scripts.js';
-import {
-  loadScript, cleanVariations,
-} from '../../scripts/scripts.js';
+import { loadScript } from '../../scripts/lib-franklin.js';
+import { cleanVariations } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
 import { changeTag, returnLinkTarget } from '../../utils/helpers.js';

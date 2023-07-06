@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/named
-import { createOptimizedPicture } from '../../scripts/scripts.js';
+import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 import createTag from '../../utils/tag.js';
 
 async function fetchBlogArticleIndex() {

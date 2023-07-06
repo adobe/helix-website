@@ -1,8 +1,9 @@
 // NOTE: combined same name `card-list` blocks in redesign & main branch here,
 //  note can be removed after approval
 import {
-  createOptimizedPicture, createTag, buildBlock, decorateBlock, loadBlock,
-} from '../../scripts/scripts.js';
+  createOptimizedPicture, loadBlock, buildBlock, decorateBlock,
+} from '../../scripts/lib-franklin.js';
+import { createTag } from '../../scripts/scripts.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 
 // Redesign's version: render image card list

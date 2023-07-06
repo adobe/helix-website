@@ -458,22 +458,11 @@ em a {
 /* Primary button over background */
 
 .dark em a {
-    color: #FFF;
+  color: #FFF;
 }
 
 strong a {
-    background: rgb(20 115 230);
-    color: white;
-    border-radius: 16px;
-    font-size: 14px;
-    line-height: 32px;
-    padding: 0 16px;
-    border: none;
-    flex: 0 1 auto;
-    font-weight: 400;
-    text-decoration: none;
-    display: inline-block;
-    cursor: pointer;
+  color: inherit;
 }
 
 pre {
@@ -1670,6 +1659,9 @@ body.contact-template .default-content-wrapper img {
 
 .icon-eyebrow .icon svg {
   width: var(--type-body-xs-size);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
 }
 
 @media screen and (min-width: 600px){
