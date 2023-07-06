@@ -514,8 +514,15 @@ strong a img {
   float: left;
 }
 
-/* buttons */
+/* icon style reset for updated decorateIcons function
+as height expanded weirdly */
+.icon svg {
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
 
+/* buttons */
 a.button:any-link {
     text-decoration: none;
     border-radius: 25px;
@@ -1028,6 +1035,10 @@ body.docs-template main p {
   font-size: var(--type-body-l-size);
   line-height: var(--type-body-l-lh);
   margin-bottom: var(--spacing-s);
+}
+
+body.guides-template main h3.icon-eyebrow svg {
+  width: var(--type-heading-m-size);
 }
 
 @media screen and (min-width: 900px) {
@@ -1659,9 +1670,6 @@ body.contact-template .default-content-wrapper img {
 
 .icon-eyebrow .icon svg {
   width: var(--type-body-xs-size);
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
 }
 
 @media screen and (min-width: 600px){

@@ -3,7 +3,7 @@ import {
   buildBlock,
   loadHeader,
   loadFooter,
-  // decorateIcons,
+  decorateIcons,
   toClassName,
   decorateSections,
   decorateBlocks,
@@ -19,7 +19,6 @@ import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements
 
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
-const ICON_ROOT = '/icons';
 
 // -------------  Custom functions ------------- //
 
@@ -105,30 +104,6 @@ export function addFavIcon(href) {
   } else {
     document.getElementsByTagName('head')[0].appendChild(link);
   }
-}
-
-/**
- * Fills icon spans with an icon.
- */
-export function decorateIcons(block = document) {
-  block.querySelectorAll('span.icon').forEach(async (span) => {
-    if (span.classList.length < 2 || !span.classList[1].startsWith('icon-')) {
-      return;
-    }
-    const icon = span.classList[1].substring(5);
-    // eslint-disable-next-line no-use-before-define
-    const resp = await fetch(`${window.hlx.codeBasePath}${ICON_ROOT}/${icon}.svg`);
-    if (resp.ok) {
-      const iconHTML = await resp.text();
-      if (iconHTML.match(/<style/i)) {
-        const img = document.createElement('img');
-        img.src = `data:image/svg+xml,${encodeURIComponent(iconHTML)}`;
-        span.appendChild(img);
-      } else {
-        span.innerHTML = iconHTML;
-      }
-    }
-  });
 }
 
 export function customDecorateButtons(block = document) {
@@ -471,9 +446,9 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/franklin-favicon.png`);
-  loadPreloadLink();
+  // TODO: test remove this and see if it affects seo score in homepage
+  // loadPreloadLink();
 
-  // TODO: not sure if this can be removed or kept
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
     doc.querySelector('footer').remove();

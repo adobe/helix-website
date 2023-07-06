@@ -159,8 +159,6 @@ const ICONS_CACHE = {};
    * Replace icons with inline SVG and prefix with codeBasePath.
    * @param {Element} [element] Element containing icons
    */
-
-// TODO: this messes with the original svg properties & styling QAQQQQQ
 export async function decorateIcons(element) {
   // Prepare the inline sprite
   let svgSprite = document.getElementById('franklin-svg-sprite');
@@ -191,6 +189,8 @@ export async function decorateIcons(element) {
           ICONS_CACHE[iconName] = {
             html: svg
               .replace('<svg', `<symbol id="icons-sprite-${iconName}"`)
+              .replace(/ width=".*?"/, '')
+              .replace(/ height=".*?"/, '')
               .replace('</svg>', '</symbol>'),
           };
         }
@@ -214,12 +214,9 @@ export async function decorateIcons(element) {
     const iconName = Array.from(span.classList).find((c) => c.startsWith('icon-')).substring(5);
     const parent = span.firstElementChild?.tagName === 'A' ? span.firstElementChild : span;
     // Styled icons need to be inlined as-is, while unstyled ones can leverage the sprite
-    // console.log(ICONS_CACHE[iconName].html);
-    // console.log(ICONS_CACHE[iconName]);
     if (ICONS_CACHE[iconName].styled) {
       parent.innerHTML = ICONS_CACHE[iconName].html;
     } else {
-      // NOTE: added for retaining original svg property for stabler styling
       parent.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg"><use href="#icons-sprite-${iconName}"/></svg>`;
     }
   });
@@ -365,6 +362,7 @@ export function decorateSections(main) {
    * @param {Element} main The container element
    */
 export function updateSectionsStatus(main) {
+  // NOTE: added div.section to pick up sections that are listed deep
   const sections = [...main.querySelectorAll(':scope > div.section, div.section')];
   for (let i = 0; i < sections.length; i += 1) {
     const section = sections[i];
@@ -387,6 +385,7 @@ export function updateSectionsStatus(main) {
    * @param {Element} main The container element
    */
 export function decorateBlocks(main) {
+  // NOTE: added deeplyNestedBlocks for support deeply nested blocks
   // maybe the best approach is to look through all js files in blocks folder
   // and select by class, there will definitely ensure all blocks are loaded
   const deeplyNestedBlocks = ['embed', 'table'];

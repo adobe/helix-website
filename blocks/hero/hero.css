@@ -52,6 +52,10 @@
     line-height: 100%;
 }
 
+.inner-content h3.icon-eyebrow {
+    padding-bottom: 0;
+}
+
 .inner-content h1 {
     font-size: var(--type-heading-xxxl-size);
     line-height: var(--type-heading-xxxl-lh);
