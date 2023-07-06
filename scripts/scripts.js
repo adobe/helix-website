@@ -22,32 +22,6 @@ const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
 
 // -------------  Custom functions ------------- //
 
-/**
- * Loads preload file for LCP.
- * @param {string} href The path to the CSS file
- */
-export function loadPreloadLink() {
-  const preloadLinks = [{
-    href: `${window.hlx.codeBasePath}/img/colorful-bg.jpg`,
-    as: 'image',
-    conditionalSelector: ['.hero', '.colorful-bg'],
-  }];
-
-  preloadLinks.forEach((preloadLink) => {
-    if (!document.querySelector(`head > link[href="${preloadLink.href}"]`)) {
-      const shouldPreload = preloadLink.conditionalSelector.some((s) => document.querySelector(s));
-
-      if (shouldPreload) {
-        const link = document.createElement('link');
-        link.setAttribute('rel', 'preload');
-        link.setAttribute('href', preloadLink.href);
-        link.setAttribute('as', preloadLink.as);
-        document.head.appendChild(link);
-      }
-    }
-  });
-}
-
 /* set language in html tag for improving SEO accessibility */
 export function setLanguageForAccessibility(lang = 'en') {
   document.documentElement.lang = lang;
@@ -373,6 +347,24 @@ function addBlockLevelInViewAnimation(main) {
   });
 }
 
+export function loadBreadcrumb(main) {
+  const breadcrumbBlock = buildBlock('breadcrumb', '');
+  const breadcrumbWrapper = createTag('div');
+  breadcrumbWrapper.append(breadcrumbBlock);
+  main.insertBefore(breadcrumbWrapper, main.querySelectorAll('.section')[0]);
+  decorateBlock(breadcrumbBlock);
+  return loadBlock(breadcrumbBlock);
+}
+
+export function setUpSideNav(main, aside) {
+  const sideNav = buildBlock('side-navigation', '');
+  aside.append(sideNav);
+  main.insertBefore(aside, main.querySelector('.section.content'));
+  updateGuideTemplateStyleBasedOnHero();
+  decorateBlock(sideNav);
+  return loadBlock(sideNav);
+}
+
 // --------------- Main functions here ---------------- //
 
 /**
@@ -446,8 +438,6 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/franklin-favicon.png`);
-  // TODO: test remove this and see if it affects seo score in homepage
-  // loadPreloadLink();
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
@@ -456,20 +446,9 @@ async function loadLazy(doc) {
   }
 
   // breadcrump setup
-  const breadcrumb = buildBlock('breadcrumb', '');
-  const breadcrumbWrapper = createTag('div');
-  breadcrumbWrapper.append(breadcrumb);
-  main.insertBefore(breadcrumbWrapper, main.querySelectorAll('.section')[0]);
-  decorateBlock(breadcrumb);
-  loadBlock(breadcrumb);
-
+  loadBreadcrumb(main);
   // sidebar + related style setup
-  const sideNav = buildBlock('side-navigation', '');
-  aside.append(sideNav);
-  main.insertBefore(aside, main.querySelector('.section.content'));
-  updateGuideTemplateStyleBasedOnHero();
-  decorateBlock(sideNav);
-  loadBlock(sideNav);
+  setUpSideNav(main, aside);
 
   sampleRUM('lazy');
 }
