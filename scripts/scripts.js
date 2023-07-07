@@ -436,6 +436,11 @@ async function loadLazy(doc) {
   loadHeader(doc.querySelector('header'));
   loadFooter(doc.querySelector('footer'));
 
+  // breadcrumb setup
+  loadBreadcrumb(main);
+  // sidebar + related style setup
+  setUpSideNav(main, aside);
+
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/img/franklin-favicon.png`);
 
@@ -444,11 +449,6 @@ async function loadLazy(doc) {
     doc.querySelector('footer').remove();
     return;
   }
-
-  // breadcrump setup
-  loadBreadcrumb(main);
-  // sidebar + related style setup
-  setUpSideNav(main, aside);
 
   sampleRUM('lazy');
 }
