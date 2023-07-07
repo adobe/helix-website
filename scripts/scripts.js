@@ -792,7 +792,7 @@ export function decorateGuideTemplate(main) {
   decorateGuideTemplateHeadings(main);
   decorateGuideTemplateHero(main);
   decorateGuideTemplateLinks(main);
-  decorateGuideTemplateCodeBlock();
+  // decorateGuideTemplateCodeBlock();
   decorateFragmentTable(main); // ususally only use fragment in doc detail
 }
 
@@ -968,6 +968,8 @@ async function loadLazy(doc) {
   updateGuideTemplateStyleBasedOnHero();
   decorateBlock(sideNav);
   loadBlock(sideNav);
+
+  decorateGuideTemplateCodeBlock();
 
   sampleRUM('lazy');
 }
