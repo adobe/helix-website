@@ -34,7 +34,7 @@ export default async function decorate(block) {
     const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
     list.append(article);
 
-    const backBtn = createTag('div', { class: 'guides-back-btn' }, `
+    const backBtn = createTag('div', { class: 'guides-back-btn desktop' }, `
         <span class="icon icon-icon-arrow"></span>
         <a href="/docs/" class="link-underline-effect">
             Back
