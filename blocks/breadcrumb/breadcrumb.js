@@ -10,6 +10,7 @@ export default async function decorate(block) {
   }
 
   const isDocumentationLanding = window.location.pathname === '/docs/';
+  block.style.display = 'none';
 
   const list = createTag('ul');
   const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
@@ -57,4 +58,5 @@ export default async function decorate(block) {
 
   const innerDiv = block.querySelector(':scope > div > div');
   innerDiv.append(list);
+  block.style.display = 'block';
 }
