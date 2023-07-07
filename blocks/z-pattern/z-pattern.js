@@ -15,8 +15,6 @@ const animationConfig = {
     {
       selectors: '.content-side ul li',
       animatedClass: 'slide-reveal-up',
-      staggerTime: 0.1,
-      // staggerTotalTime: 2,
     },
   ],
 };
@@ -37,7 +35,7 @@ const animateValueProps = (el) => {
   valuePropSections.forEach((section) => {
     const image = section.querySelector('.image-side picture');
     const imageWrapper = section.querySelector('.image-side');
-    addInViewAnimationToSingleElement(image, 'slide-reveal-up-slow', imageWrapper, null);
+    addInViewAnimationToSingleElement(image, 'fade-in', imageWrapper, null);
     // eslint-disable-next-line
     addInViewAnimationToMultipleElements(animationConfig.items, section, animationConfig.staggerTime);
   });

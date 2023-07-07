@@ -224,10 +224,10 @@ function animateTitleSection(section) {
     // udpated logic
     const imageParent = image.parentElement;
     imageParent.classList.add('default-content-image-wrapper');
-    addInViewAnimationToSingleElement(imageParent, 'slide-reveal-up');
+    addInViewAnimationToSingleElement(imageParent, 'fade-in');
     animationConfig.items.unshift({
       selector: '.default-content-image-wrapper',
-      animatedClass: 'slide-reveal-up',
+      animatedClass: 'fade-in',
     });
   }
   addInViewAnimationToMultipleElements(animationConfig.items, trigger, animationConfig.staggerTime);
