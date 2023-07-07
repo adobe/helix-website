@@ -1,4 +1,5 @@
 .breadcrumb-wrapper {
+  display: none;
   width: 100%;
   background: var(--color-white);
   box-shadow: 0 4px 6px rgba(0 0 0 / 15%);
@@ -53,6 +54,7 @@
 
 @media screen and (min-width: 600px) {
   .breadcrumb-wrapper {
+    display: block;
     position: sticky;
     top: calc(var(--nav-height));
     left: 0;

@@ -65,7 +65,17 @@ export default async function decorate(block) {
   block.append(sideNavbar);
 
   const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
-  const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, docBtnInner);
+  const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper in-doc-page' }, docBtnInner);
+  const isDocumentationLanding = window.location.pathname === '/docs/';
+  if (!isDocumentationLanding) {
+    const backDocPageBtn = createTag('div', { class: 'guides-back-btn' }, `
+      <span class="icon icon-icon-arrow"></span>
+      <a href="/docs/" class="link-underline-effect">
+          Back
+      </a>
+    `);
+    docButton.prepend(backDocPageBtn);
+  }
   const docToggleMenuButton = docButton.querySelector('.documentation-btn');
 
   const backBtnInner = '<button class="back-btn">Back</button>';
@@ -177,11 +187,6 @@ export default async function decorate(block) {
   allSideNavLinks.forEach((link) => {
     // open external link in new tab
     link.setAttribute('target', returnLinkTarget(link.href));
-    // TODO: temp fix for status.live
-    if (link.textContent.toLowerCase() === 'status.live') {
-      link.setAttribute('href', 'https://status.hlx.live/');
-      link.setAttribute('target', '_blank');
-    }
     link.addEventListener('click', () => {
       backdropCurtain.classList.remove('is-open');
       block.classList.remove('overlay');

@@ -64,8 +64,16 @@ export function changeTag(element, targetTag, className) {
 export function returnLinkTarget(url) {
   const currentHost = window.location.host;
   const urlObject = new URL(url);
-  const urlHost = urlObject.host;
-  return urlHost === currentHost ? '_self' : '_blank';
+  const isSameHost = urlObject.host === currentHost;
+
+  // take in pathname that should be opened in new tab, in redirects excel
+  const redirectExternalPaths = ['/history', '/chat'];
+  const redirectToExternalPath = redirectExternalPaths.includes(urlObject.pathname);
+
+  if (!isSameHost || redirectToExternalPath) {
+    return '_blank';
+  }
+  return '_self';
 }
 
 // as the blocks are loaded in aysnchronously, we don't have a specific timing

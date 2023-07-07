@@ -1,8 +1,5 @@
-// import {
-//   loadScript, getMetadata, cleanVariations,
-// } from '../../scripts/scripts.js';
 import {
-  loadScript, cleanVariations,
+  loadScript, getMetadata, cleanVariations,
 } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
@@ -10,11 +7,11 @@ import { changeTag, returnLinkTarget } from '../../utils/helpers.js';
 
 const ICON_ROOT = '/img';
 const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.svg">';
-// const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
-// <path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5
-// 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z">
-// </path>
-// </svg>`;
+const SEARCH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false">
+<path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5
+16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z">
+</path>
+</svg>`;
 const IS_OPEN = 'is-open';
 const MENU_ICON_COLOR_PATTERN = [
   ['lightgreen', 'pink', 'purple'],
@@ -74,19 +71,19 @@ class Gnav {
     // above keeping ends
 
     // disabled search as not in desktop design
-    // const enableSearch = getMetadata('enable-search');
-    // if (!enableSearch || enableSearch !== 'no') {
-    //   const div = createTag('div', { class: 'search' });
-    //   div.innerHTML = '<p>Search</p>';
-    //   this.body.append(div);
+    const enableSearch = getMetadata('enable-search');
+    if (!enableSearch || enableSearch !== 'no') {
+      const div = createTag('div', { class: 'search' });
+      div.innerHTML = '<p>Search</p>';
+      this.body.append(div);
 
-    //   this.search = this.decorateSearch();
-    //   if (this.search) {
-    //     const mainNavWrapper = nav.querySelector('.gnav-mainnav');
-    //     mainNavWrapper.classList.add('with-search');
-    //     nav.append(this.search);
-    //   }
-    // }
+      this.search = this.decorateSearch();
+      if (this.search) {
+        const mainNavWrapper = nav.querySelector('.gnav-mainnav');
+        mainNavWrapper.classList.add('with-search');
+        nav.append(this.search);
+      }
+    }
 
     // empty div in nav-menu grid to close mobile menu
     // when clicked on curtain area
@@ -112,17 +109,19 @@ class Gnav {
       }
     };
     toggle.addEventListener('click', async () => {
+      const searchInput = document.querySelector('.gnav-search-input');
       if (nav.classList.contains(IS_OPEN)) {
         nav.classList.remove(IS_OPEN);
         this.curtain.classList.remove(IS_OPEN);
         this.desktop.removeEventListener('change', onMediaChange);
+        if (searchInput) this.clearSearchInput(searchInput);
       } else {
         nav.classList.add(IS_OPEN);
         this.desktop.addEventListener('change', onMediaChange);
         this.curtain.classList.add(IS_OPEN);
 
         // disabled search on mobile
-        // if (this.search) { this.loadSearch(); }
+        if (this.search) { this.loadSearch(); }
       }
     });
     return toggle;
@@ -248,12 +247,6 @@ class Gnav {
       submenuLink.innerHTML = '';
       submenuLink.setAttribute('target', returnLinkTarget(submenuLink.href));
 
-      // TODO: temp fix for status.live, can be remove if subdomain is supported
-      if (submenuTitleText.toLowerCase() === 'status.live') {
-        submenuLink.setAttribute('href', 'https://status.hlx.live/');
-        submenuLink.setAttribute('target', '_blank');
-      }
-
       const submenuIcon = item.querySelector('span.icon');
       if (submenuIcon) {
         this.decorateIcon(submenuIcon, submenuTitleText);
@@ -311,52 +304,59 @@ class Gnav {
   };
 
   // search on mobile menu (Disabled for now)
-  // decorateSearch = () => {
-  //   const searchBlock = this.body.querySelector('.search');
-  //   if (searchBlock) {
-  //     const label = searchBlock.querySelector('p').textContent;
-  //     const searchEl = createTag('div', { class: 'gnav-search' });
-  //     const searchBar = this.decorateSearchBar(label);
-  //     const searchButton = createTag(
-  //       'button',
-  //       {
-  //         class: 'gnav-search-button',
-  //         'aria-label': label,
-  //         'aria-expanded': false,
-  //         'aria-controls': 'gnav-search-bar',
-  //       },
-  //       SEARCH_ICON,
-  //     );
-  //     searchButton.addEventListener('click', () => {
-  //       this.loadSearch(searchEl);
-  //       this.toggleMenu(searchEl);
-  //     });
-  //     searchEl.append(searchButton, searchBar);
-  //     return searchEl;
-  //   }
-  //   return null;
-  // };
+  decorateSearch = () => {
+    const searchBlock = this.body.querySelector('.search');
+    if (searchBlock) {
+      const label = searchBlock.querySelector('p').textContent;
+      const searchEl = createTag('div', { class: 'gnav-search' });
+      const searchBar = this.decorateSearchBar(label);
+      const searchButton = createTag(
+        'button',
+        {
+          class: 'gnav-search-button',
+          'aria-label': label,
+          'aria-expanded': false,
+          'aria-controls': 'gnav-search-bar',
+        },
+        SEARCH_ICON,
+      );
+      searchButton.addEventListener('click', () => {
+        this.loadSearch(searchEl);
+        this.toggleMenu(searchEl);
+      });
+      searchEl.append(searchButton, searchBar);
+      return searchEl;
+    }
+    return null;
+  };
 
-  // decorateSearchBar = (label) => {
-  //   const searchBar = createTag('aside', { id: 'gnav-search-bar', class: 'gnav-search-bar' });
-  //   const searchField = createTag('div', { class: 'gnav-search-field' }, SEARCH_ICON);
-  //   const searchInput = createTag('input', { class: 'gnav-search-input', placeholder: label });
-  //   const searchResults = createTag('div', { class: 'gnav-search-results' });
+  decorateSearchBar = (label) => {
+    const searchBar = createTag('aside', { id: 'gnav-search-bar', class: 'gnav-search-bar' });
+    const searchField = createTag('div', { class: 'gnav-search-field' }, SEARCH_ICON);
+    const searchInput = createTag('input', { class: 'gnav-search-input', placeholder: label });
+    const searchResults = createTag('div', { class: 'gnav-search-results' });
 
-  //   searchInput.addEventListener('input', (e) => {
-  //     this.onSearchInput(e.target.value, searchResults);
-  //   });
+    const clearButton = createTag('button', { class: 'clear-results-button' }, '✕');
+    clearButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.clearSearchInput(searchInput);
+    });
+    searchField.append(clearButton);
 
-  //   searchField.append(searchInput);
-  //   searchBar.append(searchField, searchResults);
-  //   return searchBar;
-  // };
+    searchInput.addEventListener('input', (e) => {
+      this.onSearchInput(e.target.value, searchResults);
+    });
 
-  // loadSearch = async () => {
-  //   if (this.onSearchInput) return;
-  //   const gnavSearch = await import('./gnav-search.js');
-  //   this.onSearchInput = gnavSearch.default;
-  // };
+    searchField.append(searchInput);
+    searchBar.append(searchField, searchResults);
+    return searchBar;
+  };
+
+  loadSearch = async () => {
+    if (this.onSearchInput) return;
+    const gnavSearch = await import('./gnav-search.js');
+    this.onSearchInput = gnavSearch.default;
+  };
 
   /**
    * Toggles menus when clicked directly
@@ -450,6 +450,13 @@ class Gnav {
         mainLink.click();
       }
     }
+  };
+
+  // eslint-disable-next-line
+  clearSearchInput = (searchInput) => {
+    searchInput.value = '';
+    const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+    searchInput.dispatchEvent(inputEvent);
   };
 
   // TODO: for adobe.com login status purposes, out of working scope,
