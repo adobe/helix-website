@@ -58,6 +58,7 @@ function highlightTextElements(terms, elements) {
 async function populateSearchResults(searchTerms, resultsContainer) {
   const limit = 12;
   const terms = searchTerms.toLowerCase().split(' ').map((e) => e.trim()).filter((e) => !!e);
+  const nav = document.querySelector('.gnav');
   resultsContainer.innerHTML = '';
 
   if (terms.length) {
@@ -88,11 +89,15 @@ async function populateSearchResults(searchTerms, resultsContainer) {
 
     if (!hits.length) {
       resultsContainer.classList.add('no-Results');
+      nav.classList.remove('in-search');
     } else {
       resultsContainer.classList.remove('no-Results');
+      nav.classList.add('in-search');
     }
 
     highlightTextElements(terms, resultsContainer.querySelectorAll('h3, .article-card-category, .article-card-body > p'));
+  } else {
+    nav.classList.remove('in-search');
   }
 }
 

@@ -174,7 +174,6 @@
     /* animation & transition */
     --cubic-bezier-1: cubic-bezier(0.802, 0, 0.2, 1);
     --cubic-bezier-2: cubic-bezier(0.23, 1, 0.32, 1);
-    --transition-cubic-bezier-1: all .5s var(--cubic-bezier-2);
     --transition-ease-in-out: all 0.4s ease-in-out;
     --fade-transition: all 0.6s var(--cubic-bezier-1);
     --slide-text-transition: all 1s var(--cubic-bezier-1);
@@ -422,14 +421,12 @@ h3 {
   line-height: var(--type-heading-m-lh);
 }
 
-
 @media (min-width: 900px) {
   /* Heading XXL */
   h1 u {
     font-size: 60px;
   }
 }
-
 
 /* Themes */
 .dark {
@@ -481,9 +478,6 @@ code {
 }
 
 code:not(pre > code) {
-  /* color: var(--brand-color-dark-purple)
-  background-color: var(--code-bg-color);
-  original first pass on color */
   font-size: 14px;
   overflow-wrap: break-word;
   border: 1px solid #e5e5e5;
@@ -1014,7 +1008,7 @@ body.docs-template main h1,
 body.guides-template main h1 {
   font-size: var(--type-heading-xxl-size);
   line-height: var(--type-heading-xxl-lh);
-  margin-bottom: var(--spacing-ml);
+  margin-bottom: var(--spacing-s);
 }
 
 body.docs-template main h2,
@@ -1247,12 +1241,13 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
   letter-spacing: 0;
 }
 
-body.guides-template main.without-full-width-hero .doc-detail-hero-image {
+body.guides-template main.without-full-width-hero img.doc-detail-hero-image {
   width: 100%;
   height: auto;
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
+  margin: var(--spacing-s) auto;
 }
 
 body.guides-template main.without-full-width-hero .default-content-wrapper img {
@@ -1276,7 +1271,6 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
 
 /* guides-template back button on documentation detail pages */
 body.guides-template .guides-back-btn {
-  margin: var(--spacing-s) 0;
   display: flex;
   align-items: center;
 }
@@ -1287,6 +1281,12 @@ body.guides-template .guides-back-btn a {
 
 body.guides-template .guides-back-btn span {
   margin-right: var(--spacing-xxs);
+}
+
+@media screen and (max-width: 899px) {
+  body.guides-template .guides-back-btn.desktop {
+    display: none;
+  }
 }
 
 /* guides-template message box for copying url success */
@@ -1392,6 +1392,10 @@ body.guides-template .guides-back-btn span {
 
   body.guides-template .guides-back-btn {
     margin: 0 0 var(--spacing-m);
+  }
+
+  body.guides-template main.without-full-width-hero img.doc-detail-hero-image {
+    margin-top: 0;
   }
 }
 
@@ -1842,7 +1846,9 @@ body.contact-template .default-content-wrapper img {
     right: 0;
     bottom: -1px;
     width: 0;
-    transition: var(--transition-cubic-bezier-1);
+    transition: left .5s var(--cubic-bezier-2),
+                right .5s var(--cubic-bezier-2),
+                width .5s var(--cubic-bezier-2);
 }
 
 .link-underline-effect:hover::before {
