@@ -331,6 +331,8 @@ body.bumper-template main .section {
 
 body.bumper-template main .section .hero {
   min-height: 100vh;
+  display: grid;
+  place-items: center;
 }
 
 body.bumper-template main .section p {
