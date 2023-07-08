@@ -1,5 +1,5 @@
 :root {
-  --footer-footer-nav-title-section-border: 2px solid #4B4B4B;
+  --footer-footer-nav-title-section-border: 2px solid #4b4b4b;
 }
 
 footer {
@@ -22,7 +22,7 @@ footer .footer p {
   margin: 0;
 }
 
-footer .footer a:any-link {
+.footer a {
   color: currentcolor;
 }
 
@@ -47,7 +47,7 @@ footer .new-footer {
   font-weight: 700;
 }
 
-.footer-nav-section a {
+.footer .footer-nav-section a {
   text-decoration: none;
 }
 
@@ -62,12 +62,19 @@ footer .new-footer {
   margin-bottom: var(--spacing-s);
 }
 
-.footer-nav-section li > a {
+.footer .footer-nav-title-section a {
+  text-decoration: none;
+}
+
+.footer .footer-bottom a {
+  text-decoration: none;
+}
+
+.footer .footer-nav-section li > a {
   font-size: var(--type-body-xs-size);
   line-height: var(--type-body-xs-lh);
   font-weight: 400;
 }
-
 
 /* Mobile border section styles */
 .footer-nav-title-section {
@@ -81,10 +88,6 @@ footer .new-footer {
   padding: var(--spacing-s) var(--spacing-xs);
   width: 100%;
   text-align: left;
-}
-
-.footer-nav-title-section a {
-  text-decoration: none;
 }
 
 .panel {
@@ -112,15 +115,11 @@ footer .new-footer {
   margin-bottom: 0;
 }
 
-.footer .footer-bottom a {
-  text-decoration: none;
-}
-
 .footer-nav-wrapper.desktop {
   display: none;
 }
 
-.footer .footer-cta-button.button{
+.footer .footer-cta-button.button {
   margin-top: 0;
   margin-left: auto;
   margin-right: 0;
@@ -151,7 +150,7 @@ footer .new-footer {
     grid-template-columns: repeat(5, 1fr);
   }
 
-  .footer-nav-wrapper.desktop > div:last-of-type{
+  .footer-nav-wrapper.desktop > div:last-of-type {
     display: flex;
   }
 
@@ -163,7 +162,7 @@ footer .new-footer {
   .footer .footer-bottom {
     text-align: right;
     border-top: 1px solid var(--color-font-grey);
-  }  
+  }
 
   .footer .footer-bottom p {
     font-size: var(--type-body-xxs-size);

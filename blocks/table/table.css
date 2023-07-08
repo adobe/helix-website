@@ -26,11 +26,15 @@ body main .table td p {
 }
 
 body main .table td p {
-  padding-left: 0; 
+  padding-left: 0;
 }
 
 .table tr:first-of-type {
   border-bottom: 1px solid var(--bg-color-grey);
+}
+
+.table td:first-child {
+  color: inherit;
 }
 
 .table tr:first-of-type td {
@@ -38,8 +42,4 @@ body main .table td p {
   padding-top: var(--spacing-xxs);
   padding-bottom: var(--spacing-xxs);
   color: var(--color-black);
-}
-
-.table td:first-child {
-  color: inherit;
 }

@@ -1,372 +1,351 @@
 :root {
-    /* Tab Colors */
-    --tabs-active-color: #1473e6;
-    --tabs-border-color: #d8d8d8;
-    --tabs-border-hover-color: #acacac;
-    --tabs-text-color: #7e7e7e;
-    --tabs-active-text-color: #2C2C2C;
-    --tabs-bg-color: rgb(250 250 250);
-    --tabs-active-bg-color: #fff;
-    --tabs-list-bg-gradient: linear-gradient(rgba(255 255 255 0%) 60%, rgba(245 245 245 80%));
+  /* Tab Colors */
+  --tabs-active-color: #1473e6;
+  --tabs-border-color: #d8d8d8;
+  --tabs-border-hover-color: #acacac;
+  --tabs-text-color: #7e7e7e;
+  --tabs-active-text-color: #2c2c2c;
+  --tabs-bg-color: rgb(250 250 250);
+  --tabs-active-bg-color: #fff;
+  --tabs-list-bg-gradient: linear-gradient(
+    rgba(255 255 255 0%) 60%,
+    rgba(245 245 245 80%)
+  );
 
-    /* redesign */
-    --tabs-image-based-border-color: #E8E8E8;
-    --tabs-image-based-active-border-color: #000;
-  }
-  
-  :root .dark {
-    --tabs-border-color: rgb(56 56 56);
-    --tabs-text-color: #cdcdcd;
-    --tabs-active-text-color: #fff;
-    --tabs-bg-color: #1a1a1a;
-    --tabs-active-bg-color: #111;
-    --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
-  }
-  
-  .tabs[data-block-status="loaded"] {
-    position: relative;
-    margin: 10px 0 0;
-    color: var(--tabs-active-text-color);
-    background-color: var(--tabs-bg-color);
-  }
-  
-  .tabs.xxl-spacing {
-    padding: var(--spacing-xxl) 0;
-  }
-  
-  .tabs.xl-spacing {
-    padding: var(--spacing-xl) 0;
-  }
-  
-  .tabs.l-spacing {
-    padding: var(--spacing-l) 0;
-  }
-  
-  .tabs.s-spacing {
-    padding: var(--spacing-xs) 0;
-  }
-  
-  .tabs.xs-spacing {
-    padding: var(--spacing-xxs) 0;
-  }
-  
-  .tabs [data-block-status="loaded"] div[role="tablist"] {
-    position: relative;
-    display: flex;
-    z-index: 2;
+  /* redesign */
+  --tabs-image-based-border-color: #e8e8e8;
+  --tabs-image-based-active-border-color: #000;
+}
 
-    /* ScrollProps! */
+:root .dark {
+  --tabs-border-color: rgb(56 56 56);
+  --tabs-text-color: #cdcdcd;
+  --tabs-active-text-color: #fff;
+  --tabs-bg-color: #1a1a1a;
+  --tabs-active-bg-color: #111;
+  --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
+}
 
-    /* If content exceeds height of container, overflow! */
+.tabs[data-block-status="loaded"] {
+  position: relative;
+  margin: 10px 0 0;
+  color: var(--tabs-active-text-color);
+  background-color: var(--tabs-bg-color);
+}
 
-    overflow: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -ms-overflow-style: none;
-    scrollbar-width: none; 
+.tabs.xxl-spacing {
+  padding: var(--spacing-xxl) 0;
+}
 
-    /* default bg */
+.tabs.xl-spacing {
+  padding: var(--spacing-xl) 0;
+}
 
-    background: var(--tabs-list-bg-gradient);
-    box-shadow: 0 -1px 0 inset var(--tabs-border-color);
+.tabs.l-spacing {
+  padding: var(--spacing-l) 0;
+}
+
+.tabs.s-spacing {
+  padding: var(--spacing-xs) 0;
+}
+
+.tabs.xs-spacing {
+  padding: var(--spacing-xxs) 0;
+}
+
+.tabs [data-block-status="loaded"] div[role="tablist"] {
+  position: relative;
+  display: flex;
+  z-index: 2;
+
+  /* ScrollProps! */
+
+  /* If content exceeds height of container, overflow! */
+
+  overflow: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  /* default bg */
+
+  background: var(--tabs-list-bg-gradient);
+  box-shadow: 0 -1px 0 inset var(--tabs-border-color);
+}
+
+.tabs div[role="tablist"]::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.tabs .tab-headline {
+  margin-top: var(--spacing-xxl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.tabs.center .tab-headline {
+  text-align: center;
+}
+
+.tablist-container {
+  position: relative;
+}
+
+.tabs div[role="tablist"] button[aria-selected="true"] {
+  background: var(--tabs-active-bg-color);
+  color: var(--tabs-active-text-color);
+  border-color: var(--tabs-border-color) var(--tabs-border-color) transparent;
+}
+
+@media screen and (min-width: 1200px) {
+  .tabs div[role="tablist"] button {
+    padding: 24px 32px 18px;
+    line-height: 18px;
   }
-  
-  .tabs div[role="tablist"]::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
+}
+
+/* Section Metadata */
+
+.tabs-background-transparent .tabs,
+.tabs-background-transparent .tabs div[role="tablist"],
+.tabs-background-transparent
+  .tabs
+  div[role="tablist"]
+  button[aria-selected="true"] {
+  background: transparent;
+}
+
+.tabs-background-transparent
+  .tabs
+  div[role="tablist"]
+  button[aria-selected="true"] {
+  border-bottom-color: var(--tabs-active-bg-color);
+}
+
+.tabs div[role="tablist"] .tablist-container {
+  display: flex;
+  justify-content: center;
+  width: var(--grid-container-width);
+  box-sizing: content-box;
+}
+
+/* center tabs */
+
+.tabs.center div[role="tablist"]::after,
+.tabs.center div[role="tablist"]::before {
+  content: "";
+  margin: auto;
+}
+
+.tabs.center div[role="tablist"] .tablist-container {
+  width: auto;
+  margin: 0;
+}
+
+.tabs .tabcontent {
+  padding: 0 10px;
+  border-bottom: 1px solid var(--tabs-border-color);
+  border-right: 1px solid var(--tabs-border-color);
+  border-left: 1px solid var(--tabs-border-color);
+  background-color: var(--tabs-active-bg-color);
+}
+
+.tabcontent-container {
+  position: relative;
+
+  /* ensure longer content not taking up space */
+  overflow: hidden;
+}
+
+/* contained tabs content */
+.tabs.contained .tabcontent .tabcontent-container,
+[role="tabpanel"] > .section > .content {
+  width: var(--grid-container-width);
+  margin: 0 auto;
+}
+
+.tabpanel .section {
+  padding: 0.5rem 0;
+}
+
+/* --- redesign adjustment for animation: STARTS --- */
+.tabpanel {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  opacity: 0;
+}
+
+.tabpanel.active {
+  pointer-events: auto;
+  opacity: 1;
+  position: relative;
+}
+
+/* see if need to adjust animation, experimenting only */
+.tabpanel .image-side {
+  clip-path: var(--circular-1-clip-path-init);
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+}
+
+.tabpanel.active .image-side {
+  clip-path: var(--circular-1-clip-path-full);
+  opacity: 1;
+}
+
+.tabpanel .testimonial-info {
+  transform: translateX(5%);
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+}
+
+.tabpanel.active .testimonial-info {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* --- redesign adjustment for animation: ENDS --- */
+
+.tabs div[role="tablist"] button {
+  background: transparent;
+  border-radius: 4px 4px 0 0;
+  border: 1px solid transparent;
+  color: var(--tabs-text-color);
+  cursor: pointer;
+  float: left;
+  font-family: var(--body-font-family);
+  font-weight: 600;
+  margin-left: -1px;
+  margin-top: 0;
+  padding: 14px 16px 12px;
+  text-decoration: none;
+  transition: color 0.1s ease-in-out;
+  white-space: nowrap;
+  width: auto;
+  z-index: 1;
+}
+
+.tabs div[role="tablist"] button:first-of-type {
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.tabs div[role="tablist"] button:hover {
+  color: var(--tabs-active-text-color);
+}
+
+.tabs div[role="tablist"] button:active {
+  color: var(--tabs-active-color);
+}
+
+/* - Tabs: .image-based - */
+.title-section .tabs-wrapper {
+  margin-top: var(--spacing-s);
+}
+
+.tabs.image-based[data-block-status="loaded"] {
+  background: transparent;
+}
+
+.tabs.image-based div[role="tablist"] button {
+  position: relative;
+  border: none;
+  border-bottom: 2px solid var(--tabs-image-based-border-color);
+  transition: all 0.2s ease-in-out;
+  padding: 16px 0 8px;
+  width: 100%;
+}
+
+.tabs.image-based div[role="tablist"] button:hover,
+.tabs.image-based div[role="tablist"] button[aria-selected="true"] {
+  border-bottom: 2px solid var(--tabs-image-based-active-border-color);
+}
+
+.tabs.image-based div[role="tablist"] button picture {
+  pointer-events: none;
+  opacity: 0.3;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.tabs.image-based div[role="tablist"] button:hover picture,
+.tabs.image-based div[role="tablist"] button[aria-selected="true"] picture {
+  opacity: 1;
+}
+
+.tabs.image-based div[role="tablist"] img {
+  width: 100%;
+  height: 100%;
+  max-height: 56px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.tabs.image-based .tabcontent {
+  border-color: transparent;
+  padding: 0;
+}
+
+.tabs.image-based div[role="tablist"] .tablist-container {
+  width: 175%;
+}
+
+/* tablist overflow on right side */
+.tabs.image-based div[role="tablist"] {
+  width: calc(100vw - 6vw);
+  overflow: scroll;
+}
+
+.tabs.image-based div[role="tablist"] button:last-of-type {
+  margin-right: 6vw;
+}
+
+@media screen and (max-width: 600px) {
+  .tabs.image-based div[role="tablist"] button {
+    padding: 7px 8px 6px;
   }
-  
-  .tabs .tab-headline {
-    margin-top: var(--spacing-xxl);
-    margin-bottom: var(--spacing-xl);
+}
+
+@media screen and (min-width: 768px) {
+  .tabs.image-based div[role="tablist"] {
+    width: 80%;
+    margin: 0 auto;
+    overflow: hidden;
   }
 
-  .tabs.center .tab-headline {
-      text-align: center;
+  .tabs.image-based div[role="tablist"] button:last-of-type {
+    margin-right: 0;
   }
-  
-  /* Section Metadata */
 
-  .tabs-background-transparent .tabs,
-  .tabs-background-transparent .tabs div[role="tablist"],
-  .tabs-background-transparent .tabs div[role="tablist"] button[aria-selected="true"] {
-    background: transparent;
+  .tabs.image-based div[role="tablist"] .tablist-container {
+    width: 100%;
   }
-  
-  .tabs-background-transparent .tabs div[role="tablist"] button[aria-selected="true"] {
-    border-bottom-color: var(--tabs-active-bg-color);
-  }
-  
-  .tabs div[role="tablist"] .tablist-container {
-    display: flex;
-    justify-content: center;
-    width: var(--grid-container-width);
-    box-sizing: content-box;
-  }
-  
-  /* center tabs */
+}
 
-  .tabs.center div[role="tablist"]::after,
-  .tabs.center div[role="tablist"]::before {
-    content: "";
-    margin: auto;
-  }
-  
-  .tabs.center div[role="tablist"] .tablist-container {
-    width: auto;
-    margin: 0;
-  }
-  
-  .tabs .tabcontent {
-    padding: 0 10px;
-    border-bottom: 1px solid var(--tabs-border-color);
-    border-right: 1px solid var(--tabs-border-color);
-    border-left: 1px solid var(--tabs-border-color);
-    background-color: var(--tabs-active-bg-color);
-  }
-  
-  /* contained tabs content */
-
-  .tabs.contained .tabcontent .tabcontent-container,
-  [role='tabpanel'] > .section > .content {
-    width: var(--grid-container-width);
+@media screen and (min-width: 900px) {
+  .tabs.image-based div[role="tablist"] {
+    width: 86%;
     margin: 0 auto;
   }
 
-  .tabpanel .section{
-    padding:.5rem 0;
-  }
-
-  /* --- redesign adjustment for animation: STARTS --- */
-  .tabcontent-container {
-    position: relative;
-
-    /* ensure longer content not taking up space */
-    overflow: hidden;   
-  }
-
-  .tabpanel {
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    opacity: 0;
-  }
-
-  .tabpanel.active {
-    pointer-events: auto;
-    opacity: 1;
-    position: relative;
-  }
-
-  /* see if need to adjust animation, experimenting only */
-  .tabpanel .image-side {
-    clip-path: var(--circular-1-clip-path-init);
-    opacity: 0;
-    transition: all 0.4s ease-in-out;
-    
-  }
-
-  .tabpanel.active .image-side {
-    clip-path: var(--circular-1-clip-path-full);
-    opacity: 1;
-  }
-
-  .tabpanel .testimonial-info {
-    transform: translateX(5%);
-    opacity: 0;
-    transition: all 0.4s ease-in-out;
-  }
-
-  .tabpanel.active .testimonial-info {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  /* --- redesign adjustment for animation: ENDS --- */
-  
   .tabs div[role="tablist"] button {
-    background: transparent;
-    border-radius: 4px 4px 0 0;
-    border: 1px solid transparent;
-    color: var(--tabs-text-color);
-    cursor: pointer;
-    float: left;
-    font-family: var(--body-font-family);
-    font-weight: 600;
-    margin-left: -1px;
-    margin-top: 0;
-    padding: 14px 16px 12px;
-    text-decoration: none;
-    transition: color 0.1s ease-in-out;
-    white-space: nowrap;
-    width: auto;
-    z-index: 1;
-  }
-  
-  .tabs div[role="tablist"] button:first-of-type {
-    margin-left: 0;
-    margin-top: 0;
-  }
-  
-  .tabs div[role="tablist"] button:hover {
-    color: var(--tabs-active-text-color);
-  }
-  
-  .tabs div[role="tablist"] button:active {
-    color: var(--tabs-active-color);
-  }
-  
-  .tabs div[role="tablist"] button[aria-selected="true"] {
-    background: var(--tabs-active-bg-color);
-    color: var(--tabs-active-text-color);
-    border-color: var(--tabs-border-color) var(--tabs-border-color) transparent;
-  }
-  
-  /* - Tabs: .quiet - */
-
-  .tabs.quiet div[role="tablist"] button {
-    border-width: 0 0 2px;
-    border-color: transparent;
-    background: transparent;
-    padding-right: 0;
-    padding-left: 0;
-    margin-left: 16px;
-  }
-  
-  .tabs.quiet div[role="tablist"] button:first-of-type {
-    margin-left: 0;
-  }
-  
-  .tabs.quiet div[role="tablist"] button:hover {
-    border-bottom-color: var(--tabs-border-hover-color);
-  }
-  
-  .tabs.quiet div[role="tablist"] button[aria-selected="true"] {
-    border-bottom-color: var(--tabs-active-color);
-  }
- 
-  @media screen and (min-width: 1200px) {
-      .tabs div[role="tablist"] button {
-      padding: 24px 32px 18px;
-      line-height: 18px;
-    }
-  
-    .tabs.quiet div[role="tablist"] button {
-      padding-top: 18px;
-      padding-bottom: 18px;
-    }
-  }
-
-  /* - Tabs: .image-based - */
-  .tablist-container {
-    position: relative;
-  }
-
-  .title-section .tabs-wrapper {
-    margin-top: var(--spacing-s);
-  }
-
-  .tabs.image-based[data-block-status="loaded"] {
-    background: transparent;
-  }
-
-  .tabs.image-based div[role="tablist"] button {
-    position: relative;
-    border: none;
-    border-bottom: 2px solid var(--tabs-image-based-border-color);
-    transition: all 0.2s ease-in-out;
-    padding: 16px 0 8px;
-    width: 100%;
-  }
-
-  .tabs.image-based div[role="tablist"] button:hover,
-  .tabs.image-based div[role="tablist"] button[aria-selected="true"] {
-    border-bottom: 2px solid var(--tabs-image-based-active-border-color);
-  }
-
-  .tabs.image-based div[role="tablist"] button picture {
-    pointer-events: none;
-    opacity: 0.3;
-    transition: opacity 0.2s ease-in-out;
-  }
-
-  .tabs.image-based div[role="tablist"] button:hover picture,
-  .tabs.image-based div[role="tablist"] button[aria-selected="true"] picture {
-    opacity: 1;
+    padding: 24px 16px 18px;
   }
 
   .tabs.image-based div[role="tablist"] img {
-    width: 100%;
-    height: 100%;
-    max-height: 56px;
-    object-fit: contain;
-    pointer-events: none;
+    max-height: 63px;
   }
+}
 
-  .tabs.image-based .tabcontent{
-    border-color: transparent;
-    padding: 0;
-  }
+/* - Tabs: .contained - */
+.tabs.contained {
+  max-width: var(--grid-mobile-container-width);
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .tabs.image-based div[role="tablist"] .tablist-container{
-    width: 175%;
-  }
-
-    /* tablist overflow on right side */
-  .tabs.image-based div[role="tablist"] {
-    width: calc(100vw - 6vw);
-    overflow: scroll;
-  }
-  
-  .tabs.image-based div[role="tablist"] button:last-of-type {
-    margin-right: 6vw;
-  }
-
-  @media screen and (max-width: 600px) {
-    .tabs.image-based div[role="tablist"] button {
-      padding: 7px 8px 6px;
-    }
-  }
-
-  @media screen and (min-width: 768px) {
-    .tabs.image-based div[role="tablist"] {
-      width: 80%;
-      margin: 0 auto;
-      overflow: hidden;
-    }
-
-    .tabs.image-based div[role="tablist"] button:last-of-type {
-      margin-right: 0;
-    }
-
-    .tabs.image-based div[role="tablist"] .tablist-container{
-      width: 100%;
-    }
-  }
-
-  @media screen and (min-width: 900px) {
-    .tabs.image-based div[role="tablist"] {
-      width: 86%;
-      margin: 0 auto;
-    }
-
-    .tabs div[role="tablist"] button {
-      padding: 24px 16px 18px;
-    }
-
-    .tabs.image-based div[role="tablist"] img {
-      max-height: 63px;
-    }
-  }
-
-  /* - Tabs: .contained - */
+@media screen and (min-width: 1440px) {
   .tabs.contained {
-    max-width: var(--grid-mobile-container-width);
-    margin-left: auto;
-    margin-right: auto;
+    max-width: var(--grid-desktop-container-width);
   }
-
-  @media screen and (min-width: 1440px) {
-    .tabs.contained {
-      max-width: var(--grid-desktop-container-width);
-    }
-  }
+}

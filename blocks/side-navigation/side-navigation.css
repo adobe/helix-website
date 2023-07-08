@@ -1,13 +1,13 @@
 :root {
-  --color-nav-sidebar-title: #2C2C2C;
-  --color-nav-sidebar-subtitle: #4B4B4B;
+  --color-nav-sidebar-title: #2c2c2c;
+  --color-nav-sidebar-subtitle: #4b4b4b;
   --nav-sidebar-indent-spacing: var(--spacing-xxxs);
   --nav-sidebar-link-border-radius: 4px;
   --nav-sidebar-transition: all 0.2s ease-in-out;
 }
 
 .side-navigation-wrapper {
-  width: auto; 
+  width: auto;
   display: block;
   padding: var(--spacing-xxs) 0 0;
   background: white;
@@ -42,7 +42,7 @@
   font-size: var(--type-body-xs-size);
 
   /* Temp color */
-  background: #f8f8f8; 
+  background: #f8f8f8;
   border: solid 1px lightgray;
   display: none;
 }
@@ -90,7 +90,7 @@
 }
 
 .side-nav-search-highlight::after {
-  content: '';
+  content: "";
   position: absolute;
   z-index: -1;
   top: 0;
@@ -211,12 +211,25 @@
 }
 
 /* with arrow toggle list layer */
-.side-navigation .list-section:last-of-type .list-section-inner > li.side-navigation-nested-target {
+.side-navigation
+  .list-section:last-of-type
+  .list-section-inner
+  > li.side-navigation-nested-target {
   padding: 2px var(--nav-sidebar-indent-spacing);
   width: 100%;
   cursor: pointer;
   transition: var(--nav-sidebar-transition);
   border-radius: var(--nav-sidebar-link-border-radius);
+}
+
+.side-navigation-nested-target.active li:last-of-type {
+  background: var(--bg-color-grey);
+  margin-bottom: 4px;
+}
+
+.side-navigation .list-section .list-section-inner-nested > li {
+  padding-left: var(--spacing-xs);
+  transition: var(--nav-sidebar-transition);
 }
 
 .side-navigation .list-section:last-of-type .list-section-inner > li:hover {
@@ -230,30 +243,22 @@
   border-radius: var(--nav-sidebar-link-border-radius);
 }
 
-.side-navigation-nested-target.active li:last-of-type{
-  background: var(--bg-color-grey);
-  margin-bottom: 4px;
-}
-
-.side-navigation .list-section .list-section-inner-nested > li {
-  padding-left: var(--spacing-xs);
-  transition: var(--nav-sidebar-transition);
-}
-
 .side-navigation .list-section .list-section-inner-nested > li:hover a,
 .side-navigation .list-section .list-section-inner-nested > li a.active {
   background: var(--bg-color-grey-2);
 }
 
-.side-navigation .list-section .side-navigation-nested-target button {
-  cursor: pointer;
-}
-
-.side-navigation .list-section .side-navigation-nested-target .icon.icon-icon-caret-down {
+.side-navigation
+  .list-section
+  .side-navigation-nested-target
+  .icon.icon-icon-caret-down {
   transition: all 0.2s ease-in-out;
 }
 
-.side-navigation .list-section .side-navigation-nested-target:not(.collapse) .icon.icon-icon-caret-down {
+.side-navigation
+  .list-section
+  .side-navigation-nested-target:not(.collapse)
+  .icon.icon-icon-caret-down {
   transform: rotate(180deg);
 }
 
@@ -263,18 +268,6 @@
 
 .side-navigation .side-navigation-nested-target.collapse ul {
   display: none;
-}
-
-.side-navigation .side-navigation-nested-target button {
-  width: 100%;
-  display: flex;
-  border: none;
-  background: none;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0;
-  font: var(--body-font-family);
-  color: var(--color-nav-sidebar-subtitle);
 }
 
 .side-navigation-overlay-btn-wrapper {
@@ -290,11 +283,27 @@
 .side-navigation-overlay-btn-wrapper button {
   cursor: pointer;
   appearance: none;
-  border: solid 1px black; 
+  border: solid 1px black;
   background-color: white;
   border-radius: 6px;
   padding: 8px 16px;
   font-family: var(--body-font-family);
+}
+
+.side-navigation .side-navigation-nested-target button {
+  width: 100%;
+  display: flex;
+  border: none;
+  background: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  font: var(--body-font-family);
+  color: var(--color-nav-sidebar-subtitle);
+}
+
+.side-navigation .list-section .side-navigation-nested-target button {
+  cursor: pointer;
 }
 
 .side-navigation-overlay-btn-wrapper button.back-btn {
@@ -369,7 +378,7 @@
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: var(--image-border-radius-l);
-  
+
   /* fix for ios overflow with border-radius not working */
   isolation: isolate;
 }
@@ -415,7 +424,7 @@
   transition: var(--nav-sidebar-transition);
 }
 
-.side-navigation-wrapper > .side-navigation-curtain.is-open{
+.side-navigation-wrapper > .side-navigation-curtain.is-open {
   pointer-events: auto;
   opacity: 1;
   z-index: 9990;
@@ -495,7 +504,9 @@
     padding: 0 0 var(--spacing-xs);
   }
 
-  .side-navigation .list-section li, .side-navigation .list-section a, .side-navigation .list-section button {
+  .side-navigation .list-section li,
+  .side-navigation .list-section a,
+  .side-navigation .list-section button {
     font-size: var(--type-body-xs-size);
   }
 
@@ -514,7 +525,7 @@
   }
 
   .results-wrapper {
-    width: calc(100% - 300px); 
+    width: calc(100% - 300px);
     grid-gap: var(--spacing-s);
   }
 }
