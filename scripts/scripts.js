@@ -758,7 +758,7 @@ export function setTemplate() {
 }
 
 export async function decorateGuideTemplateCodeBlock() {
-  if (!document.body.classList.contains('guides-template')) return;
+  if (!document.querySelector('pre code')) return;
 
   const highlightCSS = createTag('link', {
     rel: 'stylesheet',
