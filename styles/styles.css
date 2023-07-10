@@ -1504,6 +1504,10 @@ body.docs-template h1 {
   margin-top: 64px;
 }
 
+body.guides-template main a.anchor-link {
+  position: relative;
+}
+
 body.docs-template main a.anchor-link:any-link {
   position: relative;
   text-decoration: none;
@@ -1695,10 +1699,6 @@ body.guides-template main .default-content-wrapper h5 a:hover,
 body.guides-template main .default-content-wrapper h6 a:hover {
   color: var(--color-black);
   transition: var(--transition-ease-in-out);
-}
-
-body.guides-template main a.anchor-link {
-  position: relative;
 }
 
 body.guides-template main a.anchor-link:any-link::before {
