@@ -8,6 +8,13 @@ export default function decorate(block) {
   const innerContent = block.children[1].querySelector('div');
   innerContent.setAttribute('class', 'inner-content');
 
+  if (innerContent) {
+    const eyebrow = innerContent.querySelector('h3');
+    if (eyebrow && eyebrow.querySelector('.icon')) {
+      eyebrow.classList.add('icon-eyebrow');
+    }
+  }
+
   if (!block.classList.contains('multiple-cta')) {
     const ctaButton = innerContent.querySelector('a');
     if (ctaButton) {

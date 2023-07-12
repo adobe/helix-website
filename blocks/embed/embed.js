@@ -1,4 +1,4 @@
-import { loadCSS } from '../../scripts/scripts.js';
+import { loadCSS } from '../../scripts/lib-franklin.js';
 
 const jsonpGist = (url, callback) => {
   // Setup a unique name that cane be called & destroyed
