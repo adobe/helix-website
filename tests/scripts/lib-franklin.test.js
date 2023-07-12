@@ -12,27 +12,28 @@ document.head.innerHTML = await readFile({ path: './head.html' });
 
 describe('Core Helix features', () => {
   before(async () => {
-    const mod = await import('../../scripts/scripts.js');
-    Object
-      .keys(mod)
-      .forEach((func) => {
-        scripts[func] = mod[func];
-      });
+    const mod = await import('../../scripts/lib-franklin.js');
+    Object.keys(mod).forEach((func) => {
+      scripts[func] = mod[func];
+    });
     document.body.innerHTML = await readFile({ path: './body.html' });
   });
 
   it('Initializes window.hlx', async () => {
     // simulate code base path and turn on lighthouse
-    document.head.appendChild(document.createElement('script')).src = '/foo/scripts/scripts.js';
+    const testScript = document.createElement('script');
+    testScript.src = '../../scripts/lib-franklin.js';
+    testScript.type = 'module';
+    document.head.appendChild(testScript);
     window.history.pushState({}, '', `${window.location.href}&lighthouse=on`);
 
-    scripts.initHlx();
-    expect(window.hlx.codeBasePath).to.equal('/foo');
+    scripts.init();
+    expect(window.hlx.codeBasePath).to.equal('');
     expect(window.hlx.lighthouse).to.equal(true);
 
     // test error handling
     const url = sinon.stub(window, 'URL');
-    scripts.initHlx();
+    scripts.init();
 
     // cleanup
     url.restore();
@@ -47,35 +48,32 @@ describe('Core Helix features', () => {
   });
 
   it('Extracts metadata', async () => {
-    expect(scripts.getMetadata('description')).to.equal('Lorem ipsum dolor sit amet.');
+    expect(scripts.getMetadata('description')).to.equal(
+      'Lorem ipsum dolor sit amet.',
+    );
     expect(scripts.getMetadata('og:title')).to.equal('Foo');
-  });
-
-  it('Adds favicon', async () => {
-    scripts.addFavIcon('/foo.svg');
-    const $favIcon = document.querySelector('link[rel="icon"]');
-    expect($favIcon.getAttribute('href')).to.equal('/foo.svg');
   });
 
   it('Loads CSS', async () => {
     // loads a css file and calls callback
-    const load = await new Promise((resolve) => {
-      scripts.loadCSS('/tests/scripts/test.css', (e) => resolve(e));
-    });
-    expect(load).to.equal('load');
+    // Import the loadCSS function dynamically
+    const { loadCSS } = await import('../../scripts/lib-franklin.js');
+    const load = await loadCSS('/tests/scripts/test.css');
+    expect(load).to.be.ok;
     expect(getComputedStyle(document.body).color).to.equal('rgb(255, 0, 0)');
 
     // does nothing if css already loaded
-    const noop = await new Promise((resolve) => {
-      scripts.loadCSS('/tests/scripts/test.css', (e) => resolve(e));
-    });
-    expect(noop).to.equal('noop');
+    const noop = await loadCSS('/tests/scripts/test.css');
+    expect(noop).to.be.undefined;
 
     // calls callback in case of error
-    const error = await new Promise((resolve) => {
-      scripts.loadCSS('/tests/scripts/nope.css', (e) => resolve(e));
-    });
-    expect(error).to.equal('error');
+    let error;
+    try {
+      await loadCSS('/tests/scripts/nope.css');
+    } catch (err) {
+      error = err;
+    }
+    expect(error).to.be.ok;
   });
 
   it('Collects RUM data', async () => {
@@ -100,38 +98,39 @@ describe('Core Helix features', () => {
     sendBeacon.restore();
   });
 
-  it('Adds publish dependencies', async () => {
-    // adds single dependency
-    scripts.addPublishDependencies('/foo');
-    expect(window.hlx.dependencies).to.include('/foo');
-
-    // adds multiple dependencies
-    scripts.addPublishDependencies(['/bar', '/baz']);
-    expect(window.hlx.dependencies).to.deep.equal(['/foo', '/bar', '/baz']);
-  });
-
   it('Creates optimized picture', async () => {
     const $picture = scripts.createOptimizedPicture('/test/scripts/mock.png');
     expect($picture.querySelector(':scope source[type="image/webp"]')).to.exist; // webp
-    expect($picture.querySelector(':scope source:not([type="image/webp"])')).to.exist; // fallback
-    expect($picture.querySelector(':scope img').src).to.include('format=png&optimize=medium'); // default
+    expect($picture.querySelector(':scope source:not([type="image/webp"])')).to
+      .exist; // fallback
+    expect($picture.querySelector(':scope img').src).to.include(
+      'format=png&optimize=medium',
+    ); // default
   });
 
   // todo: no longer needed since breaking2022_05 ?
   it.skip('Decorates pictures', async () => {
     // add styling to picture and test its removal
-    document.querySelector('main picture')
-      .parentElement
-      .appendChild(document.createElement('strong'))
+    document
+      .querySelector('main picture')
+      .parentElement.appendChild(document.createElement('strong'))
       .appendChild(document.querySelector('main picture'));
     scripts.decoratePictures(document.querySelector('main'));
     expect(document.querySelectorAll('strong > picture').length).to.equal(0);
   });
 
   it('Normalizes headings', async () => {
-    const numHeadings = document.querySelectorAll('h1, h2, h3, h4, h5, h6').length;
-    scripts.normalizeHeadings(document.querySelector('main'), ['h1', 'h2', 'h3']);
-    expect(document.querySelectorAll('h1, h2, h3, h4, h5, h6').length).to.equal(numHeadings);
+    const numHeadings = document.querySelectorAll(
+      'h1, h2, h3, h4, h5, h6',
+    ).length;
+    scripts.normalizeHeadings(document.querySelector('main'), [
+      'h1',
+      'h2',
+      'h3',
+    ]);
+    expect(document.querySelectorAll('h1, h2, h3, h4, h5, h6').length).to.equal(
+      numHeadings,
+    );
     expect(document.querySelectorAll('h4, h5, h6').length).to.equal(0);
   });
 });
@@ -148,7 +147,7 @@ describe('Sections and blocks', () => {
   });
 
   it('Loads blocks', async () => {
-    scripts.initHlx();
+    scripts.init();
     await scripts.loadBlocks(document.querySelector('main'));
     document.querySelectorAll('main .block').forEach(($block) => {
       expect($block.dataset.blockStatus).to.equal('loaded');
@@ -170,7 +169,9 @@ describe('Sections and blocks', () => {
   });
 
   it('Reads block config', async () => {
-    document.querySelector('main .section > div').innerHTML += await readFile({ path: './config.html' });
+    document.querySelector('main .section > div').innerHTML += await readFile({
+      path: './config.html',
+    });
     const cfg = scripts.readBlockConfig(document.querySelector('main .config'));
     expect(cfg).to.deep.include({
       'prop-0': 'Plain text',

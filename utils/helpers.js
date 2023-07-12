@@ -119,7 +119,7 @@ export function addAnimatedClassToMultipleElements(targetSelector, animatedClass
 
 export function addInviewObserverToTriggerElement(triggerElement) {
   const observerOptions = {
-    threshold: 0.45, // show when is 50% in view
+    threshold: 0.25, // show when is 25% in view
   };
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {

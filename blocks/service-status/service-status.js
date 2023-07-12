@@ -1,4 +1,4 @@
-import { loadScript } from '../../scripts/scripts.js';
+import { loadScript } from '../../scripts/lib-franklin.js';
 import createTag from '../../utils/tag.js';
 
 async function loadWidget(el) {
