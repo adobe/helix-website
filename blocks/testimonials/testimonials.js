@@ -35,31 +35,35 @@ const decorateTestimonialContentSide = (contentDiv) => {
   const testimonialContentItems = contentDiv.querySelectorAll('p');
   const testimonialContentArray = Array.from(testimonialContentItems);
   const quoteItem = testimonialContentArray.find((contentItem) => contentItem.textContent.startsWith('"') || contentItem.textContent.startsWith('“'));
-  quoteItem.classList.add('testimonial-quote');
+  if (quoteItem) quoteItem.classList.add('testimonial-quote');
 
   const customerTitles = contentDiv.querySelectorAll('p:not(.testimonial-quote');
   const titles = createTag('div', { class: 'titles' }, '');
-  Array.from(customerTitles).forEach((title) => {
-    titles.append(title);
-  });
+  if (customerTitles && customerTitles.length > 0) {
+    Array.from(customerTitles).forEach((title) => {
+      titles.append(title);
+    });
+  }
   customerInfo.append(titles);
-  customerInfo.append(cta);
+  if (cta) customerInfo.append(cta);
 
   // decorate statistics
   const statistics = contentDiv.querySelector('ul');
-  const statItems = statistics.querySelectorAll('li');
-  statItems.forEach((item) => {
-    const [stats, info] = separateStatInfo(item.textContent);
-    if (info.length === 0) return;
+  if (statistics) {
+    const statItems = statistics.querySelectorAll('li');
+    statItems.forEach((item) => {
+      const [stats, info] = separateStatInfo(item.textContent);
+      if (info.length === 0) return;
 
-    item.innerHTML = '';
-    const statEl = createTag('span', { class: 'testimonial-stats' }, stats);
-    const statInfoEl = createTag('span', { class: 'testimonial-stats-info' }, info);
-    item.append(statEl, statInfoEl);
-  });
+      item.innerHTML = '';
+      const statEl = createTag('span', { class: 'testimonial-stats' }, stats);
+      const statInfoEl = createTag('span', { class: 'testimonial-stats-info' }, info);
+      item.append(statEl, statInfoEl);
+    });
+  }
 
   // combining new structure together
-  quoteItem.insertAdjacentElement('afterend', customerInfo);
+  if (quoteItem) quoteItem.insertAdjacentElement('afterend', customerInfo);
 };
 
 let initCount = 0;
@@ -122,13 +126,17 @@ export default function decorate(block) {
     if (index === 0) tabPanelContent.classList.add('active');
 
     const testimonialImageSide = row.querySelector(':scope > div:nth-child(2)');
-    testimonialImageSide.classList.add('image-side');
+    if (testimonialImageSide) testimonialImageSide.classList.add('image-side');
 
     const testimonialContentSide = row.querySelector(':scope > div:nth-child(3)');
-    testimonialContentSide.classList.add('testimonial-info');
-    decorateTestimonialContentSide(testimonialContentSide);
+    if (testimonialContentSide) {
+      testimonialContentSide.classList.add('testimonial-info');
+      decorateTestimonialContentSide(testimonialContentSide);
+    }
 
-    tabPanelContent.append(testimonialImageSide, testimonialContentSide);
+    if (testimonialImageSide && testimonialContentSide) {
+      tabPanelContent.append(testimonialImageSide, testimonialContentSide);
+    }
     tabContentContainer.append(tabPanelContent);
   });
 
