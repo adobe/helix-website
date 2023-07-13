@@ -1769,7 +1769,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
   letter-spacing: 0;
 }
 
-body.guides-template main.without-full-width-hero img.doc-detail-hero-image {
+body.guides-template main.without-full-width-hero .default-content-wrapper:first-of-type img:first-of-type.doc-detail-hero-image {
   width: 100%;
   height: auto;
   object-fit: cover;
