@@ -19,7 +19,8 @@
 
 .testimonials {
   position: relative;
-  margin: 10px auto;
+  margin: 0 auto;
+  padding: var(--spacing-s) 0;
   color: var(--tabs-active-text-color);
   max-width: var(--grid-mobile-container-width);
 }
