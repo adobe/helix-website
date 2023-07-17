@@ -4,7 +4,7 @@
  */
 import { createTag } from '../../scripts/scripts.js';
 
-const isElementInContainerView = (targetEl) => {
+export const isElementInContainerView = (targetEl) => {
   const rect = targetEl.getBoundingClientRect();
   return (
     rect.top >= 0
@@ -14,14 +14,14 @@ const isElementInContainerView = (targetEl) => {
   );
 };
 
-const scrollTabIntoView = (e) => {
+export const scrollTabIntoView = (e) => {
   const isElInView = isElementInContainerView(e);
 
   /* c8 ignore next */
   if (!isElInView) e.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 };
 
-function changeTabs(e) {
+export function changeTabs(e) {
   const { target } = e;
   const parent = target.parentNode;
   const grandparent = parent.parentNode.nextElementSibling;
@@ -38,7 +38,7 @@ function changeTabs(e) {
     .classList.add('active');
 }
 
-function initTabs(e) {
+export function initTabs(e) {
   const tabs = e.querySelectorAll('[role="tab"]');
   const tabLists = e.querySelectorAll('[role="tablist"]');
   tabLists.forEach((tabList) => {
