@@ -15,7 +15,11 @@ import {
   getMetadata,
   decorateBlock,
 } from './lib-franklin.js';
-import { addInViewAnimationToSingleElement, addInViewAnimationToMultipleElements, returnLinkTarget } from '../utils/helpers.js';
+import {
+  addInViewAnimationToSingleElement,
+  addInViewAnimationToMultipleElements,
+  returnLinkTarget,
+} from '../utils/helpers.js';
 
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
@@ -89,22 +93,32 @@ export function customDecorateButtons(block = document) {
     if ($block) {
       blockName = $block.className;
     }
-    if (!noButtonBlocks.includes(blockName)
-      && a.href !== a.textContent) {
+    if (!noButtonBlocks.includes(blockName) && a.href !== a.textContent) {
       const up = a.parentElement;
       const twoup = a.parentElement.parentElement;
       if (!a.querySelector('img')) {
-        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+        if (
+          up.childNodes.length === 1
+          && (up.tagName === 'P' || up.tagName === 'DIV')
+        ) {
           a.className = 'button primary';
           up.classList.add('button-container');
         }
-        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
-          && twoup.childNodes.length === 1 && twoup.tagName === 'P') {
+        if (
+          up.childNodes.length === 1
+          && up.tagName === 'STRONG'
+          && twoup.childNodes.length === 1
+          && twoup.tagName === 'P'
+        ) {
           a.className = 'button primary';
           twoup.classList.add('button-container');
         }
-        if (up.childNodes.length === 1 && up.tagName === 'EM'
-          && twoup.childNodes.length === 1 && twoup.tagName === 'P') {
+        if (
+          up.childNodes.length === 1
+          && up.tagName === 'EM'
+          && twoup.childNodes.length === 1
+          && twoup.tagName === 'P'
+        ) {
           a.className = 'button secondary';
           twoup.classList.add('button-container');
         }
@@ -180,7 +194,9 @@ export function addHeadingAnchorLink(elem) {
 export function decorateGuideTemplateHeadings(main) {
   const contentArea = main.querySelector('.section.content');
   if (!contentArea) return;
-  const contentSections = contentArea.querySelectorAll('.default-content-wrapper');
+  const contentSections = contentArea.querySelectorAll(
+    '.default-content-wrapper',
+  );
   if (!contentSections) return;
   contentSections.forEach((section) => {
     section.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
@@ -191,7 +207,9 @@ export function decorateGuideTemplateHeadings(main) {
 
 export function decorateGuideTemplateHero(main) {
   if (main.classList.contains('without-full-width-hero'));
-  const firstImageInContentArea = main.querySelector('.section.content .default-content-wrapper img');
+  const firstImageInContentArea = main.querySelector(
+    '.section.content .default-content-wrapper img',
+  );
   if (firstImageInContentArea) firstImageInContentArea.classList.add('doc-detail-hero-image');
 }
 
@@ -213,7 +231,8 @@ function animateTitleSection(section) {
       {
         selector: '.main-headline',
         animatedClass: 'slide-reveal-up',
-      }],
+      },
+    ],
   };
   const trigger = section.querySelector('.default-content-wrapper');
 
@@ -230,7 +249,11 @@ function animateTitleSection(section) {
       animatedClass: 'fade-in',
     });
   }
-  addInViewAnimationToMultipleElements(animationConfig.items, trigger, animationConfig.staggerTime);
+  addInViewAnimationToMultipleElements(
+    animationConfig.items,
+    trigger,
+    animationConfig.staggerTime,
+  );
 }
 
 export function decorateTitleSection(main) {
@@ -264,9 +287,7 @@ export function customDecorateTemplateAndTheme() {
   if (theme) addClasses(document.body, `${theme.toLowerCase()}-theme`);
 }
 
-export async function decorateGuideTemplateCodeBlock() {
-  if (!document.body.classList.contains('guides-template')) return;
-
+async function loadHighlightLibrary() {
   const highlightCSS = createTag('link', {
     rel: 'stylesheet',
     href: '/libs/highlight/atom-one-dark.min.css',
@@ -278,13 +299,36 @@ export async function decorateGuideTemplateCodeBlock() {
   document.body.append(initScript);
 }
 
+export async function decorateGuideTemplateCodeBlock() {
+  const firstCodeBlock = document.querySelector('pre code');
+  if (!firstCodeBlock) return;
+
+  const intersectionObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target);
+          loadHighlightLibrary();
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: '200px', // Adjust rootMargin as needed to trigger intersection at the desired position before the codeblock becomes visible
+      threshold: 0,
+    },
+  );
+
+  // when first codeblock is coming into view, load highlight.js for page
+  intersectionObserver.observe(firstCodeBlock);
+}
+
 export function decorateGuideTemplate(main) {
   if (!document.body.classList.contains('guides-template') || !main) return;
   addMessageBoxOnGuideTemplate(main);
   decorateGuideTemplateHeadings(main);
   decorateGuideTemplateHero(main);
   decorateGuideTemplateLinks(main);
-  decorateGuideTemplateCodeBlock();
 }
 
 /**
@@ -305,14 +349,20 @@ export function cleanVariations(parent) {
 }
 
 function buildEmbeds() {
-  const embeds = [...document.querySelectorAll('a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]')];
+  const embeds = [
+    ...document.querySelectorAll(
+      'a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]',
+    ),
+  ];
   embeds.forEach((embed) => {
     embed.replaceWith(buildBlock('embed', embed.outerHTML));
   });
 }
 
 function updateGuideTemplateStyleBasedOnHero() {
-  const isHeroContentExist = document.querySelector('.guides-template .section.heading');
+  const isHeroContentExist = document.querySelector(
+    '.guides-template .section.heading',
+  );
 
   if (isHeroContentExist) {
     document.querySelector('main').classList.add('has-full-width-hero');
@@ -449,6 +499,8 @@ async function loadLazy(doc) {
   loadBreadcrumb(main);
   // sidebar + related style setup
   setUpSideNav(main, aside);
+
+  decorateGuideTemplateCodeBlock();
 
   sampleRUM('lazy');
 }
