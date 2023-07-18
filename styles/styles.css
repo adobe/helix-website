@@ -1772,6 +1772,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
 body.guides-template main.without-full-width-hero .default-content-wrapper:first-of-type img:first-of-type.doc-detail-hero-image {
   width: 100%;
   height: auto;
+  max-height: 40vh;
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
