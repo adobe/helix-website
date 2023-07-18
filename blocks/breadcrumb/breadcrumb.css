@@ -75,7 +75,7 @@
 
 @media screen and (min-width: 900px) {
   .breadcrumb-wrapper:not(.no-shadow) {
-    margin-bottom: var(--spacing-l);
+    margin-bottom: var(--spacing-ml);
   }
 }
 

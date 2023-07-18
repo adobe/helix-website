@@ -1772,7 +1772,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
 body.guides-template main.without-full-width-hero .default-content-wrapper:first-of-type img:first-of-type.doc-detail-hero-image {
   width: 100%;
   height: auto;
-  max-height: 40vh;
+  max-height: 45vh;
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
@@ -1919,7 +1919,7 @@ body.guides-template .guides-back-btn span.icon {
   }
 
   body.guides-template .guides-back-btn {
-    margin: 0 0 var(--spacing-m);
+    margin: 0 0 var(--spacing-s);
   }
 
   body.guides-template main.without-full-width-hero img.doc-detail-hero-image {
