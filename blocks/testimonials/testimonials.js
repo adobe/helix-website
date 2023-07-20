@@ -91,7 +91,7 @@ export default function decorate(block) {
 
   rows.forEach((row, index) => {
     const tabListContent = row.querySelector(':scope > div:first-child');
-    const tabListTitle = tabListContent.querySelector('p:not(:empty):not(:has(picture)');
+    const tabListTitle = tabListContent.querySelector('p:not(:empty):not(:has(picture))');
     const tabListImage = tabListContent.querySelector('picture');
 
     // init tablist
