@@ -11,9 +11,14 @@
   margin-bottom: var(--spacing-xxs);
 }
 
-.block.breadcrumb {
+.breadcrumb {
   max-width: var(--header-container-width);
   padding: 0 var(--header-container-tablet-x-padding);
+  display: none;
+}
+
+.breadcrumb.appear {
+  display: block;
 }
 
 .breadcrumb ul {
