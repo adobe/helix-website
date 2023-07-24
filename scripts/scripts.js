@@ -496,7 +496,7 @@ async function loadLazy(doc) {
   }
 
   // breadcrumb setup
-  loadBreadcrumb(main);
+  // loadBreadcrumb(main);
   // sidebar + related style setup
   setUpSideNav(main, aside);
 
