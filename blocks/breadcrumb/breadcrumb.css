@@ -1,7 +1,6 @@
 .breadcrumb-wrapper {
   display: none;
   width: 100%;
-  max-height: var(--breadcrumb-height);
   background: var(--color-white);
   box-shadow: 0 4px 6px rgba(0 0 0 / 15%);
   z-index: 100;
