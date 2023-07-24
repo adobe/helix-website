@@ -11,7 +11,7 @@ export default async function decorate(block) {
 
   const isDocumentationLanding = window.location.pathname === '/docs/';
 
-  const list = createTag('ul');
+  const list = createTag('ul', { class: 'breadcrumb-list' });
   const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
   const docs = createTag('li', {}, '<a href="/docs/" class="breadcrumb-link-underline-effect">Documentation</a>');
 
