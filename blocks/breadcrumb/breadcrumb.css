@@ -1,7 +1,7 @@
 .breadcrumb-wrapper {
   display: none;
   width: 100%;
-  height: fit-content;
+  max-height: var(--breadcrumb-height);
   background: var(--color-white);
   box-shadow: 0 4px 6px rgba(0 0 0 / 15%);
   z-index: 100;
@@ -14,11 +14,7 @@
 .breadcrumb {
   max-width: var(--header-container-width);
   padding: 0 var(--header-container-tablet-x-padding);
-}
-
-/* prevent layout shift */
-.breadcrumb-list {
-  height: 47px;
+  height: var(--breadcrumb-height);
   overflow: hidden; 
 }
 
