@@ -57,6 +57,4 @@ export default async function decorate(block) {
 
   const innerDiv = block.querySelector(':scope > div > div');
   innerDiv.append(list);
-
-  block.closest('.breadcrumb').classList.add('appear');
 }
