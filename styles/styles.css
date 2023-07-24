@@ -395,11 +395,6 @@ h3 {
   line-height: var(--type-heading-m-lh);
 }
 
-/* Themes */
-.dark {
-  color: white;
-}
-
 /* Utilities */
 .hidden {
   display: none;
@@ -422,10 +417,6 @@ em a {
 /* Primary button over background */
 strong a {
   color: inherit;
-}
-
-.dark em a {
-  color: #fff;
 }
 
 pre {
@@ -642,52 +633,6 @@ a.button.reverse.primary-cta:any-link:hover {
 a.button.reverse.accent:any-link:active,
 a.button.reverse.primary-cta:any-link:active {
   background-color: var(--color-info-accent-reverse-down);
-}
-
-a.button.dark:any-link {
-  color: var(--color-black);
-  background-color: var(--color-white);
-  border-color: var(--color-white);
-}
-
-a.button.dark:any-link:hover {
-  color: var(--color-black);
-  background-color: var(--color-gray-100);
-  border-color: var(--color-gray-100);
-}
-
-a.button.dark:any-link:active {
-  color: var(--color-black);
-  background-color: var(--color-gray-200);
-  border-color: var(--color-gray-200);
-}
-
-a.button.dark:any-link:focus {
-  box-shadow: 0 0 0 2px var(--color-info-accent), 0 0 0 4px var(--color-white);
-}
-
-a.button.dark.reverse:any-link {
-  color: var(--color-white);
-  background-color: transparent;
-  border-color: var(--color-white);
-}
-
-a.button.dark.reverse:any-link:hover {
-  color: var(--color-white);
-  background-color: rgb(0 0 0 / 10%);
-  border-color: var(--color-gray-100);
-}
-
-a.button.dark.reverse:any-link:active {
-  color: var(--color-white);
-  background-color: rgb(0 0 0 / 20%);
-  border-color: var(--color-gray-200);
-}
-
-a.button.dark.reverse:any-link:focus {
-  background-color: var(--color-white);
-  border-color: var(--color-white);
-  color: var(--color-info-accent-hover);
 }
 
 a.button > svg {
