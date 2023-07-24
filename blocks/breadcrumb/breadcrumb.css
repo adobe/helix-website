@@ -11,7 +11,7 @@
   margin-bottom: var(--spacing-xxs);
 }
 
-.breadcrumb {
+.block.breadcrumb {
   max-width: var(--header-container-width);
   padding: 0 var(--header-container-tablet-x-padding);
   height: var(--breadcrumb-height);
