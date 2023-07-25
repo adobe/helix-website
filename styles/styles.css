@@ -790,6 +790,7 @@ main .form .button:hover::before {
 /* cannot use `overflow:hidden` here as position:sticky in breadcrumb */
 main {
   min-height: calc(100vh - 264px);
+  background-color: white;
 }
 
 main p em strong,

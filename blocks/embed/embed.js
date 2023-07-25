@@ -40,13 +40,26 @@ const youtube = (element) => {
   element.parentElement.remove();
 };
 
+const initObserver = (callback) => new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      callback(entry.target);
+    }
+  });
+}, { root: null, rootMargin: '200px', threshold: 0 });
+
 export default function decorate(block) {
   const a = block.querySelector('a');
   const { hostname } = new URL(a.href);
+
   if (hostname.includes('youtu')) {
-    youtube(a);
+    initObserver(() => {
+      youtube(a);
+    }).observe(a);
   }
   if (hostname.includes('gist')) {
-    gist(a);
+    initObserver(() => {
+      gist(a);
+    }).observe(a);
   }
 }
