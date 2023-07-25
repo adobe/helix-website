@@ -1,19 +1,21 @@
 .breadcrumb-wrapper {
   display: none;
   width: 100%;
+  max-height: var(--breadcrumb-height);
   background: var(--color-white);
   box-shadow: 0 4px 6px rgba(0 0 0 / 15%);
   z-index: 100;
 }
 
 .breadcrumb-wrapper:not(.no-shadow) {
-  box-shadow: 0 4px 6px rgba(0 0 0 15%);
   margin-bottom: var(--spacing-xxs);
 }
 
-.block.breadcrumb {
+.breadcrumb {
   max-width: var(--header-container-width);
   padding: 0 var(--header-container-tablet-x-padding);
+  height: var(--breadcrumb-height);
+  overflow: hidden; 
 }
 
 .breadcrumb ul {
