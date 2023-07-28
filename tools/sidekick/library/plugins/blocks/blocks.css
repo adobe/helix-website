@@ -43,6 +43,7 @@ sp-split-view {
 
 .details-container .details {
     height: 100%;
+    padding: 0 16px 0 16px;
 }
 
 .details-container .actions {
@@ -96,8 +97,4 @@ sp-split-view {
 
 .details-container .action-bar h3 {
     margin: 0;
-}
-
-.details-container .details {
-    padding: 16px;
 }
