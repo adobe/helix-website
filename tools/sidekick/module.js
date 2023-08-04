@@ -78,7 +78,9 @@
    * @typedef {Object} ViewConfig
    * @description A custom view configuration.
    * @prop {string} path The path or globbing pattern where to apply this view
-   * @prop {string} css The URL of a CSS file or inline CSS to render this view (optional)
+   * @prop {string} title The view title (optional)
+   * @prop {Object} titleI18n={} A map of translated view titles
+   * @prop {string} viewer The URL to render this view
    */
 
   /**
@@ -540,7 +542,7 @@
     const defaultSpecialViews = [
       {
         path: '**.json',
-        js: `${scriptRoot}/view/json.js`,
+        viewer: `${scriptRoot}/view/json/json.html`,
       },
     ];
     // try custom views first
@@ -2368,13 +2370,13 @@
   }
 
   /**
-   * Creates and/or returns a special view.
+   * Creates and/or returns a special view overlay.
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {boolean} create Create the special view if none exists
-   * @returns {HTMLELement} The special view
+   * @returns {HTMLELement} The special view overlay
    */
-  function getSpecialView(sk, create) {
+  function getSpecialViewOverlay(sk, create) {
     const view = sk.shadowRoot.querySelector('.hlx-sk-special-view')
       || (create
         ? appendTag(sk.shadowRoot, {
@@ -2383,12 +2385,15 @@
         })
         : null);
     if (create && view) {
-      const description = appendTag(view, {
+      const header = appendTag(view, {
         tag: 'div',
-        text: i18n(sk, 'json_view_description'),
-        attrs: { class: 'description' },
+        attrs: { class: 'header' },
       });
-      appendTag(description, {
+      appendTag(header, {
+        tag: 'span',
+        attrs: { class: 'title' },
+      });
+      appendTag(header, {
         tag: 'button',
         text: i18n(sk, 'close'),
         attrs: { class: 'close' },
@@ -2396,9 +2401,10 @@
         lstnrs: { click: () => hideSpecialView(sk) },
       });
       appendTag(view, {
-        tag: 'div',
+        tag: 'iframe',
         attrs: {
           class: 'container',
+          allow: 'clipboard-write *',
         },
       });
     }
@@ -2413,67 +2419,34 @@
   async function showSpecialView(sk) {
     const {
       config: {
+        lang,
         specialView,
-        pushDownElements,
       },
       location: {
+        origin,
         href,
-        pathname,
       },
     } = sk;
-    if (specialView && !getSpecialView(sk)) {
-      try {
-        const resp = await fetch(href);
-        if (!resp.ok) {
-          return;
-        }
-        const { js, css, cssLoaded } = specialView;
-        if (css && !cssLoaded) {
-          if (css.startsWith('https://') || css.startsWith('/')) {
-            // load external css file
-            sk.loadCSS(css);
-          } else {
-            // load inline css
-            const style = appendTag(sk.shadowRoot, {
-              tag: 'style',
-              attrs: {
-                type: 'text/css',
-              },
-            });
-            style.textContent = css;
+    if (specialView && !getSpecialViewOverlay(sk)) {
+      // hide original content
+      [...sk.parentElement.children].forEach((el) => {
+        if (el !== sk) {
+          try {
+            el.style.display = 'none';
+          } catch (e) {
+            // ignore
           }
-          specialView.cssLoaded = true;
         }
-
-        // hide original content
-        [...sk.parentElement.children].forEach((el) => {
-          if (el !== sk) {
-            try {
-              el.style.display = 'none';
-            } catch (e) {
-              // ignore
-            }
-          }
-        });
-
-        const view = getSpecialView(sk, true);
-        view.classList.add(pathname.split('.').pop());
-        pushDownElements.push(view);
-
-        const data = await resp.text();
-        let callback;
-        if (typeof js === 'function') {
-          callback = js;
-        } else if (typeof js === 'string') {
-          // load external module
-          const mod = await import(js);
-          callback = mod.default;
-        } else {
-          throw new Error('invalid view callback');
-        }
-        callback(view.querySelector(':scope .container'), data);
-      } catch (e) {
-        console.log('failed to draw view', e);
+      });
+      const { viewer, title, titleI18n } = specialView;
+      if (viewer) {
+        const viewUrl = new URL(viewer, origin);
+        viewUrl.searchParams.set('url', href);
+        const viewOverlay = getSpecialViewOverlay(sk, true);
+        viewOverlay.querySelector('.title').textContent = (titleI18n && titleI18n[lang])
+          || title || i18n(sk, 'json_view_description');
+        viewOverlay.querySelector('.container')
+          .setAttribute('src', viewUrl.toString());
       }
     }
   }
@@ -2484,11 +2457,9 @@
    * @param {Sidekick} sk The sidekick
    */
   function hideSpecialView(sk) {
-    const { config } = sk;
-    const view = getSpecialView(sk);
-    if (view) {
-      config.pushDownElements = config.pushDownElements.filter((el) => el !== view);
-      view.replaceWith('');
+    const viewOverlay = getSpecialViewOverlay(sk);
+    if (viewOverlay) {
+      viewOverlay.replaceWith('');
 
       // show original content
       [...sk.parentElement.children].forEach((el) => {
@@ -2763,13 +2734,11 @@
         })
         .then((json) => {
           this.status = json;
-          this.setAttribute('status', JSON.stringify(json));
           return json;
         })
         .then((json) => fireEvent(this, 'statusfetched', json))
         .catch(({ message }) => {
           this.status.error = message;
-          this.setAttribute('status', JSON.stringify(this.status));
           const modal = {
             message: message.startsWith('error_') ? i18n(this, message) : [
               i18n(this, 'error_status_fatal'),
