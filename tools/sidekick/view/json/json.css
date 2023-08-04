@@ -1,0 +1,69 @@
+.hlx-sk-view {
+  background-color: var(--hlx-sk-bg);
+  color: var(--hlx-sk-color);
+  padding: 10px 20px;
+  margin: 0;
+}
+
+.hlx-sk-view h2 {
+  margin: 10px 0;
+  font-size: 1.25rem;
+  min-height: 1.25rem;
+}
+
+.hlx-sk-view table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.hlx-sk-view table tr {
+  vertical-align: top;
+}
+
+
+.hlx-sk-view table th {
+  background-color: var(--hlx-sk-bg);
+  padding: 5px;
+}
+
+.hlx-sk-view table,
+.hlx-sk-view table tr,
+.hlx-sk-view table th,
+.hlx-sk-view table td {
+  border: solid 1px var(--hlx-sk-special-view-table-border);
+}
+
+.hlx-sk-view table td > div {
+  padding: 5px;
+  min-height: 0.875rem;
+  font-size: 0.875rem;
+}
+
+.hlx-sk-view table td > div.image  {
+  padding: 0;
+}
+
+.hlx-sk-view table td > div img {
+  width: 100%;
+  max-width: 240px;
+}
+
+.hlx-sk-view table td > div ul {
+  margin: 0;
+  padding-inline-start: 20px;
+}
+
+.hlx-sk-view table td > div li {
+  padding: 0;
+}
+
+.hlx-sk-view table td > div a:any-link {
+  color: var(--hlx-sk-color);
+  text-decoration: none;
+}
+
+.hlx-sk-view table td > div a:hover {
+  text-decoration: underline;
+}
