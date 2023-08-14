@@ -292,16 +292,28 @@
     "message": "Deletion failed. Please try again later."
   },
   "delete_file_confirm": {
+    "message": "Are you sure you want to delete this file?"
+  },
+  "delete_file_no_source_confirm": {
     "message": "This file no longer exists in the repository, deleting it cannot be undone!\n\nAre you sure you want to delete it?"
   },
   "delete_file_source_exists": {
     "message": "This file still exists in the repository and cannot be deleted."
   },
+  "delete_file_success": {
+    "message": "File successfully deleted."
+  },
   "delete_page_confirm": {
+    "message": "Are you sure you want to delete this page?"
+  },
+  "delete_page_no_source_confirm": {
     "message": "This page no longer has a source document, deleting it cannot be undone!\n\nAre you sure you want to delete it?"
   },
   "delete_page_source_exists": {
     "message": "This page still has a source document and cannot be deleted."
+  },
+  "delete_page_success": {
+    "message": "Page successfully deleted."
   },
   "description": {
     "message": "AEM Sidekick allows authors of AEM sites to easily preview and publish content."
@@ -518,10 +530,16 @@
     "message": "Unpublication failed. Please try again later."
   },
   "unpublish_page_confirm": {
-    "message": "This page no longer has a source document, unpublishing it cannot be undone!\n\nAre you sure you want to delete it?"
+    "message": "Are you sure you want to unpublish this page?"
   },
   "unpublish_page_source_exists": {
     "message": "This page still has a source document and cannot be unpublished."
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "This page no longer has a source document, unpublishing it cannot be undone!\n\nAre you sure you want to unpublish it?"
+  },
+  "unpublish_page_success": {
+    "message": "Page successfully unpublished."
   },
   "user_login": {
     "message": "Sign in"
