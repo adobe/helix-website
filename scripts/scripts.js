@@ -487,7 +487,6 @@ async function loadLazy(doc) {
   loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
-  addFavIcon(`${window.hlx.codeBasePath}/img/franklin-favicon.png`);
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
