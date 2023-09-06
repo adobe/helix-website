@@ -1,4 +1,5 @@
 import { addInViewAnimationToSingleElement } from '../../utils/helpers.js';
+import { sampleRUM } from '../../scripts/lib-franklin.js';
 
 function createSelect(fd) {
   const select = document.createElement('select');
@@ -46,6 +47,7 @@ async function submitForm(form) {
     body: JSON.stringify({ data: payload }),
   });
   await resp.text();
+  sampleRUM('form:submit');
   return payload;
 }
 
