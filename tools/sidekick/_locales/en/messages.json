@@ -453,6 +453,15 @@
   "open_view_doc_source": {
     "message": "View document source"
   },
+  "open_url": {
+    "message": "Open URL"
+  },
+  "open_urls": {
+    "message": "Open URLs"
+  },
+  "open_urls_confirm": {
+    "message": "Are you sure you want to open $1 URLs?"
+  },
   "please_wait": {
     "message": "Please wait..."
   },
