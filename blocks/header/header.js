@@ -133,8 +133,6 @@ class Gnav {
 
     const brand = brandBlock.querySelector('a');
     brand.classList.add('gnav-brand', 'link-highlight-colorful-effect-hover-wrapper');
-
-    // accessibility
     brand.innerHTML = `<span class="link-highlight-colorful-effect">${brand.textContent}</span>`;
 
     if (brandBlock.classList.contains('with-logo')) {
