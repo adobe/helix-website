@@ -133,11 +133,6 @@ class Gnav {
 
     const brand = brandBlock.querySelector('a');
     brand.classList.add('gnav-brand', 'link-highlight-colorful-effect-hover-wrapper');
-
-    // accessibility
-    const brandAriaLabel = brandBlock.textContent ? brandBlock.textContent.trim() : 'Adobe Franklin';
-    brand.setAttribute('aria-label', brandAriaLabel);
-    brand.setAttribute('tabindex', 1);
     brand.innerHTML = `<span class="link-highlight-colorful-effect">${brand.textContent}</span>`;
 
     if (brandBlock.classList.contains('with-logo')) {

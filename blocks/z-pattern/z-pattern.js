@@ -13,7 +13,7 @@ const animationConfig = {
       animatedClass: 'slide-reveal-up',
     },
     {
-      selectors: '.content-side ul li',
+      selectors: '.content-side ul',
       animatedClass: 'slide-reveal-up',
     },
   ],
