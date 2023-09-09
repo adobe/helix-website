@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URLs copiados para a área de transferência."
   },
+  "copy": {
+    "message": "Copiar"
+  },
   "copy_live_url": {
     "message": "Copiar URL ativo"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "A exclusão falhou. Tente novamente mais tarde."
+  },
+  "delete_file_confirm": {
+    "message": "Deseja excluir este arquivo?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "Este arquivo não existe mais no repositório e sua exclusão não poderá ser desfeita.\n\nDeseja excluí-lo?"
+  },
+  "delete_file_source_exists": {
+    "message": "Este arquivo ainda existe no repositório e não pode ser excluído."
+  },
+  "delete_file_success": {
+    "message": "Arquivo excluído com sucesso."
+  },
+  "delete_page_confirm": {
+    "message": "Deseja excluir esta página?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "Esta página não possui mais um documento de origem e sua exclusão não poderá ser desfeita.\n\nDeseja excluí-la?"
+  },
+  "delete_page_source_exists": {
+    "message": "Esta página ainda possui um documento de origem e não pode ser excluída."
+  },
+  "delete_page_success": {
+    "message": "Página excluída com sucesso."
   },
   "description": {
     "message": "O AEM Sidekick permite que os autores de sites do AEM visualizem e publiquem conteúdo com facilidade."
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "Falha ao cancelar a publicação. Tente novamente mais tarde."
   },
+  "unpublish_page_confirm": {
+    "message": "Deseja desfazer a publicação desta página?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "Esta página não tem mais um documento de origem e sua publicação não poderá ser desfeita.\n\nDeseja desfazer a publicação?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "Esta página ainda possui um documento de origem e sua publicação não pode ser cancelada."
+  },
+  "unpublish_page_success": {
+    "message": "Publicação da página desfeita com sucesso."
+  },
   "user_login": {
     "message": "Fazer logon"
+  },
+  "user_login_hint": {
+    "message": "É necessário fazer logon antes de usar o Sidekick."
   },
   "user_logout": {
     "message": "Fazer logoff"

@@ -24,7 +24,7 @@ function drawHeader(table, rowData) {
   thead.append(row);
 }
 
-function drawValue(cell, value) {
+function drawValue(cell, value, url) {
   const valueContainer = cell.appendChild(document.createElement('div'));
   if (value && !Number.isNaN(+value)) {
     // check for date
@@ -43,14 +43,22 @@ function drawValue(cell, value) {
   } else if (value.startsWith('/') || value.startsWith('http')) {
     // assume link
     const link = valueContainer.appendChild(document.createElement('a'));
-    link.href = value;
+    const target = new URL(value, url).toString();
+    link.href = target;
     link.title = value;
     link.target = '_blank';
-    if (value.includes('media_')) {
+    if (value.endsWith('.mp4')) {
+      // linked mp4 video
+      valueContainer.classList.add('video');
+      const video = link.appendChild(document.createElement('video'));
+      const source = video.appendChild(document.createElement('source'));
+      source.src = target;
+      source.type = 'video/mp4';
+    } else if (value.includes('media_')) {
       // linked image
       valueContainer.classList.add('image');
       const img = link.appendChild(document.createElement('img'));
-      img.src = value;
+      img.src = target;
     } else {
       // text link
       link.textContent = value;
@@ -69,22 +77,23 @@ function drawValue(cell, value) {
   }
 }
 
-function drawBody(table, data) {
+function drawBody(table, data, url) {
   const tbody = table.appendChild(document.createElement('tbody'));
   data.forEach((set) => {
     const row = document.createElement('tr');
     Object.keys(set).forEach((key) => {
       const cell = document.createElement('td');
-      drawValue(cell, set[key]);
+      drawValue(cell, set[key], url);
       row.append(cell);
     });
     tbody.append(row);
   });
 }
 
-export default function draw(json) {
+export default function draw(json, url) {
   const sheets = {};
-  if (json[':type'] === 'multi-sheet' && json[':names']) {
+  const multiSheet = json[':type'] === 'multi-sheet' && json[':names'];
+  if (multiSheet) {
     json[':names'].forEach((name) => {
       const { data } = json[name];
       if (data && data.length > 0) {
@@ -94,16 +103,18 @@ export default function draw(json) {
   } else {
     const { data } = json;
     if (data && data.length > 0) {
-      sheets['helix-default'] = data;
+      sheets['shared-default'] = data;
     }
   }
   Object.keys(sheets).forEach((name) => {
     const sheet = sheets[name];
-    const title = document.body.appendChild(document.createElement('h2'));
-    title.textContent = name;
+    if (multiSheet) {
+      const title = document.body.appendChild(document.createElement('h2'));
+      title.textContent = name;
+    }
     const table = document.body.appendChild(document.createElement('table'));
     drawHeader(table, sheet[0]);
-    drawBody(table, sheet);
+    drawBody(table, sheet, url);
   });
 }
 
@@ -120,7 +131,7 @@ export default function draw(json) {
         } catch (e) {
           throw new Error(`invalid json found at ${url}`);
         }
-        draw(json);
+        draw(json, url);
       } else {
         throw new Error(`failed to load ${url}: ${res.status}`);
       }

@@ -41,11 +41,13 @@
   font-size: 0.875rem;
 }
 
-.hlx-sk-view table td > div.image  {
+.hlx-sk-view table td > div.image,
+.hlx-sk-view table td > div.video {
   padding: 0;
 }
 
-.hlx-sk-view table td > div img {
+.hlx-sk-view table td > div img,
+.hlx-sk-view table td > div video {
   width: 100%;
   max-width: 240px;
 }

@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URL がクリップボードにコピーされました。"
   },
+  "copy": {
+    "message": "コピー"
+  },
   "copy_live_url": {
     "message": "ライブ URL をコピー"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "削除に失敗しました。後でもう一度試してください。"
+  },
+  "delete_file_confirm": {
+    "message": "このファイルを削除してもよろしいですか？"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "このファイルはリポジトリに存在しません。削除すると元に戻すことはできません。\n\n削除してもよろしいですか？"
+  },
+  "delete_file_source_exists": {
+    "message": "このファイルはリポジトリにまだ存在しているので、削除できません。"
+  },
+  "delete_file_success": {
+    "message": "ファイルが正常に削除されました。"
+  },
+  "delete_page_confirm": {
+    "message": "このページを削除してもよろしいですか？"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "このページにはソースドキュメントが存在しません。削除すると元に戻すことはできません。\n\n削除してもよろしいですか？"
+  },
+  "delete_page_source_exists": {
+    "message": "このページにはソースドキュメントがまだ存在しているので、削除できません。"
+  },
+  "delete_page_success": {
+    "message": "ページが正常に削除されました。"
   },
   "description": {
     "message": "AEM Sidekick を使用すると、AEM サイトの作成者はコンテンツを簡単にプレビューおよび公開できます。"
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "非公開に失敗しました。後でもう一度試してください。"
   },
+  "unpublish_page_confirm": {
+    "message": "このページを非公開にしてもよろしいですか？"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "このページにはソースドキュメントが存在しません。非公開にすると元に戻すことはできません。\n\n非公開にしてもよろしいですか？"
+  },
+  "unpublish_page_source_exists": {
+    "message": "このページにはソースドキュメントがまだ存在しているので、非公開にすることはできません。"
+  },
+  "unpublish_page_success": {
+    "message": "ページが正常に非公開にされました。"
+  },
   "user_login": {
     "message": "ログイン"
+  },
+  "user_login_hint": {
+    "message": "Sidekick を使用するには、ログインする必要があります。"
   },
   "user_logout": {
     "message": "ログアウト"
