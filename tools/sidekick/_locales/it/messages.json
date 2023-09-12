@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URL copiati negli Appunti."
   },
+  "copy": {
+    "message": "Copia"
+  },
   "copy_live_url": {
     "message": "Copia URL live"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "Eliminazione non riuscita. Riprova più tardi."
+  },
+  "delete_file_confirm": {
+    "message": "Eliminare questo file?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "Questo file non esiste più nell’archivio e non sarà possibile annullarne l’eliminazione.\n\nEliminarlo comunque?"
+  },
+  "delete_file_source_exists": {
+    "message": "Questo file esiste ancora nel repository e non può essere eliminato."
+  },
+  "delete_file_success": {
+    "message": "File eliminato correttamente."
+  },
+  "delete_page_confirm": {
+    "message": "Eliminare questa pagina?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "Questa pagina non ha più un documento di origine e non sarà possibile annullarne l’eliminazione. \n\nEliminarla comunque?"
+  },
+  "delete_page_source_exists": {
+    "message": "Questa pagina ha ancora un documento di origine e non può essere eliminata."
+  },
+  "delete_page_success": {
+    "message": "Pagina eliminata correttamente."
   },
   "description": {
     "message": "AEM Sidekick consente agli autori di siti AEM di visualizzare in anteprima e pubblicare facilmente i contenuti."
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "Annullamento della pubblicazione non riuscito. Riprova più tardi."
   },
+  "unpublish_page_confirm": {
+    "message": "Annullare la pubblicazione di questa pagina?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "Questa pagina non ha più un documento di origine e non sarà possibile annullarne la pubblicazione. \n\nAnnullarla comunque?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "Questa pagina ha ancora un documento di origine e non è possibile annullarne la pubblicazione."
+  },
+  "unpublish_page_success": {
+    "message": "Pagina non pubblicata correttamente."
+  },
   "user_login": {
     "message": "Accedi"
+  },
+  "user_login_hint": {
+    "message": "Devi effettuare l’accesso prima di poter utilizzare Sidekick."
   },
   "user_logout": {
     "message": "Esci"

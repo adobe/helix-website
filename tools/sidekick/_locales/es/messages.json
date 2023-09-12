@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URL copiadas al portapapeles."
   },
+  "copy": {
+    "message": "Copiar"
+  },
   "copy_live_url": {
     "message": "Copiar URL activa"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "No se pudo eliminar. Inténtelo de nuevo más tarde."
+  },
+  "delete_file_confirm": {
+    "message": "¿Seguro que desea eliminar este archivo?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "Este archivo ya no existe en el repositorio, por lo que no se puede deshacer su eliminación.\n\n¿Confirma que desea eliminarlo?"
+  },
+  "delete_file_source_exists": {
+    "message": "Este archivo todavía existe en el repositorio y no se puede eliminar."
+  },
+  "delete_file_success": {
+    "message": "Archivo eliminado correctamente."
+  },
+  "delete_page_confirm": {
+    "message": "¿Seguro que desea eliminar esta página?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "Esta página ya no dispone de un documento de origen, por lo que no se puede deshacer su eliminación.\n\n¿Confirma que desea eliminarla?"
+  },
+  "delete_page_source_exists": {
+    "message": "Esta página todavía tiene un documento origen y no se puede eliminar."
+  },
+  "delete_page_success": {
+    "message": "Página eliminada correctamente."
   },
   "description": {
     "message": "AEM Sidekick permite a los autores de sitios AEM previsualizar y publicar contenido fácilmente."
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "No se ha podido publicar. Inténtelo de nuevo más tarde."
   },
+  "unpublish_page_confirm": {
+    "message": "¿Seguro que desea cancelar la publicación de esta página?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "Esta página ya no dispone de un documento de origen, por lo que la cancelación de su publicación no se puede deshacer.\n\n¿Seguro que desea cancelar su publicación?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "Esta página todavía tiene un documento origen y no se puede anular su publicación."
+  },
+  "unpublish_page_success": {
+    "message": "Se ha cancelado correctamente la publicación de la página."
+  },
   "user_login": {
     "message": "Iniciar sesión"
+  },
+  "user_login_hint": {
+    "message": "Debe iniciar sesión antes de usar Sidekick."
   },
   "user_logout": {
     "message": "Cerrar sesión"

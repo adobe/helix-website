@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URL 已复制到剪贴板。"
   },
+  "copy": {
+    "message": "复制"
+  },
   "copy_live_url": {
     "message": "复制实时 URL"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "删除失败。请稍后再试。"
+  },
+  "delete_file_confirm": {
+    "message": "是否确实要删除此文件？"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "存储库中已不存在此文件，删除后无法撤消！\n\n是否确实要删除它？"
+  },
+  "delete_file_source_exists": {
+    "message": "该文件仍然存在于存储库中并且无法删除。"
+  },
+  "delete_file_success": {
+    "message": "已成功删除文件。"
+  },
+  "delete_page_confirm": {
+    "message": "是否确实要删除此页面？"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "此页面不再有源文档，删除后无法撤消！\n\n是否确实要删除它？"
+  },
+  "delete_page_source_exists": {
+    "message": "该页面仍有源文档，因此无法删除。"
+  },
+  "delete_page_success": {
+    "message": "已成功删除页面。"
   },
   "description": {
     "message": "AEM Sidekick 可使 AEM 网站的作者轻松预览和发布内容。"
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "取消发布失败。请稍后再试。"
   },
+  "unpublish_page_confirm": {
+    "message": "是否确实要取消发布此页面？"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "此页面不再有源文档，取消发布后无法撤消！\n\n是否确实要取消发布它？"
+  },
+  "unpublish_page_source_exists": {
+    "message": "该页面仍有源文档，因此无法取消发布。"
+  },
+  "unpublish_page_success": {
+    "message": "已成功取消发布页面。"
+  },
   "user_login": {
     "message": "登录"
+  },
+  "user_login_hint": {
+    "message": "您需要先登录才能使用 Sidekick。"
   },
   "user_logout": {
     "message": "注销"

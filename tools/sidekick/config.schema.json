@@ -108,25 +108,9 @@
             "/foo/**.json"
           ]
         },
-        "title": {
-          "type": "string",
-          "description": "The title of the special view"
-        },
-        "titleI18n": {
-          "type": "object",
-          "description": "The title of the special view in other supported languages",
-          "patternProperties": {
-            "^[a-z]{2}(-[A-Z]{2})?$": {
-              "type": "string",
-              "description": "ISO language code (`en` or `en-US`) with translated button text"
-            }
-          },
-          "minProperties": 1,
-          "additionalProperties": false
-        },
         "viewer": {
           "type": "string",
-          "description": "The URL of the special view. The resource URL will be passed to it via 'url' parameter",
+          "description": "The URL of the special view. The resource path will be passed to it via 'path' parameter",
           "examples": [
             "/tools/sidekick/foo/index.html"
           ]
@@ -176,6 +160,10 @@
     "plugins": {
       "type": "array",
       "items": { "$ref": "#/$defs/plugin" }
+    },
+    "redirect": {
+      "type": "url",
+      "description": "Loads the sidekick configuration from a different URL"
     }
    },
    "additionalProperties": false
