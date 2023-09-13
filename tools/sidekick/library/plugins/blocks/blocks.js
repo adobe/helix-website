@@ -18,15 +18,14 @@
   no-prototype-builtins */
 
 import {
-  copyBlock,
   getBlockName,
-  getTable,
   parseDescription,
-  prepareIconsForCopy,
-  prepareImagesForCopy,
+  copyBlockToClipboard,
+  copyPageToClipboard,
+  copyDefaultContentToClipboard,
 } from './utils.js';
 import {
-  createTag, setURLParams,
+  createTag, removeAllEventListeners, setURLParams,
 } from '../../utils/dom.js';
 import { sampleRUM } from '../../utils/rum.js';
 
@@ -55,127 +54,266 @@ function renderScaffolding() {
   `;
 }
 
-function renderFrameSplitContainer() {
-  return /* html */`
-    <sp-split-view
-      vertical
-      resizable
-      primary-size="2600"
-      secondary-min="200"
-      splitter-pos="250"
-    >
-      <div class="view">
-        <div class="action-bar">
-          <sp-action-group compact selects="single" selected="desktop">
-            <sp-action-button value="mobile">
-                <sp-icon-device-phone slot="icon"></sp-icon-device-phone>
-                Mobile
-            </sp-action-button>
-            <sp-action-button value="tablet">
-                <sp-icon-device-tablet slot="icon"></sp-icon-device-tablet>
-                Tablet
-            </sp-action-button>
-            <sp-action-button value="desktop">
-                <sp-icon-device-desktop slot="icon"></sp-icon-device-desktop>
-                Desktop
-            </sp-action-button>
-          </sp-action-group>
-          <sp-divider size="s"></sp-divider>
-        </div>
-        <div class="frame-view">
-          <block-renderer></block-renderer>
-        </div>
-      </div>
-      <div class="details-container">
-        <div class="action-bar">
-          <h3 class="block-title"></h3>
-          <div class="actions">
-              <sp-button class="copy-button">Copy Block</sp-button>
+/**
+ * Renders the preview frame including the top action bar, frame view and details container
+ * @param {HTMLElement} container
+ */
+function renderFrame(container) {
+  if (!isFrameLoaded(container)) {
+    const contentContainer = container.querySelector('.content');
+    contentContainer.innerHTML = /* html */`
+      <sp-split-view
+        vertical
+        resizable
+        primary-size="2600"
+        secondary-min="200"
+        splitter-pos="250"
+      >
+        <div class="view">
+          <div class="action-bar">
+            <sp-action-group compact selects="single" selected="desktop">
+              <sp-action-button value="mobile">
+                  <sp-icon-device-phone slot="icon"></sp-icon-device-phone>
+                  Mobile
+              </sp-action-button>
+              <sp-action-button value="tablet">
+                  <sp-icon-device-tablet slot="icon"></sp-icon-device-tablet>
+                  Tablet
+              </sp-action-button>
+              <sp-action-button value="desktop">
+                  <sp-icon-device-desktop slot="icon"></sp-icon-device-desktop>
+                  Desktop
+              </sp-action-button>
+            </sp-action-group>
+            <sp-divider size="s"></sp-divider>
+          </div>
+          <div class="frame-view">
+            <block-renderer></block-renderer>
           </div>
         </div>
-        <sp-divider size="s"></sp-divider>
-        <div class="details"></div>
-      </div>
-    </sp-split-view>
-  `;
-}
+        <div class="details-container">
+          <div class="action-bar">
+            <h3 class="title"></h3>
+            <div class="actions">
+                <sp-button class="copy-button">Copy</sp-button>
+            </div>
+          </div>
+          <sp-divider size="s"></sp-divider>
+          <div class="details"></div>
+        </div>
+      </sp-split-view>
+    `;
 
-function removeAllEventListeners(element) {
-  const clone = element.cloneNode(true);
-  element.parentNode.replaceChild(clone, element);
-  return clone;
-}
+    const actionGroup = container.querySelector('sp-action-group');
+    actionGroup.selected = 'desktop';
 
-/**
- * Copies a block to the clipboard
- * @param {HTMLElement} wrapper The wrapper element
- * @param {string} name The name of the block
- * @param {string} blockURL The URL of the block
- */
-export function copyBlockToClipboard(wrapper, name, blockURL) {
-  // Get the first block element ignoring any section metadata blocks
-  const element = wrapper.querySelector(':scope > div:not(.section-metadata)');
-  let blockTable = '';
+    // Setup listeners for the top action bar
+    const frameView = container.querySelector('.frame-view');
+    const mobileViewButton = removeAllEventListeners(container.querySelector('sp-action-button[value="mobile"]'));
+    mobileViewButton?.addEventListener('click', () => {
+      frameView.style.width = '480px';
+    });
 
-  // If the wrapper has no block, leave block table empty
-  if (element) {
-    blockTable = getTable(
-      element,
-      name,
-      blockURL,
-    );
+    const tabletViewButton = removeAllEventListeners(container.querySelector('sp-action-button[value="tablet"]'));
+    tabletViewButton?.addEventListener('click', () => {
+      frameView.style.width = '768px';
+    });
+
+    const desktopViewButton = removeAllEventListeners(container.querySelector('sp-action-button[value="desktop"]'));
+    desktopViewButton?.addEventListener('click', () => {
+      frameView.style.width = '100%';
+    });
   }
-
-  // Does the block have section metadata?
-  let sectionMetadataTable;
-  const sectionMetadata = wrapper.querySelector('.section-metadata');
-  if (sectionMetadata) {
-  // Create a table for the section metadata
-    sectionMetadataTable = getTable(
-      sectionMetadata,
-      'Section metadata',
-      blockURL,
-    );
-  }
-
-  const copied = copyBlock(blockTable, sectionMetadataTable);
-
-  // Track block copy event
-  sampleRUM('library:blockcopied', { target: blockURL });
-
-  return copied;
 }
 
 /**
- * Copies default content to the clipboard
- * @param {HTMLElement} wrapper The wrapper element
- * @param {string} blockURL The URL of the block
- * @returns {HTMLElement} The cloned wrapper
+ * Checks if the preview frame has been loaded yet
+ * @param {HTMLElement} container The container that hosts the preview frame
+ * @returns {Boolean} True if the frame has been loaded, false otherwise
  */
-export function copyDefaultContentToClipboard(wrapper, blockURL) {
-  const wrapperClone = wrapper.cloneNode(true);
-  prepareIconsForCopy(wrapperClone);
-  prepareImagesForCopy(wrapperClone, blockURL, 100);
+function isFrameLoaded(container) {
+  return container.querySelector('.details-container') !== null;
+}
 
-  // Does the block have section metadata?
-  let sectionMetadataTable;
-  const sectionMetadata = wrapperClone.querySelector('.section-metadata');
-  if (sectionMetadata) {
-    // Create a table for the section metadata
-    sectionMetadataTable = getTable(
-      sectionMetadata,
-      'Section metadata',
-      blockURL,
-    );
-    sectionMetadata.remove();
+/**
+ * Updates the details container with the block title and description
+ * @param {HTMLElement} container The container containing the details container
+ * @param {String} title The title of the block
+ * @param {String} description The description of the block
+ */
+function updateDetailsContainer(container, title, description) {
+  // Set block title
+  const blockTitle = container.querySelector('.action-bar .title');
+  blockTitle.textContent = title;
+
+  // Set block description
+  const details = container.querySelector('.details');
+  details.innerHTML = '';
+  if (description) {
+    const descriptionElement = createTag('p', {}, description);
+    details.append(descriptionElement);
   }
+}
 
-  const copied = copyBlock(wrapperClone.outerHTML, sectionMetadataTable);
+/**
+ * Attaches an event listener to the copy button in the preview UI
+ * @param {HTMLElement} container The container containing the copy button
+ * @param {HTMLElement} blockRenderer The block renderer
+ * @param {Object} defaultLibraryMetadata The default library metadata
+ * @param {Object} pageMetadata The page metadata
+ */
+function attachCopyButtonEventListener(
+  container,
+  blockRenderer,
+  defaultLibraryMetadata,
+  pageMetadata,
+) {
+  const copyButton = removeAllEventListeners(container.querySelector('.content .copy-button'));
+  copyButton.addEventListener('click', () => {
+    const copyElement = blockRenderer.getBlockElement();
+    const copyWrapper = blockRenderer.getBlockWrapper();
+    const copyBlockData = blockRenderer.getBlockData();
 
-  // Track block copy event
-  sampleRUM('library:blockcopied', { target: blockURL });
+    // Return the copied DOM in the toast message so it can be tested
+    // Cannot read or write clipboard in tests
+    let copiedDOM;
 
-  return copied;
+    // Are we trying to copy a block, a page or default content?
+    // The copy operation is slightly different depending on which
+    if (defaultLibraryMetadata.type === 'template' || defaultLibraryMetadata.multiSectionBlock || defaultLibraryMetadata.compoundBlock) {
+      copiedDOM = copyPageToClipboard(copyWrapper, copyBlockData.url, pageMetadata);
+    } else if (blockRenderer.isBlock) {
+      copiedDOM = copyBlockToClipboard(
+        copyWrapper,
+        getBlockName(copyElement, true),
+        copyBlockData.url,
+      );
+    } else {
+      copiedDOM = copyDefaultContentToClipboard(copyWrapper, copyBlockData.url);
+    }
+
+    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', result: copiedDOM } }));
+  });
+}
+
+function onBlockListCopyButtonClicked(event, container) {
+  const {
+    blockWrapper: wrapper,
+    blockNameWithVariant: name,
+    blockURL,
+    defaultLibraryMetadata,
+    pageMetadata,
+  } = event.detail;
+
+  // Return the copied DOM in the toast message so it can be tested
+  // Cannot read or write clipboard in tests
+  let copiedDOM;
+
+  // We may not have rendered the block yet, so we need to check for a block to know if
+  // we are dealing with a block or default content
+  const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
+  if (defaultLibraryMetadata && (defaultLibraryMetadata.type === 'template' || defaultLibraryMetadata.multiSectionBlock || defaultLibraryMetadata.compoundBlock)) {
+    copiedDOM = copyPageToClipboard(wrapper, blockURL, pageMetadata);
+  } else if (block) {
+    copiedDOM = copyBlockToClipboard(wrapper, name, blockURL);
+  } else {
+    copiedDOM = copyDefaultContentToClipboard(wrapper, blockURL);
+  }
+  container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: wrapper, result: copiedDOM } }));
+}
+
+function loadBlock(event, container) {
+  const content = container.querySelector('.block-library');
+  const {
+    blockWrapper,
+    blockData,
+    sectionLibraryMetadata,
+    defaultLibraryMetadata,
+  } = event.detail;
+  // Block element (first child of the wrapper)
+  const blockElement = blockWrapper.querySelector('div[class]');
+
+  // The name of the block (first column of the table)
+  const blockName = getBlockName(blockElement, false);
+
+  // Render the preview frame if we haven't already
+  renderFrame(content);
+
+  // For blocks we pull the block name from section metadata or the name given to the block
+  const authoredBlockName = sectionLibraryMetadata.name ?? getBlockName(blockElement);
+
+  // Pull the description for this block,
+  // first from sectionLibraryMetadata and fallback to defaultLibraryMetadata
+  const { description: sectionDescription } = sectionLibraryMetadata;
+  const blockDescription = sectionDescription
+    ? parseDescription(sectionDescription)
+    : parseDescription(defaultLibraryMetadata.description);
+
+  // Set block title & description in UI
+  updateDetailsContainer(content, authoredBlockName, blockDescription);
+
+  const blockRenderer = content.querySelector('block-renderer');
+
+  // If the block element exists, load the block
+  blockRenderer.loadBlock(
+    blockName,
+    blockData,
+    blockWrapper,
+    defaultLibraryMetadata,
+    container,
+  );
+
+  // Append the path and index of the current block to the url params
+  setURLParams([['path', blockData.path], ['index', event.detail.index]]);
+
+  // Attach copy button event listener
+  attachCopyButtonEventListener(container, blockRenderer, defaultLibraryMetadata, undefined);
+
+  // Track block view
+  sampleRUM('library:blockviewed', { target: blockData.url });
+}
+
+function loadTemplate(event, container) {
+  const content = container.querySelector('.block-library');
+  const {
+    blockWrapper,
+    blockData,
+    defaultLibraryMetadata,
+    pageMetadata,
+  } = event.detail;
+
+  // Render the preview frame if we haven't already
+  renderFrame(content);
+
+  // For templates we pull the template name from default library metadata
+  // or the name given to the document in the library sheet.
+  const authoredTemplateName = defaultLibraryMetadata.name ?? blockData.name;
+
+  // Pull the description for this page from default metadata.
+  const templateDescription = parseDescription(defaultLibraryMetadata.description);
+
+  // Set template title & description in UI
+  updateDetailsContainer(content, authoredTemplateName, templateDescription);
+
+  const blockRenderer = content.querySelector('block-renderer');
+
+  // If the block element exists, load the block
+  blockRenderer.loadBlock(
+    '',
+    blockData,
+    blockWrapper,
+    defaultLibraryMetadata,
+    container,
+  );
+
+  // Append the path and index of the current block to the url params
+  setURLParams([['path', blockData.path]], ['index']);
+
+  // Attach copy button event listener
+  attachCopyButtonEventListener(container, blockRenderer, defaultLibraryMetadata, pageMetadata);
+
+  // Track block view
+  sampleRUM('library:blockviewed', { target: blockData.url });
 }
 
 /**
@@ -189,7 +327,6 @@ export async function decorate(container, data) {
   const content = createTag('div', { class: 'block-library' }, renderScaffolding());
   container.append(content);
   const listContainer = content.querySelector('.list-container');
-  let frameLoaded = false;
 
   const blockList = createTag('block-list');
   listContainer.append(blockList);
@@ -198,117 +335,14 @@ export async function decorate(container, data) {
     window.open(e.details.path, '_blockpreview');
   });
 
-  blockList.addEventListener('LoadBlock', (e) => {
-    const {
-      blockWrapper,
-      blockData,
-      sectionLibraryMetadata,
-      defaultLibraryMetadata,
-    } = e.detail;
+  // Handle LoadTemplate events
+  blockList.addEventListener('LoadTemplate', loadPageEvent => loadTemplate(loadPageEvent, container));
 
-    const blockElement = blockWrapper.querySelector('div[class]');
-    const blockName = getBlockName(blockElement, false);
-    const authoredBlockName = sectionLibraryMetadata.name ?? getBlockName(blockElement);
+  // Handle LoadBlock events
+  blockList.addEventListener('LoadBlock', loadBlockEvent => loadBlock(loadBlockEvent, container));
 
-    // Pull the description for this block,
-    // first from sectionLibraryMetadata and fallback to defaultLibraryMetadata
-    const { description: sectionDescription } = sectionLibraryMetadata;
-    const blockDescription = sectionDescription
-      ? parseDescription(sectionDescription)
-      : parseDescription(defaultLibraryMetadata.description);
-
-    if (!frameLoaded) {
-      const contentContainer = content.querySelector('.content');
-      contentContainer.innerHTML = renderFrameSplitContainer();
-
-      const actionGroup = content.querySelector('sp-action-group');
-      actionGroup.selected = 'desktop';
-      frameLoaded = true;
-    }
-
-    // Set block title
-    const blockTitle = content.querySelector('.block-title');
-    blockTitle.textContent = authoredBlockName;
-
-    // Set block description
-    const details = content.querySelector('.details');
-    details.innerHTML = '';
-    if (blockDescription) {
-      const description = createTag('p', {}, blockDescription);
-      details.append(description);
-    }
-
-    const blockRenderer = content.querySelector('block-renderer');
-
-    // If the block element exists, load the block
-    blockRenderer.loadBlock(
-      blockName,
-      blockData,
-      blockWrapper,
-      container,
-    );
-
-    // Append the path and index of the current block to the url params
-    setURLParams([['path', blockData.path], ['index', e.detail.index]]);
-
-    const copyButton = removeAllEventListeners(content.querySelector('.copy-button'));
-    copyButton.addEventListener('click', () => {
-      const copyElement = blockRenderer.getBlockElement();
-      const copyWrapper = blockRenderer.getBlockWrapper();
-      const copyBlockData = blockRenderer.getBlockData();
-
-      // Return the copied DOM in the toast message so it can be tested
-      // Cannot read or write clipboard in tests
-      let copiedDOM;
-
-      // Are we trying to copy a block or default content?
-      // The copy operation is slightly different depending on which
-      if (blockRenderer.isBlock) {
-        copiedDOM = copyBlockToClipboard(
-          copyWrapper,
-          getBlockName(copyElement, true),
-          copyBlockData.url,
-        );
-      } else {
-        copiedDOM = copyDefaultContentToClipboard(copyWrapper, copyBlockData.url);
-      }
-
-      container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: copiedDOM } }));
-    });
-
-    const frameView = content.querySelector('.frame-view');
-    const mobileViewButton = removeAllEventListeners(content.querySelector('sp-action-button[value="mobile"]'));
-    mobileViewButton?.addEventListener('click', () => {
-      frameView.style.width = '480px';
-    });
-
-    const tabletViewButton = removeAllEventListeners(content.querySelector('sp-action-button[value="tablet"]'));
-    tabletViewButton?.addEventListener('click', () => {
-      frameView.style.width = '768px';
-    });
-
-    const desktopViewButton = removeAllEventListeners(content.querySelector('sp-action-button[value="desktop"]'));
-    desktopViewButton?.addEventListener('click', () => {
-      frameView.style.width = '100%';
-    });
-
-    // Track block view
-    sampleRUM('library:blockviewed', { target: blockData.url });
-  });
-
-  blockList.addEventListener('CopyBlock', (e) => {
-    const { blockWrapper: wrapper, blockNameWithVariant: name, blockURL } = e.detail;
-
-    // We may not have rendered the block yet, so we need to check for a block to know if
-    // we are dealing with a block or default content
-    const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
-    if (block) {
-      copyBlockToClipboard(wrapper, name, blockURL);
-    } else {
-      copyDefaultContentToClipboard(wrapper, blockURL);
-    }
-    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: wrapper } }));
-  });
+  // Handle CopyBlock events from the block list
+  blockList.addEventListener('CopyBlock', blockListCopyEvent => onBlockListCopyButtonClicked(blockListCopyEvent, container));
 
   const search = content.querySelector('sp-search');
   search.addEventListener('input', (e) => {

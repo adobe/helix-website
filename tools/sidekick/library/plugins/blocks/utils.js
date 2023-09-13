@@ -16,18 +16,51 @@ import {
   createCopy,
   createTag, readBlockConfig, toCamelCase,
 } from '../../utils/dom.js';
+import { sampleRUM } from '../../utils/rum.js';
 
+export function blockToObject(blockElement, excludes = [], convertKeys = true) {
+  if (blockElement) {
+    const result = {};
+    const config = readBlockConfig(blockElement, convertKeys);
+    Object.keys(config).forEach((key) => {
+      if (excludes.includes(key)) return;
+
+      if (convertKeys) {
+        result[toCamelCase(key)] = config[key];
+      } else {
+        result[key] = config[key];
+      }
+    });
+
+    return result;
+  }
+}
+
+/**
+ * Searches for a library metadata block and returns the metadata as an object.
+ * @param {HTMLElement} block
+ * @returns {Object} the library metadata
+ */
 export function getLibraryMetadata(block) {
   const libraryMetadata = block.querySelector('.library-metadata');
-  const metadata = {};
   if (libraryMetadata) {
-    const meta = readBlockConfig(libraryMetadata);
-    Object.keys(meta).forEach((key) => {
-      if (key === 'style') return;
-
-      metadata[toCamelCase(key)] = meta[key];
-    });
+    const metadata = blockToObject(libraryMetadata, ['style']);
     libraryMetadata.remove();
+
+    return metadata;
+  }
+}
+
+/**
+ * Searches for a page metadata block and returns the metadata as an object.
+ * @param {HTMLElement} block
+ * @returns {Object} the page metadata
+ */
+export function getPageMetadata(block) {
+  const pageMetadata = block.querySelector('.page-metadata');
+  if (pageMetadata) {
+    const metadata = blockToObject(pageMetadata, [], false);
+    pageMetadata.remove();
 
     return metadata;
   }
@@ -68,7 +101,17 @@ export function getBlockName(block, includeVariants = true) {
   return filteredClasses.length > 0 ? `${name} (${filteredClasses.join(', ')})` : name;
 }
 
-export function getTable(block, name, path) {
+function getPreferedBackgroundColor() {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue('--sk-table-bg-color') || '#ff8012';
+}
+
+function getPreferedForegroundColor() {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue('--sk-table-fg-color') || '#ffffff';
+}
+
+export function convertBlockToTable(block, name, path) {
   const url = new URL(path);
 
   prepareIconsForCopy(block);
@@ -83,14 +126,8 @@ export function getTable(block, name, path) {
   table.setAttribute('border', '1');
   table.setAttribute('style', 'width:100%;');
 
-  const backgroundColor = getComputedStyle(document.documentElement)
-    .getPropertyValue('--sk-table-bg-color') || '#ff8012';
-
-  const foregroundColor = getComputedStyle(document.documentElement)
-    .getPropertyValue('--sk-table-fg-color') || '#ffffff';
-
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${backgroundColor}; color: ${foregroundColor};` }, name));
+  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, name));
   table.append(headerRow);
   rows.forEach((row) => {
     const columns = [...row.children];
@@ -112,7 +149,34 @@ export function getTable(block, name, path) {
     });
     table.append(tr);
   });
-  return `${table.outerHTML}<br/>`;
+  return table;
+}
+
+export function convertObjectToTable(name, object) {
+  const table = document.createElement('table');
+  table.setAttribute('border', '1');
+  table.setAttribute('style', 'width:100%;');
+
+  const headerRow = document.createElement('tr');
+  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, name));
+  table.append(headerRow);
+
+  for (const [key, value] of Object.entries(object)) {
+    const tr = document.createElement('tr');
+    const keyCol = document.createElement('td');
+    keyCol.setAttribute('style', 'width: 50%');
+    keyCol.innerText = key;
+    tr.append(keyCol);
+
+    const valueCol = document.createElement('td');
+    valueCol.setAttribute('style', 'width: 50%');
+    valueCol.innerText = value;
+    tr.append(valueCol);
+
+    table.append(tr);
+  }
+
+  return table;
 }
 
 export function prepareImagesForCopy(element, url, columnWidthPercentage) {
@@ -192,10 +256,26 @@ export function parseDescription(description) {
     : description;
 }
 
-export function copyBlock(block, sectionMetadata) {
-  const tables = [block];
+/**
+ *
+ * @param {*} block
+ * @param {*} baseURL
+ * @returns
+ */
+function getSectionMetadata(block, baseURL) {
+  const sectionMetadata = block.querySelector(':scope > .section-metadata');
+  if (sectionMetadata) {
+    // Create a table for the section metadata
+    return convertBlockToTable(
+      sectionMetadata,
+      'Section metadata',
+      baseURL,
+    );
+  }
+}
 
-  if (sectionMetadata) tables.push(sectionMetadata);
+export function copyBlock(block) {
+  const tables = [block];
 
   try {
     const blob = new Blob(tables, { type: 'text/html' });
@@ -205,5 +285,123 @@ export function copyBlock(block, sectionMetadata) {
     console.error('Unable to copy block', error);
   }
 
-  return tables;
+  return block;
+}
+
+/**
+ * Copies a block to the clipboard
+ * @param {HTMLElement} wrapper The wrapper element
+ * @param {string} name The name of the block
+ * @param {string} blockURL The URL of the block
+ */
+export function copyBlockToClipboard(wrapper, name, blockURL) {
+  // Get the first block element ignoring any section metadata blocks
+  const element = wrapper.querySelector(':scope > div:not(.section-metadata)');
+  let blockTable = '';
+
+  // If the wrapper has no block, leave block table empty
+  if (element) {
+    blockTable = convertBlockToTable(
+      element,
+      name,
+      blockURL,
+    );
+  }
+
+  // Does the block have section metadata?
+  const sectionMetadataTable = getSectionMetadata(wrapper, blockURL);
+  if (sectionMetadataTable) {
+    sectionMetadataTable.prepend(createTag('br'));
+    blockTable.append(sectionMetadataTable);
+  }
+
+  const copied = copyBlock(blockTable.outerHTML);
+
+  // Track block copy event
+  sampleRUM('library:blockcopied', { target: blockURL });
+
+  return copied;
+}
+
+/**
+ * Copies default content to the clipboard
+ * @param {HTMLElement} wrapper The wrapper element
+ * @param {string} blockURL The URL of the block
+ * @returns {HTMLElement} The cloned wrapper
+ */
+export function copyDefaultContentToClipboard(wrapper, blockURL) {
+  const wrapperClone = wrapper.cloneNode(true);
+  prepareIconsForCopy(wrapperClone);
+  prepareImagesForCopy(wrapperClone, blockURL, 100);
+
+  const sectionMetadataTable = getSectionMetadata(wrapperClone, blockURL);
+  if (sectionMetadataTable) {
+    wrapperClone.append(sectionMetadataTable);
+
+    const sectionMetadata = wrapperClone.querySelector(':scope > .section-metadata');
+    sectionMetadata.remove();
+  }
+
+  const copied = copyBlock(wrapperClone.outerHTML);
+
+  // Track block copy event
+  sampleRUM('library:blockcopied', { target: blockURL });
+
+  return copied;
+}
+
+/**
+ * Copies a page to the clipboard, pages can consist of multiple blocks,
+ * default content, section metadata and metadata
+ * @param {HTMLElement} wrapper The wrapper element
+ * @param {string} blockURL The URL of the block
+ * @returns {HTMLElement} The cloned wrapper
+ */
+export function copyPageToClipboard(wrapper, blockURL, pageMetadata) {
+  const wrapperClone = wrapper.cloneNode(true);
+  prepareIconsForCopy(wrapperClone);
+  prepareImagesForCopy(wrapperClone, blockURL, 100);
+
+  const sectionBreak = createTag('p', undefined, '---');
+
+  // Get all section on page
+  const sections = wrapperClone.querySelectorAll(':scope > div');
+  sections.forEach((section, index) => {
+    // If not the last section, add a section delimeter
+    if (index < sections.length - 1) {
+      section.insertAdjacentElement('beforeend', sectionBreak.cloneNode(true));
+    }
+
+    // Does the current section have any blocks?
+    const blocks = section.querySelectorAll(':scope > div:not(.section-metadata)');
+    blocks.forEach((block) => {
+      // Convert the block to a table
+      const blockTable = convertBlockToTable(
+        block,
+        getBlockName(block, true),
+        blockURL,
+      );
+
+      // Replace the block with the table
+      block.replaceWith(blockTable);
+    });
+
+    const sectionMetadata = section.querySelector(':scope > div.section-metadata');
+    const sectionMetadataTable = getSectionMetadata(section, blockURL);
+    if (sectionMetadataTable) {
+      sectionMetadata.replaceWith(createTag('br'), sectionMetadataTable);
+    }
+  });
+
+  if (pageMetadata) {
+    const pageMetadataTable = convertObjectToTable('Metadata', pageMetadata);
+    wrapperClone.append(pageMetadataTable);
+  }
+
+  const copied = copyBlock(wrapperClone.outerHTML);
+
+  // Track block copy event
+  sampleRUM('library:blockcopied', { target: blockURL });
+
+  return copied;
 }

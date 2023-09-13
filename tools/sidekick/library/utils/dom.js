@@ -120,14 +120,14 @@ export function isPath(str) {
  * @param {Element} block The block element
  * @returns {object} The block config
  */
-export function readBlockConfig(block) {
+export function readBlockConfig(block, convertKeys = true) {
   const config = {};
   block.querySelectorAll(':scope > div').forEach((row) => {
     if (row.children) {
       const cols = [...row.children];
       if (cols[1]) {
         const col = cols[1];
-        const name = toClassName(cols[0].textContent);
+        const name = convertKeys ? toClassName(cols[0].textContent) : cols[0].textContent;
         let value = '';
         if (col.querySelector('a')) {
           const as = [...col.querySelectorAll('a')];
@@ -209,11 +209,16 @@ export function createSideNavItem(
  * Appends the provided url params to the current url
  * @param {Array} kvs An array of key value pairs
  */
-export function setURLParams(kvs) {
+export function setURLParams(toAdd, toRemove = []) {
   const url = new URL(window.location.href);
-  kvs.forEach(([key, value]) => {
+  toAdd.forEach(([key, value]) => {
     url.searchParams.set(key, value);
   });
+
+  toRemove.forEach((key) => {
+    url.searchParams.delete(key);
+  });
+
   const { href } = url;
   window.history.pushState({ path: href }, '', decodeURIComponent(href));
 }
@@ -226,4 +231,15 @@ export function removeAllURLParams() {
   const url = new URL(window.location.href);
   const newUrl = `${url.origin}${url.pathname}`;
   window.history.pushState({ path: newUrl }, '', newUrl);
+}
+
+/**
+ * Removes all event listeners from an element by cloning it
+ * @param {HTMLElement} element The element to remove the listeners from
+ * @returns The element with the listeners removed
+ */
+export function removeAllEventListeners(element) {
+  const clone = element.cloneNode(true);
+  element.parentNode.replaceChild(clone, element);
+  return clone;
 }
