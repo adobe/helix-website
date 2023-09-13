@@ -17,6 +17,8 @@
   --hlx-sk-logo-size: 24px;
   --hlx-sk-logo-position: 10px 12px;
   --hlx-sk-color: #505050;
+  --hlx-sk-accent: #1473e6;
+  --hlx-sk-accent-hover: #0054b6;
   --hlx-sk-border: none;
   --hlx-sk-border-radius: 10px;
   --hlx-sk-font-family: arial, helvetica, sans-serif;
@@ -42,6 +44,10 @@
   --hlx-sk-button-disabled-color: #909090;
   --hlx-sk-button-disabled-border: solid 1px var(--hlx-sk-button-disabled-color);
   --hlx-sk-button-disabled-hover-bg: transparent;
+  --hlx-sk-button-accent-bg: var(--hlx-sk-accent);
+  --hlx-sk-button-accent-color: #fff;
+  --hlx-sk-button-accent-hover-bg: var(--hlx-sk-accent-hover);
+  --hlx-sk-button-accent-hover-color: var(--hlx-sk-button-accent-color);
   --hlx-sk-button-badge: #F15B3A;
   --hlx-sk-button-badge-hover: #FFC40E;
   --hlx-sk-label-font-size: 14px;
@@ -51,7 +57,7 @@
   --hlx-sk-modal-bg-0: #e60016;
   --hlx-sk-modal-bg-1: #e67316;
   --hlx-sk-modal-color: white;
-  --hlx-sk-modal-help-bg: #1473e6;
+  --hlx-sk-modal-help-bg: var(--hlx-sk-accent);
   --hlx-sk-modal-help-color: white;
   --hlx-sk-modal-help-dropdown-container-bg: #1473e6be;
   --hlx-sk-modal-font-size: 1.25rem;
@@ -175,6 +181,18 @@
   background-color: var(--hlx-sk-button-disabled-hover-bg);
 }
 
+.hlx-sk button.accent {
+  background-color: var(--hlx-sk-button-accent-bg);
+  border-color: var(--hlx-sk-button-accent-bg);
+  color: var(--hlx-sk-button-accent-color);
+}
+
+.hlx-sk button.accent:hover {
+  background-color: var(--hlx-sk-button-accent-hover-bg);
+  border-color: var(--hlx-sk-button-accent-hover-bg);
+  color: var(--hlx-sk-button-accent-hover-color);
+}
+
 .hlx-sk .update button {
   position: relative;
 }
@@ -202,6 +220,15 @@
   flex-wrap: wrap;
   justify-content: start;
   row-gap: 8px;
+  opacity: 1;
+}
+
+.hlx-sk .plugin-container.hlx-sk-concealed {
+  opacity: 0;
+}
+
+.hlx-sk .plugin-container.hlx-sk-login-only > *:not(.user-login) {
+  display: none;
 }
 
 .hlx-sk .plugin-container.loading::before,
