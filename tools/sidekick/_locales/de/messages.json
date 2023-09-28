@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URLs wurden in die Zwischenablage kopiert."
   },
+  "copy": {
+    "message": "Kopieren"
+  },
   "copy_live_url": {
     "message": "Live-URL kopieren"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "Das Löschen ist fehlgeschlagen. Bitte versuchen Sie es später erneut."
+  },
+  "delete_file_confirm": {
+    "message": "Möchten Sie diese Datei wirklich löschen?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "Diese Datei existiert nicht mehr im Repository, das Löschen kann nicht rückgängig gemacht werden. \n\nMöchten Sie sie wirklich löschen?"
+  },
+  "delete_file_source_exists": {
+    "message": "Diese Datei ist noch im Repository vorhanden und kann nicht gelöscht werden."
+  },
+  "delete_file_success": {
+    "message": "Datei erfolgreich gelöscht."
+  },
+  "delete_page_confirm": {
+    "message": "Möchten Sie diese Seite wirklich löschen?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "Diese Seite verfügt über kein Quelldokument mehr, das Löschen kann nicht rückgängig gemacht werden. \n\nMöchten Sie sie wirklich löschen?"
+  },
+  "delete_page_source_exists": {
+    "message": "Diese Seite verfügt noch über ein Quelldokument und kann nicht gelöscht werden."
+  },
+  "delete_page_success": {
+    "message": "Seite erfolgreich gelöscht."
   },
   "description": {
     "message": "AEM Sidekick ermöglicht Autorinnen und Autoren von AEM-Sites die Vorschau und Veröffentlichung von Inhalten."
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "Die Aufhebung der Veröffentlichung ist fehlgeschlagen. Bitte versuchen Sie es später erneut."
   },
+  "unpublish_page_confirm": {
+    "message": "Möchten Sie die Veröffentlichung dieser Seite wirklich rückgängig machen?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "Diese Seite verfügt über kein Quelldokument mehr. Das Rückgängigmachen der Veröffentlichung dieser Seite kann nicht zurückgenommen werden.\n\nMöchten Sie die Veröffentlichung dieser Seite wirklich rückgängig machen?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "Diese Seite verfügt noch über ein Quelldokument und die Veröffentlichung kann nicht aufgehoben werden."
+  },
+  "unpublish_page_success": {
+    "message": "Veröffentlichung der Seite erfolgreich rückgängig gemacht."
+  },
   "user_login": {
     "message": "Anmelden"
+  },
+  "user_login_hint": {
+    "message": "Sie müssen sich anmelden, damit Sie Sidekick nutzen können."
   },
   "user_logout": {
     "message": "Abmelden"

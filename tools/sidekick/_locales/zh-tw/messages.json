@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "URL 已複製到剪貼簿。"
   },
+  "copy": {
+    "message": "複製"
+  },
   "copy_live_url": {
     "message": "複製即時 URL"
   },
@@ -287,6 +290,30 @@
   },
   "delete_failure": {
     "message": "刪除失敗。請稍後再試。"
+  },
+  "delete_file_confirm": {
+    "message": "您確定要刪除此檔案嗎?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "此檔案已不存在於存放庫中，刪除後就無法還原！\n\n您確定要刪除嗎?"
+  },
+  "delete_file_source_exists": {
+    "message": "此檔案仍然存在於存放庫中，因此無法刪除。"
+  },
+  "delete_file_success": {
+    "message": "檔案已成功刪除。"
+  },
+  "delete_page_confirm": {
+    "message": "您確定要刪除此頁面嗎?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "此頁面已沒有來源文件，刪除後就無法還原！\n\n您確定要刪除嗎?"
+  },
+  "delete_page_source_exists": {
+    "message": "此頁面仍有來源文件，因此無法刪除。"
+  },
+  "delete_page_success": {
+    "message": "頁面已成功刪除。"
   },
   "description": {
     "message": "AEM Sidekick 可讓 AEM 網站的作者輕鬆預覽和發佈內容。"
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "取消發佈失敗。請稍後再試。"
   },
+  "unpublish_page_confirm": {
+    "message": "您確定要取消發佈此頁面嗎?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "此頁面已沒有來源文件，取消發佈後就無法還原！\n\n您確定要取消發佈嗎?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "此頁面仍有來源文件，因此無法取消發佈。"
+  },
+  "unpublish_page_success": {
+    "message": "頁面已成功取消發佈。"
+  },
   "user_login": {
     "message": "登入"
+  },
+  "user_login_hint": {
+    "message": "您必須先登入才能使用 Sidekick。"
   },
   "user_logout": {
     "message": "登出"

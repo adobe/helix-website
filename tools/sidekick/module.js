@@ -78,8 +78,6 @@
    * @typedef {Object} ViewConfig
    * @description A custom view configuration.
    * @prop {string} path The path or globbing pattern where to apply this view
-   * @prop {string} title The view title (optional)
-   * @prop {Object} titleI18n={} A map of translated view titles
    * @prop {string} viewer The URL to render this view
    */
 
@@ -282,6 +280,16 @@
   ];
 
   /**
+   * Enumeration of view types.
+   * @private
+   * @type {Object<number>}
+   */
+  const VIEWS = {
+    DEFAULT: 0,
+    CUSTOM: 1,
+  };
+
+  /**
    * Log RUM for sidekick telemetry.
    * @private
    * @param {string} checkpoint identifies the checkpoint in funnel
@@ -383,7 +391,7 @@
       return true;
     }
     // matching project domains
-    const projectDomains = ['page', 'hlx.live'];
+    const projectDomains = ['.aem.page', '.aem.live', '.hlx.page', '.hlx.live'];
     if (!projectDomains.find((domain) => baseHost.endsWith(domain)
       && host.endsWith(domain))) {
       return false;
@@ -400,6 +408,93 @@
   }
 
   /**
+   * Checks a path against supported file extensions.
+   * @private
+   * @param {string} path The path to check
+   * @returns {boolean} {@code true} if file extension supported, else {@code false}
+   */
+  function isSupportedFileExtension(path) {
+    const file = path.split('/').pop();
+    const extension = file.split('.').pop();
+    if (extension === file) {
+      return true;
+    } else {
+      return [
+        'jpg',
+        'jpeg',
+        'png',
+        'pdf',
+        'svg',
+      ].includes(extension.toLowerCase());
+    }
+  }
+
+  /**
+   * Recognizes a SharePoint URL.
+   * @private
+   * @param {URL} url The URL
+   * @returns {boolean} {@code true} if URL is SharePoint, else {@code false}
+   */
+  function isSharePoint(url) {
+    return /\w+\.sharepoint.com$/.test(url.host);
+  }
+
+  /**
+   * Recognizes a SharePoint document management URL.
+   * @private
+   * @param {URL} url The URL
+   * @returns {boolean} {@code true} if URL is SharePoint DM, else {@code false}
+   */
+  function isSharePointDM(url) {
+    return isSharePoint(url)
+      && (url.pathname.endsWith('/Forms/AllItems.aspx')
+      || url.pathname.endsWith('/onedrive.aspx'));
+  }
+
+  /**
+   * Recognizes a SharePoint folder URL.
+   * @private
+   * @param {URL} url The URL
+   * @returns {boolean} {@code true} if URL is SharePoint folder, else {@code false}
+   */
+  function isSharePointFolder(url) {
+    if (isSharePointDM(url)) {
+      const docPath = new URLSearchParams(url.search).get('id');
+      const dotIndex = docPath?.split('/').pop().indexOf('.');
+      return [-1, 0].includes(dotIndex); // dot only allowed as first char
+    }
+    return false;
+  }
+
+  /**
+   * Recognizes a SharePoint editor URL.
+   * @private
+   * @param {URL} url The URL
+   * @returns {boolean} {@code true} if URL is SharePoint editor, else {@code false}
+   */
+  function isSharePointEditor(url) {
+    const { pathname, search } = url;
+    return isSharePoint(url)
+      && pathname.match(/\/_layouts\/15\/[\w]+.aspx$/)
+      && search.includes('sourcedoc=');
+  }
+
+  /**
+   * Recognizes a SharePoint viewer URL.
+   * @private
+   * @param {URL} url The URL
+   * @returns {boolean} {@code true} if URL is SharePoint viewer, else {@code false}
+   */
+  function isSharePointViewer(url) {
+    if (isSharePointDM(url)) {
+      const docPath = new URLSearchParams(url.search).get('id');
+      const dotIndex = docPath?.split('/').pop().lastIndexOf('.');
+      return dotIndex > 0; // must contain a dot
+    }
+    return false;
+  }
+
+  /**
    * Turns a globbing into a regular expression.
    * @private
    * @param {string} glob The globbing
@@ -410,6 +505,7 @@
       glob = '**';
     }
     const reString = glob
+      .replace('.', '\\.') // don't match every char, just real dots
       .replace(/\*\*/g, '_')
       .replace(/\*/g, '[0-9a-z-.]*')
       .replace(/_/g, '.*');
@@ -468,13 +564,53 @@
   }
 
   /**
+   * Checks for configured views for the current resource.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {number} viewType An optional view type (see {@link VIEWS})
+   * @param {string} testPath An optional test path (default: status.webPath)
+   * @returns {Object[]} The views
+   */
+  function findViews(sk, viewType, testPath) {
+    const { config } = sk;
+    // find view based on resource path
+    if (!testPath) {
+      const { webPath } = sk.status;
+      if (!webPath) {
+        return [];
+      }
+      testPath = webPath;
+    }
+    const { views, scriptRoot } = config;
+    const defaultOnly = viewType === VIEWS.DEFAULT;
+    const customOnly = viewType === VIEWS.CUSTOM;
+    return views.filter(({
+      path,
+      viewer,
+    }) => globToRegExp(path).test(testPath)
+      && !RESTRICTED_PATHS.includes(testPath)
+      && (!defaultOnly || viewer.startsWith(scriptRoot))
+      && (!customOnly || !viewer.startsWith(scriptRoot)));
+  }
+
+  /**
+   * Retrieves a string from the dictionary in the user's language.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @param {string} key The dictionary key
+   * @returns {string} The string in the user's language
+   */
+  function i18n(sk, key) {
+    return sk.dict ? (sk.dict[key] || '') : '';
+  }
+
+  /**
    * Returns the sidekick configuration.
    * @private
    * @param {SidekickConfig} cfg The sidekick config (defaults to {@link window.hlx.sidekickConfig})
-   * @param {Location} location The current location
    * @returns {Object} The sidekick configuration
    */
-  async function initConfig(cfg, location) {
+  async function initConfig(cfg) {
     let config = cfg || (window.hlx && window.hlx.sidekickConfig) || {};
     const {
       owner,
@@ -523,13 +659,15 @@
       pushDown,
       pushDownSelector,
       specialViews,
+      hlx5,
       scriptUrl = 'https://www.hlx.live/tools/sidekick/module.js',
       scriptRoot = scriptUrl.split('/').filter((_, i, arr) => i < arr.length - 1).join('/'),
     } = config;
     const publicHost = host && host.startsWith('http') ? new URL(host).host : host;
     const hostPrefix = owner && repo ? `${ref}--${repo}--${owner}` : null;
-    const stdInnerHost = hostPrefix ? `${hostPrefix}.hlx.page` : null;
-    const stdOuterHost = hostPrefix ? `${hostPrefix}.hlx.live` : null;
+    const domain = hlx5 ? 'aem' : 'hlx';
+    const stdInnerHost = hostPrefix ? `${hostPrefix}.${domain}.page` : null;
+    const stdOuterHost = hostPrefix ? `${hostPrefix}.${domain}.live` : null;
     const devUrl = new URL(devOrigin);
     // define elements to push down
     const pushDownElements = [];
@@ -539,21 +677,15 @@
       ).forEach((elem) => pushDownElements.push(elem));
     }
     // default views
-    const defaultSpecialViews = [
+    let views = [
       {
         path: '**.json',
         viewer: `${scriptRoot}/view/json/json.html`,
+        title: (sk) => i18n(sk, 'json_view_description'),
       },
     ];
-    // try custom views first
-    const allSpecialViews = Array.isArray(specialViews)
-      ? specialViews.concat(defaultSpecialViews)
-      : defaultSpecialViews;
-    // find view based on path
-    const { pathname } = location;
-    const specialView = allSpecialViews.find(({
-      path,
-    }) => !RESTRICTED_PATHS.includes(pathname) && globToRegExp(path).test(pathname));
+    // prepend custom views
+    views = (specialViews || []).concat(views);
 
     return {
       ...config,
@@ -566,7 +698,7 @@
       host: publicHost,
       project,
       pushDownElements,
-      specialView,
+      views,
       devUrl,
       lang: lang || getLanguage(),
     };
@@ -578,31 +710,40 @@
    * @returns {Location} The location object
    */
   function getLocation() {
+    // use window location by default
+    let url = new URL(window.location);
     // first check if there is a test location
     const $test = document.getElementById('sidekick_test_location');
     if ($test) {
       try {
-        return new URL($test.value);
+        url = new URL($test.value);
       } catch (e) {
         return null;
       }
     }
-    // fall back to window location
-    const {
-      hash, host, hostname, href, origin, pathname, port, protocol, search,
-    } = window.location;
+    const { origin, search } = url;
+    // check for resource proxy url
+    const searchParams = new URLSearchParams(search);
+    const resource = searchParams.get('path');
+    if (resource) {
+      return new URL(resource, origin);
+    }
+    return url;
+  }
 
-    return {
-      hash,
-      host,
-      hostname,
-      href,
-      origin,
-      pathname,
-      port,
-      protocol,
-      search,
-    };
+  /**
+   * Checks if the location has changed.
+   * @private
+   * @param {Sidekick} sk The sidekick
+   * @returns {boolean} {@code true} if location changed, else {@code false}
+   */
+  function isNewLocation(sk) {
+    const { location } = sk;
+    const $test = document.getElementById('sidekick_test_location');
+    if ($test) {
+      return $test.value !== location.href;
+    }
+    return window.location.href !== location.href;
   }
 
   /**
@@ -677,17 +818,6 @@
     return makeAccessible(before
       ? parent.insertBefore(tag, before)
       : parent.appendChild(tag));
-  }
-
-  /**
-   * Retrieves a string from the dictionary in the user's language.
-   * @private
-   * @param {Sidekick} sk The sidekick
-   * @param {string} key The dictionary key
-   * @returns {string} The string in the user's language
-   */
-  function i18n(sk, key) {
-    return sk.dict ? (sk.dict[key] || '') : '';
   }
 
   /**
@@ -861,14 +991,25 @@
    */
   function fireEvent(sk, name, data) {
     try {
-      sk.dispatchEvent(new CustomEvent(name, {
-        detail: {
-          data: data || {
-            config: JSON.parse(JSON.stringify(sk.config)),
-            location: sk.location,
-            status: sk.status,
-          },
+      const { config, location, status } = sk;
+      data = data || {
+        // turn complex into simple objects for event listener
+        config: JSON.parse(JSON.stringify(config)),
+        location: {
+          hash: location.hash,
+          host: location.host,
+          hostname: location.hostname,
+          href: location.href,
+          origin: location.origin,
+          pathname: location.pathname,
+          port: location.port,
+          protocol: location.protocol,
+          search: location.search,
         },
+        status,
+      };
+      sk.dispatchEvent(new CustomEvent(name, {
+        detail: { data },
       }));
       const userEvents = [
         'shown',
@@ -1246,8 +1387,10 @@
       id: 'delete',
       condition: (s) => s.isProject()
         && s.isAuthorized('preview', 'delete') // show only if authorized and
-        && s.status.preview.status !== 404 // preview exists
+        && s.status.preview.status !== 404 // preview exists and
+        && s.status.code !== 200 // not code
         && !RESTRICTED_PATHS.includes(s.location.pathname),
+      advanced: (s) => s.status.edit.url, // keep hidden if source still exists
       button: {
         text: i18n(sk, 'delete'),
         action: async () => {
@@ -1316,12 +1459,7 @@
             const redirectHost = config.host || config.outerHost;
             const prodURL = `https://${redirectHost}${path}`;
             console.log(`redirecting to ${prodURL}`);
-            if (newTab(evt)) {
-              window.open(prodURL);
-              sk.hideModal();
-            } else {
-              window.location.href = prodURL;
-            }
+            sk.switchEnv('prod', newTab(evt));
           } else {
             console.error(results);
             sk.showModal({
@@ -1347,8 +1485,10 @@
       id: 'unpublish',
       condition: (s) => s.isProject() && s.isContent()
         && s.isAuthorized('live', 'delete') // show only if authorized and
-        && s.status.live.status !== 404 // published
+        && s.status.live.status !== 404 // published and
+        && s.status.code !== 200 // not code
         && !RESTRICTED_PATHS.includes(s.location.pathname),
+      advanced: (s) => s.status.edit.url, // keep hidden if source still exists
       button: {
         text: i18n(sk, 'unpublish'),
         action: async () => {
@@ -1400,15 +1540,11 @@
   function addBulkPlugins(sk) {
     let bulkSelection = [];
 
-    const isSharePoint = (location) => /\w+\.sharepoint.com$/.test(location.host)
-      && (location.pathname.endsWith('/Forms/AllItems.aspx')
-      || location.pathname.endsWith('/onedrive.aspx'));
-
     const toWebPath = (folder, item) => {
       const { path, type } = item;
       const nameParts = path.split('.');
       let [file, ext] = nameParts;
-      if (isSharePoint(sk.location) && ext === 'docx') {
+      if (isSharePointFolder(sk.location) && ext === 'docx') {
         // omit docx extension on sharepoint
         ext = '';
       }
@@ -1431,15 +1567,15 @@
 
     const getBulkSelection = () => {
       const { location } = sk;
-      if (isSharePoint(location)) {
+      if (isSharePointFolder(location)) {
         const isGrid = document.querySelector('div[class~="ms-TilesList"]');
         return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
-          .filter((row) => !row.querySelector('img').getAttribute('src').includes('/foldericons/')
-            && !row.querySelector('img').getAttribute('src').endsWith('folder.svg'))
+          .filter((row) => !row.querySelector('img')?.getAttribute('src').includes('/foldericons/')
+            && !row.querySelector('img')?.getAttribute('src').endsWith('folder.svg'))
           .map((row) => ({
             type: isGrid
               ? row.querySelector(':scope i[aria-label]')?.getAttribute('aria-label').trim()
-              : new URL(row.querySelector('img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
+              : new URL(row.querySelector('img')?.getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
             path: isGrid
               ? row.querySelector('div[data-automationid="name"]').textContent.trim()
               : row.querySelector('button')?.textContent.trim(),
@@ -1454,14 +1590,6 @@
               || row.querySelector(':scope > div > div > div:nth-of-type(4)').textContent.trim(), // grid layout
           }));
       }
-    };
-
-    const isChangedUrl = () => {
-      const $test = document.getElementById('sidekick_test_location');
-      if ($test) {
-        return $test.value !== sk.location.href;
-      }
-      return window.location.href !== sk.location.href;
     };
 
     const updateBulkInfo = () => {
@@ -1481,15 +1609,15 @@
       }
       // show/hide bulk buttons
       const filesSelected = sel.length > 0;
-      if (isChangedUrl()) {
-        // refresh location
-        sk.location = getLocation();
-      }
       ['preview', 'publish', 'copy-urls'].forEach((action) => {
         const pluginId = `bulk-${action}`;
         const plugin = sk.get(pluginId);
-        const customShowPlugin = (sk.customPlugins[action]?.condition || (() => true))(sk);
-        plugin.classList[filesSelected && customShowPlugin ? 'remove' : 'add']('hlx-sk-hidden');
+        let customShow = true;
+        const customPlugin = sk.customPlugins[action];
+        if (customPlugin) {
+          customShow = customPlugin.condition(sk);
+        }
+        plugin.classList[filesSelected && customShow ? 'remove' : 'add']('hlx-sk-hidden');
       });
       // update copy url button texts based on selection size
       ['', 'preview', 'live', 'prod'].forEach((env) => {
@@ -1530,7 +1658,13 @@
       const ok = results.filter((res) => res.ok);
       if (ok.length > 0) {
         lines.push(getBulkText([ok.length], 'result', operation, 'success'));
-        lines.push(createTag({
+        const buttonGroup = createTag({
+          tag: 'span',
+          attrs: {
+            class: 'hlx-sk-modal-button-group',
+          },
+        });
+        buttonGroup.append(createTag({
           tag: 'button',
           text: i18n(sk, ok.length === 1 ? 'copy_url' : 'copy_urls'),
           lstnrs: {
@@ -1542,6 +1676,30 @@
             },
           },
         }));
+        buttonGroup.append(createTag({
+          tag: 'button',
+          text: i18n(sk, ok.length === 1 ? 'open_url' : 'open_urls'),
+          lstnrs: {
+            click: (evt) => {
+              evt.stopPropagation();
+              if (ok.length <= 20 || window.confirm(i18n(sk, 'open_urls_confirm').replace('$1', ok.length))) {
+                ok.forEach((item) => {
+                  const url = `https://${host}${item.path}`;
+                  const [{ viewer } = {}] = findViews(sk, VIEWS.CUSTOM, item.path);
+                  if (viewer) {
+                    const viewUrl = new URL(viewer, url);
+                    viewUrl.searchParams.set('path', item.path);
+                    window.open(viewUrl.toString());
+                  } else {
+                    window.open(url);
+                  }
+                });
+                sk.hideModal();
+              }
+            },
+          },
+        }));
+        lines.push(buttonGroup);
       }
       const failed = results.filter((res) => !res.ok);
       if (failed.length > 0) {
@@ -1596,10 +1754,15 @@
           class: 'hlx-sk-label',
         },
       }],
-      callback: () => {
-        window.setInterval(() => {
-          updateBulkInfo();
-        }, 500);
+      callback: (sidekick) => {
+        const { location } = sk;
+        const listener = () => window.setTimeout(() => updateBulkInfo(sidekick), 100);
+        const rootEl = document.querySelector(isSharePointFolder(location) ? '#appRoot' : 'body');
+        if (rootEl) {
+          rootEl.addEventListener('click', listener);
+          rootEl.addEventListener('keyup', listener);
+        }
+        listener();
       },
     });
 
@@ -1696,45 +1859,30 @@
         },
       });
     });
-
-    updateBulkInfo();
   }
 
   /**
-   * Adds UI to encourage eusers to log in.
+   * Adds UI to encourage users to log in.
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {boolean} show Whether to show the login encouragement or not
-   * @param {HTMLElement} toggle The user menu toggle
    */
-  function encourageLogin(sk, show, toggle) {
-    const openUserMenu = () => {
-      if (toggle) {
-        toggle.click();
-      }
-    };
+  function encourageLogin(sk, show) {
+    const loginPlugin = sk.get('user-login');
+    const plugins = sk.pluginContainer;
     if (show) {
-      openUserMenu();
-      // add overlay
-      sk.pluginContainer.append(createTag({
-        tag: 'div',
-        attrs: {
-          class: 'plugin-container-overlay',
-        },
-        lstnrs: {
-          click: () => {
-            if (sk.status.status === 401) {
-              sk.showModal({
-                message: i18n(sk, 'user_login_hint'),
-                callback: () => openUserMenu(),
-              });
-            }
-          },
-        },
-      }));
+      if (loginPlugin.parentElement === plugins) {
+        // login already encouraged
+        return;
+      }
+      // hide all plugins and only show login
+      plugins.classList.add('hlx-sk-login-only');
+      loginPlugin.firstElementChild.classList.add('accent');
+      loginPlugin.firstElementChild.title = i18n(sk, 'user_login_hint');
+      plugins.append(loginPlugin);
     } else {
-      // remove overlay
-      sk.pluginContainer.querySelector('.plugin-container-overlay')?.remove();
+      // unhide plugins
+      plugins.classList.remove('hlx-sk-login-only');
     }
   }
 
@@ -1770,13 +1918,13 @@
           } = cfg;
           const condition = (s) => {
             let excluded = false;
-            const pathSearchHash = s.location.href.replace(s.location.origin, '');
+            const { webPath } = s.status;
             if (excludePaths && Array.isArray(excludePaths)
-              && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+              && excludePaths.some((glob) => globToRegExp(glob).test(webPath))) {
               excluded = true;
             }
             if (includePaths && Array.isArray(includePaths)
-              && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+              && includePaths.some((glob) => globToRegExp(glob).test(webPath))) {
               excluded = false;
             }
             if (excluded) {
@@ -1840,7 +1988,13 @@
                           id: `hlx-sk-palette-${id}`,
                           class: 'hlx-sk-palette hlx-sk-hidden',
                           style: paletteRect || '',
+                          tabindex: '0',
                         },
+                      });
+                      palette.addEventListener('keydown', async (e) => {
+                        if (e.key === 'Escape') {
+                          palette.classList.add('hlx-sk-hidden');
+                        }
                       });
                       const titleBar = appendTag(palette, {
                         tag: 'div',
@@ -1888,12 +2042,12 @@
             container: containerId,
           };
           sk.customPlugins[plugin.id] = plugin;
-          // check and remove existing plugin
-          const existingPlugin = sk.plugins[plugin.id];
-          if (existingPlugin) {
-            if (sk.get(plugin.id) && !condition(sk)) {
-              sk.remove(id);
-            }
+          // check default plugin
+          const defaultPlugin = sk.plugins[plugin.id];
+          if (defaultPlugin) {
+            // extend default condition
+            const { condition: defaultCondition } = defaultPlugin;
+            defaultPlugin.condition = (s) => defaultCondition(s) && condition(s);
           } else {
             // add custom plugin
             sk.add(plugin);
@@ -2135,7 +2289,7 @@
       });
       if (!sk.status.loggedOut && sk.status.status === 401 && !sk.isAuthenticated()) {
         // encourage login
-        encourageLogin(sk, true, toggle);
+        encourageLogin(sk, true);
       }
     }
   }
@@ -2256,18 +2410,15 @@
   }
 
   /**
-   * Registers a plugin for re-evaluation if it should be shown or hidden,
-   * and if its button should be enabled or disabled.
+   * Checks existing plugins based on the status of the current resource.
    * @private
    * @param {Sidekick} sk The sidekick
-   * @param {Plugin} plugin The plugin configuration
-   * @param {HTMLElement} $plugin The plugin
-   * @returns {HTMLElement} The plugin or {@code null}
    */
-  function registerPlugin(sk, plugin, $plugin) {
-    // re-evaluate plugin when status fetched
-    sk.addEventListener('statusfetched', () => {
-      const { status } = sk;
+  function checkPlugins(sk) {
+    const { status, plugins, pluginContainer } = sk;
+    Object.keys(plugins).forEach((id) => {
+      const plugin = plugins[id];
+      const $plugin = sk.get(id);
       if (typeof plugin.condition === 'function') {
         if ($plugin && !plugin.condition(sk)) {
           // plugin exists but condition now false
@@ -2295,23 +2446,12 @@
         }
       }
     });
-    if (typeof plugin.callback === 'function') {
-      plugin.callback(sk, $plugin);
-    }
-    return $plugin || null;
-  }
-
-  /**
-   * Checks existing plugins based on the status of the current resource.
-   * @private
-   * @param {Sidekick} sk The sidekick
-   */
-  function checkPlugins(sk) {
+    pluginContainer.classList.remove('hlx-sk-concealed');
     window.setTimeout(() => {
-      if (!sk.pluginContainer.querySelector(':scope div.plugin')) {
+      if (!pluginContainer.querySelector(':scope div.plugin')) {
         // add empty text
-        sk.pluginContainer.innerHTML = '';
-        sk.pluginContainer.append(createTag({
+        pluginContainer.innerHTML = '';
+        pluginContainer.append(createTag({
           tag: 'span',
           text: i18n(sk, 'plugins_empty'),
           attrs: {
@@ -2383,13 +2523,13 @@
   }
 
   /**
-   * Creates and/or returns a special view overlay.
+   * Creates and/or returns a view overlay.
    * @private
    * @param {Sidekick} sk The sidekick
-   * @param {boolean} create Create the special view if none exists
-   * @returns {HTMLELement} The special view overlay
+   * @param {boolean} create Create the view if none exists
+   * @returns {HTMLELement} The view overlay
    */
-  function getSpecialViewOverlay(sk, create) {
+  function getViewOverlay(sk, create) {
     const view = sk.shadowRoot.querySelector('.hlx-sk-special-view')
       || (create
         ? appendTag(sk.shadowRoot, {
@@ -2411,7 +2551,7 @@
         text: i18n(sk, 'close'),
         attrs: { class: 'close' },
         // eslint-disable-next-line no-use-before-define
-        lstnrs: { click: () => hideSpecialView(sk) },
+        lstnrs: { click: () => hideView(sk, true) },
       });
       appendTag(view, {
         tag: 'iframe',
@@ -2429,37 +2569,41 @@
    * @private
    * @param {Sidekick} sk The sidekick
    */
-  async function showSpecialView(sk) {
+  async function showView(sk) {
+    if (!sk.isProject()) {
+      return;
+    }
     const {
-      config: {
-        lang,
-        specialView,
-      },
       location: {
         origin,
         href,
       },
     } = sk;
-    if (specialView && !getSpecialViewOverlay(sk)) {
-      // hide original content
-      [...sk.parentElement.children].forEach((el) => {
-        if (el !== sk) {
-          try {
-            el.style.display = 'none';
-          } catch (e) {
-            // ignore
-          }
-        }
-      });
-      const { viewer, title, titleI18n } = specialView;
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('path')) {
+      // custom view
+      return;
+    }
+    const [view] = findViews(sk, VIEWS.DEFAULT);
+    if (view && !getViewOverlay(sk)) {
+      const { viewer, title } = view;
       if (viewer) {
         const viewUrl = new URL(viewer, origin);
         viewUrl.searchParams.set('url', href);
-        const viewOverlay = getSpecialViewOverlay(sk, true);
-        viewOverlay.querySelector('.title').textContent = (titleI18n && titleI18n[lang])
-          || title || i18n(sk, 'json_view_description');
+        const viewOverlay = getViewOverlay(sk, true);
+        viewOverlay.querySelector('.title').textContent = title(sk);
         viewOverlay.querySelector('.container')
           .setAttribute('src', viewUrl.toString());
+        // hide original content
+        [...sk.parentElement.children].forEach((el) => {
+          if (el !== sk) {
+            try {
+              el.style.display = 'none';
+            } catch (e) {
+              // ignore
+            }
+          }
+        });
       }
     }
   }
@@ -2468,9 +2612,10 @@
    * Hides the special view.
    * @private
    * @param {Sidekick} sk The sidekick
+   * @param {boolean} click {@code true} if triggered by user
    */
-  function hideSpecialView(sk) {
-    const viewOverlay = getSpecialViewOverlay(sk);
+  function hideView(sk, userAction) {
+    const viewOverlay = getViewOverlay(sk);
     if (viewOverlay) {
       viewOverlay.replaceWith('');
 
@@ -2484,9 +2629,10 @@
           }
         }
       });
-
+    }
+    if (userAction) {
       // log telemetry
-      sampleRUM('sidekick:specialviewhidden', {
+      sampleRUM('sidekick:viewhidden', {
         source: sk.location.href,
         target: sk.status.webPath,
       });
@@ -2534,20 +2680,6 @@
         attrs: {
           class: 'hlx-sk hlx-sk-hidden',
         },
-        lstnrs: {
-          keydown: ({ altKey }) => {
-            if (altKey) {
-              // enable advanced mode
-              this.root.classList.add('hlx-sk-advanced');
-            }
-          },
-          keyup: ({ altKey }) => {
-            if (!altKey) {
-              // disable advanced mode
-              this.root.classList.remove('hlx-sk-advanced');
-            }
-          },
-        },
       });
       this.addEventListener('contextloaded', () => {
         this.loadCSS();
@@ -2555,7 +2687,7 @@
         this.pluginContainer = appendTag(this.root, {
           tag: 'div',
           attrs: {
-            class: 'plugin-container',
+            class: 'plugin-container hlx-sk-concealed',
           },
         });
         this.pluginContainer.append(createTag({
@@ -2652,14 +2784,26 @@
         this.fetchStatus();
         // push down content
         pushDownContent(this);
-        // show special view
-        showSpecialView(this);
 
+        // reveal advanced features via alt key
+        document.addEventListener('keydown', ({ altKey }) => {
+          if (altKey) {
+            // enable advanced mode
+            this.root.classList.add('hlx-sk-advanced');
+          }
+        });
+        document.addEventListener('keyup', ({ altKey }) => {
+          if (!altKey) {
+            // disable advanced mode
+            this.root.classList.remove('hlx-sk-advanced');
+          }
+        });
         // announce to the document that the sidekick is ready
         document.dispatchEvent(new CustomEvent('sidekick-ready'));
         document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
       }, { once: true });
       this.addEventListener('statusfetched', () => {
+        showView(this);
         checkUserState(this);
         checkPlugins(this);
         checkLastModified(this);
@@ -2669,7 +2813,7 @@
         pushDownContent(this);
       });
       this.addEventListener('hidden', () => {
-        hideSpecialView(this);
+        hideView(this);
         revertPushDownContent(this);
       });
       this.status = {};
@@ -2682,6 +2826,15 @@
 
       // collapse dropdowns when document is clicked
       document.addEventListener('click', () => collapseDropdowns(this));
+      // listen to URL changes
+      window.setInterval(() => {
+        if (isNewLocation(this)) {
+          this.fetchStatus(true);
+        }
+      }, 500);
+      window.addEventListener('popstate', () => {
+        this.fetchStatus(true);
+      });
     }
 
     /**
@@ -2873,7 +3026,7 @@
       plugin.isShown = typeof plugin.condition === 'undefined'
           || (typeof plugin.condition === 'function' && plugin.condition(this));
       if (!plugin.isShown) {
-        return registerPlugin(this, plugin, null);
+        return null;
       }
 
       // find existing plugin
@@ -2961,7 +3114,11 @@
       if (typeof plugin.advanced === 'function' && plugin.advanced(this)) {
         $plugin.classList.add('hlx-sk-advanced-only');
       }
-      return registerPlugin(this, plugin, $plugin);
+      // callback
+      if (typeof plugin.callback === 'function') {
+        plugin.callback(this, $plugin);
+      }
+      return $plugin;
     }
 
     /**
@@ -2992,13 +3149,17 @@
      */
     isEditor() {
       const { config, location } = this;
-      const { host, pathname, search } = location;
-      return (/.*\.sharepoint\.com$/.test(host)
-        && pathname.match(/\/_layouts\/15\/[\w]+.aspx$/)
-        && search.includes('sourcedoc='))
-        || location.host === 'docs.google.com'
-        || (config.mountpoint && new URL(config.mountpoint).host === location.host
-          && !this.isAdmin());
+      const { host } = location;
+      if (isSharePointEditor(location) || isSharePointViewer(location)) {
+        return true;
+      }
+      if (host === 'docs.google.com') {
+        return true;
+      }
+      if (config.mountpoint && new URL(config.mountpoint).host === host && !this.isAdmin()) {
+        return true;
+      }
+      return false;
     }
 
     /**
@@ -3007,10 +3168,7 @@
      */
     isAdmin() {
       const { location } = this;
-      return (location.host === 'drive.google.com')
-        || (/\w+\.sharepoint.com$/.test(location.host)
-        && (location.pathname.endsWith('/Forms/AllItems.aspx')
-        || location.pathname.endsWith('/onedrive.aspx')));
+      return isSharePointFolder(location) || location.host === 'drive.google.com';
     }
 
     /**
@@ -3077,10 +3235,8 @@
      * @returns {boolean} <code>true</code> if content URL, else <code>false</code>
      */
     isContent() {
-      const file = this.location.pathname.split('/').pop();
-      const ext = file && file.split('.').pop();
-      return this.isEditor() || this.isAdmin() || ext === file || ext === 'html'
-        || ext === 'json' || ext === 'pdf';
+      const extSupported = isSupportedFileExtension(this.location.pathname);
+      return this.isEditor() || this.isAdmin() || extSupported;
     }
 
     /**
@@ -3420,6 +3576,7 @@
      * @returns {Sidekick} The sidekick
      */
     async switchEnv(targetEnv, open) {
+      this.showWait();
       const hostType = ENVS[targetEnv];
       if (!hostType) {
         console.error('invalid environment', targetEnv);
@@ -3429,21 +3586,27 @@
         return this;
       }
       const { config, location: { href, search, hash }, status } = this;
-      this.showWait();
+      let envHost = config[hostType];
+      if (targetEnv === 'prod' && !envHost) {
+        // no production host defined yet, use live instead
+        envHost = config.outerHost;
+      }
       if (!status.webPath) {
         console.log('not ready yet, trying again in a second ...');
         window.setTimeout(() => this.switchEnv(targetEnv, open), 1000);
         return this;
       }
-      const envOrigin = targetEnv === 'dev' ? config.devUrl.origin : `https://${config[hostType]}`;
+      const envOrigin = targetEnv === 'dev' ? config.devUrl.origin : `https://${envHost}`;
       let envUrl = `${envOrigin}${status.webPath}`;
       if (!this.isEditor()) {
         envUrl += `${search}${hash}`;
       }
-      fireEvent(this, 'envswitched', {
-        sourceUrl: href,
-        targetUrl: envUrl,
-      });
+      const [customView] = findViews(this, VIEWS.CUSTOM);
+      if (customView) {
+        const customViewUrl = new URL(customView.viewer, envUrl);
+        customViewUrl.searchParams.set('path', status.webPath);
+        envUrl = customViewUrl;
+      }
       // switch or open env
       if (open || this.isEditor()) {
         window.open(envUrl, open
@@ -3452,6 +3615,10 @@
       } else {
         window.location.href = envUrl;
       }
+      fireEvent(this, 'envswitched', {
+        sourceUrl: href,
+        targetUrl: envUrl,
+      });
       return this;
     }
 
