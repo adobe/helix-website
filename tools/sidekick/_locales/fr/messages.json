@@ -258,6 +258,9 @@
   "copied_urls": {
     "message": "Les URL ont été copiées dans le presse-papiers."
   },
+  "copy": {
+    "message": "Copier"
+  },
   "copy_live_url": {
     "message": "Copier l'URL dynamique"
   },
@@ -288,8 +291,32 @@
   "delete_failure": {
     "message": "Échec de la suppression. Réessayez plus tard."
   },
+  "delete_file_confirm": {
+    "message": "Voulez-vous vraiment supprimer ce fichier ?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "Ce fichier n’existe plus dans le référentiel, sa suppression est irréversible/\n\nVoulez-vous vraiment le supprimer ?"
+  },
+  "delete_file_source_exists": {
+    "message": "Ce fichier existe toujours dans le référentiel et ne peut pas être supprimé."
+  },
+  "delete_file_success": {
+    "message": "Le fichier a été supprimé."
+  },
+  "delete_page_confirm": {
+    "message": "Voulez-vous vraiment supprimer cette page ?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "Cette page ne contient plus de document source, sa suppression est irréversible.\n\nVoulez-vous vraiment la supprimer ?"
+  },
+  "delete_page_source_exists": {
+    "message": "Cette page contient toujours un document source et ne peut pas être supprimée."
+  },
+  "delete_page_success": {
+    "message": "La page a été supprimée."
+  },
   "description": {
-    "message": "AEM Sidekick permet aux créateurs et créatrices de sites d’AEM de prévisualiser et publier du contenu."
+    "message": "AEM Sidekick permet aux créateurs et créatrices de sites AEM de prévisualiser et publier facilement du contenu."
   },
   "description_shortcut": {
     "message": "Activer/désactiver Sidekick"
@@ -502,8 +529,23 @@
   "unpublish_failure": {
     "message": "Échec de la dépublication. Réessayez plus tard."
   },
+  "unpublish_page_confirm": {
+    "message": "Voulez-vous vraiment dépublier cette page ?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "Cette page ne contient plus de document source, sa dépublication est irréversible.\n\nVoulez-vous vraiment la dépublier ?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "Cette page contient toujours un document source et ne peut pas être dépubliée."
+  },
+  "unpublish_page_success": {
+    "message": "La page a été dépubliée."
+  },
   "user_login": {
     "message": "Se connecter"
+  },
+  "user_login_hint": {
+    "message": "Vous devez vous connecter avant de pouvoir utiliser Sidekick."
   },
   "user_logout": {
     "message": "Se déconnecter"

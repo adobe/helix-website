@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "Production Hostname (optional)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "Custom Live Hostname (optional)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "Content URL: https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "Custom Preview Hostname (optional)"
   },
   "config_manual_project_placeholder": {
     "message": "Project Name (optional)"
@@ -452,6 +458,15 @@
   },
   "open_view_doc_source": {
     "message": "View document source"
+  },
+  "open_url": {
+    "message": "Open URL"
+  },
+  "open_urls": {
+    "message": "Open URLs"
+  },
+  "open_urls_confirm": {
+    "message": "Are you sure you want to open $1 URLs?"
   },
   "please_wait": {
     "message": "Please wait..."
