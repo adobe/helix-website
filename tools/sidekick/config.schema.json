@@ -29,8 +29,8 @@
           },
           "description": "Exclude the plugin from these paths",
           "examples": [
-            "/foo/bar",
-            "/foo/**"
+            "/foo/**",
+            "**/:x:**"
           ]
         },
         "id": {
@@ -44,8 +44,8 @@
           },
           "description": "Include the plugin on these paths (overrides excludePaths)",
           "examples": [
-            "/foo/bar",
-            "/foo/bar/**"
+            "/foo/bar/**",
+            "**.docx**"
           ]
         },
         "isContainer": {

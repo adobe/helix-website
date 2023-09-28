@@ -420,6 +420,7 @@
       return true;
     } else {
       return [
+        'json',
         'jpg',
         'jpeg',
         'png',
@@ -1571,7 +1572,8 @@
         const isGrid = document.querySelector('div[class~="ms-TilesList"]');
         return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
           .filter((row) => !row.querySelector('img')?.getAttribute('src').includes('/foldericons/')
-            && !row.querySelector('img')?.getAttribute('src').endsWith('folder.svg'))
+            && !row.querySelector('img')?.getAttribute('src').endsWith('folder.svg')
+            && !row.querySelector('svg')?.parentElement.className.toLowerCase().includes('folder'))
           .map((row) => ({
             type: isGrid
               ? row.querySelector(':scope i[aria-label]')?.getAttribute('aria-label').trim()
@@ -1918,13 +1920,13 @@
           } = cfg;
           const condition = (s) => {
             let excluded = false;
-            const { webPath } = s.status;
+            const pathSearchHash = s.location.href.replace(s.location.origin, '');
             if (excludePaths && Array.isArray(excludePaths)
-              && excludePaths.some((glob) => globToRegExp(glob).test(webPath))) {
+              && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
               excluded = true;
             }
             if (includePaths && Array.isArray(includePaths)
-              && includePaths.some((glob) => globToRegExp(glob).test(webPath))) {
+              && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
               excluded = false;
             }
             if (excluded) {
