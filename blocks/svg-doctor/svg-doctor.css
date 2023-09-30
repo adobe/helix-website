@@ -97,6 +97,7 @@
 .svg-doctor .viewbox svg {
   width: 100%;
   height: auto;
+  max-height: 598px;
 }
 
 @media (min-width: 900px) {
