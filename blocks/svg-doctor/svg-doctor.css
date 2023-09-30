@@ -1,0 +1,364 @@
+/* form */
+.svg-doctor form {
+  position: relative;
+}
+
+.svg-doctor form input[name='upload'] {
+  display: block;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+}
+
+.svg-doctor form input[name='upload']:disabled,
+.svg-doctor form label[for='upload'][aria-hidden=true] {
+  display: none;
+  visibility: hidden;
+}
+
+.svg-doctor form label {
+  transition: color .3s;
+}
+
+.svg-doctor form .viewbox[data-mode="dark"] label {
+  color: white;
+}
+
+.svg-doctor form label p {
+  color: inherit;
+  font-size: var(--type-body-l-size);
+  text-align: center;
+}
+
+.svg-doctor form label span + p {
+  margin-top: .5em;
+}
+
+/* viewbox */
+.svg-doctor .viewbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vw;
+  outline: 2px solid transparent;
+  border: 1px solid var(--color-checkerboard-bg-border);
+  padding: 1rem;
+  background-image: var(--checkerboard-background);
+  background-size: var(--checkerboard-background-size);
+  background-position: center;
+}
+
+.svg-doctor .viewbox,
+.svg-doctor .viewbox [data-mode='light'] {
+  --color-checkerboard-bg-fill: #fefefe;
+  --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
+  --checkerboard-background: linear-gradient(
+      var(--color-checkerboard-bg-border) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      var(--color-checkerboard-bg-border) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      45deg,
+      var(--color-checkerboard-bg-fill) 50%,
+      var(--color-checkerboard-bg-fill) 51%
+    );
+}
+
+.svg-doctor .viewbox[data-mode='dark'] {
+  --color-checkerboard-bg-border: rgb(41 42 42 / 40%);
+  --color-checkerboard-bg-fill: #010101;
+}
+
+.svg-doctor .viewbox[data-status='upload'] {
+  transition: background-color .3s, outline .3s;
+}
+
+.svg-doctor .viewbox[data-status='upload'].hover,
+.svg-doctor .viewbox[data-status='upload']:hover {
+  --color-checkerboard-bg-fill: var(--bg-color-lightgrey);
+
+  outline: 2px solid var(--spectrum-blue);
+}
+
+.svg-doctor .viewbox[data-status='upload'][data-mode='dark'].hover,
+.svg-doctor .viewbox[data-status='upload'][data-mode='dark']:hover {
+  --color-checkerboard-bg-fill: #070707;
+}
+
+.svg-doctor .viewbox svg {
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 900px) {
+  .svg-doctor .viewbox {
+    min-height: 598px;
+    height: calc(100% - 300px - var(--side-navigation-bar-gap));
+  }
+}
+
+/* controls */
+.svg-doctor .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  border-radius: 0 0 var(--card-border-radius-l) var(--card-border-radius-l);
+  padding: .5rem var(--card-border-radius-l);
+  background-color: var(--bg-color-grey);
+}
+
+.svg-doctor .controls[aria-hidden] {
+  display: none;
+  visibility: hidden;
+}
+
+.svg-doctor .controls button {
+  position: relative;
+  border: 0;
+  border-radius: var(--input-border-radius);
+  padding: .2rem .5rem;
+  background-color: transparent;
+  font-size: var(--type-detail-m-size);
+  cursor: pointer;
+  transition: background-color .3s;
+}
+
+.svg-doctor .controls button:hover,
+.svg-doctor .controls button:focus {
+  background-color: var(--bg-color-grey-2);
+}
+
+.svg-doctor .controls button:hover::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: calc(100% + .2rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  padding: .2rem .5rem;
+  border: 1px solid var(--bg-color-lightgrey);
+  border-radius: var(--input-border-radius);
+  background-color: #070707;
+  color: var(--bg-color-lightgrey);
+  z-index: 1;
+}
+
+/* specs */
+.svg-doctor .specs[aria-hidden] {
+  display: none;
+  visibility: hidden;
+}
+
+/* preview */
+.svg-doctor .viewbox .preview {
+  width: 100%;
+}
+
+.svg-doctor .viewbox[data-display='button'] .preview {
+  width: max-content;
+  border-radius: 32px;
+  padding: 13px 1.5em;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+  background-color: var(--spectrum-blue);
+  color: var(--color-white);
+  font-size: var(--type-body-l-size);
+  font-style: normal;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, border 0.3s;
+}
+
+.svg-doctor .viewbox[data-display='button'] .preview:hover {
+  border-color: var(--spectrum-blue);
+  background-color: var(--color-white);
+  color: var(--spectrum-blue);
+}
+
+.svg-doctor .viewbox[data-display='button'] .preview::after {
+  content: 'Call to Action';
+  vertical-align: 5px;
+}
+
+.svg-doctor .viewbox[data-display='button'] .preview svg {
+  width: auto;
+  height: 25px;
+  margin-right: 1rem;
+  fill: currentcolor;
+}
+
+/* icons/glyphs */
+.svg-doctor .glyph,
+.svg-doctor .glyph::before,
+.svg-doctor .glyph::after {
+  box-sizing: border-box;
+  display: block;
+  position: relative;
+}
+
+.svg-doctor .glyph::before,
+.svg-doctor .glyph::after {
+  content: '';
+  position: absolute;
+}
+
+.svg-doctor .glyph-upload {
+  width: 20px;
+  height: 10px;
+  margin: auto;
+  margin-top: 12px;
+  border: 2px solid;
+  border-top: 0;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.svg-doctor .glyph-upload::after {
+  left: 3px;
+  bottom: 7px;
+  width: 10px;
+  height: 10px;
+  border-left: 2px solid;
+  border-top: 2px solid;
+  transform: rotate(45deg);
+}
+
+.svg-doctor .glyph-upload::before {
+  left: 7px;
+  bottom: 5px;
+  width: 2px;
+  height: 12px;
+  background: currentcolor;
+}
+
+.svg-doctor .glyph-dark,
+.svg-doctor .glyph-dark::after {
+  border-radius: 50%;
+}
+
+.svg-doctor .glyph-dark {
+  width: 24px;
+  height: 24px;
+  transform: rotate(-135deg);
+  border: 2px solid;
+  border-bottom-color: transparent;
+  overflow: hidden;
+}
+
+.svg-doctor .glyph-dark::after {
+  top: 8px;
+  left: 2px;
+  width: 16px;
+  height: 26px;
+  border: 2px solid transparent;
+  box-shadow: 0 0 0 2px;
+}
+
+.svg-doctor .glyph-light {
+  width: 24px;
+  height: 24px;
+  box-shadow: inset 0 0 0 2px;
+  border: 6px solid transparent;
+  border-radius: 50%;
+  background:
+    linear-gradient(to bottom, currentcolor 4px, transparent 0) no-repeat 5px -6px / 2px 6px,
+    linear-gradient(to bottom, currentcolor 4px, transparent 0) no-repeat 5px 14px / 2px 6px,
+    linear-gradient(to bottom, currentcolor 4px, transparent 0) no-repeat -8px 5px / 6px 2px,
+    linear-gradient(to bottom, currentcolor 4px, transparent 0) no-repeat 14px 5px / 6px 2px;
+}
+
+.svg-doctor .glyph-light::before,
+.svg-doctor .glyph-light::after {
+  top: 5px;
+  left: -6px;
+  width: 24px;
+  height: 2px;
+  border-left: 4px solid;
+  border-right: 4px solid;
+}
+
+.svg-doctor .glyph-light::before {
+  transform: rotate(-45deg)
+}
+
+.svg-doctor .glyph-light::after {
+  transform: rotate(45deg)
+}
+
+.svg-doctor .glyph-button {
+  width: 24px;
+  height: 14px;
+  margin: 5px 0;
+  border: 2px solid;
+  border-radius: 7px;
+}
+
+.svg-doctor .glyph-button::before {
+  top: 2px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: currentcolor;
+}
+
+.svg-doctor .glyph-image {
+  width: 24px;
+  height: 16px;
+  margin: 4px 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px;
+  border-radius: 2px;
+}
+
+.svg-doctor .glyph-image::after,
+.svg-doctor .glyph-image::before {
+  border: 2px solid;
+}
+
+.svg-doctor .glyph-image::after {
+  top: 9px;
+  left: 9px;
+  transform: rotate(45deg);
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.svg-doctor .glyph-image::before {
+  top: 2px;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 100%;
+}
+
+.svg-doctor .glyph-reset {
+  width: 24px;
+  height: 24px;
+  border: 2px solid;
+  border-right-color: transparent;
+  border-radius: 50%;
+  transform: rotate(15deg);
+}
+
+.svg-doctor .glyph-reset::before {
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+  top: -3px;
+  right: 0;
+  transform: rotate(90deg);
+}
