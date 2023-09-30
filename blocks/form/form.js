@@ -131,7 +131,7 @@ function fill(form) {
   }
 }
 
-async function createForm(formURL) {
+export async function createForm(formURL) {
   const { pathname } = new URL(formURL);
   const resp = await fetch(pathname);
   const json = await resp.json();
