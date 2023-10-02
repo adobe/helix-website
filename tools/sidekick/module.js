@@ -706,6 +706,24 @@
   }
 
   /**
+   * Get resource URL from a url string.
+   * For custom views, resource is given by the path request parameter.
+   * @private
+   * @param {URL} url The url string
+   * @returns {URL} The resource URL
+   */
+  function getResourceURL(url) {
+    const { origin, search } = url;
+    // check for resource proxy url
+    const searchParams = new URLSearchParams(search);
+    const resource = searchParams.get('path');
+    if (resource) {
+      return new URL(resource, origin);
+    }
+    return url;
+  }
+
+  /**
    * Returns the location of the current document.
    * @private
    * @returns {Location} The location object
@@ -722,14 +740,8 @@
         return null;
       }
     }
-    const { origin, search } = url;
-    // check for resource proxy url
-    const searchParams = new URLSearchParams(search);
-    const resource = searchParams.get('path');
-    if (resource) {
-      return new URL(resource, origin);
-    }
-    return url;
+
+    return getResourceURL(url);
   }
 
   /**
@@ -744,7 +756,9 @@
     if ($test) {
       return $test.value !== location.href;
     }
-    return window.location.href !== location.href;
+
+    const href = getResourceURL(new URL(window.location.href)).toString();
+    return href !== location.href;
   }
 
   /**
