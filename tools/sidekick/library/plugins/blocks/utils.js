@@ -372,6 +372,9 @@ export function copyPageToClipboard(wrapper, blockURL, pageMetadata) {
       section.insertAdjacentElement('beforeend', sectionBreak.cloneNode(true));
     }
 
+    // Create a br element to space out tables
+    const br = createTag('br');
+
     // Does the current section have any blocks?
     const blocks = section.querySelectorAll(':scope > div:not(.section-metadata)');
     blocks.forEach((block) => {
@@ -381,6 +384,9 @@ export function copyPageToClipboard(wrapper, blockURL, pageMetadata) {
         getBlockName(block, true),
         blockURL,
       );
+
+      // Insert a br after every table to add some spacing in the document
+      block.parentNode.insertBefore(br.cloneNode(), block.nextSibling);
 
       // Replace the block with the table
       block.replaceWith(blockTable);
