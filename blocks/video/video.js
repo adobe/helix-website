@@ -1,3 +1,5 @@
+import { sampleRUM } from '../../scripts/lib-franklin.js';
+
 function decorateVideoBlock($block, videoURL) {
   if (videoURL.endsWith('.mp4')) {
     let attrs = '';
@@ -8,6 +10,11 @@ function decorateVideoBlock($block, videoURL) {
         <video ${attrs} name="media"><source src="${videoURL}" type="video/mp4"></video>
       </div>
       `;
+    $block.querySelector('video').addEventListener('play', (e) => {
+      sampleRUM('play', {
+        source: e.target.currentSrc,
+      });
+    });
   }
 }
 
