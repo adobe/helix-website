@@ -397,6 +397,76 @@ function addBlockLevelInViewAnimation(main) {
   });
 }
 
+function decorateBreadcrumb(main) {
+  if (!document.body.classList.contains('guides-template')) {
+    return;
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('breadcrumb-wrapper');
+
+  const breadcrumb = document.createElement('div');
+  breadcrumb.classList.add('breadcrumb');
+
+  const div1 = document.createElement('div');
+  const div2 = document.createElement('div');
+
+  div1.append(div2);
+  breadcrumb.append(div1);
+
+  wrapper.append(breadcrumb);
+  main.prepend(wrapper);
+
+  const isDocumentationLanding = window.location.pathname === '/docs/';
+
+  const list = createTag('ul');
+  const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
+  const docs = createTag('li', {}, '<a href="/docs/" class="breadcrumb-link-underline-effect">Documentation</a>');
+
+  list.append(home);
+  list.append(docs);
+
+  const category = getMetadata('category');
+  const title = getMetadata('og:title');
+
+  if (category) {
+    const section = createTag(
+      'li',
+      {},
+      `<a href="/docs/#${category.toLowerCase()}" class="breadcrumb-link-underline-effect category">${category}</a>`,
+    );
+    list.append(section);
+  }
+
+  if (!isDocumentationLanding) {
+    const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
+    list.append(article);
+
+    const backBtn = createTag('div', { class: 'guides-back-btn desktop' }, `
+        <span class="icon icon-icon-arrow"></span>
+        <a href="/docs/" class="link-underline-effect">
+            Back
+        </a>
+    `);
+    document.querySelector('.default-content-wrapper').prepend(backBtn);
+  }
+
+  // make the last item to be unclickable as already on the page
+  const listLinks = list.querySelectorAll('a');
+  const lastLinkItem = listLinks[listLinks.length - 1];
+  lastLinkItem.classList.remove('breadcrumb-link-underline-effect');
+  lastLinkItem.style.cursor = 'default';
+  lastLinkItem.addEventListener('click', (e) => e.preventDefault());
+
+  breadcrumb.classList.add('contained');
+  if (isDocumentationLanding) {
+    breadcrumb.parentElement.classList.add('no-shadow');
+  }
+
+  const innerDiv = breadcrumb.querySelector(':scope > div > div');
+  innerDiv.append(list);
+}
+
 export function loadBreadcrumb(main) {
   const breadcrumbBlock = buildBlock('breadcrumb', '');
   const breadcrumbWrapper = createTag('div');
@@ -454,6 +524,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    decorateBreadcrumb(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -495,7 +566,7 @@ async function loadLazy(doc) {
   }
 
   // breadcrumb setup
-  loadBreadcrumb(main);
+  // loadBreadcrumb(main);
   // sidebar + related style setup
   setUpSideNav(main, aside);
 

@@ -90,12 +90,12 @@ footer .new-footer {
   text-align: left;
 }
 
-.panel {
+.footer .panel {
   padding: 0 18px;
   overflow: hidden;
 }
 
-.panel:last-of-type {
+.footer .panel:last-of-type {
   border-bottom: var(--footer-footer-nav-title-section-border);
 }
 
