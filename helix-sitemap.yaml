@@ -1,0 +1,5 @@
+sitemaps:
+   example:
+     origin: https://www.aem.live
+     source: /query-index.json
+     destination: /sitemap.xml

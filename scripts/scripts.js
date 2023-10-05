@@ -597,6 +597,14 @@ async function loadPage(doc) {
   loadDelayed(doc);
 }
 
+/* disable redirect for now
+if (window.location.hostname === 'www.hlx.live') {
+  const url = `https://www.aem.live${window.location.pathname}${window.location.search}${window.location.hash}`;
+  // eslint-disable-next-line no-console
+  console.log(`redirecting to ${url}`);
+}
+*/
+
 loadPage(document);
 
 if (window.name.includes('performance')) {
