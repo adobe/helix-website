@@ -1,6 +1,6 @@
 window.hlx.initSidekick({
-  project: 'hlx',
+  project: 'www.aem.live',
   hlx3: true,
-  host: 'www.hlx.live',
+  host: 'www.aem.live',
   pushDownSelector: 'header',
 });
