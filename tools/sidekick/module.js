@@ -433,21 +433,26 @@
   /**
    * Recognizes a SharePoint URL.
    * @private
+   * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
    * @returns {boolean} {@code true} if URL is SharePoint, else {@code false}
    */
-  function isSharePoint(url) {
-    return /\w+\.sharepoint.com$/.test(url.host);
+  function isSharePoint(sk, url) {
+    const { host } = url;
+    const { config: { mountpoint } } = sk;
+    return /\w+\.sharepoint.com$/.test(host)
+      || (!host.endsWith('.google.com') && mountpoint && new URL(mountpoint).host === host);
   }
 
   /**
    * Recognizes a SharePoint document management URL.
    * @private
+   * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
    * @returns {boolean} {@code true} if URL is SharePoint DM, else {@code false}
    */
-  function isSharePointDM(url) {
-    return isSharePoint(url)
+  function isSharePointDM(sk, url) {
+    return isSharePoint(sk, url)
       && (url.pathname.endsWith('/Forms/AllItems.aspx')
       || url.pathname.endsWith('/onedrive.aspx'));
   }
@@ -455,11 +460,12 @@
   /**
    * Recognizes a SharePoint folder URL.
    * @private
+   * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
    * @returns {boolean} {@code true} if URL is SharePoint folder, else {@code false}
    */
-  function isSharePointFolder(url) {
-    if (isSharePointDM(url)) {
+  function isSharePointFolder(sk, url) {
+    if (isSharePointDM(sk, url)) {
       const docPath = new URLSearchParams(url.search).get('id');
       const dotIndex = docPath?.split('/').pop().indexOf('.');
       return [-1, 0].includes(dotIndex); // dot only allowed as first char
@@ -470,12 +476,13 @@
   /**
    * Recognizes a SharePoint editor URL.
    * @private
+   * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
    * @returns {boolean} {@code true} if URL is SharePoint editor, else {@code false}
    */
-  function isSharePointEditor(url) {
+  function isSharePointEditor(sk, url) {
     const { pathname, search } = url;
-    return isSharePoint(url)
+    return isSharePoint(sk, url)
       && pathname.match(/\/_layouts\/15\/[\w]+.aspx$/)
       && search.includes('sourcedoc=');
   }
@@ -483,11 +490,12 @@
   /**
    * Recognizes a SharePoint viewer URL.
    * @private
+   * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
    * @returns {boolean} {@code true} if URL is SharePoint viewer, else {@code false}
    */
-  function isSharePointViewer(url) {
-    if (isSharePointDM(url)) {
+  function isSharePointViewer(sk, url) {
+    if (isSharePointDM(sk, url)) {
       const docPath = new URLSearchParams(url.search).get('id');
       const dotIndex = docPath?.split('/').pop().lastIndexOf('.');
       return dotIndex > 0; // must contain a dot
@@ -706,6 +714,24 @@
   }
 
   /**
+   * Get resource URL from a url string.
+   * For custom views, resource is given by the path request parameter.
+   * @private
+   * @param {URL} url The url string
+   * @returns {URL} The resource URL
+   */
+  function getResourceURL(url) {
+    const { origin, search } = url;
+    // check for resource proxy url
+    const searchParams = new URLSearchParams(search);
+    const resource = searchParams.get('path');
+    if (resource) {
+      return new URL(resource, origin);
+    }
+    return url;
+  }
+
+  /**
    * Returns the location of the current document.
    * @private
    * @returns {Location} The location object
@@ -722,14 +748,8 @@
         return null;
       }
     }
-    const { origin, search } = url;
-    // check for resource proxy url
-    const searchParams = new URLSearchParams(search);
-    const resource = searchParams.get('path');
-    if (resource) {
-      return new URL(resource, origin);
-    }
-    return url;
+
+    return getResourceURL(url);
   }
 
   /**
@@ -744,7 +764,9 @@
     if ($test) {
       return $test.value !== location.href;
     }
-    return window.location.href !== location.href;
+
+    const href = getResourceURL(new URL(window.location.href)).toString();
+    return href !== location.href;
   }
 
   /**
@@ -1545,7 +1567,7 @@
       const { path, type } = item;
       const nameParts = path.split('.');
       let [file, ext] = nameParts;
-      if (isSharePointFolder(sk.location) && ext === 'docx') {
+      if (isSharePointFolder(sk, sk.location) && ext === 'docx') {
         // omit docx extension on sharepoint
         ext = '';
       }
@@ -1568,7 +1590,7 @@
 
     const getBulkSelection = () => {
       const { location } = sk;
-      if (isSharePointFolder(location)) {
+      if (isSharePointFolder(sk, location)) {
         const isGrid = document.querySelector('div[class~="ms-TilesList"]');
         return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
           .filter((row) => !row.querySelector('img')?.getAttribute('src').includes('/foldericons/')
@@ -1759,7 +1781,7 @@
       callback: (sidekick) => {
         const { location } = sk;
         const listener = () => window.setTimeout(() => updateBulkInfo(sidekick), 100);
-        const rootEl = document.querySelector(isSharePointFolder(location) ? '#appRoot' : 'body');
+        const rootEl = document.querySelector(isSharePointFolder(sk, location) ? '#appRoot' : 'body');
         if (rootEl) {
           rootEl.addEventListener('click', listener);
           rootEl.addEventListener('keyup', listener);
@@ -3152,7 +3174,7 @@
     isEditor() {
       const { config, location } = this;
       const { host } = location;
-      if (isSharePointEditor(location) || isSharePointViewer(location)) {
+      if (isSharePointEditor(this, location) || isSharePointViewer(this, location)) {
         return true;
       }
       if (host === 'docs.google.com') {
@@ -3170,7 +3192,7 @@
      */
     isAdmin() {
       const { location } = this;
-      return isSharePointFolder(location) || location.host === 'drive.google.com';
+      return isSharePointFolder(this, location) || location.host === 'drive.google.com';
     }
 
     /**
