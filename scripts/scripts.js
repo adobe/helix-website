@@ -348,9 +348,9 @@ export function cleanVariations(parent) {
   });
 }
 
-function buildEmbeds() {
+function buildEmbeds(main) {
   const embeds = [
-    ...document.querySelectorAll(
+    ...main.querySelectorAll(
       'a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]',
     ),
   ];
