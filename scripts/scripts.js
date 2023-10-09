@@ -402,6 +402,9 @@ function decorateBreadcrumb(main) {
     return;
   }
 
+  const existingBC = document.querySelector('.breadcrumb-wrapper');
+  if (existingBC) existingBC.remove();
+
   const wrapper = document.createElement('div');
   wrapper.classList.add('breadcrumb-wrapper');
 
@@ -530,10 +533,52 @@ async function loadEager(doc) {
   }
 }
 
+function setUpSoftNavigation() {
+  document.body.addEventListener('click', async (e) => {
+    const link = e.target.closest('a');
+    if (link && getMetadata('template') === 'guides') {
+      const { href } = link;
+      const hrefURL = new URL(href);
+      if (hrefURL.origin === window.location.origin) {
+        e.preventDefault();
+        try {
+          const resp = await fetch(href);
+          const html = await resp.text();
+          const dom = new DOMParser().parseFromString(html, 'text/html');
+          const main = dom.querySelector('main');
+          const template = dom.querySelector('meta[name="template"]');
+          if (template && template.getAttribute('content') === 'guides') {
+            await decorateMain(main);
+            await loadBlocks(main);
+            const currentMain = document.querySelector('main');
+            const children = [...currentMain.children].slice(2);
+            children.forEach((child) => child.remove());
+            while (main.firstElementChild) currentMain.append(main.firstElementChild);
+            const title = dom.querySelector('title').textContent;
+            const category = dom.querySelector('meta[name="category"').getAttribute('content');
+            document.querySelector('meta[name="category"]').setAttribute('content', category);
+            document.querySelector('meta[property="og:title"]').setAttribute('content', title);
+            document.querySelector('title').textContent = title;
+            decorateBreadcrumb(currentMain);
+            window.history.pushState({}, null, href);
+            link.closest('div > ul').querySelector('a.active').classList.remove('active');
+            link.classList.add('active');
+          } else {
+            window.location.href = href;
+          }
+        } catch {
+          window.location.href = href;
+        }
+      }
+    }
+  });
+}
+
 /**
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
+  setUpSoftNavigation();
   const main = doc.querySelector('main');
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
