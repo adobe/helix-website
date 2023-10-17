@@ -123,7 +123,7 @@ async function fgrep(pathname, pattern, type) {
 
 async function edit(path, y) {
   try {
-    const statusRes = await fetch(`https://admin.hlx.page/status/davidnuescheler/embrew/main${path}?editUrl=auto`);
+    const statusRes = await fetch(`https://admin.hlx.page/status/adobe/helix-website/main${path}?editUrl=auto`);
     const status = await statusRes.json();
     const editUrl = status.edit && status.edit.url;
     if (y) {
