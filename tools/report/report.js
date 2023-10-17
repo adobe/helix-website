@@ -183,7 +183,7 @@ function displayResult(result) {
         const [mediaHash] = match.substr(8).split('.');
         const existing = mediaDisplay.querySelector(`img[src*="${mediaHash}"]`);
         if (existing) {
-          const count = existing.querySelector('span.badge');
+          const count = existing.closest('div').querySelector('span.badge');
           count.textContent = +count.textContent + 1;
         } else {
           const mediaDiv = document.createElement('div');
@@ -325,7 +325,7 @@ export async function run() {
 
   await loadSitemap('/sitemap.xml');
   const type = document.getElementById('type').value;
-  document.body.classList.add(type);
+  document.body.className = type;
   const sitemap = sitemapURLs;
   let pattern = document.getElementById('input').value;
   let connections = 10;
