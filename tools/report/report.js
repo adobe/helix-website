@@ -183,8 +183,21 @@ function displayResult(result) {
         const [mediaHash] = match.substr(8).split('.');
         const existing = mediaDisplay.querySelector(`img[src*="${mediaHash}"]`);
         if (existing) {
-          const count = existing.closest('div').querySelector('span.badge');
+          const parent = existing.closest('div');
+          const count = parent.querySelector('span.badge');
           count.textContent = +count.textContent + 1;
+          let prev = parent.previousElementSibling;
+          while (prev) {
+            if (+prev.querySelector('span.badge').textContent > +count.textContent) {
+              break;
+            }
+            prev = prev.previousElementSibling;
+          }
+          if (!prev) {
+            mediaDisplay.prepend(parent);
+          } else {
+            prev.after(parent);
+          }
         } else {
           const mediaDiv = document.createElement('div');
           mediaDiv.append(img.cloneNode(true));
@@ -368,7 +381,8 @@ if (window.location.hostname.endsWith('.hlx.page')) {
 const type = document.getElementById('type');
 type.value = localStorage.getItem('content-report-type') || '';
 
-const typeParam = window.location.searchParams.get('type');
+const params = new URLSearchParams(window.location.search);
+const typeParam = params.get('type');
 
 if (typeParam) {
   const select = document.getElementById('type');
