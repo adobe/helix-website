@@ -1,0 +1,162 @@
+<html>
+    <head>
+        <title>fgrep</title>
+        <script type="module" src="report.js"></script>
+        <style>
+body, input {
+  background-color: black;
+  margin: 0;
+  padding: 2rem;
+  color: white;
+  font: 1.3rem Inconsolata, monospace;
+}
+
+::selection {
+  background: #0080FF;
+  text-shadow: none;
+}
+
+pre {
+  margin: 0;
+}
+
+a:any-link {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.edit::before {
+  content: '[edit]';
+}
+
+#controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+#input {
+  flex-grow: 1;
+}
+
+#exportLink {
+  display: none;
+}
+
+#results p {
+    margin: 0;
+    padding: 0.5rem;
+}
+
+#results img {
+  height: 100px;
+  width: 200px;
+  object-fit: contain;
+}
+
+#results p:nth-child(odd) {
+    background-color: #222;
+}
+
+.images #media {
+  display: grid;
+}
+
+.images #results {
+  display: none;
+}
+
+input {
+    padding: 5px 10px;
+    border: #222 2px solid;
+    width: 100%;
+    border-radius: 4px;
+}
+
+button {
+    vertical-align: top;
+    margin-right: 4px;
+    margin-top: 4px;
+    width: fit-content;
+    height: 30px;
+    display: inline-block;
+    background-color: #222;
+    color: white;
+    border: 0;
+    font: 1.3rem Inconsolata, monospace;
+}
+
+#media {
+  display: none;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 16px;
+}
+
+#media div {
+  position: relative;
+}
+
+#media img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+}
+
+#media .badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: red;
+  padding: 5px;
+  min-height: 32px;
+  min-width: 32px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+dialog {
+  background-color: black;
+  color: white;
+}
+
+</style>
+    </head>
+    <body>
+        <div id="controls">
+          <select id="type">
+            <option value="">(all)</option>
+            <option value="link">link</option>
+            <option value="meta">meta</option>
+            <option value="alt">alt</option>
+            <option value="images">images</option>
+          </select>
+          <input id="input" type="text" placeholder="class=&quot;card">
+          <button id="run">run</button>
+          <button id="export">export</button>
+          <a id="exportLink"></a>
+        </div>
+        <pre>
+        <div id="status"></div>
+        <div id="results">
+
+        </div>
+        </pre>
+        <div id="media">
+
+        </div>
+        <dialog id="media-details">
+          <div id="media-details-content"></div>
+          <button id="media-details-close">close</button>
+        </dialog>    
+    </body>
+</html>
