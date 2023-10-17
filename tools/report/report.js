@@ -153,7 +153,11 @@ function showMediaDetails(mediaHash) {
   results.forEach((res) => {
     const href = res.closest('p').querySelector('a').getAttribute('href');
     const p = document.createElement('p');
-    p.innerHTML = `<a href="${href}">${href}</a> [<a href="#${href}">edit</a>]`;
+    p.innerHTML = `<a href="${href}">${href}</a> <a class="edit" href="#${href}"></a>`;
+    const editLink = p.querySelector('a.edit');
+    editLink.addEventListener('click', () => {
+      edit(href, window.scrollY);
+    });
     dialogContent.append(p);
   });
   dialog.showModal();
