@@ -552,6 +552,7 @@ function setUpSoftNavigation() {
             await loadBlocks(main);
             const currentMain = document.querySelector('main');
             const children = [...currentMain.children].slice(2);
+            sampleRUM('leave');
             children.forEach((child) => child.remove());
             while (main.firstElementChild) currentMain.append(main.firstElementChild);
             const title = dom.querySelector('title').textContent;
