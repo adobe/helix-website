@@ -560,7 +560,11 @@ function setUpSoftNavigation() {
             document.querySelector('meta[property="og:title"]').setAttribute('content', title);
             document.querySelector('title').textContent = title;
             decorateBreadcrumb(currentMain);
+            const oldhref = window.location.href.pathname;
             window.history.pushState({}, null, href);
+            sampleRUM('enter', { source: 'softnav', target: oldhref });
+            sampleRUM.observe(currentMain.querySelectorAll('div[data-block-name]'));
+            sampleRUM.observe(currentMain.querySelectorAll('picture > img'));
             link.closest('div > ul').querySelector('a.active').classList.remove('active');
             link.classList.add('active');
           } else {
