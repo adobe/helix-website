@@ -6,6 +6,8 @@ sampleRUM('cwv');
 
 // add more delayed functionality here
 
+const preloaded = new Set();
+
 async function preloadPage(href) {
   const hrefURL = new URL(href);
   if (hrefURL.origin === window.location.origin) {
@@ -21,6 +23,52 @@ async function preloadPage(href) {
   }
 }
 
+const PADDING = 20; // extend trigger area by 20px around the link
+
+function getIsMouseOverForElement(el) {
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+
+  const rect = el.getBoundingClientRect();
+
+  const top = rect.top + scrollTop - PADDING;
+  const left = rect.left + scrollLeft - PADDING;
+  const bottom = rect.bottom + scrollTop + PADDING;
+  const right = rect.right + PADDING;
+
+  return (x, y) => {
+    const st = document.documentElement.scrollTop || document.body.scrollTop;
+    const sl = document.documentElement.scrollLeft || document.body.scrollLeft;
+
+    const xs = x + sl;
+    const ys = y + st;
+
+    if (xs >= left
+      && xs <= right
+      && ys >= top
+      && ys <= bottom) {
+      return el.href;
+    }
+    return null;
+  };
+}
+
+const linksIsMouseOver = [];
+
 document.querySelectorAll('.side-navigation a[href]').forEach((a) => {
-  preloadPage(a.href);
+  const isMouseOver = getIsMouseOverForElement(a);
+  linksIsMouseOver.push(isMouseOver);
+});
+
+document.addEventListener('mousemove', (e) => {
+  const x = e.clientX;
+  const y = e.clientY;
+
+  linksIsMouseOver.forEach((isMouseOver) => {
+    const href = isMouseOver(x, y);
+    if (href && !preloaded.has(href)) {
+      preloadPage(href);
+      preloaded.add(href);
+    }
+  });
 });
