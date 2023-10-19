@@ -166,6 +166,7 @@ function attachCopyButtonEventListener(
   container,
   blockRenderer,
   defaultLibraryMetadata,
+  sectionLibraryMetadata,
   pageMetadata,
 ) {
   const copyButton = removeAllEventListeners(container.querySelector('.content .copy-button'));
@@ -180,7 +181,8 @@ function attachCopyButtonEventListener(
 
     // Are we trying to copy a block, a page or default content?
     // The copy operation is slightly different depending on which
-    if (defaultLibraryMetadata.type === 'template' || defaultLibraryMetadata.multiSectionBlock || defaultLibraryMetadata.compoundBlock) {
+
+    if (defaultLibraryMetadata.type === 'template' || sectionLibraryMetadata.multiSectionBlock || sectionLibraryMetadata.compoundBlock) {
       copiedDOM = copyPageToClipboard(copyWrapper, copyBlockData.url, pageMetadata);
     } else if (blockRenderer.isBlock) {
       copiedDOM = copyBlockToClipboard(
@@ -202,6 +204,7 @@ function onBlockListCopyButtonClicked(event, container) {
     blockNameWithVariant: name,
     blockURL,
     defaultLibraryMetadata,
+    sectionLibraryMetadata,
     pageMetadata,
   } = event.detail;
 
@@ -212,7 +215,7 @@ function onBlockListCopyButtonClicked(event, container) {
   // We may not have rendered the block yet, so we need to check for a block to know if
   // we are dealing with a block or default content
   const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
-  if (defaultLibraryMetadata && (defaultLibraryMetadata.type === 'template' || defaultLibraryMetadata.multiSectionBlock || defaultLibraryMetadata.compoundBlock)) {
+  if (defaultLibraryMetadata && (defaultLibraryMetadata.type === 'template' || sectionLibraryMetadata.multiSectionBlock || sectionLibraryMetadata.compoundBlock)) {
     copiedDOM = copyPageToClipboard(wrapper, blockURL, pageMetadata);
   } else if (block) {
     copiedDOM = copyBlockToClipboard(wrapper, name, blockURL);
@@ -267,7 +270,13 @@ function loadBlock(event, container) {
   setURLParams([['path', blockData.path], ['index', event.detail.index]]);
 
   // Attach copy button event listener
-  attachCopyButtonEventListener(container, blockRenderer, defaultLibraryMetadata, undefined);
+  attachCopyButtonEventListener(
+    container,
+    blockRenderer,
+    defaultLibraryMetadata,
+    sectionLibraryMetadata,
+    undefined,
+  );
 
   // Track block view
   sampleRUM('library:blockviewed', { target: blockData.url });
@@ -279,6 +288,7 @@ function loadTemplate(event, container) {
     blockWrapper,
     blockData,
     defaultLibraryMetadata,
+    sectionLibraryMetadata,
     pageMetadata,
   } = event.detail;
 
@@ -310,7 +320,13 @@ function loadTemplate(event, container) {
   setURLParams([['path', blockData.path]], ['index']);
 
   // Attach copy button event listener
-  attachCopyButtonEventListener(container, blockRenderer, defaultLibraryMetadata, pageMetadata);
+  attachCopyButtonEventListener(
+    container,
+    blockRenderer,
+    defaultLibraryMetadata,
+    sectionLibraryMetadata,
+    pageMetadata,
+  );
 
   // Track block view
   sampleRUM('library:blockviewed', { target: blockData.url });
