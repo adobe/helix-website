@@ -536,7 +536,7 @@ async function loadEager(doc) {
 function setUpSoftNavigation() {
   document.body.addEventListener('click', async (e) => {
     const link = e.target.closest('a');
-    if (link && getMetadata('template') === 'guides') {
+    if (link && getMetadata('template') === 'guides' && e.target.closest('.side-navigation')) {
       const { href } = link;
       const hrefURL = new URL(href);
       if (hrefURL.origin === window.location.origin) {
