@@ -73,4 +73,10 @@ export default async function decorate(block) {
   json.forEach((release) => {
     block.append(createRelease(release));
   });
+  const link = document.createElement('link');
+  link.rel = 'alternate';
+  link.type = 'application/rss+xml';
+  link.title = 'AEM Releases';
+  link.href = `${url}?format=rss`;
+  document.head.append(link);
 }
