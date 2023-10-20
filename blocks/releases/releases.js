@@ -10,6 +10,14 @@ function mdToHTML(md) {
   return toHTML.trim(); // using trim method to remove whitespace
 }
 
+const displayNames = {
+  'helix-pipeline-service': 'Delivery Pipeline Service',
+  'helix-admin': 'Admin Service / API',
+  'helix-importer-ui': 'Content Importer Tooling',
+  'helix-cli': 'AEM Developer Command Line Interface',
+  'helix-sidekick-extension': 'AEM Authoring Sidekick',
+};
+
 function createRelease(release) {
   const div = document.createElement('div');
   const dateToReadable = (date) => {
@@ -44,14 +52,6 @@ function createRelease(release) {
     return (relativeTime);
   };
 
-  const displayNames = {
-    'helix-pipeline-service': 'Delivery Pipeline Service',
-    'helix-admin': 'Admin Service / API',
-    'helix-importer-ui': 'Content Importer Tooling',
-    'helix-cli': 'AEM Developer Command Line Interface',
-    'helix-sidekick-extension': 'AEM Authoring Sidekick',
-  };
-
   div.classList.add('release', `release-${release.repo}`);
   const readableDate = dateToReadable(new Date(release.published));
   const fullDate = readableDate ? `${readableDate} (${release.published})` : release.published;
@@ -68,11 +68,39 @@ function createRelease(release) {
 export default async function decorate(block) {
   const url = block.querySelector('a').href;
   block.textContent = '';
+  const releases = document.createElement('div');
+  const controls = document.createElement('div');
+  controls.classList.add('releases-controls');
+  Object.keys(displayNames).forEach((repo) => {
+    const control = document.createElement('div');
+    control.classList.add(`release-${repo}`, 'releases-control');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.name = 'repo';
+    cb.checked = true;
+    cb.value = repo;
+    cb.id = repo;
+    control.append(cb);
+    const label = document.createElement('label');
+    label.textContent = displayNames[repo];
+    label.labelFor = repo;
+    control.append(label);
+    controls.append(control);
+    control.addEventListener('click', () => {
+      cb.checked = !cb.checked;
+      releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
+      releases.classList.add('releases-results');
+    });
+  });
+  block.append(controls);
+  releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
+  releases.classList.add('releases-results');
   const resp = await fetch(url);
   const json = await resp.json();
   json.forEach((release) => {
-    block.append(createRelease(release));
+    releases.append(createRelease(release));
   });
+  block.append(releases);
   const link = document.createElement('link');
   link.rel = 'alternate';
   link.type = 'application/rss+xml';
