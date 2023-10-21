@@ -11,11 +11,11 @@ function mdToHTML(md) {
 }
 
 const displayNames = {
-  'helix-pipeline-service': 'Delivery Pipeline Service',
-  'helix-admin': 'Admin Service / API',
-  'helix-importer-ui': 'Content Importer Tooling',
-  'helix-cli': 'AEM Developer Command Line Interface',
-  'helix-sidekick-extension': 'AEM Authoring Sidekick',
+  'helix-pipeline-service': 'Delivery Pipeline',
+  'helix-admin': 'Admin API',
+  'helix-importer-ui': 'Content Importer',
+  'helix-cli': 'Command Line Interface',
+  'helix-sidekick-extension': 'Sidekick Extension',
 };
 
 function createRelease(release) {
