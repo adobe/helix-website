@@ -83,7 +83,7 @@ export default async function decorate(block) {
     control.append(cb);
     const label = document.createElement('label');
     label.textContent = displayNames[repo];
-    label.for = repo;
+    label.htmlFor = repo;
     control.append(label);
     controls.append(control);
     control.addEventListener('click', () => {
