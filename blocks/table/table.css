@@ -45,3 +45,7 @@ body main .table td p {
   padding-bottom: var(--spacing-xxs);
   color: var(--color-black);
 }
+
+.table thead + tbody tr:first-of-type td {
+  text-transform: none;
+}
