@@ -58,6 +58,13 @@ function createRelease(release) {
   const releaseBody = document.createElement('p');
   releaseBody.innerHTML = mdToHTML(release.body);
   releaseBody.querySelectorAll('h1, h2').forEach((h) => h.remove());
+  releaseBody.querySelectorAll('li').forEach((li) => {
+    if (!(li.previousElementSibling && li.previousElementSibling.tagName === 'UL')) {
+      li.before(document.createElement('ul'));
+    }
+    const ul = li.previousElementSibling;
+    ul.append(li);
+  });
 
   div.innerHTML = `<p class="releases-date">${fullDate}</p><h2>${displayNames[release.repo]} <a href="${release.url}">${release.tag}</a></h2>`;
 
