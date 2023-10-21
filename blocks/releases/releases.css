@@ -60,3 +60,7 @@
 .releases .release h2 {
     margin-top: 0;
 }
+
+.releases .releases-results[aria-hidden="true"] {
+    display: none;
+}

@@ -83,7 +83,7 @@ export default async function decorate(block) {
     control.append(cb);
     const label = document.createElement('label');
     label.textContent = displayNames[repo];
-    label.labelFor = repo;
+    label.for = repo;
     control.append(label);
     controls.append(control);
     control.addEventListener('click', () => {
@@ -95,6 +95,17 @@ export default async function decorate(block) {
   block.append(controls);
   releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
   releases.classList.add('releases-results');
+  releases.ariaHidden = true;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        releases.ariaHidden = false;
+        io.disconnect();
+      }
+    });
+  });
+  io.observe(block);
+
   const resp = await fetch(url);
   const json = await resp.json();
   json.forEach((release) => {
