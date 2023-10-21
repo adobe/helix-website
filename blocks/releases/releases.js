@@ -73,56 +73,54 @@ function createRelease(release) {
 }
 
 export default async function decorate(block) {
-  const url = block.querySelector('a').href;
-  block.textContent = '';
-  const releases = document.createElement('div');
-  const controls = document.createElement('div');
-  controls.classList.add('releases-controls');
-  Object.keys(displayNames).forEach((repo) => {
-    const control = document.createElement('div');
-    control.classList.add(`release-${repo}`, 'releases-control');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.name = 'repo';
-    cb.checked = true;
-    cb.value = repo;
-    cb.id = repo;
-    control.append(cb);
-    const label = document.createElement('label');
-    label.textContent = displayNames[repo];
-    label.htmlFor = repo;
-    control.append(label);
-    controls.append(control);
-    control.addEventListener('click', () => {
-      cb.checked = !cb.checked;
-      releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
-      releases.classList.add('releases-results');
-    });
-  });
-  block.append(controls);
-  releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
-  releases.classList.add('releases-results');
-  releases.ariaHidden = true;
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
+    entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
-        releases.ariaHidden = false;
         io.disconnect();
+        const url = block.querySelector('a').href;
+        block.textContent = '';
+        const releases = document.createElement('div');
+        const controls = document.createElement('div');
+        controls.classList.add('releases-controls');
+        Object.keys(displayNames).forEach((repo) => {
+          const control = document.createElement('div');
+          control.classList.add(`release-${repo}`, 'releases-control');
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.name = 'repo';
+          cb.checked = true;
+          cb.value = repo;
+          cb.id = repo;
+          control.append(cb);
+          const label = document.createElement('label');
+          label.textContent = displayNames[repo];
+          label.htmlFor = repo;
+          control.append(label);
+          controls.append(control);
+          control.addEventListener('click', () => {
+            cb.checked = !cb.checked;
+            releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
+            releases.classList.add('releases-results');
+          });
+        });
+        block.append(controls);
+        releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
+        releases.classList.add('releases-results');
+
+        const resp = await fetch(url);
+        const json = await resp.json();
+        json.forEach((release) => {
+          releases.append(createRelease(release));
+        });
+        block.append(releases);
+        const link = document.createElement('link');
+        link.rel = 'alternate';
+        link.type = 'application/rss+xml';
+        link.title = 'AEM Releases';
+        link.href = `${url}?format=rss`;
+        document.head.append(link);
       }
     });
   });
   io.observe(block);
-
-  const resp = await fetch(url);
-  const json = await resp.json();
-  json.forEach((release) => {
-    releases.append(createRelease(release));
-  });
-  block.append(releases);
-  const link = document.createElement('link');
-  link.rel = 'alternate';
-  link.type = 'application/rss+xml';
-  link.title = 'AEM Releases';
-  link.href = `${url}?format=rss`;
-  document.head.append(link);
 }
