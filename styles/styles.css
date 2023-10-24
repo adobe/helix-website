@@ -1993,6 +1993,7 @@ body.contact-template main .default-content-wrapper img {
   padding: 0 var(--header-container-tablet-x-padding);
   height: var(--breadcrumb-height);
   overflow: hidden; 
+  margin: auto;
 }
 
 .breadcrumb ul {

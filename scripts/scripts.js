@@ -348,9 +348,9 @@ export function cleanVariations(parent) {
   });
 }
 
-function buildEmbeds() {
+function buildEmbeds(main) {
   const embeds = [
-    ...document.querySelectorAll(
+    ...main.querySelectorAll(
       'a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]',
     ),
   ];
@@ -401,6 +401,9 @@ function decorateBreadcrumb(main) {
   if (!document.body.classList.contains('guides-template')) {
     return;
   }
+
+  const existingBC = document.querySelector('.breadcrumb-wrapper');
+  if (existingBC) existingBC.remove();
 
   const wrapper = document.createElement('div');
   wrapper.classList.add('breadcrumb-wrapper');
@@ -530,10 +533,57 @@ async function loadEager(doc) {
   }
 }
 
+function setUpSoftNavigation() {
+  document.body.addEventListener('click', async (e) => {
+    const link = e.target.closest('a');
+    if (link && getMetadata('template') === 'guides' && e.target.closest('.side-navigation')) {
+      const { href } = link;
+      const hrefURL = new URL(href);
+      if (hrefURL.origin === window.location.origin) {
+        e.preventDefault();
+        try {
+          const resp = await fetch(href);
+          const html = await resp.text();
+          const dom = new DOMParser().parseFromString(html, 'text/html');
+          const main = dom.querySelector('main');
+          const template = dom.querySelector('meta[name="template"]');
+          if (template && template.getAttribute('content') === 'guides') {
+            await decorateMain(main);
+            await loadBlocks(main);
+            const currentMain = document.querySelector('main');
+            const children = [...currentMain.children].slice(2);
+            sampleRUM('leave');
+            children.forEach((child) => child.remove());
+            while (main.firstElementChild) currentMain.append(main.firstElementChild);
+            const title = dom.querySelector('title').textContent;
+            const category = dom.querySelector('meta[name="category"').getAttribute('content');
+            document.querySelector('meta[name="category"]').setAttribute('content', category);
+            document.querySelector('meta[property="og:title"]').setAttribute('content', title);
+            document.querySelector('title').textContent = title;
+            decorateBreadcrumb(currentMain);
+            const oldhref = window.location.pathname;
+            window.history.pushState({}, null, href);
+            sampleRUM('enter', { source: 'softnav', target: oldhref });
+            sampleRUM.observe(currentMain.querySelectorAll('div[data-block-name]'));
+            sampleRUM.observe(currentMain.querySelectorAll('picture > img'));
+            link.closest('div > ul').querySelector('a.active').classList.remove('active');
+            link.classList.add('active');
+          } else {
+            window.location.href = href;
+          }
+        } catch {
+          window.location.href = href;
+        }
+      }
+    }
+  });
+}
+
 /**
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
+  setUpSoftNavigation();
   const main = doc.querySelector('main');
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
