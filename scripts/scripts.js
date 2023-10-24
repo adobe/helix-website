@@ -561,7 +561,7 @@ function setUpSoftNavigation() {
             document.querySelector('meta[property="og:title"]').setAttribute('content', title);
             document.querySelector('title').textContent = title;
             decorateBreadcrumb(currentMain);
-            const oldhref = window.location.href.pathname;
+            const oldhref = window.location.pathname;
             window.history.pushState({}, null, href);
             sampleRUM('enter', { source: 'softnav', target: oldhref });
             sampleRUM.observe(currentMain.querySelectorAll('div[data-block-name]'));
