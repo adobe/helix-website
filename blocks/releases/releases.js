@@ -1,3 +1,5 @@
+import { addAnchorLink } from '../../scripts/scripts.js';
+
 function mdToHTML(md) {
   const toHTML = md
     .replace(/^### (.*$)/gim, '<h3>$1</h3>') // h3 tag
@@ -67,7 +69,8 @@ function createRelease(release) {
     ul.append(li);
   });
 
-  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2>${displayNames[release.repo]} <a href="${release.url}">${release.tag}</a></h2>`;
+  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo]} <a href="${release.url}">${release.tag}</a></h2>`;
+  addAnchorLink(div.querySelector('h2'));
 
   div.append(releaseBody);
   return div;
