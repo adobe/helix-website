@@ -24,6 +24,10 @@
   margin-right: auto;
 }
 
+.side-navigation-wrapper.expand + .section.content {
+  display: none;
+}
+
 .side-navigation {
   width: 300px;
   border-radius: 16px;
@@ -465,6 +469,14 @@
     width: 300px;
     padding: 0;
     min-height: 80vh;
+  }
+
+  .side-navigation-wrapper + .section.content {
+    display: none;
+  }
+
+  .side-navigation-wrapper.ready + .section.content {
+    display: block;
   }
 
   .side-navigation-wrapper.expand {
