@@ -8,14 +8,12 @@
 
 .side-navigation-wrapper {
   width: auto;
-  display: none;
-  padding: var(--spacing-xxs) 0 0;
+  visibility: hidden;
   background: white;
-  min-height: 55px;
 }
 
 .side-navigation-wrapper.ready {
-  display: block;
+  visibility: visible;
 }
 
 .side-navigation-wrapper > div {

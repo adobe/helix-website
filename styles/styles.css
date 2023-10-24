@@ -281,6 +281,8 @@ body.appear {
 
 aside {
   min-height: 55px;
+  padding: var(--spacing-xxs) 0 0;
+  margin-bottom: var(--spacing-s);
 }
 
 @media screen and (min-width: 600px) {
@@ -1695,7 +1697,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper:first
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
-  margin: var(--spacing-s) auto;
+  margin: 0 auto var(--spacing-s) auto;
 }
 
 body.guides-template main.without-full-width-hero .default-content-wrapper img {
