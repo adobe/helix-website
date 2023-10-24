@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "Produktions-Host-Name (optional)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "Benutzerdefinierter Live-Hostname (optional)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "Inhalts-URL: https://…"
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "Benutzerdefinierter Vorschau-Hostname (optional)"
   },
   "config_manual_project_placeholder": {
     "message": "Projektname (optional)"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "Öffnet die Vorschau-URL für einen bestimmten GitHub-Zweig",
     "message": "Vorschau-URL öffnen"
+  },
+  "open_url": {
+    "message": "URL öffnen"
+  },
+  "open_urls": {
+    "message": "URLs öffnen"
+  },
+  "open_urls_confirm": {
+    "message": "Möchten Sie wirklich $1 URLs öffnen?"
   },
   "open_view_doc_source": {
     "message": "Dokumentenquelle anzeigen"

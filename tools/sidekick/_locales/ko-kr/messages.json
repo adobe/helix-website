@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "프로덕션 호스트 이름(선택 사항)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "사용자 정의 라이브 호스트 이름 (선택 사항)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "콘텐츠 URL: https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "사용자 정의 미리보기 호스트 이름 (선택 사항)"
   },
   "config_manual_project_placeholder": {
     "message": "프로젝트 이름(선택 사항)"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "지정된 GitHub 분기의 미리보기 URL을 엽니다.",
     "message": "미리보기 URL 열기"
+  },
+  "open_url": {
+    "message": "URL 열기"
+  },
+  "open_urls": {
+    "message": "URL 열기"
+  },
+  "open_urls_confirm": {
+    "message": "$1개 URL을 여시겠습니까?"
   },
   "open_view_doc_source": {
     "message": "문서 소스 보기"

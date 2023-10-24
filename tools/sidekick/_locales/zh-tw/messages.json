@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "生產主機名稱 (選擇性)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "自訂上線主機名稱 (選擇性)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "內容 URL：https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "自訂預覽主機名稱 (選擇性)"
   },
   "config_manual_project_placeholder": {
     "message": "專案名稱 (選擇性)"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "開啟給定 GitHub 分支的預覽 URL",
     "message": "開啟預覽 URL"
+  },
+  "open_url": {
+    "message": "開啟 URL"
+  },
+  "open_urls": {
+    "message": "開啟 URL"
+  },
+  "open_urls_confirm": {
+    "message": "您確定要開啟 $1 個 URL 嗎?"
   },
   "open_view_doc_source": {
     "message": "檢視文件來源"

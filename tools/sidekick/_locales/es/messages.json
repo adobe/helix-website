@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "Nombre de host de producción (opcional)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "Nombre de host activo personalizado (opcional)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "URL del contenido: https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "Nombre de host de previsualización personalizado (opcional)"
   },
   "config_manual_project_placeholder": {
     "message": "Nombre del proyecto (opcional)"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "Abra la URL de vista previa para una rama determinada de GitHub",
     "message": "Abrir URL de vista previa"
+  },
+  "open_url": {
+    "message": "Abrir URL"
+  },
+  "open_urls": {
+    "message": "Abrir direcciones URL"
+  },
+  "open_urls_confirm": {
+    "message": "¿Confirma que desea abrir las URL de $1?"
   },
   "open_view_doc_source": {
     "message": "Ver fuente del documento"

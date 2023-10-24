@@ -101,6 +101,10 @@
     "specialView": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique view ID"
+        },
         "path": {
           "type": "string",
           "description": "Open the special view on this path",
@@ -126,6 +130,13 @@
   "description": "Sidekick configuration",
   "type": "object",
   "properties": {
+    "extends": {
+      "type": "string",
+      "description": "Extend another project's sidekick configuration",
+      "examples": [
+        "hlxsites/foo"
+      ]
+    },
     "project": {
       "type": "string",
       "description": "The name of the project to display in the sidekick"
@@ -164,6 +175,10 @@
     "redirect": {
       "type": "url",
       "description": "Loads the sidekick configuration from a different URL"
+    },
+    "specialViews": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/specialView" }
     }
    },
    "additionalProperties": false

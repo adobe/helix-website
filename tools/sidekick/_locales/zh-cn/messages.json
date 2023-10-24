@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "生产主机名（可选）"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "自定义实时主机名（可选）"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "内容 URL：https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "自定义预览主机名（可选）"
   },
   "config_manual_project_placeholder": {
     "message": "项目名称（可选）"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "打开给定 GitHub 分支的预览 URL",
     "message": "打开预览 URL"
+  },
+  "open_url": {
+    "message": "打开 URL"
+  },
+  "open_urls": {
+    "message": "打开 URL"
+  },
+  "open_urls_confirm": {
+    "message": "是否确实要打开 $1 URL？"
   },
   "open_view_doc_source": {
     "message": "查看文档源"
