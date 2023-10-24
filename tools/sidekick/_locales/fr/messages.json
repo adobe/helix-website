@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "Nom d'hôte de production (facultatif)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "Nom d’hôte dynamique personnalisé (facultatif)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "URL du contenu : https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "Nom d’hôte d’aperçu personnalisé (facultatif)"
   },
   "config_manual_project_placeholder": {
     "message": "Nom du projet (facultatif)"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "Permet d'ouvrir l'URL d'aperçu d'une branche GitHub donnée.",
     "message": "Ouvrir l'URL d'aperçu"
+  },
+  "open_url": {
+    "message": "Ouvrir l’URL"
+  },
+  "open_urls": {
+    "message": "Ouvrir les URL"
+  },
+  "open_urls_confirm": {
+    "message": "Voulez-vous vraiment ouvrir les URL $1 ?"
   },
   "open_view_doc_source": {
     "message": "Afficher la source du document"

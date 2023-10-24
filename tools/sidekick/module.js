@@ -2122,6 +2122,7 @@
           sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
           sk.config = await initConfig(config, location);
           sk.config.authToken = window.hlx.sidekickConfig.authToken;
+          sk.config.authTokenExpiry = window.hlx.sidekickConfig.authTokenExpiry || 0;
           addCustomPlugins(sk);
           encourageLogin(sk, false);
           sk.fetchStatus();
@@ -2168,6 +2169,7 @@
         if (await checkProfileStatus(sk, 401)) {
           delete sk.status.profile;
           delete sk.config.authToken;
+          delete sk.config.authTokenExpiry;
           sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
           sk.fetchStatus();
           fireEvent(sk, 'loggedout');
@@ -2294,7 +2296,7 @@
         sk.remove('user-info');
         sk.remove('user-switch');
         sk.remove('user-logout');
-      });
+      }, { once: true });
     } else {
       updateUserPicture();
       // login
@@ -2310,10 +2312,75 @@
       // clean up on login
       sk.addEventListener('loggedin', () => {
         sk.remove('user-login');
-      });
+      }, { once: true });
       if (!sk.status.loggedOut && sk.status.status === 401 && !sk.isAuthenticated()) {
         // encourage login
         encourageLogin(sk, true);
+      }
+    }
+
+    const { authTokenExpiry } = sk.config;
+    if (authTokenExpiry) {
+      // alert user before and after token expiry
+      const now = Date.now();
+      if (authTokenExpiry > now && !sk.config.authTokenTimers) {
+        const showLoginDialog = (text) => {
+          const buttonGroup = createTag({
+            tag: 'span',
+            attrs: {
+              class: 'hlx-sk-modal-button-group',
+            },
+          });
+          buttonGroup.append(createTag({
+            tag: 'button',
+            text: i18n(sk, 'user_login'),
+            attrs: {
+              class: 'accent',
+            },
+            lstnrs: {
+              click: () => {
+                login(sk);
+              },
+            },
+          }));
+          buttonGroup.append(createTag({
+            tag: 'button',
+            text: i18n(sk, 'cancel'),
+            lstnrs: {
+              click: () => {
+                sk.hideModal();
+              },
+            },
+          }));
+          sk.showModal(
+            [text, buttonGroup],
+            true,
+          );
+        };
+
+        // alert user 1 second after token has expired
+        let delay = authTokenExpiry - now + 1000;
+        if (delay < 0) {
+          delay = 0;
+        }
+        window.setTimeout(async () => {
+          // fetch status and double check
+          sk.addEventListener('statusfetched', async ({ detail }) => {
+            const { data: status } = detail;
+            if (sk.config.authTokenExpiry === authTokenExpiry && status.status === 401) {
+              delete sk.config.authToken;
+              delete sk.config.authTokenExpiry;
+              delete sk.config.authTokenTimers;
+              showLoginDialog(i18n(sk, 'user_login_expired'));
+            } else if (sk.config.authTokenTimers) {
+              // clean up existing warning dialogs
+              sk.hideModal();
+              delete sk.config.authTokenTimers;
+            }
+          }, { once: true });
+          sk.fetchStatus();
+        }, delay);
+        sk.config.authTokenTimers = true;
       }
     }
   }

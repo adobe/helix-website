@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "実稼動ホスト名 (オプション)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "カスタムライブホスト名 (オプション)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "コンテンツ URL : https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "カスタムプレビューホスト名 (オプション)"
   },
   "config_manual_project_placeholder": {
     "message": "プロジェクト名 (オプション)"
@@ -449,6 +455,15 @@
   "open_preview": {
     "description": "特定の GitHub ブランチのプレビュー URL を開く",
     "message": "プレビュー URL を開く"
+  },
+  "open_url": {
+    "message": "URL を開く"
+  },
+  "open_urls": {
+    "message": "URL を開く"
+  },
+  "open_urls_confirm": {
+    "message": "$1 個の URL を開いてもよろしいですか？"
   },
   "open_view_doc_source": {
     "message": "ドキュメントソースを表示"
