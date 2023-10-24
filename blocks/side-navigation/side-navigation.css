@@ -8,19 +8,13 @@
 
 .side-navigation-wrapper {
   width: auto;
-  display: block;
+  display: none;
   padding: var(--spacing-xxs) 0 0;
   background: white;
   min-height: 55px;
 }
 
-.side-navigation-wrapper,
-.side-navigation-wrapper + .section.content {
-  display: none;
-}
-
-.side-navigation-wrapper.ready,
-.side-navigation-wrapper.ready + .section.content {
+.side-navigation-wrapper.ready {
   display: block;
 }
 
@@ -28,10 +22,6 @@
   max-width: var(--grid-mobile-container-width);
   margin-left: auto;
   margin-right: auto;
-}
-
-.side-navigation-wrapper.expand + .section.content {
-  display: none;
 }
 
 .side-navigation {
