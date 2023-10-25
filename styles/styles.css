@@ -280,7 +280,7 @@ body.appear {
 }
 
 aside {
-  min-height: 55px;
+  min-height: 75px;
   padding: var(--spacing-xxs) 0 0;
 }
 
