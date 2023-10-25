@@ -518,6 +518,11 @@ export function decorateMain(main) {
   decorateTitleSection(main);
 }
 
+function prepareSideNav(main) {
+  const aside = createTag('aside');
+  main.insertBefore(aside, main.querySelector('.section.content'));
+}
+
 /**
  * loads everything needed to get to LCP.
  */
@@ -528,6 +533,7 @@ async function loadEager(doc) {
   if (main) {
     decorateMain(main);
     decorateBreadcrumb(main);
+    prepareSideNav(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -585,8 +591,6 @@ function setUpSoftNavigation() {
 async function loadLazy(doc) {
   setUpSoftNavigation();
   const main = doc.querySelector('main');
-  const aside = createTag('aside');
-  main.insertBefore(aside, main.querySelector('.section.content'));
 
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
@@ -618,7 +622,7 @@ async function loadLazy(doc) {
   // breadcrumb setup
   // loadBreadcrumb(main);
   // sidebar + related style setup
-  setUpSideNav(main, aside);
+  setUpSideNav(main, main.querySelector('aside'));
 
   decorateGuideTemplateCodeBlock();
 
