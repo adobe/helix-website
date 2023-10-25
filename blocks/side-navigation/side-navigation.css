@@ -10,6 +10,7 @@
   width: auto;
   visibility: hidden;
   background: white;
+  padding-bottom: var(--spacing-xs);
 }
 
 .side-navigation-wrapper.ready {
