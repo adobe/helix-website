@@ -31,7 +31,7 @@ const AUDIENCES = {
   // define your custom audiences here as needed
 };
 
-window.hlx.plugins.add('/scripts/performance.js', {
+window.hlx.plugins.add('/plugins/performance.js', {
   condition: () => window.name.includes('performance'),
 });
 
@@ -683,9 +683,3 @@ if (window.location.hostname === 'www.hlx.live') {
 */
 
 loadPage(document);
-
-if (window.name.includes('performance')) {
-  import('./performance.js').then((mod) => {
-    if (mod.default) mod.default();
-  });
-}
