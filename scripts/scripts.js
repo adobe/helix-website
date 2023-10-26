@@ -12,6 +12,7 @@ import {
   loadBlock,
   loadCSS,
   loadScript,
+  getAllMetadata,
   getMetadata,
   decorateBlock,
 } from './lib-franklin.js';
@@ -24,8 +25,22 @@ import {
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
 
+const AUDIENCES = {
+  mobile: () => window.innerWidth < 600,
+  desktop: () => window.innerWidth >= 600,
+  // define your custom audiences here as needed
+};
+
 window.hlx.plugins.add('/scripts/performance.js', {
   condition: () => window.name.includes('performance'),
+});
+
+window.hlx.plugins.add('experience-decisioning', {
+  condition: () => getMetadata('experiment')
+    || Object.keys(getAllMetadata('campaign')).length
+    || Object.keys(getAllMetadata('audience')).length,
+  options: { audiences: AUDIENCES },
+  url: '/plugins/experience-decisioning/src/index.js',
 });
 
 // -------------  Custom functions ------------- //
@@ -621,15 +636,13 @@ async function loadLazy(doc) {
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
     doc.querySelector('footer').remove();
-    return;
+  } else {
+    // breadcrumb setup
+    // loadBreadcrumb(main);
+    // sidebar + related style setup
+    setUpSideNav(main, main.querySelector('aside'));
+    decorateGuideTemplateCodeBlock();
   }
-
-  // breadcrumb setup
-  // loadBreadcrumb(main);
-  // sidebar + related style setup
-  setUpSideNav(main, main.querySelector('aside'));
-
-  decorateGuideTemplateCodeBlock();
 
   window.hlx.plugins.run('loadLazy');
 

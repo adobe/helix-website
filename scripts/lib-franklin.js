@@ -205,6 +205,22 @@ export function toCamelCase(name) {
   return toClassName(name).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
+/**
+ * Gets all the metadata elements that are in the given scope.
+ * @param {String} scope The scope/prefix for the metadata
+ * @returns an array of HTMLElement nodes that match the given scope
+ */
+export function getAllMetadata(scope) {
+  return [...document.head.querySelectorAll(`meta[property^="${scope}:"],meta[name^="${scope}-"]`)]
+    .reduce((res, meta) => {
+      const id = toClassName(meta.name
+        ? meta.name.substring(scope.length + 1)
+        : meta.getAttribute('property').split(':')[1]);
+      res[id] = meta.getAttribute('content');
+      return res;
+    }, {});
+}
+
 const ICONS_CACHE = {};
 /**
  * Replace icons with inline SVG and prefix with codeBasePath.
@@ -777,6 +793,7 @@ function parsePluginParams(id, config) {
 // Define an execution context for plugins
 export const executionContext = {
   createOptimizedPicture,
+  getAllMetadata,
   getMetadata,
   decorateBlock,
   decorateButtons,
@@ -826,8 +843,8 @@ class PluginsRegistry {
           // If the plugin has a default export, it will be executed immediately
           const pluginApi = (await loadModule(
             key,
-            !plugin.url.endsWith('.js') ? `${plugin.url}/${key}.css` : null,
             !plugin.url.endsWith('.js') ? `${plugin.url}/${key}.js` : plugin.url,
+            !plugin.url.endsWith('.js') ? `${plugin.url}/${key}.css` : null,
             document,
             plugin.options,
             executionContext,
