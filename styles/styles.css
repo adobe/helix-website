@@ -280,9 +280,8 @@ body.appear {
 }
 
 aside {
-  min-height: 55px;
+  min-height: 75px;
   padding: var(--spacing-xxs) 0 0;
-  margin-bottom: var(--spacing-s);
 }
 
 @media screen and (min-width: 600px) {
