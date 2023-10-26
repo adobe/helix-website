@@ -9,6 +9,9 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+
+var storage = window.sessionStorage;
+
 function murmurhash3_32_gc(key, seed) {
   var remainder = key.length & 3;
   var bytes = key.length - remainder;
@@ -92,7 +95,7 @@ function assignTreatment(allocationPercentages, treatments) {
   return treatments[i];
 }
 function getLastExperimentTreatment(experimentId) {
-  var experimentsStr = localStorage.getItem(LOCAL_STORAGE_KEY);
+  var experimentsStr = storage.getItem(LOCAL_STORAGE_KEY);
   if (experimentsStr) {
       var experiments = JSON.parse(experimentsStr);
       if (experiments[experimentId]) {
@@ -102,7 +105,7 @@ function getLastExperimentTreatment(experimentId) {
   return null;
 }
 function setLastExperimentTreatment(experimentId, treatment) {
-  var experimentsStr = localStorage.getItem(LOCAL_STORAGE_KEY);
+  var experimentsStr = storage.getItem(LOCAL_STORAGE_KEY);
   var experiments = experimentsStr ? JSON.parse(experimentsStr) : {};
   var now = new Date();
   var expKeys = Object.keys(experiments);
@@ -114,7 +117,7 @@ function setLastExperimentTreatment(experimentId, treatment) {
   });
   var date = now.toISOString().split('T')[0];
   experiments[experimentId] = { treatment: treatment, date: date };
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(experiments));
+  storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(experiments));
 }
 function assignTreatmentByDevice(experimentId, allocationPercentages, treatments) {
   var cachedTreatmentId = getLastExperimentTreatment(experimentId);
@@ -173,6 +176,9 @@ function traverseDecisionTree(decisionNodesMap, context, currentNodeId) {
   }
 }
 function evaluateDecisionPolicy(decisionPolicy, context) {
+  if (context.storage && context.storage instanceof Storage) {
+    storage = context.storage;
+  }
   var decisionNodesMap = {};
   decisionPolicy.decisionNodes.forEach(function (item) {
       decisionNodesMap[item['id']] = item;
