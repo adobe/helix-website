@@ -24,6 +24,10 @@ import {
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
 
+window.hlx.plugins.add('/scripts/performance.js', {
+  condition: () => window.name.includes('performance'),
+});
+
 // -------------  Custom functions ------------- //
 
 /* set language in html tag for improving SEO accessibility */
@@ -531,6 +535,7 @@ async function loadEager(doc) {
   customDecorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    await window.hlx.plugins.run('loadEager');
     decorateMain(main);
     decorateBreadcrumb(main);
     prepareSideNav(main);
@@ -626,6 +631,8 @@ async function loadLazy(doc) {
 
   decorateGuideTemplateCodeBlock();
 
+  window.hlx.plugins.run('loadLazy');
+
   sampleRUM('lazy');
 }
 
@@ -635,7 +642,11 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
+  window.setTimeout(() => {
+    window.hlx.plugins.load('delayed');
+    window.hlx.plugins.run('loadDelayed');
+    return import('./delayed.js');
+  }, 3000);
   // load anything that can be postponed to the latest here
 }
 
@@ -643,11 +654,10 @@ function loadDelayed() {
  * Decorates the page.
  */
 async function loadPage(doc) {
-  // eslint-disable-next-line no-use-before-define
+  await window.hlx.plugins.load('eager');
   await loadEager(doc);
-  // eslint-disable-next-line no-use-before-define
+  await window.hlx.plugins.load('lazy');
   await loadLazy(doc);
-  // eslint-disable-next-line no-use-before-define
   loadDelayed(doc);
 }
 
