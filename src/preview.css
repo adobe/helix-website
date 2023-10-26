@@ -146,6 +146,8 @@
 .hlx-popup code {
   margin: 0;
   padding: 0;
+  background: inherit;
+  border: inherit;
   color: inherit;
   font-size: inherit;
   line-height: 1.5;
