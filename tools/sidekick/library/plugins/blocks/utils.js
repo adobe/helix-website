@@ -111,6 +111,11 @@ function getPreferedForegroundColor() {
     .getPropertyValue('--sk-table-fg-color') || '#ffffff';
 }
 
+export function getAuthorFriendlyName(name) {
+  return name.replace(/-/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+
 export function convertBlockToTable(block, name, path) {
   const url = new URL(path);
 
@@ -127,7 +132,7 @@ export function convertBlockToTable(block, name, path) {
   table.setAttribute('style', 'width:100%;');
 
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, name));
+  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, getAuthorFriendlyName(name)));
   table.append(headerRow);
   rows.forEach((row) => {
     const columns = [...row.children];
@@ -158,7 +163,7 @@ export function convertObjectToTable(name, object) {
   table.setAttribute('style', 'width:100%;');
 
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, name));
+  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, getAuthorFriendlyName(name)));
   table.append(headerRow);
 
   for (const [key, value] of Object.entries(object)) {
