@@ -33,6 +33,7 @@ const AUDIENCES = {
 
 window.hlx.plugins.add('/plugins/performance.js', {
   condition: () => window.name.includes('performance'),
+  load: 'eager',
 });
 
 window.hlx.plugins.add('experience-decisioning', {
@@ -40,6 +41,7 @@ window.hlx.plugins.add('experience-decisioning', {
     || Object.keys(getAllMetadata('campaign')).length
     || Object.keys(getAllMetadata('audience')).length,
   options: { audiences: AUDIENCES },
+  load: 'eager',
   url: '/plugins/experience-decisioning/src/index.js',
 });
 
