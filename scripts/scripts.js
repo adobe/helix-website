@@ -31,9 +31,10 @@ const AUDIENCES = {
   // define your custom audiences here as needed
 };
 
-window.hlx.plugins.add('/plugins/performance.js', {
+window.hlx.plugins.add('performance', {
   condition: () => window.name.includes('performance'),
   load: 'eager',
+  url: '/plugins/performance.js',
 });
 
 window.hlx.plugins.add('experience-decisioning', {
