@@ -512,23 +512,6 @@ export function buildBlock(blockName, content) {
 }
 
 /**
- * Gets the configuration for the given block, and also passes
- * the config through all custom patching helpers added to the project.
- *
- * @param {Element} block The block element
- * @returns {Object} The block config (blockName, cssPath and jsPath)
- */
-function getBlockConfig(block) {
-  const { blockName } = block.dataset;
-  const cssPath = `${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`;
-  const jsPath = `${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.js`;
-  const original = { blockName, cssPath, jsPath };
-  return (window.hlx.patchBlockConfig || [])
-    .filter((fn) => typeof fn === 'function')
-    .reduce((config, fn) => fn(config, original), { blockName, cssPath, jsPath });
-}
-
-/**
  * Loads JS and CSS for a module and executes it's default export.
  * @param {string} name The module name
  * @param {string} jsPath The JS file to load
@@ -556,6 +539,23 @@ async function loadModule(name, jsPath, cssPath, ...args) {
     : Promise.resolve();
   return Promise.all([cssLoaded, decorationComplete])
     .then(([, api]) => api);
+}
+
+/**
+ * Gets the configuration for the given block, and also passes
+ * the config through all custom patching helpers added to the project.
+ *
+ * @param {Element} block The block element
+ * @returns {Object} The block config (blockName, cssPath and jsPath)
+ */
+function getBlockConfig(block) {
+  const { blockName } = block.dataset;
+  const cssPath = `${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`;
+  const jsPath = `${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.js`;
+  const original = { blockName, cssPath, jsPath };
+  return (window.hlx.patchBlockConfig || [])
+    .filter((fn) => typeof fn === 'function')
+    .reduce((config, fn) => fn(config, original), { blockName, cssPath, jsPath });
 }
 
 /**

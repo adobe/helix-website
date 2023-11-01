@@ -37,13 +37,13 @@ window.hlx.plugins.add('performance', {
   url: '/plugins/performance.js',
 });
 
-window.hlx.plugins.add('experience-decisioning', {
+window.hlx.plugins.add('experimentation', {
   condition: () => getMetadata('experiment')
     || Object.keys(getAllMetadata('campaign')).length
     || Object.keys(getAllMetadata('audience')).length,
   options: { audiences: AUDIENCES },
   load: 'eager',
-  url: '/plugins/experience-decisioning/src/index.js',
+  url: '/plugins/experimentation/src/index.js',
 });
 
 // -------------  Custom functions ------------- //
@@ -551,9 +551,11 @@ function prepareSideNav(main) {
 async function loadEager(doc) {
   setLanguageForAccessibility('en');
   customDecorateTemplateAndTheme();
+
+  await window.hlx.plugins.run('loadEager');
+
   const main = doc.querySelector('main');
   if (main) {
-    await window.hlx.plugins.run('loadEager');
     decorateMain(main);
     decorateBreadcrumb(main);
     prepareSideNav(main);
@@ -657,10 +659,10 @@ async function loadLazy(doc) {
  * the user experience.
  */
 function loadDelayed() {
-  // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => {
     window.hlx.plugins.load('delayed');
     window.hlx.plugins.run('loadDelayed');
+    // eslint-disable-next-line import/no-cycle
     return import('./delayed.js');
   }, 3000);
   // load anything that can be postponed to the latest here
