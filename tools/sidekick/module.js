@@ -251,10 +251,10 @@
     'fr',
     'it',
     'ja',
-    'ko-kr',
-    'pt-br',
-    'zh-cn',
-    'zh-tw',
+    'ko',
+    'pt_BR',
+    'zh_CN',
+    'zh_TW',
   ];
 
   /**
@@ -529,7 +529,9 @@
    */
   function getLanguage() {
     return navigator.languages
-      .map((prefLang) => LANGS.find((lang) => prefLang.toLowerCase().startsWith(lang)))
+      .map((uLang) => LANGS
+        .find((lang) => ((uLang.replace('-', '_') === lang || lang.startsWith(uLang.split('-')[0]))
+          ? lang : undefined)))
       .filter((lang) => !!lang)[0] || LANGS[0];
   }
 

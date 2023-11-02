@@ -1,0 +1,577 @@
+{
+  "add": {
+    "message": "新增"
+  },
+  "admin_version": {
+    "message": "使用特定的管理員 API 版本"
+  },
+  "admin_version_placeholder": {
+    "message": "管理員版本：x.y.z"
+  },
+  "advanced": {
+    "description": "進階設定模式",
+    "message": "進階"
+  },
+  "anonymous": {
+    "message": "匿名"
+  },
+  "bulk_confirm_empty": {
+    "message": "未選取任何檔案"
+  },
+  "bulk_confirm_preview_multiple": {
+    "message": "您確定要產生 $1 個檔案的預覽嗎?"
+  },
+  "bulk_confirm_preview_single": {
+    "message": "您確定要產生此檔案的預覽嗎?"
+  },
+  "bulk_confirm_publish_multiple": {
+    "message": "您確定要發佈 $1 個檔案嗎?"
+  },
+  "bulk_confirm_publish_single": {
+    "message": "您確定要發佈此檔案嗎?"
+  },
+  "bulk_progress_preview_multiple": {
+    "message": "已產生 $1 個檔案 (共 $2 個檔案) 的預覽…"
+  },
+  "bulk_progress_publish_multiple": {
+    "message": "$1/$2 個檔案已發佈…"
+  },
+  "bulk_result_preview_multiple_failure": {
+    "message": "產生 $1 個檔案的預覽失敗："
+  },
+  "bulk_result_preview_multiple_success": {
+    "message": "已成功產生 $1 個檔案的預覽。"
+  },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "資料夾名稱中只允許使用標準化的小寫拉丁字母、數字和連字號"
+  },
+  "bulk_result_preview_single_error_no_docx": {
+    "message": "Microsoft Word 文件，請先轉換為 Google 文件"
+  },
+  "bulk_result_preview_single_error_no_xlsx": {
+    "message": "Microsoft Excel 文件，請先轉換為 Google 試算表"
+  },
+  "bulk_result_preview_single_failure": {
+    "message": "產生此檔案的預覽失敗："
+  },
+  "bulk_result_preview_single_success": {
+    "message": "已成功產生此檔案的預覽。"
+  },
+  "bulk_result_publish_multiple_failure": {
+    "message": "發佈 $1 個檔案失敗："
+  },
+  "bulk_result_publish_multiple_success": {
+    "message": "$1 個檔案已成功發佈。"
+  },
+  "bulk_result_publish_single_error_no_source": {
+    "message": "必須先預覽檔案"
+  },
+  "bulk_result_publish_single_failure": {
+    "message": "發佈 1 個檔案失敗："
+  },
+  "bulk_result_publish_single_success": {
+    "message": "1 個檔案已成功發佈。"
+  },
+  "bulk_selection_empty": {
+    "message": "在下方選取檔案"
+  },
+  "bulk_selection_multiple": {
+    "message": "已選取 $1 個檔案"
+  },
+  "bulk_selection_single": {
+    "message": "已選取 1 個檔案"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "caution_side_effects": {
+    "message": "警告：出現意外副作用！"
+  },
+  "close": {
+    "message": "關閉"
+  },
+  "config_add_no_mountpoint": {
+    "message": "專案已新增至 Sidekick，但是…\n\n擷取內容 URL 失敗，因此您還不能在編輯模式下使用 Sidekick。若要手動新增它，請按一下專案設定旁邊的「編輯」按鈕。"
+  },
+  "config_add_success": {
+    "message": "專案已新增至 Sidekick"
+  },
+  "config_backup": {
+    "message": "備份"
+  },
+  "config_delete": {
+    "message": "刪除"
+  },
+  "config_delete_all": {
+    "message": "刪除所有設定"
+  },
+  "config_delete_all_confirm": {
+    "message": "您是否要刪除所有設定?"
+  },
+  "config_delete_all_description": {
+    "message": "警告：此動作無法復原！"
+  },
+  "config_delete_confirm": {
+    "message": "您是否要刪除此專案?"
+  },
+  "config_development": {
+    "message": "開發"
+  },
+  "config_edit": {
+    "message": "編輯"
+  },
+  "config_export": {
+    "message": "匯出設定"
+  },
+  "config_export_description": {
+    "message": "將您的設定備份到電腦。"
+  },
+  "config_filter": {
+    "description": "篩選專案",
+    "message": "搜尋…"
+  },
+  "config_filter_clear": {
+    "description": "重設專案篩選器",
+    "message": "重設"
+  },
+  "config_import": {
+    "message": "匯入設定"
+  },
+  "config_import_confirm": {
+    "message": "您確定要匯入此設定並覆寫目前的設定嗎?"
+  },
+  "config_import_description": {
+    "message": "從您的電腦匯入設定。請確定您有目前設定的備份！"
+  },
+  "config_import_failure": {
+    "message": "匯入設定失敗。"
+  },
+  "config_import_success": {
+    "message": "設定已成功匯入"
+  },
+  "config_invalid_export": {
+    "message": "您還沒有任何可匯出的設定"
+  },
+  "config_invalid_giturl": {
+    "message": "存放庫 URL 無效"
+  },
+  "config_invalid_import": {
+    "message": "選擇要匯入的有效檔案"
+  },
+  "config_invalid_shareurl": {
+    "message": "共用 URL 無效"
+  },
+  "config_manual_devMode": {
+    "message": "在本機測試專案設定"
+  },
+  "config_manual_devOrigin_placeholder": {
+    "message": "本機開發 URL：http://localhost:3000"
+  },
+  "config_manual_giturl_placeholder": {
+    "message": "存放庫 URL：https://github.com/..."
+  },
+  "config_manual_host_placeholder": {
+    "message": "生產主機名稱 (選擇性)"
+  },
+  "config_manual_liveHost_placeholder": {
+    "message": "自訂上線主機名稱 (選擇性)"
+  },
+  "config_manual_mountpoints_placeholder": {
+    "message": "內容 URL：https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "自訂預覽主機名稱 (選擇性)"
+  },
+  "config_manual_project_placeholder": {
+    "message": "專案名稱 (選擇性)"
+  },
+  "config_manual_title": {
+    "message": "手動新增"
+  },
+  "config_picker_button_title": {
+    "message": "按 $1 以選取 $2"
+  },
+  "config_project_add": {
+    "message": "新增此專案"
+  },
+  "config_project_disable": {
+    "message": "停用此專案"
+  },
+  "config_project_empty": {
+    "message": "您尚未新增任何專案。"
+  },
+  "config_project_enable": {
+    "message": "啟用此專案"
+  },
+  "config_project_exists": {
+    "message": "此專案的設定已存在。"
+  },
+  "config_project_host": {
+    "message": "生產"
+  },
+  "config_project_innerhost": {
+    "message": "預覽"
+  },
+  "config_project_mountpoints": {
+    "message": "內容"
+  },
+  "config_project_pick": {
+    "message": "選取一個專案"
+  },
+  "config_project_pick_more": {
+    "description": "更多設定",
+    "message": "更多…"
+  },
+  "config_project_remove": {
+    "message": "移除此專案"
+  },
+  "config_projects": {
+    "message": "專案"
+  },
+  "config_reset": {
+    "message": "重設"
+  },
+  "config_share": {
+    "message": "共用"
+  },
+  "config_shareurl_copied": {
+    "message": "$1 的共用 URL 已複製到剪貼簿"
+  },
+  "config_shareurl_description": {
+    "message": "按一下右側的共用圖示，要求擁有 Sidekick 的人與您共用其 URL。"
+  },
+  "config_shareurl_placeholder": {
+    "message": "共用 URL：https://www.hlx.live/sidekick..."
+  },
+  "config_shareurl_share_title": {
+    "message": "$1 的 Sidekick 設定"
+  },
+  "config_shareurl_title": {
+    "message": "透過共用 URL 新增"
+  },
+  "config_toggle_menu": {
+    "message": "顯示/隱藏選單"
+  },
+  "config_unsupported_legacy": {
+    "message": "此網站不再受支援"
+  },
+  "config_ux": {
+    "message": "使用者體驗"
+  },
+  "copied_url": {
+    "message": "URL 已複製到剪貼簿。"
+  },
+  "copied_urls": {
+    "message": "URL 已複製到剪貼簿。"
+  },
+  "copy": {
+    "message": "複製"
+  },
+  "copy_live_url": {
+    "message": "複製即時 URL"
+  },
+  "copy_live_urls": {
+    "message": "複製即時 URL"
+  },
+  "copy_preview_url": {
+    "message": "複製預覽 URL"
+  },
+  "copy_preview_urls": {
+    "message": "複製預覽 URL"
+  },
+  "copy_prod_url": {
+    "message": "複製生產 URL"
+  },
+  "copy_prod_urls": {
+    "message": "複製生產 URL"
+  },
+  "copy_url": {
+    "message": "複製 URL"
+  },
+  "copy_urls": {
+    "message": "複製 URL"
+  },
+  "delete": {
+    "message": "刪除"
+  },
+  "delete_failure": {
+    "message": "刪除失敗。請稍後再試。"
+  },
+  "delete_file_confirm": {
+    "message": "您確定要刪除此檔案嗎?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "此檔案已不存在於存放庫中，刪除後就無法還原！\n\n您確定要刪除嗎?"
+  },
+  "delete_file_source_exists": {
+    "message": "此檔案仍然存在於存放庫中，因此無法刪除。"
+  },
+  "delete_file_success": {
+    "message": "檔案已成功刪除。"
+  },
+  "delete_page_confirm": {
+    "message": "您確定要刪除此頁面嗎?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "此頁面已沒有來源文件，刪除後就無法還原！\n\n您確定要刪除嗎?"
+  },
+  "delete_page_source_exists": {
+    "message": "此頁面仍有來源文件，因此無法刪除。"
+  },
+  "delete_page_success": {
+    "message": "頁面已成功刪除。"
+  },
+  "description": {
+    "message": "AEM Sidekick 可讓 AEM 網站的作者輕鬆預覽和發佈內容。"
+  },
+  "description_shortcut": {
+    "message": "切換 Sidekick"
+  },
+  "development": {
+    "message": "開發"
+  },
+  "docs": {
+    "message": "https://www.hlx.live/docs/sidekick"
+  },
+  "edit": {
+    "message": "編輯"
+  },
+  "edit_date": {
+    "message": "已編輯："
+  },
+  "error_config_failure": {
+    "message": "啟用設定失敗："
+  },
+  "error_login_aborted": {
+    "message": "登入已中止。"
+  },
+  "error_login_timeout": {
+    "message": "登入逾時。請稍後再試。"
+  },
+  "error_logout_error": {
+    "message": "登出失敗。請稍後再試。"
+  },
+  "error_preview_failure": {
+    "message": "預覽產生失敗。請稍後再試。"
+  },
+  "error_preview_not_gdoc_generic": {
+    "message": "預覽產生失敗。必須是 Google 文件或試算表。"
+  },
+  "error_preview_not_gdoc_ms_word": {
+    "message": "這是一份 Microsoft Word 文件。請將其轉換為 Google 文件：「檔案 > 儲存成 Google 文件」"
+  },
+  "error_preview_not_gsheet_ms_excel": {
+    "message": "這是一份 Microsoft Excel 文件。請將其轉換為 Google 試算表：「檔案 > 儲存為 Google 試算表」"
+  },
+  "error_status_404_content": {
+    "message": "404 找不到：請檢查您的 Sidekick 設定或 URL。"
+  },
+  "error_status_404_document": {
+    "message": "404 找不到：請檢查您的 Sidekick 設定，並確保已授予對此文件的存取權。"
+  },
+  "error_status_500": {
+    "message": "500 內部伺服器錯誤：擷取頁面狀態失敗。請稍後再試。"
+  },
+  "error_status_502": {
+    "message": "502 錯誤的閘道：擷取頁面狀態失敗。請稍後再試。"
+  },
+  "error_status_504": {
+    "message": "504 閘道逾時：擷取頁面狀態失敗。請稍後再試。"
+  },
+  "error_status_fatal": {
+    "message": "抱歉，我們目前似乎遇到問題。請在這裡查看更多資訊："
+  },
+  "error_status_invalid": {
+    "message": "伺服器回應無效。請檢查您的 Sidekick 設定或 URL。"
+  },
+  "extensions": {
+    "message": "擴充功能"
+  },
+  "help": {
+    "message": "說明"
+  },
+  "help_acknowledge": {
+    "message": "知道了！"
+  },
+  "help_close_acknowledge": {
+    "message": "不要再顯示說明主題"
+  },
+  "help_close_dismiss": {
+    "message": "稍後再顯示說明主題"
+  },
+  "help_close_opt_out": {
+    "message": "永不顯示任何說明主題"
+  },
+  "help_current": {
+    "message": "這個祕訣"
+  },
+  "help_next": {
+    "message": "下一個祕訣"
+  },
+  "help_opt_out": {
+    "message": "不要顯示任何說明"
+  },
+  "help_opt_out_alert": {
+    "message": "說明已關閉。您可以在「選項 > 使用者體驗」下方將其重新開啟。"
+  },
+  "help_previous": {
+    "message": "上一個祕訣"
+  },
+  "help_user_status": {
+    "message": "可用的說明主題"
+  },
+  "help_user_status_check_all": {
+    "description": "勾選所有說明主題",
+    "message": "全部勾選"
+  },
+  "help_user_status_description": {
+    "message": "勾選的主題將不再顯示。請移除您想要再次看到的主題旁邊的核取記號。"
+  },
+  "help_user_status_uncheck_all": {
+    "description": "取消勾選所有說明主題",
+    "message": "全部取消勾選"
+  },
+  "homepage": {
+    "message": "https://www.hlx.live/tools/sidekick/"
+  },
+  "info": {
+    "message": "資訊"
+  },
+  "json_view_description": {
+    "message": "使用者友好的資料轉譯。"
+  },
+  "live": {
+    "message": "即時"
+  },
+  "minutes_ago": {
+    "message": "$1 分鐘前"
+  },
+  "never": {
+    "message": "永不"
+  },
+  "now": {
+    "message": "現在"
+  },
+  "open_preview": {
+    "description": "開啟給定 GitHub 分支的預覽 URL",
+    "message": "開啟預覽 URL"
+  },
+  "open_url": {
+    "message": "開啟 URL"
+  },
+  "open_urls": {
+    "message": "開啟 URL"
+  },
+  "open_urls_confirm": {
+    "message": "您確定要開啟 $1 個 URL 嗎?"
+  },
+  "open_view_doc_source": {
+    "message": "檢視文件來源"
+  },
+  "please_wait": {
+    "message": "請稍候..."
+  },
+  "plugins_empty": {
+    "message": "找不到此頁面的動作"
+  },
+  "plugins_loading": {
+    "message": "正在載入動作…"
+  },
+  "preview": {
+    "message": "預覽"
+  },
+  "preview_config_success": {
+    "message": "設定已成功啟用。"
+  },
+  "preview_date": {
+    "message": "已預覽："
+  },
+  "preview_onedrive": {
+    "message": "專業祕訣：在產生預覽前按 Ctrl+S 可立即查看最新變更…"
+  },
+  "preview_onedrive_mac": {
+    "message": "專業祕訣：在產生預覽前按 ⌘+S 可立即查看最新變更…"
+  },
+  "production": {
+    "message": "生產"
+  },
+  "publish": {
+    "message": "發佈"
+  },
+  "publish_date": {
+    "message": "已發佈："
+  },
+  "publish_failure": {
+    "message": "發佈失敗。請稍後再試。"
+  },
+  "push_down_content": {
+    "message": "將內容下推而不是覆蓋"
+  },
+  "push_down_content_description": {
+    "message": "注意：根據網站的結構，這可能需要自訂專案設定才能如預期般運作。"
+  },
+  "reload": {
+    "message": "重新載入"
+  },
+  "reload_failure": {
+    "message": "重新載入失敗。請稍後再試。"
+  },
+  "save": {
+    "message": "儲存"
+  },
+  "seconds_ago": {
+    "message": "$1 秒前"
+  },
+  "share_description": {
+    "message": "共用您的 Sidekick"
+  },
+  "standard": {
+    "description": "標準設定模式",
+    "message": "標準"
+  },
+  "switch_view": {
+    "message": "檢視"
+  },
+  "title": {
+    "message": "AEM Sidekick"
+  },
+  "today_at": {
+    "message": "今天 $1"
+  },
+  "unpublish": {
+    "message": "取消發佈"
+  },
+  "unpublish_failure": {
+    "message": "取消發佈失敗。請稍後再試。"
+  },
+  "unpublish_page_confirm": {
+    "message": "您確定要取消發佈此頁面嗎?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "此頁面已沒有來源文件，取消發佈後就無法還原！\n\n您確定要取消發佈嗎?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "此頁面仍有來源文件，因此無法取消發佈。"
+  },
+  "unpublish_page_success": {
+    "message": "頁面已成功取消發佈。"
+  },
+  "user_login": {
+    "message": "登入"
+  },
+  "user_login_expired": {
+    "message": "您的工作階段已過期，請重新登入。"
+  },
+  "user_login_hint": {
+    "message": "您必須先登入才能使用 Sidekick。"
+  },
+  "user_logout": {
+    "message": "登出"
+  },
+  "user_switch": {
+    "message": "切換使用者"
+  },
+  "yesterday_at": {
+    "message": "昨天 $1"
+  }
+}

@@ -559,6 +559,9 @@
   "user_login": {
     "message": "Accedi"
   },
+  "user_login_expired": {
+    "message": "La sessione è scaduta. Accedi di nuovo."
+  },
   "user_login_hint": {
     "message": "Devi effettuare l’accesso prima di poter utilizzare Sidekick."
   },
