@@ -1,0 +1,580 @@
+{
+  "add": {
+    "message": "添加"
+  },
+  "admin_version": {
+    "message": "使用特定的管理员 API 版本"
+  },
+  "admin_version_placeholder": {
+    "message": "管理员版本：x.y.z"
+  },
+  "advanced": {
+    "description": "高级配置模式",
+    "message": "高级"
+  },
+  "anonymous": {
+    "message": "匿名"
+  },
+  "bulk_confirm_empty": {
+    "message": "未选中任何文件"
+  },
+  "bulk_confirm_preview_multiple": {
+    "message": "是否确实要生成 $1 个文件的预览？"
+  },
+  "bulk_confirm_preview_single": {
+    "message": "是否确实要生成此文件的预览？"
+  },
+  "bulk_confirm_publish_multiple": {
+    "message": "是否确定要发布 $1 个文件？"
+  },
+  "bulk_confirm_publish_single": {
+    "message": "是否确实要发布此文件？"
+  },
+  "bulk_progress_preview_multiple": {
+    "message": "已生成 $1 个文件（总共 $2 个文件）的预览..."
+  },
+  "bulk_progress_publish_multiple": {
+    "message": "$2 个文件中的 $1 个已发布..."
+  },
+  "bulk_result_preview_multiple_failure": {
+    "message": "无法生成 $1 个文件的预览："
+  },
+  "bulk_result_preview_multiple_success": {
+    "message": "已成功生成 $1 个文件的预览。"
+  },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "文件夹名称中只允许使用规范化的小写拉丁字母、数字和连字符"
+  },
+  "bulk_result_preview_single_error_no_docx": {
+    "message": "Microsoft Word 文件，先转换成 Google Docs"
+  },
+  "bulk_result_preview_single_error_no_xlsx": {
+    "message": "Microsoft Excel 文件，先转换成 Google Sheets"
+  },
+  "bulk_result_preview_single_failure": {
+    "message": "无法生成此文件的预览："
+  },
+  "bulk_result_preview_single_success": {
+    "message": "已成功生成此文件的预览。"
+  },
+  "bulk_result_publish_multiple_failure": {
+    "message": "未能发布 $1 个文件："
+  },
+  "bulk_result_publish_multiple_success": {
+    "message": "已成功发布 $1 个文件。"
+  },
+  "bulk_result_publish_single_error_no_source": {
+    "message": "必须先预览文件"
+  },
+  "bulk_result_publish_single_failure": {
+    "message": "未能发布 1 个文件："
+  },
+  "bulk_result_publish_single_success": {
+    "message": "已成功发布 1 个文件。"
+  },
+  "bulk_selection_empty": {
+    "message": "选择下面的文件"
+  },
+  "bulk_selection_multiple": {
+    "message": "已选中 $1 个文件"
+  },
+  "bulk_selection_single": {
+    "message": "已选中 1 个文件"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "caution_side_effects": {
+    "message": "注意：意外的副作用！"
+  },
+  "close": {
+    "message": "关闭"
+  },
+  "config_add_no_mountpoint": {
+    "message": "项目已添加到 Sidekick，但是...... \n\n检索内容 URL 失败，因此您还不能在编辑模式下使用 Sidekick。要手动添加它，请单击项目配置旁边的“编辑”按钮。"
+  },
+  "config_add_success": {
+    "message": "项目已添加到 Sidekick"
+  },
+  "config_backup": {
+    "message": "备份"
+  },
+  "config_delete": {
+    "message": "删除"
+  },
+  "config_delete_all": {
+    "message": "删除所有设置"
+  },
+  "config_delete_all_confirm": {
+    "message": "您真的要删除所有设置吗？"
+  },
+  "config_delete_all_description": {
+    "message": "注意：无法撤消此操作！"
+  },
+  "config_delete_confirm": {
+    "message": "您真的要删除这个项目吗？"
+  },
+  "config_development": {
+    "message": "开发"
+  },
+  "config_edit": {
+    "message": "编辑"
+  },
+  "config_export": {
+    "message": "导出配置"
+  },
+  "config_export_description": {
+    "message": "将您的配置备份到计算机。"
+  },
+  "config_filter": {
+    "description": "筛选项目",
+    "message": "搜索..."
+  },
+  "config_filter_clear": {
+    "description": "重置项目筛选器",
+    "message": "重置"
+  },
+  "config_import": {
+    "message": "导入配置"
+  },
+  "config_import_confirm": {
+    "message": "您真的要导入此配置并覆盖当前配置吗？"
+  },
+  "config_import_description": {
+    "message": "从您的计算机导入配置。确保您已备份当前的配置！"
+  },
+  "config_import_failure": {
+    "message": "无法导入配置"
+  },
+  "config_import_success": {
+    "message": "配置已成功导入"
+  },
+  "config_invalid_export": {
+    "message": "您还没有任何要导出的配置"
+  },
+  "config_invalid_giturl": {
+    "message": "无效的存储库 URL"
+  },
+  "config_invalid_import": {
+    "message": "选择要导入的有效文件"
+  },
+  "config_invalid_shareurl": {
+    "message": "共享 URL 无效"
+  },
+  "config_manual_devMode": {
+    "message": "在本地测试项目配置"
+  },
+  "config_manual_devOrigin_placeholder": {
+    "message": "本地开发 URL：http://localhost:3000"
+  },
+  "config_manual_giturl_placeholder": {
+    "message": "存储库 URL：https://github.com/..."
+  },
+  "config_manual_host_placeholder": {
+    "message": "生产主机名（可选）"
+  },
+  "config_manual_liveHost_placeholder": {
+    "message": "自定义实时主机名（可选）"
+  },
+  "config_manual_mountpoints_placeholder": {
+    "message": "内容 URL：https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "自定义预览主机名（可选）"
+  },
+  "config_manual_project_placeholder": {
+    "message": "项目名称（可选）"
+  },
+  "config_manual_title": {
+    "message": "手动添加"
+  },
+  "config_picker_button_title": {
+    "message": "按 $1 选择 $2"
+  },
+  "config_project_add": {
+    "message": "添加该项目"
+  },
+  "config_project_disable": {
+    "message": "禁用该项目"
+  },
+  "config_project_empty": {
+    "message": "您还没有添加任何项目。"
+  },
+  "config_project_enable": {
+    "message": "启用该项目"
+  },
+  "config_project_exists": {
+    "message": "对该项目的配置已存在。"
+  },
+  "config_project_host": {
+    "message": "生产"
+  },
+  "config_project_innerhost": {
+    "message": "预览"
+  },
+  "config_project_mountpoints": {
+    "message": "内容"
+  },
+  "config_project_pick": {
+    "message": "选择一个项目"
+  },
+  "config_project_pick_more": {
+    "description": "更多配置",
+    "message": "更多..."
+  },
+  "config_project_remove": {
+    "message": "删除该项目"
+  },
+  "config_projects": {
+    "message": "项目"
+  },
+  "config_reset": {
+    "message": "重置"
+  },
+  "config_share": {
+    "message": "共享"
+  },
+  "config_shareurl_copied": {
+    "message": "$1 的共享 URL 已复制到剪贴板"
+  },
+  "config_shareurl_description": {
+    "message": "单击右侧的共享图标，让拥有 Sidekick 的人与您共享其 URL。"
+  },
+  "config_shareurl_placeholder": {
+    "message": "Sharing URL：https://www.hlx.live/sidekick..."
+  },
+  "config_shareurl_share_title": {
+    "message": "$1 的 Sidekick 配置"
+  },
+  "config_shareurl_title": {
+    "message": "通过分享 URL 进行添加"
+  },
+  "config_toggle_menu": {
+    "message": "显示/隐藏菜单"
+  },
+  "config_unsupported_legacy": {
+    "message": "不再支持此网站"
+  },
+  "config_ux": {
+    "message": "用户体验"
+  },
+  "copied_url": {
+    "message": "URL 已复制到剪贴板。"
+  },
+  "copied_urls": {
+    "message": "URL 已复制到剪贴板。"
+  },
+  "copy": {
+    "message": "复制"
+  },
+  "copy_live_url": {
+    "message": "复制实时 URL"
+  },
+  "copy_live_urls": {
+    "message": "复制实时 URL"
+  },
+  "copy_preview_url": {
+    "message": "复制预览 URL"
+  },
+  "copy_preview_urls": {
+    "message": "复制预览 URL"
+  },
+  "copy_prod_url": {
+    "message": "复制生产 URL"
+  },
+  "copy_prod_urls": {
+    "message": "复制生产 URL"
+  },
+  "copy_url": {
+    "message": "复制 URL"
+  },
+  "copy_urls": {
+    "message": "复制 URL"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "delete_failure": {
+    "message": "删除失败。请稍后再试。"
+  },
+  "delete_file_confirm": {
+    "message": "是否确实要删除此文件？"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "存储库中已不存在此文件，删除后无法撤消！\n\n是否确实要删除它？"
+  },
+  "delete_file_source_exists": {
+    "message": "该文件仍然存在于存储库中并且无法删除。"
+  },
+  "delete_file_success": {
+    "message": "已成功删除文件。"
+  },
+  "delete_page_confirm": {
+    "message": "是否确实要删除此页面？"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "此页面不再有源文档，删除后无法撤消！\n\n是否确实要删除它？"
+  },
+  "delete_page_source_exists": {
+    "message": "该页面仍有源文档，因此无法删除。"
+  },
+  "delete_page_success": {
+    "message": "已成功删除页面。"
+  },
+  "description": {
+    "message": "AEM Sidekick 可使 AEM 网站的作者轻松预览和发布内容。"
+  },
+  "description_shortcut": {
+    "message": "切换 Sidekick"
+  },
+  "development": {
+    "message": "开发"
+  },
+  "docs": {
+    "message": "https://www.hlx.live/docs/sidekick"
+  },
+  "edit": {
+    "message": "编辑"
+  },
+  "edit_date": {
+    "message": "已编辑: "
+  },
+  "error_config_failure": {
+    "message": "无法激活配置："
+  },
+  "error_login_aborted": {
+    "message": "登录已中止。"
+  },
+  "error_login_timeout": {
+    "message": "登录超时。请稍后再试。"
+  },
+  "error_logout_error": {
+    "message": "注销失败。请稍后再试。"
+  },
+  "error_preview_failure": {
+    "message": "预览生成失败。请稍后重试。"
+  },
+  "error_preview_not_gdoc_generic": {
+    "message": "预览生成失败。必须是 Google 文档或电子表格。"
+  },
+  "error_preview_not_gdoc_ms_word": {
+    "message": "这是一份 Microsoft Word 文件。请将其转换为 Google Docs：文件 > 另存为 Google Docs"
+  },
+  "error_preview_not_gsheet_ms_excel": {
+    "message": "这是一份 Microsoft Excel 文件。请将其转换为 Google Sheets：文件 > 另存为 Google Sheets"
+  },
+  "error_status_404_content": {
+    "message": "404 未找到：请检查您的 Sidekick 配置或 URL。"
+  },
+  "error_status_404_document": {
+    "message": "404 未找到：检查您的 Sidekick 配置并确保已授予对该文档的访问权限。"
+  },
+  "error_status_500": {
+    "message": "500 内部服务器错误：获取页面状态失败。请稍后再试。"
+  },
+  "error_status_502": {
+    "message": "502 错误的网关：获取页面状态失败。请稍后再试。"
+  },
+  "error_status_504": {
+    "message": "504 网关超时：获取页面状态失败。请稍后再试。"
+  },
+  "error_status_fatal": {
+    "message": "抱歉，我们目前似乎遇到了问题。请在此处查看更多信息："
+  },
+  "error_status_invalid": {
+    "message": "服务器响应无效。检查您的 Sidekick 配置或 URL。"
+  },
+  "extensions": {
+    "message": "扩展"
+  },
+  "help": {
+    "message": "帮助"
+  },
+  "help_acknowledge": {
+    "message": "明白了！"
+  },
+  "help_close_acknowledge": {
+    "message": "不再显示帮助主题"
+  },
+  "help_close_dismiss": {
+    "message": "稍后显示帮助主题"
+  },
+  "help_close_opt_out": {
+    "message": "从不显示任何帮助主题"
+  },
+  "help_current": {
+    "message": "该提示"
+  },
+  "help_next": {
+    "message": "下一个提示"
+  },
+  "help_opt_out": {
+    "message": "不显示任何帮助"
+  },
+  "help_opt_out_alert": {
+    "message": "帮助已关闭。您可以在“选项”>“用户体验”下将其重新打开。"
+  },
+  "help_previous": {
+    "message": "上一提示"
+  },
+  "help_user_status": {
+    "message": "可用的帮助主题"
+  },
+  "help_user_status_check_all": {
+    "description": "检查所有帮助主题",
+    "message": "选择所有"
+  },
+  "help_user_status_description": {
+    "message": "选中的主题将不再显示。移除您希望再次看到的主题旁边的复选标记。"
+  },
+  "help_user_status_uncheck_all": {
+    "description": "取消选择所有帮助主题",
+    "message": "取消选择所有"
+  },
+  "homepage": {
+    "message": "https://www.hlx.live/tools/sidekick/"
+  },
+  "info": {
+    "message": "信息"
+  },
+  "json_view_description": {
+    "message": "用户友好型数据呈现。"
+  },
+  "live": {
+    "message": "实时"
+  },
+  "minutes_ago": {
+    "message": "$1 分钟前"
+  },
+  "never": {
+    "message": "无"
+  },
+  "now": {
+    "message": "现在"
+  },
+  "open_preview": {
+    "description": "打开给定 GitHub 分支的预览 URL",
+    "message": "打开预览 URL"
+  },
+  "open_url": {
+    "message": "打开 URL"
+  },
+  "open_urls": {
+    "message": "打开 URL"
+  },
+  "open_urls_confirm": {
+    "message": "是否确实要打开 $1 URL？"
+  },
+  "open_view_doc_source": {
+    "message": "查看文档源"
+  },
+  "view_doc_source_copied": {
+    "message": "Copied!"
+  },
+  "please_wait": {
+    "message": "请稍候..."
+  },
+  "plugins_empty": {
+    "message": "未找到此页面的任何操作"
+  },
+  "plugins_loading": {
+    "message": "正在加载操作..."
+  },
+  "preview": {
+    "message": "预览"
+  },
+  "preview_config_success": {
+    "message": "配置已成功激活。"
+  },
+  "preview_date": {
+    "message": "已预览："
+  },
+  "preview_onedrive": {
+    "message": "专业提示：在生成预览前按 Ctrl + S 可立即查看最新更改..."
+  },
+  "preview_onedrive_mac": {
+    "message": "专业提示：在生成预览前按 ⌘ + S 可立即查看最新更改..."
+  },
+  "production": {
+    "message": "生产"
+  },
+  "publish": {
+    "message": "发布"
+  },
+  "publish_date": {
+    "message": "已发布："
+  },
+  "publish_failure": {
+    "message": "发布失败。请稍后再试。"
+  },
+  "push_down_content": {
+    "message": "下推内容而不是覆盖内容"
+  },
+  "push_down_content_description": {
+    "message": "注意：根据站点的结构，这可能需要自定义项目配置才能按预期工作。"
+  },
+  "reload": {
+    "message": "重新加载"
+  },
+  "reload_failure": {
+    "message": "重新加载失败。请稍后再试。"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "seconds_ago": {
+    "message": "$1 秒前"
+  },
+  "share_description": {
+    "message": "分享您的 Sidekick"
+  },
+  "standard": {
+    "description": "标准配置模式",
+    "message": "标准"
+  },
+  "switch_view": {
+    "message": "查看"
+  },
+  "title": {
+    "message": "AEM Sidekick"
+  },
+  "today_at": {
+    "message": "今天 $1"
+  },
+  "unpublish": {
+    "message": "取消发布"
+  },
+  "unpublish_failure": {
+    "message": "取消发布失败。请稍后再试。"
+  },
+  "unpublish_page_confirm": {
+    "message": "是否确实要取消发布此页面？"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "此页面不再有源文档，取消发布后无法撤消！\n\n是否确实要取消发布它？"
+  },
+  "unpublish_page_source_exists": {
+    "message": "该页面仍有源文档，因此无法取消发布。"
+  },
+  "unpublish_page_success": {
+    "message": "已成功取消发布页面。"
+  },
+  "user_login": {
+    "message": "登录"
+  },
+  "user_login_expired": {
+    "message": "您的会话已过期，请重新登录。"
+  },
+  "user_login_hint": {
+    "message": "您需要先登录才能使用 Sidekick。"
+  },
+  "user_logout": {
+    "message": "注销"
+  },
+  "user_switch": {
+    "message": "切换用户"
+  },
+  "yesterday_at": {
+    "message": "昨天 $1"
+  }
+}

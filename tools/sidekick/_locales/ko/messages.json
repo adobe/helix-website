@@ -1,0 +1,580 @@
+{
+  "add": {
+    "message": "추가"
+  },
+  "admin_version": {
+    "message": "특정 관리 API 버전 사용"
+  },
+  "admin_version_placeholder": {
+    "message": "관리 버전: x.y.z"
+  },
+  "advanced": {
+    "description": "고급 구성 모드",
+    "message": "고급"
+  },
+  "anonymous": {
+    "message": "익명"
+  },
+  "bulk_confirm_empty": {
+    "message": "선택한 파일 없음"
+  },
+  "bulk_confirm_preview_multiple": {
+    "message": "$1개 파일에 대한 미리보기를 생성시겠습니까?"
+  },
+  "bulk_confirm_preview_single": {
+    "message": "이 파일에 대한 미리보기를 생성시겠습니까?"
+  },
+  "bulk_confirm_publish_multiple": {
+    "message": "$1개 파일을 게시하시겠습니까?"
+  },
+  "bulk_confirm_publish_single": {
+    "message": "이 파일을 게시하시겠습니까?"
+  },
+  "bulk_progress_preview_multiple": {
+    "message": "생성된 파일 $2개 중 $1개 미리보기..."
+  },
+  "bulk_progress_publish_multiple": {
+    "message": "$2개 파일 중 $1개 게시됨..."
+  },
+  "bulk_result_preview_multiple_failure": {
+    "message": "$1개 파일 미리보기 생성 실패:"
+  },
+  "bulk_result_preview_multiple_success": {
+    "message": "$1개 파일의 미리보기가 정상적으로 생성되었습니다."
+  },
+  "bulk_result_preview_single_error_invalid_folder_name": {
+    "message": "폴더 이름에는 정규화된 소문자 라틴 문자, 숫자 및 하이픈만 사용할 수 있습니다."
+  },
+  "bulk_result_preview_single_error_no_docx": {
+    "message": "Microsoft Word 문서입니다. 먼저 Google Docs로 변환하십시오."
+  },
+  "bulk_result_preview_single_error_no_xlsx": {
+    "message": "Microsoft Excel 문서입니다. 먼저 Google Sheets로 변환하십시오."
+  },
+  "bulk_result_preview_single_failure": {
+    "message": "다음 파일 미리보기 생성 실패:"
+  },
+  "bulk_result_preview_single_success": {
+    "message": "이 파일의 미리보기가 정상적으로 생성되었습니다."
+  },
+  "bulk_result_publish_multiple_failure": {
+    "message": "$1개 파일 게시 실패:"
+  },
+  "bulk_result_publish_multiple_success": {
+    "message": "$1개 파일이 정상적으로 게시되었습니다."
+  },
+  "bulk_result_publish_single_error_no_source": {
+    "message": "먼저 파일을 미리 보아야 합니다."
+  },
+  "bulk_result_publish_single_failure": {
+    "message": "1개 파일 게시 실패:"
+  },
+  "bulk_result_publish_single_success": {
+    "message": "1개 파일이 정상적으로 게시되었습니다."
+  },
+  "bulk_selection_empty": {
+    "message": "아래에서 파일 선택"
+  },
+  "bulk_selection_multiple": {
+    "message": "$1개 파일 선택됨"
+  },
+  "bulk_selection_single": {
+    "message": "1개 파일 선택됨"
+  },
+  "cancel": {
+    "message": "취소"
+  },
+  "caution_side_effects": {
+    "message": "경고: 예기치 않은 부작용이 발생할 수 있습니다."
+  },
+  "close": {
+    "message": "닫기"
+  },
+  "config_add_no_mountpoint": {
+    "message": "Sidekick에 프로젝트가 추가되었지만 콘텐츠 URL 검색에 실패하여 아직 편집 모드에서 Sidekick을 사용할 수 없습니다. 수동으로 추가하려면 프로젝트 구성 옆에 있는 [편집] 버튼을 클릭하십시오."
+  },
+  "config_add_success": {
+    "message": "Sidekick에 프로젝트 추가됨"
+  },
+  "config_backup": {
+    "message": "백업"
+  },
+  "config_delete": {
+    "message": "삭제"
+  },
+  "config_delete_all": {
+    "message": "모든 설정 삭제"
+  },
+  "config_delete_all_confirm": {
+    "message": "모든 설정을 삭제하시겠습니까?"
+  },
+  "config_delete_all_description": {
+    "message": "경고: 이 작업은 실행 취소할 수 없습니다."
+  },
+  "config_delete_confirm": {
+    "message": "이 프로젝트를 삭제하시겠습니까?"
+  },
+  "config_development": {
+    "message": "개발"
+  },
+  "config_edit": {
+    "message": "편집"
+  },
+  "config_export": {
+    "message": "구성 내보내기"
+  },
+  "config_export_description": {
+    "message": "구성을 컴퓨터에 백업합니다."
+  },
+  "config_filter": {
+    "description": "프로젝트 필터링",
+    "message": "검색 ..."
+  },
+  "config_filter_clear": {
+    "description": "프로젝트 필터 재설정",
+    "message": "재설정"
+  },
+  "config_import": {
+    "message": "구성 가져오기"
+  },
+  "config_import_confirm": {
+    "message": "이 구성을 가져와서 현재 구성을 덮어쓰시겠습니까?"
+  },
+  "config_import_description": {
+    "message": "컴퓨터에서 구성을 가져옵니다. 현재 구성의 백업이 있는지 확인하십시오."
+  },
+  "config_import_failure": {
+    "message": "구성 가져오기 실패"
+  },
+  "config_import_success": {
+    "message": "구성 가져오기 성공"
+  },
+  "config_invalid_export": {
+    "message": "아직 내보낼 구성이 없습니다."
+  },
+  "config_invalid_giturl": {
+    "message": "잘못된 저장소 URL"
+  },
+  "config_invalid_import": {
+    "message": "가져올 올바른 파일 선택"
+  },
+  "config_invalid_shareurl": {
+    "message": "잘못된 공유 URL"
+  },
+  "config_manual_devMode": {
+    "message": "로컬에서 프로젝트 구성 테스트"
+  },
+  "config_manual_devOrigin_placeholder": {
+    "message": "로컬 개발 URL: http://localhost:3000"
+  },
+  "config_manual_giturl_placeholder": {
+    "message": "저장소 URL: https://github.com/..."
+  },
+  "config_manual_host_placeholder": {
+    "message": "프로덕션 호스트 이름(선택 사항)"
+  },
+  "config_manual_liveHost_placeholder": {
+    "message": "사용자 정의 라이브 호스트 이름 (선택 사항)"
+  },
+  "config_manual_mountpoints_placeholder": {
+    "message": "콘텐츠 URL: https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "사용자 정의 미리보기 호스트 이름 (선택 사항)"
+  },
+  "config_manual_project_placeholder": {
+    "message": "프로젝트 이름(선택 사항)"
+  },
+  "config_manual_title": {
+    "message": "수동 추가"
+  },
+  "config_picker_button_title": {
+    "message": "$1을(를) 눌러 $2 선택"
+  },
+  "config_project_add": {
+    "message": "이 프로젝트 추가"
+  },
+  "config_project_disable": {
+    "message": "이 프로젝트 비활성화"
+  },
+  "config_project_empty": {
+    "message": "아직 프로젝트를 추가하지 않았습니다."
+  },
+  "config_project_enable": {
+    "message": "이 프로젝트 활성화"
+  },
+  "config_project_exists": {
+    "message": "이 프로젝트에 대한 구성이 이미 있습니다."
+  },
+  "config_project_host": {
+    "message": "프로덕션"
+  },
+  "config_project_innerhost": {
+    "message": "미리보기"
+  },
+  "config_project_mountpoints": {
+    "message": "콘텐츠"
+  },
+  "config_project_pick": {
+    "message": "프로젝트 선택"
+  },
+  "config_project_pick_more": {
+    "description": "추가 구성",
+    "message": "더 보기..."
+  },
+  "config_project_remove": {
+    "message": "이 프로젝트 제거"
+  },
+  "config_projects": {
+    "message": "프로젝트"
+  },
+  "config_reset": {
+    "message": "재설정"
+  },
+  "config_share": {
+    "message": "공유"
+  },
+  "config_shareurl_copied": {
+    "message": "$1에 대한 공유 URL이 클립보드에 정상적으로 복사되었습니다."
+  },
+  "config_shareurl_description": {
+    "message": "오른쪽에 있는 공유 아이콘을 클릭하여 Sidekick을 보유한 사용자에게 URL을 공유하도록 요청합니다."
+  },
+  "config_shareurl_placeholder": {
+    "message": "공유 URL: https://www.hlx.live/sidekick..."
+  },
+  "config_shareurl_share_title": {
+    "message": "$1에 대한 Sidekick 구성"
+  },
+  "config_shareurl_title": {
+    "message": "공유 URL을 통해 추가"
+  },
+  "config_toggle_menu": {
+    "message": "메뉴 표시/숨기기"
+  },
+  "config_unsupported_legacy": {
+    "message": "이 사이트는 더 이상 지원되지 않습니다."
+  },
+  "config_ux": {
+    "message": "사용자 경험"
+  },
+  "copied_url": {
+    "message": "URL이 클립보드에 복사되었습니다."
+  },
+  "copied_urls": {
+    "message": "URL이 클립보드에 복사되었습니다."
+  },
+  "copy": {
+    "message": "복사"
+  },
+  "copy_live_url": {
+    "message": "라이브 URL 복사"
+  },
+  "copy_live_urls": {
+    "message": "라이브 URL 복사"
+  },
+  "copy_preview_url": {
+    "message": "미리보기 URL 복사"
+  },
+  "copy_preview_urls": {
+    "message": "미리보기 URL 복사"
+  },
+  "copy_prod_url": {
+    "message": "프로덕션 URL 복사"
+  },
+  "copy_prod_urls": {
+    "message": "프로덕션 URL 복사"
+  },
+  "copy_url": {
+    "message": "URL 복사"
+  },
+  "copy_urls": {
+    "message": "URL 복사"
+  },
+  "delete": {
+    "message": "삭제"
+  },
+  "delete_failure": {
+    "message": "삭제하지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "delete_file_confirm": {
+    "message": "이 파일을 삭제하시겠습니까?"
+  },
+  "delete_file_no_source_confirm": {
+    "message": "이 파일은 더 이상 ​​저장소에 없으며 삭제하면 되돌릴 수 없습니다.\n\n삭제하시겠습니까?"
+  },
+  "delete_file_source_exists": {
+    "message": "이 파일은 ​​저장소에 있으므로 삭제할 수 없습니다."
+  },
+  "delete_file_success": {
+    "message": "파일이 정상적으로 삭제되었습니다."
+  },
+  "delete_page_confirm": {
+    "message": "이 페이지를 삭제하시겠습니까?"
+  },
+  "delete_page_no_source_confirm": {
+    "message": "이 페이지에는 더 이상 소스 문서가 없으므로 삭제하면 되돌릴 수 없습니다.\n\n삭제하시겠습니까?"
+  },
+  "delete_page_source_exists": {
+    "message": "이 페이지에는 소스 문서가 있으므로 삭제할 수 없습니다."
+  },
+  "delete_page_success": {
+    "message": "페이지가 정상적으로 삭제되었습니다."
+  },
+  "description": {
+    "message": "AEM Sidekick을 사용하면 AEM 사이트 작성자가 간편하게 콘텐츠를 미리 보고 게시할 수 있습니다."
+  },
+  "description_shortcut": {
+    "message": "Sidekick 전환"
+  },
+  "development": {
+    "message": "개발"
+  },
+  "docs": {
+    "message": "https://www.hlx.live/docs/sidekick"
+  },
+  "edit": {
+    "message": "편집"
+  },
+  "edit_date": {
+    "message": "편집됨: "
+  },
+  "error_config_failure": {
+    "message": "구성 활성화 실패: "
+  },
+  "error_login_aborted": {
+    "message": "로그인이 중단되었습니다."
+  },
+  "error_login_timeout": {
+    "message": "로그인 시간이 초과되었습니다. 나중에 다시 시도해 주십시오."
+  },
+  "error_logout_error": {
+    "message": "로그아웃하지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "error_preview_failure": {
+    "message": "미리보기 생성에 실패했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "error_preview_not_gdoc_generic": {
+    "message": "미리보기 생성에 실패했습니다. Google 문서 또는 스프레드시트여야 합니다."
+  },
+  "error_preview_not_gdoc_ms_word": {
+    "message": "Microsoft Word 문서입니다. [파일] > [Google Docs로 저장]을 클릭하여 Google Docs로 변환하십시오."
+  },
+  "error_preview_not_gsheet_ms_excel": {
+    "message": "Microsoft Excel 문서입니다. [파일] > [Google Sheets로 저장]을 클릭하여 Google Sheets로 변환하십시오."
+  },
+  "error_status_404_content": {
+    "message": "404 찾을 수 없음: Sidekick 구성 또는 URL을 확인하십시오."
+  },
+  "error_status_404_document": {
+    "message": "404 찾을 수 없음: Sidekick 구성을 확인하고 이 문서에 대한 액세스 권한이 부여되었는지 확인하십시오."
+  },
+  "error_status_500": {
+    "message": "500 내부 서버 오류: 페이지 상태를 가져오지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "error_status_502": {
+    "message": "502 잘못된 게이트웨이: 페이지 상태를 가져오지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "error_status_504": {
+    "message": "504 게이트웨이 시간 초과: 페이지 상태를 가져오지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "error_status_fatal": {
+    "message": "죄송합니다. 현재 문제가 있는 것 같습니다. 자세한 내용은 여기를 클릭하여 확인하십시오."
+  },
+  "error_status_invalid": {
+    "message": "잘못된 서버 응답입니다. Sidekick 구성 또는 URL을 확인하십시오."
+  },
+  "extensions": {
+    "message": "확장 기능"
+  },
+  "help": {
+    "message": "도움말"
+  },
+  "help_acknowledge": {
+    "message": "확인"
+  },
+  "help_close_acknowledge": {
+    "message": "도움말 항목 다시 표시 안 함"
+  },
+  "help_close_dismiss": {
+    "message": "나중에 도움말 항목 다시 표시"
+  },
+  "help_close_opt_out": {
+    "message": "도움말 항목 표시 안 함"
+  },
+  "help_current": {
+    "message": "이 팁"
+  },
+  "help_next": {
+    "message": "다음 팁"
+  },
+  "help_opt_out": {
+    "message": "도움말 표시 안 함"
+  },
+  "help_opt_out_alert": {
+    "message": "도움말 기능이 해제되었습니다. [옵션] > [사용자 환경]에서 다시 활성화할 수 있습니다."
+  },
+  "help_previous": {
+    "message": "이전 팁"
+  },
+  "help_user_status": {
+    "message": "사용 가능한 도움말 항목"
+  },
+  "help_user_status_check_all": {
+    "description": "모든 도움말 항목 선택",
+    "message": "모든 항목 선택"
+  },
+  "help_user_status_description": {
+    "message": "선택한 항목은 더 이상 표시되지 않습니다. 다시 보고 싶은 항목 옆의 확인 표시를 제거하십시오."
+  },
+  "help_user_status_uncheck_all": {
+    "description": "모든 도움말 항목 선택 취소",
+    "message": "모든 항목 선택 해제"
+  },
+  "homepage": {
+    "message": "https://www.hlx.live/tools/sidekick/"
+  },
+  "info": {
+    "message": "정보"
+  },
+  "json_view_description": {
+    "message": "알기 쉬운 데이터 렌디션."
+  },
+  "live": {
+    "message": "라이브"
+  },
+  "minutes_ago": {
+    "message": "$1분 전"
+  },
+  "never": {
+    "message": "사용 안 함"
+  },
+  "now": {
+    "message": "현재"
+  },
+  "open_preview": {
+    "description": "지정된 GitHub 분기의 미리보기 URL을 엽니다.",
+    "message": "미리보기 URL 열기"
+  },
+  "open_url": {
+    "message": "URL 열기"
+  },
+  "open_urls": {
+    "message": "URL 열기"
+  },
+  "open_urls_confirm": {
+    "message": "$1개 URL을 여시겠습니까?"
+  },
+  "open_view_doc_source": {
+    "message": "문서 소스 보기"
+  },
+  "view_doc_source_copied": {
+    "message": "Copied!"
+  },
+  "please_wait": {
+    "message": "잠시 기다려 주십시오."
+  },
+  "plugins_empty": {
+    "message": "이 작업에 대한 페이지를 찾을 수 없음"
+  },
+  "plugins_loading": {
+    "message": "작업 로드 중..."
+  },
+  "preview": {
+    "message": "미리보기"
+  },
+  "preview_config_success": {
+    "message": "구성이 정상적으로 활성화되었습니다."
+  },
+  "preview_date": {
+    "message": "미리보기됨: "
+  },
+  "preview_onedrive": {
+    "message": "프로 팁: 최근 변경 내용을 즉시 보려면 미리보기를 생성하기 전에 Ctrl+S를 누르십시오."
+  },
+  "preview_onedrive_mac": {
+    "message": "프로 팁: 최근 변경 내용을 즉시 보려면 미리보기를 생성하기 전에 ⌘ + S를 누르십시오."
+  },
+  "production": {
+    "message": "프로덕션"
+  },
+  "publish": {
+    "message": "게시"
+  },
+  "publish_date": {
+    "message": "게시됨: "
+  },
+  "publish_failure": {
+    "message": "게시하지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "push_down_content": {
+    "message": "콘텐츠 오버레이 대신 푸시다운"
+  },
+  "push_down_content_description": {
+    "message": "참고: 이 작업을 의도한 대로 수행하려면 사이트의 구조에 따라 사용자 지정 프로젝트 구성이 필요할 수 있습니다."
+  },
+  "reload": {
+    "message": "다시 로드"
+  },
+  "reload_failure": {
+    "message": "다시 로드하지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "save": {
+    "message": "저장"
+  },
+  "seconds_ago": {
+    "message": "$1초 전"
+  },
+  "share_description": {
+    "message": "Sidekick 공유"
+  },
+  "standard": {
+    "description": "표준 구성 모드",
+    "message": "표준"
+  },
+  "switch_view": {
+    "message": "보기"
+  },
+  "title": {
+    "message": "AEM Sidekick"
+  },
+  "today_at": {
+    "message": "오늘($1)"
+  },
+  "unpublish": {
+    "message": "게시 취소"
+  },
+  "unpublish_failure": {
+    "message": "게시를 취소하지 못했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "unpublish_page_confirm": {
+    "message": "이 페이지를 게시 취소하시겠습니까?"
+  },
+  "unpublish_page_no_source_confirm": {
+    "message": "이 페이지에는 더 이상 소스 문서가 없으므로 게시를 취소하면 되돌릴 수 없습니다.\n\n게시 취소하시겠습니까?"
+  },
+  "unpublish_page_source_exists": {
+    "message": "이 페이지에는 소스 문서가 있으므로 게시할 수 없습니다."
+  },
+  "unpublish_page_success": {
+    "message": "페이지가 정상적으로 게시 취소되었습니다."
+  },
+  "user_login": {
+    "message": "로그인"
+  },
+  "user_login_expired": {
+    "message": "세션이 만료되었습니다. 다시 로그인하십시오."
+  },
+  "user_login_hint": {
+    "message": "Sidekick을 사용하려면 먼저 로그인해야 합니다."
+  },
+  "user_logout": {
+    "message": "로그아웃"
+  },
+  "user_switch": {
+    "message": "사용자 전환"
+  },
+  "yesterday_at": {
+    "message": "어제($1)"
+  }
+}
