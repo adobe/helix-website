@@ -11,6 +11,8 @@
  */
 /* eslint-disable no-console, no-alert */
 
+import sampleRUM from './rum.js';
+
 (() => {
   /**
    * @typedef {Object} ElemConfig
@@ -251,10 +253,10 @@
     'fr',
     'it',
     'ja',
-    'ko-kr',
-    'pt-br',
-    'zh-cn',
-    'zh-tw',
+    'ko',
+    'pt_BR',
+    'zh_CN',
+    'zh_TW',
   ];
 
   /**
@@ -288,73 +290,6 @@
     DEFAULT: 0,
     CUSTOM: 1,
   };
-
-  /**
-   * Log RUM for sidekick telemetry.
-   * @private
-   * @param {string} checkpoint identifies the checkpoint in funnel
-   * @param {Object} data additional data for RUM sample
-   */
-  function sampleRUM(checkpoint, data = {}) {
-    sampleRUM.defer = sampleRUM.defer || [];
-    const defer = (fnname) => {
-      sampleRUM[fnname] = sampleRUM[fnname]
-        || ((...args) => sampleRUM.defer.push({ fnname, args }));
-    };
-    sampleRUM.drain = sampleRUM.drain
-      || ((dfnname, fn) => {
-        sampleRUM[dfnname] = fn;
-        sampleRUM.defer
-          .filter(({ fnname }) => dfnname === fnname)
-          .forEach(({ fnname, args }) => sampleRUM[fnname](...args));
-      });
-    sampleRUM.on = (chkpnt, fn) => {
-      sampleRUM.cases[chkpnt] = fn;
-    };
-    defer('observe');
-    defer('cw');
-    try {
-      window.hlx = window.hlx || {};
-      const sk = window.hlx.sidekick;
-      if (!window.hlx.rum) {
-        const usp = new URLSearchParams(sk.location.search);
-        const weight = (usp.get('hlx-sk-rum') === 'on') ? 1 : 10; // with parameter, weight is 1. Defaults to 10.
-        // eslint-disable-next-line no-bitwise
-        const hashCode = (s) => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
-        const id = `${hashCode(sk.location.href)}-${new Date().getTime()}-${Math.random().toString(16).substr(2, 14)}`;
-        const random = Math.random();
-        const isSelected = (random * weight < 1);
-        // eslint-disable-next-line object-curly-newline
-        window.hlx.rum = { weight, id, random, isSelected, sampleRUM };
-      }
-      const { weight, id } = window.hlx.rum;
-      if (window.hlx && window.hlx.rum && window.hlx.rum.isSelected) {
-        const sendPing = () => {
-          // eslint-disable-next-line object-curly-newline, max-len, no-use-before-define
-          const body = JSON.stringify({ weight, id, referer: sk.location.href, generation: window.hlx.RUM_GENERATION, checkpoint, ...data });
-          const url = `https://rum.hlx.page/.rum/${weight}`;
-          // eslint-disable-next-line no-unused-expressions
-          navigator.sendBeacon(url, body);
-        };
-        sampleRUM.cases = sampleRUM.cases || {
-          cwv: () => sampleRUM.cwv(data) || true,
-          lazy: () => {
-            // use classic script to avoid CORS issues
-            const script = document.createElement('script');
-            script.src = 'https://rum.hlx.page/.rum/@adobe/helix-rum-enhancer@^1/src/index.js';
-            document.head.appendChild(script);
-            return true;
-          },
-        };
-        sendPing(data);
-        if (sampleRUM.cases[checkpoint]) {
-          sampleRUM.cases[checkpoint]();
-        }
-      }
-    } catch (error) {
-      // something went wrong
-    }
-  }
 
   /**
    * Retrieves project details from a host name.
@@ -529,7 +464,9 @@
    */
   function getLanguage() {
     return navigator.languages
-      .map((prefLang) => LANGS.find((lang) => prefLang.toLowerCase().startsWith(lang)))
+      .map((uLang) => LANGS
+        .find((lang) => ((uLang.replace('-', '_') === lang || lang.startsWith(uLang.split('-')[0]))
+          ? lang : undefined)))
       .filter((lang) => !!lang)[0] || LANGS[0];
   }
 
@@ -998,7 +935,6 @@
       navigator.clipboard.writeText(shareUrl);
       sk.showModal(i18n(sk, 'config_shareurl_copied').replace('$1', config.project));
     }
-    // log telemetry
     sampleRUM('sidekick:share', {
       source: sk.location.href,
       target: shareUrl,
@@ -1042,8 +978,6 @@
         'unpublished',
         'deleted',
         'envswitched',
-        'page-info',
-        'user',
         'loggedin',
         'loggedout',
         'helpnext',
@@ -1052,7 +986,6 @@
         'helpoptedout',
       ];
       if (name.startsWith('custom:') || userEvents.includes(name)) {
-        // log telemetry
         sampleRUM(`sidekick:${name}`, {
           source: data?.sourceUrl || sk.location.href,
           target: data?.targetUrl || sk.status.webPath,
@@ -1166,6 +1099,10 @@
             editUrl,
             `hlx-sk-edit--${config.owner}/${config.repo}/${config.ref}${status.webPath}`,
           );
+          sampleRUM('sidekick:editoropened', {
+            source: sk.location.href,
+            target: editUrl,
+          });
         },
         isEnabled: (sidekick) => sidekick.status.edit && sidekick.status.edit.url,
       },
@@ -1565,6 +1502,9 @@
 
     const toWebPath = (folder, item) => {
       const { path, type } = item;
+      if (['/', '*', '\\', '!', '?'].find((pattern) => path.includes(pattern))) {
+        return `!ILLEGAL!_${path}`;
+      }
       const nameParts = path.split('.');
       let [file, ext] = nameParts;
       if (isSharePointFolder(sk, sk.location) && ext === 'docx') {
@@ -1586,6 +1526,29 @@
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
       return `${folder}${folder.endsWith('/') ? '' : '/'}${file}${ext ? `.${ext}` : ''}`;
+    };
+
+    const validateWebPaths = (paths) => {
+      const illegal = paths
+        .filter((path) => path.startsWith('!ILLEGAL!_'))
+        .map((path) => path.substring(10));
+      if (illegal.length > 0) {
+        sk.showModal({
+          message: [
+            i18n(sk, `bulk_error_illegal_file_name${illegal.length > 1 ? 's' : ''}`),
+            ...illegal,
+            createTag({
+              tag: 'button',
+              text: i18n(sk, 'close'),
+            }),
+          ],
+          level: 2,
+          sticky: true,
+        });
+        return [];
+      } else {
+        return paths;
+      }
     };
 
     const getBulkSelection = () => {
@@ -1656,7 +1619,7 @@
 
     const getBulkText = ([num, total], type, action, mod) => {
       let i18nKey = `bulk_${type}`;
-      if (num === 0) {
+      if (num === 0 && type !== 'progress') {
         i18nKey = `${i18nKey}_empty`;
       } else {
         i18nKey = `${i18nKey}_${action}_${(total || num) === 1 ? 'single' : 'multiple'}${mod ? `_${mod}` : ''}`;
@@ -1666,20 +1629,21 @@
         .replace('$2', total);
     };
 
-    const doBulkOperation = async (operation, method, concurrency, host) => {
-      const { config, status } = sk;
-      const sel = bulkSelection.map((item) => toWebPath(status.webPath, item));
-      const results = [];
-      const total = sel.length;
-      const { processQueue } = await import(`${config.scriptRoot}/lib/process-queue.js`);
-      await processQueue(sel, async (file) => {
-        results.push(await sk[method](file));
-        if (total > 1) {
-          sk.showModal(getBulkText([results.length, total], 'progress', operation), true);
-        }
-      }, concurrency);
+    const showBulkOperationProgress = ({
+      operation,
+      progress,
+    }) => {
+      const { processed, total } = progress;
+      sk.showModal(getBulkText([processed, total], 'progress', operation), true);
+    };
+
+    const showBulkOperationSummary = ({
+      operation,
+      resources,
+      host,
+    }) => {
       const lines = [];
-      const ok = results.filter((res) => res.ok);
+      const ok = resources.filter((res) => res.status < 400);
       if (ok.length > 0) {
         lines.push(getBulkText([ok.length], 'result', operation, 'success'));
         const buttonGroup = createTag({
@@ -1725,21 +1689,23 @@
         }));
         lines.push(buttonGroup);
       }
-      const failed = results.filter((res) => !res.ok);
+      const failed = resources.filter((res) => res.status >= 400);
       if (failed.length > 0) {
         const failureText = getBulkText([failed.length], 'result', operation, 'failure');
         lines.push(failureText);
+        // localize error messages
         lines.push(...failed.map((item) => {
-          if (item.error.endsWith('docx with google not supported.')) {
-            item.error = getBulkText([1], 'result', operation, 'error_no_docx');
-          }
-          if (item.error.endsWith('xlsx with google not supported.')) {
-            item.error = getBulkText([1], 'result', operation, 'error_no_xlsx');
-          }
-          if (item.error.includes('source does not exist')) {
+          if (item.status === 404) {
             item.error = getBulkText([1], 'result', operation, 'error_no_source');
+          } else {
+            if (item.error?.endsWith('docx with google not supported.')) {
+              item.error = getBulkText([1], 'result', operation, 'error_no_docx');
+            }
+            if (item.error?.endsWith('xlsx with google not supported.')) {
+              item.error = getBulkText([1], 'result', operation, 'error_no_xlsx');
+            }
           }
-          return `${item.path.split('/').pop()}: ${item.error}`;
+          return `${item.path.split('/').pop()}${item.error ? `: ${item.error}` : ''}`;
         }));
       }
       lines.push(createTag({
@@ -1760,9 +1726,101 @@
       );
     };
 
+    const doBulkOperation = async ({
+      operation,
+      route = operation,
+      method = 'POST',
+      host,
+    }) => {
+      const { config, status } = sk;
+      const paths = validateWebPaths(bulkSelection
+        .map((item) => toWebPath(status.webPath, item)));
+      if (paths.length === 0) {
+        return;
+      }
+      try {
+        const bulkUrl = getAdminUrl(config, route, '/*');
+        const bulkResp = await fetch(bulkUrl, {
+          ...getAdminFetchOptions(),
+          method,
+          body: JSON.stringify({
+            paths,
+          }),
+          headers: {
+            'content-type': 'application/json',
+          },
+        });
+
+        if (bulkResp.status === 401 && paths.length > 100) {
+          sk.showModal({
+            message: i18n(sk, `bulk_error_${operation}_login_required`),
+            level: 2,
+          });
+          return;
+        } else if (!bulkResp.ok) {
+          throw new Error(bulkResp.headers['x-error']);
+        }
+
+        // start showing progress
+        const defaultProgress = {
+          processed: 0,
+          total: paths.length,
+        };
+        showBulkOperationProgress({
+          operation,
+          progress: defaultProgress,
+        });
+
+        // update progress based on job
+        const { job } = await bulkResp.json();
+        const { name: jobName } = job;
+        const jobStatusUrl = getAdminUrl(config, 'job', `/${operation}/${jobName}`);
+        const jobStatusPoll = window.setInterval(async () => {
+          try {
+            const jobStatusResp = await fetch(jobStatusUrl, getAdminFetchOptions());
+            const jobStatus = await jobStatusResp.json();
+            const { state, progress } = jobStatus;
+            if (state === 'stopped') {
+              // stop polling
+              window.clearInterval(jobStatusPoll);
+              // get job details
+              const jobDetailsUrl = getAdminUrl(config, 'job', `/${operation}/${jobName}/details`);
+              const jobDetailsResp = await fetch(jobDetailsUrl, getAdminFetchOptions());
+              const jobDetails = await jobDetailsResp.json();
+              const { data: { resources } = {} } = jobDetails;
+              showBulkOperationSummary({ operation, resources, host });
+            } else {
+              showBulkOperationProgress({
+                operation,
+                progress: progress || defaultProgress,
+              });
+            }
+          } catch (e) {
+            console.error(`failed to get status for job ${jobName}: ${e}`);
+            window.clearInterval(jobStatusPoll);
+          }
+        }, 1000);
+      } catch (e) {
+        console.error(`bulk ${operation} failed: ${e.message}`);
+        sk.showModal({
+          message: [
+            getBulkText([paths.length], 'result', operation, 'failure'),
+            e.message || i18n(sk, 'bulk_error'),
+          ],
+          level: 0,
+          sticky: true,
+        });
+      }
+    };
+
     const doBulkCopyUrls = async (hostProperty) => {
       const { config, status } = sk;
-      const urls = bulkSelection.map((item) => `https://${config[hostProperty]}${toWebPath(status.webPath, item)}`);
+      const paths = validateWebPaths(bulkSelection
+        .map((item) => toWebPath(status.webPath, item)));
+      if (paths.length === 0) {
+        return;
+      }
+      const urls = paths.map((path) => `https://${config[hostProperty]}${path}`);
       navigator.clipboard.writeText(urls.join('\n'));
       sk.showModal(i18n(sk, `copied_url${urls.length !== 1 ? 's' : ''}`));
     };
@@ -1802,8 +1860,14 @@
             sk.showModal(confirmText);
           } else if (window.confirm(confirmText)) {
             sk.showWait();
-            sk.addEventListener('statusfetched', () => {
-              doBulkOperation('preview', 'update', 2, sk.config.innerHost);
+            sk.addEventListener('statusfetched', ({ detail }) => {
+              const { data: { status } = {} } = detail;
+              if (status !== 401) {
+                doBulkOperation({
+                  operation: 'preview',
+                  host: sk.config.innerHost,
+                });
+              }
             }, { once: true });
             sk.fetchStatus(true);
           }
@@ -1824,8 +1888,15 @@
             sk.showModal(confirmText);
           } else if (window.confirm(confirmText)) {
             sk.showWait();
-            sk.addEventListener('statusfetched', () => {
-              doBulkOperation('publish', 'publish', 40, sk.config.host || sk.config.outerHost);
+            sk.addEventListener('statusfetched', ({ detail }) => {
+              const { data: { status } = {} } = detail;
+              if (status !== 401) {
+                doBulkOperation({
+                  operation: 'publish',
+                  route: 'live',
+                  host: sk.config.host || sk.config.outerHost,
+                });
+              }
             }, { once: true });
             sk.fetchStatus(true);
           }
@@ -1997,7 +2068,6 @@
                       } else {
                         palette.classList.remove('hlx-sk-hidden');
                         button.classList.add('pressed');
-                        // log telemetry
                         sampleRUM('sidekick:paletteclosed', {
                           source: sk.location.href,
                           target: sk.status.webPath,
@@ -2200,7 +2270,6 @@
     const toggle = sk.userMenu.firstElementChild;
     toggle.removeAttribute('disabled');
     const updateUserPicture = async (picture, name) => {
-      toggle.querySelector('.user-picture')?.remove();
       if (picture) {
         if (picture.startsWith('https://admin.hlx.page/')) {
           // fetch the image with auth token
@@ -2212,6 +2281,7 @@
           picture = resp.ok ? URL.createObjectURL(await resp.blob()) : null;
         }
         if (picture) {
+          toggle.querySelector('.user-picture')?.remove();
           toggle.querySelector('.user-icon').classList.add('user-icon-hidden');
           appendTag(toggle, {
             tag: 'img',
@@ -2722,7 +2792,6 @@
       });
     }
     if (userAction) {
-      // log telemetry
       sampleRUM('sidekick:viewhidden', {
         source: sk.location.href,
         target: sk.status.webPath,
@@ -2803,6 +2872,9 @@
               click: () => {
                 this.fetchStatus();
                 updateModifiedDates(this);
+                sampleRUM('sidekick:info', {
+                  source: this.location.href,
+                });
               },
             },
             button: {
@@ -3038,6 +3110,12 @@
         config: this.config,
         location: this.location,
       });
+
+      const skMode = this.config.scriptUrl.startsWith('https://www.hlx.live/')
+        ? 'bookmarklet' : 'extension';
+      sampleRUM(`sidekick:load:${skMode}`, {
+        source: this.location.href,
+      });
       return this;
     }
 
@@ -3064,8 +3142,8 @@
     show() {
       if (this.root.classList.contains('hlx-sk-hidden')) {
         this.root.classList.remove('hlx-sk-hidden');
+        fireEvent(this, 'shown');
       }
-      fireEvent(this, 'shown');
       return this;
     }
 
