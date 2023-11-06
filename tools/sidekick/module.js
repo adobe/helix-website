@@ -1554,19 +1554,23 @@ import sampleRUM from './rum.js';
     const getBulkSelection = () => {
       const { location } = sk;
       if (isSharePointFolder(sk, location)) {
-        const isGrid = document.querySelector('div[class~="ms-TilesList"]');
         return [...document.querySelectorAll('#appRoot [role="presentation"] div[aria-selected="true"]')]
+          // exclude folders
           .filter((row) => !row.querySelector('img')?.getAttribute('src').includes('/foldericons/')
             && !row.querySelector('img')?.getAttribute('src').endsWith('folder.svg')
             && !row.querySelector('svg')?.parentElement.className.toLowerCase().includes('folder'))
-          .map((row) => ({
-            type: isGrid
-              ? row.querySelector(':scope i[aria-label]')?.getAttribute('aria-label').trim()
-              : new URL(row.querySelector('img')?.getAttribute('src'), sk.location.href).pathname.split('/').slice(-1)[0].split('.')[0],
-            path: isGrid
-              ? row.querySelector('div[data-automationid="name"]').textContent.trim()
-              : row.querySelector('button')?.textContent.trim(),
-          }));
+          // extract file name and type
+          .map((row) => {
+            const [path, type] = (row.getAttribute('aria-label') || row.querySelector('span')?.textContent)
+              ?.split(',')
+              .map((detail) => detail.trim()) || [];
+            return {
+              path,
+              type: type?.split(' ')[0],
+            };
+          })
+          // validate selection
+          .filter((sel) => sel.path && sel.type);
       } else {
         // gdrive
         return [...document.querySelectorAll('#drive_main_page [role="row"][aria-selected="true"]')]
