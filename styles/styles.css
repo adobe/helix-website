@@ -279,6 +279,11 @@ body.appear {
   margin-right: auto;
 }
 
+aside {
+  min-height: 75px;
+  padding: var(--spacing-xxs) 0 0;
+}
+
 @media screen and (min-width: 600px) {
   .block.contained,
   .section.content > div,
@@ -1691,7 +1696,7 @@ body.guides-template main.without-full-width-hero .default-content-wrapper:first
   object-fit: cover;
   aspect-ratio: 16 / 9;
   border-radius: var(--image-border-radius-l);
-  margin: var(--spacing-s) auto;
+  margin: 0 auto var(--spacing-s) auto;
 }
 
 body.guides-template main.without-full-width-hero .default-content-wrapper img {
@@ -1993,6 +1998,7 @@ body.contact-template main .default-content-wrapper img {
   padding: 0 var(--header-container-tablet-x-padding);
   height: var(--breadcrumb-height);
   overflow: hidden; 
+  margin: auto;
 }
 
 .breadcrumb ul {

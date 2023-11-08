@@ -173,8 +173,14 @@
   "config_manual_host_placeholder": {
     "message": "Nome host di produzione (facoltativo)"
   },
+  "config_manual_liveHost_placeholder": {
+    "message": "Nome host live personalizzato (facoltativo)"
+  },
   "config_manual_mountpoints_placeholder": {
     "message": "URL del contenuto: https://..."
+  },
+  "config_manual_previewHost_placeholder": {
+    "message": "Nome host di anteprima personalizzato (facoltativo)"
   },
   "config_manual_project_placeholder": {
     "message": "Nome progetto (facoltativo)"
@@ -450,8 +456,20 @@
     "description": "Apre l’URL di anteprima per un determinato ramo GitHub",
     "message": "Apri URL di anteprima"
   },
+  "open_url": {
+    "message": "Apri URL"
+  },
+  "open_urls": {
+    "message": "Apri gli URL"
+  },
+  "open_urls_confirm": {
+    "message": "Desideri aprire $1 URL?"
+  },
   "open_view_doc_source": {
     "message": "Visualizza origine del documento"
+  },
+  "view_doc_source_copied": {
+    "message": "Copied!"
   },
   "please_wait": {
     "message": "Attendi..."
@@ -543,6 +561,9 @@
   },
   "user_login": {
     "message": "Accedi"
+  },
+  "user_login_expired": {
+    "message": "La sessione è scaduta. Accedi di nuovo."
   },
   "user_login_hint": {
     "message": "Devi effettuare l’accesso prima di poter utilizzare Sidekick."

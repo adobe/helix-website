@@ -8,20 +8,12 @@
 
 .side-navigation-wrapper {
   width: auto;
-  display: block;
-  padding: var(--spacing-xxs) 0 0;
+  visibility: hidden;
   background: white;
-  min-height: 55px;
 }
 
-.side-navigation-wrapper,
-.side-navigation-wrapper + .section.content {
-  display: none;
-}
-
-.side-navigation-wrapper.ready,
-.side-navigation-wrapper.ready + .section.content {
-  display: block;
+.side-navigation-wrapper.ready {
+  visibility: visible;
 }
 
 .side-navigation-wrapper > div {
@@ -475,6 +467,14 @@
     width: 300px;
     padding: 0;
     min-height: 80vh;
+  }
+
+  .side-navigation-wrapper + .section.content {
+    display: none;
+  }
+
+  .side-navigation-wrapper.ready + .section.content {
+    display: block;
   }
 
   .side-navigation-wrapper.expand {

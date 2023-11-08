@@ -12,6 +12,7 @@ import {
   loadBlock,
   loadCSS,
   loadScript,
+  getAllMetadata,
   getMetadata,
   decorateBlock,
 } from './lib-franklin.js';
@@ -23,6 +24,27 @@ import {
 
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
+
+const AUDIENCES = {
+  mobile: () => window.innerWidth < 600,
+  desktop: () => window.innerWidth >= 600,
+  // define your custom audiences here as needed
+};
+
+window.hlx.plugins.add('performance', {
+  condition: () => window.name.includes('performance'),
+  load: 'eager',
+  url: '/plugins/performance.js',
+});
+
+window.hlx.plugins.add('experimentation', {
+  condition: () => getMetadata('experiment')
+    || Object.keys(getAllMetadata('campaign')).length
+    || Object.keys(getAllMetadata('audience')).length,
+  options: { audiences: AUDIENCES },
+  load: 'eager',
+  url: '/plugins/experimentation/src/index.js',
+});
 
 // -------------  Custom functions ------------- //
 
@@ -348,9 +370,9 @@ export function cleanVariations(parent) {
   });
 }
 
-function buildEmbeds() {
+function buildEmbeds(main) {
   const embeds = [
-    ...document.querySelectorAll(
+    ...main.querySelectorAll(
       'a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]',
     ),
   ];
@@ -401,6 +423,9 @@ function decorateBreadcrumb(main) {
   if (!document.body.classList.contains('guides-template')) {
     return;
   }
+
+  const existingBC = document.querySelector('.breadcrumb-wrapper');
+  if (existingBC) existingBC.remove();
 
   const wrapper = document.createElement('div');
   wrapper.classList.add('breadcrumb-wrapper');
@@ -515,28 +540,96 @@ export function decorateMain(main) {
   decorateTitleSection(main);
 }
 
+function prepareSideNav(main) {
+  const aside = createTag('aside');
+  main.insertBefore(aside, main.querySelector('.section.content'));
+}
+
 /**
  * loads everything needed to get to LCP.
  */
 async function loadEager(doc) {
   setLanguageForAccessibility('en');
   customDecorateTemplateAndTheme();
+
+  await window.hlx.plugins.run('loadEager');
+
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
     decorateBreadcrumb(main);
+    prepareSideNav(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
+}
+
+function setUpSoftNavigation() {
+  const navigate = async (href, link) => {
+    try {
+      const resp = await fetch(href);
+      const html = await resp.text();
+      const dom = new DOMParser().parseFromString(html, 'text/html');
+      const main = dom.querySelector('main');
+      const template = dom.querySelector('meta[name="template"]');
+      if (template && template.getAttribute('content') === 'guides') {
+        await decorateMain(main);
+        await loadBlocks(main);
+        const currentMain = document.querySelector('main');
+        const children = [...currentMain.children].slice(2);
+        sampleRUM('leave');
+        children.forEach((child) => child.remove());
+        while (main.firstElementChild) currentMain.append(main.firstElementChild);
+        const title = dom.querySelector('title').textContent;
+        const category = dom.querySelector('meta[name="category"').getAttribute('content');
+        document.querySelector('meta[name="category"]').setAttribute('content', category);
+        document.querySelector('meta[property="og:title"]').setAttribute('content', title);
+        document.querySelector('title').textContent = title;
+        decorateBreadcrumb(currentMain);
+        const oldhref = window.location.pathname;
+        sampleRUM('enter', { source: 'softnav', target: oldhref });
+        sampleRUM.observe(currentMain.querySelectorAll('div[data-block-name]'));
+        sampleRUM.observe(currentMain.querySelectorAll('picture > img'));
+
+        link.closest('div > ul').querySelector('a.active').classList.remove('active');
+        link.classList.add('active');
+      } else {
+        window.location.href = href;
+      }
+    } catch {
+      window.location.href = href;
+    }
+  };
+
+  window.addEventListener('popstate', async (e) => {
+    const { href, pathname } = window.location;
+    const link = document.body.querySelector(`.side-navigation a[href="${pathname}"]`);
+    if (link && getMetadata('template') === 'guides') {
+      e.preventDefault();
+      await navigate(href, link);
+    }
+  });
+
+  document.body.addEventListener('click', async (e) => {
+    const link = e.target.closest('a');
+    if (link && getMetadata('template') === 'guides' && e.target.closest('.side-navigation')) {
+      const { href } = link;
+      const hrefURL = new URL(href);
+      if (hrefURL.origin === window.location.origin) {
+        e.preventDefault();
+        await navigate(href, link);
+        window.history.pushState({}, null, href);
+      }
+    }
+  });
 }
 
 /**
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
+  setUpSoftNavigation();
   const main = doc.querySelector('main');
-  const aside = createTag('aside');
-  main.insertBefore(aside, main.querySelector('.section.content'));
 
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
@@ -562,15 +655,15 @@ async function loadLazy(doc) {
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
     doc.querySelector('footer').remove();
-    return;
+  } else {
+    // breadcrumb setup
+    // loadBreadcrumb(main);
+    // sidebar + related style setup
+    setUpSideNav(main, main.querySelector('aside'));
+    decorateGuideTemplateCodeBlock();
   }
 
-  // breadcrumb setup
-  // loadBreadcrumb(main);
-  // sidebar + related style setup
-  setUpSideNav(main, aside);
-
-  decorateGuideTemplateCodeBlock();
+  window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
 }
@@ -580,8 +673,12 @@ async function loadLazy(doc) {
  * the user experience.
  */
 function loadDelayed() {
-  // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
+  window.setTimeout(() => {
+    window.hlx.plugins.load('delayed');
+    window.hlx.plugins.run('loadDelayed');
+    // eslint-disable-next-line import/no-cycle
+    return import('./delayed.js');
+  }, 3000);
   // load anything that can be postponed to the latest here
 }
 
@@ -589,11 +686,10 @@ function loadDelayed() {
  * Decorates the page.
  */
 async function loadPage(doc) {
-  // eslint-disable-next-line no-use-before-define
+  await window.hlx.plugins.load('eager');
   await loadEager(doc);
-  // eslint-disable-next-line no-use-before-define
+  await window.hlx.plugins.load('lazy');
   await loadLazy(doc);
-  // eslint-disable-next-line no-use-before-define
   loadDelayed(doc);
 }
 
@@ -606,9 +702,3 @@ if (window.location.hostname === 'www.hlx.live') {
 */
 
 loadPage(document);
-
-if (window.name.includes('performance')) {
-  import('./performance.js').then((mod) => {
-    if (mod.default) mod.default();
-  });
-}
