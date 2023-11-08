@@ -1,0 +1,72 @@
+.releases .helix-admin .release-helix-admin,
+.releases .helix-pipeline-service .release-helix-pipeline-service, 
+.releases .helix-importer-ui .release-helix-importer-ui, 
+.releases .helix-sidekick-extension .release-helix-sidekick-extension,
+.releases .helix-cli .release-helix-cli,
+.releases .franklin-sidekick-library .release-franklin-sidekick-library {
+    display: block;
+}
+
+.releases .releases-controls input[type="checkbox"] {
+    pointer-events: none;
+}
+
+.releases .release-helix-admin {
+    background-color: #FFD4F1;
+}
+
+.releases .release-helix-pipeline-service {
+    background-color: #D1FFED;
+}
+
+.releases .release-helix-importer-ui {
+    background-color: #E8E8E8;
+}
+
+.releases .release-helix-sidekick-extension {
+    background-color: #E4E8BF;
+}
+
+.releases .release-franklin-sidekick-library {
+    background-color: #F4F8CF;
+}
+
+
+.releases .release-helix-cli {
+    background-color: #FFEBD4;
+}
+
+.releases .release {
+    padding: 16px 32px 32px;
+    margin: 16px 0;
+    border-radius: 16px;
+    display: none;
+}
+
+.releases .releases-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.releases .releases-control {
+    padding: 4px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: top;
+}
+
+
+.releases-date {
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.releases .release h2 {
+    margin-top: 0;
+}
+
+.releases .releases-results[aria-hidden="true"] {
+    display: none;
+}
