@@ -2195,7 +2195,6 @@ import sampleRUM from './rum.js';
           delete status.status;
           sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
           sk.config = await initConfig(config, location);
-          sk.config.authToken = window.hlx.sidekickConfig.authToken;
           sk.config.authTokenExpiry = window.hlx.sidekickConfig.authTokenExpiry || 0;
           addCustomPlugins(sk);
           encourageLogin(sk, false);
@@ -2242,7 +2241,6 @@ import sampleRUM from './rum.js';
         // try 5 times after login window has been closed
         if (await checkProfileStatus(sk, 401)) {
           delete sk.status.profile;
-          delete sk.config.authToken;
           delete sk.config.authTokenExpiry;
           sk.addEventListener('statusfetched', () => sk.hideModal(), { once: true });
           sk.fetchStatus();
@@ -2277,11 +2275,7 @@ import sampleRUM from './rum.js';
       if (picture) {
         if (picture.startsWith('https://admin.hlx.page/')) {
           // fetch the image with auth token
-          const resp = await fetch(picture, {
-            headers: {
-              'x-auth-token': sk.config.authToken,
-            },
-          });
+          const resp = await fetch(picture);
           picture = resp.ok ? URL.createObjectURL(await resp.blob()) : null;
         }
         if (picture) {
@@ -2442,7 +2436,6 @@ import sampleRUM from './rum.js';
           sk.addEventListener('statusfetched', async ({ detail }) => {
             const { data: status } = detail;
             if (sk.config.authTokenExpiry === authTokenExpiry && status.status === 401) {
-              delete sk.config.authToken;
               delete sk.config.authTokenExpiry;
               delete sk.config.authTokenTimers;
               showLoginDialog(i18n(sk, 'user_login_expired'));
