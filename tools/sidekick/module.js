@@ -292,6 +292,52 @@ import sampleRUM from './rum.js';
   };
 
   /**
+   * Detects the platform.
+   * @private
+   * @param {string} userAgent The user agent
+   * @returns {string} The platform
+   */
+  function detectPlatform(userAgent) {
+    userAgent = userAgent.toLowerCase();
+    if (userAgent.includes('(windows')) {
+      return 'windows';
+    } else if (userAgent.includes('(iphone') || userAgent.includes('(ipad')) {
+      return 'ios';
+    } else if (userAgent.includes('(macintosh')) {
+      return 'macos';
+    } else if (userAgent.includes('android')) {
+      return 'android';
+    } else if (userAgent.includes('linux')) {
+      return 'linux';
+    }
+    return 'other';
+  }
+
+  /**
+   * Detects the browser.
+   * @private
+   * @param {string} userAgent The user agent
+   * @returns {string} The browser
+   */
+  function detectBrowser(userAgent) {
+    userAgent = userAgent.toLowerCase();
+    if (userAgent.includes('edg/')) {
+      return 'edge';
+    } else if (userAgent.includes('opr/')) {
+      return 'opera';
+    } else if (userAgent.includes('samsung')) {
+      return 'samsung';
+    } else if (userAgent.includes('chrome/')) {
+      return 'chrome';
+    } else if (userAgent.includes('safari/')) {
+      return 'safari';
+    } else if (userAgent.includes('firefox/')) {
+      return 'firefox';
+    }
+    return 'other';
+  }
+
+  /**
    * Retrieves project details from a host name.
    * @private
    * @param {string} host The host name
@@ -2958,6 +3004,14 @@ import sampleRUM from './rum.js';
             this.root.classList.remove('hlx-sk-advanced');
           }
         });
+        // platform and browser data
+        const platform = detectPlatform(navigator.userAgent);
+        const browser = detectBrowser(navigator.userAgent);
+        const mode = this.config.scriptUrl.startsWith('https://') ? 'bookmarklet' : 'extension';
+        sampleRUM('sidekick:loaded', {
+          source: this.location.href,
+          target: `${platform}:${browser}:${mode}`,
+        });
         // announce to the document that the sidekick is ready
         document.dispatchEvent(new CustomEvent('sidekick-ready'));
         document.dispatchEvent(new CustomEvent('helix-sidekick-ready')); // legacy
@@ -3106,12 +3160,6 @@ import sampleRUM from './rum.js';
       fireEvent(this, 'contextloaded', {
         config: this.config,
         location: this.location,
-      });
-
-      const skMode = this.config.scriptUrl.startsWith('https://www.hlx.live/')
-        ? 'bookmarklet' : 'extension';
-      sampleRUM(`sidekick:load:${skMode}`, {
-        source: this.location.href,
       });
       return this;
     }
