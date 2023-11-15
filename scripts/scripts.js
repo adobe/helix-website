@@ -510,6 +510,24 @@ export function setUpSideNav(main, aside) {
   return loadBlock(sideNav);
 }
 
+function decorateSVGs(main) {
+  // get all links that end with .svg
+  const svgLinks = main.querySelectorAll('a[href$=".svg"]');
+  Array.from(svgLinks).forEach((svg) => {
+    const svgHref = new URL(svg.href).pathname;
+
+    const svgEl = createTag('img', {
+      src: svgHref,
+      // use the path name as the alt text
+      alt: svgHref.split('/').pop().split('.')[0],
+      width: '100%',
+      // class: 'logo-wall-item-svg',
+    });
+
+    svg.replaceWith(svgEl);
+  });
+}
+
 // --------------- Main functions here ---------------- //
 
 /**
@@ -538,6 +556,7 @@ export function decorateMain(main) {
   decorateGuideTemplate(main);
   decorateBlocks(main);
   decorateTitleSection(main);
+  decorateSVGs(main);
 }
 
 function prepareSideNav(main) {
