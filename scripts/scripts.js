@@ -512,8 +512,9 @@ export function setUpSideNav(main, aside) {
 
 function decorateSVGs(main) {
   // get all links that end with .svg
-  const svgLinks = main.querySelectorAll('a[href$=".svg"]');
+  const svgLinks = main.querySelectorAll('div.default-content-wrapper a[href$=".svg"]');
   Array.from(svgLinks).forEach((svg) => {
+    console.log(svg.parentElement.parentElement);
     const svgHref = new URL(svg.href).pathname;
 
     const svgEl = createTag('img', {
