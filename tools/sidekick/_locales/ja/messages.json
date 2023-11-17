@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "このファイルを公開しますか？"
   },
+  "bulk_error": {
+    "message": "一括操作に失敗しました。後でもう一度試してください。"
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "ファイル名には、正規化された小文字のラテン文字、数字、ハイフンのみを使用できます。次のファイル名に不正な文字が含まれています :"
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "ファイル名には、正規化された小文字のラテン文字、数字、ハイフンのみを使用できます。次のファイル名に不正な文字が含まれています :"
+  },
+  "bulk_error_preview_login_required": {
+    "message": "100 個を超えるファイルのプレビューを生成するには、ログインする必要があります。"
+  },
+  "bulk_error_publish_login_required": {
+    "message": "100 個を超えるファイルを公開するには、ログインする必要があります。"
+  },
   "bulk_progress_preview_multiple": {
     "message": "$2 個中 $1 個のファイルのプレビューが生成されました..."
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "ドキュメントソースを表示"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "お待ちください..."
   },
@@ -563,7 +575,7 @@
     "message": "ログイン"
   },
   "user_login_expired": {
-    "message": "セッションの有効期限が切れました。もう一度サインインしてください。"
+    "message": "セッションの有効期限が切れました。もう一度ログインしてください。"
   },
   "user_login_hint": {
     "message": "Sidekick を使用するには、ログインする必要があります。"
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "ユーザーを切り替え"
+  },
+  "view_doc_source_copied": {
+    "message": "コピーしました。"
   },
   "yesterday_at": {
     "message": "昨日の $1"

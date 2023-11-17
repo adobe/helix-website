@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "¿Seguro que desea publicar este archivo?"
   },
+  "bulk_error": {
+    "message": "Error de operación masiva. Inténtelo de nuevo más tarde."
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "Solo se permiten letras latinas minúsculas, dígitos y guiones normalizados en los nombres de los archivos. El siguiente nombre de archivo contiene caracteres no permitidos:"
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "Solo se permiten letras latinas minúsculas, dígitos y guiones normalizados en los nombres de los archivos. El siguiente nombre de archivo contiene caracteres no permitidos:"
+  },
+  "bulk_error_preview_login_required": {
+    "message": "Debe iniciar sesión para generar la vista previa de más de 100 archivos."
+  },
+  "bulk_error_publish_login_required": {
+    "message": "Debe iniciar sesión para publicar más de 100 archivos."
+  },
   "bulk_progress_preview_multiple": {
     "message": "Se ha generado la vista previa de $1 de $2 archivos..."
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "Ver fuente del documento"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "Espere..."
   },
@@ -563,7 +575,7 @@
     "message": "Iniciar sesión"
   },
   "user_login_expired": {
-    "message": "Su sesión ha caducado. Inicie sesión de nuevo."
+    "message": "La sesión ha caducado. Inicie sesión de nuevo."
   },
   "user_login_hint": {
     "message": "Debe iniciar sesión antes de usar Sidekick."
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "Cambiar de usuario"
+  },
+  "view_doc_source_copied": {
+    "message": "Copiado."
   },
   "yesterday_at": {
     "message": "Ayer a las $1"

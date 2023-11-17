@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "Deseja publicar este arquivo?"
   },
+  "bulk_error": {
+    "message": "Falha na operação em massa. Tente novamente mais tarde."
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "Somente letras latinas minúsculas, dígitos e hifens normalizados são permitidos nos nomes de arquivos. O nome de arquivo a seguir contém caracteres inválidos:"
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "Somente letras latinas minúsculas, dígitos e hifens normalizados são permitidos nos nomes de arquivos. Os nomes de arquivos a seguir contêm caracteres inválidos:"
+  },
+  "bulk_error_preview_login_required": {
+    "message": "É necessário fazer logon para gerar a pré-visualização de mais de 100 arquivos."
+  },
+  "bulk_error_publish_login_required": {
+    "message": "É necessário fazer logon para publicar mais de 100 arquivos."
+  },
   "bulk_progress_preview_multiple": {
     "message": "A pré-visualização de $1 de $2 arquivos foi gerada..."
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "Visualizar fonte do documento"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "Aguarde..."
   },
@@ -563,7 +575,7 @@
     "message": "Fazer logon"
   },
   "user_login_expired": {
-    "message": "Sua sessão expirou; entre novamente."
+    "message": "Sua sessão expirou, faça logon novamente."
   },
   "user_login_hint": {
     "message": "É necessário fazer logon antes de usar o Sidekick."
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "Trocar usuário"
+  },
+  "view_doc_source_copied": {
+    "message": "Copiado."
   },
   "yesterday_at": {
     "message": "Ontem às $1"
