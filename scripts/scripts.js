@@ -683,6 +683,16 @@ async function loadLazy(doc) {
     decorateGuideTemplateCodeBlock();
   }
 
+  // labs banner
+  const labs = getMetadata('labs');
+  if (labs) {
+    const labsBanner = buildBlock('labs', labs);
+    const h1 = document.querySelector('h1');
+    h1.parentElement.insertBefore(labsBanner, h1);
+    decorateBlock(labsBanner);
+    loadBlock(labsBanner);
+  }
+
   window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
