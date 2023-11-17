@@ -574,6 +574,14 @@ async function loadEager(doc) {
 
   await window.hlx.plugins.run('loadEager');
 
+  // labs banner
+  const labs = getMetadata('labs');
+  if (labs) {
+    const labsBanner = buildBlock('labs', labs);
+    const h1 = document.querySelector('h1');
+    h1.parentElement.insertBefore(labsBanner, h1);
+  }
+
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -681,16 +689,6 @@ async function loadLazy(doc) {
     // sidebar + related style setup
     setUpSideNav(main, main.querySelector('aside'));
     decorateGuideTemplateCodeBlock();
-  }
-
-  // labs banner
-  const labs = getMetadata('labs');
-  if (labs) {
-    const labsBanner = buildBlock('labs', labs);
-    const h1 = document.querySelector('h1');
-    h1.parentElement.insertBefore(labsBanner, h1);
-    decorateBlock(labsBanner);
-    loadBlock(labsBanner);
   }
 
   window.hlx.plugins.run('loadLazy');
