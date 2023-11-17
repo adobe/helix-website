@@ -4,7 +4,7 @@
   background-color: #e6118a;
   color: #fff;
   border-radius: var(--image-border-radius-l);
-  font-size: var(--type-heading-xs-size);
+  font-size: var(--type-body-s-size);
 }
 
 .labs .header {
