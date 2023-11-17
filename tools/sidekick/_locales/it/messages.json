@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "Pubblicare questo file?"
   },
+  "bulk_error": {
+    "message": "Operazione in blocco non riuscita. Riprova più tardi."
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "Nei nomi dei file sono consentiti solo i seguenti caratteri latini normalizzati: lettere minuscole, cifre e trattini. Il nome di file seguente contiene caratteri non validi:"
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "Nei nomi dei file sono consentiti solo i seguenti caratteri latini normalizzati: lettere minuscole, cifre e trattini. I nomi dei file seguenti contengono caratteri non validi:"
+  },
+  "bulk_error_preview_login_required": {
+    "message": "Per generare l’anteprima di più di 100 file, è necessario accedere."
+  },
+  "bulk_error_publish_login_required": {
+    "message": "Per pubblicare più di 100 file, è necessario accedere."
+  },
   "bulk_progress_preview_multiple": {
     "message": "È stata generata l’anteprima di $1 di $2 file..."
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "Visualizza origine del documento"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "Attendi..."
   },
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "Cambia utente"
+  },
+  "view_doc_source_copied": {
+    "message": "Copiato."
   },
   "yesterday_at": {
     "message": "Ieri alle $1"

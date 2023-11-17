@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "是否确实要发布此文件？"
   },
+  "bulk_error": {
+    "message": "批量操作失败。请稍后重试。"
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "文件名中只允许使用规范化的小写拉丁字母、数字和连字符。以下文件名包含非法字符："
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "文件名中只允许使用规范化的小写拉丁字母、数字和连字符。以下文件名包含非法字符："
+  },
+  "bulk_error_preview_login_required": {
+    "message": "您需要登录才能生成 100 多个文件的预览。"
+  },
+  "bulk_error_publish_login_required": {
+    "message": "您需要登录才能发布超过 100 个文件。"
+  },
   "bulk_progress_preview_multiple": {
     "message": "已生成 $1 个文件（总共 $2 个文件）的预览..."
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "查看文档源"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "请稍候..."
   },
@@ -563,7 +575,7 @@
     "message": "登录"
   },
   "user_login_expired": {
-    "message": "您的会话已过期，请重新登录。"
+    "message": "您的会话已到期，请重新登录。"
   },
   "user_login_hint": {
     "message": "您需要先登录才能使用 Sidekick。"
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "切换用户"
+  },
+  "view_doc_source_copied": {
+    "message": "已复制！"
   },
   "yesterday_at": {
     "message": "昨天 $1"

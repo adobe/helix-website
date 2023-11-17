@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "이 파일을 게시하시겠습니까?"
   },
+  "bulk_error": {
+    "message": "일괄 작업에 실패했습니다. 나중에 다시 시도해 주십시오."
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "파일 이름에는 정규화된 소문자 라틴 문자, 숫자 및 하이픈만 허용됩니다. 다음 파일 이름에 잘못된 문자가 포함되어 있습니다."
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "파일 이름에는 정규화된 소문자 라틴 문자, 숫자 및 하이픈만 허용됩니다. 다음 파일 이름에 잘못된 문자가 포함되어 있습니다."
+  },
+  "bulk_error_preview_login_required": {
+    "message": "100개를 초과하는 파일의 미리보기를 생성하려면 로그인해야 합니다."
+  },
+  "bulk_error_publish_login_required": {
+    "message": "100개를 초과하는 파일을 게시하려면 로그인해야 합니다."
+  },
   "bulk_progress_preview_multiple": {
     "message": "생성된 파일 $2개 중 $1개 미리보기..."
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "문서 소스 보기"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "잠시 기다려 주십시오."
   },
@@ -563,7 +575,7 @@
     "message": "로그인"
   },
   "user_login_expired": {
-    "message": "세션이 만료되었습니다. 다시 로그인하십시오."
+    "message": "세션이 만료되었습니다. 다시 로그인해 주십시오."
   },
   "user_login_hint": {
     "message": "Sidekick을 사용하려면 먼저 로그인해야 합니다."
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "사용자 전환"
+  },
+  "view_doc_source_copied": {
+    "message": "복사됨!"
   },
   "yesterday_at": {
     "message": "어제($1)"

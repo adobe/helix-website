@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "Voulez-vous vraiment publier ce fichier ?"
   },
+  "bulk_error": {
+    "message": "Échec de l’opération en bloc. Veuillez réessayer plus tard."
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "Seuls les lettres latines minuscules, les chiffres et les tirets normalisés sont autorisés dans les noms de fichier. Le nom de fichier suivant contient des caractères interdits :"
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "Seuls les lettres latines minuscules, les chiffres et les tirets normalisés sont autorisés dans les noms de fichier. Les noms de fichiers suivants contiennent des caractères interdits :"
+  },
+  "bulk_error_preview_login_required": {
+    "message": "Vous devez vous connecter pour générer l’aperçu de plus de 100 fichiers."
+  },
+  "bulk_error_publish_login_required": {
+    "message": "Vous devez vous connecter pour publier plus de 100 fichiers."
+  },
   "bulk_progress_preview_multiple": {
     "message": "Prévisualisation de $1 fichiers sur $2 générée…"
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "Afficher la source du document"
   },
-  "view_doc_source_copied": {
-    "message": "Copié !"
-  },
   "please_wait": {
     "message": "Veuillez patienter..."
   },
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "Changer d'utilisateur"
+  },
+  "view_doc_source_copied": {
+    "message": "Copié."
   },
   "yesterday_at": {
     "message": "Hier à $1"

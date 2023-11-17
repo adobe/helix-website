@@ -30,6 +30,21 @@
   "bulk_confirm_publish_single": {
     "message": "您確定要發佈此檔案嗎?"
   },
+  "bulk_error": {
+    "message": "大量作業失敗。請稍後再試。"
+  },
+  "bulk_error_illegal_file_name": {
+    "message": "檔案名稱中只允許使用標準化的小型拉丁字母、數字和連字號。以下檔案名稱包含非法字元："
+  },
+  "bulk_error_illegal_file_names": {
+    "message": "檔案名稱中只允許使用標準化的小型拉丁字母、數字和連字號。以下檔案名稱包含非法字元："
+  },
+  "bulk_error_preview_login_required": {
+    "message": "您必須登入才能產生超過 100 個檔案的預覽。"
+  },
+  "bulk_error_publish_login_required": {
+    "message": "您必須登入才能發佈超過 100 個檔案。"
+  },
   "bulk_progress_preview_multiple": {
     "message": "已產生 $1 個檔案 (共 $2 個檔案) 的預覽…"
   },
@@ -468,9 +483,6 @@
   "open_view_doc_source": {
     "message": "檢視文件來源"
   },
-  "view_doc_source_copied": {
-    "message": "Copied!"
-  },
   "please_wait": {
     "message": "請稍候..."
   },
@@ -563,7 +575,7 @@
     "message": "登入"
   },
   "user_login_expired": {
-    "message": "您的工作階段已過期，請重新登入。"
+    "message": "您的工作階段已到期，請重新登入。"
   },
   "user_login_hint": {
     "message": "您必須先登入才能使用 Sidekick。"
@@ -573,6 +585,9 @@
   },
   "user_switch": {
     "message": "切換使用者"
+  },
+  "view_doc_source_copied": {
+    "message": "已複製！"
   },
   "yesterday_at": {
     "message": "昨天 $1"
