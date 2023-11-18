@@ -574,6 +574,20 @@ async function loadEager(doc) {
 
   await window.hlx.plugins.run('loadEager');
 
+  // labs banner
+  const labs = getMetadata('labs');
+  if (labs) {
+    const labsBanner = buildBlock('labs', labs);
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      // insert above title
+      h1.parentElement.insertBefore(labsBanner, h1);
+    } else {
+      // insert at top of page
+      document.querySelector('main > div').append(labsBanner);
+    }
+  }
+
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);

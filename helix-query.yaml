@@ -22,7 +22,7 @@ indices:
           parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
   docpages:
     target: /docpages-index
-    include: 
+    include:
       - /docs/**
       - /developer/**
     properties:
@@ -38,6 +38,10 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, 'content')
+      labs:
+        select: head > meta[name="labs"]
+        value: |
+          attribute(el, 'content')
       lastModified:
         select: none
         value: |
@@ -46,5 +50,3 @@ indices:
         select: main
         value: |
           textContent(el)
-      
-
