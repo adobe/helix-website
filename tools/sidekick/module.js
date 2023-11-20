@@ -109,135 +109,138 @@ import sampleRUM from './rum.js';
    * @prop {string} previewHost The host name of a custom preview CDN (optional)
    * @prop {string} liveHost The host name of a custom live CDN (optional)
    * @prop {string} host The production host name to publish content to (optional)
-   * @prop {boolean} byocdn=false <pre>true</pre> if the production host is a 3rd party CDN
+   * @prop {boolean} byocdn=false <code>true</code> if the production host is a 3rd party CDN
    * @prop {boolean} devMode=false Loads configuration and plugins from the development environment
    * @prop {boolean} devOrigin=http://localhost:3000 URL of the local development environment
-   * @prop {boolean} pushDown=false <pre>true</pre> to have the sidekick push down page content
+   * @prop {boolean} pushDown=false <code>true</code> to have the sidekick push down page content
    * @prop {string} pushDownSelector The CSS selector for absolute elements to also push down
    * @prop {ViewConfig[]} specialViews An array of custom {@link ViewConfig|view configurations}
    * @prop {number} adminVersion The specific version of admin service to use (optional)
    */
 
   /**
-   * @external
-   * @name "window.hlx.sidekickConfig"
-   * @type {SidekickConfig}
-   * @description The global variable holding the initial sidekick configuration.
-   */
-
-  /**
-   * @external
-   * @name "window.hlx.sidekick"
-   * @type {Sidekick}
-   * @description The global variable referencing the {@link Sidekick} singleton.
-   */
-
-  /**
-   * @external
-   * @name "window.hlx.sidekickScript"
-   * @type {Element}
-   * @description The <pre>script</pre> element which loaded the sidekick module.
-   */
-
-  /**
    * @event Sidekick#shown
-   * @type {Sidekick} The sidekick
+   * @arg {CustomEvent} e The event
+   * @prop {Sidekick} e.detail.data The sidekick
    * @description This event is fired when the sidekick has been shown.
    */
 
   /**
    * @event Sidekick#hidden
-   * @type {Sidekick} The sidekick
+   * @arg {CustomEvent} e The event
+   * @prop {Sidekick} e.detail.data The sidekick
    * @description This event is fired when the sidekick has been hidden.
    */
 
   /**
    * @event Sidekick#pluginused
-   * @type {Object} The plugin used
-   * @property {string} id The plugin ID
-   * @property {Element} button The button element
+   * @arg {CustomEvent} e The event
+   * @prop {Object} e.detail.data The event payload
+   * @prop {string} e.detail.data.id The plugin ID
+   * @prop {Element} e.detail.data.button The button element
    * @description This event is fired when a sidekick plugin has been used.
    */
 
   /**
    * @event Sidekick#contextloaded
-   * @type {Object} The context object
-   * @property {SidekickConfig} config The sidekick configuration
-   * @property {Location} location The sidekick location
+   * @arg {CustomEvent} e The event
+   * @prop {Object} e.detail.data The event payload
+   * @prop {SidekickConfig} e.detail.data.config The sidekick configuration
+   * @prop {Location} e.detail.data.location The sidekick location
    * @description This event is fired when the context has been loaded.
    */
 
   /**
    * @event Sidekick#statusfetched
-   * @type {Object} The status object
+   * @arg {CustomEvent} e The event
+   * @prop {Object} e.detail.data The status object
    * @description This event is fired when the status has been fetched.
    */
 
   /**
    * @event Sidekick#envswitched
-   * @type {Object} The environment object
-   * @property {string} sourceUrl The URL of the source environment
-   * @property {string} targetUrl The URL of the target environment
+   * @arg {CustomEvent} e The event
+   * @prop {Object} e.detail.data The event payload
+   * @prop {string} e.detail.data.sourceUrl The URL of the source environment
+   * @prop {string} e.detail.data.targetUrl The URL of the target environment
    * @description This event is fired when the environment has been switched
    */
 
   /**
+   * @event Sidekick#previewed
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The previewed path
+   * @description This event is fired when content has been previewed.
+   */
+
+  /**
    * @event Sidekick#updated
-   * @type {string} The updated path
-   * @description This event is fired when a path has been updated.
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data  The updated path
+   * @description This event is fired when content or code has been updated.
+   * This event is deprecated for content, use {@link Sidekick#previewed} instead.
    */
 
   /**
    * @event Sidekick#deleted
-   * @type {string} The deleted path
-   * @description This event is fired when a path has been deleted.
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The deleted path
+   * @description This event is fired when a resource has been deleted.
    */
 
   /**
    * @event Sidekick#published
-   * @type {string} The published path
-   * @description This event is fired when a path has been published.
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The published path
+   * @description This event is fired when content has been published.
    */
 
   /**
    * @event Sidekick#unpublished
-   * @type {string} The unpublished path
-   * @description This event is fired when a path has been unpublished.
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The unpublished path
+   * @description This event is fired when content has been unpublished.
    */
 
   /**
    * @event Sidekick#loggedin
-   * @type {Sidekick} The sidekick
+   * @arg {CustomEvent} e The event
+   * @prop {Sidekick} e.detail.data The sidekick
    * @description This event is fired when a user has logged in.
    */
 
   /**
    * @event Sidekick#loggedout
-   * @type {Sidekick} The sidekick
+   * @arg {CustomEvent} e The event
+   * @prop {Sidekick} e.detail.data The sidekick
    * @description This event is fired when a user has logged out.
    */
 
   /**
    * @event Sidekick#helpnext
-   * @type {string} The help topic
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The help topic
    * @description This event is fired when a user clicks next on a help dialog.
    */
 
   /**
    * @event Sidekick#helpdismissed
-   * @type {string} The help topic
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The help topic
    * @description This event is fired when a help dialog has been dismissed.
    */
 
   /**
    * @event Sidekick#helpacknowledged
-   * @type {string} The help topic
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The help topic
    * @description This event is fired when a help dialog has been acknowledged.
    */
 
   /**
    * @event Sidekick#helpoptedout
-   * @type {string} The help topic
+   * @arg {CustomEvent} e The event
+   * @prop {string} e.detail.data The help topic
    * @description This event is fired when a user decides to opt out of help content.
    */
 
@@ -392,7 +395,7 @@ import sampleRUM from './rum.js';
    * Checks a path against supported file extensions.
    * @private
    * @param {string} path The path to check
-   * @returns {boolean} {@code true} if file extension supported, else {@code false}
+   * @returns {boolean} <code>true</code> if file extension supported, else <code>false</code>
    */
   function isSupportedFileExtension(path) {
     const file = path.split('/').pop();
@@ -416,7 +419,7 @@ import sampleRUM from './rum.js';
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
-   * @returns {boolean} {@code true} if URL is SharePoint, else {@code false}
+   * @returns {boolean} <code>true</code> if URL is SharePoint, else <code>false</code>
    */
   function isSharePoint(sk, url) {
     const { host } = url;
@@ -430,7 +433,7 @@ import sampleRUM from './rum.js';
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
-   * @returns {boolean} {@code true} if URL is SharePoint DM, else {@code false}
+   * @returns {boolean} <code>true</code> if URL is SharePoint DM, else <code>false</code>
    */
   function isSharePointDM(sk, url) {
     return isSharePoint(sk, url)
@@ -443,7 +446,7 @@ import sampleRUM from './rum.js';
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
-   * @returns {boolean} {@code true} if URL is SharePoint folder, else {@code false}
+   * @returns {boolean} <code>true</code> if URL is SharePoint folder, else <code>false</code>
    */
   function isSharePointFolder(sk, url) {
     if (isSharePointDM(sk, url)) {
@@ -459,7 +462,7 @@ import sampleRUM from './rum.js';
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
-   * @returns {boolean} {@code true} if URL is SharePoint editor, else {@code false}
+   * @returns {boolean} <code>true</code> if URL is SharePoint editor, else <code>false</code>
    */
   function isSharePointEditor(sk, url) {
     const { pathname, search } = url;
@@ -473,7 +476,7 @@ import sampleRUM from './rum.js';
    * @private
    * @param {Sidekick} sk The sidekick
    * @param {URL} url The URL
-   * @returns {boolean} {@code true} if URL is SharePoint viewer, else {@code false}
+   * @returns {boolean} <code>true</code> if URL is SharePoint viewer, else <code>false</code>
    */
   function isSharePointViewer(sk, url) {
     if (isSharePointDM(sk, url)) {
@@ -739,7 +742,7 @@ import sampleRUM from './rum.js';
    * Checks if the location has changed.
    * @private
    * @param {Sidekick} sk The sidekick
-   * @returns {boolean} {@code true} if location changed, else {@code false}
+   * @returns {boolean} <code>true</code> if location changed, else <code>false</code>
    */
   function isNewLocation(sk) {
     const { location } = sk;
@@ -1020,6 +1023,7 @@ import sampleRUM from './rum.js';
         'shown',
         'hidden',
         'updated',
+        'previewed',
         'published',
         'unpublished',
         'deleted',
@@ -1082,7 +1086,7 @@ import sampleRUM from './rum.js';
    * Determines whether to open a new tab or reuse the existing window.
    * @private
    * @param {Event} evt The event
-   * @returns <pre>true</pre> if a new tab should be opened, else <pre>false</pre>
+   * @returns {boolean} <code>true</code> if a new tab should be opened, else <code>false</code>
    */
   function newTab(evt) {
     return evt.metaKey || evt.shiftKey || evt.which === 2;
@@ -2671,9 +2675,9 @@ import sampleRUM from './rum.js';
   /**
    * Pushes down the page content to make room for the sidekick.
    * @private
-   * @see {@link SidekickConfig.noPushDown}
    * @param {Sidekick} sk The sidekick
    * @param {number} skHeight The current height of the sidekick (optional)
+   * @see SidekickConfig.pushDown
    */
   function pushDownContent(sk, skHeight) {
     const { config, location } = sk;
@@ -2816,7 +2820,7 @@ import sampleRUM from './rum.js';
    * Hides the special view.
    * @private
    * @param {Sidekick} sk The sidekick
-   * @param {boolean} click {@code true} if triggered by user
+   * @param {boolean} userAction <code>true</code> if triggered by user
    */
   function hideView(sk, userAction) {
     const viewOverlay = getViewOverlay(sk);
@@ -3168,6 +3172,7 @@ import sampleRUM from './rum.js';
      * Recalculates the height of the sidekick and pushes down the
      * page content by that amount to make room for the sidekick.
      * @returns {Sidekick} The sidekick
+     * @see SidekickConfig.pushDown
      */
     checkPushDownContent() {
       const sk = this instanceof Sidekick ? this : window.hlx.sidekick;
@@ -3436,9 +3441,10 @@ import sampleRUM from './rum.js';
     }
 
     /**
-     * @deprecated Use {@link isProject} instead
      * Checks if the current location is a configured project URL.
      * @returns {boolean} <code>true</code> if project URL, else <code>false</code>
+     * @deprecated
+     * @see isProject
      */
     isHelix() {
       return this.isProject();
@@ -3482,9 +3488,10 @@ import sampleRUM from './rum.js';
 
     /**
      * Displays a non-sticky notification.
-     * @deprecated Use <code>showModal(<Object>)</code> instead
      * @param {string|string[]} message The message (lines) to display
      * @param {number}          level error (0), warning (1), of info (2)
+     * @deprecated
+     * @see showModal
      */
     notify(message, level = 2) {
       this.showModal({
@@ -3784,8 +3791,8 @@ import sampleRUM from './rum.js';
     /**
      * Switches to (or opens) a given environment.
      * @param {string} targetEnv One of the following environments:
-     *        <pre>dev</pre>, <pre>preview</pre>, <pre>live</pre> or <pre>prod</pre>
-     * @param {boolean} open=false <pre>true</pre> if environment should be opened in new tab
+     *        <code>dev</code>, <code>preview</code>, <code>live</code> or <code>prod</code>
+     * @param {boolean} open=false <code>true</code> if environment should be opened in new tab
      * @fires Sidekick#envswitched
      * @returns {Sidekick} The sidekick
      */
@@ -3839,6 +3846,7 @@ import sampleRUM from './rum.js';
     /**
      * Updates the preview or code of the current resource.
      * @fires Sidekick#updated
+     * @fires Sidekick#previewed
      * @returns {Response} The response object
      */
     async update(path) {
@@ -3861,7 +3869,10 @@ import sampleRUM from './rum.js';
             await fetch(`https://${config.innerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
           }
           respPath = (await resp.json()).webPath;
-          fireEvent(this, 'updated', respPath);
+          fireEvent(this, 'updated', respPath); // @deprecated for content, use for code only
+          if (this.isContent()) {
+            fireEvent(this, 'previewed', respPath);
+          }
         }
       } catch (e) {
         console.error('failed to update', path, e);
@@ -3908,7 +3919,7 @@ import sampleRUM from './rum.js';
     }
 
     /**
-     * Publishes the page at the specified path if <pre>config.host</pre> is defined.
+     * Publishes the page at the specified path if <code>config.host</code> is defined.
      * @param {string} path The path of the page to publish
      * @fires Sidekick#published
      * @returns {Response} The response object
@@ -3980,6 +3991,36 @@ import sampleRUM from './rum.js';
       return resp;
     }
   }
+
+  /**
+   * @external
+   * @event document#sidekick-ready
+   * @type {CustomEvent}
+   * @arg {CustomEvent} e
+   * @prop {Sidekick} e.detail.data The sidekick
+   * @description This event is fired on the <code>document</code> once the sidekick is ready
+   */
+
+  /**
+   * @external
+   * @name "window.hlx.sidekickConfig"
+   * @type {SidekickConfig}
+   * @description The global variable holding the initial sidekick configuration.
+   */
+
+  /**
+   * @external
+   * @name "window.hlx.sidekick"
+   * @type {Sidekick}
+   * @description The global variable referencing the {@link Sidekick} singleton.
+   */
+
+  /**
+   * @external
+   * @name "window.hlx.sidekickScript"
+   * @type {Element}
+   * @description The <code>script</code> element which loaded the sidekick module.
+   */
 
   /**
    * @external
