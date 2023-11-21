@@ -458,7 +458,7 @@ export function updateSectionsStatus(main) {
       } else {
         section.dataset.sectionStatus = 'loaded';
         section.style.display = null;
-        if (window.performance) performance.mark('section-loaded', { detail: { preview: `section ${i} - ${section.className}`, index: i, className: section.className } });
+        if (window.performance) performance.mark('section-loaded', { detail: { preview: `${i} - ${[...section.classList.values()].reverse().join(' ')}`, index: i, className: section.className } });
       }
     }
   }
