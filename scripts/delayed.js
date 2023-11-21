@@ -73,3 +73,5 @@ document.addEventListener('mousemove', (e) => {
     }
   });
 });
+
+if (window.performance) performance.mark('delayed-end');

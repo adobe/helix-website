@@ -458,6 +458,7 @@ export function updateSectionsStatus(main) {
       } else {
         section.dataset.sectionStatus = 'loaded';
         section.style.display = null;
+        if (window.performance) performance.mark('section-loaded', { detail: { preview: `section ${i} - ${section.className}`, index: i, className: section.className } });
       }
     }
   }
@@ -574,6 +575,7 @@ export async function loadBlock(block) {
       console.log(`failed to load block ${blockName}`, error);
     }
     block.dataset.blockStatus = 'loaded';
+    if (window.performance) performance.mark('block-loaded', { detail: { preview: blockName, className: block.className } });
   }
 }
 

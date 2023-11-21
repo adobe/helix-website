@@ -569,6 +569,7 @@ function prepareSideNav(main) {
  * loads everything needed to get to LCP.
  */
 async function loadEager(doc) {
+  if (window.performance) performance.mark('eager-start');
   setLanguageForAccessibility('en');
   customDecorateTemplateAndTheme();
 
@@ -596,6 +597,8 @@ async function loadEager(doc) {
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
+
+  if (window.performance) performance.mark('eager-end');
 }
 
 function setUpSoftNavigation() {
@@ -662,6 +665,7 @@ function setUpSoftNavigation() {
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
+  if (window.performance) performance.mark('lazy-start');
   setUpSoftNavigation();
   const main = doc.querySelector('main');
 
@@ -700,6 +704,8 @@ async function loadLazy(doc) {
   window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
+
+  if (window.performance) performance.mark('lazy-end');
 }
 
 /**
@@ -707,6 +713,7 @@ async function loadLazy(doc) {
  * the user experience.
  */
 function loadDelayed() {
+  if (window.performance) performance.mark('delayed-start');
   window.setTimeout(() => {
     window.hlx.plugins.load('delayed');
     window.hlx.plugins.run('loadDelayed');
