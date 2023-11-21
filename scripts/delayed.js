@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { sampleRUM } from './lib-franklin.js';
+import { sampleRUM, loadScript } from './lib-franklin.js';
 
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
@@ -75,3 +75,10 @@ document.addEventListener('mousemove', (e) => {
 });
 
 if (window.performance) performance.mark('delayed-end');
+
+const usp = new URLSearchParams(window.location.search);
+if (usp.has('performance-report')) {
+  window.setTimeout(() => {
+    loadScript('https://main--hlxplayground--kptdobe.hlx.live/tools/report/report.js');
+  }, 1000);
+}
