@@ -79,6 +79,6 @@ if (window.performance) performance.mark('delayed-end');
 const usp = new URLSearchParams(window.location.search);
 if (usp.has('performance-report')) {
   window.setTimeout(() => {
-    loadScript('https://main--hlxplayground--kptdobe.hlx.live/tools/report/report.js');
+    loadScript(`https://main--hlxplayground--kptdobe.hlx.live/tools/report/report.js?ck=${Date.now()}`);
   }, 1000);
 }
