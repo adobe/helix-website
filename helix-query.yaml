@@ -20,6 +20,10 @@ indices:
         select: none
         value: |
           parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
+      robots:
+        select: head > meta[name="robots"]
+        value: |
+          attribute(el, 'content')
   docpages:
     target: /docpages-index
     include:
@@ -46,6 +50,10 @@ indices:
         select: none
         value: |
           parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
+      robots:
+        select: head > meta[name="robots"]
+        value: |
+          attribute(el, 'content')
       content:
         select: main
         value: |
