@@ -53,7 +53,7 @@ export default function decorate(block) {
 
     // colored number tag in cards
     if (block.classList.contains('colored-number')) {
-      cell.querySelector('h4').classList.add('colored-tag', 'number-tag', ColorNumberPattern[index]);
+      cell.querySelector('h4')?.classList.add('colored-tag', 'number-tag', ColorNumberPattern[index]);
     }
   });
 
