@@ -91,7 +91,6 @@ function decorateTimestamps(element) {
       container = container.parentElement;
     }
     const heading = container?.querySelector('h1, h2, h3, h4, h5, h6');
-    console.log(heading);
 
     // find a sibling element that is a link
     const link = timeEl.parentElement.querySelector('a[href]');
@@ -110,9 +109,6 @@ function decorateTimestamps(element) {
       // add a space before the download link
       timeEl.parentElement.append(document.createTextNode(' '));
       timeEl.parentElement.append(download);
-
-
-      console.log(download);
     }
   });
 }
