@@ -46,6 +46,11 @@ window.hlx.plugins.add('experimentation', {
   url: '/plugins/experimentation/src/index.js',
 });
 
+window.hlx.plugins.add('time-decorator', {
+  load: 'lazy',
+  url: '/plugins/time-decorator.js',
+});
+
 // -------------  Custom functions ------------- //
 
 /* set language in html tag for improving SEO accessibility */
@@ -514,7 +519,6 @@ function decorateSVGs(main) {
   // get all links that end with .svg
   const svgLinks = main.querySelectorAll('div.default-content-wrapper a[href$=".svg"]');
   Array.from(svgLinks).forEach((svg) => {
-    console.log(svg.parentElement.parentElement);
     const svgHref = new URL(svg.href).pathname;
 
     const svgEl = createTag('img', {

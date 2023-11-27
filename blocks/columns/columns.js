@@ -1,7 +1,7 @@
 import { removeOuterElementLayer, combineChildrenToSingleDiv, addInViewAnimationToMultipleElements } from '../../utils/helpers.js';
 
 const ColorIconPattern = ['pink', 'lightgreen', 'purple', 'yellow', 'purple', 'yellow', 'lightgreen', 'pink'];
-const ColorNumberPattern = ['lightgreen', 'pink', 'purple'];
+const ColorNumberPattern = ['lightgreen', 'pink', 'purple', 'yellow'];
 const animationConfig = {
   staggerTime: 0.04,
   items: [
@@ -12,6 +12,8 @@ const animationConfig = {
     },
   ],
 };
+
+const getColorPatternIndex = (patternArray, currentIndex) => (currentIndex % patternArray.length);
 
 export default function decorate(block) {
   const classes = ['one', 'two', 'three', 'four', 'five'];
@@ -47,13 +49,15 @@ export default function decorate(block) {
       // colored icons
       removeOuterElementLayer(cell, '.icon');
       if (block.classList.contains('colored-icon')) {
-        cell.querySelector('.icon').classList.add('colored-tag', 'circle', ColorIconPattern[index]);
+        const colorIconPatternIndex = getColorPatternIndex(ColorIconPattern, index);
+        cell.querySelector('.icon').classList.add('colored-tag', 'circle', colorIconPatternIndex);
       }
     }
 
     // colored number tag in cards
     if (block.classList.contains('colored-number')) {
-      cell.querySelector('h4').classList.add('colored-tag', 'number-tag', ColorNumberPattern[index]);
+      const colorNumberPatternIndex = getColorPatternIndex(ColorNumberPattern, index);
+      cell.querySelector('h4')?.classList.add('colored-tag', 'number-tag', ColorNumberPattern[colorNumberPatternIndex]);
     }
   });
 
