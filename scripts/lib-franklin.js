@@ -458,6 +458,23 @@ export function updateSectionsStatus(main) {
       } else {
         section.dataset.sectionStatus = 'loaded';
         section.style.display = null;
+        if (i === 0) {
+          const observer = new MutationObserver((mutationsList) => {
+            mutationsList.forEach((m) => {
+              if (m.type === 'childList') {
+                if (m.addedNodes.length > 0) {
+                  performance.mark('first-section-mutation', { detail: { preview: `Node(s) added to ${m.target.outerHTML}` } });
+                }
+                if (m.removedNodes.length > 0) {
+                  performance.mark('first-section-mutation', { detail: { preview: `Node(s) removed from ${m.target.outerHTML}` } });
+                }
+              } else if (m.type === 'attributes') {
+                performance.mark('first-section-mutation', { detail: { preview: `Attribute "${m.attributeName}" new value: "${m.target.getAttribute(m.attributeName)}"` } });
+              }
+            });
+          });
+          observer.observe(section, { attributes: true, childList: true, subtree: true });
+        }
         if (window.performance) performance.mark('section-loaded', { detail: { preview: `${i} - ${[...section.classList.values()].reverse().join(' ')}`, index: i, className: section.className } });
       }
     }
