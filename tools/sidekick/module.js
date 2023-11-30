@@ -2180,10 +2180,9 @@ import sampleRUM from './rum.js';
                     // open url in new window
                     window.open(target, `hlx-sk-${id || `custom-plugin-${i}`}`);
                   }
-                } else if (eventName) {
-                  // fire custom event
-                  fireEvent(sk, `custom:${eventName}`);
                 }
+                // fire custom event
+                fireEvent(sk, `custom:${eventName || id}`);
               },
               isDropdown: isContainer,
             },
