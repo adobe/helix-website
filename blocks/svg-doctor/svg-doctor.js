@@ -448,10 +448,18 @@ function buildControlButton(specs, viewBox) {
     },
     `<span class="glyph glyph-${specs.icon}">`,
   );
+  if (specs.checked !== null) button.setAttribute('aria-checked', specs.checked);
   button.addEventListener('click', (e) => {
     e.preventDefault();
     if (specs.effect !== 'reset') {
       viewBox.dataset[specs.effect] = toClassName(specs.icon);
+      const unchecked = button.getAttribute('aria-checked') === 'false';
+      if (unchecked) {
+        button.parentElement.querySelectorAll('button').forEach((btn) => {
+          btn.setAttribute('aria-checked', false);
+        });
+        button.setAttribute('aria-checked', true);
+      }
     } else resetForm(viewBox);
   });
   return button;
@@ -462,12 +470,24 @@ function buildPreviewControls(form, viewBox) {
     // build buttons
     const buttons = createTag('div', { class: 'controls-buttons' });
     const controls = createTag('div', { class: 'controls', role: 'toolbar' });
-    const darkBtn = buildControlButton({ label: 'Dark Mode', icon: 'dark', effect: 'mode' }, viewBox);
-    const lightBtn = buildControlButton({ label: 'Light Mode', icon: 'light', effect: 'mode' }, viewBox);
-    const buttonBtn = buildControlButton({ label: 'Button Display', icon: 'button', effect: 'display' }, viewBox);
-    const imageBtn = buildControlButton({ label: 'Image Display', icon: 'image', effect: 'display' }, viewBox);
+    const modes = createTag('div', { class: 'controls-mode' });
+    const lightBtn = buildControlButton({
+      label: 'Light Mode', icon: 'light', effect: 'mode', checked: true,
+    }, viewBox);
+    const darkBtn = buildControlButton({
+      label: 'Dark Mode', icon: 'dark', effect: 'mode', checked: false,
+    }, viewBox);
+    const displays = createTag('div', { class: 'controls-display' });
+    const imageBtn = buildControlButton({
+      label: 'Image Display', icon: 'image', effect: 'display', checked: true,
+    }, viewBox);
+    const buttonBtn = buildControlButton({
+      label: 'Button Display', icon: 'button', effect: 'display', checked: false,
+    }, viewBox);
     const resetBtn = buildControlButton({ label: 'Reset Form', icon: 'reset', effect: 'reset' }, viewBox);
-    buttons.append(darkBtn, lightBtn, buttonBtn, imageBtn, resetBtn);
+    modes.append(lightBtn, darkBtn);
+    displays.append(imageBtn, buttonBtn);
+    buttons.append(modes, displays, resetBtn);
     // build palette
     const palette = createTag('div', { class: 'controls-palette' });
     controls.append(buttons, palette);
@@ -486,7 +506,11 @@ export default function decorate(block) {
     // build preview
     const viewBox = createTag('div', { class: 'viewbox' });
     viewBox.dataset.status = 'upload';
-    viewBox.addEventListener('dragover', () => viewBox.classList.add('hover'));
+    viewBox.addEventListener('dragover', () => {
+      viewBox.classList.add('hover');
+      const preview = block.querySelector('.preview');
+      if (preview) resetForm(viewBox);
+    });
     viewBox.addEventListener('dragleave', () => viewBox.classList.remove('hover'));
     const label = createTag('label', { for: 'upload' });
     label.innerHTML = `<span class="glyph glyph-upload"></span>
