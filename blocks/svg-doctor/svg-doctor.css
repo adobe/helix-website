@@ -24,7 +24,7 @@
   transition: color .3s;
 }
 
-.svg-doctor form .viewbox[data-mode="dark"] label {
+.svg-doctor form .viewbox[data-mode='dark'] label {
   color: white;
 }
 
@@ -36,6 +36,13 @@
 
 .svg-doctor form label span + p {
   margin-top: .5em;
+}
+
+.svg-doctor .form .form-number-wrapper,
+.svg-doctor .form label[for=width], .svg-doctor .form input#width,
+.svg-doctor .form label[for=height], .svg-doctor .form input#height {
+  visibility: hidden;
+  display: none;
 }
 
 /* viewbox */
@@ -110,7 +117,7 @@
 /* controls */
 .svg-doctor .controls {
   display: flex;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: .5rem;
   border-radius: 0 0 var(--card-border-radius-l) var(--card-border-radius-l);
   padding: .5rem var(--card-border-radius-l);
@@ -122,7 +129,15 @@
   visibility: hidden;
 }
 
-.svg-doctor .controls button {
+/* controls buttons */
+.svg-doctor .controls-buttons {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.svg-doctor .controls-buttons button {
   position: relative;
   border: 0;
   border-radius: var(--input-border-radius);
@@ -133,12 +148,12 @@
   transition: background-color .3s;
 }
 
-.svg-doctor .controls button:hover,
-.svg-doctor .controls button:focus {
+.svg-doctor .controls-buttons button:hover,
+.svg-doctor .controls-buttons button:focus {
   background-color: var(--bg-color-grey-2);
 }
 
-.svg-doctor .controls button:hover::after {
+.svg-doctor .controls-buttons button:hover::after {
   content: attr(aria-label);
   position: absolute;
   top: calc(100% + .2rem);
@@ -153,6 +168,65 @@
   z-index: 1;
 }
 
+/* controls palette */
+.svg-doctor .controls-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2rem;
+}
+
+.svg-doctor .controls-palette .swatch {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: calc(24px + .3em);
+  height: calc(24px + .3em);
+  outline: 1px solid black;
+  border: 1px solid white;
+  background-color: black;
+  transition: background-color .2s;
+  cursor: pointer;
+}
+
+.svg-doctor .controls-palette .swatch.icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: white;
+  transition: background-color .2s;
+}
+
+.svg-doctor .viewbox[data-mode='dark'] + .controls .controls-palette .swatch {
+  background-color: white;
+}
+
+.svg-doctor .viewbox[data-mode='dark'] + .controls .controls-palette .swatch.icon::after {
+  background-color: black;
+}
+
+.svg-doctor .viewbox[data-display='button'] + .controls .controls-palette .swatch {
+  background-color: var(--spectrum-blue);
+}
+
+.svg-doctor .viewbox[data-display='button'] + .controls .controls-palette .swatch.icon::after {
+  background-color: white;
+}
+
+.svg-doctor .controls-palette .swatch::-webkit-color-swatch,
+.svg-doctor .controls-palette .swatch::-webkit-color-swatch-wrapper {
+  all: unset;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+	padding: 0;
+}
+
 /* specs */
 .svg-doctor .specs[aria-hidden] {
   display: none;
@@ -162,6 +236,11 @@
 /* preview */
 .svg-doctor .viewbox .preview {
   width: 100%;
+  color: black;
+}
+
+.svg-doctor .viewbox[data-mode='dark'] .preview {
+  color: white;
 }
 
 .svg-doctor .viewbox[data-display='button'] .preview {
@@ -173,7 +252,7 @@
   border-color: transparent;
   background-color: var(--spectrum-blue);
   color: var(--color-white);
-  font-size: var(--type-body-l-size);
+  font-size: var(--type-body-l-lh);
   font-style: normal;
   font-weight: 600;
   text-align: center;
@@ -194,9 +273,8 @@
 
 .svg-doctor .viewbox[data-display='button'] .preview svg {
   width: auto;
-  height: 25px;
-  margin-right: 1rem;
-  fill: currentcolor;
+  height: var(--type-body-l-lh);
+  margin-right: 1ch;
 }
 
 /* icons/glyphs */
