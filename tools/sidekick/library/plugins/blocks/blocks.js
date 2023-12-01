@@ -11,7 +11,6 @@
  */
 
 /* eslint-disable
-  no-await-in-loop,
   no-param-reassign,
   consistent-return,
   no-plusplus,
@@ -163,6 +162,7 @@ function updateDetailsContainer(container, title, description) {
  * @param {Object} pageMetadata The page metadata
  */
 function attachCopyButtonEventListener(
+  context,
   container,
   blockRenderer,
   defaultLibraryMetadata,
@@ -170,35 +170,36 @@ function attachCopyButtonEventListener(
   pageMetadata,
 ) {
   const copyButton = removeAllEventListeners(container.querySelector('.content .copy-button'));
-  copyButton.addEventListener('click', () => {
+  copyButton.addEventListener('click', async () => {
     const copyElement = blockRenderer.getBlockElement();
     const copyWrapper = blockRenderer.getBlockWrapper();
     const copyBlockData = blockRenderer.getBlockData();
 
-    // Return the copied DOM in the toast message so it can be tested
-    // Cannot read or write clipboard in tests
-    let copiedDOM;
-
     // Are we trying to copy a block, a page or default content?
     // The copy operation is slightly different depending on which
-
     if (defaultLibraryMetadata.type === 'template' || sectionLibraryMetadata.multiSectionBlock || sectionLibraryMetadata.compoundBlock) {
-      copiedDOM = copyPageToClipboard(copyWrapper, copyBlockData.url, pageMetadata);
+      await copyPageToClipboard(
+        context,
+        copyWrapper,
+        copyBlockData.url,
+        pageMetadata,
+      );
     } else if (blockRenderer.isBlock) {
-      copiedDOM = copyBlockToClipboard(
+      await copyBlockToClipboard(
+        context,
         copyWrapper,
         getBlockName(copyElement, true),
         copyBlockData.url,
       );
     } else {
-      copiedDOM = copyDefaultContentToClipboard(copyWrapper, copyBlockData.url);
+      await copyDefaultContentToClipboard(context, copyWrapper, copyBlockData.url);
     }
 
-    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', result: copiedDOM } }));
+    container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block' } }));
   });
 }
 
-function onBlockListCopyButtonClicked(event, container) {
+async function onBlockListCopyButtonClicked(context, event, container) {
   const {
     blockWrapper: wrapper,
     blockNameWithVariant: name,
@@ -208,24 +209,20 @@ function onBlockListCopyButtonClicked(event, container) {
     pageMetadata,
   } = event.detail;
 
-  // Return the copied DOM in the toast message so it can be tested
-  // Cannot read or write clipboard in tests
-  let copiedDOM;
-
   // We may not have rendered the block yet, so we need to check for a block to know if
   // we are dealing with a block or default content
   const block = wrapper.querySelector(':scope > div:not(.section-metadata)');
   if (defaultLibraryMetadata && (defaultLibraryMetadata.type === 'template' || sectionLibraryMetadata.multiSectionBlock || sectionLibraryMetadata.compoundBlock)) {
-    copiedDOM = copyPageToClipboard(wrapper, blockURL, pageMetadata);
+    await copyPageToClipboard(context, wrapper, blockURL, pageMetadata);
   } else if (block) {
-    copiedDOM = copyBlockToClipboard(wrapper, name, blockURL);
+    await copyBlockToClipboard(context, wrapper, name, blockURL);
   } else {
-    copiedDOM = copyDefaultContentToClipboard(wrapper, blockURL);
+    await copyDefaultContentToClipboard(context, wrapper, blockURL);
   }
-  container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: wrapper, result: copiedDOM } }));
+  container.dispatchEvent(new CustomEvent('Toast', { detail: { message: 'Copied Block', target: wrapper } }));
 }
 
-function loadBlock(event, container) {
+function loadBlock(context, event, container) {
   const content = container.querySelector('.block-library');
   const {
     blockWrapper,
@@ -271,6 +268,7 @@ function loadBlock(event, container) {
 
   // Attach copy button event listener
   attachCopyButtonEventListener(
+    context,
     container,
     blockRenderer,
     defaultLibraryMetadata,
@@ -282,7 +280,7 @@ function loadBlock(event, container) {
   sampleRUM('library:blockviewed', { target: blockData.url });
 }
 
-function loadTemplate(event, container) {
+function loadTemplate(context, event, container) {
   const content = container.querySelector('.block-library');
   const {
     blockWrapper,
@@ -321,6 +319,7 @@ function loadTemplate(event, container) {
 
   // Attach copy button event listener
   attachCopyButtonEventListener(
+    context,
     container,
     blockRenderer,
     defaultLibraryMetadata,
@@ -337,7 +336,7 @@ function loadTemplate(event, container) {
  * @param {HTMLElement} container The container to render the plugin in
  * @param {Object} data The data contained in the plugin sheet
  */
-export async function decorate(container, data) {
+export async function decorate(container, data, searchTerm, context) {
   container.dispatchEvent(new CustomEvent('ShowLoader'));
 
   const content = createTag('div', { class: 'block-library' }, renderScaffolding());
@@ -352,13 +351,13 @@ export async function decorate(container, data) {
   });
 
   // Handle LoadTemplate events
-  blockList.addEventListener('LoadTemplate', loadPageEvent => loadTemplate(loadPageEvent, container));
+  blockList.addEventListener('LoadTemplate', loadPageEvent => loadTemplate(context, loadPageEvent, container));
 
   // Handle LoadBlock events
-  blockList.addEventListener('LoadBlock', loadBlockEvent => loadBlock(loadBlockEvent, container));
+  blockList.addEventListener('LoadBlock', loadBlockEvent => loadBlock(context, loadBlockEvent, container));
 
   // Handle CopyBlock events from the block list
-  blockList.addEventListener('CopyBlock', blockListCopyEvent => onBlockListCopyButtonClicked(blockListCopyEvent, container));
+  blockList.addEventListener('CopyBlock', blockListCopyEvent => onBlockListCopyButtonClicked(context, blockListCopyEvent, container));
 
   const search = content.querySelector('sp-search');
   search.addEventListener('input', (e) => {

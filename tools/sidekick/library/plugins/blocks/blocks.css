@@ -39,11 +39,13 @@ sp-split-view {
     display: flex;
     flex-direction: column;
     background-color: var(--spectrum-global-color-gray-75);
+    overflow: hidden;
 }
 
 .details-container .details {
     height: 100%;
     padding: 0 16px 0 16px;
+    overflow-y: auto;
 }
 
 .details-container .actions {
