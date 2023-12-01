@@ -13,8 +13,7 @@
 /* eslint-disable consistent-return, no-param-reassign */
 
 import {
-  createCopy,
-  createTag, readBlockConfig, toCamelCase,
+  createTag, readBlockConfig, toCamelCase, isPath,
 } from '../../utils/dom.js';
 import { sampleRUM } from '../../utils/rum.js';
 
@@ -116,7 +115,7 @@ export function getAuthorFriendlyName(name) {
     .replace(/\b\w/g, char => char.toUpperCase());
 }
 
-export function convertBlockToTable(block, name, path) {
+export async function convertBlockToTable(context, block, name, path) {
   const url = new URL(path);
 
   prepareIconsForCopy(block);
@@ -134,10 +133,10 @@ export function convertBlockToTable(block, name, path) {
   const headerRow = document.createElement('tr');
   headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, getAuthorFriendlyName(name)));
   table.append(headerRow);
-  rows.forEach((row) => {
+  for (const row of rows) {
     const columns = [...row.children];
     const tr = document.createElement('tr');
-    columns.forEach((col) => {
+    for (const col of columns) {
       const columnWidthPercentage = (1 / columns.length) * 100;
       const td = document.createElement('td');
       if (row.children.length < maxCols) {
@@ -146,14 +145,15 @@ export function convertBlockToTable(block, name, path) {
         td.setAttribute('style', `width: ${columnWidthPercentage}%`);
       }
 
-      prepareImagesForCopy(col, url, columnWidthPercentage);
+      await prepareImagesForCopy(context, col, url, columnWidthPercentage);
 
       td.innerHTML = col.innerHTML;
 
       tr.append(td);
-    });
+    }
     table.append(tr);
-  });
+  }
+
   return table;
 }
 
@@ -184,16 +184,66 @@ export function convertObjectToTable(name, object) {
   return table;
 }
 
-export function prepareImagesForCopy(element, url, columnWidthPercentage) {
+/**
+ * Converts an image URL to a base64 encoded string
+ * @param {String} url The URL of the image
+ * @returns {Promise<String>} The base64 encoded string
+ */
+async function imageUrlToBase64(url) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    try {
+      const reader = new FileReader();
+      reader.onload = (res) => {
+        resolve(res.target.result);
+      };
+      reader.readAsDataURL(blob);
+    } catch (e) {
+      /* c8 ignore next 2 */
+      reject(e);
+    }
+  });
+}
+
+/**
+ * Prepares images for copying to the clipboard, encodes if needed and sizes correctly
+ * @param {Object} context The library context
+ * @param {*} element The element to prepare
+ * @param {*} url The URL of the block
+ * @param {*} columnWidthPercentage The column width percentage
+ */
+export async function prepareImagesForCopy(context, element, url, columnWidthPercentage) {
   const blockURL = typeof url === 'string' ? new URL(url) : url;
-  element.querySelectorAll('img').forEach((img) => {
+  const images = element.querySelectorAll('img');
+  for (const img of images) {
+    // If the image is not a data URL
     if (!img.src.includes('data:')) {
-      const srcSplit = img.src.split('/');
-      const mediaPath = srcSplit.pop();
-      img.src = `${blockURL.origin}/${mediaPath}`;
+      // If we are encoding images, convert the image to a data URL
+      if (context.encodeImages) {
+        try {
+          const imgURL = new URL(img.src);
+
+          // Limit image width to 2000px
+          imgURL.searchParams.set('width', '2000');
+          const dataURL = await imageUrlToBase64(imgURL.href);
+          img.src = dataURL;
+        } catch (e) {
+          /* c8 ignore next 3 */
+          // eslint-disable-next-line no-console
+          console.error(e);
+        }
+      } else {
+        // Not encoding, just replace the host with the block host
+        const srcSplit = img.src.split('/');
+        const mediaPath = srcSplit.pop();
+        img.src = `${blockURL.origin}/${mediaPath}`;
+      }
     }
 
-    const maxWidth = Math.min(295, (columnWidthPercentage / 100) * 540);
+    const maxWidth = columnWidthPercentage !== 100
+      ? Math.min(295, (columnWidthPercentage / 100) * 540)
+      : 650;
     const originalWidth = img.width;
     const originalHeight = img.height;
 
@@ -206,15 +256,21 @@ export function prepareImagesForCopy(element, url, columnWidthPercentage) {
 
     // Check if the new height exceeds the maximum height
     if (newHeight > maxWidth) {
+      /* c8 ignore next 3 */
       newHeight = maxWidth;
       newWidth = newHeight * aspectRatio;
     }
 
     img.width = newWidth;
     img.height = newHeight;
-  });
+  }
 }
 
+/**
+ * Prepares icons for copying to the clipboard,
+ * replaces the span with the icon name in the format :icon-name:
+ * @param {HTMLElement} element The element to prepare
+ */
 export function prepareIconsForCopy(element) {
   element.querySelectorAll('span.icon').forEach((icon) => {
     const classNames = icon.className.split(' ');
@@ -232,6 +288,22 @@ export function prepareIconsForCopy(element) {
         icon.parentElement.innerHTML = icon.parentElement.innerHTML.replace(/<span\b[^>]*>(.*?)<\/span>/, `:${iconName}:`);
         break;
       }
+    }
+  });
+}
+
+/**
+ * Prepares anchor tags for copying to the clipboard,
+ * updates any relative paths to include the origin
+ * @param {HTMLElement} element The element to prepare
+ * @param {String} origin The origin to use for any relative paths
+ */
+export function prepareAnchorsForCopy(element) {
+  const { origin } = window.location;
+  element.querySelectorAll('a').forEach((anchor) => {
+    const path = anchor.getAttribute('href');
+    if (isPath(path)) {
+      anchor.href = `${origin}${path}`;
     }
   });
 }
@@ -262,16 +334,18 @@ export function parseDescription(description) {
 }
 
 /**
- *
- * @param {*} block
- * @param {*} baseURL
+ * Fetches the section metadata for a block and returns it as a table
+ * @param {Object} context The library context
+ * @param {HTMLElement} block The block element
+ * @param {String} baseURL The base URL of the block
  * @returns
  */
-function getSectionMetadata(block, baseURL) {
+async function getSectionMetadata(context, block, baseURL) {
   const sectionMetadata = block.querySelector(':scope > .section-metadata');
   if (sectionMetadata) {
     // Create a table for the section metadata
     return convertBlockToTable(
+      context,
       sectionMetadata,
       'Section metadata',
       baseURL,
@@ -279,48 +353,79 @@ function getSectionMetadata(block, baseURL) {
   }
 }
 
-export function copyBlock(block) {
-  const tables = [block];
-
+/**
+ * Copies to the clipboard
+ * @param {Object} context The library context
+ * @param {Object} data The data request to prepare the block
+ * @param {Function} prepare The function to prepare the block
+ */
+export function copyToClipboard(context, data, prepare) {
   try {
-    const blob = new Blob(tables, { type: 'text/html' });
-    createCopy(blob);
+    // Since we need may need to pontentially fetch images (if encodeImages is true),
+    // we need to use the promise based API for the clipboard API.
+    const clipboardData = [new ClipboardItem({
+      'text/html': new Promise((resolve, reject) => {
+        prepare(context, data).then((html) => {
+          try {
+            const blob = new Blob([html.outerHTML], { type: 'text/html' });
+            resolve(blob);
+          } catch (e) {
+            /* c8 ignore next 2 */
+            reject(e);
+          }
+        });
+      }),
+    })];
+    navigator.clipboard.write(clipboardData);
+    /* c8 ignore next 4 */
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Unable to copy block', error);
+    console.error('Unable to write to clipboard', error);
   }
-
-  return block;
 }
 
 /**
  * Copies a block to the clipboard
+ * @param {Object} context The library context
  * @param {HTMLElement} wrapper The wrapper element
  * @param {string} name The name of the block
  * @param {string} blockURL The URL of the block
  */
-export function copyBlockToClipboard(wrapper, name, blockURL) {
-  // Get the first block element ignoring any section metadata blocks
-  const element = wrapper.querySelector(':scope > div:not(.section-metadata)');
-  let blockTable = '';
+export async function copyBlockToClipboard(context, wrapper, name, blockURL) {
+  async function prepare(ctx, data) {
+    const { blockName, html } = data;
+    // Get the first block element ignoring any section metadata blocks
+    const element = html.querySelector(':scope > div:not(.section-metadata)');
+    let blockTable = '';
 
-  // If the wrapper has no block, leave block table empty
-  if (element) {
-    blockTable = convertBlockToTable(
-      element,
-      name,
-      blockURL,
-    );
+    prepareAnchorsForCopy(element);
+
+    // If the wrapper has no block, leave block table empty
+    if (element) {
+      blockTable = await convertBlockToTable(
+        ctx,
+        element,
+        blockName,
+        blockURL,
+      );
+    }
+
+    // Does the block have section metadata?
+    const sectionMetadataTable = await getSectionMetadata(ctx, html, blockURL);
+    if (sectionMetadataTable) {
+      sectionMetadataTable.prepend(createTag('br'));
+      blockTable.append(sectionMetadataTable);
+    }
+
+    return blockTable;
   }
 
-  // Does the block have section metadata?
-  const sectionMetadataTable = getSectionMetadata(wrapper, blockURL);
-  if (sectionMetadataTable) {
-    sectionMetadataTable.prepend(createTag('br'));
-    blockTable.append(sectionMetadataTable);
-  }
+  const data = {
+    blockName: name,
+    html: wrapper,
+  };
 
-  const copied = copyBlock(blockTable.outerHTML);
+  const copied = await copyToClipboard(context, data, prepare);
 
   // Track block copy event
   sampleRUM('library:blockcopied', { target: blockURL });
@@ -330,24 +435,36 @@ export function copyBlockToClipboard(wrapper, name, blockURL) {
 
 /**
  * Copies default content to the clipboard
+ * @param {Object} context The library context
  * @param {HTMLElement} wrapper The wrapper element
  * @param {string} blockURL The URL of the block
  * @returns {HTMLElement} The cloned wrapper
  */
-export function copyDefaultContentToClipboard(wrapper, blockURL) {
-  const wrapperClone = wrapper.cloneNode(true);
-  prepareIconsForCopy(wrapperClone);
-  prepareImagesForCopy(wrapperClone, blockURL, 100);
+export async function copyDefaultContentToClipboard(context, wrapper, blockURL) {
+  async function prepare(ctx, data) {
+    const { html, url } = data;
+    const wrapperClone = html.cloneNode(true);
+    prepareAnchorsForCopy(wrapperClone);
+    prepareIconsForCopy(wrapperClone);
+    await prepareImagesForCopy(ctx, wrapperClone, blockURL, 100);
 
-  const sectionMetadataTable = getSectionMetadata(wrapperClone, blockURL);
-  if (sectionMetadataTable) {
-    wrapperClone.append(sectionMetadataTable);
+    const sectionMetadataTable = await getSectionMetadata(ctx, wrapperClone, url);
+    if (sectionMetadataTable) {
+      wrapperClone.append(sectionMetadataTable);
 
-    const sectionMetadata = wrapperClone.querySelector(':scope > .section-metadata');
-    sectionMetadata.remove();
+      const sectionMetadata = wrapperClone.querySelector(':scope > .section-metadata');
+      sectionMetadata.remove();
+    }
+
+    return wrapperClone;
   }
 
-  const copied = copyBlock(wrapperClone.outerHTML);
+  const data = {
+    html: wrapper,
+    url: blockURL,
+  };
+
+  const copied = await copyToClipboard(context, data, prepare);
 
   // Track block copy event
   sampleRUM('library:blockcopied', { target: blockURL });
@@ -358,61 +475,76 @@ export function copyDefaultContentToClipboard(wrapper, blockURL) {
 /**
  * Copies a page to the clipboard, pages can consist of multiple blocks,
  * default content, section metadata and metadata
+ * @param {Object} context The library context
  * @param {HTMLElement} wrapper The wrapper element
  * @param {string} blockURL The URL of the block
  * @returns {HTMLElement} The cloned wrapper
  */
-export function copyPageToClipboard(wrapper, blockURL, pageMetadata) {
-  const wrapperClone = wrapper.cloneNode(true);
-  prepareIconsForCopy(wrapperClone);
-  prepareImagesForCopy(wrapperClone, blockURL, 100);
+export async function copyPageToClipboard(context, wrapper, blockURL, pageMetadata) {
+  async function prepare(ctx, data) {
+    const { html, pageMeta, url } = data;
+    const wrapperClone = html.cloneNode(true);
+    prepareAnchorsForCopy(wrapperClone);
+    prepareIconsForCopy(wrapperClone);
+    await prepareImagesForCopy(ctx, wrapperClone, url, 100);
 
-  const sectionBreak = createTag('p', undefined, '---');
+    const sectionBreak = createTag('p', undefined, '---');
 
-  // Get all section on page
-  const sections = wrapperClone.querySelectorAll(':scope > div');
-  sections.forEach((section, index) => {
-    // If not the last section, add a section delimeter
-    if (index < sections.length - 1) {
-      section.insertAdjacentElement('beforeend', sectionBreak.cloneNode(true));
+    // Get all section on page
+    const sections = wrapperClone.querySelectorAll(':scope > div');
+    let index = 0;
+    for (const section of sections) {
+      // If not the last section, add a section delimeter
+      if (index < sections.length - 1) {
+        section.insertAdjacentElement('beforeend', sectionBreak.cloneNode(true));
+      }
+
+      // Create a br element to space out tables
+      const br = createTag('br');
+
+      // Does the current section have any blocks?
+      const blocks = section.querySelectorAll(':scope > div:not(.section-metadata)');
+      for (const block of blocks) {
+        // Convert the block to a table
+        const blockTable = await convertBlockToTable(
+          ctx,
+          block,
+          getBlockName(block, true),
+          blockURL,
+        );
+
+        // Insert a br after every table to add some spacing in the document
+        block.parentNode.insertBefore(br.cloneNode(), block.nextSibling);
+
+        // Replace the block with the table
+        block.replaceWith(blockTable);
+      }
+
+      const sectionMetadata = section.querySelector(':scope > div.section-metadata');
+      const sectionMetadataTable = await getSectionMetadata(ctx, section, blockURL);
+      if (sectionMetadataTable) {
+        sectionMetadata.replaceWith(createTag('br'), sectionMetadataTable);
+      }
+
+      index += 1;
     }
 
-    // Create a br element to space out tables
-    const br = createTag('br');
-
-    // Does the current section have any blocks?
-    const blocks = section.querySelectorAll(':scope > div:not(.section-metadata)');
-    blocks.forEach((block) => {
-      // Convert the block to a table
-      const blockTable = convertBlockToTable(
-        block,
-        getBlockName(block, true),
-        blockURL,
-      );
-
-      // Insert a br after every table to add some spacing in the document
-      block.parentNode.insertBefore(br.cloneNode(), block.nextSibling);
-
-      // Replace the block with the table
-      block.replaceWith(blockTable);
-    });
-
-    const sectionMetadata = section.querySelector(':scope > div.section-metadata');
-    const sectionMetadataTable = getSectionMetadata(section, blockURL);
-    if (sectionMetadataTable) {
-      sectionMetadata.replaceWith(createTag('br'), sectionMetadataTable);
+    if (pageMeta) {
+      const pageMetadataTable = convertObjectToTable('Metadata', pageMeta);
+      wrapperClone.append(pageMetadataTable);
     }
-  });
 
-  if (pageMetadata) {
-    const pageMetadataTable = convertObjectToTable('Metadata', pageMetadata);
-    wrapperClone.append(pageMetadataTable);
+    return wrapperClone;
   }
 
-  const copied = copyBlock(wrapperClone.outerHTML);
+  const data = {
+    html: wrapper,
+    pageMeta: pageMetadata,
+    url: blockURL,
+  };
+
+  await copyToClipboard(context, data, prepare);
 
   // Track block copy event
   sampleRUM('library:blockcopied', { target: blockURL });
-
-  return copied;
 }
