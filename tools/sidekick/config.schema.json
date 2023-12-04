@@ -20,7 +20,7 @@
         },
         "event": {
           "type": "string",
-          "description": "The name of a custom event to fire when the button is clicked"
+          "description": "The name of a custom event to fire when the button is clicked (defaults to id)"
         },
         "excludePaths": {
           "type": "array",
@@ -91,6 +91,7 @@
           "description": "Append the referrer URL as a query param on new URL button click"
         }
       },
+      "required": [ "id" ],
       "anyOf": [
         { "required": [ "url" ] },
         { "required": [ "event" ] },
@@ -121,6 +122,7 @@
         }
       },
       "required": [
+        "id",
         "path",
         "viewer"
       ],
