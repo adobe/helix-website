@@ -104,13 +104,16 @@
 .svg-doctor .viewbox svg {
   width: 100%;
   height: auto;
-  max-height: 598px;
+  max-height: calc(100vw - 3rem);
 }
 
 @media (min-width: 900px) {
   .svg-doctor .viewbox {
-    min-height: 598px;
-    height: calc(100% - 300px - var(--side-navigation-bar-gap));
+    height: 860px;
+  }
+
+  .svg-doctor .viewbox svg {
+    max-height: calc(860px - 3rem);
   }
 }
 
@@ -118,6 +121,7 @@
 .svg-doctor .controls {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: .5rem;
   border-radius: 0 0 var(--card-border-radius-l) var(--card-border-radius-l);
   padding: .5rem var(--card-border-radius-l);
@@ -130,11 +134,20 @@
 }
 
 /* controls buttons */
-.svg-doctor .controls-buttons {
+.svg-doctor .controls-buttons,
+.svg-doctor .controls-buttons > div {
   flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   gap: .5rem;
+  max-width: 100%;
+}
+
+.svg-doctor .controls-buttons > div::after {
+  content: '';
+  width: 1px;
+  height: 100%;
+  background-color: var(--bg-color-grey-2);
 }
 
 .svg-doctor .controls-buttons button {
@@ -148,6 +161,7 @@
   transition: background-color .3s;
 }
 
+.svg-doctor .controls-buttons button[aria-checked=true],
 .svg-doctor .controls-buttons button:hover,
 .svg-doctor .controls-buttons button:focus {
   background-color: var(--bg-color-grey-2);
