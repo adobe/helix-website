@@ -1,12 +1,3 @@
-.releases .helix-admin .release-helix-admin,
-.releases .helix-pipeline-service .release-helix-pipeline-service, 
-.releases .helix-importer-ui .release-helix-importer-ui, 
-.releases .helix-sidekick-extension .release-helix-sidekick-extension,
-.releases .helix-cli .release-helix-cli,
-.releases .franklin-sidekick-library .release-franklin-sidekick-library {
-    display: block;
-}
-
 .releases .releases-controls input[type="checkbox"] {
     pointer-events: none;
 }
@@ -69,4 +60,13 @@
 
 .releases .releases-results[aria-hidden="true"] {
     display: none;
+}
+
+.releases .helix-admin .release-helix-admin,
+.releases .helix-pipeline-service .release-helix-pipeline-service, 
+.releases .helix-importer-ui .release-helix-importer-ui, 
+.releases .helix-sidekick-extension .release-helix-sidekick-extension,
+.releases .helix-cli .release-helix-cli,
+.releases .franklin-sidekick-library .release-franklin-sidekick-library {
+    display: block;
 }

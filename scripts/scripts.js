@@ -653,7 +653,7 @@ function setUpSoftNavigation() {
     if (link && getMetadata('template') === 'guides' && e.target.closest('.side-navigation')) {
       const { href } = link;
       const hrefURL = new URL(href);
-      if (hrefURL.origin === window.location.origin) {
+      if ((hrefURL.origin === window.location.origin) && window.location.pathname !== '/docs/') {
         e.preventDefault();
         await navigate(href, link);
         window.history.pushState({}, null, href);
