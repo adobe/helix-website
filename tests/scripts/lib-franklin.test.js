@@ -146,26 +146,12 @@ describe('Sections and blocks', () => {
     expect(document.querySelectorAll('main .block').length).to.equal(7);
   });
 
-  it('Loads blocks', async () => {
+  it('Loads Sections', async () => {
     scripts.init();
-    await scripts.loadBlocks(document.querySelector('main'));
+    await scripts.loadSections(document.querySelector('main'));
     document.querySelectorAll('main .block').forEach(($block) => {
       expect($block.dataset.blockStatus).to.equal('loaded');
     });
-  });
-
-  it('Updates section status', async () => {
-    scripts.updateSectionsStatus(document.querySelector('main'));
-    document.querySelectorAll('main .section').forEach(($section) => {
-      expect($section.dataset.sectionStatus).to.equal('loaded');
-    });
-
-    // test section with block still loading
-    const $section = document.querySelector('main .section');
-    delete $section.dataset.sectionStatus;
-    $section.querySelector(':scope .block').dataset.blockStatus = 'loading';
-    scripts.updateSectionsStatus(document.querySelector('main'));
-    expect($section.dataset.sectionStatus).to.equal('loading');
   });
 
   it('Reads block config', async () => {
