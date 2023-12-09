@@ -7,8 +7,9 @@ import {
   toClassName,
   decorateSections,
   decorateBlocks,
-  waitForLCP,
-  loadBlocks,
+  waitForImage,
+  loadSection,
+  loadSections,
   loadBlock,
   loadCSS,
   loadScript,
@@ -23,8 +24,6 @@ import {
 } from '../utils/helpers.js';
 
 // Constants here
-const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
-
 const AUDIENCES = {
   mobile: () => window.innerWidth < 600,
   desktop: () => window.innerWidth >= 600,
@@ -598,7 +597,8 @@ async function loadEager(doc) {
     decorateBreadcrumb(main);
     prepareSideNav(main);
     document.body.classList.add('appear');
-    await waitForLCP(LCP_BLOCKS);
+    const firstSection = main.querySelector('.section');
+    await loadSection(firstSection, waitForImage);
   }
 }
 
@@ -612,7 +612,7 @@ function setUpSoftNavigation() {
       const template = dom.querySelector('meta[name="template"]');
       if (template && template.getAttribute('content') === 'guides') {
         await decorateMain(main);
-        await loadBlocks(main);
+        await loadSections(main);
         const currentMain = document.querySelector('main');
         const children = [...currentMain.children].slice(2);
         sampleRUM('leave');
@@ -672,7 +672,7 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  await loadBlocks(main);
+  await loadSections(main);
   addBlockLevelInViewAnimation(main);
 
   const { hash } = window.location;
