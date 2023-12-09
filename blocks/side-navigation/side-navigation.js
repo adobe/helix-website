@@ -116,7 +116,7 @@ export default async function decorate(block) {
   });
 
   [searchInput, searchInputOuter].forEach((el) => {
-    el.querySelector('input').addEventListener('input', (event) => {
+    el.querySelector('input').addEventListener('input', async (event) => {
       if (event.target.value.length === 0) {
         resultsContainer.classList.remove('open');
         block.parentElement.classList.remove('expand');
@@ -127,7 +127,7 @@ export default async function decorate(block) {
         searchParams.set('q', event.target.value);
         handleSearchString();
       }
-      searchFunc(event.target.value, resultsContainer);
+      await searchFunc(event.target.value, resultsContainer);
     });
   });
 

@@ -78,17 +78,19 @@ async function populateSearchResults(searchTerms, resultsContainer) {
     let i = 0;
     for (; i < articles.length; i += 1) {
       const e = articles[i];
+      e.firstMatch = -1;
       const text = [e.title, e.content].join(' ').toLowerCase();
-
-      if (terms.every((term) => text.includes(term))) {
-        if (hits.length === limit) {
-          break;
-        }
+      const matches = terms.map((term) => text.indexOf(term));
+      if (matches.every((match) => match >= 0)) {
+        e.firstMatch = Math.min(...matches);
         hits.push(e);
       }
     }
 
-    hits.forEach((hit) => {
+    hits.sort((a, b) => a.firstMatch - b.firstMatch);
+    const limitedHits = hits.slice(0, limit);
+
+    limitedHits.forEach((hit) => {
       const card = decorateCard(hit);
       resultsContainer.appendChild(card);
     });
