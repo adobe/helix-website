@@ -374,10 +374,14 @@ import sampleRUM from './rum.js';
     if (baseHost === host) {
       return true;
     }
-    // matching project domains
-    const projectDomains = ['.aem.page', '.aem.live', '.hlx.page', '.hlx.live'];
-    if (!projectDomains.find((domain) => baseHost.endsWith(domain)
-      && host.endsWith(domain))) {
+    // check for matching domain suffixes
+    const previewSuffixes = ['.aem.page', '.hlx.page'];
+    const liveSuffixes = ['.aem.live', '.hlx.live'];
+    const isPreview = previewSuffixes.some((suffix) => baseHost.endsWith(suffix))
+      && previewSuffixes.some((suffix) => host.endsWith(suffix));
+    const isLive = liveSuffixes.some((suffix) => baseHost.endsWith(suffix))
+      && liveSuffixes.some((suffix) => host.endsWith(suffix));
+    if (!isPreview && !isLive) {
       return false;
     }
     // project details
@@ -512,11 +516,21 @@ import sampleRUM from './rum.js';
    * @return {string} The language
    */
   function getLanguage() {
-    return navigator.languages
-      .map((uLang) => LANGS
-        .find((lang) => ((uLang.replace('-', '_') === lang || lang.startsWith(uLang.split('-')[0]))
-          ? lang : undefined)))
-      .filter((lang) => !!lang)[0] || LANGS[0];
+    for (const navLang of navigator.languages) {
+      const prefLang = navLang.replace('-', '_');
+      const exactMatch = LANGS.includes(prefLang);
+      if (exactMatch) {
+        return prefLang;
+      } else {
+        const prefLangPrefix = prefLang.split('_')[0];
+        const prefixMatch = LANGS.find((lang) => lang.startsWith(prefLangPrefix));
+        if (prefixMatch) {
+          return prefixMatch;
+        }
+      }
+    }
+    // fallback to default
+    return LANGS[0];
   }
 
   /**
@@ -2180,10 +2194,9 @@ import sampleRUM from './rum.js';
                     // open url in new window
                     window.open(target, `hlx-sk-${id || `custom-plugin-${i}`}`);
                   }
-                } else if (eventName) {
-                  // fire custom event
-                  fireEvent(sk, `custom:${eventName}`);
                 }
+                // fire custom event
+                fireEvent(sk, `custom:${eventName || id}`);
               },
               isDropdown: isContainer,
             },
