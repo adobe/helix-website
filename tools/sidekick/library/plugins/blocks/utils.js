@@ -110,9 +110,8 @@ function getPreferedForegroundColor() {
     .getPropertyValue('--sk-table-fg-color') || '#ffffff';
 }
 
-export function getAuthorFriendlyName(name) {
-  return name.replace(/-/g, ' ')
-    .replace(/\b\w/g, char => char.toUpperCase());
+export function normalizeBlockName(name) {
+  return name.replace(/-/g, ' ');
 }
 
 export async function convertBlockToTable(context, block, name, path) {
@@ -131,7 +130,7 @@ export async function convertBlockToTable(context, block, name, path) {
   table.setAttribute('style', 'width:100%;');
 
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, getAuthorFriendlyName(name)));
+  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, normalizeBlockName(name)));
   table.append(headerRow);
   for (const row of rows) {
     const columns = [...row.children];
@@ -143,6 +142,14 @@ export async function convertBlockToTable(context, block, name, path) {
         td.setAttribute('colspan', maxCols);
       } else {
         td.setAttribute('style', `width: ${columnWidthPercentage}%`);
+      }
+
+      if (col.hasAttribute('data-align')) {
+        td.setAttribute('data-align', col.getAttribute('data-align'));
+      }
+
+      if (col.hasAttribute('data-valign')) {
+        td.setAttribute('data-valign', col.getAttribute('data-valign'));
       }
 
       await prepareImagesForCopy(context, col, url, columnWidthPercentage);
@@ -163,7 +170,7 @@ export function convertObjectToTable(name, object) {
   table.setAttribute('style', 'width:100%;');
 
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, getAuthorFriendlyName(name)));
+  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, normalizeBlockName(name)));
   table.append(headerRow);
 
   for (const [key, value] of Object.entries(object)) {
@@ -347,7 +354,7 @@ async function getSectionMetadata(context, block, baseURL) {
     return convertBlockToTable(
       context,
       sectionMetadata,
-      'Section metadata',
+      'section metadata',
       baseURL,
     );
   }
@@ -530,7 +537,7 @@ export async function copyPageToClipboard(context, wrapper, blockURL, pageMetada
     }
 
     if (pageMeta) {
-      const pageMetadataTable = convertObjectToTable('Metadata', pageMeta);
+      const pageMetadataTable = convertObjectToTable('metadata', pageMeta);
       wrapperClone.append(pageMetadataTable);
     }
 
