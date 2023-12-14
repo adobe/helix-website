@@ -7,7 +7,7 @@ import {
   toClassName,
   decorateSections,
   decorateBlocks,
-  waitForImage,
+  waitForFirstImage,
   loadSection,
   loadSections,
   loadBlock,
@@ -599,7 +599,7 @@ async function loadEager(doc) {
     prepareSideNav(main);
     document.body.classList.add('appear');
     const firstSection = main.querySelector('.section');
-    await loadSection(firstSection, waitForImage);
+    await loadSection(firstSection, waitForFirstImage);
   }
 }
 

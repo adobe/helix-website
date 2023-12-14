@@ -729,7 +729,7 @@ export function decorateButtons(element) {
 /**
  * Wait for Image.
  */
-export async function waitForImage(section) {
+export async function waitForFirstImage(section) {
   const lcpCandidate = section.querySelector('img');
   await new Promise((resolve) => {
     if (lcpCandidate && !lcpCandidate.complete) {
