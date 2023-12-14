@@ -509,7 +509,6 @@ export function setUpSideNav(main, aside) {
   const sideNav = buildBlock('side-navigation', '');
   aside.append(sideNav);
   main.insertBefore(aside, main.querySelector('.section.content'));
-  updateGuideTemplateStyleBasedOnHero();
   decorateBlock(sideNav);
   return loadBlock(sideNav);
 }
@@ -566,6 +565,8 @@ export function decorateMain(main) {
 function prepareSideNav(main) {
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
+  aside.classList.add('side-navigation-wrapper');
+  updateGuideTemplateStyleBasedOnHero();
 }
 
 /**

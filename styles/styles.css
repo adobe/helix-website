@@ -2077,3 +2077,9 @@ body.contact-template main .default-content-wrapper img {
     padding: 0 var(--header-container-desktop-x-padding);
   }
 }
+
+@media (min-width: 900px) {
+  aside.side-navigation-wrapper {
+    width: 300px;
+  }
+}
