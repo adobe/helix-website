@@ -594,7 +594,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
-    decorateBreadcrumb(main);
+    // decorateBreadcrumb(main);
     prepareSideNav(main);
     document.body.classList.add('appear');
     const firstSection = main.querySelector('.section');
