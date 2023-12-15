@@ -54,11 +54,60 @@ function renderScaffolding() {
 }
 
 /**
+ * Supported structures for the configuration is a list of objects like the below
+ * default or a shorthand list of two breakpoints which gets merged into the default.
+ * [600, 900] will overwrite the default sizes with '599px' and '899px' as breakpoints.
+ *
+ * @param {*} contextViewPorts project specific config object
+ * @returns viewport options
+ */
+function getViewPorts(contextViewPorts) {
+  const viewPorts = [
+    {
+      width: '599px',
+      label: 'Mobile',
+      icon: 'device-phone',
+    },
+    {
+      width: '899px',
+      label: 'Tablet',
+      icon: 'device-tablet',
+    },
+    {
+      width: '100%',
+      label: 'Desktop',
+      icon: 'device-desktop',
+      default: true,
+    },
+  ];
+  if (contextViewPorts && contextViewPorts.length > 0) {
+    if (contextViewPorts.length === 2
+        && contextViewPorts.every(breakpoint => Number.isInteger(breakpoint))) {
+      for (let i = 0; i < 2; i += 1) {
+        viewPorts[i].width = `${contextViewPorts[i] - 1}px`;
+      }
+    } else {
+      return contextViewPorts;
+    }
+  }
+  return viewPorts;
+}
+
+/**
  * Renders the preview frame including the top action bar, frame view and details container
  * @param {HTMLElement} container
  */
-function renderFrame(container) {
+function renderFrame(contextViewPorts, container) {
   if (!isFrameLoaded(container)) {
+    const viewPorts = getViewPorts(contextViewPorts);
+    const viewPortsHTML = viewPorts.map((viewPort, index) => /* html */`
+      <sp-action-button value="viewPort${index}">
+        <sp-icon-${viewPort.icon} slot="icon"></sp-icon-${viewPort.icon}>
+          ${viewPort.label}
+        </sp-action-button>
+    `).join('');
+    const selectedViewPortIndex = viewPorts.findIndex(viewPort => viewPort.default);
+
     const contentContainer = container.querySelector('.content');
     contentContainer.innerHTML = /* html */`
       <sp-split-view
@@ -70,19 +119,8 @@ function renderFrame(container) {
       >
         <div class="view">
           <div class="action-bar">
-            <sp-action-group compact selects="single" selected="desktop">
-              <sp-action-button value="mobile">
-                  <sp-icon-device-phone slot="icon"></sp-icon-device-phone>
-                  Mobile
-              </sp-action-button>
-              <sp-action-button value="tablet">
-                  <sp-icon-device-tablet slot="icon"></sp-icon-device-tablet>
-                  Tablet
-              </sp-action-button>
-              <sp-action-button value="desktop">
-                  <sp-icon-device-desktop slot="icon"></sp-icon-device-desktop>
-                  Desktop
-              </sp-action-button>
+            <sp-action-group compact selects="single" selected="viewPort${selectedViewPortIndex}">
+              ${viewPortsHTML}
             </sp-action-group>
             <sp-divider size="s"></sp-divider>
           </div>
@@ -104,23 +142,16 @@ function renderFrame(container) {
     `;
 
     const actionGroup = container.querySelector('sp-action-group');
-    actionGroup.selected = 'desktop';
+    actionGroup.selected = `viewPort${selectedViewPortIndex}`;
 
-    // Setup listeners for the top action bar
     const frameView = container.querySelector('.frame-view');
-    const mobileViewButton = removeAllEventListeners(container.querySelector('sp-action-button[value="mobile"]'));
-    mobileViewButton?.addEventListener('click', () => {
-      frameView.style.width = '480px';
-    });
+    frameView.style.width = viewPorts[selectedViewPortIndex].width;
 
-    const tabletViewButton = removeAllEventListeners(container.querySelector('sp-action-button[value="tablet"]'));
-    tabletViewButton?.addEventListener('click', () => {
-      frameView.style.width = '768px';
-    });
-
-    const desktopViewButton = removeAllEventListeners(container.querySelector('sp-action-button[value="desktop"]'));
-    desktopViewButton?.addEventListener('click', () => {
-      frameView.style.width = '100%';
+    [...container.querySelectorAll('sp-action-button')].forEach((button, index) => {
+      const buttonClone = removeAllEventListeners(button);
+      buttonClone?.addEventListener('click', () => {
+        frameView.style.width = viewPorts[index].width;
+      });
     });
   }
 }
@@ -237,7 +268,7 @@ function loadBlock(context, event, container) {
   const blockName = getBlockName(blockElement, false);
 
   // Render the preview frame if we haven't already
-  renderFrame(content);
+  renderFrame(context.viewPorts, content);
 
   // For blocks we pull the block name from section metadata or the name given to the block
   const authoredBlockName = sectionLibraryMetadata.name ?? getBlockName(blockElement);
@@ -291,7 +322,7 @@ function loadTemplate(context, event, container) {
   } = event.detail;
 
   // Render the preview frame if we haven't already
-  renderFrame(content);
+  renderFrame(context.viewPorts, content);
 
   // For templates we pull the template name from default library metadata
   // or the name given to the document in the library sheet.
