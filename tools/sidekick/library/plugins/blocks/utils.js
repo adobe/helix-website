@@ -100,21 +100,44 @@ export function getBlockName(block, includeVariants = true) {
   return filteredClasses.length > 0 ? `${name} (${filteredClasses.join(', ')})` : name;
 }
 
-function getPreferedBackgroundColor() {
+export function getPreferedBackgroundColor(blockName) {
+  const defaultBackgroundColor = '#ff8012';
+  if (blockName === 'Section Metadata') {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--sk-section-metadata-table-background-color') || defaultBackgroundColor;
+  }
+
+  if (blockName === 'Metadata') {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--sk-metadata-table-background-color') || defaultBackgroundColor;
+  }
+
   return getComputedStyle(document.documentElement)
-    .getPropertyValue('--sk-table-bg-color') || '#ff8012';
+    .getPropertyValue('--sk-block-table-background-color') || defaultBackgroundColor;
 }
 
-function getPreferedForegroundColor() {
+export function getPreferedForegroundColor(blockName) {
+  const defaultForegroundColor = '#ffffff';
+  if (blockName === 'Section Metadata') {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--sk-section-metadata-table-foreground-color') || defaultForegroundColor;
+  }
+
+  if (blockName === 'Metadata') {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--sk-metadata-table-foreground-color') || defaultForegroundColor;
+  }
+
   return getComputedStyle(document.documentElement)
-    .getPropertyValue('--sk-table-fg-color') || '#ffffff';
+    .getPropertyValue('--sk-block-table-foreground-color') || defaultForegroundColor;
 }
 
 export function normalizeBlockName(name) {
-  return name.replace(/-/g, ' ');
+  // eslint-disable-next-line no-confusing-arrow
+  return name.replace(/-/g, ' ').replace(/(\b\w+)|(?:\([^)]*\))/g, (match, p1) => p1 ? p1.charAt(0).toUpperCase() + p1.slice(1) : match);
 }
 
-export async function convertBlockToTable(context, block, name, path) {
+export async function convertBlockToTable(context, block, name, path, tableStyle) {
   const url = new URL(path);
 
   prepareIconsForCopy(block);
@@ -130,7 +153,8 @@ export async function convertBlockToTable(context, block, name, path) {
   table.setAttribute('style', 'width:100%;');
 
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, normalizeBlockName(name)));
+  const blockName = normalizeBlockName(name);
+  headerRow.append(createTag('td', { colspan: maxCols, style: `background-color: ${tableStyle?.tableHeaderBackgroundColor || getPreferedBackgroundColor(blockName)}; color: ${tableStyle?.tableHeaderForegroundColor || getPreferedForegroundColor(blockName)};` }, blockName));
   table.append(headerRow);
   for (const row of rows) {
     const columns = [...row.children];
@@ -170,7 +194,8 @@ export function convertObjectToTable(name, object) {
   table.setAttribute('style', 'width:100%;');
 
   const headerRow = document.createElement('tr');
-  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor()}; color: ${getPreferedForegroundColor()};` }, normalizeBlockName(name)));
+  const blockName = normalizeBlockName(name);
+  headerRow.append(createTag('td', { colspan: 2, style: `background-color: ${getPreferedBackgroundColor(blockName)}; color: ${getPreferedForegroundColor(blockName)};` }, blockName));
   table.append(headerRow);
 
   for (const [key, value] of Object.entries(object)) {
@@ -398,7 +423,7 @@ export function copyToClipboard(context, data, prepare) {
  * @param {string} name The name of the block
  * @param {string} blockURL The URL of the block
  */
-export async function copyBlockToClipboard(context, wrapper, name, blockURL) {
+export async function copyBlockToClipboard(context, wrapper, name, blockURL, tableStyle) {
   async function prepare(ctx, data) {
     const { blockName, html } = data;
     // Get the first block element ignoring any section metadata blocks
@@ -414,6 +439,7 @@ export async function copyBlockToClipboard(context, wrapper, name, blockURL) {
         element,
         blockName,
         blockURL,
+        tableStyle,
       );
     }
 
@@ -554,4 +580,28 @@ export async function copyPageToClipboard(context, wrapper, blockURL, pageMetada
 
   // Track block copy event
   sampleRUM('library:blockcopied', { target: blockURL });
+}
+
+/**
+ * Gets the block table style from library metadata
+ * @param {Object} defaultLibraryMetadata
+ * @param {Object} sectionLibraryMetadata
+ * @returns
+ */
+export function getBlockTableStyle(defaultLibraryMetadata, sectionLibraryMetadata) {
+  const tableStyle = {};
+
+  if (sectionLibraryMetadata.tableheaderbackgroundcolor) {
+    tableStyle.tableHeaderBackgroundColor = sectionLibraryMetadata.tableheaderbackgroundcolor;
+  } else if (defaultLibraryMetadata.tableheaderbackgroundcolor) {
+    tableStyle.tableHeaderBackgroundColor = defaultLibraryMetadata.tableheaderbackgroundcolor;
+  }
+
+  if (sectionLibraryMetadata.tableheaderforegroundcolor) {
+    tableStyle.tableHeaderForegroundColor = sectionLibraryMetadata.tableheaderforegroundcolor;
+  } else if (defaultLibraryMetadata.tableheaderforegroundcolor) {
+    tableStyle.tableHeaderForegroundColor = defaultLibraryMetadata.tableheaderforegroundcolor;
+  }
+
+  return tableStyle;
 }
