@@ -1,4 +1,4 @@
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { getMetadata } from '../../scripts/lib-franklin.js';
 import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 
@@ -116,11 +116,12 @@ const decoratefooterCopyrightSection = (footer) => {
  */
 
 export default async function decorate(block) {
-  const cfg = readBlockConfig(block);
+  const footerMeta = getMetadata('footer');
   block.textContent = '';
   block.classList.add('contained');
 
-  const footerPath = cfg.footer || '/new-footer';
+  // load footer fragment
+  const footerPath = footerMeta.footer || '/footer';
   const resp = await fetch(`${footerPath}.plain.html`);
   const html = await resp.text();
 

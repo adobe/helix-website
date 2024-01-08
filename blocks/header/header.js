@@ -511,9 +511,9 @@ async function fetchGnav(url) {
 }
 
 export default async function init(blockEl) {
-  // OLD CODE: const url = getMetadata('gnav') || '/gnav';
-  const url = '/new-nav';
-  const html = await fetchGnav(url);
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
+  const html = await fetchGnav(navPath);
 
   if (html) {
     try {
