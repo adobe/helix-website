@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "Questo è un documento Microsoft Excel. Convertilo in Fogli Google: File > Salva come foglio Google"
   },
+  "error_status_403": {
+    "message": "403 - Non consentito: chiedi all’amministratore le autorizzazioni necessarie."
+  },
   "error_status_404_content": {
     "message": "404 - Non trovato: controlla la configurazione o l’URL di Sidekick."
   },

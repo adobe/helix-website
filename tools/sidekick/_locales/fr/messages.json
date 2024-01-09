@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "Il s'agit d'un document Microsoft Excel. Convertissez-le au format Google Sheets : Fichier > Enregistrer au format Google Sheets."
   },
+  "error_status_403": {
+    "message": "403 Accès interdit : demandez les autorisations nécessaires à votre administrateur ou à votre administratrice."
+  },
   "error_status_404_content": {
     "message": "404 Introuvable : vérifiez la configuration ou l'URL de Sidekick."
   },

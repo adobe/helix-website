@@ -41,7 +41,7 @@
   --hlx-sk-button-pressed-bg: rgba(44, 44, 44, .1);
   --hlx-sk-button-pressed-color: #404040;
   --hlx-sk-button-border-radius: 6px;
-  --hlx-sk-button-disabled-color: #909090;
+  --hlx-sk-button-disabled-color: #a6a6a6;
   --hlx-sk-button-disabled-border: solid 1px var(--hlx-sk-button-disabled-color);
   --hlx-sk-button-disabled-hover-bg: transparent;
   --hlx-sk-button-accent-bg: var(--hlx-sk-accent);
@@ -76,7 +76,7 @@
     --hlx-sk-button-hover-bg: rgba(211, 211, 211, .04);
     --hlx-sk-button-pressed-bg: rgba(211, 211, 211, .06);
     --hlx-sk-button-pressed-color: #C0C0C0;
-    --hlx-sk-button-disabled-color: #707070;
+    --hlx-sk-button-disabled-color: #6c6c6c;
     --hlx-sk-button-badge: #F15B3A;
     --hlx-sk-button-badge-hover: #C71F3D;
     --hlx-sk-dropdown-container-bg: rgba(48, 48, 48, .9);
@@ -487,6 +487,28 @@
   white-space: pre;
 }
 
+.hlx-sk .feature-container .add-project button {
+  font-size: 0;
+  position: relative;
+}
+
+.hlx-sk .feature-container .add-project button::before,
+.hlx-sk .feature-container .add-project button::after {
+  position: absolute;
+  content: "";
+  font-size: 0;
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  top: 12px;
+  left: 5px;
+}
+
+.hlx-sk .feature-container .add-project button::after {
+  transform: rotate(-90deg);
+}
+
 .hlx-sk .dropdown,
 .hlx-sk-overlay .dropdown {
   min-height: 28px;
@@ -859,17 +881,13 @@
   height: 100%;
 }
 
-.hlx-sk span.hlx-sk-placeholder {
-  /* display: none; */
-  background-color: orange;
-}
-
 @media(max-width:600px) {
   .hlx-sk {
     background-image: none;
     padding-left: 10px;
   }
 
+  .hlx-sk .feature-container .add-project,
   .hlx-sk .feature-container .share,
   .hlx-sk .feature-container .close {
     display: none;

@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "这是一份 Microsoft Excel 文件。请将其转换为 Google Sheets：文件 > 另存为 Google Sheets"
   },
+  "error_status_403": {
+    "message": "403 禁止：请向管理员请求足够的权限。"
+  },
   "error_status_404_content": {
     "message": "404 未找到：请检查您的 Sidekick 配置或 URL。"
   },

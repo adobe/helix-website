@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "Este es un documento de Microsoft Excel. Conviértalo a Hojas de cálculo de Google: Archivo > Guardar como hoja de cálculo de Google"
   },
+  "error_status_403": {
+    "message": "403 Prohibido: Pídale al administrador permisos suficientes."
+  },
   "error_status_404_content": {
     "message": "404 No encontrado: verifique la configuración o la URL de su Sidekick."
   },

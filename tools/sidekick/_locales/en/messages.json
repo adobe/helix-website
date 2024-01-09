@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "This is a Microsoft Excel document. Please convert it to Google Sheets: File > Save as Google Sheets'"
   },
+  "error_status_403": {
+    "message": "403 Forbidden: Ask your administrator for sufficient permissions."
+  },
   "error_status_404_content": {
     "message": "404 Not found: Check your Sidekick configuration or URL."
   },

@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "これは、Microsoft Excel ドキュメントです。[ファイル] > [Google スプレッドシートとして保存] を選択し、Google スプレッドシートに変換してください"
   },
+  "error_status_403": {
+    "message": "403 Forbidden：管理者に十分な許可を求めてください。"
+  },
   "error_status_404_content": {
     "message": "404 見つかりません : Sidekick の設定または URL を確認してください。"
   },
