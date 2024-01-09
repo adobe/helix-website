@@ -162,7 +162,8 @@ function updateFormTitle(form, svg, wrapper) {
   let svgTitle = svg.querySelector('title');
   titleField.value = svgTitle ? svgTitle.textContent : writeTitleFromFileName(wrapper.dataset.name);
   if (!svgTitle) {
-    svgTitle = createTag('title', {}, titleField.value);
+    svgTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    svgTitle.textContent = titleField.value;
     svg.prepend(svgTitle);
   }
   titleField.addEventListener('keyup', (e) => {
