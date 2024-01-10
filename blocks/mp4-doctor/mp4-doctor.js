@@ -224,7 +224,7 @@ export default function decorate(block) {
           await ffmpeg.writeFile(name, await fetchFile(file));
           // console.log('Start transcoding');
           // console.time('exec');
-          await ffmpeg.exec(['-i', name, '-b:v', '750k', 'output.mp4']);
+          await ffmpeg.exec(['-i', name, '-b:v', '1800k', 'output.mp4']);
           // console.timeEnd('exec');
           // console.log('Complete transcoding');
           const data = await ffmpeg.readFile('output.mp4');
