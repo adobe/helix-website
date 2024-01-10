@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "這是一份 Microsoft Excel 文件。請將其轉換為 Google 試算表：「檔案 > 儲存為 Google 試算表」"
   },
+  "error_status_403": {
+    "message": "403 已禁止：請向管理員要求足夠的權限。"
+  },
   "error_status_404_content": {
     "message": "404 找不到：請檢查您的 Sidekick 設定或 URL。"
   },

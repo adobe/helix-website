@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "Dies ist ein Microsoft Excel-Dokument. Bitte konvertieren Sie es in eine Google-Tabelle: „Datei“ > „Als Google-Tabelle speichern“"
   },
+  "error_status_403": {
+    "message": "403 Verboten: Bitten Sie Ihre bzw. Ihren Admin um ausreichende Berechtigungen."
+  },
   "error_status_404_content": {
     "message": "404 Nicht gefunden: Überprüfen Sie die Sidekick-Konfiguration oder URL."
   },
