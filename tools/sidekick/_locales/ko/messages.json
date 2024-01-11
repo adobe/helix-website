@@ -378,6 +378,9 @@
   "error_preview_not_gsheet_ms_excel": {
     "message": "Microsoft Excel 문서입니다. [파일] > [Google Sheets로 저장]을 클릭하여 Google Sheets로 변환하십시오."
   },
+  "error_status_403": {
+    "message": "403 금지됨: 관리자에게 충분한 권한을 요청하십시오."
+  },
   "error_status_404_content": {
     "message": "404 찾을 수 없음: Sidekick 구성 또는 URL을 확인하십시오."
   },
@@ -453,7 +456,7 @@
     "message": "정보"
   },
   "json_view_description": {
-    "message": "알기 쉬운 데이터 렌디션."
+    "message": "사용자 친화적인 데이터 렌디션."
   },
   "live": {
     "message": "라이브"
