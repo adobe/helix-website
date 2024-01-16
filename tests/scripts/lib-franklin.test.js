@@ -85,15 +85,17 @@ describe('Core Helix features', () => {
     // sends checkpoint beacon
     await scripts.sampleRUM('test', { foo: 'bar' });
     expect(sendBeacon.called).to.be.true;
+    expect(window.hlx.rum.queue.length).to.equal(1);
     sendBeacon.resetHistory();
 
-    // sends cwv beacon
+    // queues cwv beacon
     await scripts.sampleRUM('cwv', { foo: 'bar' });
-    expect(sendBeacon.called).to.be.true;
+    expect(window.hlx.rum.queue.length).to.equal(2);
 
     // test error handling
     sendBeacon.throws();
     await scripts.sampleRUM('error', { foo: 'bar' });
+    expect(window.hlx.rum.queue.length).to.equal(3);
 
     sendBeacon.restore();
   });
