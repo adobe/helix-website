@@ -650,9 +650,13 @@ function adjustedRumSamplingRate(checkpoint, options, context) {
 }
 
 export async function loadEager(document, options, context) {
-  context.sampleRUM.always.on('audiences', adjustedRumSamplingRate('audiences', options, context));
-  context.sampleRUM.always.on('campaign', adjustedRumSamplingRate('campaign', options, context));
-  context.sampleRUM.always.on('experiment', adjustedRumSamplingRate('experiment', options, context));
+  document.addEventListener('rum', (event) => {
+    const checkpoint = event.detail ? event.detail.checkpoint || '' : '';
+    if(['audiences', 'campaign', 'experiment'].includes(checkpoint)) {
+      adjustedRumSamplingRate(checkpoint, options, context);
+    }
+  });
+
   let res = await runCampaign(document, options, context);
   if (!res) {
     res = await runExperiment(document, options, context);
