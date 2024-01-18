@@ -454,7 +454,8 @@ import sampleRUM from './rum.js';
    */
   function isSharePointFolder(sk, url) {
     if (isSharePointDM(sk, url)) {
-      const docPath = new URLSearchParams(url.search).get('id');
+      const sp = new URLSearchParams(url.search);
+      const docPath = sp.get('id') || sp.get('RootFolder');
       const dotIndex = docPath?.split('/').pop().indexOf('.');
       return [-1, 0].includes(dotIndex); // dot only allowed as first char
     }
@@ -1827,6 +1828,38 @@ import sampleRUM from './rum.js';
         return;
       }
       try {
+        if (paths.length === 1) {
+          // single operation
+          const [path] = paths;
+          const url = getAdminUrl(config, route, path);
+          try {
+            const resp = await fetch(url, {
+              ...getAdminFetchOptions(),
+              method,
+            });
+            if (!resp.ok) {
+              throw new Error(resp.headers['x-error']);
+            } else {
+              showBulkOperationSummary({
+                operation,
+                resources: [{ path, status: resp.status }],
+                host,
+              });
+            }
+          } catch (e) {
+            console.error(`bulk ${operation} failed: ${e.message}`);
+            sk.showModal({
+              message: [
+                getBulkText([1], 'result', operation, 'failure'),
+                e.message || i18n(sk, 'bulk_error'),
+              ],
+              level: 0,
+              sticky: true,
+            });
+          }
+          return;
+        }
+        // bulk operation
         const bulkUrl = getAdminUrl(config, route, '/*');
         const bulkResp = await fetch(bulkUrl, {
           ...getAdminFetchOptions(),
