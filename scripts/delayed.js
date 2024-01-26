@@ -73,3 +73,5 @@ document.addEventListener('mousemove', (e) => {
     }
   });
 });
+
+document.dispatchEvent(new CustomEvent('hlx:delayed'));
