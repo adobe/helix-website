@@ -22,7 +22,8 @@ export function sampleRUM(checkpoint, data) {
       const rumStorage = sessionStorage.getItem(SESSION_STORAGE_KEY) ? JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY)) : {};
       rumStorage.pages = (rumStorage.pages ?? 0) + (Math.floor(Math.random() * 20) - 10) + 1;
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(rumStorage));
-      sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE == null ? 'https://rum.hlx.page' : window.RUM_BASE, window.location);
+      sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE == null ? '/' : window.RUM_BASE, window.location);
+      const pathBase = window.hlx.codeBasePath ? `${window.hlx.codeBasePath}/` : '';
       const weight = new URLSearchParams(window.location.search).get('rum') === 'on' ? 1 : 100;
       const id = Array.from({ length: 75 }, (_, i) => String.fromCharCode(48 + i)).filter((a) => /\d|[A-Z]/i.test(a)).filter(() => Math.random() * 75 > 70).join('');
       const isSelected = (Math.random() * weight < 1);
@@ -31,10 +32,10 @@ export function sampleRUM(checkpoint, data) {
       if (isSelected) {
         // eslint-disable-next-line object-curly-newline, max-len
         const body = JSON.stringify({ weight, id, referer: window.location.href, checkpoint: 'top', t: timeShift(), target: document.visibilityState });
-        const url = new URL(`.rum/${weight}`, sampleRUM.baseURL).href;
+        const url = new URL(`${pathBase}.rum/${weight}`, sampleRUM.baseURL).href;
         navigator.sendBeacon(url, body);
         // eslint-disable-next-line max-statements-per-line, brace-style
-        window.addEventListener('load', () => { sampleRUM('load'); import(new URL('.rum/@adobe/helix-rum-enhancer@^2/src/index.js', sampleRUM.baseURL)); });
+        window.addEventListener('load', () => { sampleRUM('load'); import(new URL(`${pathBase}.rum/@adobe/helix-rum-enhancer@^2/src/index.js`, sampleRUM.baseURL)); });
       }
     }
     if (window.hlx.rum && window.hlx.rum.isSelected && checkpoint) {
