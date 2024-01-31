@@ -312,6 +312,10 @@ aside {
     padding-left: var(--side-navigation-bar-gap);
     margin-right: 0;
   }
+
+  .blog-template .default-content-wrapper {
+    max-width: 70%;
+  }
 }
 
 @media screen and (min-width: 1250px) {
@@ -322,6 +326,11 @@ aside {
   .side-navigation-wrapper.expand,
   .franklin .gnav .submenu-content {
     max-width: var(--grid-desktop-container-width);
+  }
+
+  .blog-template .default-content-wrapper {
+    max-width: 60%;
+    height: 50%;
   }
 }
 
@@ -1718,12 +1727,14 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
 }
 
 /* guides-template back button on documentation detail pages */
-body.guides-template .guides-back-btn {
+body.guides-template .guides-back-btn,
+body.blog-template .guides-back-btn {
   display: flex;
   align-items: center;
 }
 
-body.guides-template .guides-back-btn span.icon {
+body.guides-template .guides-back-btn span.icon,
+body.blog-template .guides-back-btn span.icon {
   margin-right: var(--spacing-xxs);
 }
 
@@ -1801,6 +1812,12 @@ body.guides-template .guides-back-btn span.icon {
   body.guides-template main.without-full-width-hero .doc-detail-hero-image {
     border-radius: var(--image-border-radius-xxl);
   }
+
+  body.blog-template img {
+      max-width: 100%;
+      width: 100%;
+      height: 450px;
+  }
 }
 
 @media screen and (min-width: 900px) {
@@ -1853,7 +1870,8 @@ body.guides-template main .section.content .default-content-wrapper {
 
 body.guides-template .icon-icon-caret-right,
 body.guides-template .icon-icon-caret-down,
-body.guides-template .icon-icon-arrow {
+body.guides-template .icon-icon-arrow,
+body.blog-template .icon-icon-arrow {
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
@@ -1872,10 +1890,15 @@ body.guides-template .icon-icon-caret-down {
   background-image: url("/icons/icon-caret-down.svg");
 }
 
-body.guides-template .guides-back-btn .icon-icon-arrow {
+body.guides-template .guides-back-btn .icon-icon-arrow,
+body.blog-template .guides-back-btn .icon-icon-arrow {
   background-image: url("/icons/icon-arrow.svg");
   filter: invert(38%) sepia(42%) saturate(5895%) hue-rotate(203deg)
     brightness(94%) contrast(92%);
+}
+
+body.blog-template aside {
+  display: none;
 }
 
 /* bumper template */

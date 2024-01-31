@@ -425,7 +425,7 @@ function addBlockLevelInViewAnimation(main) {
 }
 
 function decorateBreadcrumb(main) {
-  if (!document.body.classList.contains('guides-template')) {
+  if (!document.body.classList.contains('guides-template') && !document.body.classList.contains('blog-template')) {
     return;
   }
 
@@ -533,6 +533,21 @@ function decorateSVGs(main) {
   });
 }
 
+function buildAuthorBox(main) {
+  const div = document.createElement('div');
+  const author = getMetadata('author');
+  const publicationDate = getMetadata('publication-date');
+  const authorImage = getMetadata('author-image');
+
+  const authorBoxBlockEl = buildBlock('author-box', [
+    [`<img src="${authorImage}">`,
+    `<p>${author}</p>
+      <p>${publicationDate}</p>`],
+  ]);
+  div.append(authorBoxBlockEl);
+  main.append(div);
+}
+
 // --------------- Main functions here ---------------- //
 
 /**
@@ -541,6 +556,9 @@ function decorateSVGs(main) {
  */
 export function buildAutoBlocks(main) {
   try {
+    if (getMetadata('author') && !main.querySelector('.author-box')) {
+      buildAuthorBox(main);
+    }
     buildEmbeds(main);
   } catch (error) {
     // eslint-disable-next-line no-console
