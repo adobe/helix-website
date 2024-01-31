@@ -13,7 +13,6 @@ main .author-box-container > div {
   main .author-box {
     visibility: unset;
     max-width: unset;
-    border-top: 1px solid black;
   }
   
   main .author-box-info {
