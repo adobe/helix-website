@@ -17,8 +17,8 @@ describe('Lazy-loader Web Component test', async () => {
   });
 
   it('Does not activate elements before hlx:delayed ', async () => {
-    expect(document.body.querySelector(sceSelector)).to.be.null;
-    expect(document.head.querySelector(scriptSelector)).to.be.null;
+    expect(document.querySelector(sceSelector)).to.be.null;
+    expect(document.querySelector(scriptSelector)).to.be.null;
   });
 
   it('Activates elements once hlx:delayed is received', async () => {
