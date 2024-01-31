@@ -1814,9 +1814,7 @@ body.blog-template .guides-back-btn span.icon {
   }
 
   body.blog-template img {
-      max-width: 100%;
-      width: 100%;
-      height: 450px;
+      max-width: 80%;
   }
 }
 
