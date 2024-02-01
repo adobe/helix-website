@@ -28,10 +28,11 @@ describe('Lazy-loader Web Component test', async () => {
     expect(sce.getAttribute('id')).to.equal('12');
   });
 
-  it('Moves scripts under document.head', async () => {
+  it('Moves scripts under document.head with async loading', async () => {
     document.dispatchEvent(new CustomEvent('hlx:delayed'));
     const script = document.head.querySelector(scriptSelector);
     expect(script).to.exist;
     expect(script.getAttribute('type')).to.equal('test-type');
+    expect(script.getAttribute('async')).to.equal('true');
   });
 });
