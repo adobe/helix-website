@@ -62,9 +62,6 @@ main .author-box-container > div {
     font-style: italic;
     color: grey;
     padding-left: 15px;
-  }
-
-  main .author-box-info .blog-author-blurb {
     display: none;
   }
 
