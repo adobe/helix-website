@@ -40,24 +40,12 @@ async function createAuthorBlurb(blurb) {
 }
 
 function validateDate(dateTag, dateString) {
-  const date = new Date(dateString);
+  const regex = /^[A-Z][a-z]+\s\d{1,2}(st|nd|rd|th),?\s\d{4}$/;
 
-  if (Number.isNaN(date.getTime())) {
+  if (!regex.test(dateString)) {
     dateTag.classList.add('publication-date-invalid');
+    dateTag.setAttribute('title', 'invalid-date');
     console.error('Invalid publication date format. Please use a format like Month DDth, YYYY (e.g., January 30th, 2024)');
-  } else {
-    const formattedDate = new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(date);
-    // Check if the formatted date matches the expected pattern
-    const regex = /^[A-Z][a-z]+\s\d{1,2}(st|nd|rd|th),?\s\d{4}$/;
-    if (!regex.test(formattedDate)) {
-      dateTag.classList.add('publication-date-invalid');
-      dateTag.setAttribute('title', 'invalid-date');
-      console.error('Invalid publication date format. Please use a format like Month DDth, YYYY (e.g., January 30th, 2024)');
-    }
   }
 }
 

@@ -553,7 +553,7 @@ function buildAuthorBox(main) {
   const authorImage = getMetadata('author-image');
 
   const authorBoxBlockEl = buildBlock('author-box', [
-    [`<img src="${authorImage}">`,
+    [`<img src="${authorImage}" alt="${author}" title="${author}">`,
       `<p>${author}</p>
       <p>${publicationDate}</p>`],
   ]);
