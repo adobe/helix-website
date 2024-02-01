@@ -2,7 +2,7 @@ import {
     getMetadata,
 }   from '../../scripts/lib-franklin.js';
   
-  function openPopup(e) {
+function openPopup(e) {
     const target = e.target.closest('a');
     const href = target.getAttribute('data-href');
     const type = target.getAttribute('data-type');
@@ -11,7 +11,7 @@ import {
       type,
       'popup,top=233,left=233,width=700,height=467',
     );
-  }
+}
 
 async function buildSharing(githubId) {
     const sharing = document.createElement('div');
@@ -38,23 +38,30 @@ async function createAuthorBlurb(blurb) {
     authorBlurb.append(blurb);
     return authorBlurb;
 }
-  
-  function validateDate(date) {
-    if (date
-      && !window.location.hostname.includes('adobe.com')
-      && window.location.pathname.includes('/publish/')) {
-      // match publication date to MM-DD-YYYY format
-      if (!/[0-1]\d{1}-[0-3]\d{1}-[2]\d{3}/.test(date.textContent.trim())) {
-        date.classList.add('article-date-invalid');
-        fetchPlaceholders().then((placeholders) => {
-          date.setAttribute('title', placeholders['invalid-date']);
-        });
-      }
-    }
-  }
-  
 
-  export default async function decorateAuthorBox(blockEl) {
+function validateDate(dateTag, dateString) {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+        return false; // Invalid date
+    }
+
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+    }).format(date);
+
+    // Check if the formatted date matches the expected pattern
+    const regex = new RegExp(/^[A-Z][a-z]+\s\d{1,2}(st|nd|rd|th),?\s\d{4}$/);
+    if(!regex.test(formattedDate)) {
+        dateTag.classList.add('publication-date-invalid');
+        dateTag.setAttribute('title', 'invalid-date');
+        console.error('Invalid publication date format. Please use a format like Month DDth, YYYY (e.g., January 30th, 2024)');
+    }
+}
+
+export default async function decorateAuthorBox(blockEl) {
     const childrenEls = Array.from(blockEl.children);
     const bylineContainer = childrenEls[0];
     bylineContainer.classList.add('author-box-info');
@@ -66,7 +73,7 @@ async function createAuthorBlurb(blurb) {
     // publication date
     const date = authorDetails.lastElementChild;
     date.classList.add('blog-publication-date');
-    validateDate(date);
+    validateDate(date, date.textContent.trim());
     // author blurb
     const blurb = getMetadata('author-blurb');
     const authorBlurb = await createAuthorBlurb(blurb);
@@ -75,4 +82,4 @@ async function createAuthorBlurb(blurb) {
     const githubId = getMetadata('github');
     const shareBlock = await buildSharing(githubId);
     bylineContainer.append(shareBlock);
-  }
+}

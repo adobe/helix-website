@@ -68,6 +68,10 @@ main .author-box-container > div {
     display: none;
   }
 
+  main .author-box-info .publication-date-invalid {
+    display: none;
+  }
+
   @media (min-width: 600px) {
     main .author-box {
         margin-left: auto;

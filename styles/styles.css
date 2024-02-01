@@ -1727,14 +1727,12 @@ body.guides-template main.has-full-width-hero .card-list-wrapper {
 }
 
 /* guides-template back button on documentation detail pages */
-body.guides-template .guides-back-btn,
-body.blog-template .guides-back-btn {
+body.guides-template .guides-back-btn {
   display: flex;
   align-items: center;
 }
 
-body.guides-template .guides-back-btn span.icon,
-body.blog-template .guides-back-btn span.icon {
+body.guides-template .guides-back-btn span.icon {
   margin-right: var(--spacing-xxs);
 }
 
@@ -1814,7 +1812,7 @@ body.blog-template .guides-back-btn span.icon {
   }
 
   body.blog-template img {
-      max-width: 80%;
+      max-width: 90%;
   }
 }
 
@@ -1868,8 +1866,7 @@ body.guides-template main .section.content .default-content-wrapper {
 
 body.guides-template .icon-icon-caret-right,
 body.guides-template .icon-icon-caret-down,
-body.guides-template .icon-icon-arrow,
-body.blog-template .icon-icon-arrow {
+body.guides-template .icon-icon-arrow {
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
@@ -1888,8 +1885,7 @@ body.guides-template .icon-icon-caret-down {
   background-image: url("/icons/icon-caret-down.svg");
 }
 
-body.guides-template .guides-back-btn .icon-icon-arrow,
-body.blog-template .guides-back-btn .icon-icon-arrow {
+body.guides-template .guides-back-btn .icon-icon-arrow {
   background-image: url("/icons/icon-arrow.svg");
   filter: invert(38%) sepia(42%) saturate(5895%) hue-rotate(203deg)
     brightness(94%) contrast(92%);

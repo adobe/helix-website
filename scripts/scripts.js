@@ -448,6 +448,7 @@ function decorateBreadcrumb(main) {
   main.prepend(wrapper);
 
   const isDocumentationLanding = window.location.pathname === '/docs/';
+  const blogTemplate = document.body.classList.contains('blog-template');
 
   const list = createTag('ul');
   const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
@@ -458,6 +459,7 @@ function decorateBreadcrumb(main) {
 
   const category = getMetadata('category');
   const title = getMetadata('og:title');
+  const template = getMetadata('template');
 
   if (category) {
     const section = createTag(
@@ -468,17 +470,28 @@ function decorateBreadcrumb(main) {
     list.append(section);
   }
 
+  if (template) {
+    const section = createTag(
+      'li',
+      {},
+      `<a href="/docs/#${template.toLowerCase()}" class="breadcrumb-link-underline-effect category">${template}</a>`,
+    );
+    list.append(section);
+  }
+
   if (!isDocumentationLanding) {
     const article = createTag('li', {}, `<a href="${window.location.pathname}">${title}</a>`);
     list.append(article);
 
-    const backBtn = createTag('div', { class: 'guides-back-btn desktop' }, `
-        <span class="icon icon-icon-arrow"></span>
-        <a href="/docs/" class="link-underline-effect">
-            Back
-        </a>
-    `);
-    document.querySelector('.default-content-wrapper').prepend(backBtn);
+    if (!blogTemplate) {
+      const backBtn = createTag('div', { class: 'guides-back-btn desktop' }, `
+          <span class="icon icon-icon-arrow"></span>
+          <a href="/docs/" class="link-underline-effect">
+              Back
+          </a>
+      `);
+      document.querySelector('.default-content-wrapper').prepend(backBtn);
+    }
   }
 
   // make the last item to be unclickable as already on the page
