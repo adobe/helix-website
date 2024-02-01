@@ -20,6 +20,7 @@ class LazyLoader extends HTMLElement {
         const script = document.createElement('script');
         script.setAttribute('src', s.getAttribute('src'));
         script.setAttribute('type', s.getAttribute('type'));
+        script.setAttribute('async', 'true');
         document.head.appendChild(script);
         s.parentNode.removeChild(s);
       });
