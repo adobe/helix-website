@@ -554,7 +554,7 @@ function buildAuthorBox(main) {
 
   const authorBoxBlockEl = buildBlock('author-box', [
     [`<img src="${authorImage}">`,
-    `<p>${author}</p>
+      `<p>${author}</p>
       <p>${publicationDate}</p>`],
   ]);
   div.append(authorBoxBlockEl);
