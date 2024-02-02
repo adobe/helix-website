@@ -14,6 +14,7 @@ function openPopup(e) {
 }
 
 async function buildSharing(githubId) {
+  const authorName = getMetadata('author');
   const sharing = document.createElement('div');
   sharing.classList.add('sharing-details');
   const scriptUrl = new URL(import.meta.url);
@@ -22,7 +23,7 @@ async function buildSharing(githubId) {
   const response = await fetch(iconsPath);
   const svgContent = await response.text();
   sharing.innerHTML = `<span>
-      <a data-type="GitHub" data-href="${githubId}" alt="share-github" aria-label="share-github" title="Github Profile">
+      <a data-type="GitHub" data-href="${githubId}" alt="share-github" aria-label="share-github" title="${authorName}'s Profile">
         ${svgContent}
       </a>
     </span>`;
@@ -30,6 +31,15 @@ async function buildSharing(githubId) {
     link.addEventListener('click', openPopup);
   });
   return sharing;
+}
+
+async function addProfileLinkToImage(authorImage, githubId) {
+  const authorLink = document.createElement('a');
+  authorLink.classList.add('blog-author-link');
+  authorLink.setAttribute('data-href', githubId);
+  authorLink.append(authorImage);
+  authorLink.addEventListener('click', openPopup);
+  return authorLink;
 }
 
 async function createAuthorBlurb(blurb) {
@@ -41,7 +51,6 @@ async function createAuthorBlurb(blurb) {
 
 function validateDate(dateTag, dateString) {
   const regex = /^[A-Z][a-z]+\s\d{1,2}(st|nd|rd|th),?\s\d{4}$/;
-
   if (!regex.test(dateString)) {
     dateTag.classList.add('publication-date-invalid');
     dateTag.setAttribute('title', 'invalid-date');
@@ -50,10 +59,15 @@ function validateDate(dateTag, dateString) {
 }
 
 export default async function decorateAuthorBox(blockEl) {
+  const githubId = getMetadata('github');
   const childrenEls = Array.from(blockEl.children);
   const bylineContainer = childrenEls[0];
   bylineContainer.classList.add('author-box-info');
-  bylineContainer.firstElementChild.classList.add('blog-author-image');
+  // author image
+  const authorImage = bylineContainer.firstElementChild;
+  authorImage.classList.add('blog-author-image');
+  const addAuthorLink = await addProfileLinkToImage(authorImage, githubId);
+  bylineContainer.prepend(addAuthorLink);
   // author name
   bylineContainer.lastElementChild.classList.add('blog-author-details');
   const authorDetails = bylineContainer.lastElementChild;
@@ -67,7 +81,6 @@ export default async function decorateAuthorBox(blockEl) {
   const authorBlurb = await createAuthorBlurb(blurb);
   bylineContainer.append(authorBlurb);
   // sharing
-  const githubId = getMetadata('github');
   const shareBlock = await buildSharing(githubId);
   bylineContainer.append(shareBlock);
 }

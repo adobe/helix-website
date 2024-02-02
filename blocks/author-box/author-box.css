@@ -14,7 +14,7 @@ main .author-box-container > div {
     visibility: unset;
     max-width: unset;
   }
-  
+
   main .author-box-info {
     display: flex;
     flex-wrap: wrap;
@@ -43,14 +43,14 @@ main .author-box-container > div {
     margin-bottom: 0;
   }
 
+  main .author-box-info a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
   main .author-box-info p,
   main .author-box-info p a {
     margin: 0;
-  }
-
-  main .author-box-info .sharing-details a {
-    text-decoration: none;
-    cursor: pointer;
   }
 
   main .author-box-info .sharing-details svg {
