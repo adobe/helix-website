@@ -537,7 +537,10 @@
 }
 
 @media screen and (min-width: 2100px) {
-    .side-navigation-wrapper.expand + .section.content {
-    max-width: unset;
+  .side-navigation-wrapper.expand + .section.content {
+    max-width: var(--grid-desktop-container-width);
+    margin-left: 20%;
+    margin-right: 20%;
+    padding-left: 300px;
   }
 }
