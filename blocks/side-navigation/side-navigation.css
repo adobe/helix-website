@@ -535,3 +535,9 @@
     max-width: var(--grid-desktop-container-width);
   }
 }
+
+@media screen and (min-width: 2100px) {
+    .side-navigation-wrapper.expand + .section.content {
+    max-width: unset;
+  }
+}
