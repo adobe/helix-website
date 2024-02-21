@@ -469,14 +469,6 @@
     min-height: 80vh;
   }
 
-  .side-navigation-wrapper + .section.content {
-    display: none;
-  }
-
-  .side-navigation-wrapper.ready + .section.content {
-    display: block;
-  }
-
   .side-navigation-wrapper.expand {
     width: calc(100% - var(--side-navigation-bar-gap));
     display: flex;
