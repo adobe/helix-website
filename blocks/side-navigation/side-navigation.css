@@ -534,4 +534,9 @@
   .side-navigation-wrapper > div {
     max-width: var(--grid-desktop-container-width);
   }
+
+  .side-navigation-wrapper.expand + .section.content {
+    margin-left: 16%;
+    margin-right: 16%;
+  }
 }
