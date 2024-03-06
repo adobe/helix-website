@@ -35,7 +35,13 @@ export function sampleRUM(checkpoint, data) {
         const url = new URL(`${pathBase}.rum/${weight}`, sampleRUM.baseURL).href;
         navigator.sendBeacon(url, body);
         // eslint-disable-next-line max-statements-per-line, brace-style
-        window.addEventListener('load', () => { sampleRUM('load'); import(new URL(`${pathBase}.rum/@adobe/helix-rum-enhancer@^2/src/index.js`, sampleRUM.baseURL)); });
+        window.addEventListener('load', () => {
+          sampleRUM('load');
+          // use classic script to avoid CORS issues
+          const script = document.createElement('script');
+          script.src = new URL('https://rum.hlx.page/.rum/@adobe/helix-rum-enhancer@^2/src/index.js').href;
+          document.head.appendChild(script);
+        });
       }
     }
     if (window.hlx.rum && window.hlx.rum.isSelected && checkpoint) {
