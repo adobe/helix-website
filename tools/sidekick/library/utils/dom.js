@@ -188,6 +188,7 @@ export function createSideNavItem(
   disclosureArrow,
   hasAction = false,
   actionIcon = '',
+  disableCopy = false,
 ) {
   const childElements = [];
   if (icon) {
@@ -199,7 +200,7 @@ export function createSideNavItem(
   }
 
   const blockVariant = createTag('sp-sidenav-item', { label }, childElements);
-  if (hasAction) {
+  if (hasAction && !disableCopy) {
     blockVariant.setAttribute('action', true);
   }
 

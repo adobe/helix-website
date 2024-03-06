@@ -1,0 +1,122 @@
+/* author box */
+
+main .author-box-container {
+    padding-top: 0;
+}
+
+main .author-box-container > div {
+    max-width: unset;
+    padding: 0;
+    margin: 0 auto;
+  }
+  
+  main .author-box {
+    visibility: unset;
+    max-width: unset;
+  }
+
+  main .author-box-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 0 2rem;
+  }
+
+  main .author-box-info .sharing-details {
+    margin-left: auto;
+  }
+  
+  main .author-box-info .blog-author-image,
+  main .author-box-info .blog-author-image img {
+    flex: 0 0 64px;
+    margin: 0;
+    margin-right: 16px;
+    height: 64px;
+    width: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  main .author-box-info .blog-author-name {
+    margin-bottom: 0;
+  }
+
+  main .author-box-info a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  main .author-box-info p,
+  main .author-box-info p a {
+    margin: 0;
+  }
+
+  main .author-box-info .sharing-details svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  main .author-box-info .blog-author-blurb {
+    font-style: italic;
+    color: grey;
+    padding-left: 15px;
+    display: none;
+  }
+
+  main .author-box-info .publication-date-invalid {
+    display: none;
+  }
+
+  @media (min-width: 600px) {
+    main .author-box {
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+    main .author-box .author-box-info {
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    main .author-box-info .blog-author-blurb {
+        max-width: 300px;
+        margin-left: 10px;
+        border-left: 1px solid grey;
+        display: block;
+        font-size: 15px;
+      }
+    
+    main .author-box-info .blog-author-details {
+        font-size: 16px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    main .author-box-info .blog-author-blurb {
+        max-width: 380px;
+        margin-left: 20px;
+        font-size: 18px;
+      }
+    
+    main .author-box-info .blog-author-details {
+        font-size: 18px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    main .author-box-info .blog-author-blurb {
+        max-width: 450px;
+        font-size: 20px;
+        margin-left: 30px;
+        padding-left: 30px;
+    }
+
+    main .author-box-info .blog-author-details {
+        font-size: 20px;
+    }
+  }

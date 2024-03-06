@@ -40,6 +40,23 @@ const youtube = (element) => {
   element.parentElement.remove();
 };
 
+const iframe = (element) => {
+  const url = new URL(element.href);
+  const html = `<div style="position: relative; padding-bottom: 56.25%;">
+      <iframe
+        src="${url.href}"
+        style="position: absolute; width: 100%; height: 100%; border: 0;"
+        title="Content from ${url.hostname}"
+        allow="encrypted-media"
+        allow-fullscreen=""
+        loading="lazy"
+        scrolling="no">
+      </iframe>
+    </div>`;
+  element.parentElement.insertAdjacentHTML('afterend', html);
+  element.parentElement.remove();
+};
+
 const initObserver = (callback) => new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -55,10 +72,13 @@ export default function decorate(block) {
     initObserver(() => {
       youtube(a);
     }).observe(a);
-  }
-  if (hostname.includes('gist')) {
+  } else if (hostname.includes('gist')) {
     initObserver(() => {
       gist(a);
+    }).observe(a);
+  } else {
+    initObserver(() => {
+      iframe(a);
     }).observe(a);
   }
 }
