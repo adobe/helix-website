@@ -33,8 +33,9 @@ export function sampleRUM(checkpoint, data) {
         const pathBase = window.hlx.codeBasePath ? `${window.hlx.codeBasePath}/` : '';
         // eslint-disable-next-line object-curly-newline, max-len
         const body = JSON.stringify({ weight, id, referer: window.location.href, checkpoint: 'top', t: timeShift(), target: document.visibilityState });
+        const headers = { type: 'application/json' };
         const url = new URL(`${pathBase}.rum/${weight}`, sampleRUM.collectBaseURL).href;
-        navigator.sendBeacon(url, body);
+        navigator.sendBeacon(url, new Blob([body], headers));
         // eslint-disable-next-line max-statements-per-line, brace-style
         window.addEventListener('load', () => {
           sampleRUM('load');
