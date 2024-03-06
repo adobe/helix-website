@@ -22,24 +22,25 @@ export function sampleRUM(checkpoint, data) {
       const rumStorage = sessionStorage.getItem(SESSION_STORAGE_KEY) ? JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY)) : {};
       rumStorage.pages = (rumStorage.pages ?? 0) + (Math.floor(Math.random() * 20) - 10) + 1;
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(rumStorage));
-      sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE == null ? '/' : window.RUM_BASE, window.location);
-      const pathBase = window.hlx.codeBasePath ? `${window.hlx.codeBasePath}/` : '';
       const weight = new URLSearchParams(window.location.search).get('rum') === 'on' ? 1 : 100;
       const id = Array.from({ length: 75 }, (_, i) => String.fromCharCode(48 + i)).filter((a) => /\d|[A-Z]/i.test(a)).filter(() => Math.random() * 75 > 70).join('');
       const isSelected = (Math.random() * weight < 1);
       // eslint-disable-next-line object-curly-newline, max-len
       window.hlx.rum = { weight, id, isSelected, firstReadTime: window.performance ? window.performance.timeOrigin : Date.now(), sampleRUM, queue: [], collector: (...args) => window.hlx.rum.queue.push(args) };
       if (isSelected) {
+        sampleRUM.collectorBaseURL = sampleRUM.collectorBaseURL || new URL(window.RUM_BASE || '/', window.origin);
+        sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE || '/', new URL('https://rum.hlx.page'));
+        const pathBase = window.hlx.codeBasePath ? `${window.hlx.codeBasePath}/` : '';
         // eslint-disable-next-line object-curly-newline, max-len
         const body = JSON.stringify({ weight, id, referer: window.location.href, checkpoint: 'top', t: timeShift(), target: document.visibilityState });
-        const url = new URL(`${pathBase}.rum/${weight}`, sampleRUM.baseURL).href;
+        const url = new URL(`${pathBase}.rum/${weight}`, sampleRUM.collectorBaseURL).href;
         navigator.sendBeacon(url, body);
         // eslint-disable-next-line max-statements-per-line, brace-style
         window.addEventListener('load', () => {
           sampleRUM('load');
           // use classic script to avoid CORS issues
           const script = document.createElement('script');
-          script.src = new URL('https://rum.hlx.page/.rum/@adobe/helix-rum-enhancer@^2/src/index.js').href;
+          script.src = new URL('.rum/@adobe/helix-rum-enhancer@^2/src/index.js', sampleRUM.baseURL).href;
           document.head.appendChild(script);
         });
       }
