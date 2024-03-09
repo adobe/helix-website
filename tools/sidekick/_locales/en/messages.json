@@ -170,6 +170,9 @@
   "config_invalid_giturl": {
     "message": "Invalid repository URL"
   },
+  "config_invalid_host": {
+    "message": "Invalid hostname"
+  },
   "config_invalid_import": {
     "message": "Choose a valid file to import"
   },
