@@ -6,5 +6,10 @@
   border-radius: var(--image-border-radius-l);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
+}
+
+.deprecation .header {
+  font-weight: 700;
+  font-size: var(--type-body-m-size);
   text-transform: uppercase;
 }
