@@ -1,7 +1,7 @@
 .deprecation {
   padding: 10px 16px;
   margin-bottom: 16px;
-  background-color: var(--color-gray-500);
+  background-color: #d31510;
   color: #fff;
   border-radius: var(--image-border-radius-l);
   font-size: var(--type-body-s-size);
