@@ -623,6 +623,20 @@ async function loadEager(doc) {
     }
   }
 
+  // deprecation banner
+  const deprecation = getMetadata('deprecation');
+  if (deprecation) {
+    const deprecationBanner = buildBlock('deprecation', deprecation);
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      // insert above title
+      h1.parentElement.insertBefore(deprecationBanner, h1);
+    } else {
+      // insert at top of page
+      document.querySelector('main > div').append(deprecationBanner);
+    }
+  }
+
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
