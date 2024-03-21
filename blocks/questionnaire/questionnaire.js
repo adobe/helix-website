@@ -84,7 +84,7 @@ function buildBadge(score, i) {
   return badge;
 }
 
-function oraganizeResults(e, options) {
+function organizeResults(e, options) {
   const results = calculateResults(e);
   options.forEach((o) => {
     // reset options
@@ -152,7 +152,7 @@ export default async function decorate(block) {
     form.append(button);
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      oraganizeResults(e, results);
+      organizeResults(e, results);
     });
     row.append(form);
   }
