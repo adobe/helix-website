@@ -36,7 +36,7 @@ function buildQuestion(q) {
   const label = createTag('label', { for: name }, q.Question);
   // TODO: allow authoring of range, calculate step from options and range
   const input = createTag('input', {
-    type: 'range', name, id: name, min: -1, max: 1, step: 0.5, value: 0,
+    type: 'range', name, id: name, min: -1, max: 1, step: 0.25, value: 0,
   });
   Object.keys(q).forEach((choice) => {
     // eslint-disable-next-line eqeqeq
