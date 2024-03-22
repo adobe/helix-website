@@ -39,10 +39,7 @@ function buildQuestion(q) {
     type: 'range', name, id: name, min: -1, max: 1, step: 0.25, value: 0,
   });
   Object.keys(q).forEach((choice) => {
-    // eslint-disable-next-line eqeqeq
-    if (q[choice] == parseInt(q[choice], 10)) {
-      input.dataset[toCamelCase(choice)] = q[choice];
-    }
+    input.dataset[toCamelCase(choice)] = q[choice];
   });
   const score = createTag('p', { class: 'score' });
   // TODO: move strings out of code
@@ -56,20 +53,57 @@ function buildQuestion(q) {
   return wrapper;
 }
 
+/**
+ * Returns a function that calculates a score based on a multiplier
+ * The multiplier is a string that starts with a prefix and ends with a number
+ * The prefix can be '+', '-', '--', '++' or nothing (default to '+')
+ * The number is a float (default to 0)
+ * @param {string} scoreMultiplier the multiplier string
+ * @returns {function} a function that takes a value and returns a score
+ */
+function scoreFn(scoreMultiplier) {
+  const [numstring] = scoreMultiplier.match(/[\d.]+/) || ['0']; // default to 0
+  const numvalue = parseFloat(numstring, 10);
+  const prefix = (scoreMultiplier.match(/^[^\d]+/) || ['+'])[0]; // default to '+'
+  const multipliers = {
+    '+': (value) => value * numvalue, // more is better, less is worse
+    '-': (value) => value * -numvalue, // less is better, more is worse
+    '--': (value) => (value < 0 ? value * -numvalue : 0), // less is better, more is neutral
+    '++': (value) => (value > 0 ? value * numvalue : 0), // more is better, less is neutral
+  };
+  return multipliers[prefix] || multipliers['+'];
+}
+
 function calculateResults(e) {
-  const qs = [...e.target.querySelectorAll('input')].map((i) => ({
-    id: i.id, multipliers: i.dataset, value: parseFloat(i.value, 10),
-  }));
-  const results = {};
-  qs.forEach((q) => {
-    Object.keys(q.multipliers).forEach((key) => {
-      const multiplier = parseFloat(q.multipliers[key], 10);
-      const value = multiplier * parseFloat(q.value, 10);
-      if (results[key]) results[key] += value;
-      else results[key] = value;
-    });
-  });
-  return Object.entries(results).sort((a, b) => b[1] - a[1]);
+  const aggregatedScores = [...e.target.querySelectorAll('input')]
+    // get all questions and their answers
+    .map((i) => ({
+      id: i.id, multipliers: i.dataset, value: parseFloat(i.value, 10),
+    }))
+    // calculate scores for each answer
+    .map((q) => Object.fromEntries(
+      Object
+        .entries(q.multipliers)
+        .map(([answerKey, scoreMultiplier]) => [
+          answerKey,
+          scoreFn(scoreMultiplier)(q.value)]),
+    ))
+    // aggregate scores for each answer
+    .reduce((answerScores, questionScores) => {
+      Object.entries(questionScores).forEach(([answerKey, answerScore]) => {
+        if (answerScores[answerKey] !== undefined) answerScores[answerKey] += answerScore;
+        else answerScores[answerKey] = answerScore;
+      });
+      return answerScores;
+    }, {});
+  // sort aggregated scores
+  return Object
+    .entries(aggregatedScores)
+    .filter(([, score]) => !Number.isNaN(score))
+    .sort(([, aScore], [, bScore]) => (
+      // randomize order of equal scores
+      bScore === aScore ? Math.random() - 0.5
+        : bScore - aScore));
 }
 
 function buildBadge(score, i) {
