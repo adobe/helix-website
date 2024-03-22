@@ -41,6 +41,11 @@ function buildQuestion(q) {
   Object.keys(q).forEach((choice) => {
     input.dataset[toCamelCase(choice)] = q[choice];
   });
+  // if URL query string has a value, set the input value
+  const url = new URL(window.location);
+  const params = new URLSearchParams(url.search);
+  if (params.has(name)) input.value = params.get(name);
+
   const score = createTag('p', { class: 'score' });
   // TODO: move strings out of code
   const scores = ['strongly disagree', 'disagree', 'no opinion', 'agree', 'strongly agree'];
@@ -188,6 +193,20 @@ export default async function decorate(block) {
       e.preventDefault();
       oraganizeResults(e, results);
     });
+
+    form.addEventListener('change', (e) => {
+      // push state to update URL
+      const url = new URL(window.location);
+      const params = new URLSearchParams(url.search);
+      params.set(e.target.id, e.target.value);
+      url.search = params;
+      window.history.pushState({}, '', url);
+    });
     row.append(form);
+    // if the URL has query strings, submit the form, so that there is a
+    // permalink to the results
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search);
+    if (params.toString()) form.dispatchEvent(new Event('submit'));
   }
 }
