@@ -1,4 +1,4 @@
-# AEM Edge Delivery Services Experimenation
+# AEM Edge Delivery Services Experimentation
 
 The AEM Experimentation plugin helps you quickly set up experimentation and segmentation on your AEM project. 
 It is currently available to customers in collaboration with AEM Engineering via co-innovation VIP Projects. 
@@ -28,6 +28,8 @@ If you prefer using `https` links you'd replace `git@github.com:adobe/aem-experi
 
 ## Project instrumentation
 
+:warning: The plugin requires that you have a recent RUM instrumentation from the AEM boilerplate that supports `sampleRUM.always`. If you are getting errors that `.on` cannot be called on an `undefined` object, please apply the changes from https://github.com/adobe/aem-boilerplate/pull/247/files to your `lib-franklin.js`.
+
 ### On top of the plugin system
 
 The easiest way to add the plugin is if your project is set up with the plugin system extension in the boilerplate.
@@ -52,9 +54,9 @@ window.hlx.plugins.add('experimentation', {
 });
 ```
 
-### Without the plugin system
+### On top of a regular boilerplate project
 
-To properly connect and configure the plugin for your project, you'll need to edit your `scripts.js` in your AEM project and add the following:
+Typically, you'd know you don't have the plugin system if you don't see a reference to `window.hlx.plugins` in your `scripts.js`. In that case, you can still manually instrument this plugin in your project by falling back to a more manual instrumentation. To properly connect and configure the plugin for your project, you'll need to edit your `scripts.js` in your AEM project and add the following:
 
 1. at the start of the file:
     ```js
@@ -131,13 +133,16 @@ There are various aspects of the plugin that you can configure via options you a
 You have already seen the `audiences` option in the examples above, but here is the full list we support:
 
 ```js
-runEager.call(pluginContext, {
+runEager.call(document, {
   // Overrides the base path if the plugin was installed in a sub-directory
   basePath: '',
-  // Lets you configure if we are in a prod environment or not
+
+  // Lets you configure the prod environment.
   // (prod environments do not get the pill overlay)
+  prodHost: 'www.my-website.com',
+  // if you have several, or need more complex logic to toggle pill overlay, you can use
   isProd: () => window.location.hostname.endsWith('hlx.page')
-    || window.location.hostname === ('localhost')
+    || window.location.hostname === ('localhost'),
 
   /* Generic properties */
   // RUM sampling rate on regular AEM pages is 1 out of 100 page views
@@ -145,6 +150,10 @@ runEager.call(pluginContext, {
   // to 1 out of 10 page views so we can collect metrics faster of the relative
   // short durations of those campaigns/experiments
   rumSamplingRate: 10,
+
+  // the storage type used to persist data between page views
+  // (for instance to remember what variant in an experiment the user was served)
+  storage: window.SessionStorage,
 
   /* Audiences related properties */
   // See more details on the dedicated Audiences page linked below
@@ -163,7 +172,7 @@ runEager.call(pluginContext, {
   experimentsConfigFile: 'manifest.json',
   experimentsMetaTag: 'experiment',
   experimentsQueryParameter: 'experiment',
-});
+}, pluginContext);
 ```
 
 For detailed implementation instructions on the different features, please read the dedicated pages we have on those topics:

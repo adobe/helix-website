@@ -10,6 +10,8 @@
  * governing permissions and limitations under the License.
  */
 
+const DOMAIN_KEY_NAME = 'aem-domainkey';
+
 function createPreviewOverlay(cls) {
   const overlay = document.createElement('div');
   overlay.className = cls;
@@ -27,7 +29,9 @@ function createButton(label) {
 
 function createPopupItem(item) {
   const actions = typeof item === 'object'
-    ? item.actions.map((action) => `<div class="hlx-button"><a href="${action.href}">${action.label}</a></div>`)
+    ? item.actions.map((action) => (action.href
+      ? `<div class="hlx-button"><a href="${action.href}">${action.label}</a></div>`
+      : `<div class="hlx-button"><a href="#">${action.label}</a></div>`))
     : [];
   const div = document.createElement('div');
   div.className = `hlx-popup-item${item.isSelected ? ' is-selected' : ''}`;
@@ -35,12 +39,20 @@ function createPopupItem(item) {
     <h5 class="hlx-popup-item-label">${typeof item === 'object' ? item.label : item}</h5>
     ${item.description ? `<div class="hlx-popup-item-description">${item.description}</div>` : ''}
     ${actions.length ? `<div class="hlx-popup-item-actions">${actions}</div>` : ''}`;
+  const buttons = [...div.querySelectorAll('.hlx-button a')];
+  item.actions.forEach((action, index) => {
+    if (action.onclick) {
+      buttons[index].addEventListener('click', action.onclick);
+    }
+  });
   return div;
 }
 
 function createPopupDialog(header, items = []) {
   const actions = typeof header === 'object'
-    ? (header.actions || []).map((action) => `<div class="hlx-button"><a href="${action.href}">${action.label}</a></div>`)
+    ? (header.actions || []).map((action) => (action.href
+      ? `<div class="hlx-button"><a href="${action.href}">${action.label}</a></div>`
+      : `<div class="hlx-button"><a href="#">${action.label}</a></div>`))
     : [];
   const popup = document.createElement('div');
   popup.className = 'hlx-popup hlx-hidden';
@@ -54,6 +66,12 @@ function createPopupDialog(header, items = []) {
   const list = popup.querySelector('.hlx-popup-items');
   items.forEach((item) => {
     list.append(createPopupItem(item));
+  });
+  const buttons = [...popup.querySelectorAll('.hlx-popup-header-actions .hlx-button a')];
+  actions.forEach((action, index) => {
+    if (action.onclick) {
+      buttons[index].addEventListener('click', action.onclick);
+    }
   });
   return popup;
 }
@@ -144,13 +162,27 @@ function createVariant(experiment, variantName, config, options) {
 }
 
 async function fetchRumData(experiment, options) {
-  // the query is a bit slow, so I'm only fetching the results when the popup is opened
-  const resultsURL = new URL('https://helix-pages.anywhere.run/helix-services/run-query@v2/rum-experiments');
-  resultsURL.searchParams.set(options.experimentsQueryParameter, experiment);
-  if (window.hlx.sidekickConfig && window.hlx.sidekickConfig.host) {
-    // restrict results to the production host, this also reduces query cost
-    resultsURL.searchParams.set('domain', window.hlx.sidekickConfig.host);
+  if (!options.domainKey) {
+    // eslint-disable-next-line no-console
+    console.warn('Cannot show RUM data. No `domainKey` configured.');
+    return null;
   }
+  if (!options.prodHost && (typeof options.isProd !== 'function' || !options.isProd())) {
+    // eslint-disable-next-line no-console
+    console.warn('Cannot show RUM data. No `prodHost` configured or custom `isProd` method provided.');
+    return null;
+  }
+
+  // the query is a bit slow, so I'm only fetching the results when the popup is opened
+  const resultsURL = new URL('https://helix-pages.anywhere.run/helix-services/run-query@v3/rum-experiments');
+  // restrict results to the production host, this also reduces query cost
+  if (typeof options.isProd === 'function' && options.isProd()) {
+    resultsURL.searchParams.set('url', window.location.host);
+  } else if (options.prodHost) {
+    resultsURL.searchParams.set('url', options.prodHost);
+  }
+  resultsURL.searchParams.set('domainkey', options.domainKey);
+  resultsURL.searchParams.set('experiment', experiment);
 
   const response = await fetch(resultsURL.href);
   if (!response.ok) {
@@ -158,7 +190,8 @@ async function fetchRumData(experiment, options) {
   }
 
   const { results } = await response.json();
-  if (!results.length) {
+  const { data } = results;
+  if (!data.length) {
     return null;
   }
 
@@ -168,7 +201,7 @@ async function fetchRumData(experiment, options) {
     return o;
   }, {});
 
-  const variantsAsNums = results.map(numberify);
+  const variantsAsNums = data.map(numberify);
   const totals = Object.entries(
     variantsAsNums.reduce((o, v) => {
       Object.entries(v).forEach(([k, val]) => {
@@ -185,7 +218,7 @@ async function fetchRumData(experiment, options) {
     const vkey = k.replace(/^(variant|control)_/, 'variant_');
     const ckey = k.replace(/^(variant|control)_/, 'control_');
     const tkey = k.replace(/^(variant|control)_/, 'total_');
-    if (o[ckey] && o[vkey]) {
+    if (!Number.isNaN(o[ckey]) && !Number.isNaN(o[vkey])) {
       o[tkey] = o[ckey] + o[vkey];
     }
     return o;
@@ -282,6 +315,7 @@ async function decorateExperimentPill(overlay, options, context) {
   // eslint-disable-next-line no-console
   console.log('preview experiment', experiment);
 
+  const domainKey = window.localStorage.getItem(DOMAIN_KEY_NAME);
   const pill = createPopupButton(
     `Experiment: ${config.id}`,
     {
@@ -296,14 +330,41 @@ async function decorateExperimentPill(overlay, options, context) {
           ${config.variants[config.variantNames[0]].blocks.join(',')}
         </div>
         <div class="hlx-info">How is it going?</div>`,
-      actions: config.manifest ? [{ label: 'Manifest', href: config.manifest }] : [],
+      actions: [
+        ...config.manifest ? [{ label: 'Manifest', href: config.manifest }] : [],
+        {
+          label: '<span style="font-size:2em;line-height:1em">⚙</span>',
+          onclick: async () => {
+            // eslint-disable-next-line no-alert
+            const key = window.prompt(
+              'Please enter your domain key:',
+              window.localStorage.getItem(DOMAIN_KEY_NAME) || '',
+            );
+            if (key && key.match(/[a-f0-9-]+/)) {
+              window.localStorage.setItem(DOMAIN_KEY_NAME, key);
+              const performanceMetrics = await fetchRumData(experiment, {
+                ...options,
+                domainKey: key,
+              });
+              if (performanceMetrics === null) {
+                return;
+              }
+              populatePerformanceMetrics(pill, config, performanceMetrics);
+            } else if (key === '') {
+              window.localStorage.removeItem(DOMAIN_KEY_NAME);
+            }
+          },
+        },
+      ],
     },
     config.variantNames.map((vname) => createVariant(experiment, vname, config, options)),
   );
-  pill.classList.add(`is-${context.toClassName(config.status)}`);
+  if (config.run) {
+    pill.classList.add(`is-${context.toClassName(config.status)}`);
+  }
   overlay.append(pill);
 
-  const performanceMetrics = await fetchRumData(experiment, options);
+  const performanceMetrics = await fetchRumData(experiment, { ...options, domainKey });
   if (performanceMetrics === null) {
     return;
   }
