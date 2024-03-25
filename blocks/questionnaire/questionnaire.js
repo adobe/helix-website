@@ -21,12 +21,11 @@ async function fetchQuestionnaire(source) {
   return {};
 }
 
-function updateSliderValue(input, index) {
+function updateSliderValue(input, index, options) {
   const min = parseFloat(input.min, 10);
   const max = parseFloat(input.max, 10);
-  const step = parseFloat(input.step, 10);
-  const steps = Math.ceil((max - min) / step) + 1; // + 1 to make range inclusive
-  const values = [...Array(steps)].map((_, i) => (i * step) + min);
+  const step = (max - min) / (options - 1);
+  const values = [...Array(options)].map((_, i) => min + (i * step));
   input.value = values[index];
 }
 
@@ -51,7 +50,7 @@ function buildQuestion(q) {
   const scores = ['strongly disagree', 'disagree', 'no opinion', 'agree', 'strongly agree'];
   scores.forEach((s, i) => {
     const span = createTag('span', {}, s);
-    span.addEventListener('click', () => updateSliderValue(input, i));
+    span.addEventListener('click', () => updateSliderValue(input, i, scores.length));
     score.append(span);
   });
   wrapper.append(label, input, score);
