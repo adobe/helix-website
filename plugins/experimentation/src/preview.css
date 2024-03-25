@@ -112,6 +112,7 @@
   background-color: #222;
   border-radius: 16px 16px 0 0;
   padding: 24px 16px;
+  gap: 0 16px;
 }
 
 .hlx-popup-header-label {
@@ -132,6 +133,7 @@
 .hlx-popup h5 {
   font-family: system-ui, sans-serif;
   margin: 0;
+  color: inherit;
 }
 
 .hlx-popup h4 {
@@ -188,6 +190,7 @@
   margin: 16px;
   padding: 16px;
   border-radius: 16px;
+  gap: 0 16px;
 }
 
 .hlx-popup-item-label {
@@ -217,5 +220,5 @@
   .hlx-preview-overlay {
     flex-flow: row-reverse wrap-reverse;
     justify-content: flex-start;
-  }  
+  }
 }
