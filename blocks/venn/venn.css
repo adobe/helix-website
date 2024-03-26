@@ -1,5 +1,12 @@
+/**
+  * venn diagram
+  * Used https://adrianroselli.com/2018/12/a-css-venn-diagram.html as a start point
+  */
+
 .venn {
-  --venn-width-mult: 1;
+  --venn-width-mult: .9;
+  --venn-font-size: .5em;
+
   width: calc(100% * var(--venn-width-mult));
   margin: 0 auto;
 }
@@ -91,7 +98,6 @@
     padding: initial;
   }
 
-  /* Grid layout  */
   .venn {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -106,7 +112,6 @@
   }
 
   .venn > .circle.one {
-    /*   outline: .2em solid #f00; */
     grid-column-start: 1;
     grid-column-end: 4;
     grid-row-start: 1;
@@ -114,7 +119,6 @@
   }
 
   .venn > .circle.two {
-    /*   outline: .2em solid #0f0; */
     grid-column-start: 3;
     grid-column-end: 6;
     grid-row-start: 1;
@@ -122,7 +126,6 @@
   }
 
   .venn > .circle.three {
-    /*   outline: .2em solid #00f; */
     grid-column-start: 2;
     grid-column-end: 5;
     grid-row-start: 2;
@@ -130,7 +133,6 @@
   }
 
   .venn > .shape.onetwo {
-    /*   outline: .2em solid #ff0; */
     grid-column-start: 3;
     grid-column-end: 4;
     grid-row-start: 1;
@@ -138,7 +140,6 @@
   }
 
   .venn > .shape.onethree {
-    /*   outline: .2em solid #f0f; */
     grid-column-start: 2;
     grid-column-end: 4;
     grid-row-start: 2;
@@ -146,7 +147,6 @@
   }
 
   .venn > .shape.twothree {
-    /*   outline: .2em solid #0ff; */
     grid-column-start: 3;
     grid-column-end: 5;
     grid-row-start: 2;
@@ -154,7 +154,6 @@
   }
 
   .venn > .shape.onetwothree {
-    /*   outline: .2em solid #fff; */
     grid-column-start: 3;
     grid-column-end: 3;
     grid-row-start: 2;
@@ -170,8 +169,6 @@
   .venn .shape span {
     box-sizing: border-box;
     float: right;
-    /*     border: 1px dotted #00f;
-    background-color: rgba(0,0,0,.1); */
   }
   .venn .circle > span {
     width: calc(58.5vw * var(--venn-width-mult));
@@ -432,38 +429,33 @@
       100% 100%
     );
   }
-  .venn .circle h3 {
+  .venn h3 {
     margin: 0.5em 0 0 0;
     text-align: center;
   }
-  .venn .circle h3 + * {
+  .venn h3 + * {
     margin-top: 0.2em;
-  }
-  .venn .shape h3 {
-    clip-path: inset(100%);
-    clip: rect(1px, 1px, 1px, 1px);
-    height: 1px;
-    width: 1px;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
   }
 }
 
 .venn > .circle.one {
-  background-color: rgba(255, 0, 0, 0.1);
+  background-color: rgba(255, 0, 0, 0.2);
 }
 
 .venn > .circle.two {
-  background-color: rgba(0, 255, 0, 0.1);
+  background-color: rgba(0, 255, 0, 0.2);
 }
 
 .venn > .circle.three {
-  background-color: rgba(0, 0, 255, 0.1);
+  background-color: rgba(0, 0, 255, 0.2);
 }
 
 .venn ul > li {
   list-style: none;
   margin: 0.5em 0;
-  font-size: 16px;
+  font-size: var(--venn-font-size);
+}
+
+.venn .onetwothree ul > li {
+  font-size: var(--venn-font-size);
 }
