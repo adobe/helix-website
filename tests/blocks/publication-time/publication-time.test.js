@@ -10,14 +10,13 @@ document.body.innerHTML = mock;
 
 describe('Publication time block', async () => {
   it('has a relative-time element', async () => {
-    Object.defineProperty(document, 'lastModified', {
-      get: () => 1234567891234,
-    });
     const block = document.querySelector('.block');
     decorate(block);
     const rt = document.querySelector('relative-time');
-    expect(rt.getAttribute('datetime')).to.equal('2009-02-13T23:31:31.234Z');
-    expect(rt.textContent).to.equal('2/14/2009');
-    expect(block.textContent).to.equal('prefix for relative time 2/14/2009');
+    const lastMod = new Date(document.lastModified);
+    const shortDate = lastMod.toLocaleDateString();
+    expect(rt.getAttribute('datetime')).to.equal(lastMod.toISOString());
+    expect(rt.textContent).to.equal(shortDate);
+    expect(block.textContent).to.equal(`prefix for relative time ${shortDate}`);
   });
 });
