@@ -6,15 +6,15 @@ export default function decorate($block) {
 
   // Output the <relative-time> element as specified,
   // https://github.com/github/relative-time-element
-  if(!document.lastModified) {
+  if (!document.lastModified) {
     console.error('document.lastModified returns null');
   } else {
     const lastMod = new Date(document.lastModified);
     const p = document.createElement('p');
     const rt = document.createElement('relative-time');
-    rt.setAttribute('datetime', lastMod.toISOString())
+    rt.setAttribute('datetime', lastMod.toISOString());
     rt.textContent = lastMod.toLocaleDateString();
-    p.textContent = prefix + ' ';
+    p.textContent = `${prefix} `;
     p.appendChild(rt);
     $block.replaceChildren(p);
   }
