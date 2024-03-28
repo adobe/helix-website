@@ -5,6 +5,9 @@
  *  Built using "npm run build" at commit e0d2780f6 of
  *  that module
  */
+
+/* eslint-disable */
+
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
