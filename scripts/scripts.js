@@ -7,8 +7,9 @@ import {
   toClassName,
   decorateSections,
   decorateBlocks,
-  waitForLCP,
-  loadBlocks,
+  waitForFirstImage,
+  loadSection,
+  loadSections,
   loadBlock,
   loadCSS,
   loadScript,
@@ -23,8 +24,6 @@ import {
 } from '../utils/helpers.js';
 
 // Constants here
-const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
-
 const AUDIENCES = {
   mobile: () => window.innerWidth < 600,
   desktop: () => window.innerWidth >= 600,
@@ -523,7 +522,6 @@ export function setUpSideNav(main, aside) {
   const sideNav = buildBlock('side-navigation', '');
   aside.append(sideNav);
   main.insertBefore(aside, main.querySelector('.section.content'));
-  updateGuideTemplateStyleBasedOnHero();
   decorateBlock(sideNav);
   return loadBlock(sideNav);
 }
@@ -598,6 +596,8 @@ export function decorateMain(main) {
 function prepareSideNav(main) {
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
+  aside.classList.add('side-navigation-wrapper');
+  updateGuideTemplateStyleBasedOnHero();
 }
 
 /**
@@ -643,7 +643,8 @@ async function loadEager(doc) {
     decorateBreadcrumb(main);
     prepareSideNav(main);
     document.body.classList.add('appear');
-    await waitForLCP(LCP_BLOCKS);
+    const firstSection = main.querySelector('.section');
+    await loadSection(firstSection, waitForFirstImage);
   }
 }
 
@@ -657,7 +658,7 @@ function setUpSoftNavigation() {
       const template = dom.querySelector('meta[name="template"]');
       if (template && template.getAttribute('content') === 'guides') {
         await decorateMain(main);
-        await loadBlocks(main);
+        await loadSections(main);
         const currentMain = document.querySelector('main');
         const children = [...currentMain.children].slice(2);
         sampleRUM('leave');
@@ -717,7 +718,7 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  await loadBlocks(main);
+  await loadSections(main);
   addBlockLevelInViewAnimation(main);
 
   const { hash } = window.location;

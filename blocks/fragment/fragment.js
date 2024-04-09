@@ -5,7 +5,7 @@
  */
 
 import { decorateMain } from '../../scripts/scripts.js';
-import { loadBlocks } from '../../scripts/lib-franklin.js';
+import { loadSections } from '../../scripts/lib-franklin.js';
 
 /**
  * Loads a fragment.
@@ -19,7 +19,7 @@ async function loadFragment(path) {
       const main = document.createElement('main');
       main.innerHTML = await resp.text();
       decorateMain(main);
-      await loadBlocks(main);
+      await loadSections(main);
       return main;
     }
   }
