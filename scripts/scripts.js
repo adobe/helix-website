@@ -647,71 +647,10 @@ async function loadEager(doc) {
   }
 }
 
-function setUpSoftNavigation() {
-  const navigate = async (href, link) => {
-    try {
-      const resp = await fetch(href);
-      const html = await resp.text();
-      const dom = new DOMParser().parseFromString(html, 'text/html');
-      const main = dom.querySelector('main');
-      const template = dom.querySelector('meta[name="template"]');
-      if (template && template.getAttribute('content') === 'guides') {
-        await decorateMain(main);
-        await loadBlocks(main);
-        const currentMain = document.querySelector('main');
-        const children = [...currentMain.children].slice(2);
-        sampleRUM('leave');
-        children.forEach((child) => child.remove());
-        while (main.firstElementChild) currentMain.append(main.firstElementChild);
-        const title = dom.querySelector('title').textContent;
-        const category = dom.querySelector('meta[name="category"').getAttribute('content');
-        document.querySelector('meta[name="category"]').setAttribute('content', category);
-        document.querySelector('meta[property="og:title"]').setAttribute('content', title);
-        document.querySelector('title').textContent = title;
-        decorateBreadcrumb(currentMain);
-        const oldhref = window.location.pathname;
-        sampleRUM('enter', { source: 'softnav', target: oldhref });
-        sampleRUM.observe(currentMain.querySelectorAll('div[data-block-name]'));
-        sampleRUM.observe(currentMain.querySelectorAll('picture > img'));
-
-        link.closest('div > ul').querySelector('a.active').classList.remove('active');
-        link.classList.add('active');
-      } else {
-        window.location.href = href;
-      }
-    } catch {
-      window.location.href = href;
-    }
-  };
-
-  window.addEventListener('popstate', async (e) => {
-    const { href, pathname } = window.location;
-    const link = document.body.querySelector(`.side-navigation a[href="${pathname}"]`);
-    if (link && getMetadata('template') === 'guides') {
-      e.preventDefault();
-      await navigate(href, link);
-    }
-  });
-
-  document.body.addEventListener('click', async (e) => {
-    const link = e.target.closest('a');
-    if (link && getMetadata('template') === 'guides' && e.target.closest('.side-navigation')) {
-      const { href } = link;
-      const hrefURL = new URL(href);
-      if ((hrefURL.origin === window.location.origin) && window.location.pathname !== '/docs/') {
-        e.preventDefault();
-        await navigate(href, link);
-        window.history.pushState({}, null, href);
-      }
-    }
-  });
-}
-
 /**
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
-  setUpSoftNavigation();
   const main = doc.querySelector('main');
 
   // NOTE:'.redesign' class is needed for the redesign styles, keep this

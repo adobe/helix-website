@@ -11,15 +11,17 @@ const preloaded = new Set();
 async function preloadPage(href) {
   const hrefURL = new URL(href);
   if (hrefURL.origin === window.location.origin) {
-    const resp = await fetch(href);
-    const html = await resp.text();
-    const dom = new DOMParser().parseFromString(html, 'text/html');
-    const picture = dom.querySelector('picture');
-    if (picture) {
-      const imgLoader = document.createElement('div');
-      imgLoader.append(picture);
-      picture.querySelector('img').loading = 'eager';
-    }
+    // use speculation rules to preload the page
+    const script = document.createElement('script');
+    script.type = 'speculationrules';
+    script.textContent = JSON.stringify({
+      prerender: [
+        {
+          urls: [`${hrefURL.pathname}${hrefURL.search}`],
+        },
+      ],
+    });
+    document.head.appendChild(script);
   }
 }
 
