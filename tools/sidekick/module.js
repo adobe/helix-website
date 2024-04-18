@@ -1654,8 +1654,8 @@ import sampleRUM from './rum.js';
           .map((row) => {
             const info = row.getAttribute('aria-label') || row.querySelector('span')?.textContent;
             // info format: bla.docx, docx File, Private, Modified 8/28/2023, edited by Jane, 1 KB
-            const type = info.match(/, ([a-z0-9]+) File,/)?.[1];
-            const path = type && info.split(`, ${type} File,`)[0];
+            const type = info.match(/, ([a-z0-9]+) [A-Za-z]+,/)?.[1];
+            const path = type && info.split(`, ${type}`)[0];
             return {
               path,
               type,

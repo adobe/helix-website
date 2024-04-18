@@ -49,7 +49,7 @@
     "message": "Prévisualisation de $1 fichiers sur $2 générée…"
   },
   "bulk_progress_publish_multiple": {
-    "message": "$1 sur $2 fichiers publiés..."
+    "message": "$1 fichiers publiés sur $2…"
   },
   "bulk_result_preview_multiple_failure": {
     "message": "Échec de la génération de la prévisualisation de $1 fichiers :"
@@ -170,8 +170,14 @@
   "config_invalid_giturl": {
     "message": "URL de référentiel non valide"
   },
+  "config_invalid_host": {
+    "message": "Nom d’hôte non valide"
+  },
   "config_invalid_import": {
     "message": "Choisissez un fichier valide à importer."
+  },
+  "config_invalid_mountpoints": {
+    "message": "URL de contenu non valide"
   },
   "config_invalid_shareurl": {
     "message": "URL de partage non valide"
@@ -222,7 +228,7 @@
     "message": "Une configuration pour ce projet existe déjà."
   },
   "config_project_host": {
-    "message": "Production"
+    "message": "Production "
   },
   "config_project_innerhost": {
     "message": "Aperçu"
@@ -231,7 +237,7 @@
     "message": "Contenu"
   },
   "config_project_pick": {
-    "message": "Choisissez un projet."
+    "message": "Choisissez un projet"
   },
   "config_project_pick_more": {
     "description": "Plus de configurations",
@@ -271,7 +277,7 @@
     "message": "Ce site n'est plus pris en charge."
   },
   "config_ux": {
-    "message": "Expérience utilisateur"
+    "message": "Expérience client"
   },
   "copied_url": {
     "message": "URL copiée dans le presse-papiers."
@@ -412,7 +418,7 @@
     "message": "J'ai compris."
   },
   "help_close_acknowledge": {
-    "message": "Ne plus afficher le sujet d'aide"
+    "message": "Ne plus afficher la rubrique d’aide"
   },
   "help_close_dismiss": {
     "message": "Afficher à nouveau la rubrique d'aide plus tard"
@@ -424,13 +430,13 @@
     "message": "Ce conseil"
   },
   "help_next": {
-    "message": "Prochain conseil"
+    "message": "Conseil suivant"
   },
   "help_opt_out": {
-    "message": "Ne pas montrer d'aide"
+    "message": "Ne pas afficher de contenu d’aide"
   },
   "help_opt_out_alert": {
-    "message": "L'aide a été désactivée. Réactivez-la sous Options > Expérience utilisateur."
+    "message": "L’aide a été désactivée. Réactivez-la sous Options > Expérience client."
   },
   "help_previous": {
     "message": "Conseil précédent"
@@ -440,10 +446,10 @@
   },
   "help_user_status_check_all": {
     "description": "Consulter toutes les rubriques d'aide",
-    "message": "Tout vérifier"
+    "message": "Tout cocher"
   },
   "help_user_status_description": {
-    "message": "Les sujets cochés ne seront plus affichés. Enlevez la coche à côté d'un sujet que vous souhaitez voir à nouveau."
+    "message": "Les rubriques cochées ne seront plus affichées. Enlevez la coche à côté d’une rubrique que vous souhaitez voir à nouveau."
   },
   "help_user_status_uncheck_all": {
     "description": "Décocher toutes les rubriques d'aide",
@@ -496,7 +502,7 @@
     "message": "Chargement des actions…"
   },
   "preview": {
-    "message": "Aperçu"
+    "message": "Prévisualiser"
   },
   "preview_config_success": {
     "message": "La configuration a été activée."
@@ -523,7 +529,7 @@
     "message": "Échec de la publication. Réessayez plus tard."
   },
   "push_down_content": {
-    "message": "Transférer le contenu au lieu de le superposer"
+    "message": "Pousser le contenu vers le bas au lieu de le superposer"
   },
   "push_down_content_description": {
     "message": "Remarque : selon la structure du site, une configuration personnalisée du projet peut s'avérer nécessaire pour obtenir le résultat escompté."
@@ -590,7 +596,7 @@
     "message": "Changer d'utilisateur"
   },
   "view_doc_source_copied": {
-    "message": "Copié."
+    "message": "Copie effectuée"
   },
   "yesterday_at": {
     "message": "Hier à $1"

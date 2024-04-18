@@ -124,7 +124,7 @@
     "message": "您真的要删除所有设置吗？"
   },
   "config_delete_all_description": {
-    "message": "注意：无法撤消此操作！"
+    "message": "注意：此操作无法撤消！"
   },
   "config_delete_confirm": {
     "message": "您真的要删除这个项目吗？"
@@ -156,7 +156,7 @@
     "message": "您真的要导入此配置并覆盖当前配置吗？"
   },
   "config_import_description": {
-    "message": "从您的计算机导入配置。确保您已备份当前的配置！"
+    "message": "从您的计算机导入配置。请确定您已备份当前的配置！"
   },
   "config_import_failure": {
     "message": "无法导入配置"
@@ -165,13 +165,19 @@
     "message": "配置已成功导入"
   },
   "config_invalid_export": {
-    "message": "您还没有任何要导出的配置"
+    "message": "您还没有任何可导出的配置"
   },
   "config_invalid_giturl": {
     "message": "无效的存储库 URL"
   },
+  "config_invalid_host": {
+    "message": "无效主机名"
+  },
   "config_invalid_import": {
     "message": "选择要导入的有效文件"
+  },
+  "config_invalid_mountpoints": {
+    "message": "内容 URL 无效"
   },
   "config_invalid_shareurl": {
     "message": "共享 URL 无效"
@@ -186,7 +192,7 @@
     "message": "存储库 URL：https://github.com/..."
   },
   "config_manual_host_placeholder": {
-    "message": "生产主机名（可选）"
+    "message": "生产主机名称（可选）"
   },
   "config_manual_liveHost_placeholder": {
     "message": "自定义实时主机名（可选）"
@@ -204,7 +210,7 @@
     "message": "手动添加"
   },
   "config_picker_button_title": {
-    "message": "按 $1 选择 $2"
+    "message": "按 $1 选择“$2”"
   },
   "config_project_add": {
     "message": "添加该项目"
@@ -256,13 +262,13 @@
     "message": "单击右侧的共享图标，让拥有 Sidekick 的人与您共享其 URL。"
   },
   "config_shareurl_placeholder": {
-    "message": "Sharing URL：https://www.hlx.live/sidekick..."
+    "message": "共享 URL: https://www.hlx.live/sidekick..."
   },
   "config_shareurl_share_title": {
     "message": "$1 的 Sidekick 配置"
   },
   "config_shareurl_title": {
-    "message": "通过分享 URL 进行添加"
+    "message": "通过共享 URL 添加"
   },
   "config_toggle_menu": {
     "message": "显示/隐藏菜单"
@@ -325,7 +331,7 @@
     "message": "已成功删除文件。"
   },
   "delete_page_confirm": {
-    "message": "是否确实要删除此页面？"
+    "message": "您是否确定要删除此页面？"
   },
   "delete_page_no_source_confirm": {
     "message": "此页面不再有源文档，删除后无法撤消！\n\n是否确实要删除它？"
@@ -373,10 +379,10 @@
     "message": "预览生成失败。必须是 Google 文档或电子表格。"
   },
   "error_preview_not_gdoc_ms_word": {
-    "message": "这是一份 Microsoft Word 文件。请将其转换为 Google Docs：文件 > 另存为 Google Docs"
+    "message": "这是一个 Microsoft Word 文件。请将其转换为 Google 文档：文件 > 另存为 Google 文档"
   },
   "error_preview_not_gsheet_ms_excel": {
-    "message": "这是一份 Microsoft Excel 文件。请将其转换为 Google Sheets：文件 > 另存为 Google Sheets"
+    "message": "这是一个 Microsoft Excel 文件。请将其转换为 Google 表格：文件 > 另存为 Google 表格"
   },
   "error_status_403": {
     "message": "403 禁止：请向管理员请求足够的权限。"
@@ -433,7 +439,7 @@
     "message": "帮助已关闭。您可以在“选项”>“用户体验”下将其重新打开。"
   },
   "help_previous": {
-    "message": "上一提示"
+    "message": "上一个提示"
   },
   "help_user_status": {
     "message": "可用的帮助主题"
@@ -526,7 +532,7 @@
     "message": "下推内容而不是覆盖内容"
   },
   "push_down_content_description": {
-    "message": "注意：根据站点的结构，这可能需要自定义项目配置才能按预期工作。"
+    "message": "注意：根据网站的结构，此项可能需要自定义的项目配置才能按预期工作。"
   },
   "reload": {
     "message": "重新加载"
@@ -541,7 +547,7 @@
     "message": "$1 秒前"
   },
   "share_description": {
-    "message": "分享您的 Sidekick"
+    "message": "共享您的 Sidekick"
   },
   "standard": {
     "description": "标准配置模式",
@@ -563,7 +569,7 @@
     "message": "取消发布失败。请稍后再试。"
   },
   "unpublish_page_confirm": {
-    "message": "是否确实要取消发布此页面？"
+    "message": "您是否确定要取消发布此页面？"
   },
   "unpublish_page_no_source_confirm": {
     "message": "此页面不再有源文档，取消发布后无法撤消！\n\n是否确实要取消发布它？"
