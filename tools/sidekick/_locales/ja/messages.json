@@ -170,8 +170,14 @@
   "config_invalid_giturl": {
     "message": "無効なリポジトリ URL"
   },
+  "config_invalid_host": {
+    "message": "無効なホスト名"
+  },
   "config_invalid_import": {
     "message": "読み込む有効なファイルを選択"
+  },
+  "config_invalid_mountpoints": {
+    "message": "無効なコンテンツ URL"
   },
   "config_invalid_shareurl": {
     "message": "無効な共有 URL"
@@ -352,7 +358,7 @@
     "message": "編集"
   },
   "edit_date": {
-    "message": "編集済み :"
+    "message": "編集 : "
   },
   "error_config_failure": {
     "message": "設定をアクティブ化できませんでした :"
@@ -415,10 +421,10 @@
     "message": "ヘルプトピックを今後表示しない"
   },
   "help_close_dismiss": {
-    "message": "後でヘルプトピックを再度表示"
+    "message": "ヘルプトピックを後で再表示する"
   },
   "help_close_opt_out": {
-    "message": "ヘルプトピックを表示しない"
+    "message": "ヘルプトピックを一切表示しない"
   },
   "help_current": {
     "message": "このヒント"
@@ -430,7 +436,7 @@
     "message": "ヘルプを表示しない"
   },
   "help_opt_out_alert": {
-    "message": "ヘルプがオフになりました。オプショ／ユーザーエクスペリエンスでオンに戻すことができます。"
+    "message": "ヘルプがオフになりました。オプション／ユーザーエクスペリエンスでオンに戻すことができます。"
   },
   "help_previous": {
     "message": "前のヒント"
@@ -443,11 +449,11 @@
     "message": "すべてオンにする"
   },
   "help_user_status_description": {
-    "message": "オンにしたトピックは表示されなくなります。もう一度表示するトピックの横にあるチェックマークを解除します。"
+    "message": "選択したトピックは表示されなくなります。トピックを再表示するにはトピックのチェックマークを外してください。"
   },
   "help_user_status_uncheck_all": {
     "description": "すべてのヘルプトピックのチェックを解除",
-    "message": "すべてのチェックを解除"
+    "message": "すべて解除する"
   },
   "homepage": {
     "message": "https://www.hlx.live/tools/sidekick/"
@@ -502,7 +508,7 @@
     "message": "設定が正常にアクティブ化されました。"
   },
   "preview_date": {
-    "message": "プレビュー済み :"
+    "message": "プレビュー : "
   },
   "preview_onedrive": {
     "message": "プロのヒント : 最新の変更をすぐに確認するには、プレビューを生成する前に Ctrl+S キーを押します..."
@@ -517,7 +523,7 @@
     "message": "公開"
   },
   "publish_date": {
-    "message": "公開中のアイテム :"
+    "message": "公開 : "
   },
   "publish_failure": {
     "message": "公開に失敗しました。後でもう一度試してください。"
@@ -526,7 +532,7 @@
     "message": "コンテンツをオーバーレイでなくプッシュダウンする"
   },
   "push_down_content_description": {
-    "message": "メモ : サイトの構造によっては、期待どおりに機能するためにカスタムプロジェクト設定が必要になる場合があります。"
+    "message": "メモ：サイトの構造によっては、期待通りに動作させるためにカスタムプロジェクト設定が必要になる場合があります。"
   },
   "reload": {
     "message": "リロード"

@@ -112,7 +112,7 @@
     "message": "Projekt zu Sidekick hinzugefügt"
   },
   "config_backup": {
-    "message": "Sichern"
+    "message": "Backup"
   },
   "config_delete": {
     "message": "Löschen"
@@ -165,13 +165,19 @@
     "message": "Konfiguration erfolgreich importiert"
   },
   "config_invalid_export": {
-    "message": "Es gibt noch keine Konfiguration zum Exportieren"
+    "message": "Es gibt noch keine Konfiguration, die exportiert werden kann"
   },
   "config_invalid_giturl": {
     "message": "Ungültige Repository-URL"
   },
+  "config_invalid_host": {
+    "message": "Ungültiger Host-Name"
+  },
   "config_invalid_import": {
     "message": "Gültige Datei zum Importieren auswählen"
+  },
+  "config_invalid_mountpoints": {
+    "message": "Ungültige Inhalts-URL"
   },
   "config_invalid_shareurl": {
     "message": "Ungültige Freigabe-URL"
@@ -456,13 +462,13 @@
     "message": "Informationen"
   },
   "json_view_description": {
-    "message": "Benutzerfreundliche Datenwiedergabe."
+    "message": "Benutzerfreundliche Datendarstellung"
   },
   "live": {
     "message": "Live"
   },
   "minutes_ago": {
-    "message": "vor $1 Minuten"
+    "message": "Vor $1 Minuten"
   },
   "never": {
     "message": "Nie"
@@ -526,7 +532,7 @@
     "message": "Inhalte nach unten verschieben, statt sie zu überlagern"
   },
   "push_down_content_description": {
-    "message": "Hinweis: Abhängig von der Struktur der Site ist möglicherweise eine benutzerdefinierte Projektkonfiguration erforderlich, damit es wie erwartet funktioniert."
+    "message": "Hinweis: Abhängig von der Struktur der Site ist möglicherweise eine benutzerdefinierte Projektkonfiguration erforderlich, damit die Option ordnungsgemäß funktioniert."
   },
   "reload": {
     "message": "Neu laden"
@@ -538,7 +544,7 @@
     "message": "Speichern"
   },
   "seconds_ago": {
-    "message": "vor $1 Sekunden"
+    "message": "Vor $1 Sekunden"
   },
   "share_description": {
     "message": "Sidekick freigeben"
@@ -563,16 +569,16 @@
     "message": "Die Aufhebung der Veröffentlichung ist fehlgeschlagen. Bitte versuchen Sie es später erneut."
   },
   "unpublish_page_confirm": {
-    "message": "Möchten Sie die Veröffentlichung dieser Seite wirklich rückgängig machen?"
+    "message": "Möchten Sie die Veröffentlichung dieser Seite wirklich aufheben?"
   },
   "unpublish_page_no_source_confirm": {
-    "message": "Diese Seite verfügt über kein Quelldokument mehr. Das Rückgängigmachen der Veröffentlichung dieser Seite kann nicht zurückgenommen werden.\n\nMöchten Sie die Veröffentlichung dieser Seite wirklich rückgängig machen?"
+    "message": "Diese Seite verfügt über kein Quelldokument mehr. Das Aufheben der Veröffentlichung dieser Seite kann nicht zurückgenommen werden.\n\nMöchten Sie die Veröffentlichung dieser Seite wirklich aufheben?"
   },
   "unpublish_page_source_exists": {
     "message": "Diese Seite verfügt noch über ein Quelldokument und die Veröffentlichung kann nicht aufgehoben werden."
   },
   "unpublish_page_success": {
-    "message": "Veröffentlichung der Seite erfolgreich rückgängig gemacht."
+    "message": "Veröffentlichung der Seite erfolgreich aufgehoben."
   },
   "user_login": {
     "message": "Anmelden"
@@ -587,7 +593,7 @@
     "message": "Abmelden"
   },
   "user_switch": {
-    "message": "Benutzer wechseln"
+    "message": "Benutzer/in wechseln"
   },
   "view_doc_source_copied": {
     "message": "Kopiert!"
