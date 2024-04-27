@@ -170,8 +170,14 @@
   "config_invalid_giturl": {
     "message": "URL de repositório inválido"
   },
+  "config_invalid_host": {
+    "message": "Nome de host inválido"
+  },
   "config_invalid_import": {
     "message": "Escolha um arquivo válido para importar"
+  },
+  "config_invalid_mountpoints": {
+    "message": "URL do conteúdo inválido"
   },
   "config_invalid_shareurl": {
     "message": "URL de compartilhamento inválido"
