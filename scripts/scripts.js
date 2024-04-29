@@ -681,7 +681,8 @@ async function loadLazy(doc) {
     // breadcrumb setup
     // loadBreadcrumb(main);
     // sidebar + related style setup
-    setUpSideNav(main, main.querySelector('aside'));
+    const aside = main.querySelector('main > aside');
+    if (aside) setUpSideNav(main, aside);
     decorateGuideTemplateCodeBlock();
   }
 
