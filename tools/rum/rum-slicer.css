@@ -448,7 +448,7 @@ fieldset li::after {
   main {
     display: flex;
     gap: 16px;
-    height: 100%;
+    height: calc(100vh - var(--nav-height) - 32px);
   }
 
   main .key-metrics ul {
