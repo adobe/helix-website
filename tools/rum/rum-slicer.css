@@ -477,3 +477,6 @@ fieldset li::after {
   }  
 }
 
+footer.footer-wrapper.appear {
+  display: none;
+}
