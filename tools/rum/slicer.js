@@ -1,4 +1,5 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import DataLoader from './loader.js';
 
 const mainInnerHTML = `<div class="output">
 <div class="title">
@@ -145,111 +146,14 @@ function toISOStringWithTimezone(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
 }
 
-/* fetch and process raw bundles */
+const loader = new DataLoader();
+loader.apiEndpoint = API_ENDPOINT;
 
-function addCalculatedProps(bundle) {
-  bundle.events.forEach((e) => {
-    if (e.checkpoint === 'enter') {
-      bundle.visit = true;
-      if (e.source === '') e.source = '(direct)';
-    }
-    if (e.checkpoint === 'click') {
-      bundle.conversion = true;
-    }
-    if (e.checkpoint === 'cwv-inp') {
-      bundle.cwvINP = e.value;
-    }
-    if (e.checkpoint === 'cwv-lcp') {
-      bundle.cwvLCP = e.value;
-    }
-    if (e.checkpoint === 'cwv-cls') {
-      bundle.cwvCLS = e.value;
-    }
-    if (e.checkpoint === 'cwv-ttfb') {
-      bundle.cwvTTFB = e.value;
-    }
-  });
-}
-
-function apiURL(datePath, hour) {
-  return `${API_ENDPOINT}/${DOMAIN}/${datePath}${hour != null ? `/${hour}` : ''}?domainkey=${DOMAIN_KEY}`;
-}
-
-async function fetchUTCMonth(utcISOString) {
-  const [date] = utcISOString.split('T');
-  const dateSplits = date.split('-');
-  dateSplits.pop();
-  const monthPath = dateSplits.join('/');
-  const apiRequestURL = apiURL(monthPath);
-  const resp = await fetch(apiRequestURL);
-  const json = await resp.json();
-  const { rumBundles } = json;
-  rumBundles.forEach((bundle) => addCalculatedProps(bundle));
-  return { date, rumBundles };
-}
-
-async function fetchUTCDay(utcISOString) {
-  const [date] = utcISOString.split('T');
-  const datePath = date.split('-').join('/');
-  const apiRequestURL = apiURL(datePath);
-  const resp = await fetch(apiRequestURL);
-  const json = await resp.json();
-  const { rumBundles } = json;
-  rumBundles.forEach((bundle) => addCalculatedProps(bundle));
-  return { date, rumBundles };
-}
-
-async function fetchUTCHour(utcISOString) {
-  const [date, time] = utcISOString.split('T');
-  const datePath = date.split('-').join('/');
-  const hour = time.split(':')[0];
-  const apiRequestURL = apiURL(datePath, hour);
-  const resp = await fetch(apiRequestURL);
-  const json = await resp.json();
-  const { rumBundles } = json;
-  rumBundles.forEach((bundle) => addCalculatedProps(bundle));
-  return { date, hour, rumBundles };
-}
-
-export function setDomain(domain, key) {
+function setDomain(domain, key) {
   DOMAIN = domain;
   DOMAIN_KEY = key;
-}
-
-export async function fetchLastWeek() {
-  const date = new Date();
-  const hoursInWeek = 7 * 24;
-  const promises = [];
-  for (let i = 0; i < hoursInWeek; i += 1) {
-    promises.push(fetchUTCHour(date.toISOString()));
-    date.setTime(date.getTime() - (3600 * 1000));
-  }
-  const chunks = Promise.all(promises);
-  return chunks;
-}
-
-export async function fetchPrevious31Days(endDate) {
-  const date = endDate ? new Date(endDate) : new Date();
-  const days = 31;
-  const promises = [];
-  for (let i = 0; i < days; i += 1) {
-    promises.push(fetchUTCDay(date.toISOString()));
-    date.setDate(date.getDate() - 1);
-  }
-  const chunks = Promise.all(promises);
-  return chunks;
-}
-
-export async function fetchPrevious12Months(endDate) {
-  const date = endDate ? new Date(endDate) : new Date();
-  const months = 12;
-  const promises = [];
-  for (let i = 0; i < months; i += 1) {
-    promises.push(fetchUTCMonth(date.toISOString()));
-    date.setMonth(date.getMonth() - 1);
-  }
-  const chunks = Promise.all(promises);
-  return chunks;
+  loader.domain = domain;
+  loader.domainKey = key;
 }
 
 /* filter, slice and dice bundles */
@@ -969,13 +873,13 @@ async function loadData(scope) {
   const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
 
   if (scope === 'week') {
-    dataChunks = await fetchLastWeek();
+    dataChunks = await loader.fetchLastWeek(endDate);
   }
   if (scope === 'month') {
-    dataChunks = await fetchPrevious31Days(endDate);
+    dataChunks = await loader.fetchPrevious31Days(endDate);
   }
   if (scope === 'year') {
-    dataChunks = await fetchPrevious12Months(endDate);
+    dataChunks = await loader.fetchPrevious12Months(endDate);
   }
 
   draw();
@@ -1107,8 +1011,7 @@ const params = new URL(window.location).searchParams;
 filterInput.value = params.get('filter');
 const view = params.get('view') || 'week';
 viewSelect.value = view;
-DOMAIN = params.get('domain') || 'www.thinktanked.org';
-DOMAIN_KEY = params.get('domainkey') || '';
+setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
 const h1 = document.querySelector('h1');
 h1.textContent = ` ${DOMAIN}`;
 const img = document.createElement('img');
