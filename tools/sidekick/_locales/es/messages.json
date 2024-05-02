@@ -19,16 +19,16 @@
     "message": "No se ha seleccionado ningún archivo"
   },
   "bulk_confirm_preview_multiple": {
-    "message": "¿Seguro que desea generar la vista previa de $1 archivos?"
+    "message": "¿Confirma que desea generar la vista previa de $1 archivos?"
   },
   "bulk_confirm_preview_single": {
-    "message": "¿Seguro que desea generar la vista previa de este archivo?"
+    "message": "¿Confirma que desea generar la vista previa de este archivo?"
   },
   "bulk_confirm_publish_multiple": {
     "message": "¿Seguro que desea publicar $1 archivos?"
   },
   "bulk_confirm_publish_single": {
-    "message": "¿Seguro que desea publicar este archivo?"
+    "message": "¿Confirma que desea publicar este archivo?"
   },
   "bulk_error": {
     "message": "Error de operación masiva. Inténtelo de nuevo más tarde."
@@ -121,7 +121,7 @@
     "message": "Eliminar todas las configuraciones"
   },
   "config_delete_all_confirm": {
-    "message": "¿Realmente desea eliminar todas las configuraciones?"
+    "message": "¿Seguro que desea eliminar todas las configuraciones?"
   },
   "config_delete_all_description": {
     "message": "Precaución: Esta acción no se puede deshacer."
@@ -136,7 +136,7 @@
     "message": "Editar"
   },
   "config_export": {
-    "message": "Configuración de exportación"
+    "message": "Exportar configuración"
   },
   "config_export_description": {
     "message": "Haga una copia de seguridad de su configuración en su ordenador."
@@ -153,7 +153,7 @@
     "message": "Importar configuración"
   },
   "config_import_confirm": {
-    "message": "¿Realmente desea importar esta configuración y sobrescribir la actual?"
+    "message": "¿Seguro que desea importar esta configuración y sobrescribir la actual?"
   },
   "config_import_description": {
     "message": "Importe una configuración desde su ordenador. Asegúrese de tener una copia de seguridad de su configuración actual."
@@ -170,8 +170,14 @@
   "config_invalid_giturl": {
     "message": "URL del repositorio no válida"
   },
+  "config_invalid_host": {
+    "message": "Nombre de host no válido"
+  },
   "config_invalid_import": {
     "message": "Elija un archivo válido para importar"
+  },
+  "config_invalid_mountpoints": {
+    "message": "URL de contenido no válida"
   },
   "config_invalid_shareurl": {
     "message": "URL para compartir no válida"
@@ -253,7 +259,7 @@
     "message": "Compartir URL de $1 copiada al portapapeles"
   },
   "config_shareurl_description": {
-    "message": "Solicite a alguien que tenga Sidekick que comparta su URL con usted haciendo clic en el icono para compartir en el lado derecho."
+    "message": "Haga clic en el icono de compartir del lado derecho para solicitar a alguien que tenga Sidekick que comparta su URL con usted."
   },
   "config_shareurl_placeholder": {
     "message": "Compartir URL: https://www.hlx.live/sidekick..."
@@ -328,7 +334,7 @@
     "message": "¿Seguro que desea eliminar esta página?"
   },
   "delete_page_no_source_confirm": {
-    "message": "Esta página ya no dispone de un documento de origen, por lo que no se puede deshacer su eliminación.\n\n¿Confirma que desea eliminarla?"
+    "message": "Esta página ya no dispone de un documento de origen, por lo que no se puede deshacer su eliminación.\n\n¿Seguro que desea eliminarla?"
   },
   "delete_page_source_exists": {
     "message": "Esta página todavía tiene un documento origen y no se puede eliminar."
@@ -409,7 +415,7 @@
     "message": "Ayuda"
   },
   "help_acknowledge": {
-    "message": "Vale"
+    "message": "Entendido"
   },
   "help_close_acknowledge": {
     "message": "No volver a mostrar el tema de ayuda"
@@ -430,7 +436,7 @@
     "message": "No mostrar ninguna ayuda"
   },
   "help_opt_out_alert": {
-    "message": "Ayuda desactivada. Puede volver a activarlo en Opciones > Experiencia de usuario."
+    "message": "Ayuda desactivada. Puede volver a activarla en Opciones > Experiencia de usuario."
   },
   "help_previous": {
     "message": "Consejo anterior"
@@ -440,7 +446,7 @@
   },
   "help_user_status_check_all": {
     "description": "Revise todos los temas de ayuda",
-    "message": "Comprobar todo"
+    "message": "Marcar todo"
   },
   "help_user_status_description": {
     "message": "Los temas marcados ya no se mostrarán. Quite la marca de verificación junto a un tema que desee volver a ver."

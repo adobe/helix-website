@@ -173,6 +173,9 @@
   "config_invalid_host": {
     "message": "Invalid hostname"
   },
+  "config_invalid_mountpoints": {
+    "message": "Invalid Content URL"
+  },
   "config_invalid_import": {
     "message": "Choose a valid file to import"
   },
