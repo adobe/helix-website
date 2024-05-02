@@ -30,29 +30,244 @@ export function addCalculatedProps(bundle) {
   });
 }
 
+function aggregateFn(valueFn) {
+  return (acc, bundle) => {
+    const value = valueFn(bundle);
+    acc.count += 1;
+    acc.sum += value;
+    acc.values.push(value);
+    return acc;
+  };
+}
+
+function groupFn(groupByFn) {
+  return (acc, bundle) => {
+    const key = groupByFn(bundle);
+    if (!key) return acc;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(bundle);
+    return acc;
+  };
+}
+
+function initialAggregate() {
+  return {
+    count: 0,
+    sum: 0,
+    values: [],
+    get min() { return Math.min(...this.values); },
+    get max() { return Math.max(...this.values); },
+    // stay nice or ...
+    get mean() { return this.sum / this.count; },
+    percentile(p) {
+      const sorted = this.values.sort((left, right) => left - right);
+      const index = Math.floor((p / 100) * sorted.length);
+      return sorted[index];
+    },
+  };
+}
+
+// todo: add significance testing
+// eslint-disable-next-line no-unused-vars
+export function pValue(arr1, arr2) {
+  return 0.5;
+}
+
 export class DataChunks {
   constructor() {
     this.data = [];
-    this.filtered = [];
+    this.resetData();
+    this.resetSeries();
+  }
+
+  resetSeries() {
+    this.series = {};
+  }
+
+  addSeries(seriesName, seriesValueFn) {
+    this.series[seriesName] = seriesValueFn;
+  }
+
+  resetFacets() {
+    this.facets = {};
+  }
+
+  addFacet(facetName, facetValueFn) {
+    this.facets[facetName] = facetValueFn;
+  }
+
+  resetData() {
+    // data that has been filtered
+    this.filteredIn = [];
+    this.filteredOut = [];
+    // filtered data that has been grouped
+    this.groupedIn = {};
+    this.groupedOut = {};
+    // grouped data that has been aggregated
+    this.seriesIn = {};
+    this.seriesOut = {};
+    // totals for the entire dataset
+    this.totalIn = {};
+    this.totalOut = {};
+    // facets[series]
+    this.facetsIn = {};
+    this.facetsOut = {};
+    // subfacets[facet][series]
+    this.subfacetsIn = {};
+    this.subfacetsOut = {};
   }
 
   load(chunks) {
     this.data = chunks;
-    this.filtered = [];
+    this.resetData();
   }
 
-  add(chunks) {
+  addData(chunks) {
     this.data.push(chunks);
-    this.filtered = [];
+    this.resetData();
   }
 
+  /**
+   * Splits the data into two groups: filteredIn and filteredOut
+   * based on the criteria in the filterFn. Most downstream
+   * functions will only need the filteredIn data.
+   * @param {function(bundle)} filterFn
+   * @returns {Array} all bundles that passed the filter
+   */
   filter(filterFn) {
-    this.filtered = [];
+    this.resetData();
     this.data.forEach((chunk) => {
-      this.filtered.push(...chunk.rumBundles.filter(filterFn));
+      this.filteredIn.push(...chunk.rumBundles.filter(filterFn));
+      this.filteredOut.push(...chunk.rumBundles.filter((bundle) => !filterFn(bundle)));
     });
-    return this.filtered;
+    return this.filteredIn;
   }
+
+  /**
+   * Groups the filteredIn data by the groupFn. The groupFn
+   * should return a string that will be used as the key for
+   * the group. If the groupFn returns a falsy value, the
+   * bundle will be skipped.
+   * We will group the data into two objects: groupedIn and
+   * groupedOut. Most downstream functions will only need the
+   * groupedIn data.
+   * @param {function(bundle)} groupByFn for each object, determine the group key
+   * @returns {Object} grouped data, each key is a group and each vaule is an array of bundles
+   */
+  group(groupByFn) {
+    this.resetData();
+    this.groupedIn = this.filteredIn.reduce(groupFn(groupByFn), {});
+    this.groupedOut = this.filteredOut.reduce(groupFn(groupByFn), {});
+    return this.groupedIn;
+  }
+
+  aggregateGroupBundles(valueFn, seriesName, groupName, out) {
+    const group = out ? this.groupedOut : this.groupedIn;
+    const bundlesInGroup = group[groupName];
+    if (out) {
+      if (!this.seriesOut[groupName]) this.seriesOut[groupName] = {};
+      this.seriesOut[groupName][seriesName] = bundlesInGroup
+        .reduce(aggregateFn(valueFn), initialAggregate());
+    } else {
+      if (!this.seriesIn[groupName]) this.seriesIn[groupName] = {};
+      this.seriesIn[groupName][seriesName] = bundlesInGroup
+        .reduce(aggregateFn(valueFn), initialAggregate());
+    }
+  }
+
+  /**
+   * Aggregates the grouped data into series data. Each series
+   * has been provided by `addSeries` and will be used to
+   * calculate the value of each bundle in the group. The
+   * aggregated data will be stored in the seriesIn[groupName][seriesName]
+   * object.
+   * Each result will be an object with the following properties:
+   * - count
+   * - sum
+   * - min
+   * - max
+   * - mean
+   * - percentile(p)
+   * @returns {Object} series data
+   */
+  aggregate() {
+    Object.entries(this.series)
+      .forEach(([seriesName, valueFn]) => {
+        Object.keys(this.groupedIn)
+          .forEach((groupName) => this
+            .aggregateGroupBundles(valueFn, seriesName, groupName, false));
+        Object.keys(this.groupedOut)
+          .forEach((groupName) => this
+            .aggregateGroupBundles(valueFn, seriesName, groupName, true));
+      });
+    return this.seriesIn;
+  }
+
+  /**
+   * Aggregates the filtered data into totals. The totals will
+   * be stored in the totalIn object. The result will be an object
+   * with one key for each series that has been added with `addSeries`.
+   * Each value will be an object with the following properties:
+   * - count
+   * - sum
+   * - min
+   * - max
+   * - mean
+   * - percentile(p)
+   * @returns {Object} total data
+   */
+  totals() {
+    // go over each function in this.series and each value in filteredIn
+    // and appy the function to the value
+    this.totalsIn = Object.entries(this.series)
+      .reduce((acc, [seriesName, valueFn]) => {
+        acc[seriesName] = this.filteredIn.reduce(aggregateFn(valueFn), initialAggregate());
+        return acc;
+      }, {});
+    this.totalsOut = Object.entries(this.series)
+      .reduce((acc, [seriesName, valueFn]) => {
+        acc[seriesName] = this.filteredOut.reduce(aggregateFn(valueFn), initialAggregate());
+        return acc;
+      }, {});
+    return this.totalsIn;
+  }
+
+  facets() {
+    // go over each function in this.facets and each value in filteredIn
+    // then aggregate the values
+    const f = (acc, bundle) => {
+      acc.count += 1;
+      acc.weight += bundle.weight;
+      return acc;
+    };
+    // group by facet
+    this.facetsIn = Object.entries(this.facets)
+      .reduce((accOuter, [facetName, facetValueFn]) => {
+        const groupedByFacetIn = this.filteredIn.reduce(groupFn(facetValueFn), {});
+        accOuter[facetName] = Object.entries(groupedByFacetIn)
+          .reduce((accInner, [facetValue, bundles]) => {
+            accInner[facetValue] = bundles.reduce(f, { count: 0, weight: 0 });
+            return accInner;
+          }, {});
+        return accOuter;
+      }, {});
+    // repeat for filteredOut
+    this.facetsOut = Object.entries(this.facets)
+      .reduce((accOuter, [facetName, facetValueFn]) => {
+        const groupedByFacetOut = this.filteredOut.reduce(groupFn(facetValueFn), {});
+        accOuter[facetName] = Object.entries(groupedByFacetOut)
+          .reduce((accInner, [facetValue, bundles]) => {
+            accInner[facetValue] = bundles.reduce(f, { count: 0, weight: 0 });
+            return accInner;
+          }, {});
+        return accOuter;
+      }, {});
+
+    return this.facetsIn;
+  }
+  // do we need subfacet aggregation?
+  // i.e. when a checkpoint has been picked, do we need to
+  // split out facets by source, target, value?
 }
 /* filter, slice and dice bundles */
 export function filterBundle(bundle, filter, facets, cwv) {
