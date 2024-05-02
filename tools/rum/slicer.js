@@ -1,5 +1,6 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import { filterBundle, DataChunks } from './cruncher.js';
+import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, UA_KEY, scoreCWV } from './utils.js';
 
@@ -92,22 +93,10 @@ const lowDataWarning = document.getElementById('low-data-warning');
 
 const dataChunks = new DataChunks();
 
-function toISOStringWithTimezone(date) {
-  // Pad a number to 2 digits
-  const pad = (n) => `${Math.floor(Math.abs(n))}`.padStart(2, '0');
-
-  // Get timezone offset in ISO format (+hh:mm or -hh:mm)
-  const getTimezoneOffset = () => {
-    const tzOffset = -date.getTimezoneOffset();
-    const diff = tzOffset >= 0 ? '+' : '-';
-    return `${diff}${pad(tzOffset / 60)}:${pad(tzOffset % 60)}`;
-  };
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
-}
-
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
+
+const timelinechart = new CWVTimeLineChart();
 
 function setDomain(domain, key) {
   DOMAIN = domain;
@@ -138,183 +127,6 @@ function updateKeyMetrics(keyMetrics) {
   const ttfbElem = document.querySelector('#ttfb p');
   ttfbElem.textContent = `${toHumanReadable(keyMetrics.ttfb / 1000)} s`;
   ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
-}
-
-function createChartData(bundles, config, endDate) {
-  const labels = [];
-  const datasets = [];
-
-  const stats = {};
-  const cwvStructure = () => ({
-    bundles: [],
-    weight: 0,
-    average: 0,
-    good: { weight: 0, average: 0 },
-    ni: { weight: 0, average: 0 },
-    poor: { weight: 0, average: 0 },
-  });
-
-  bundles.forEach((bundle) => {
-    const slotTime = new Date(bundle.timeSlot);
-    slotTime.setMinutes(0);
-    slotTime.setSeconds(0);
-    if (config.unit === 'day' || config.unit === 'week' || config.unit === 'month') slotTime.setHours(0);
-    if (config.unit === 'week') slotTime.setDate(slotTime.getDate() - slotTime.getDay());
-    if (config.unit === 'month') slotTime.setDate(1);
-
-    const localTimeSlot = toISOStringWithTimezone(slotTime);
-    if (!stats[localTimeSlot]) {
-      const s = {
-        total: 0,
-        conversions: 0,
-        visits: 0,
-        lcp: cwvStructure(),
-        inp: cwvStructure(),
-        cls: cwvStructure(),
-        ttfb: cwvStructure(),
-        bundles: [],
-      };
-
-      stats[localTimeSlot] = s;
-    }
-
-    const updateAverage = (b, struct, key) => {
-      const newWeight = b.weight + struct.weight;
-      struct.average = (
-        (struct.average * struct.weight)
-        + (b[key] * b.weight)
-      ) / newWeight;
-      struct.weight = newWeight;
-    };
-
-    const stat = stats[localTimeSlot];
-    stat.bundles.push(bundle);
-    stat.total += bundle.weight;
-    if (bundle.conversion) stat.conversions += bundle.weight;
-    if (bundle.visit) stat.visits += bundle.weight;
-
-    if (bundle.cwvLCP) {
-      const score = scoreCWV(bundle.cwvLCP, 'lcp');
-      const bucket = stat.lcp[score];
-      updateAverage(bundle, bucket, 'cwvLCP');
-      updateAverage(bundle, stat.lcp, 'cwvLCP');
-      stat.lcp.bundles.push(bundle);
-    }
-    if (bundle.cwvCLS) {
-      const score = scoreCWV(bundle.cwvCLS, 'cls');
-      const bucket = stat.cls[score];
-      updateAverage(bundle, bucket, 'cwvCLS');
-      updateAverage(bundle, stat.cls, 'cwvCLS');
-      stat.cls.bundles.push(bundle);
-    }
-    if (bundle.cwvINP) {
-      const score = scoreCWV(bundle.cwvINP, 'inp');
-      const bucket = stat.inp[score];
-      updateAverage(bundle, bucket, 'cwvINP');
-      updateAverage(bundle, stat.inp, 'cwvINP');
-      stat.inp.bundles.push(bundle);
-    }
-
-    if (bundle.cwvTTFB) {
-      const score = scoreCWV(bundle.cwvTTFB, 'ttfb');
-      const bucket = stat.ttfb[score];
-      updateAverage(bundle, bucket, 'cwvTTFB');
-      updateAverage(bundle, stat.ttfb, 'cwvTTFB');
-      stat.ttfb.bundles.push(bundle);
-    }
-  });
-
-  const dataTotal = [];
-  const dataGood = [];
-  const dataNI = [];
-  const dataPoor = [];
-
-  const date = endDate ? new Date(endDate) : new Date();
-  date.setMinutes(0);
-  date.setSeconds(0);
-  if (config.unit === 'day' || config.unit === 'month' || config.unit === 'week') date.setHours(0);
-  if (config.unit === 'week') date.setDate(date.getDate() - date.getDay());
-  if (config.unit === 'month') date.setDate(1);
-
-  for (let i = 0; i < config.units; i += 1) {
-    const localTimeSlot = toISOStringWithTimezone(date);
-    const stat = stats[localTimeSlot];
-    // eslint-disable-next-line no-undef
-    labels.unshift(localTimeSlot);
-    const sumBucket = (bucket) => {
-      bucket.weight = bucket.good.weight + bucket.ni.weight + bucket.poor.weight;
-      if (bucket.weight) {
-        bucket.average = ((bucket.good.weight * bucket.good.average)
-      + (bucket.ni.weight * bucket.ni.average)
-      + (bucket.poor.weight * bucket.poor.average)) / bucket.weight;
-      } else {
-        bucket.average = 0;
-      }
-    };
-
-    if (stat) {
-      sumBucket(stat.lcp);
-      sumBucket(stat.cls);
-      sumBucket(stat.inp);
-      sumBucket(stat.ttfb);
-
-      const cwvNumBundles = stat.lcp.bundles.length
-      + stat.cls.bundles.length + stat.inp.bundles.length;
-      const cwvTotal = stat.lcp.weight + stat.cls.weight + stat.inp.weight;
-      const cwvFactor = stat.total / cwvTotal;
-
-      const cwvGood = stat.lcp.good.weight + stat.cls.good.weight + stat.inp.good.weight;
-      const cwvNI = stat.lcp.ni.weight + stat.cls.ni.weight + stat.inp.ni.weight;
-      const cwvPoor = stat.lcp.poor.weight + stat.cls.poor.weight + stat.inp.poor.weight;
-
-      const showCWVSplit = cwvNumBundles && (cwvNumBundles > 10);
-      if (!config.focus) {
-        dataTotal.unshift(showCWVSplit ? 0 : stat.total);
-        dataGood.unshift(showCWVSplit ? Math.round(cwvGood * cwvFactor) : 0);
-        dataNI.unshift(showCWVSplit ? Math.round(cwvNI * cwvFactor) : 0);
-        dataPoor.unshift(showCWVSplit ? Math.round(cwvPoor * cwvFactor) : 0);
-      } else {
-        if (config.focus === 'lcp' || config.focus === 'cls' || config.focus === 'inp' || config.focus === 'ttfb') {
-          const m = config.focus;
-          dataTotal.unshift(showCWVSplit ? 0 : 1);
-          dataGood.unshift(showCWVSplit ? stat[m].good.weight / stat[m].weight : 0);
-          dataNI.unshift(showCWVSplit ? stat[m].ni.weight / stat[m].weight : 0);
-          dataPoor.unshift(showCWVSplit ? stat[m].poor.weight / stat[m].weight : 0);
-        }
-        if (config.focus === 'conversions') {
-          // cls here
-          dataTotal.unshift(0);
-          dataGood.unshift(stat.conversions / stat.total);
-          dataNI.unshift(1 - (stat.conversions / stat.total));
-          dataPoor.unshift(0);
-        }
-        if (config.focus === 'visits') {
-          // cls here
-          dataTotal.unshift(stat.visits / stat.total);
-          dataGood.unshift(1 - (stat.visits / stat.total));
-          dataNI.unshift(0);
-          dataPoor.unshift(0);
-        }
-      }
-    } else {
-      dataTotal.unshift(0);
-      dataGood.unshift(0);
-      dataNI.unshift(0);
-      dataPoor.unshift(0);
-    }
-
-    if (config.unit === 'hour') date.setTime(date.getTime() - (3600 * 1000));
-    if (config.unit === 'day') date.setDate(date.getDate() - 1);
-    if (config.unit === 'week') date.setDate(date.getDate() - 7);
-    if (config.unit === 'month') date.setMonth(date.getMonth() - 1);
-  }
-
-  datasets.push({ data: dataTotal });
-  datasets.push({ data: dataGood });
-  datasets.push({ data: dataNI });
-  datasets.push({ data: dataPoor });
-
-  return { labels, datasets, stats };
 }
 
 function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
@@ -596,7 +408,8 @@ async function draw() {
 
   const config = configs[view];
 
-  const { labels, datasets, stats } = createChartData(filtered, config, endDate);
+  timelinechart.config = config;
+  const { labels, datasets, stats } = timelinechart.createChartData(filtered, endDate);
   datasets.forEach((ds, i) => {
     chart.data.datasets[i].data = ds.data;
   });

@@ -35,4 +35,16 @@ export const UA_KEY = 'userAgent'; export function toHumanReadable(num) {
 
   const precision = (dp - 1) - Math.floor(Math.log10(number));
   return `${number.toFixed(precision)}${units[u]}`;
+} export function toISOStringWithTimezone(date) {
+  // Pad a number to 2 digits
+  const pad = (n) => `${Math.floor(Math.abs(n))}`.padStart(2, '0');
+
+  // Get timezone offset in ISO format (+hh:mm or -hh:mm)
+  const getTimezoneOffset = () => {
+    const tzOffset = -date.getTimezoneOffset();
+    const diff = tzOffset >= 0 ? '+' : '-';
+    return `${diff}${pad(tzOffset / 60)}:${pad(tzOffset % 60)}`;
+  };
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
 }
