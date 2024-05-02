@@ -7,7 +7,7 @@ const mainInnerHTML = `<div class="output">
     <select id="view">
       <option value="week">Week</option>
       <option value="month">Month</option>
-      <option value="year" disabled>Year</option>
+      <option value="year">Year</option>
     </select>
   </div>
 </div>
@@ -479,6 +479,7 @@ function createChartData(bundles, config, endDate) {
     slotTime.setMinutes(0);
     slotTime.setSeconds(0);
     if (config.unit === 'day' || config.unit === 'week' || config.unit === 'month') slotTime.setHours(0);
+    if (config.unit === 'week') slotTime.setDate(slotTime.getDate() - slotTime.getDay());
     if (config.unit === 'month') slotTime.setDate(1);
 
     const localTimeSlot = toISOStringWithTimezone(slotTime);
@@ -552,6 +553,7 @@ function createChartData(bundles, config, endDate) {
   date.setMinutes(0);
   date.setSeconds(0);
   if (config.unit === 'day' || config.unit === 'month' || config.unit === 'week') date.setHours(0);
+  if (config.unit === 'week') date.setDate(date.getDate() - date.getDay());
   if (config.unit === 'month') date.setDate(1);
 
   for (let i = 0; i < config.units; i += 1) {
