@@ -1602,7 +1602,7 @@ import sampleRUM from './rum.js';
         // omit docx extension on sharepoint
         ext = '';
       }
-      if (type === 'xlsx' || type.includes('vnd.google-apps.spreadsheet')) {
+      if (type === 'xlsx' || type === 'spreadsheet') {
         // use json extension for spreadsheets
         ext = '.json';
       }
@@ -1654,8 +1654,8 @@ import sampleRUM from './rum.js';
           .map((row) => {
             const info = row.getAttribute('aria-label') || row.querySelector('span')?.textContent;
             // info format: bla.docx, docx File, Private, Modified 8/28/2023, edited by Jane, 1 KB
-            const type = info.match(/, ([a-z0-9]+) File,/)?.[1];
-            const path = type && info.split(`, ${type} File,`)[0];
+            const type = info.match(/, ([a-z0-9]+) [A-Za-z]+,/)?.[1];
+            const path = type && info.split(`, ${type}`)[0];
             return {
               path,
               type,
@@ -1666,12 +1666,33 @@ import sampleRUM from './rum.js';
       } else {
         // gdrive
         return [...document.querySelectorAll('#drive_main_page [role="row"][aria-selected="true"]')]
-          .filter((row) => row.querySelector(':scope img'))
-          .map((row) => ({
-            type: new URL(row.querySelector('div > img').getAttribute('src'), sk.location.href).pathname.split('/').slice(-2).join('/'),
-            path: row.querySelector(':scope > div > div:nth-of-type(2)').textContent.trim() // list layout
-              || row.querySelector(':scope > div > div > div:nth-of-type(4)').textContent.trim(), // grid layout
-          }));
+          // extract file name and type
+          .map((row) => {
+            const typeHint = (row.querySelector(':scope div[role="gridcell"] > div:nth-child(2) > div > div[data-tooltip]') // list layout
+              || row.querySelector(':scope div[role="gridcell"]'))?.getAttribute('aria-label'); // grid layout
+            let type = 'unknown';
+            if (typeHint) {
+              if (typeHint.includes('Google Drive')) {
+                type = 'folder';
+              } else if (typeHint.includes('Google Docs')) {
+                type = 'document';
+              } else if (typeHint.includes('Google Sheets')) {
+                type = 'spreadsheet';
+              } else if (['Image', 'Video', 'PDF']
+                .find((hint) => typeHint.includes(hint))) {
+                type = 'media';
+              }
+            }
+            const path = row.querySelector(':scope > div > div:nth-of-type(2)')?.textContent.trim() // list layout
+              || (row.querySelector(':scope > div > div > div:nth-of-type(4)') // grid layout (file)
+              || row.querySelector(':scope div[role="gridcell"] > div > div:nth-child(4) > div'))?.textContent.trim(); // grid layout (folder)
+            return {
+              type,
+              path,
+            };
+          })
+          // exclude folders and emtpy paths
+          .filter(({ type, path }) => type !== 'folder' && path);
       }
     };
 
@@ -2125,7 +2146,11 @@ import sampleRUM from './rum.js';
    * @param {Sidekick} sk The sidekick
    */
   function addCustomPlugins(sk) {
-    const { location, config: { lang, plugins, innerHost } = {} } = sk;
+    const {
+      location, config: {
+        lang, plugins, innerHost, devMode, devUrl,
+      } = {},
+    } = sk;
     if (plugins && Array.isArray(plugins)) {
       plugins.forEach((cfg, i) => {
         if (typeof (cfg.button && cfg.button.action) === 'function'
@@ -2185,7 +2210,7 @@ import sampleRUM from './rum.js';
               text: (titleI18n && titleI18n[lang]) || title || '',
               action: () => {
                 if (url) {
-                  const target = url.startsWith('/') ? new URL(url, `https://${innerHost}/`) : new URL(url);
+                  const target = devMode ? new URL(url, devUrl) : new URL(url, `https://${innerHost}/`);
                   if (passConfig) {
                     target.searchParams.append('ref', sk.config.ref);
                     target.searchParams.append('repo', sk.config.repo);

@@ -6,7 +6,7 @@
     "message": "Utilizza una versione specifica di Admin API"
   },
   "admin_version_placeholder": {
-    "message": "Versione amministrazione: x.y.z"
+    "message": "Versione Admin: x.y.z"
   },
   "advanced": {
     "description": "Modalità di configurazione avanzata",
@@ -170,8 +170,14 @@
   "config_invalid_giturl": {
     "message": "URL archivio non valido"
   },
+  "config_invalid_host": {
+    "message": "Nome host non valido"
+  },
   "config_invalid_import": {
     "message": "Scegli un file valido da importare"
+  },
+  "config_invalid_mountpoints": {
+    "message": "URL di contenuto non valido"
   },
   "config_invalid_shareurl": {
     "message": "URL di condivisione non valido"
@@ -566,13 +572,13 @@
     "message": "Annullare la pubblicazione di questa pagina?"
   },
   "unpublish_page_no_source_confirm": {
-    "message": "Questa pagina non ha più un documento di origine e non sarà possibile annullarne la pubblicazione. \n\nAnnullarla comunque?"
+    "message": "Questa pagina non ha più un documento di origine e l’annullamento della pubblicazione non potrà essere annullato. \n\nAnnullare comunque la pubblicazione?"
   },
   "unpublish_page_source_exists": {
     "message": "Questa pagina ha ancora un documento di origine e non è possibile annullarne la pubblicazione."
   },
   "unpublish_page_success": {
-    "message": "Pagina non pubblicata correttamente."
+    "message": "La pubblicazione della pagina è stata annullata."
   },
   "user_login": {
     "message": "Accedi"
