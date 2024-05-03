@@ -67,10 +67,86 @@ function initialAggregate() {
   };
 }
 
-// todo: add significance testing
-// eslint-disable-next-line no-unused-vars
+function tDistributionCDF(t, df) {
+  // Calculate the cumulative distribution function (CDF) of the t-distribution
+  const x = t / Math.sqrt(df);
+  const a1 = 1 / Math.sqrt(df);
+  const a2 = x ** 2 / df;
+  const a3 = x ** 2 / (df + x ** 2);
+
+  const a4 = x ** 2 / (df + 2 * x ** 2);
+  const a5 = x ** 2 / (df + 3 * x ** 2);
+  const a6 = x ** 2 / (df + 4 * x ** 2);
+
+  const a7 = x ** 2 / (df + 5 * x ** 2);
+  const a8 = x ** 2 / (df + 6 * x ** 2);
+  const a9 = x ** 2 / (df + 7 * x ** 2);
+
+  const a10 = x ** 2 / (df + 8 * x ** 2);
+  const a11 = x ** 2 / (df + 9 * x ** 2);
+  const a12 = x ** 2 / (df + 10 * x ** 2);
+
+  const a13 = x ** 2 / (df + 11 * x ** 2);
+  const a14 = x ** 2 / (df + 12 * x ** 2);
+  const a15 = x ** 2 / (df + 13 * x ** 2);
+
+  const a16 = x ** 2 / (df + 14 * x ** 2);
+  const a17 = x ** 2 / (df + 15 * x ** 2);
+  const a18 = x ** 2 / (df + 16 * x ** 2);
+  const a19 = x ** 2 / (df + 17 * x ** 2);
+  const a20 = x ** 2 / (df + 18 * x ** 2);
+  const a21 = x ** 2 / (df + 19 * x ** 2);
+  const a22 = x ** 2 / (df + 20 * x ** 2);
+
+  const cdf = 0.5 + (
+    x
+    * (1
+      - a1
+      + a2
+      - a3
+      + a4
+      - a5
+      + a6
+      - a7
+      + a8
+      - a9
+      + a10
+      - a11
+      + a12
+      - a13
+      + a14
+      - a15
+      + a16
+      - a17
+      + a18
+      - a19
+      + a20
+      - a21
+      + a22));
+
+  return cdf;
+}
+
 export function pValue(arr1, arr2) {
-  return 0.5;
+  // Calculate the means of the two arrays
+  const mean1 = arr1.reduce((sum, num) => sum + num, 0) / arr1.length;
+  const mean2 = arr2.reduce((sum, num) => sum + num, 0) / arr2.length;
+
+  // Calculate the standard deviations of the two arrays
+  const variance1 = arr1.reduce((sum, num) => sum + (num - mean1) ** 2, 0) / arr1.length;
+  const variance2 = arr2.reduce((sum, num) => sum + (num - mean2) ** 2, 0) / arr2.length;
+
+  // Calculate the test statistic
+  const testStatistic = (mean1 - mean2)
+    / Math.sqrt((variance1 / arr1.length) + (variance2 / arr2.length));
+
+  // Calculate the degrees of freedom
+  const degreesOfFreedom = arr1.length + arr2.length - 2;
+
+  // Calculate the p-value using the t-distribution
+  const p = 2 * (1 - tDistributionCDF(Math.abs(testStatistic), degreesOfFreedom));
+
+  return p;
 }
 
 export class DataChunks {
