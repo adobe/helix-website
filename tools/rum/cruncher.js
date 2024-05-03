@@ -4,6 +4,7 @@
  */
 /* fetch and process raw bundles */
 
+// eslint-disable-next-line max-classes-per-file
 import { UA_KEY, scoreCWV } from './utils.js';
 
 export function addCalculatedProps(bundle) {
@@ -147,6 +148,23 @@ export function pValue(arr1, arr2) {
   const p = 2 * (1 - tDistributionCDF(Math.abs(testStatistic), degreesOfFreedom));
 
   return p;
+}
+
+class Facet {
+  constructor(parent, value) {
+    this.parent = parent;
+    this.name = value;
+    this.count = 0;
+    this.weight = 0;
+    this.entries = [];
+  }
+
+  get metrics() {
+    if (this.entries.length === 0) return {};
+    // todo: go over each of this.parent.series and calculate the metrics
+    // for each of the entries
+    return {};
+  }
 }
 
 export class DataChunks {
@@ -308,13 +326,28 @@ export class DataChunks {
     return this.totalsIn;
   }
 
+  /**
+   * Calculates facets for the filtered data. For each function
+   * added through `addFacet`, it will determine the most common
+   * values, their frequency and their weight. The result will
+   * be an object with one key for each facet, containing an object
+   * with one key for each value, containing an object with the
+   * following properties:
+   * - count: number of raw occurrences
+   * - weight: sum of the weight of the occurrences (estimated page views)
+   * @returns {object} facets data
+   */
   facets() {
     // go over each function in this.facets and each value in filteredIn
     // then aggregate the values
-    const f = (acc, bundle) => {
-      acc.count += 1;
-      acc.weight += bundle.weight;
-      return acc;
+    const f = (facet, bundle) => {
+      // add the bundle to the entries
+      // so that we can calculate metrics
+      // later on
+      facet.entries.push(bundle);
+      facet.count += 1;
+      facet.weight += bundle.weight;
+      return facet;
     };
     // group by facet
     this.facetsIn = Object.entries(this.facets)
@@ -324,7 +357,7 @@ export class DataChunks {
           .reduce((accInner, [facetValue, bundles]) => {
             accInner[facetValue] = bundles.reduce(f, { count: 0, weight: 0 });
             return accInner;
-          }, {});
+          }, new Facet(this, facetName));
         return accOuter;
       }, {});
     // repeat for filteredOut
@@ -335,7 +368,7 @@ export class DataChunks {
           .reduce((accInner, [facetValue, bundles]) => {
             accInner[facetValue] = bundles.reduce(f, { count: 0, weight: 0 });
             return accInner;
-          }, {});
+          }, new Facet(this, facetName));
         return accOuter;
       }, {});
 
