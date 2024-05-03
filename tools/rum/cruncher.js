@@ -159,11 +159,27 @@ class Facet {
     this.entries = [];
   }
 
+  /**
+   * Calculate the metrics for this facet. The metrics will be
+   * calculated based on the series that have been added to the
+   * parent object using `addSeries`.
+   * The return value will be an object with one key for each
+   * series, containing an object with the following properties:
+   * - count
+   * - sum
+   * - min
+   * - max
+   * - mean
+   * - percentile(p)
+   * @returns {Object} metrics
+   */
   get metrics() {
     if (this.entries.length === 0) return {};
-    // todo: go over each of this.parent.series and calculate the metrics
-    // for each of the entries
-    return {};
+    return Object.entries(this.parent.series)
+      .reduce((acc, [seriesName, valueFn]) => {
+        acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), initialAggregate());
+        return acc;
+      }, {});
   }
 }
 
