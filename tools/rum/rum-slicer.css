@@ -27,7 +27,6 @@
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
   max-width: 1200px;
   margin: auto;
   margin-top: 32px;
@@ -112,6 +111,8 @@ main .key-metrics ul {
 
 main .key-metrics li h2 {
   font-size: 10px;
+  font-weight: 600;
+  letter-spacing: normal;
 }
 
 main .key-metrics li h2::before {

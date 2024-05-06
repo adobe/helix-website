@@ -419,9 +419,11 @@ async function draw() {
   chart.options.scales.x.time.unit = config.unit;
   chart.update();
 
+  // eslint-disable-next-line no-console
   console.log(`filtered to ${filtered.length} bundles in ${new Date() - startTime}ms`);
   updateFacets(facets, cwv, focus, mode, ph);
   const statsKeys = Object.keys(stats);
+  // eslint-disable-next-line no-console
   if (mode === 'all') console.log(stats);
 
   const getP75 = (metric) => {
@@ -534,6 +536,9 @@ chart = new Chart(canvas, {
   options: {
     maintainAspectRatio: false,
     plugins: {
+      legend: {
+        display: false,
+      },
       customCanvasBackgroundColor: {
         color: 'white',
       },
