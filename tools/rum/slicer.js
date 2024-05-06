@@ -4,78 +4,6 @@ import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, UA_KEY, scoreCWV } from './utils.js';
 
-const mainInnerHTML = `<div class="output">
-<div class="title">
-  <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
-  <div>
-    <select id="view">
-      <option value="week">Week</option>
-      <option value="month">Month</option>
-      <option value="year">Year</option>
-    </select>
-  </div>
-</div>
-<div class="key-metrics">
-  <ul>
-    <li id="pageviews">
-      <h2>Pageviews</h2>
-      <p>0</p>
-    </li>
-    <li id="visits">
-      <h2>Visits</h2>
-      <p>0</p>
-    </li>
-    <li id="conversions">
-      <h2>Conversions</h2>
-      <p>0</p>
-    </li>
-    <li id="lcp">
-      <h2>LCP</h2>
-      <p>0</p>
-    </li>
-    <li id="cls">
-      <h2>CLS</h2>
-      <p>0</p>
-    </li>
-    <li id="inp">
-      <h2>INP</h2>
-      <p>0</p>
-    </li>
-  </ul>
-  <div class="key-metrics-more" aria-hidden="true">
-    <ul>
-      <li id="ttfb">
-        <h2>TTFB</h2>
-        <p>0</p>
-      </li>  
-    </ul>
-  </div>
-</div>
-
-<figure>
-  <div class="chart-container">
-    <canvas id="time-series"></canvas>
-  </div>
-  <div class="filter-tags"></div>
-  <figcaption>
-    <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>
-    <span id="timezone"></span>
-  </figcaption>
-</figure>
-</div>
-
-<div class="filters">
-  <div class="quick-filter">
-  <input type="text" id="filter" placeholder="Type to filter...">
-  </div>
-  <aside id="facets">
-  </aside>
-</div>
-`;
-
-const main = document.querySelector('main');
-main.innerHTML = mainInnerHTML;
-
 /* globals */
 let DOMAIN_KEY = '';
 let DOMAIN = 'www.thinktanked.org';
@@ -86,12 +14,7 @@ const API_ENDPOINT = BUNDLER_ENDPOINT;
 // const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
 // const UA_KEY = 'user_agent';
 
-const viewSelect = document.getElementById('view');
-const filterInput = document.getElementById('filter');
-const facetsElement = document.getElementById('facets');
-const canvas = document.getElementById('time-series');
-const timezoneElement = document.getElementById('timezone');
-const lowDataWarning = document.getElementById('low-data-warning');
+const elems = {};
 
 const dataChunks = new DataChunks();
 
@@ -143,12 +66,12 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
     filterTags.append(tag);
   };
 
-  if (filterInput.value) addFilterTag('text', filterInput.value);
+  if (elems.filterInput.value) addFilterTag('text', elems.filterInput.value);
   if (focus) addFilterTag(focus);
 
   const url = new URL(window.location);
 
-  facetsElement.textContent = '';
+  elems.facetsElement.textContent = '';
   const keys = Object.keys(facets);
   keys.forEach((facetName) => {
     const facet = facets[facetName];
@@ -318,7 +241,7 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
         setTimeout(() => { toast.ariaHidden = true; }, 3000);
       });
 
-      facetsElement.append(fieldSet);
+      elems.facetsElement.append(fieldSet);
     }
   });
 }
@@ -382,9 +305,9 @@ async function draw() {
   const filtered = dataChunks.filter((bundle) => filterBundle(bundle, filter, facets, cwv));
 
   if (filtered.length < 1000) {
-    lowDataWarning.ariaHidden = 'false';
+    elems.lowDataWarning.ariaHidden = 'false';
   } else {
-    lowDataWarning.ariaHidden = 'true';
+    elems.lowDataWarning.ariaHidden = 'true';
   }
 
   const configs = {
@@ -478,14 +401,14 @@ function updateState() {
   const url = new URL(window.location.href.split('?')[0]);
   const { searchParams } = new URL(window.location.href);
   url.searchParams.set('domain', DOMAIN);
-  url.searchParams.set('filter', filterInput.value);
-  url.searchParams.set('view', viewSelect.value);
+  url.searchParams.set('filter', elems.filterInput.value);
+  url.searchParams.set('view', elems.viewSelect.value);
   if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
   const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
   if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
 
-  facetsElement.querySelectorAll('input').forEach((e) => {
+  elems.facetsElement.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
@@ -494,123 +417,202 @@ function updateState() {
   window.history.replaceState({}, '', url);
 }
 
-// eslint-disable-next-line no-undef, no-new
-chart = new Chart(canvas, {
-  type: 'bar',
-  data: {
-    labels: [],
-    datasets: [{
-      label: 'No CVW',
-      backgroundColor: '#888',
-      data: [],
-    },
-    {
-      label: 'Good',
-      backgroundColor: '#49cc93',
-      data: [],
-    },
-    {
-      label: 'Needs Improvement',
-      backgroundColor: '#ffa037',
-      data: [],
-    },
-    {
-      label: 'Poor',
-      backgroundColor: '#ff7c65',
-      data: [],
-    }],
-  },
-  plugins: [
-    {
-      id: 'customCanvasBackgroundColor',
-      beforeDraw: (ch, args, options) => {
-        const { ctx } = ch;
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.fillStyle = options.color || '#99ffff';
-        ctx.fillRect(0, 0, ch.width, ch.height);
-        ctx.restore();
-      },
-    },
-  ],
-  options: {
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      customCanvasBackgroundColor: {
-        color: 'white',
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const { datasets } = context.chart.data;
-            const value = context.parsed.y;
-            const i = context.dataIndex;
-            const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
-
-            return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
-          },
-        },
-      },
-    },
-    interaction: {
-      mode: 'x',
-    },
-    animation: {
-      duration: 300,
-    },
-    datasets: {
-      bar: {
-        barPercentage: 1,
-        categoryPercentage: 0.9,
-        borderSkipped: false,
-        borderRadius: {
-          topLeft: 3,
-          topRight: 3,
-          bottomLeft: 3,
-          bottomRight: 3,
-        },
-      },
-    },
-    responsive: true,
-    scales: {
-      x: {
-        type: 'time',
-        display: true,
-        offset: true,
-        time: {
-          displayFormats: {
-            day: 'EEE, MMM d',
-          },
-          unit: 'day',
-        },
-        stacked: true,
-        ticks: {
-          minRotation: 90,
-          maxRotation: 90,
-          autoSkip: false,
-        },
-      },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: (value) => toHumanReadable(value),
-        },
-      },
-    },
-  },
-});
-
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
+  // wait for decoration to have happened
   if (entries[0].isIntersecting) {
-    console.log(entries);
+    const mainInnerHTML = `<div class="output">
+<div class="title">
+  <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
+  <div>
+    <select id="view">
+      <option value="week">Week</option>
+      <option value="month">Month</option>
+      <option value="year">Year</option>
+    </select>
+  </div>
+</div>
+<div class="key-metrics">
+  <ul>
+    <li id="pageviews">
+      <h2>Pageviews</h2>
+      <p>0</p>
+    </li>
+    <li id="visits">
+      <h2>Visits</h2>
+      <p>0</p>
+    </li>
+    <li id="conversions">
+      <h2>Conversions</h2>
+      <p>0</p>
+    </li>
+    <li id="lcp">
+      <h2>LCP</h2>
+      <p>0</p>
+    </li>
+    <li id="cls">
+      <h2>CLS</h2>
+      <p>0</p>
+    </li>
+    <li id="inp">
+      <h2>INP</h2>
+      <p>0</p>
+    </li>
+  </ul>
+  <div class="key-metrics-more" aria-hidden="true">
+    <ul>
+      <li id="ttfb">
+        <h2>TTFB</h2>
+        <p>0</p>
+      </li>  
+    </ul>
+  </div>
+</div>
+
+<figure>
+  <div class="chart-container">
+    <canvas id="time-series"></canvas>
+  </div>
+  <div class="filter-tags"></div>
+  <figcaption>
+    <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>
+    <span id="timezone"></span>
+  </figcaption>
+</figure>
+</div>
+
+<div class="filters">
+  <div class="quick-filter">
+  <input type="text" id="filter" placeholder="Type to filter...">
+  </div>
+  <aside id="facets">
+  </aside>
+</div>
+`;
+
+    const main = document.querySelector('main');
+    main.innerHTML = mainInnerHTML;
+
+    elems.viewSelect = document.getElementById('view');
+    elems.filterInput = document.getElementById('filter');
+    elems.facetsElement = document.getElementById('facets');
+    elems.canvas = document.getElementById('time-series');
+    elems.timezoneElement = document.getElementById('timezone');
+    elems.lowDataWarning = document.getElementById('low-data-warning');
+
+    // eslint-disable-next-line no-undef, no-new
+    chart = new Chart(elems.canvas, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'No CVW',
+          backgroundColor: '#888',
+          data: [],
+        },
+        {
+          label: 'Good',
+          backgroundColor: '#49cc93',
+          data: [],
+        },
+        {
+          label: 'Needs Improvement',
+          backgroundColor: '#ffa037',
+          data: [],
+        },
+        {
+          label: 'Poor',
+          backgroundColor: '#ff7c65',
+          data: [],
+        }],
+      },
+      plugins: [
+        {
+          id: 'customCanvasBackgroundColor',
+          beforeDraw: (ch, args, options) => {
+            const { ctx } = ch;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = options.color || '#99ffff';
+            ctx.fillRect(0, 0, ch.width, ch.height);
+            ctx.restore();
+          },
+        },
+      ],
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          customCanvasBackgroundColor: {
+            color: 'white',
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const { datasets } = context.chart.data;
+                const value = context.parsed.y;
+                const i = context.dataIndex;
+                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
+
+                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+              },
+            },
+          },
+        },
+        interaction: {
+          mode: 'x',
+        },
+        animation: {
+          duration: 300,
+        },
+        datasets: {
+          bar: {
+            barPercentage: 1,
+            categoryPercentage: 0.9,
+            borderSkipped: false,
+            borderRadius: {
+              topLeft: 3,
+              topRight: 3,
+              bottomLeft: 3,
+              bottomRight: 3,
+            },
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            display: true,
+            offset: true,
+            time: {
+              displayFormats: {
+                day: 'EEE, MMM d',
+              },
+              unit: 'day',
+            },
+            stacked: true,
+            ticks: {
+              minRotation: 90,
+              maxRotation: 90,
+              autoSkip: false,
+            },
+          },
+          y: {
+            stacked: true,
+            ticks: {
+              callback: (value) => toHumanReadable(value),
+            },
+          },
+        },
+      },
+    });
+
     const params = new URL(window.location).searchParams;
-    filterInput.value = params.get('filter');
+    elems.filterInput.value = params.get('filter');
     const view = params.get('view') || 'week';
-    viewSelect.value = view;
+    elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
     const h1 = document.querySelector('h1');
     h1.textContent = ` ${DOMAIN}`;
@@ -636,16 +638,16 @@ const io = new IntersectionObserver((entries) => {
     });
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    timezoneElement.textContent = timezone;
+    elems.timezoneElement.textContent = timezone;
 
     loadData(view);
 
-    filterInput.addEventListener('input', () => {
+    elems.filterInput.addEventListener('input', () => {
       updateState();
       draw();
     });
 
-    viewSelect.addEventListener('input', () => {
+    elems.viewSelect.addEventListener('input', () => {
       updateState();
       window.location.reload();
     });
