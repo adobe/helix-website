@@ -6,7 +6,49 @@
 
 // eslint-disable-next-line max-classes-per-file
 import { UA_KEY, scoreCWV } from './utils.js';
+/**
+ * @typedef {Object} RawEvent - a raw RUM event
+ * @property {string} checkpoint - the name of the event that happened
+ * @property {string|number} target - the target of the event, typically an external URL
+ * @property {string} source - the source of the event, typically a CSS selector
+ * @property {number} value - the value of a CWV metric
+ * @property {number} timeDelta – the difference in milliseconds between this event's
+ * time and the containing bundle's timestamp
+ */
 
+/**
+ * @typedef {Object} RawBundle - a raw bundle of events, all belonging to the same page view
+ * @property {string} id - the unique identifier of the bundle. IDs can duplicate across bundles
+ * @property {string} host - the hostname that the page view was made to
+ * @property {string} time - exact time of the first event in the bundle, in ISO8601 format
+ * @property {string} timeSlot - the hourly timesot that this bundle belongs to
+ * @property {string} url - the URL of the request, without URL parameters
+ * @property {string} userAgent - the user agent class, for instance desktop:windows or mobile:ios
+ * @property {number} weight - the weight, or sampling ratio 1:n of the bundle
+ * @property {RawEvent} events - the list of events that make up the bundle
+ */
+
+/**
+ * @typedef {Object} Bundle - a processed bundle of events, with extra properties
+ * @extends RawBundle
+ * @property {boolean} visit - does this bundle start a visit
+ * @property {boolean} conversion - did a conversion happen in this visit
+ * @property {number} cwvINP - interaction to next paint, for the entire bundle
+ * @property {number} cwvLCP - largest contentful paint, for the entire bundle
+ * @property {number} cwvCLS - cumulative layout shift, for the entire bundle
+ * @property {number} ttfb - time to first byte, for the entire bundle
+ */
+
+/**
+ * @typedef {Object} RawChunk - a list of raw, unprocessed bundles as delivered by the endpoint
+ * @property {string} date - the base date of all bundles in the chunk
+ * @property {RawBundle[]} rumBundles - the bundles, as retrieved from the server
+ */
+/**
+ * Calculates properties on the bundle, so that bundle-level filtering can be performed
+ * @param {RawBundle} bundle the raw input bundle, without calculated properties
+ * @returns {Bundle} a bundle with additional properties
+ */
 export function addCalculatedProps(bundle) {
   bundle.events.forEach((e) => {
     if (e.checkpoint === 'enter') {
@@ -29,6 +71,7 @@ export function addCalculatedProps(bundle) {
       bundle.cwvTTFB = e.value;
     }
   });
+  return bundle;
 }
 
 function aggregateFn(valueFn) {
