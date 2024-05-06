@@ -14,10 +14,10 @@ export default class CWVTimeLineChart {
   }
 
   createChartData(bundles, endDate) {
+    const stats = [];
     const labels = [];
     const datasets = [];
 
-    const stats = {};
     const cwvStructure = () => ({
       bundles: [],
       weight: 0,
