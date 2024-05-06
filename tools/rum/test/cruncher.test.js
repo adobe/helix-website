@@ -164,6 +164,141 @@ describe('DataChunks', () => {
     // load test chunks from cruncher.fixture.json
     const testFile = new URL('cruncher.fixture.json', import.meta.url);
     const testChunks = JSON.parse(readFileSync(testFile));
-    assert.ok(testChunks);
+    const d = new DataChunks();
+    d.load(testChunks);
+    assert.equal(d.data.length, 31);
+  });
+
+  it('DataChunk.bundles', () => {
+    // load test chunks from cruncher.fixture.json
+    const testFile = new URL('cruncher.fixture.json', import.meta.url);
+    const testChunks = JSON.parse(readFileSync(testFile));
+    const d = new DataChunks();
+    d.load(testChunks);
+    assert.equal(d.bundles.length, 969);
+  });
+
+  it('DataChunk.bundles (repeat)', () => {
+    // load test chunks from cruncher.fixture.json
+    const testFile = new URL('cruncher.fixture.json', import.meta.url);
+    const testChunks = JSON.parse(readFileSync(testFile));
+    const d = new DataChunks();
+    d.load(testChunks);
+    assert.equal(d.bundles.length, 969);
+    assert.equal(d.bundles.length, 969);
+    assert.equal(d.bundles.length, 969);
+  });
+
+  it('DataChunk.addData()', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 4444.5,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const chunks2 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 4444.5,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+    assert.equal(d.bundles.length, 1);
+    d.addData(chunks2);
+    assert.equal(d.bundles.length, 2);
+  });
+
+  it('DataChunk.filter()', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 4444.5,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const chunks2 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 4444.5,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+    d.addData(chunks2);
+
+    const filteredAll = d.filter(() => true);
+    const filteredNone = d.filter(() => false);
+    const filteredOne = d.filter((bundle) => bundle.id === 'one');
+    assert.equal(filteredAll.length, 2);
+    assert.equal(filteredNone.length, 0);
+    assert.equal(filteredOne.length, 1);
   });
 });

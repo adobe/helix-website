@@ -268,16 +268,38 @@ export class DataChunks {
     // subfacets[facet][series]
     this.subfacetsIn = {};
     this.subfacetsOut = {};
+    // memoziaton
+    this.memo = {};
   }
 
+  /**
+   * Load raw chunks. This will replace data that has been loaded before
+   * @param {RawChunk[]} chunks the raw data to load, an array of chunks
+   */
   load(chunks) {
     this.data = chunks;
     this.resetData();
   }
 
+  /**
+   * Load more data. This will amend the data that has been loaded before
+   * @param {RawChunk} chunks the raw data to load, an array of chunks
+   */
   addData(chunks) {
-    this.data.push(chunks);
+    this.data.push(...chunks);
     this.resetData();
+  }
+
+  /**
+   * @returns {Bundle[]} all bundles, regardless of the chunk they belong to
+   */
+  get bundles() {
+    if (this.memo.bundles) return this.memo.bundles;
+    this.memo.bundles = this.data.reduce((acc, chunk) => {
+      acc.push(...chunk.rumBundles);
+      return acc;
+    }, []);
+    return this.memo.bundles;
   }
 
   /**
@@ -289,11 +311,9 @@ export class DataChunks {
    */
   filter(filterFn) {
     this.resetData();
-    this.data.forEach((chunk) => {
-      this.filteredIn.push(...chunk.rumBundles.filter(filterFn));
-      // TODO: re-enable this once the filter function is without side-effecs
-      // this.filteredOut.push(...chunk.rumBundles.filter((bundle) => !filterFn(bundle)));
-    });
+    this.filteredIn = this.bundles.filter(filterFn);
+    // TODO: enable filterOut when we don't have filter functions
+    // with side effects anymore
     return this.filteredIn;
   }
 
@@ -410,6 +430,7 @@ export class DataChunks {
       return facet;
     };
     // group by facet
+    // TODO: facets need to be calculated on all data, not just filtered in
     this.facetsIn = Object.entries(this.facets)
       .reduce((accOuter, [facetName, facetValueFn]) => {
         const groupedByFacetIn = this.filteredIn.reduce(groupFn(facetValueFn), {});
