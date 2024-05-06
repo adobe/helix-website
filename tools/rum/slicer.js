@@ -606,6 +606,7 @@ chart = new Chart(canvas, {
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
   if (entries[0].isIntersecting) {
+    console.log(entries);
     const params = new URL(window.location).searchParams;
     filterInput.value = params.get('filter');
     const view = params.get('view') || 'week';
