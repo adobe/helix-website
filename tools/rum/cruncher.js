@@ -75,10 +75,15 @@ export function addCalculatedProps(bundle) {
 }
 
 function aggregateFn(valueFn) {
+  /**
+   * @param {Aggregate} acc the current aggregate
+   * @param {Bundle} bundle the bundle to add to the aggregate
+   */
   return (acc, bundle) => {
     const value = valueFn(bundle);
     acc.count += 1;
     acc.sum += value;
+    acc.weight += bundle.weight;
     acc.values.push(value);
     return acc;
   };
@@ -94,21 +99,42 @@ function groupFn(groupByFn) {
   };
 }
 
-function initialAggregate() {
-  return {
-    count: 0,
-    sum: 0,
-    values: [],
-    get min() { return Math.min(...this.values); },
-    get max() { return Math.max(...this.values); },
-    // stay nice or ...
-    get mean() { return this.sum / this.count; },
-    percentile(p) {
-      const sorted = this.values.sort((left, right) => left - right);
-      const index = Math.floor((p / 100) * sorted.length);
-      return sorted[index];
-    },
-  };
+class Aggregate {
+  constructor(parent = null) {
+    this.count = 0;
+    this.sum = 0;
+    this.weight = 0;
+    this.values = [];
+    this.parent = parent;
+  }
+
+  get min() {
+    return Math.min(...this.values);
+  }
+
+  get max() {
+    return Math.max(...this.values);
+  }
+
+  get share() {
+    if (!this.parent) return null;
+    return this.count / this.parent.count;
+  }
+
+  get percentage() {
+    if (!this.parent) return null;
+    return this.sum / this.parent.sum;
+  }
+
+  get mean() {
+    return this.sum / this.count;
+  }
+
+  percentile(p) {
+    const sorted = this.values.sort((left, right) => left - right);
+    const index = Math.floor((p / 100) * sorted.length);
+    return sorted[index];
+  }
 }
 
 function tDistributionCDF(t, df) {
@@ -220,7 +246,7 @@ class Facet {
     if (this.entries.length === 0) return {};
     return Object.entries(this.parent.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), initialAggregate());
+        acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
         return acc;
       }, {});
   }
@@ -260,8 +286,8 @@ export class DataChunks {
     this.seriesIn = {};
     this.seriesOut = {};
     // totals for the entire dataset
-    this.totalIn = {};
-    this.totalOut = {};
+    this.totalsIn = {};
+    this.totalsOut = {};
     // facets[series]
     this.facetsIn = {};
     this.facetsOut = {};
@@ -352,20 +378,6 @@ export class DataChunks {
     return this.groupedIn;
   }
 
-  aggregateGroupBundles(valueFn, seriesName, groupName, out) {
-    const group = out ? this.groupedOut : this.groupedIn;
-    const bundlesInGroup = group[groupName];
-    if (out) {
-      if (!this.seriesOut[groupName]) this.seriesOut[groupName] = {};
-      this.seriesOut[groupName][seriesName] = bundlesInGroup
-        .reduce(aggregateFn(valueFn), initialAggregate());
-    } else {
-      if (!this.seriesIn[groupName]) this.seriesIn[groupName] = {};
-      this.seriesIn[groupName][seriesName] = bundlesInGroup
-        .reduce(aggregateFn(valueFn), initialAggregate());
-    }
-  }
-
   /**
    * Aggregates the grouped data into series data. Each series
    * has been provided by `addSeries` and will be used to
@@ -379,21 +391,33 @@ export class DataChunks {
    * - max
    * - mean
    * - percentile(p)
-   * @returns {Object} series data
+   * @returns {Object<string, Totals>} series data
    */
   aggregate() {
-    Object.entries(this.series)
-      .forEach(([seriesName, valueFn]) => {
-        Object.keys(this.groupedIn)
-          .forEach((groupName) => this
-            .aggregateGroupBundles(valueFn, seriesName, groupName, false));
-        Object.keys(this.groupedOut)
-          .forEach((groupName) => this
-            .aggregateGroupBundles(valueFn, seriesName, groupName, true));
-      });
+    if (Object.keys(this.seriesIn).length) return this.seriesIn;
+    this.seriesIn = Object.entries(this.groupedIn)
+      .reduce((accOuter, [groupName, bundles]) => {
+        accOuter[groupName] = Object.entries(this.series)
+          .reduce((accInner, [seriesName, valueFn]) => {
+            accInner[seriesName] = bundles.reduce(
+              aggregateFn(valueFn),
+              // we reference the totals object here, so that we can
+              // calculate the share and percentage metrics
+              new Aggregate(this.totals[seriesName]),
+            );
+            return accInner;
+          }, {});
+        return accOuter;
+      }, {});
     return this.seriesIn;
   }
 
+  /**
+   * A total is an object that contains {Metric} objects
+   * for each defined series.
+   * @typedef Totals
+   * @extends Object<string, Aggregate>
+   */
   /**
    * Aggregates the filtered data into totals. The totals will
    * be stored in the totalIn object. The result will be an object
@@ -405,19 +429,26 @@ export class DataChunks {
    * - max
    * - mean
    * - percentile(p)
-   * @returns {Object} total data
+   * @returns {Totals} total data
    */
-  totals() {
+  get totals() {
     // go over each function in this.series and each value in filteredIn
     // and appy the function to the value
-    this.totalsIn = Object.entries(this.series)
+    if (Object.keys(this.totalsIn).length) return this.totalsIn;
+    const parentTotals = Object.entries(this.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filteredIn.reduce(aggregateFn(valueFn), initialAggregate());
+        acc[seriesName] = this.filteredIn.reduce(
+          aggregateFn(valueFn),
+          new Aggregate(),
+        );
         return acc;
       }, {});
-    this.totalsOut = Object.entries(this.series)
+    this.totalsIn = Object.entries(this.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filteredOut.reduce(aggregateFn(valueFn), initialAggregate());
+        acc[seriesName] = this.filteredIn.reduce(
+          aggregateFn(valueFn),
+          new Aggregate(parentTotals[seriesName]),
+        );
         return acc;
       }, {});
     return this.totalsIn;

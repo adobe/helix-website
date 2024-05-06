@@ -353,4 +353,135 @@ describe('DataChunks', () => {
     assert.equal(groupedbydisplay.visible.length, 1);
     assert.equal(groupedbydisplay.hidden.length, 1);
   });
+
+  it('DataChunk.totals()', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 100,
+              },
+            ],
+          },
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'click',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+    // remember to call filter at least once.
+    d.filter(() => true);
+
+    // define two series
+    d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
+    d.addSeries('clickcount', (bundle) => bundle.events.filter((e) => e.checkpoint === 'click').length);
+
+    // get totals
+    const { totals } = d;
+    // for each series, there are a number of ways to look at the aggregate
+    assert.equal(totals.toptime.sum, 300);
+    assert.equal(totals.toptime.mean, 150);
+    assert.equal(totals.clickcount.sum, 1);
+    assert.equal(totals.clickcount.mean, 0.5);
+  });
+
+  it('DataChunk.aggregate()', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 100,
+              },
+            ],
+          },
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'click',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+    // remember to call filter at least once.
+    d.filter(() => true);
+
+    // define two series
+    d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
+    d.addSeries('clickcount', (bundle) => bundle.events.filter((e) => e.checkpoint === 'click').length);
+
+    // group by display
+    d.group((bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.target);
+
+    // get aggregates
+    const aggregates = d.aggregate();
+    // the first level of aggregation is by group
+    assert.deepEqual(Object.keys(aggregates), ['visible', 'hidden']);
+    // the second level of aggregation is by series
+    assert.equal(aggregates.visible.toptime.sum, 100);
+    assert.equal(aggregates.hidden.toptime.sum, 200);
+    assert.equal(aggregates.visible.clickcount.sum, 0);
+    assert.equal(aggregates.hidden.clickcount.sum, 1);
+    // we can also compare the sum and count metrics to the parent (all) group
+    assert.equal(aggregates.visible.toptime.share, 1 / 2);
+    // percentage is calculated as the ratio of sums
+    assert.equal(aggregates.hidden.toptime.percentage, 2 / 3);
+  });
 });
