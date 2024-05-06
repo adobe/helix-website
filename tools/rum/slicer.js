@@ -53,7 +53,9 @@ const mainInnerHTML = `<div class="output">
 </div>
 
 <figure>
-  <canvas id="time-series"></canvas>
+  <div class="chart-container">
+    <canvas id="time-series"></canvas>
+  </div>
   <div class="filter-tags"></div>
   <figcaption>
     <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>
@@ -530,6 +532,7 @@ chart = new Chart(canvas, {
     },
   ],
   options: {
+    maintainAspectRatio: false,
     plugins: {
       customCanvasBackgroundColor: {
         color: 'white',
@@ -587,6 +590,9 @@ chart = new Chart(canvas, {
       },
       y: {
         stacked: true,
+        ticks: {
+          callback: (value) => toHumanReadable(value),
+        },
       },
     },
   },
