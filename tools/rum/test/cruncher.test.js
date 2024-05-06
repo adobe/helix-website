@@ -484,4 +484,131 @@ describe('DataChunks', () => {
     // percentage is calculated as the ratio of sums
     assert.equal(aggregates.hidden.toptime.percentage, 2 / 3);
   });
+
+  it('DataChunk.facets', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/developer/tutorial',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 100,
+              },
+            ],
+          },
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'click',
+              },
+            ],
+          },
+          {
+            id: 'three',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'mobile:ios',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'viewmedia',
+                target: 'some_image.png',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+    // remember to call filter at least once.
+    // we will later use subfacets, so let's pretend we are most interested in the
+    // top checkpoint
+    const eventFilterFn = (e) => e.checkpoint === 'top';
+    d.filter((bundle) => bundle.events.find(eventFilterFn));
+
+    // define two series
+    d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
+    d.addSeries('clickcount', (bundle) => bundle.events.filter((e) => e.checkpoint === 'click').length);
+
+    // group by display
+    d.group((bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.target);
+
+    // define facet functions
+    d.addFacet('host', (bundle) => bundle.host);
+    d.addFacet('url', (bundle) => bundle.url);
+    d.addFacet('userAgent', (bundle) => {
+      const parts = bundle.userAgent.split(':');
+      return parts.reduce((acc, _, i) => {
+        acc.push(parts.slice(0, i + 1).join(':'));
+        return acc;
+      }, []);
+    });
+
+    // add all source and target values as subfacets
+    d.addSubFacet('target', (bundle) => bundle.events
+      // filter out events that are not interesting
+      // – this will need to be done based on the UI filters
+      .filter(eventFilterFn)
+      .map((e) => e.target).filter((t) => t), eventFilterFn);
+    d.addSubFacet('source', (bundle) => bundle.events
+      // filter out events that are not interesting
+      .filter(eventFilterFn)
+      .map((e) => e.source).filter((t) => t));
+
+    // get facets and subfacets
+    const { subfacets, facets } = d;
+
+    // the first level of aggregation is by facet
+    assert.deepEqual(Object.keys(facets), ['host', 'url', 'userAgent']);
+    assert.deepEqual(facets.url.map((f) => f.value), [
+      // two bundles, so it comes first
+      'https://www.aem.live/home',
+      // one bundle, so it comes second
+      'https://www.aem.live/developer/tutorial']);
+
+    // one entry can create multiple facets, if the facet function returns an array
+    // so that desktop can include all desktop:* variants
+    assert.deepEqual(facets.userAgent.map((f) => f.value), [
+      'desktop',
+      'desktop:windows',
+      'mobile',
+      'mobile:ios',
+    ]);
+
+    assert.deepEqual(Object.keys(subfacets), ['target', 'source']);
+    assert.deepEqual(subfacets.target.map((f) => f.value), [
+      'visible',
+      'hidden',
+    ]);
+  });
 });
