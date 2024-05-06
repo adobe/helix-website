@@ -301,4 +301,56 @@ describe('DataChunks', () => {
     assert.equal(filteredNone.length, 0);
     assert.equal(filteredOne.length, 1);
   });
+
+  it('DataChunk.group()', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 100,
+              },
+            ],
+          },
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+    // remember to call filter at least once.
+    d.filter(() => true);
+    const grouped = d.group((bundle) => bundle.id);
+    assert.equal(grouped.one.length, 1);
+    assert.equal(grouped.two.length, 1);
+    const groupedbydisplay = d.group((bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.target);
+    assert.equal(groupedbydisplay.visible.length, 1);
+    assert.equal(groupedbydisplay.hidden.length, 1);
+  });
 });

@@ -303,11 +303,19 @@ export class DataChunks {
   }
 
   /**
+   * A filter function that will return true for matching
+   * bundles and false for non-matching bundles.
+   * @function bundleFilter
+   * @param {Bundle} bundle the bundle to check
+   * @returns {boolean} true if the bundle matches the filter
+   */
+
+  /**
    * Splits the data into two groups: filteredIn and filteredOut
    * based on the criteria in the filterFn. Most downstream
    * functions will only need the filteredIn data.
-   * @param {function(bundle)} filterFn
-   * @returns {Array} all bundles that passed the filter
+   * @param {bundleFilter} filterFn
+   * @returns {Bundle[]} all bundles that passed the filter
    */
   filter(filterFn) {
     this.resetData();
@@ -318,6 +326,15 @@ export class DataChunks {
   }
 
   /**
+   * A grouping function returns a group name or undefined
+   * for each bundle, according to the group that the bundle
+   * belongs to.
+   * @function groupByFn
+   * @param {Bundle} bundle the bundle to check
+   * @returns {string|undefined} the group name or undefined
+   */
+
+  /**
    * Groups the filteredIn data by the groupFn. The groupFn
    * should return a string that will be used as the key for
    * the group. If the groupFn returns a falsy value, the
@@ -325,11 +342,11 @@ export class DataChunks {
    * We will group the data into two objects: groupedIn and
    * groupedOut. Most downstream functions will only need the
    * groupedIn data.
-   * @param {function(bundle)} groupByFn for each object, determine the group key
-   * @returns {Object} grouped data, each key is a group and each vaule is an array of bundles
+   * @param {groupByFn} groupByFn for each object, determine the group key
+   * @returns {Object<string, Bundle[]>} grouped data, each key is a group
+   * and each vaule is an array of bundles
    */
   group(groupByFn) {
-    this.resetData();
     this.groupedIn = this.filteredIn.reduce(groupFn(groupByFn), {});
     this.groupedOut = this.filteredOut.reduce(groupFn(groupByFn), {});
     return this.groupedIn;
