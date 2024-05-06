@@ -34,10 +34,10 @@
     "message": "大量作業失敗。請稍後再試。"
   },
   "bulk_error_illegal_file_name": {
-    "message": "檔案名稱中只允許使用標準化的小型拉丁字母、數字和連字號。以下檔案名稱包含非法字元："
+    "message": "檔案名稱中只允許使用標準化的小寫拉丁字母、數字和連字號。以下檔案名稱含有違規字元："
   },
   "bulk_error_illegal_file_names": {
-    "message": "檔案名稱中只允許使用標準化的小型拉丁字母、數字和連字號。以下檔案名稱包含非法字元："
+    "message": "檔案名稱中只允許使用標準化的小寫拉丁字母、數字和連字號。以下檔案名稱含有違規字元："
   },
   "bulk_error_preview_login_required": {
     "message": "您必須登入才能產生超過 100 個檔案的預覽。"
@@ -100,7 +100,7 @@
     "message": "取消"
   },
   "caution_side_effects": {
-    "message": "警告：出現意外副作用！"
+    "message": "警告：注意意外的副作用！"
   },
   "close": {
     "message": "關閉"
@@ -139,7 +139,7 @@
     "message": "匯出設定"
   },
   "config_export_description": {
-    "message": "將您的設定備份到電腦。"
+    "message": "將設定備份到您的電腦。"
   },
   "config_filter": {
     "description": "篩選專案",
@@ -170,8 +170,14 @@
   "config_invalid_giturl": {
     "message": "存放庫 URL 無效"
   },
+  "config_invalid_host": {
+    "message": "主機名稱無效"
+  },
   "config_invalid_import": {
     "message": "選擇要匯入的有效檔案"
+  },
+  "config_invalid_mountpoints": {
+    "message": "內容 URL 無效"
   },
   "config_invalid_shareurl": {
     "message": "共用 URL 無效"
@@ -186,19 +192,19 @@
     "message": "存放庫 URL：https://github.com/..."
   },
   "config_manual_host_placeholder": {
-    "message": "生產主機名稱 (選擇性)"
+    "message": "生產主機名稱 (選填)"
   },
   "config_manual_liveHost_placeholder": {
-    "message": "自訂上線主機名稱 (選擇性)"
+    "message": "自訂即時主機名稱 (選填)"
   },
   "config_manual_mountpoints_placeholder": {
     "message": "內容 URL：https://..."
   },
   "config_manual_previewHost_placeholder": {
-    "message": "自訂預覽主機名稱 (選擇性)"
+    "message": "自訂預覽主機名稱 (選填)"
   },
   "config_manual_project_placeholder": {
-    "message": "專案名稱 (選擇性)"
+    "message": "專案名稱 (選填)"
   },
   "config_manual_title": {
     "message": "手動新增"
@@ -253,7 +259,7 @@
     "message": "$1 的共用 URL 已複製到剪貼簿"
   },
   "config_shareurl_description": {
-    "message": "按一下右側的共用圖示，要求擁有 Sidekick 的人與您共用其 URL。"
+    "message": "請擁有 Sidekick 的人按一下右側的共用圖示，以與您共用其 URL。"
   },
   "config_shareurl_placeholder": {
     "message": "共用 URL：https://www.hlx.live/sidekick..."
@@ -352,7 +358,7 @@
     "message": "編輯"
   },
   "edit_date": {
-    "message": "已編輯："
+    "message": "編輯時間："
   },
   "error_config_failure": {
     "message": "啟用設定失敗："
@@ -443,7 +449,7 @@
     "message": "全部勾選"
   },
   "help_user_status_description": {
-    "message": "勾選的主題將不再顯示。請移除您想要再次看到的主題旁邊的核取記號。"
+    "message": "勾選的主題將不再顯示。請到您想要再次看到的主題旁，移除其核取記號。"
   },
   "help_user_status_uncheck_all": {
     "description": "取消勾選所有說明主題",
@@ -456,7 +462,7 @@
     "message": "資訊"
   },
   "json_view_description": {
-    "message": "使用者友好的資料轉譯。"
+    "message": "使用者友善的資料轉譯。"
   },
   "live": {
     "message": "即時"
@@ -465,7 +471,7 @@
     "message": "$1 分鐘前"
   },
   "never": {
-    "message": "永不"
+    "message": "從未"
   },
   "now": {
     "message": "現在"
@@ -502,7 +508,7 @@
     "message": "設定已成功啟用。"
   },
   "preview_date": {
-    "message": "已預覽："
+    "message": "預覽時間："
   },
   "preview_onedrive": {
     "message": "專業祕訣：在產生預覽前按 Ctrl+S 可立即查看最新變更…"
@@ -517,7 +523,7 @@
     "message": "發佈"
   },
   "publish_date": {
-    "message": "已發佈："
+    "message": "發佈時間："
   },
   "publish_failure": {
     "message": "發佈失敗。請稍後再試。"
