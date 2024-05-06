@@ -1,0 +1,8 @@
+{
+  "name": "@adobe/aem-rum-explorer",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "node --test"
+  },
+  "type": "module"
+}
