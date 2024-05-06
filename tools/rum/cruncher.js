@@ -248,7 +248,8 @@ export class DataChunks {
     this.resetData();
     this.data.forEach((chunk) => {
       this.filteredIn.push(...chunk.rumBundles.filter(filterFn));
-      this.filteredOut.push(...chunk.rumBundles.filter((bundle) => !filterFn(bundle)));
+      // TODO: re-enable this once the filter function is without side-effecs
+      // this.filteredOut.push(...chunk.rumBundles.filter((bundle) => !filterFn(bundle)));
     });
     return this.filteredIn;
   }
