@@ -605,64 +605,65 @@ chart = new Chart(canvas, {
 
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
-  console.log(entries);
-  const params = new URL(window.location).searchParams;
-  filterInput.value = params.get('filter');
-  const view = params.get('view') || 'week';
-  viewSelect.value = view;
-  setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
-  const h1 = document.querySelector('h1');
-  h1.textContent = ` ${DOMAIN}`;
-  const img = document.createElement('img');
-  img.src = `https://${DOMAIN}/favicon.ico`;
-  img.addEventListener('error', () => {
-    img.src = './website.svg';
-  });
-  h1.prepend(img);
-  h1.addEventListener('click', async () => {
-    // eslint-disable-next-line no-alert
-    let domain = window.prompt('enter domain or URL');
-    if (domain) {
-      try {
-        const url = new URL(domain);
-        domain = url.host;
-      } catch {
-        // nothing
+  if (entries[0].isIntersecting) {
+    const params = new URL(window.location).searchParams;
+    filterInput.value = params.get('filter');
+    const view = params.get('view') || 'week';
+    viewSelect.value = view;
+    setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
+    const h1 = document.querySelector('h1');
+    h1.textContent = ` ${DOMAIN}`;
+    const img = document.createElement('img');
+    img.src = `https://${DOMAIN}/favicon.ico`;
+    img.addEventListener('error', () => {
+      img.src = './website.svg';
+    });
+    h1.prepend(img);
+    h1.addEventListener('click', async () => {
+      // eslint-disable-next-line no-alert
+      let domain = window.prompt('enter domain or URL');
+      if (domain) {
+        try {
+          const url = new URL(domain);
+          domain = url.host;
+        } catch {
+          // nothing
+        }
+        const domainkey = await fetchDomainKey(domain);
+        window.location = `${window.location.pathname}?domain=${domain}&view=month&domainkey=${domainkey}`;
       }
-      const domainkey = await fetchDomainKey(domain);
-      window.location = `${window.location.pathname}?domain=${domain}&view=month&domainkey=${domainkey}`;
-    }
-  });
+    });
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  timezoneElement.textContent = timezone;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    timezoneElement.textContent = timezone;
 
-  loadData(view);
+    loadData(view);
 
-  filterInput.addEventListener('input', () => {
-    updateState();
-    draw();
-  });
-
-  viewSelect.addEventListener('input', () => {
-    updateState();
-    window.location.reload();
-  });
-
-  const metrics = [...document.querySelectorAll('.key-metrics li')];
-  metrics.forEach((e) => {
-    e.addEventListener('click', (evt) => {
-      const metric = evt.currentTarget.id;
-      const selected = evt.currentTarget.ariaSelected === 'true';
-      metrics.forEach((m) => { m.ariaSelected = false; });
-      if (metric !== 'pageviews') e.ariaSelected = !selected;
+    filterInput.addEventListener('input', () => {
       updateState();
       draw();
     });
-  });
 
-  if (params.get('metrics') === 'all') {
-    document.querySelector('.key-metrics-more').ariaHidden = false;
+    viewSelect.addEventListener('input', () => {
+      updateState();
+      window.location.reload();
+    });
+
+    const metrics = [...document.querySelectorAll('.key-metrics li')];
+    metrics.forEach((e) => {
+      e.addEventListener('click', (evt) => {
+        const metric = evt.currentTarget.id;
+        const selected = evt.currentTarget.ariaSelected === 'true';
+        metrics.forEach((m) => { m.ariaSelected = false; });
+        if (metric !== 'pageviews') e.ariaSelected = !selected;
+        updateState();
+        draw();
+      });
+    });
+
+    if (params.get('metrics') === 'all') {
+      document.querySelector('.key-metrics-more').ariaHidden = false;
+    }
   }
 });
 
