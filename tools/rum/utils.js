@@ -15,7 +15,8 @@ export function scoreCWV(value, name) {
   };
   return scoreValue(value, ...limits[name]);
 }
-export const UA_KEY = 'userAgent'; export function toHumanReadable(num) {
+export const UA_KEY = 'userAgent';
+export function toHumanReadable(num) {
   const dp = 3;
   let number = num;
   const thresh = 1000;

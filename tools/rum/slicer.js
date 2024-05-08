@@ -64,7 +64,22 @@ function updateKeyMetrics(keyMetrics) {
   ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
 
-function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
+function updateFacets(focus, mode, placeholders, show = {}) {
+  const createLabelHTML = (labelText, usePlaceholders) => {
+    if (labelText.startsWith('https://') && labelText.includes('media_')) {
+      return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
+    }
+
+    if (labelText.startsWith('https://')) {
+      return `<a href="${labelText}" target="_new">${labelText}</a>`;
+    }
+
+    if (usePlaceholders && placeholders[labelText]) {
+      return (`${placeholders[labelText]} [${labelText}]`);
+    }
+    return (labelText);
+  };
+
   const numOptions = mode === 'all' ? 20 : 10;
   const filterTags = document.querySelector('.filter-tags');
   filterTags.textContent = '';
@@ -82,10 +97,10 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
   const url = new URL(window.location);
 
   elems.facetsElement.textContent = '';
-  const keys = Object.keys(facets);
+  const keys = Object.keys(dataChunks.facets);
   keys.forEach((facetName) => {
-    const facet = facets[facetName];
-    const optionKeys = Object.keys(facet);
+    const facetEntries = dataChunks.facets[facetName];
+    const optionKeys = facetEntries.map((f) => f.value);
     if (optionKeys.length) {
       let tsv = '';
       const fieldSet = document.createElement('fieldset');
@@ -97,23 +112,23 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
       legend.append(clipboard);
       fieldSet.append(legend);
       tsv += `${facetName}\tcount\tlcp\tcls\tinp\r\n`;
-      optionKeys.sort((a, b) => facet[b] - facet[a]);
       const filterKeys = facetName === 'checkpoint' && mode !== 'all';
-      const filteredKeys = filterKeys ? optionKeys.filter((a) => !!(ph[a])) : optionKeys;
+      const filteredKeys = filterKeys ? optionKeys.filter((a) => !!(placeholders[a])) : optionKeys;
       const nbToShow = show[facetName] || numOptions;
-      filteredKeys.forEach((optionKey, i) => {
-        if (i < nbToShow) {
-          const optionValue = facet[optionKey];
+      facetEntries
+        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
+        .slice(0, nbToShow)
+        .forEach((entry) => {
           const div = document.createElement('div');
           const input = document.createElement('input');
           input.type = 'checkbox';
-          input.value = optionKey;
-          input.checked = url.searchParams.getAll(facetName).includes(optionKey);
+          input.value = entry.value;
+          input.checked = url.searchParams.getAll(facetName).includes(entry.value);
           if (input.checked) {
-            addFilterTag(facetName, optionKey);
+            addFilterTag(facetName, entry.value);
             div.ariaSelected = true;
           }
-          input.id = `${facetName}=${optionKey}`;
+          input.id = `${facetName}=${entry.value}`;
           div.addEventListener('click', (evt) => {
             if (evt.target !== input) input.checked = !input.checked;
             evt.stopPropagation();
@@ -122,92 +137,67 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
             // eslint-disable-next-line no-use-before-define
             draw();
           });
-          const createLabelHTML = (labelText, usePlaceholders) => {
-            if (labelText.startsWith('https://') && labelText.includes('media_')) {
-              return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
-            }
-
-            if (labelText.startsWith('https://')) {
-              return `<a href="${labelText}" target="_new">${labelText}</a>`;
-            }
-
-            if (usePlaceholders && ph[labelText]) {
-              return (`${ph[labelText]} [${labelText}]`);
-            }
-            return (labelText);
-          };
 
           const label = document.createElement('label');
-          label.setAttribute('for', `${facetName}-${optionKey}`);
-          label.innerHTML = `${createLabelHTML(optionKey, facetName === 'checkpoint')} (${toHumanReadable(optionValue)})`;
-
-          const getP75 = (metric) => {
-            const cwvMetric = `cwv${metric.toUpperCase()}`;
-            const optionMetric = cwv[facetName][optionKey][metric];
-            optionMetric.bundles.sort((a, b) => a[cwvMetric] - b[cwvMetric]);
-            let p75Weight = optionMetric.weight * 0.75;
-            let p75Value;
-            for (let j = 0; j < optionMetric.bundles.length; j += 1) {
-              p75Weight -= optionMetric.bundles[j].weight;
-              if (p75Weight < 0) {
-                p75Value = optionMetric.bundles[j][cwvMetric];
-                break;
-              }
-            }
-            return (p75Value);
-          };
+          label.setAttribute('for', `${facetName}-${entry.value}`);
+          label.innerHTML = `${createLabelHTML(entry.value, facetName === 'checkpoint')} (${toHumanReadable(entry.metrics.pageViews.sum)})`;
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
 
           // display core web vital to facets
-          if (cwv[facetName]) {
-            // add lcp
-            let lcp = '-';
-            let lcpScore = '';
-            if (cwv[facetName][optionKey] && cwv[facetName][optionKey].lcp) {
-              const lcpValue = getP75('lcp');
-              lcp = `${toHumanReadable(lcpValue / 1000)} s`;
-              lcpScore = scoreCWV(lcpValue, 'lcp');
-            }
-            const lcpLI = document.createElement('li');
-            lcpLI.classList.add(`score-${lcpScore}`);
-            lcpLI.textContent = lcp;
-            ul.append(lcpLI);
-
-            // add cls
-            let cls = '-';
-            let clsScore = '';
-            if (cwv[facetName][optionKey] && cwv[facetName][optionKey].cls) {
-              const clsValue = getP75('cls');
-              cls = `${toHumanReadable(clsValue)}`;
-              clsScore = scoreCWV(clsValue, 'cls');
-            }
-            const clsLI = document.createElement('li');
-            clsLI.classList.add(`score-${clsScore}`);
-            clsLI.textContent = cls;
-            ul.append(clsLI);
-
-            // add inp
-            let inp = '-';
-            let inpScore = '';
-            if (cwv[facetName][optionKey] && cwv[facetName][optionKey].inp) {
-              const inpValue = getP75('inp');
-              inp = `${toHumanReadable(inpValue / 1000)} s`;
-              inpScore = scoreCWV(inpValue, 'inp');
-            }
-            const inpLI = document.createElement('li');
-            inpLI.classList.add(`score-${inpScore}`);
-            inpLI.textContent = inp;
-            ul.append(inpLI);
-            tsv += `${optionKey}\t${optionValue}\t${lcp}\t${cls}\t${inp}\r\n`;
+          // add lcp
+          let lcp = '-';
+          let lcpScore = '';
+          if (entry.metrics.lcp) {
+            const lcpValue = entry.metrics.lcp.percentile(75);
+            lcp = `${toHumanReadable(lcpValue / 1000)} s`;
+            lcpScore = scoreCWV(lcpValue, 'lcp');
           }
+          const lcpLI = document.createElement('li');
+          lcpLI.classList.add(`score-${lcpScore}`);
+          lcpLI.textContent = lcp;
+          ul.append(lcpLI);
+
+          // add cls
+          let cls = '-';
+          let clsScore = '';
+          if (entry.metrics.cls) {
+            const clsValue = entry.metrics.cls.percentile(75);
+            cls = `${toHumanReadable(clsValue)}`;
+            clsScore = scoreCWV(clsValue, 'cls');
+          }
+          const clsLI = document.createElement('li');
+          clsLI.classList.add(`score-${clsScore}`);
+          clsLI.textContent = cls;
+          ul.append(clsLI);
+
+          // add inp
+          let inp = '-';
+          let inpScore = '';
+          if (entry.metrics.inp) {
+            const inpValue = entry.metrics.inp.percentile(75);
+            inp = `${toHumanReadable(inpValue / 1000)} s`;
+            inpScore = scoreCWV(inpValue, 'inp');
+          }
+          const inpLI = document.createElement('li');
+          inpLI.classList.add(`score-${inpScore}`);
+          inpLI.textContent = inp;
+          ul.append(inpLI);
+          tsv += `${entry.name}\t${entry.value}\t${lcp}\t${cls}\t${inp}\r\n`;
+
           div.append(input, label, ul);
           fieldSet.append(div);
-        } else if (i < 100) {
-          tsv += `${optionKey}\t${facet[optionKey]}\t\t\t\r\n`;
-        }
-      });
+        });
+      // populate pastebuffer with overflow data
+      // ideally, this would be populated only when
+      // the user clicks the copy button, so that we
+      // don't waste cycles on rendering p75s that
+      // the user never sees.
+      tsv = facetEntries
+        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
+        .slice(0, nbToShow)
+        .reduce((acc, entry) => `${acc}${entry.value}\t${entry.metrics.pageViews.sum}\t${entry.metrics.lcp.percentile(75)}\t${entry.metrics.cls.percentile(75)}\t${entry.metrics.inp.percentile(75)}\r\n`, tsv);
 
       if (filteredKeys.length > nbToShow) {
         // add "more" link
@@ -219,11 +209,9 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
           evt.preventDefault();
           // increase number of keys shown
           updateFacets(
-            facets,
-            cwv,
             focus,
             mode,
-            ph,
+            placeholders,
             { [facetName]: (show[facetName] || numOptions) + numOptions },
           );
         });
@@ -235,7 +223,12 @@ function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
         all.addEventListener('click', (evt) => {
           evt.preventDefault();
           // increase number of keys shown
-          updateFacets(facets, cwv, focus, mode, ph, { [facetName]: filteredKeys.length });
+          updateFacets(
+            focus,
+            mode,
+            placeholders,
+            { [facetName]: filteredKeys.length },
+          );
         });
         div.append(all);
         const container = document.createElement('div');
@@ -295,6 +288,37 @@ async function draw() {
     [UA_KEY]: userAgent,
   };
 
+  filter.fn = (bundle) => {
+    // include all by default
+    let matched = true;
+    // new filter function, without side effects
+    // poor man's full text search
+    if (
+      matched
+      && filter.text
+      && JSON.stringify(bundle).indexOf(filter.text) > -1
+    ) matched = true;
+    if (
+      matched
+      && filter.checkpoint.length
+      && filter.checkpoint.find((fcp) => (bundle.events.find((evt) => evt.checkpoint === fcp)))
+    ) matched = true;
+    if (
+      matched
+      && filter.url.length
+      && filter.url.find((furl) => bundle.url === furl)
+    ) matched = true;
+    if (
+      matched
+      && filter.userAgent.length
+      // fuzzy user agent matching
+      && filter.userAgent.find((fua) => bundle.userAgent && bundle.userAgent.startsWith(fua))
+    ) matched = true;
+    // TODO: filter by checkpoint.source and checkpoint.target
+    // return the result
+    return matched;
+  };
+
   checkpoint.forEach((cp) => {
     const props = ['target', 'source', 'value'];
     props.forEach((prop) => {
@@ -315,6 +339,19 @@ async function draw() {
   const cwv = structuredClone(facets);
 
   const filtered = dataChunks.filter((bundle) => filterBundle(bundle, filter, facets, cwv));
+
+  dataChunks.addFacet('userAgent', (bundle) => {
+    const parts = bundle.userAgent.split(':');
+    return parts.reduce((acc, _, i) => {
+      acc.push(parts.slice(0, i + 1).join(':'));
+      return acc;
+    }, []);
+  });
+  dataChunks.addFacet('url', (bundle) => bundle.url);
+  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
+    acc.add(evt.checkpoint);
+    return acc;
+  }, new Set())));
 
   if (filtered.length < 1000) {
     elems.lowDataWarning.ariaHidden = 'false';
@@ -383,7 +420,7 @@ async function draw() {
 
   // eslint-disable-next-line no-console
   console.log(`filtered to ${filtered.length} bundles in ${new Date() - startTime}ms`);
-  updateFacets(facets, cwv, focus, mode, ph);
+  updateFacets(focus, mode, ph);
   const keyMetrics = {
     pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
