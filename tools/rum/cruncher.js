@@ -81,6 +81,7 @@ function aggregateFn(valueFn) {
    */
   return (acc, bundle) => {
     const value = valueFn(bundle);
+    if (value === undefined) return acc;
     acc.count += 1;
     acc.sum += value;
     acc.weight += bundle.weight;
