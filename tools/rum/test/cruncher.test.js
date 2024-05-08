@@ -471,7 +471,7 @@ describe('DataChunks', () => {
     d.group((bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.target);
 
     // get aggregates
-    const aggregates = d.aggregate();
+    const { aggregates } = d;
     // the first level of aggregation is by group
     assert.deepEqual(Object.keys(aggregates), ['visible', 'hidden']);
     // the second level of aggregation is by series

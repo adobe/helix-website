@@ -1,8 +1,31 @@
 /*
  * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
  */
-import { toISOStringWithTimezone, scoreCWV } from './utils.js';
+import { toISOStringWithTimezone, scoreBundle, scoreCWV } from './utils.js';
 
+const INTERPOLATION_THRESHOLD = 10;
+function cwvInterpolationFn(targetMetric, interpolateTo100) {
+  return (cwvs) => {
+    const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
+    const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
+    if (interpolateTo100) {
+      return (cwvs[targetMetric].weight / valuedWeights);
+    }
+    if (valueCount < INTERPOLATION_THRESHOLD) {
+      // not enough data to interpolate
+      return 0;
+    }
+    // total weight
+    const totalWeight = cwvs.goodCWV.weight
+      + cwvs.niCWV.weight
+      + cwvs.poorCWV.weight
+      + cwvs.noCWV.weight;
+    // share of targetMetric compared to all CWV
+    const share = cwvs[targetMetric].weight / (valuedWeights);
+    // interpolate the share to the total weight
+    return Math.round(share * totalWeight);
+  };
+}
 // todo
 export default class CWVTimeLineChart {
   constructor(config) {
@@ -13,180 +36,97 @@ export default class CWVTimeLineChart {
     this.chartConfig = config;
   }
 
-  createChartData(bundles, endDate) {
-    const stats = [];
-    const labels = [];
-    const datasets = [];
-
-    const cwvStructure = () => ({
-      bundles: [],
-      weight: 0,
-      average: 0,
-      good: { weight: 0, average: 0 },
-      ni: { weight: 0, average: 0 },
-      poor: { weight: 0, average: 0 },
-    });
-
-    bundles.forEach((bundle) => {
+  /**
+   * Returns a function that can group the data bundles based on the
+   * configuration of the chart. As this is a timeline chart,
+   * the grouping is based on the time slot of the bundle, truncated
+   * to the granularity of the chart.
+   * @returns {function} A function that can group the data bundles
+   */
+  get groupBy() {
+    return (bundle) => {
       const slotTime = new Date(bundle.timeSlot);
       slotTime.setMinutes(0);
       slotTime.setSeconds(0);
       if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
       if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() - slotTime.getDay());
       if (this.chartConfig.unit === 'month') slotTime.setDate(1);
+      return toISOStringWithTimezone(slotTime);
+    };
+  }
 
-      const localTimeSlot = toISOStringWithTimezone(slotTime);
-      if (!stats[localTimeSlot]) {
-        const s = {
-          total: 0,
-          conversions: 0,
-          visits: 0,
-          lcp: cwvStructure(),
-          inp: cwvStructure(),
-          cls: cwvStructure(),
-          ttfb: cwvStructure(),
-          bundles: [],
-        };
+  useData(dataChunks) {
+    this.dataChunks = dataChunks;
+  }
 
-        stats[localTimeSlot] = s;
-      }
-
-      const updateAverage = (b, struct, key) => {
-        const newWeight = b.weight + struct.weight;
-        struct.average = (
-          (struct.average * struct.weight)
-          + (b[key] * b.weight)
-        ) / newWeight;
-        struct.weight = newWeight;
-      };
-
-      const stat = stats[localTimeSlot];
-      stat.bundles.push(bundle);
-      stat.total += bundle.weight;
-      if (bundle.conversion) stat.conversions += bundle.weight;
-      if (bundle.visit) stat.visits += bundle.weight;
-
-      if (bundle.cwvLCP) {
-        const score = scoreCWV(bundle.cwvLCP, 'lcp');
-        const bucket = stat.lcp[score];
-        updateAverage(bundle, bucket, 'cwvLCP');
-        updateAverage(bundle, stat.lcp, 'cwvLCP');
-        stat.lcp.bundles.push(bundle);
-      }
-      if (bundle.cwvCLS) {
-        const score = scoreCWV(bundle.cwvCLS, 'cls');
-        const bucket = stat.cls[score];
-        updateAverage(bundle, bucket, 'cwvCLS');
-        updateAverage(bundle, stat.cls, 'cwvCLS');
-        stat.cls.bundles.push(bundle);
-      }
-      if (bundle.cwvINP) {
-        const score = scoreCWV(bundle.cwvINP, 'inp');
-        const bucket = stat.inp[score];
-        updateAverage(bundle, bucket, 'cwvINP');
-        updateAverage(bundle, stat.inp, 'cwvINP');
-        stat.inp.bundles.push(bundle);
-      }
-
-      if (bundle.cwvTTFB) {
-        const score = scoreCWV(bundle.cwvTTFB, 'ttfb');
-        const bucket = stat.ttfb[score];
-        updateAverage(bundle, bucket, 'cwvTTFB');
-        updateAverage(bundle, stat.ttfb, 'cwvTTFB');
-        stat.ttfb.bundles.push(bundle);
-      }
-    });
-
-    const dataTotal = [];
-    const dataGood = [];
-    const dataNI = [];
-    const dataPoor = [];
-
-    const date = endDate ? new Date(endDate) : new Date();
-    date.setMinutes(0);
-    date.setSeconds(0);
-    if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'month' || this.chartConfig.unit === 'week') date.setHours(0);
-    if (this.chartConfig.unit === 'week') date.setDate(date.getDate() - date.getDay());
-    if (this.chartConfig.unit === 'month') date.setDate(1);
-
-    for (let i = 0; i < this.chartConfig.units; i += 1) {
-      const localTimeSlot = toISOStringWithTimezone(date);
-      const stat = stats[localTimeSlot];
-      // eslint-disable-next-line no-undef
-      labels.unshift(localTimeSlot);
-      const sumBucket = (bucket) => {
-        bucket.weight = bucket.good.weight + bucket.ni.weight + bucket.poor.weight;
-        if (bucket.weight) {
-          bucket.average = ((bucket.good.weight * bucket.good.average)
-            + (bucket.ni.weight * bucket.ni.average)
-            + (bucket.poor.weight * bucket.poor.average)) / bucket.weight;
-        } else {
-          bucket.average = 0;
-        }
-      };
-
-      if (stat) {
-        sumBucket(stat.lcp);
-        sumBucket(stat.cls);
-        sumBucket(stat.inp);
-        sumBucket(stat.ttfb);
-
-        const cwvNumBundles = stat.lcp.bundles.length
-          + stat.cls.bundles.length + stat.inp.bundles.length;
-        const cwvTotal = stat.lcp.weight + stat.cls.weight + stat.inp.weight;
-        const cwvFactor = stat.total / cwvTotal;
-
-        const cwvGood = stat.lcp.good.weight + stat.cls.good.weight + stat.inp.good.weight;
-        const cwvNI = stat.lcp.ni.weight + stat.cls.ni.weight + stat.inp.ni.weight;
-        const cwvPoor = stat.lcp.poor.weight + stat.cls.poor.weight + stat.inp.poor.weight;
-
-        const showCWVSplit = cwvNumBundles && (cwvNumBundles > 10);
-        if (!this.chartConfig.focus) {
-          dataTotal.unshift(showCWVSplit ? 0 : stat.total);
-          dataGood.unshift(showCWVSplit ? Math.round(cwvGood * cwvFactor) : 0);
-          dataNI.unshift(showCWVSplit ? Math.round(cwvNI * cwvFactor) : 0);
-          dataPoor.unshift(showCWVSplit ? Math.round(cwvPoor * cwvFactor) : 0);
-        } else {
-          if (this.chartConfig.focus === 'lcp' || this.chartConfig.focus === 'cls' || this.chartConfig.focus === 'inp' || this.chartConfig.focus === 'ttfb') {
-            const m = this.chartConfig.focus;
-            dataTotal.unshift(showCWVSplit ? 0 : 1);
-            dataGood.unshift(showCWVSplit ? stat[m].good.weight / stat[m].weight : 0);
-            dataNI.unshift(showCWVSplit ? stat[m].ni.weight / stat[m].weight : 0);
-            dataPoor.unshift(showCWVSplit ? stat[m].poor.weight / stat[m].weight : 0);
-          }
-          if (this.chartConfig.focus === 'conversions') {
-            // cls here
-            dataTotal.unshift(0);
-            dataGood.unshift(stat.conversions / stat.total);
-            dataNI.unshift(1 - (stat.conversions / stat.total));
-            dataPoor.unshift(0);
-          }
-          if (this.chartConfig.focus === 'visits') {
-            // cls here
-            dataTotal.unshift(stat.visits / stat.total);
-            dataGood.unshift(1 - (stat.visits / stat.total));
-            dataNI.unshift(0);
-            dataPoor.unshift(0);
-          }
-        }
-      } else {
-        dataTotal.unshift(0);
-        dataGood.unshift(0);
-        dataNI.unshift(0);
-        dataPoor.unshift(0);
-      }
-
-      if (this.chartConfig.unit === 'hour') date.setTime(date.getTime() - (3600 * 1000));
-      if (this.chartConfig.unit === 'day') date.setDate(date.getDate() - 1);
-      if (this.chartConfig.unit === 'week') date.setDate(date.getDate() - 7);
-      if (this.chartConfig.unit === 'month') date.setMonth(date.getMonth() - 1);
+  /**
+   * Defines the series for the chart based on the data chunks
+   * @param {DataChunks} dataChunks
+   */
+  defineSeries() {
+    const { dataChunks } = this;
+    // aggregate series
+    if (this.chartConfig.focus === 'lcp') {
+      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'good' ? bundle.weight : undefined));
+      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'poor' ? bundle.weight : undefined));
+      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'ni' ? bundle.weight : undefined));
+      dataChunks.addSeries('noCWV', () => (0));
+    } else if (this.chartConfig.focus === 'cls') {
+      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'good' ? bundle.weight : undefined));
+      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'poor' ? bundle.weight : undefined));
+      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'ni' ? bundle.weight : undefined));
+      dataChunks.addSeries('noCWV', () => (0));
+    } else if (this.chartConfig.focus === 'inp') {
+      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'good' ? bundle.weight : undefined));
+      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'poor' ? bundle.weight : undefined));
+      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'ni' ? bundle.weight : undefined));
+      dataChunks.addSeries('noCWV', () => (0));
+    } else {
+      dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
+      dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
+      dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
+      dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
     }
 
-    datasets.push({ data: dataTotal });
-    datasets.push({ data: dataGood });
-    datasets.push({ data: dataNI });
-    datasets.push({ data: dataPoor });
+    // interpolated series
+    dataChunks.addInterpolation(
+      'iGoodCWV', // name of the series
+      ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'], // calculate from these series
+      cwvInterpolationFn('goodCWV', this.chartConfig.focus), // interpolation function
+    );
 
-    return { labels, datasets, stats };
+    dataChunks.addInterpolation(
+      'iNiCWV',
+      ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
+      cwvInterpolationFn('niCWV', this.chartConfig.focus),
+    );
+
+    dataChunks.addInterpolation(
+      'iPoorCWV',
+      ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
+      cwvInterpolationFn('poorCWV', this.chartConfig.focus),
+    );
+
+    dataChunks.addInterpolation(
+      'iNoCWV',
+      ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
+      ({
+        goodCWV, niCWV, poorCWV, noCWV,
+      }) => {
+        const valueCount = goodCWV.count + niCWV.count + poorCWV.count;
+        if (this.chartConfig.focus) {
+          // we have a focus, so this series can stay at 0
+          // as all other series are interpolated to 100%
+          return 0;
+        }
+        if (valueCount < INTERPOLATION_THRESHOLD) {
+          // not enough data to interpolate the other values, so
+          // we report as if there are no CWV at all
+          const totalWeight = goodCWV.weight + niCWV.weight + poorCWV.weight + noCWV.weight;
+          return totalWeight;
+        }
+        return 0;
+      },
+    );
   }
 }

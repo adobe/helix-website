@@ -281,6 +281,8 @@ async function draw() {
 
   const userAgent = params.getAll(UA_KEY);
   const view = params.get('view') || 'week';
+  // TODO re-add. I think this should be a filter
+  // eslint-disable-next-line no-unused-vars
   const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
   const focus = params.get('focus');
 
@@ -344,11 +346,35 @@ async function draw() {
   const config = configs[view];
 
   timelinechart.config = config;
-  const { labels, datasets } = timelinechart.createChartData(filtered, endDate);
-  datasets.forEach((ds, i) => {
-    chart.data.datasets[i].data = ds.data;
-  });
-  chart.data.labels = labels;
+  timelinechart.useData(dataChunks);
+  timelinechart.defineSeries();
+
+  // group by date, according to the chart config
+  const group = dataChunks.group(timelinechart.groupBy);
+  const chartLabels = Object.keys(group).sort();
+
+  const iGoodCWVs = Object.entries(dataChunks.aggregates)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, totals]) => totals.iGoodCWV.weight);
+
+  const iNiCWVs = Object.entries(dataChunks.aggregates)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, totals]) => totals.iNiCWV.weight);
+
+  const iPoorCWVs = Object.entries(dataChunks.aggregates)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, totals]) => totals.iPoorCWV.weight);
+
+  const iNoCWVs = Object.entries(dataChunks.aggregates)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, totals]) => totals.iNoCWV.weight);
+
+  chart.data.datasets[1].data = iGoodCWVs;
+  chart.data.datasets[2].data = iNiCWVs;
+  chart.data.datasets[3].data = iPoorCWVs;
+  chart.data.datasets[0].data = iNoCWVs;
+
+  chart.data.labels = chartLabels;
   chart.options.scales.x.time.unit = config.unit;
   chart.update();
 

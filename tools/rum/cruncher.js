@@ -107,6 +107,9 @@ function groupFn(groupByFn) {
   };
 }
 
+/**
+ * @typedef {Object} Aggregate - an object that contains aggregate metrics
+ */
 class Aggregate {
   constructor(parent = null) {
     this.count = 0;
@@ -142,6 +145,19 @@ class Aggregate {
     const sorted = this.values.sort((left, right) => left - right);
     const index = Math.floor((p / 100) * sorted.length);
     return sorted[index];
+  }
+}
+
+class InterpolatedAggregate {
+  constructor(interpolationFn, sourceAggregates) {
+    this.interpolationFn = interpolationFn;
+    this.sourceAggregates = sourceAggregates;
+  }
+
+  get weight() {
+    const value = this.interpolationFn(this.sourceAggregates);
+    if (Number.isNaN(value)) return 0;
+    return value;
   }
 }
 
@@ -271,6 +287,7 @@ export class DataChunks {
 
   resetSeries() {
     this.series = {};
+    this.interpolations = {};
   }
 
   /**
@@ -290,6 +307,21 @@ export class DataChunks {
    */
   addSeries(seriesName, seriesValueFn) {
     this.series[seriesName] = seriesValueFn;
+  }
+
+  /**
+   * An interpolation is a series that is calulated based on the aggrega
+   * values of other series. The interpolation function will receive the
+   * list of source series and an interpolation function that will return
+   * the interpolated value.
+   * The interpolation function will have as many arguments as there are
+   * source series.
+   * @param {string} seriesName name of the (interpolated) series
+   * @param {string[]} sourceSeries list of source series to interpolate from
+   * @param {function(Object<string, Aggregate>)} interpolationFn
+   */
+  addInterpolation(seriesName, sourceSeries, interpolationFn) {
+    this.interpolations[seriesName] = { sourceSeries, interpolationFn };
   }
 
   resetFacets() {
@@ -443,7 +475,7 @@ export class DataChunks {
    * - percentile(p)
    * @returns {Object<string, Totals>} series data
    */
-  aggregate() {
+  get aggregates() {
     if (Object.keys(this.seriesIn).length) return this.seriesIn;
     this.seriesIn = Object.entries(this.groupedIn)
       .reduce((accOuter, [groupName, bundles]) => {
@@ -457,6 +489,20 @@ export class DataChunks {
             );
             return accInner;
           }, {});
+        // repeat, for interpolations
+        accOuter[groupName] = Object.entries(this.interpolations)
+          .reduce(
+            (accInner, [seriesName, { sourceSeries, interpolationFn }]) => {
+              const sourceAggregates = sourceSeries
+                .reduce((acc, sourceSeriesName) => {
+                  acc[sourceSeriesName] = accOuter[groupName][sourceSeriesName];
+                  return acc;
+                }, {});
+              accInner[seriesName] = new InterpolatedAggregate(interpolationFn, sourceAggregates);
+              return accInner;
+            },
+            accOuter[groupName],
+          );
         return accOuter;
       }, {});
     return this.seriesIn;
