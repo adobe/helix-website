@@ -24,6 +24,15 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const timelinechart = new CWVTimeLineChart();
 
+// set up metrics for dataChunks
+dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
+dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
+dataChunks.addSeries('conversions', (bundle) => (bundle.conversion ? bundle.weight : 0));
+dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
+dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
+dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
+dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
+
 function setDomain(domain, key) {
   DOMAIN = domain;
   DOMAIN_KEY = key;
@@ -335,7 +344,7 @@ async function draw() {
   const config = configs[view];
 
   timelinechart.config = config;
-  const { labels, datasets, stats } = timelinechart.createChartData(filtered, endDate);
+  const { labels, datasets } = timelinechart.createChartData(filtered, endDate);
   datasets.forEach((ds, i) => {
     chart.data.datasets[i].data = ds.data;
   });
@@ -346,36 +355,14 @@ async function draw() {
   // eslint-disable-next-line no-console
   console.log(`filtered to ${filtered.length} bundles in ${new Date() - startTime}ms`);
   updateFacets(facets, cwv, focus, mode, ph);
-  const statsKeys = Object.keys(stats);
-  // eslint-disable-next-line no-console
-  if (mode === 'all') console.log(stats);
-
-  const getP75 = (metric) => {
-    const cwvMetric = `cwv${metric.toUpperCase()}`;
-    const totalWeight = statsKeys.reduce((cv, nv) => (cv + stats[nv][metric].weight), 0);
-    const allBundles = [];
-    statsKeys.forEach((key) => allBundles.push(...stats[key][metric].bundles));
-    allBundles.sort((a, b) => a[cwvMetric] - b[cwvMetric]);
-    let p75Weight = totalWeight * 0.75;
-    let p75Value;
-    for (let i = 0; i < allBundles.length; i += 1) {
-      p75Weight -= allBundles[i].weight;
-      if (p75Weight < 0) {
-        p75Value = allBundles[i][cwvMetric];
-        break;
-      }
-    }
-    return (p75Value);
-  };
-
   const keyMetrics = {
-    pageViews: statsKeys.reduce((cv, nv) => cv + stats[nv].total, 0),
-    lcp: getP75('lcp'),
-    cls: getP75('cls'),
-    inp: getP75('inp'),
-    ttfb: getP75('ttfb'),
-    conversions: statsKeys.reduce((cv, nv) => cv + stats[nv].conversions, 0),
-    visits: statsKeys.reduce((cv, nv) => cv + stats[nv].visits, 0),
+    pageViews: dataChunks.totals.pageViews.sum,
+    lcp: dataChunks.totals.lcp.percentile(75),
+    cls: dataChunks.totals.cls.percentile(75),
+    inp: dataChunks.totals.inp.percentile(75),
+    ttfb: dataChunks.totals.ttfb.percentile(75),
+    conversions: dataChunks.totals.conversions.sum,
+    visits: dataChunks.totals.visits.sum,
   };
 
   updateKeyMetrics(keyMetrics);
