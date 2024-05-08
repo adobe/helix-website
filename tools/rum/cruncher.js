@@ -456,7 +456,15 @@ export class DataChunks {
    */
   group(groupByFn) {
     this.groupedIn = this.filteredIn.reduce(groupFn(groupByFn), {});
-    this.groupedOut = this.filteredOut.reduce(groupFn(groupByFn), {});
+    if (groupByFn.fillerFn) {
+      // fill in the gaps, as sometimes there is no data for a group
+      // so we need to add an empty array for that group
+      const allGroups = groupByFn.fillerFn(Object.keys(this.groupedIn));
+      this.groupedIn = allGroups.reduce((acc, group) => {
+        acc[group] = this.groupedIn[group] || [];
+        return acc;
+      }, {});
+    }
     return this.groupedIn;
   }
 

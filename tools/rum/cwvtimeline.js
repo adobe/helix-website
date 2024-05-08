@@ -44,7 +44,7 @@ export default class CWVTimeLineChart {
    * @returns {function} A function that can group the data bundles
    */
   get groupBy() {
-    return (bundle) => {
+    const groupFn = (bundle) => {
       const slotTime = new Date(bundle.timeSlot);
       slotTime.setMinutes(0);
       slotTime.setSeconds(0);
@@ -53,6 +53,29 @@ export default class CWVTimeLineChart {
       if (this.chartConfig.unit === 'month') slotTime.setDate(1);
       return toISOStringWithTimezone(slotTime);
     };
+
+    groupFn.fillerFn = () => {
+      const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
+      // set start date depending on the unit
+      const startDate = new Date(endDate);
+      if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 31);
+      if (this.chartConfig.unit === 'week') startDate.setDate(endDate.getDate() - 7);
+      if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 12);
+      const slots = new Set();
+      const slotTime = new Date(startDate);
+      slotTime.setMinutes(0);
+      slotTime.setSeconds(0);
+      if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
+      while (slotTime <= endDate) {
+        slots.add(toISOStringWithTimezone(slotTime));
+        if (this.chartConfig.unit === 'day') slotTime.setDate(slotTime.getDate() + 1);
+        if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
+        if (this.chartConfig.unit === 'month') slotTime.setMonth(slotTime.getMonth() + 1);
+      }
+      return Array.from(slots);
+    };
+
+    return groupFn;
   }
 
   useData(dataChunks) {

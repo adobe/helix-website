@@ -328,18 +328,21 @@ async function draw() {
       unit: 'day',
       units: 30,
       focus,
+      endDate,
     },
     week: {
       view,
       unit: 'hour',
       units: 24 * 7,
       focus,
+      endDate,
     },
     year: {
       view,
       unit: 'week',
       units: 52,
       focus,
+      endDate,
     },
   };
 
