@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-relative-packages
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import { filterBundle, DataChunks } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
