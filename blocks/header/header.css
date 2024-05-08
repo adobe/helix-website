@@ -656,6 +656,7 @@ button.gnav-toggle::after {
   .franklin .gnav-mainnav.with-search,
   .gnav-brand-wrapper {
     border-bottom: 1px solid #eaeaea;
+    display: flex;
   }
 
   .franklin .gnav .gnav-mainnav,
