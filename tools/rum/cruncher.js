@@ -272,6 +272,21 @@ export class DataChunks {
     this.series = {};
   }
 
+  /**
+   * A series value function calculates the series value of a bundle.
+   * If no value is returned, then the bundle will not be considered
+   * for the series.
+   * @function seriesValueFn
+   * @param {Bundle} bundle the bundle to calculate the series value for
+   * @returns {number|undefined} the series value or undefined
+   */
+  /**
+   * A series is a named list of values, which are calculated
+   * for each bundle in the data set.
+   * @param {string} seriesName name of the series
+   * @param {seriesValueFn} seriesValueFn function that returns the series value
+   * for each bundle
+   */
   addSeries(seriesName, seriesValueFn) {
     this.series[seriesName] = seriesValueFn;
   }
