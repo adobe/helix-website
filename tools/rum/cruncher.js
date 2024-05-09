@@ -265,7 +265,7 @@ class Facet {
    * - max
    * - mean
    * - percentile(p)
-   * @returns {Object} metrics
+   * @returns {Aggregate} metrics
    */
   get metrics() {
     if (this.entries.length === 0) return {};
@@ -359,10 +359,9 @@ export class DataChunks {
   resetData() {
     // data that has been filtered
     this.filteredIn = [];
-    this.filteredOut = [];
+    this.filters = {};
     // filtered data that has been grouped
     this.groupedIn = {};
-    this.groupedOut = {};
     // grouped data that has been aggregated
     this.seriesIn = {};
     this.seriesOut = {};
@@ -418,18 +417,54 @@ export class DataChunks {
    */
 
   /**
-   * Splits the data into two groups: filteredIn and filteredOut
-   * based on the criteria in the filterFn. Most downstream
-   * functions will only need the filteredIn data.
-   * @param {bundleFilter} filterFn
-   * @returns {Bundle[]} all bundles that passed the filter
+   * Defines what filter to apply to the data. The filter
+   * is an object that specifies the valid values for each
+   * defined facet.
+   * Filter values are the same values that can get returned
+   * by the `valueFn` that has been added with `addFacet`.
+   * @param {Object<string, string[]>} filterSpec the filter specification
    */
-  filter(filterFn) {
-    this.resetData();
-    this.bundleFilterFn = filterFn;
-    this.filteredIn = this.bundles.filter(filterFn);
-    // TODO: enable filterOut when we don't have filter functions
-    // with side effects anymore
+  set filter(filterSpec) {
+    this.filters = filterSpec;
+    // reset filter cache
+    this.filteredIn = [];
+  }
+
+  /**
+   * @private
+   * @param {Bundle[]} bundles
+   * @param {Object<string, string[]>} filterSpec
+   * @param {string[]} skipped facets to skip
+   */
+  filterBundles(bundles, filterSpec, skipped = []) {
+    const filterBy = Object.entries(filterSpec) // use the full filter spec
+      .filter(([facetName]) => !skipped.includes(facetName)) // except for skipped facets
+      .filter(([, filterValues]) => filterValues.length) // and filters that accept no values
+      .filter(([facetName]) => this.facetFns[facetName]); // and facets that don't exist
+    return bundles.filter((bundle) => {
+      const matches = filterBy.map(([facetName, values]) => {
+        // get the facet values for the bundle, remember that
+        // a facet can return multiple values
+        const facetValue = this.facetFns[facetName](bundle);
+        const facetValues = Array.isArray(facetValue) ? facetValue : [facetValue];
+        // check if any of the values match
+        return values.some((value) => facetValues.includes(value));
+      });
+      // only if all active filters have a match, then the bundle is included
+      return matches.every((match) => match);
+    });
+  }
+
+  filterBy(filterSpec) {
+    this.filter = filterSpec;
+    return this.filtered;
+  }
+
+  get filtered() {
+    if (this.filteredIn.length) return this.filteredIn;
+    if (Object.keys(this.filters).length === 0) return this.bundles; // no filter, return all
+    if (Object.keys(this.facetFns).length === 0) return this.bundles; // no facets, return all
+    this.filteredIn = this.filterBundles(this.bundles, this.filters);
     return this.filteredIn;
   }
 
@@ -447,15 +482,12 @@ export class DataChunks {
    * should return a string that will be used as the key for
    * the group. If the groupFn returns a falsy value, the
    * bundle will be skipped.
-   * We will group the data into two objects: groupedIn and
-   * groupedOut. Most downstream functions will only need the
-   * groupedIn data.
    * @param {groupByFn} groupByFn for each object, determine the group key
    * @returns {Object<string, Bundle[]>} grouped data, each key is a group
    * and each vaule is an array of bundles
    */
   group(groupByFn) {
-    this.groupedIn = this.filteredIn.reduce(groupFn(groupByFn), {});
+    this.groupedIn = this.filtered.reduce(groupFn(groupByFn), {});
     if (groupByFn.fillerFn) {
       // fill in the gaps, as sometimes there is no data for a group
       // so we need to add an empty array for that group
@@ -541,7 +573,7 @@ export class DataChunks {
     if (Object.keys(this.totalsIn).length) return this.totalsIn;
     const parentTotals = Object.entries(this.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filteredIn.reduce(
+        acc[seriesName] = this.filtered.reduce(
           aggregateFn(valueFn),
           new Aggregate(),
         );
@@ -549,7 +581,7 @@ export class DataChunks {
       }, {});
     this.totalsIn = Object.entries(this.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filteredIn.reduce(
+        acc[seriesName] = this.filtered.reduce(
           aggregateFn(valueFn),
           new Aggregate(parentTotals[seriesName]),
         );
@@ -581,7 +613,12 @@ export class DataChunks {
 
     this.facetsIn = Object.entries(this.facetFns)
       .reduce((accOuter, [facetName, facetValueFn]) => {
-        const groupedByFacetIn = this.bundles.reduce(groupFn(facetValueFn), {});
+        const groupedByFacetIn = this
+          // we filter the bundles by all active filters,
+          // except for the current facet (we want to see)
+          // all values here.
+          .filterBundles(this.bundles, this.filters, [facetName])
+          .reduce(groupFn(facetValueFn), {});
         accOuter[facetName] = Object.entries(groupedByFacetIn)
           .reduce((accInner, [facetValue, bundles]) => {
             accInner.push(bundles

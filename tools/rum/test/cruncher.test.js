@@ -294,12 +294,24 @@ describe('DataChunks', () => {
     d.load(chunks1);
     d.addData(chunks2);
 
-    const filteredAll = d.filter(() => true);
-    const filteredNone = d.filter(() => false);
-    const filteredOne = d.filter((bundle) => bundle.id === 'one');
-    assert.equal(filteredAll.length, 2);
-    assert.equal(filteredNone.length, 0);
-    assert.equal(filteredOne.length, 1);
+    d.addFacet('all', () => 'true');
+    d.addFacet('none', () => 'false');
+    d.addFacet('id', (bundle) => bundle.id);
+
+    d.filter = {
+      all: ['true'],
+    };
+    assert.equal(d.filtered.length, 2);
+
+    d.filter = {
+      none: ['true'],
+    };
+    assert.equal(d.filtered.length, 0);
+
+    d.filter = {
+      id: ['one'],
+    };
+    assert.equal(d.filtered.length, 1);
   });
 
   it('DataChunk.group()', () => {
@@ -344,8 +356,6 @@ describe('DataChunks', () => {
     ];
     const d = new DataChunks();
     d.load(chunks1);
-    // remember to call filter at least once.
-    d.filter(() => true);
     const grouped = d.group((bundle) => bundle.id);
     assert.equal(grouped.one.length, 1);
     assert.equal(grouped.two.length, 1);
@@ -399,8 +409,6 @@ describe('DataChunks', () => {
     ];
     const d = new DataChunks();
     d.load(chunks1);
-    // remember to call filter at least once.
-    d.filter(() => true);
 
     // define two series
     d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
@@ -460,8 +468,6 @@ describe('DataChunks', () => {
     ];
     const d = new DataChunks();
     d.load(chunks1);
-    // remember to call filter at least once.
-    d.filter(() => true);
 
     // define two series
     d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
@@ -554,7 +560,6 @@ describe('DataChunks', () => {
     // we will later use subfacets, so let's pretend we are most interested in the
     // top checkpoint
     const eventFilterFn = (e) => e.checkpoint === 'top';
-    d.filter((bundle) => bundle.events.find(eventFilterFn));
 
     // define two series
     d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
@@ -584,6 +589,11 @@ describe('DataChunks', () => {
       // filter out events that are not interesting
       .filter(eventFilterFn)
       .map((e) => e.source).filter((t) => t));
+
+    // set an example filter
+    d.filter = {
+      host: ['www.aem.live'],
+    };
 
     // get facets and subfacets
     const { subfacets, facets } = d;
