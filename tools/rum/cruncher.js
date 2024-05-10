@@ -157,86 +157,48 @@ class InterpolatedAggregate {
     return value;
   }
 }
+/**
+ * The error function, also known as the Gauss error function.
+ * @param {number} x the value to calculate the error function for
+ */
+function erf(x1) {
+  // save the sign of x
+  const sign = x1 >= 0 ? 1 : -1;
+  const x = Math.abs(x1);
 
-function tDistributionCDF(t, df) {
-  // Calculate the cumulative distribution function (CDF) of the t-distribution
-  const x = t / Math.sqrt(df);
-  const a1 = 1 / Math.sqrt(df);
-  const a2 = x ** 2 / df;
-  const a3 = x ** 2 / (df + x ** 2);
+  // constants
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
 
-  const a4 = x ** 2 / (df + 2 * x ** 2);
-  const a5 = x ** 2 / (df + 3 * x ** 2);
-  const a6 = x ** 2 / (df + 4 * x ** 2);
+  // A&S formula 7.1.26
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
-  const a7 = x ** 2 / (df + 5 * x ** 2);
-  const a8 = x ** 2 / (df + 6 * x ** 2);
-  const a9 = x ** 2 / (df + 7 * x ** 2);
-
-  const a10 = x ** 2 / (df + 8 * x ** 2);
-  const a11 = x ** 2 / (df + 9 * x ** 2);
-  const a12 = x ** 2 / (df + 10 * x ** 2);
-
-  const a13 = x ** 2 / (df + 11 * x ** 2);
-  const a14 = x ** 2 / (df + 12 * x ** 2);
-  const a15 = x ** 2 / (df + 13 * x ** 2);
-
-  const a16 = x ** 2 / (df + 14 * x ** 2);
-  const a17 = x ** 2 / (df + 15 * x ** 2);
-  const a18 = x ** 2 / (df + 16 * x ** 2);
-  const a19 = x ** 2 / (df + 17 * x ** 2);
-  const a20 = x ** 2 / (df + 18 * x ** 2);
-  const a21 = x ** 2 / (df + 19 * x ** 2);
-  const a22 = x ** 2 / (df + 20 * x ** 2);
-
-  const cdf = 0.5 + (
-    x
-    * (1
-      - a1
-      + a2
-      - a3
-      + a4
-      - a5
-      + a6
-      - a7
-      + a8
-      - a9
-      + a10
-      - a11
-      + a12
-      - a13
-      + a14
-      - a15
-      + a16
-      - a17
-      + a18
-      - a19
-      + a20
-      - a21
-      + a22));
-
-  return cdf;
+  return sign * y;
 }
 
-export function pValue(arr1, arr2) {
-  // Calculate the means of the two arrays
-  const mean1 = arr1.reduce((sum, num) => sum + num, 0) / arr1.length;
-  const mean2 = arr2.reduce((sum, num) => sum + num, 0) / arr2.length;
-
-  // Calculate the standard deviations of the two arrays
-  const variance1 = arr1.reduce((sum, num) => sum + (num - mean1) ** 2, 0) / arr1.length;
-  const variance2 = arr2.reduce((sum, num) => sum + (num - mean2) ** 2, 0) / arr2.length;
-
-  // Calculate the test statistic
-  const testStatistic = (mean1 - mean2)
-    / Math.sqrt((variance1 / arr1.length) + (variance2 / arr2.length));
-
-  // Calculate the degrees of freedom
-  const degreesOfFreedom = arr1.length + arr2.length - 2;
-
-  // Calculate the p-value using the t-distribution
-  const p = 2 * (1 - tDistributionCDF(Math.abs(testStatistic), degreesOfFreedom));
-
+/**
+ * Performs a significance test on the data. The test assumes
+ * that the data is normally distributed and will calculate
+ * the p-value for the difference between the two data sets.
+ * @param {number[]} left the first data set
+ * @param {number[]} right the second data set
+ * @returns {number} the p-value, a value between 0 and 1
+ */
+export function pValue(left, right) {
+  const meanLeft = left.reduce((acc, value) => acc + value, 0) / left.length;
+  const meanRight = right.reduce((acc, value) => acc + value, 0) / right.length;
+  const varianceLeft = left.reduce((acc, value) => acc + (value - meanLeft) ** 2, 0) / left.length;
+  const varianceRight = right
+    .reduce((acc, value) => acc + (value - meanRight) ** 2, 0) / right.length;
+  const pooledVariance = (varianceLeft + varianceRight) / 2;
+  const tValue = (meanLeft - meanRight) / Math
+    .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
+  const p = 1 - (0.5 + 0.5 * erf(tValue / Math.sqrt(2)));
   return p;
 }
 

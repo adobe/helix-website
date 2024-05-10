@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-relative-packages
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { DataChunks } from './cruncher.js';
+import { DataChunks, pValue } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, UA_KEY, scoreCWV } from './utils.js';
@@ -162,17 +162,28 @@ function updateFacets(focus, mode, placeholders, show = {}) {
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
 
+          async function addSignificanceFlag(element, metric, baseline) {
+            const p = pValue(metric.values, baseline.values);
+            if (p < 0.05) {
+              element.classList.add('significant');
+            } else if (p < 0.1) {
+              element.classList.add('interesting');
+            }
+            element.dataset.pValue = p;
+          }
+
           const CWVDISPLAYTHRESHOLD = 10;
           // display core web vital to facets
           // add lcp
           let lcp = '-';
           let lcpScore = '';
+          const lcpLI = document.createElement('li');
           if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
             const lcpValue = entry.metrics.lcp.percentile(75);
             lcp = `${toHumanReadable(lcpValue / 1000)} s`;
             lcpScore = scoreCWV(lcpValue, 'lcp');
+            addSignificanceFlag(lcpLI, entry.metrics.lcp, dataChunks.totals.lcp);
           }
-          const lcpLI = document.createElement('li');
           lcpLI.classList.add(`score-${lcpScore}`);
           lcpLI.textContent = lcp;
           ul.append(lcpLI);
@@ -180,12 +191,13 @@ function updateFacets(focus, mode, placeholders, show = {}) {
           // add cls
           let cls = '-';
           let clsScore = '';
+          const clsLI = document.createElement('li');
           if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
             const clsValue = entry.metrics.cls.percentile(75);
             cls = `${toHumanReadable(clsValue)}`;
             clsScore = scoreCWV(clsValue, 'cls');
+            addSignificanceFlag(clsLI, entry.metrics.cls, dataChunks.totals.cls);
           }
-          const clsLI = document.createElement('li');
           clsLI.classList.add(`score-${clsScore}`);
           clsLI.textContent = cls;
           ul.append(clsLI);
@@ -193,12 +205,14 @@ function updateFacets(focus, mode, placeholders, show = {}) {
           // add inp
           let inp = '-';
           let inpScore = '';
+          const inpLI = document.createElement('li');
           if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
             const inpValue = entry.metrics.inp.percentile(75);
             inp = `${toHumanReadable(inpValue / 1000)} s`;
             inpScore = scoreCWV(inpValue, 'inp');
+            addSignificanceFlag(inpLI, entry.metrics.inp, dataChunks.totals.inp);
           }
-          const inpLI = document.createElement('li');
+
           inpLI.classList.add(`score-${inpScore}`);
           inpLI.textContent = inp;
           ul.append(inpLI);
