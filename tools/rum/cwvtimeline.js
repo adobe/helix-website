@@ -63,7 +63,7 @@ export default class CWVTimeLineChart {
       const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
       // set start date depending on the unit
       const startDate = new Date(endDate);
-      if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 31);
+      if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
       if (this.chartConfig.unit === 'week') startDate.setDate(endDate.getDate() - 7);
       if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 12);
       const slots = new Set();
