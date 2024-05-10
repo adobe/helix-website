@@ -33,6 +33,21 @@ dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
 
+const facetDecorators = {
+  userAgent: {
+    label: 'User Agent (Operating System and Browser)',
+  },
+  url: {
+    label: 'URL',
+  },
+  checkpoint: {
+    label: 'Checkpoint',
+  },
+  filter: {
+    hidden: true,
+  },
+};
+
 function setDomain(domain, key) {
   DOMAIN = domain;
   DOMAIN_KEY = key;
@@ -97,7 +112,9 @@ function updateFacets(focus, mode, placeholders, show = {}) {
   const url = new URL(window.location);
 
   elems.facetsElement.textContent = '';
-  const keys = Object.keys(dataChunks.facets);
+  const keys = Object.keys(dataChunks.facets)
+    // only show facets that have no decorators or are not hidden
+    .filter((key) => !facetDecorators[key] || !facetDecorators[key].hidden);
   keys.forEach((facetName) => {
     const facetEntries = dataChunks.facets[facetName];
     const optionKeys = facetEntries.map((f) => f.value);
@@ -106,7 +123,7 @@ function updateFacets(focus, mode, placeholders, show = {}) {
       const fieldSet = document.createElement('fieldset');
       fieldSet.classList.add(`facet-${facetName}`);
       const legend = document.createElement('legend');
-      legend.textContent = facetName;
+      legend.textContent = facetDecorators[facetName]?.label || facetName;
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
       legend.append(clipboard);
