@@ -556,10 +556,6 @@ describe('DataChunks', () => {
     ];
     const d = new DataChunks();
     d.load(chunks1);
-    // remember to call filter at least once.
-    // we will later use subfacets, so let's pretend we are most interested in the
-    // top checkpoint
-    const eventFilterFn = (e) => e.checkpoint === 'top';
 
     // define two series
     d.addSeries('toptime', (bundle) => bundle.events.find((e) => e.checkpoint === 'top')?.timeDelta);
@@ -579,24 +575,13 @@ describe('DataChunks', () => {
       }, []);
     });
 
-    // add all source and target values as subfacets
-    d.addSubFacet('target', (bundle) => bundle.events
-      // filter out events that are not interesting
-      // – this will need to be done based on the UI filters
-      .filter(eventFilterFn)
-      .map((e) => e.target).filter((t) => t), eventFilterFn);
-    d.addSubFacet('source', (bundle) => bundle.events
-      // filter out events that are not interesting
-      .filter(eventFilterFn)
-      .map((e) => e.source).filter((t) => t));
-
     // set an example filter
     d.filter = {
       host: ['www.aem.live'],
     };
 
-    // get facets and subfacets
-    const { subfacets, facets } = d;
+    // get facets
+    const { facets } = d;
 
     // the first level of aggregation is by facet
     assert.deepEqual(Object.keys(facets), ['host', 'url', 'userAgent']);
@@ -613,12 +598,6 @@ describe('DataChunks', () => {
       'desktop:windows',
       'mobile',
       'mobile:ios',
-    ]);
-
-    assert.deepEqual(Object.keys(subfacets), ['target', 'source']);
-    assert.deepEqual(subfacets.target.map((f) => f.value), [
-      'visible',
-      'hidden',
     ]);
   });
 

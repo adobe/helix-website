@@ -286,7 +286,6 @@ export class DataChunks {
 
   resetFacets() {
     this.facetFns = {};
-    this.subfacetFns = {};
   }
 
   /**
@@ -304,17 +303,6 @@ export class DataChunks {
    * @param {Event} event the event to check
    * @returns {boolean} true if the event should be included
    */
-  /**
-   * A subfacet function works on the data that has been filtered
-   * @param {string} facetName name of the facet
-   * @param {groupByFn} facetValueFn  function that returns the facet value –
-   * @param {eventFilterFn} filterFn function that filters events to be considered
-   * can return multiple values
-   */
-  addSubFacet(facetName, facetValueFn, filterFn) {
-    this.subfacetFns[facetName] = facetValueFn;
-    this.subfacetFns[facetName].filter = filterFn;
-  }
 
   resetData() {
     // data that has been filtered
@@ -327,8 +315,6 @@ export class DataChunks {
     this.totalsIn = {};
     // facets[series]
     this.facetsIn = {};
-    // subfacets[facet][series]
-    this.subfacetsIn = {};
     // memoziaton
     this.memo = {};
   }
@@ -586,47 +572,4 @@ export class DataChunks {
       }, {});
     return this.facetsIn;
   }
-
-  /**
-   * Calculates subfacets for the filtered data.
-   * Other than facets, which operate on bundle-level data,
-   * subfacets operate on event-level data.
-   * For each function
-   * added through `addFacet`, it will determine the most common
-   * values, their frequency and their weight. The result will
-   * be an object with one key for each facet, containing an array
-   * of facet objects.
-   * @returns {Object<string, Facet[]>} facets data
-   */
-  get subfacets() {
-    if (Object.keys(this.subfacetsIn).length) return this.subfacetsIn;
-
-    const f = (facet, bundle) => {
-      // add the bundle to the entries
-      // so that we can calculate metrics
-      // later on
-      facet.entries.push(bundle);
-      facet.count += 1;
-      facet.weight += bundle.weight;
-      return facet;
-    };
-
-    this.subfacetsIn = Object.entries(this.subfacetFns)
-      .reduce((accOuter, [facetName, facetValueFn]) => {
-        const groupedByFacetIn = this.bundles.reduce(groupFn(facetValueFn), {});
-        accOuter[facetName] = Object.entries(groupedByFacetIn)
-          .reduce((accInner, [facetValue, bundles]) => {
-            accInner.push(bundles
-              .reduce(f, new Facet(this, facetValue, facetName)));
-            // sort the entries by weight, descending
-            accInner.sort((left, right) => right.weight - left.weight);
-            return accInner;
-          }, []);
-        return accOuter;
-      }, {});
-    return this.subfacetsIn;
-  }
-  // do we need subfacet aggregation?
-  // i.e. when a checkpoint has been picked, do we need to
-  // split out facets by source, target, value?
 }
