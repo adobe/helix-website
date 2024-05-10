@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-relative-packages
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { filterBundle, DataChunks } from './cruncher.js';
+import { DataChunks } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, UA_KEY, scoreCWV } from './utils.js';
@@ -288,37 +288,6 @@ async function draw() {
     [UA_KEY]: userAgent,
   };
 
-  filter.fn = (bundle) => {
-    // include all by default
-    let matched = true;
-    // new filter function, without side effects
-    // poor man's full text search
-    if (
-      matched
-      && filter.text
-      && JSON.stringify(bundle).indexOf(filter.text) > -1
-    ) matched = true;
-    if (
-      matched
-      && filter.checkpoint.length
-      && filter.checkpoint.find((fcp) => (bundle.events.find((evt) => evt.checkpoint === fcp)))
-    ) matched = true;
-    if (
-      matched
-      && filter.url.length
-      && filter.url.find((furl) => bundle.url === furl)
-    ) matched = true;
-    if (
-      matched
-      && filter.userAgent.length
-      // fuzzy user agent matching
-      && filter.userAgent.find((fua) => bundle.userAgent && bundle.userAgent.startsWith(fua))
-    ) matched = true;
-    // TODO: filter by checkpoint.source and checkpoint.target
-    // return the result
-    return matched;
-  };
-
   checkpoint.forEach((cp) => {
     const props = ['target', 'source', 'value'];
     props.forEach((prop) => {
@@ -329,16 +298,7 @@ async function draw() {
     });
   });
 
-  const facets = {
-    [UA_KEY]: {},
-    url: {},
-    checkpoint: {},
-  };
-
   const startTime = new Date();
-  const cwv = structuredClone(facets);
-
-  const filtered = dataChunks.filter((bundle) => filterBundle(bundle, filter, facets, cwv));
 
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
@@ -353,7 +313,36 @@ async function draw() {
     return acc;
   }, new Set())));
 
-  if (filtered.length < 1000) {
+  // this is a bad name, fulltext would be better
+  // but I'm keeping it for compatibility reasons
+  dataChunks.addFacet('filter', (bundle) => {
+    // this function is also a bit weird, because it takes
+    // the filtertext into consideration
+    const fullText = JSON.stringify(bundle).toLowerCase();
+    const matching = filterText.split(' ').filter((word) => fullText.indexOf(word) > -1);
+    if (matching.length) {
+      matching.push('*');
+    }
+    return matching;
+  });
+
+  // todo: add full text facet
+
+  // set up filter from URL parameters
+  dataChunks.filter = params
+    .entries()
+    .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
+      || key === 'userAgent'
+      || key === 'filter'
+      || key === 'url'
+      || key === 'checkpoint')
+    .reduce((acc, [key, value]) => {
+      if (acc[key]) acc[key].push(value);
+      else acc[key] = [value];
+      return acc;
+    }, {});
+
+  if (dataChunks.filtered.length < 1000) {
     elems.lowDataWarning.ariaHidden = 'false';
   } else {
     elems.lowDataWarning.ariaHidden = 'true';
@@ -419,7 +408,7 @@ async function draw() {
   chart.update();
 
   // eslint-disable-next-line no-console
-  console.log(`filtered to ${filtered.length} bundles in ${new Date() - startTime}ms`);
+  console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
   updateFacets(focus, mode, ph);
   const keyMetrics = {
     pageViews: dataChunks.totals.pageViews.sum,

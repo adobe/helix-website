@@ -621,4 +621,100 @@ describe('DataChunks', () => {
       'hidden',
     ]);
   });
+
+  it('DataChunk.filter(userAgent)', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/developer/tutorial',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 100,
+              },
+            ],
+          },
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'click',
+              },
+            ],
+          },
+          {
+            id: 'three',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'mobile:ios',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'viewmedia',
+                target: 'some_image.png',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+
+    // define facet functions
+    d.addFacet('userAgent', (bundle) => {
+      const parts = bundle.userAgent.split(':');
+      return parts.reduce((acc, _, i) => {
+        acc.push(parts.slice(0, i + 1).join(':'));
+        return acc;
+      }, []);
+    });
+
+    // set an example filter
+    d.filter = {
+      host: ['www.aem.live'],
+      userAgent: ['desktop'],
+    };
+
+    assert.equal(d.filtered.length, 2);
+
+    // get facets and subfacets
+    const { facets } = d;
+
+    // one entry can create multiple facets, if the facet function returns an array
+    // so that desktop can include all desktop:* variants
+    assert.deepEqual(facets.userAgent.map((f) => f.value), [
+      'desktop',
+      'desktop:windows',
+      'mobile',
+      'mobile:ios',
+    ]);
+  });
 });
