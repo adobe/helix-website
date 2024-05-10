@@ -3,7 +3,7 @@ import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import { DataChunks, pValue } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
-import { toHumanReadable, UA_KEY, scoreCWV } from './utils.js';
+import { toHumanReadable, scoreCWV } from './utils.js';
 
 /* globals */
 let DOMAIN_KEY = '';
@@ -45,6 +45,33 @@ const facetDecorators = {
   },
   filter: {
     hidden: true,
+  },
+  'click.source': {
+    label: 'Clicked Element (CSS Selector)',
+  },
+  'click.target': {
+    label: 'Click Target (URL)',
+  },
+  'utm.source': {
+    label: 'Campaign Tracking Parameter',
+  },
+  'utm.utm_medium.target': {
+    label: 'Medium',
+  },
+  'utm.utm_campaign.target': {
+    label: 'Campaign',
+  },
+  'utm.utm_content.target': {
+    label: 'Content',
+  },
+  'utm.utm_term.target': {
+    label: 'Term',
+  },
+  'utm.utm_source.target': {
+    label: 'Source',
+  },
+  'utm.utm_keyword.target': {
+    label: 'Keyword',
   },
 };
 
@@ -300,11 +327,8 @@ async function draw() {
   const ph = await fetchPlaceholders('/tools/rum');
   const params = new URL(window.location).searchParams;
   const checkpoint = params.getAll('checkpoint');
-  const target = params.getAll('target');
-  const url = params.getAll('url');
   const mode = params.get('metrics');
 
-  const userAgent = params.getAll(UA_KEY);
   const view = params.get('view') || 'week';
   // TODO re-add. I think this should be a filter
   // eslint-disable-next-line no-unused-vars
@@ -312,25 +336,10 @@ async function draw() {
   const focus = params.get('focus');
 
   const filterText = params.get('filter') || '';
-  const filter = {
-    text: filterText,
-    checkpoint,
-    target,
-    url,
-    [UA_KEY]: userAgent,
-  };
-
-  checkpoint.forEach((cp) => {
-    const props = ['target', 'source', 'value'];
-    props.forEach((prop) => {
-      const values = params.getAll(`${cp}.${prop}`);
-      if (values.length) {
-        filter[`${cp}.${prop}`] = values;
-      }
-    });
-  });
 
   const startTime = new Date();
+
+  dataChunks.resetFacets();
 
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
@@ -358,7 +367,35 @@ async function draw() {
     return matching;
   });
 
-  // todo: add full text facet
+  // if we have a checkpoint filter, then we also want facets for
+  // source and target
+  checkpoint
+    .forEach((cp) => {
+      dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
+        bundle.events
+          .filter((evt) => evt.checkpoint === cp)
+          .filter(({ source }) => source) // filter out empty sources
+          .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
+      ));
+      if (cp !== 'utm') { // utm.target is different from the other checkpoints
+        dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === cp)
+            .filter(({ target }) => target) // filter out empty targets
+            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+        ));
+      } else if (params.has('utm.source')) {
+        params.getAll('utm.source').forEach((utmsource) => {
+          dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
+            bundle.events
+              .filter((evt) => evt.checkpoint === 'utm')
+              .filter((evt) => evt.source === utmsource)
+              .filter((evt) => evt.target)
+              .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+          ));
+        });
+      }
+    });
 
   // set up filter from URL parameters
   dataChunks.filter = params
@@ -367,6 +404,8 @@ async function draw() {
       || key === 'userAgent'
       || key === 'filter'
       || key === 'url'
+      || key.endsWith('.source')
+      || key.endsWith('.target')
       || key === 'checkpoint')
     .reduce((acc, [key, value]) => {
       if (acc[key]) acc[key].push(value);

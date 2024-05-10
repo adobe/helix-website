@@ -342,6 +342,14 @@ fieldset li[class$="-"] {
   opacity: 0.2;
 }
 
+fieldset li.interesting {
+  border-width: 2px;
+}
+
+fieldset li.significant {
+  border-width: 3px;
+}
+
 fieldset li::after {
   content: ' ';
   background-color: currentcolor;
