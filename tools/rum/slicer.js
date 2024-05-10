@@ -232,7 +232,7 @@ export function updateState() {
   window.history.replaceState({}, '', url);
 }
 
-sidebar.addEventListener('facetchange', () => {
+sidebar.addEventListener('change', () => {
   updateState();
   draw();
 });
