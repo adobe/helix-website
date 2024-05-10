@@ -162,11 +162,12 @@ function updateFacets(focus, mode, placeholders, show = {}) {
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
 
+          const CWVDISPLAYTHRESHOLD = 10;
           // display core web vital to facets
           // add lcp
           let lcp = '-';
           let lcpScore = '';
-          if (entry.metrics.lcp) {
+          if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
             const lcpValue = entry.metrics.lcp.percentile(75);
             lcp = `${toHumanReadable(lcpValue / 1000)} s`;
             lcpScore = scoreCWV(lcpValue, 'lcp');
@@ -179,7 +180,7 @@ function updateFacets(focus, mode, placeholders, show = {}) {
           // add cls
           let cls = '-';
           let clsScore = '';
-          if (entry.metrics.cls) {
+          if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
             const clsValue = entry.metrics.cls.percentile(75);
             cls = `${toHumanReadable(clsValue)}`;
             clsScore = scoreCWV(clsValue, 'cls');
@@ -192,7 +193,7 @@ function updateFacets(focus, mode, placeholders, show = {}) {
           // add inp
           let inp = '-';
           let inpScore = '';
-          if (entry.metrics.inp) {
+          if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
             const inpValue = entry.metrics.inp.percentile(75);
             inp = `${toHumanReadable(inpValue / 1000)} s`;
             inpScore = scoreCWV(inpValue, 'inp');
