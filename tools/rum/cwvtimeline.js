@@ -1,7 +1,9 @@
 /*
  * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
  */
-import { toISOStringWithTimezone, scoreBundle, scoreCWV } from './utils.js';
+import {
+  toISOStringWithTimezone, scoreBundle, scoreCWV, toHumanReadable,
+} from './utils.js';
 
 const INTERPOLATION_THRESHOLD = 10;
 function cwvInterpolationFn(targetMetric, interpolateTo100) {
@@ -28,8 +30,11 @@ function cwvInterpolationFn(targetMetric, interpolateTo100) {
 }
 // todo
 export default class CWVTimeLineChart {
-  constructor(config) {
-    this.chartConfig = config;
+  constructor(dataChunks, elems) {
+    this.chartConfig = {};
+    this.dataChunks = dataChunks;
+    this.elems = elems;
+    this.chart = {};
   }
 
   set config(config) {
@@ -80,6 +85,117 @@ export default class CWVTimeLineChart {
 
   useData(dataChunks) {
     this.dataChunks = dataChunks;
+  }
+
+  render() {
+    // eslint-disable-next-line no-undef
+    this.chart = new Chart(this.elems.canvas, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'No CVW',
+          backgroundColor: '#888',
+          data: [],
+        },
+        {
+          label: 'Good',
+          backgroundColor: '#49cc93',
+          data: [],
+        },
+        {
+          label: 'Needs Improvement',
+          backgroundColor: '#ffa037',
+          data: [],
+        },
+        {
+          label: 'Poor',
+          backgroundColor: '#ff7c65',
+          data: [],
+        }],
+      },
+      plugins: [
+        {
+          id: 'customCanvasBackgroundColor',
+          beforeDraw: (ch, _, options) => {
+            const { ctx } = ch;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = options.color || '#99ffff';
+            ctx.fillRect(0, 0, ch.width, ch.height);
+            ctx.restore();
+          },
+        },
+      ],
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          customCanvasBackgroundColor: {
+            color: 'white',
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const { datasets } = context.chart.data;
+                const value = context.parsed.y;
+                const i = context.dataIndex;
+                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
+
+                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+              },
+            },
+          },
+        },
+        interaction: {
+          mode: 'x',
+        },
+        animation: {
+          duration: 300,
+        },
+        datasets: {
+          bar: {
+            barPercentage: 1,
+            categoryPercentage: 0.9,
+            borderSkipped: false,
+            borderRadius: {
+              topLeft: 3,
+              topRight: 3,
+              bottomLeft: 3,
+              bottomRight: 3,
+            },
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            display: true,
+            offset: true,
+            time: {
+              displayFormats: {
+                day: 'EEE, MMM d',
+              },
+              unit: 'day',
+            },
+            stacked: true,
+            ticks: {
+              minRotation: 90,
+              maxRotation: 90,
+              autoSkip: false,
+            },
+          },
+          y: {
+            stacked: true,
+            ticks: {
+              callback: (value) => toHumanReadable(value),
+            },
+          },
+        },
+      },
+    });
   }
 
   /**
@@ -151,5 +267,79 @@ export default class CWVTimeLineChart {
         return 0;
       },
     );
+  }
+
+  async draw() {
+    const params = new URL(window.location).searchParams;
+    const view = params.get('view') || 'week';
+    // TODO re-add. I think this should be a filter
+    // eslint-disable-next-line no-unused-vars
+    const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
+    const focus = params.get('focus');
+
+    if (this.dataChunks.filtered.length < 1000) {
+      this.elems.lowDataWarning.ariaHidden = 'false';
+    } else {
+      this.elems.lowDataWarning.ariaHidden = 'true';
+    }
+
+    const configs = {
+      month: {
+        view,
+        unit: 'day',
+        units: 30,
+        focus,
+        endDate,
+      },
+      week: {
+        view,
+        unit: 'hour',
+        units: 24 * 7,
+        focus,
+        endDate,
+      },
+      year: {
+        view,
+        unit: 'week',
+        units: 52,
+        focus,
+        endDate,
+      },
+    };
+
+    const config = configs[view];
+
+    this.config = config;
+    this.useData(this.dataChunks);
+    this.defineSeries();
+
+    // group by date, according to the chart config
+    const group = this.dataChunks.group(this.groupBy);
+    const chartLabels = Object.keys(group).sort();
+
+    const iGoodCWVs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iGoodCWV.weight);
+
+    const iNiCWVs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iNiCWV.weight);
+
+    const iPoorCWVs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iPoorCWV.weight);
+
+    const iNoCWVs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iNoCWV.weight);
+
+    this.chart.data.datasets[1].data = iGoodCWVs;
+    this.chart.data.datasets[2].data = iNiCWVs;
+    this.chart.data.datasets[3].data = iPoorCWVs;
+    this.chart.data.datasets[0].data = iNoCWVs;
+
+    this.chart.data.labels = chartLabels;
+    this.chart.options.scales.x.time.unit = config.unit;
+    this.chart.update();
   }
 }

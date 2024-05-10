@@ -1,28 +1,30 @@
 // eslint-disable-next-line import/no-relative-packages
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import { DataChunks, pValue } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
+// eslint-disable-next-line import/no-relative-packages
+import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
+
 /* globals */
 let DOMAIN_KEY = '';
 let DOMAIN = 'www.thinktanked.org';
-let chart;
+
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
 // const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
 // const UA_KEY = 'user_agent';
 
-const elems = {};
+export const elems = {};
 
-const dataChunks = new DataChunks();
+export const dataChunks = new DataChunks();
 
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const timelinechart = new CWVTimeLineChart();
+export const timelinechart = new CWVTimeLineChart(dataChunks, elems);
 
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
@@ -83,8 +85,7 @@ function setDomain(domain, key) {
 }
 
 /* update UX */
-
-function updateKeyMetrics(keyMetrics) {
+export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
@@ -106,7 +107,7 @@ function updateKeyMetrics(keyMetrics) {
   ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
 
-function updateFacets(focus, mode, placeholders, show = {}) {
+export function updateFacets(focus, mode, placeholders, show = {}) {
   const createLabelHTML = (labelText, usePlaceholders) => {
     if (labelText.startsWith('https://') && labelText.includes('media_')) {
       return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
@@ -308,39 +309,8 @@ function updateFacets(focus, mode, placeholders, show = {}) {
   });
 }
 
-async function fetchDomainKey(domain) {
-  try {
-    const auth = localStorage.getItem('rum-bundler-token');
-    const resp = await fetch(`https://rum.fastly-aem.page/domainkey/${domain}`, {
-      headers: {
-        authorization: `Bearer ${auth}`,
-      },
-    });
-    const json = await resp.json();
-    return (json.domainkey);
-  } catch {
-    return '';
-  }
-}
-
-async function draw() {
-  const ph = await fetchPlaceholders('/tools/rum');
-  const params = new URL(window.location).searchParams;
-  const checkpoint = params.getAll('checkpoint');
-  const mode = params.get('metrics');
-
-  const view = params.get('view') || 'week';
-  // TODO re-add. I think this should be a filter
-  // eslint-disable-next-line no-unused-vars
-  const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
-  const focus = params.get('focus');
-
-  const filterText = params.get('filter') || '';
-
-  const startTime = new Date();
-
+function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
-
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
     return parts.reduce((acc, _, i) => {
@@ -400,13 +370,14 @@ async function draw() {
         });
       }
     });
+}
 
-  // set up filter from URL parameters
+function updateFilter(params, filterText) {
   dataChunks.filter = params
     .entries()
     .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
       || key === 'userAgent'
-      || key === 'filter'
+      || (key === 'filter' && filterText.length > 2)
       || key === 'url'
       || key.endsWith('.source')
       || key.endsWith('.target')
@@ -416,76 +387,27 @@ async function draw() {
       else acc[key] = [value];
       return acc;
     }, {});
+}
 
-  if (dataChunks.filtered.length < 1000) {
-    elems.lowDataWarning.ariaHidden = 'false';
-  } else {
-    elems.lowDataWarning.ariaHidden = 'true';
-  }
+async function draw() {
+  const ph = await fetchPlaceholders('/tools/rum');
+  const params = new URL(window.location).searchParams;
+  const checkpoint = params.getAll('checkpoint');
 
-  const configs = {
-    month: {
-      view,
-      unit: 'day',
-      units: 30,
-      focus,
-      endDate,
-    },
-    week: {
-      view,
-      unit: 'hour',
-      units: 24 * 7,
-      focus,
-      endDate,
-    },
-    year: {
-      view,
-      unit: 'week',
-      units: 52,
-      focus,
-      endDate,
-    },
-  };
+  const filterText = params.get('filter') || '';
 
-  const config = configs[view];
+  const startTime = new Date();
 
-  timelinechart.config = config;
-  timelinechart.useData(dataChunks);
-  timelinechart.defineSeries();
+  updateDataFacets(filterText, params, checkpoint);
 
-  // group by date, according to the chart config
-  const group = dataChunks.group(timelinechart.groupBy);
-  const chartLabels = Object.keys(group).sort();
+  // set up filter from URL parameters
+  updateFilter(params, filterText);
 
-  const iGoodCWVs = Object.entries(dataChunks.aggregates)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, totals]) => totals.iGoodCWV.weight);
-
-  const iNiCWVs = Object.entries(dataChunks.aggregates)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, totals]) => totals.iNiCWV.weight);
-
-  const iPoorCWVs = Object.entries(dataChunks.aggregates)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, totals]) => totals.iPoorCWV.weight);
-
-  const iNoCWVs = Object.entries(dataChunks.aggregates)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, totals]) => totals.iNoCWV.weight);
-
-  chart.data.datasets[1].data = iGoodCWVs;
-  chart.data.datasets[2].data = iNiCWVs;
-  chart.data.datasets[3].data = iPoorCWVs;
-  chart.data.datasets[0].data = iNoCWVs;
-
-  chart.data.labels = chartLabels;
-  chart.options.scales.x.time.unit = config.unit;
-  chart.update();
-
-  // eslint-disable-next-line no-console
   console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
-  updateFacets(focus, mode, ph);
-  const keyMetrics = {
+
+  await timelinechart.draw();
+
+  updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
     cls: dataChunks.totals.cls.percentile(75),
@@ -493,9 +415,26 @@ async function draw() {
     ttfb: dataChunks.totals.ttfb.percentile(75),
     conversions: dataChunks.totals.conversions.sum,
     visits: dataChunks.totals.visits.sum,
-  };
+  });
 
-  updateKeyMetrics(keyMetrics);
+  const focus = params.get('focus');
+  const mode = params.get('metrics');
+  updateFacets(focus, mode, ph);
+}
+
+async function fetchDomainKey(domain) {
+  try {
+    const auth = localStorage.getItem('rum-bundler-token');
+    const resp = await fetch(`https://rum.fastly-aem.page/domainkey/${domain}`, {
+      headers: {
+        authorization: `Bearer ${auth}`,
+      },
+    });
+    const json = await resp.json();
+    return (json.domainkey);
+  } catch {
+    return '';
+  }
 }
 
 async function loadData(scope) {
@@ -618,114 +557,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
 
-    // eslint-disable-next-line no-undef, no-new
-    chart = new Chart(elems.canvas, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'No CVW',
-          backgroundColor: '#888',
-          data: [],
-        },
-        {
-          label: 'Good',
-          backgroundColor: '#49cc93',
-          data: [],
-        },
-        {
-          label: 'Needs Improvement',
-          backgroundColor: '#ffa037',
-          data: [],
-        },
-        {
-          label: 'Poor',
-          backgroundColor: '#ff7c65',
-          data: [],
-        }],
-      },
-      plugins: [
-        {
-          id: 'customCanvasBackgroundColor',
-          beforeDraw: (ch, args, options) => {
-            const { ctx } = ch;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = options.color || '#99ffff';
-            ctx.fillRect(0, 0, ch.width, ch.height);
-            ctx.restore();
-          },
-        },
-      ],
-      options: {
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          customCanvasBackgroundColor: {
-            color: 'white',
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const { datasets } = context.chart.data;
-                const value = context.parsed.y;
-                const i = context.dataIndex;
-                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
-
-                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
-              },
-            },
-          },
-        },
-        interaction: {
-          mode: 'x',
-        },
-        animation: {
-          duration: 300,
-        },
-        datasets: {
-          bar: {
-            barPercentage: 1,
-            categoryPercentage: 0.9,
-            borderSkipped: false,
-            borderRadius: {
-              topLeft: 3,
-              topRight: 3,
-              bottomLeft: 3,
-              bottomRight: 3,
-            },
-          },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            type: 'time',
-            display: true,
-            offset: true,
-            time: {
-              displayFormats: {
-                day: 'EEE, MMM d',
-              },
-              unit: 'day',
-            },
-            stacked: true,
-            ticks: {
-              minRotation: 90,
-              maxRotation: 90,
-              autoSkip: false,
-            },
-          },
-          y: {
-            stacked: true,
-            ticks: {
-              callback: (value) => toHumanReadable(value),
-            },
-          },
-        },
-      },
-    });
+    timelinechart.render();
 
     const params = new URL(window.location).searchParams;
     elems.filterInput.value = params.get('filter');
