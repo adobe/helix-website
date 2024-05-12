@@ -12,6 +12,75 @@
 /* eslint-disable no-console, no-alert */
 
 (() => {
+  /**
+   * Returns the share URL for the sidekick extension.
+   * @private
+   * @param {Object} config The sidekick configuration
+   * @returns {string} The share URL
+   */
+  function getShareUrl(config) {
+    const { owner, repo, ref } = config;
+    const shareUrl = new URL('https://www.hlx.live/tools/sidekick/');
+    shareUrl.search = new URLSearchParams([
+      ['giturl', `https://github.com/${owner}/${repo}/tree/${ref}`],
+    ]).toString();
+    return shareUrl.toString();
+  }
+
+  /**
+   * Warns the bookmarklet user about the deprecation of the
+   * sidekick bookmarklet.
+   * @private
+   */
+  function showDeprecationWarning() {
+    const EXT_HINT = 'hlxSidekickBookmarkletDeprecation';
+
+    // respect user choice
+    if (window.sessionStorage.getItem(EXT_HINT)) {
+      return;
+    }
+
+    const browsers = ['Chrome', 'Safari'];
+    const message = 'The Sidekick bookmarklet has been deprecated. Switch to the {{browser}} extension today to stay productive!';
+    const shareUrl = getShareUrl(window.hlx.sidekickConfig);
+    const installButtonText = 'Install now';
+    const laterButtonText = 'Remind me tomorrow';
+
+    const browser = browsers.find((b) => navigator.userAgent.includes(b));
+    if (!browser || navigator.userAgent.includes('Headless')) {
+      return;
+    }
+
+    // show extension hint
+    window.hlx.sidekick.showHelp({
+      id: EXT_HINT,
+      steps: [{
+        message: message.replace('{{browser}}', browser),
+      }],
+    });
+
+    const showAgainSoon = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
+
+    const okHandler = () => {
+      window.open(shareUrl);
+      showAgainSoon();
+    };
+
+    const helpActions = window.hlx.sidekick.shadowRoot
+      .querySelector('.hlx-sk-overlay .modal .help-actions');
+
+    const okButton = helpActions.querySelector('button');
+    okButton.textContent = installButtonText;
+    okButton.title = installButtonText;
+    okButton.addEventListener('click', okHandler);
+    okButton.focus();
+
+    const laterButton = document.createElement('button');
+    laterButton.textContent = laterButtonText;
+    laterButton.addEventListener('click', showAgainSoon);
+    helpActions.append(laterButton);
+  }
+
   if (!window.hlx || !window.hlx.sidekick) {
     window.hlx = window.hlx || {};
     const appScript = document.getElementById('hlx-sk-app');
@@ -34,6 +103,9 @@
         window.hlx.sidekickConfig = baseConfig;
         window.hlx.initSidekick();
       }
+      window.hlx.sidekick.addEventListener('statusfetched', () => {
+        showDeprecationWarning();
+      }, { once: true });
     });
     document.head.append(moduleScript);
   } else if (window.hlx.sidekick) {
