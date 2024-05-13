@@ -67,3 +67,10 @@
   font-family: adobe-clean, 'Trebuchet MS', sans-serif;
   flex: 0 1 auto;
 }
+
+.sidekick-generator p > .icon svg {
+  box-sizing: border-box;
+  height: 24px;
+  margin-bottom: -5px;
+  margin-right: 4px;
+}
