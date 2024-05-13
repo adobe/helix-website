@@ -64,18 +64,25 @@ export default class CWVTimeLineChart {
       // set start date depending on the unit
       const startDate = new Date(endDate);
       if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
-      if (this.chartConfig.unit === 'week') startDate.setDate(endDate.getDate() - 7);
+      if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
       if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 12);
       const slots = new Set();
       const slotTime = new Date(startDate);
       slotTime.setMinutes(0);
       slotTime.setSeconds(0);
       if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
+      // return Array.from(slots);
+      let maxSlots = 1000;
       while (slotTime <= endDate) {
         slots.add(toISOStringWithTimezone(slotTime));
         if (this.chartConfig.unit === 'day') slotTime.setDate(slotTime.getDate() + 1);
-        if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
+        if (this.chartConfig.unit === 'hour') slotTime.setHours(slotTime.getHours() + 1);
         if (this.chartConfig.unit === 'month') slotTime.setMonth(slotTime.getMonth() + 1);
+        maxSlots -= 1;
+        if (maxSlots < 0) {
+          console.error('Too many slots');
+          break;
+        }
       }
       return Array.from(slots);
     };
