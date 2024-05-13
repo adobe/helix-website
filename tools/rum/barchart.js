@@ -1,7 +1,15 @@
+import {
+  Chart, LinearScale, registerables,
+  // eslint-disable-next-line import/no-unresolved, import/extensions
+} from 'https://cdn.skypack.dev/chart.js@4.2.0';
+// eslint-disable-next-line import/no-unresolved, import/extensions
+import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
 import AbstractChart from './chart.js';
 import {
   toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn,
 } from './utils.js';
+
+Chart.register(LinearScale, ...registerables);
 
 const INTERPOLATION_THRESHOLD = 10;
 export default class BarChart extends AbstractChart {

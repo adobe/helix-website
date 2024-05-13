@@ -2,11 +2,20 @@
  * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
  */
 import {
+  Chart, TimeScale, LinearScale, registerables,
+  // eslint-disable-next-line import/no-unresolved, import/extensions
+} from 'https://cdn.skypack.dev/chart.js@4.2.0';
+// eslint-disable-next-line import/no-unresolved, import/extensions
+import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
+import {
   toISOStringWithTimezone,
   INTERPOLATION_THRESHOLD,
   scoreBundle, scoreCWV, toHumanReadable, cwvInterpolationFn,
 } from './utils.js';
 import AbstractChart from './chart.js';
+
+Chart.register(TimeScale, LinearScale, ...registerables);
+
 // todo
 export default class CWVTimeLineChart extends AbstractChart {
   /**
