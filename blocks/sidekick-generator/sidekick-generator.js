@@ -1,6 +1,7 @@
 import createTag from '../../utils/tag.js';
 
 const browserExtensionSupported = [
+  'edg',
   'chrome',
   'safari',
 ].find((b) => window.navigator.userAgent.toLowerCase().includes(b));
@@ -140,7 +141,7 @@ export default async function decorate(el) {
       webStoreIcon.src = '/img/chrome.svg';
       chromeLink.prepend(webStoreIcon);
       chromeLink.setAttribute('target', '_blank');
-      if (!['chrome', 'edge'].includes(browserExtensionSupported)) {
+      if (!['chrome', 'edg'].includes(browserExtensionSupported)) {
         chromeLink.parentElement.parentElement.classList.add('hidden');
       }
     }

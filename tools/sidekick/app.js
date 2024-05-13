@@ -20,7 +20,7 @@
    */
   function getShareUrl(config) {
     const { owner, repo, ref } = config;
-    const shareUrl = new URL('https://www.hlx.live/tools/sidekick/');
+    const shareUrl = new URL('https://www.aem.live/tools/sidekick/');
     shareUrl.search = new URLSearchParams([
       ['giturl', `https://github.com/${owner}/${repo}/tree/${ref}`],
     ]).toString();
@@ -41,14 +41,12 @@
       return;
     }
 
-    const browsers = ['Chrome', 'Safari'];
-    const browser = browsers.find((b) => navigator.userAgent.includes(b));
-    if (!browser || navigator.userAgent.includes('Headless')) {
+    if (navigator.userAgent.includes('Headless')) {
       return;
     }
 
     const installUrl = getShareUrl(window.hlx.sidekickConfig);
-    const installButtonText = 'Install extension now';
+    const installButtonText = 'Install now';
     const laterButtonText = 'Remind me tomorrow';
 
     const remindLater = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
@@ -77,7 +75,7 @@
     window.hlx.sidekick.showModal(
       [
         'The Sidekick bookmarklet has been deprecated.',
-        `Switch to the ${browser} extension today to stay productive.`,
+        `Switch to the Sidekick extension today to stay productive.`,
         buttonGroup,
       ],
       true,
