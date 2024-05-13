@@ -6,6 +6,7 @@ export function scoreValue(value, ni, poor) {
 }
 
 export function scoreCWV(value, name) {
+  if (!value) return null;
   const limits = {
     lcp: [2500, 4000],
     cls: [0.1, 0.25],
@@ -14,7 +15,8 @@ export function scoreCWV(value, name) {
   };
   return scoreValue(value, ...limits[name]);
 }
-export const UA_KEY = 'userAgent'; export function toHumanReadable(num) {
+export const UA_KEY = 'userAgent';
+export function toHumanReadable(num) {
   const dp = 3;
   let number = num;
   const thresh = 1000;
@@ -47,4 +49,18 @@ export const UA_KEY = 'userAgent'; export function toHumanReadable(num) {
   };
 
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
+}
+export function scoreBundle(bundle) {
+  // a bundle is good if all CWV that have a value are good
+  // a bundle is ni if all CWV that have a value are ni or good
+  // a bundle is poor if any CWV that have a value are poor
+  // a bundle has no CWV if no CWV have a value
+  const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
+  const scores = cwv
+    .filter((metric) => bundle[metric])
+    .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)));
+  if (scores.length === 0) return null;
+  if (scores.every((s) => s === 'good')) return 'good';
+  if (scores.every((s) => s !== 'poor')) return 'ni';
+  return 'poor';
 }

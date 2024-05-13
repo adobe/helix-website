@@ -1,13 +1,17 @@
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { filterBundle, DataChunks } from './cruncher.js';
+// eslint-disable-next-line import/no-relative-packages
+import { DataChunks } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
 import DataLoader from './loader.js';
-import { toHumanReadable, UA_KEY, scoreCWV } from './utils.js';
+import { toHumanReadable, scoreCWV } from './utils.js';
+
+// eslint-disable-next-line import/no-relative-packages
+import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import FacetSidebar from './facetsidebar.js';
 
 /* globals */
 let DOMAIN_KEY = '';
 let DOMAIN = 'www.thinktanked.org';
-let chart;
+
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
@@ -21,7 +25,17 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const timelinechart = new CWVTimeLineChart();
+const timelinechart = new CWVTimeLineChart(dataChunks, elems);
+const sidebar = new FacetSidebar(dataChunks, elems);
+
+// set up metrics for dataChunks
+dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
+dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
+dataChunks.addSeries('conversions', (bundle) => (bundle.conversion ? bundle.weight : 0));
+dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
+dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
+dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
+dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
 
 function setDomain(domain, key) {
   DOMAIN = domain;
@@ -31,8 +45,7 @@ function setDomain(domain, key) {
 }
 
 /* update UX */
-
-function updateKeyMetrics(keyMetrics) {
+export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
@@ -54,196 +67,117 @@ function updateKeyMetrics(keyMetrics) {
   ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
 
-function updateFacets(facets, cwv, focus, mode, ph, show = {}) {
-  const numOptions = mode === 'all' ? 20 : 10;
-  const filterTags = document.querySelector('.filter-tags');
-  filterTags.textContent = '';
-  const addFilterTag = (name, value) => {
-    const tag = document.createElement('span');
-    if (value) tag.textContent = `${name}: ${value}`;
-    else tag.textContent = `${name}`;
-    tag.classList.add(`filter-tag-${name}`);
-    filterTags.append(tag);
-  };
-
-  if (elems.filterInput.value) addFilterTag('text', elems.filterInput.value);
-  if (focus) addFilterTag(focus);
-
-  const url = new URL(window.location);
-
-  elems.facetsElement.textContent = '';
-  const keys = Object.keys(facets);
-  keys.forEach((facetName) => {
-    const facet = facets[facetName];
-    const optionKeys = Object.keys(facet);
-    if (optionKeys.length) {
-      let tsv = '';
-      const fieldSet = document.createElement('fieldset');
-      fieldSet.classList.add(`facet-${facetName}`);
-      const legend = document.createElement('legend');
-      legend.textContent = facetName;
-      const clipboard = document.createElement('span');
-      clipboard.className = 'clipboard';
-      legend.append(clipboard);
-      fieldSet.append(legend);
-      tsv += `${facetName}\tcount\tlcp\tcls\tinp\r\n`;
-      optionKeys.sort((a, b) => facet[b] - facet[a]);
-      const filterKeys = facetName === 'checkpoint' && mode !== 'all';
-      const filteredKeys = filterKeys ? optionKeys.filter((a) => !!(ph[a])) : optionKeys;
-      const nbToShow = show[facetName] || numOptions;
-      filteredKeys.forEach((optionKey, i) => {
-        if (i < nbToShow) {
-          const optionValue = facet[optionKey];
-          const div = document.createElement('div');
-          const input = document.createElement('input');
-          input.type = 'checkbox';
-          input.value = optionKey;
-          input.checked = url.searchParams.getAll(facetName).includes(optionKey);
-          if (input.checked) {
-            addFilterTag(facetName, optionKey);
-            div.ariaSelected = true;
-          }
-          input.id = `${facetName}=${optionKey}`;
-          div.addEventListener('click', (evt) => {
-            if (evt.target !== input) input.checked = !input.checked;
-            evt.stopPropagation();
-            // eslint-disable-next-line no-use-before-define
-            updateState();
-            // eslint-disable-next-line no-use-before-define
-            draw();
-          });
-          const createLabelHTML = (labelText, usePlaceholders) => {
-            if (labelText.startsWith('https://') && labelText.includes('media_')) {
-              return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
-            }
-
-            if (labelText.startsWith('https://')) {
-              return `<a href="${labelText}" target="_new">${labelText}</a>`;
-            }
-
-            if (usePlaceholders && ph[labelText]) {
-              return (`${ph[labelText]} [${labelText}]`);
-            }
-            return (labelText);
-          };
-
-          const label = document.createElement('label');
-          label.setAttribute('for', `${facetName}-${optionKey}`);
-          label.innerHTML = `${createLabelHTML(optionKey, facetName === 'checkpoint')} (${toHumanReadable(optionValue)})`;
-
-          const getP75 = (metric) => {
-            const cwvMetric = `cwv${metric.toUpperCase()}`;
-            const optionMetric = cwv[facetName][optionKey][metric];
-            optionMetric.bundles.sort((a, b) => a[cwvMetric] - b[cwvMetric]);
-            let p75Weight = optionMetric.weight * 0.75;
-            let p75Value;
-            for (let j = 0; j < optionMetric.bundles.length; j += 1) {
-              p75Weight -= optionMetric.bundles[j].weight;
-              if (p75Weight < 0) {
-                p75Value = optionMetric.bundles[j][cwvMetric];
-                break;
-              }
-            }
-            return (p75Value);
-          };
-
-          const ul = document.createElement('ul');
-          ul.classList.add('cwv');
-
-          // display core web vital to facets
-          if (cwv[facetName]) {
-            // add lcp
-            let lcp = '-';
-            let lcpScore = '';
-            if (cwv[facetName][optionKey] && cwv[facetName][optionKey].lcp) {
-              const lcpValue = getP75('lcp');
-              lcp = `${toHumanReadable(lcpValue / 1000)} s`;
-              lcpScore = scoreCWV(lcpValue, 'lcp');
-            }
-            const lcpLI = document.createElement('li');
-            lcpLI.classList.add(`score-${lcpScore}`);
-            lcpLI.textContent = lcp;
-            ul.append(lcpLI);
-
-            // add cls
-            let cls = '-';
-            let clsScore = '';
-            if (cwv[facetName][optionKey] && cwv[facetName][optionKey].cls) {
-              const clsValue = getP75('cls');
-              cls = `${toHumanReadable(clsValue)}`;
-              clsScore = scoreCWV(clsValue, 'cls');
-            }
-            const clsLI = document.createElement('li');
-            clsLI.classList.add(`score-${clsScore}`);
-            clsLI.textContent = cls;
-            ul.append(clsLI);
-
-            // add inp
-            let inp = '-';
-            let inpScore = '';
-            if (cwv[facetName][optionKey] && cwv[facetName][optionKey].inp) {
-              const inpValue = getP75('inp');
-              inp = `${toHumanReadable(inpValue / 1000)} s`;
-              inpScore = scoreCWV(inpValue, 'inp');
-            }
-            const inpLI = document.createElement('li');
-            inpLI.classList.add(`score-${inpScore}`);
-            inpLI.textContent = inp;
-            ul.append(inpLI);
-            tsv += `${optionKey}\t${optionValue}\t${lcp}\t${cls}\t${inp}\r\n`;
-          }
-          div.append(input, label, ul);
-          fieldSet.append(div);
-        } else if (i < 100) {
-          tsv += `${optionKey}\t${facet[optionKey]}\t\t\t\r\n`;
-        }
-      });
-
-      if (filteredKeys.length > nbToShow) {
-        // add "more" link
-        const div = document.createElement('div');
-        div.className = 'load-more';
-        const more = document.createElement('label');
-        more.textContent = 'more...';
-        more.addEventListener('click', (evt) => {
-          evt.preventDefault();
-          // increase number of keys shown
-          updateFacets(
-            facets,
-            cwv,
-            focus,
-            mode,
-            ph,
-            { [facetName]: (show[facetName] || numOptions) + numOptions },
-          );
-        });
-
-        div.append(more);
-
-        const all = document.createElement('label');
-        all.textContent = `all (${filteredKeys.length})`;
-        all.addEventListener('click', (evt) => {
-          evt.preventDefault();
-          // increase number of keys shown
-          updateFacets(facets, cwv, focus, mode, ph, { [facetName]: filteredKeys.length });
-        });
-        div.append(all);
-        const container = document.createElement('div');
-        container.classList.add('more-container');
-        container.append(div);
-        fieldSet.append(container);
-      }
-
-      legend.addEventListener('click', () => {
-        navigator.clipboard.writeText(tsv);
-        const toast = document.getElementById('copied-toast');
-        toast.ariaHidden = false;
-        setTimeout(() => { toast.ariaHidden = true; }, 3000);
-      });
-
-      elems.facetsElement.append(fieldSet);
-    }
+function updateDataFacets(filterText, params, checkpoint) {
+  dataChunks.resetFacets();
+  dataChunks.addFacet('userAgent', (bundle) => {
+    const parts = bundle.userAgent.split(':');
+    return parts.reduce((acc, _, i) => {
+      acc.push(parts.slice(0, i + 1).join(':'));
+      return acc;
+    }, []);
   });
+  dataChunks.addFacet('url', (bundle) => bundle.url);
+  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
+    acc.add(evt.checkpoint);
+    return acc;
+  }, new Set())));
+
+  // this is a bad name, fulltext would be better
+  // but I'm keeping it for compatibility reasons
+  dataChunks.addFacet('filter', (bundle) => {
+    // this function is also a bit weird, because it takes
+    // the filtertext into consideration
+    const fullText = JSON.stringify(bundle).toLowerCase();
+    const keywords = filterText
+      .split(' ')
+      .filter((word) => word.length > 2);
+    const matching = keywords
+      .filter((word) => fullText.indexOf(word) > -1);
+    if (matching.length === keywords.length && filterText.length > 2) {
+      matching.push(params.get('filter'));
+    }
+    return matching;
+  });
+
+  // if we have a checkpoint filter, then we also want facets for
+  // source and target
+  checkpoint
+    .forEach((cp) => {
+      dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
+        bundle.events
+          .filter((evt) => evt.checkpoint === cp)
+          .filter(({ source }) => source) // filter out empty sources
+          .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
+      ));
+      if (cp !== 'utm') { // utm.target is different from the other checkpoints
+        dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === cp)
+            .filter(({ target }) => target) // filter out empty targets
+            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+        ));
+      } else if (params.has('utm.source')) {
+        params.getAll('utm.source').forEach((utmsource) => {
+          dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
+            bundle.events
+              .filter((evt) => evt.checkpoint === 'utm')
+              .filter((evt) => evt.source === utmsource)
+              .filter((evt) => evt.target)
+              .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+          ));
+        });
+      }
+    });
+}
+
+function updateFilter(params, filterText) {
+  dataChunks.filter = params
+    .entries()
+    .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
+      || key === 'userAgent'
+      || (key === 'filter' && filterText.length > 2)
+      || key === 'url'
+      || key.endsWith('.source')
+      || key.endsWith('.target')
+      || key === 'checkpoint')
+    .reduce((acc, [key, value]) => {
+      if (acc[key]) acc[key].push(value);
+      else acc[key] = [value];
+      return acc;
+    }, {});
+}
+
+export async function draw() {
+  const ph = await fetchPlaceholders('/tools/rum');
+  const params = new URL(window.location).searchParams;
+  const checkpoint = params.getAll('checkpoint');
+
+  const filterText = params.get('filter') || '';
+
+  const startTime = new Date();
+
+  updateDataFacets(filterText, params, checkpoint);
+
+  // set up filter from URL parameters
+  updateFilter(params, filterText);
+
+  console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
+
+  await timelinechart.draw();
+
+  updateKeyMetrics({
+    pageViews: dataChunks.totals.pageViews.sum,
+    lcp: dataChunks.totals.lcp.percentile(75),
+    cls: dataChunks.totals.cls.percentile(75),
+    inp: dataChunks.totals.inp.percentile(75),
+    ttfb: dataChunks.totals.ttfb.percentile(75),
+    conversions: dataChunks.totals.conversions.sum,
+    visits: dataChunks.totals.visits.sum,
+  });
+
+  const focus = params.get('focus');
+  const mode = params.get('metrics');
+  sidebar.updateFacets(focus, mode, ph);
 }
 
 async function fetchDomainKey(domain) {
@@ -259,125 +193,6 @@ async function fetchDomainKey(domain) {
   } catch {
     return '';
   }
-}
-
-async function draw() {
-  const ph = await fetchPlaceholders('/tools/rum');
-  const params = new URL(window.location).searchParams;
-  const checkpoint = params.getAll('checkpoint');
-  const target = params.getAll('target');
-  const url = params.getAll('url');
-  const mode = params.get('metrics');
-
-  const userAgent = params.getAll(UA_KEY);
-  const view = params.get('view') || 'week';
-  const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
-  const focus = params.get('focus');
-
-  const filterText = params.get('filter') || '';
-  const filter = {
-    text: filterText,
-    checkpoint,
-    target,
-    url,
-    [UA_KEY]: userAgent,
-  };
-
-  checkpoint.forEach((cp) => {
-    const props = ['target', 'source', 'value'];
-    props.forEach((prop) => {
-      const values = params.getAll(`${cp}.${prop}`);
-      if (values.length) {
-        filter[`${cp}.${prop}`] = values;
-      }
-    });
-  });
-
-  const facets = {
-    [UA_KEY]: {},
-    url: {},
-    checkpoint: {},
-  };
-
-  const startTime = new Date();
-  const cwv = structuredClone(facets);
-
-  const filtered = dataChunks.filter((bundle) => filterBundle(bundle, filter, facets, cwv));
-
-  if (filtered.length < 1000) {
-    elems.lowDataWarning.ariaHidden = 'false';
-  } else {
-    elems.lowDataWarning.ariaHidden = 'true';
-  }
-
-  const configs = {
-    month: {
-      view,
-      unit: 'day',
-      units: 30,
-      focus,
-    },
-    week: {
-      view,
-      unit: 'hour',
-      units: 24 * 7,
-      focus,
-    },
-    year: {
-      view,
-      unit: 'week',
-      units: 52,
-      focus,
-    },
-  };
-
-  const config = configs[view];
-
-  timelinechart.config = config;
-  const { labels, datasets, stats } = timelinechart.createChartData(filtered, endDate);
-  datasets.forEach((ds, i) => {
-    chart.data.datasets[i].data = ds.data;
-  });
-  chart.data.labels = labels;
-  chart.options.scales.x.time.unit = config.unit;
-  chart.update();
-
-  // eslint-disable-next-line no-console
-  console.log(`filtered to ${filtered.length} bundles in ${new Date() - startTime}ms`);
-  updateFacets(facets, cwv, focus, mode, ph);
-  const statsKeys = Object.keys(stats);
-  // eslint-disable-next-line no-console
-  if (mode === 'all') console.log(stats);
-
-  const getP75 = (metric) => {
-    const cwvMetric = `cwv${metric.toUpperCase()}`;
-    const totalWeight = statsKeys.reduce((cv, nv) => (cv + stats[nv][metric].weight), 0);
-    const allBundles = [];
-    statsKeys.forEach((key) => allBundles.push(...stats[key][metric].bundles));
-    allBundles.sort((a, b) => a[cwvMetric] - b[cwvMetric]);
-    let p75Weight = totalWeight * 0.75;
-    let p75Value;
-    for (let i = 0; i < allBundles.length; i += 1) {
-      p75Weight -= allBundles[i].weight;
-      if (p75Weight < 0) {
-        p75Value = allBundles[i][cwvMetric];
-        break;
-      }
-    }
-    return (p75Value);
-  };
-
-  const keyMetrics = {
-    pageViews: statsKeys.reduce((cv, nv) => cv + stats[nv].total, 0),
-    lcp: getP75('lcp'),
-    cls: getP75('cls'),
-    inp: getP75('inp'),
-    ttfb: getP75('ttfb'),
-    conversions: statsKeys.reduce((cv, nv) => cv + stats[nv].conversions, 0),
-    visits: statsKeys.reduce((cv, nv) => cv + stats[nv].visits, 0),
-  };
-
-  updateKeyMetrics(keyMetrics);
 }
 
 async function loadData(scope) {
@@ -397,7 +212,7 @@ async function loadData(scope) {
   draw();
 }
 
-function updateState() {
+export function updateState() {
   const url = new URL(window.location.href.split('?')[0]);
   const { searchParams } = new URL(window.location.href);
   url.searchParams.set('domain', DOMAIN);
@@ -416,6 +231,11 @@ function updateState() {
   url.searchParams.set('domainkey', DOMAIN_KEY);
   window.history.replaceState({}, '', url);
 }
+
+sidebar.addEventListener('change', () => {
+  updateState();
+  draw();
+});
 
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
@@ -480,134 +300,19 @@ const io = new IntersectionObserver((entries) => {
   </figcaption>
 </figure>
 </div>
-
-<div class="filters">
-  <div class="quick-filter">
-  <input type="text" id="filter" placeholder="Type to filter...">
-  </div>
-  <aside id="facets">
-  </aside>
-</div>
 `;
 
     const main = document.querySelector('main');
     main.innerHTML = mainInnerHTML;
 
+    main.append(sidebar.rootElement);
+
     elems.viewSelect = document.getElementById('view');
-    elems.filterInput = document.getElementById('filter');
-    elems.facetsElement = document.getElementById('facets');
     elems.canvas = document.getElementById('time-series');
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
 
-    // eslint-disable-next-line no-undef, no-new
-    chart = new Chart(elems.canvas, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'No CVW',
-          backgroundColor: '#888',
-          data: [],
-        },
-        {
-          label: 'Good',
-          backgroundColor: '#49cc93',
-          data: [],
-        },
-        {
-          label: 'Needs Improvement',
-          backgroundColor: '#ffa037',
-          data: [],
-        },
-        {
-          label: 'Poor',
-          backgroundColor: '#ff7c65',
-          data: [],
-        }],
-      },
-      plugins: [
-        {
-          id: 'customCanvasBackgroundColor',
-          beforeDraw: (ch, args, options) => {
-            const { ctx } = ch;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = options.color || '#99ffff';
-            ctx.fillRect(0, 0, ch.width, ch.height);
-            ctx.restore();
-          },
-        },
-      ],
-      options: {
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          customCanvasBackgroundColor: {
-            color: 'white',
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const { datasets } = context.chart.data;
-                const value = context.parsed.y;
-                const i = context.dataIndex;
-                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
-
-                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
-              },
-            },
-          },
-        },
-        interaction: {
-          mode: 'x',
-        },
-        animation: {
-          duration: 300,
-        },
-        datasets: {
-          bar: {
-            barPercentage: 1,
-            categoryPercentage: 0.9,
-            borderSkipped: false,
-            borderRadius: {
-              topLeft: 3,
-              topRight: 3,
-              bottomLeft: 3,
-              bottomRight: 3,
-            },
-          },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            type: 'time',
-            display: true,
-            offset: true,
-            time: {
-              displayFormats: {
-                day: 'EEE, MMM d',
-              },
-              unit: 'day',
-            },
-            stacked: true,
-            ticks: {
-              minRotation: 90,
-              maxRotation: 90,
-              autoSkip: false,
-            },
-          },
-          y: {
-            stacked: true,
-            ticks: {
-              callback: (value) => toHumanReadable(value),
-            },
-          },
-        },
-      },
-    });
+    timelinechart.render();
 
     const params = new URL(window.location).searchParams;
     elems.filterInput.value = params.get('filter');
