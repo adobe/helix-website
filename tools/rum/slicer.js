@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
+import BarChart from './barchart.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
@@ -25,7 +26,9 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const timelinechart = new CWVTimeLineChart(dataChunks, elems);
+const herochart = window.slicer && window.slicer.mode === 'list'
+  ? new BarChart(dataChunks, elems)
+  : new CWVTimeLineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 
 // set up metrics for dataChunks
@@ -163,7 +166,7 @@ export async function draw() {
 
   console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
 
-  await timelinechart.draw();
+  await herochart.draw();
 
   updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
@@ -312,7 +315,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
 
-    timelinechart.render();
+    herochart.render();
 
     const params = new URL(window.location).searchParams;
     elems.filterInput.value = params.get('filter');

@@ -140,11 +140,15 @@ export default class FacetSidebar {
         legend.append(clipboard);
         if (facetDecorators[facetName]?.drilldown) {
           const drilldown = document.createElement('a');
+          drilldown.className = 'drilldown';
           drilldown.href = facetDecorators[facetName].drilldown;
-          drilldown.textContent = 'view all';
+          drilldown.title = 'Drill down to more details';
+          drilldown.textContent = '';
           drilldown.addEventListener('click', () => {
             const drilldownurl = new URL(drilldown.href, window.location);
             drilldownurl.search = new URL(window.location).search;
+            drilldownurl.searchParams.delete(facetName);
+            drilldownurl.searchParams.set('drilldown', facetName);
             drilldown.href = drilldownurl.href;
           });
           legend.append(drilldown);

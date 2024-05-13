@@ -2,45 +2,13 @@
  * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
  */
 import {
-  toISOStringWithTimezone, scoreBundle, scoreCWV, toHumanReadable,
+  toISOStringWithTimezone,
+  INTERPOLATION_THRESHOLD,
+  scoreBundle, scoreCWV, toHumanReadable, cwvInterpolationFn,
 } from './utils.js';
-
-const INTERPOLATION_THRESHOLD = 10;
-function cwvInterpolationFn(targetMetric, interpolateTo100) {
-  return (cwvs) => {
-    const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
-    const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
-    if (interpolateTo100) {
-      return (cwvs[targetMetric].weight / valuedWeights);
-    }
-    if (valueCount < INTERPOLATION_THRESHOLD) {
-      // not enough data to interpolate
-      return 0;
-    }
-    // total weight
-    const totalWeight = cwvs.goodCWV.weight
-      + cwvs.niCWV.weight
-      + cwvs.poorCWV.weight
-      + cwvs.noCWV.weight;
-    // share of targetMetric compared to all CWV
-    const share = cwvs[targetMetric].weight / (valuedWeights);
-    // interpolate the share to the total weight
-    return Math.round(share * totalWeight);
-  };
-}
+import AbstractChart from './chart.js';
 // todo
-export default class CWVTimeLineChart {
-  constructor(dataChunks, elems) {
-    this.chartConfig = {};
-    this.dataChunks = dataChunks;
-    this.elems = elems;
-    this.chart = {};
-  }
-
-  set config(config) {
-    this.chartConfig = config;
-  }
-
+export default class CWVTimeLineChart extends AbstractChart {
   /**
    * Returns a function that can group the data bundles based on the
    * configuration of the chart. As this is a timeline chart,
@@ -81,10 +49,6 @@ export default class CWVTimeLineChart {
     };
 
     return groupFn;
-  }
-
-  useData(dataChunks) {
-    this.dataChunks = dataChunks;
   }
 
   render() {
@@ -310,7 +274,6 @@ export default class CWVTimeLineChart {
     const config = configs[view];
 
     this.config = config;
-    this.useData(this.dataChunks);
     this.defineSeries();
 
     // group by date, according to the chart config
