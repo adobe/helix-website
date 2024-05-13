@@ -36,49 +36,53 @@
     const EXT_HINT = 'hlxSidekickBookmarkletDeprecation';
 
     // respect user choice
-    if (window.sessionStorage.getItem(EXT_HINT)) {
+    const later = +window.sessionStorage.getItem(EXT_HINT);
+    if (Date.now() - later < 86400000) {
       return;
     }
 
     const browsers = ['Chrome', 'Safari'];
-    const message = 'The Sidekick bookmarklet has been deprecated. Switch to the {{browser}} extension today to stay productive!';
-    const shareUrl = getShareUrl(window.hlx.sidekickConfig);
-    const installButtonText = 'Install now';
-    const laterButtonText = 'Remind me tomorrow';
-
     const browser = browsers.find((b) => navigator.userAgent.includes(b));
     if (!browser || navigator.userAgent.includes('Headless')) {
       return;
     }
 
-    // show extension hint
-    window.hlx.sidekick.showHelp({
-      id: EXT_HINT,
-      steps: [{
-        message: message.replace('{{browser}}', browser),
-      }],
-    });
+    const installUrl = getShareUrl(window.hlx.sidekickConfig);
+    const installButtonText = 'Install extension now';
+    const laterButtonText = 'Remind me tomorrow';
 
-    const showAgainSoon = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
-
-    const okHandler = () => {
-      window.open(shareUrl);
-      showAgainSoon();
-    };
+    const remindLater = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
 
     const helpActions = window.hlx.sidekick.shadowRoot
       .querySelector('.hlx-sk-overlay .modal .help-actions');
 
-    const okButton = helpActions.querySelector('button');
-    okButton.textContent = installButtonText;
-    okButton.title = installButtonText;
-    okButton.addEventListener('click', okHandler);
-    okButton.focus();
+    const installButton = document.createElement('button');
+    installButton.textContent = installButtonText;
+    installButton.title = installButtonText;
+    installButton.addEventListener('click', () => {
+      window.open(installUrl);
+      remindLater();
+    });
 
     const laterButton = document.createElement('button');
     laterButton.textContent = laterButtonText;
-    laterButton.addEventListener('click', showAgainSoon);
-    helpActions.append(laterButton);
+    laterButton.title = laterButtonText;
+    laterButton.addEventListener('click', remindLater);
+
+    const buttonGroup = document.createElement('span');
+    buttonGroup.className = 'hlx-sk-modal-button-group';
+    buttonGroup.append(installButton);
+    buttonGroup.append(laterButton);
+
+    window.hlx.sidekick.showModal(
+      [
+        'The Sidekick bookmarklet has been deprecated.',
+        `Switch to the ${browser} extension today to stay productive.`,
+        buttonGroup,
+      ],
+      true,
+      1,
+    );
   }
 
   if (!window.hlx || !window.hlx.sidekick) {
@@ -103,7 +107,7 @@
         window.hlx.sidekickConfig = baseConfig;
         window.hlx.initSidekick();
       }
-      window.hlx.sidekick.addEventListener('statusfetched', () => {
+      window.hlx.sidekick.addEventListener('contextloaded', () => {
         showDeprecationWarning();
       }, { once: true });
     });
