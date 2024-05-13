@@ -4,9 +4,11 @@ import { toHumanReadable, scoreCWV } from './utils.js';
 const facetDecorators = {
   userAgent: {
     label: 'User Agent (Operating System and Browser)',
+    drilldown: 'list.html',
   },
   url: {
     label: 'URL',
+    drilldown: 'list.html',
   },
   checkpoint: {
     label: 'Checkpoint',
@@ -136,6 +138,17 @@ export default class FacetSidebar {
         const clipboard = document.createElement('span');
         clipboard.className = 'clipboard';
         legend.append(clipboard);
+        if (facetDecorators[facetName]?.drilldown) {
+          const drilldown = document.createElement('a');
+          drilldown.href = facetDecorators[facetName].drilldown;
+          drilldown.textContent = 'view all';
+          drilldown.addEventListener('click', () => {
+            const drilldownurl = new URL(drilldown.href, window.location);
+            drilldownurl.search = new URL(window.location).search;
+            drilldown.href = drilldownurl.href;
+          });
+          legend.append(drilldown);
+        }
         fieldSet.append(legend);
         tsv += `${facetName}\tcount\tlcp\tcls\tinp\r\n`;
         const filterKeys = facetName === 'checkpoint' && mode !== 'all';
