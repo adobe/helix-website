@@ -225,6 +225,8 @@ export function updateState() {
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
   const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
   if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
+  const drilldown = new URL(window.location).searchParams.get('drilldown');
+  if (drilldown) url.searchParams.set('drilldown', drilldown);
 
   elems.facetsElement.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
