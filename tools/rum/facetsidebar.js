@@ -12,6 +12,7 @@ const facetDecorators = {
   },
   checkpoint: {
     label: 'Checkpoint',
+    drilldown: 'flow.html',
   },
   filter: {
     hidden: true,
