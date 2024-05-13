@@ -138,7 +138,7 @@ export default class FacetSidebar {
         const clipboard = document.createElement('span');
         clipboard.className = 'clipboard';
         legend.append(clipboard);
-        if (facetDecorators[facetName]?.drilldown) {
+        if (facetDecorators[facetName]?.drilldown && url.searchParams.get('drilldown') !== facetName) {
           const drilldown = document.createElement('a');
           drilldown.className = 'drilldown';
           drilldown.href = facetDecorators[facetName].drilldown;
@@ -152,7 +152,22 @@ export default class FacetSidebar {
             drilldown.href = drilldownurl.href;
           });
           legend.append(drilldown);
+        } else if (url.searchParams.get('drilldown') === facetName) {
+          const drillup = document.createElement('a');
+          drillup.className = 'drillup';
+          drillup.href = facetDecorators[facetName].drilldown;
+          drillup.title = 'Drill down to more details';
+          drillup.textContent = '';
+          drillup.addEventListener('click', () => {
+            const drillupurl = new URL('explorer.html', window.location);
+            drillupurl.search = new URL(window.location).search;
+            drillupurl.searchParams.delete(facetName);
+            drillupurl.searchParams.delete('drilldown', facetName);
+            drillup.href = drillupurl.href;
+          });
+          legend.append(drillup);
         }
+
         fieldSet.append(legend);
         tsv += `${facetName}\tcount\tlcp\tcls\tinp\r\n`;
         const filterKeys = facetName === 'checkpoint' && mode !== 'all';

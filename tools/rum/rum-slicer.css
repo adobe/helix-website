@@ -416,7 +416,7 @@ fieldset li::after {
   padding-right: 50px;
 }
 
-.clipboard, a.drilldown {
+.clipboard, a.drilldown, a.drillup {
   margin-left: 8px;
   box-sizing: border-box;
   position: relative;
@@ -480,6 +480,34 @@ a.drilldown::after {
   border-top-color: currentcolor;
   top: 6px;
   left: 2px;
+}
+
+/* make a little upward pointing arrow from ::before and ::after for drillup */
+a.drillup::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  border: 2px solid;
+  border-width: 0 2px 0 0;
+  top: 6px;
+  left: 6px;
+}
+
+/* and the upward facing triangle */
+a.drillup::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-bottom-color: currentcolor;
+  top: -4px;
+  left: 1px;
 }
 
 /* toasts */
