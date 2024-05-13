@@ -92,7 +92,7 @@ export default class BarChart extends AbstractChart {
 
     this.defineSeries();
 
-    const drilldown = params.get('drilldown');
+    const drilldown = params.get('drilldown') || 'url';
 
     this.dataChunks.group((bundle) => bundle[drilldown]);
     const topgroups = Object.entries(this.dataChunks.aggregates)

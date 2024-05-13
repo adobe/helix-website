@@ -1,7 +1,6 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import CWVTimeLineChart from './cwvtimeline.js';
-import BarChart from './barchart.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
@@ -26,8 +25,8 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const herochart = window.slicer && window.slicer.mode === 'list'
-  ? new BarChart(dataChunks, elems)
+const herochart = window.slicer && window.slicer.Chart
+  ? new window.slicer.Chart(dataChunks, elems)
   : new CWVTimeLineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 

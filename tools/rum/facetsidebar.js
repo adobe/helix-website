@@ -4,7 +4,7 @@ import { toHumanReadable, scoreCWV } from './utils.js';
 const facetDecorators = {
   userAgent: {
     label: 'User Agent (Operating System and Browser)',
-    drilldown: 'list.html',
+    drilldown: 'share.html',
   },
   url: {
     label: 'URL',
