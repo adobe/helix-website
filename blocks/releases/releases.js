@@ -76,6 +76,11 @@ function createRelease(release) {
   return div;
 }
 
+function showResults(results, controls) {
+  results.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
+  results.classList.add('releases-results');
+}
+
 export default async function decorate(block) {
   const io = new IntersectionObserver((entries) => {
     entries.forEach(async (entry) => {
@@ -86,6 +91,29 @@ export default async function decorate(block) {
         const releases = document.createElement('div');
         const controls = document.createElement('div');
         controls.classList.add('releases-controls');
+
+        // select all
+        const all = document.createElement('div');
+        all.classList.add('releases-control');
+        const allCb = document.createElement('input');
+        allCb.type = 'checkbox';
+        // allCb.id = 'all';
+        // allCb.value = 'all';
+        allCb.checked = true;
+        all.append(allCb);
+        const allLabel = document.createElement('label');
+        allLabel.textContent = 'All';
+        allLabel.htmlFor = 'all';
+        all.append(allLabel);
+        all.addEventListener('click', () => {
+          allCb.checked = !allCb.checked;
+          controls.querySelectorAll('input[name="repo"]').forEach((cb) => {
+            cb.checked = allCb.checked;
+          });
+          showResults(releases, controls);
+        });
+        controls.append(all);
+
         Object.keys(displayNames).forEach((repo) => {
           const control = document.createElement('div');
           control.classList.add(`release-${repo}`, 'releases-control');
@@ -103,12 +131,16 @@ export default async function decorate(block) {
           controls.append(control);
           control.addEventListener('click', () => {
             cb.checked = !cb.checked;
-            releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
-            releases.classList.add('releases-results');
+            if (!cb.checked) {
+              allCb.checked = false;
+            } else if (controls.querySelectorAll('input[name="repo"]:checked').length === Object.keys(displayNames).length) {
+              allCb.checked = true;
+            }
+            showResults(releases, controls);
           });
         });
         block.append(controls);
-        releases.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
+        releases.className = Array.from(controls.querySelectorAll('input[name="repo"]:checked')).map((i) => i.value).join(' ');
         releases.classList.add('releases-results');
 
         const resp = await fetch(url);
