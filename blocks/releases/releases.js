@@ -133,6 +133,8 @@ export default async function decorate(block) {
             cb.checked = !cb.checked;
             if (!cb.checked) {
               allCb.checked = false;
+            } else if (controls.querySelectorAll('input[name="repo"]:checked').length === Object.keys(displayNames).length) {
+              allCb.checked = true;
             }
             showResults(releases, controls);
           });
