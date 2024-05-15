@@ -1,0 +1,62 @@
+.availability {
+  position: relative;
+  border: 1px solid var(--color-checkerboard-bg-border);
+  background: var(--checkerboard-background);
+  background-position: center;
+  background-size: var(--checkerboard-background-size);
+}
+
+.availability img,
+.availability svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  color: var(--bg-color-grey-2);
+}
+
+.availability svg circle {
+  position: relative;
+  stroke: var(--brand-color-purple);
+  stroke-width: 0;
+  fill: var(--brand-color-purple);
+  transition: fill .2s, stroke .2s, stroke-width .2s;
+  cursor: context-menu;
+}
+
+.availability svg circle:hover,
+.availability svg circle[data-focus] {
+  stroke: var(--brand-color-dark-purple);
+  stroke-width: 33px;
+  fill: var(--brand-color-dark-purple);
+}
+
+.availability .tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-50% - (9px + var(--type-detail-m-lh))));
+  border-radius: var(--input-border-radius);
+  padding: var(--spacing-xxxs) var(--spacing-xxs);
+  background-color: var(--overlay-curtain-bg-color);
+  color: var(--color-white);
+  font-size: var(--type-detail-m-size);
+  line-height: var(--type-detail-m-lh);
+  opacity: 1;
+  transition: opacity .4s;
+}
+
+.availability .tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--overlay-curtain-bg-color);
+}
+
+.availability .tooltip[aria-hidden='true'] {
+  opacity: 0;
+}
