@@ -131,8 +131,8 @@ function updateDataFacets(filterText, params, checkpoint) {
 }
 
 function updateFilter(params, filterText) {
-  dataChunks.filter = params
-    .entries()
+  dataChunks.filter = Array.from(params
+    .entries())
     .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
       || key === 'userAgent'
       || (key === 'filter' && filterText.length > 2)
