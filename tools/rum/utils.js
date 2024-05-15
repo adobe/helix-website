@@ -64,3 +64,17 @@ export function scoreBundle(bundle) {
   if (scores.every((s) => s !== 'poor')) return 'ni';
   return 'poor';
 }
+
+export function truncate(time, unit) {
+  const t = new Date(time);
+  // truncate to the beginning of the hour
+  t.setMinutes(0);
+  t.setSeconds(0);
+  // truncate to the beginning of the day
+  if (unit !== 'hour') t.setHours(0);
+  // truncate to the beginning of the week, if the unit is week
+  if (unit === 'week') t.setDate(t.getDate() - t.getDay());
+  // truncate to the beginning of the month, if the unit is month
+  if (unit === 'month') t.setDate(1);
+  return toISOStringWithTimezone(t);
+}

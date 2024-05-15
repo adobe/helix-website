@@ -2,7 +2,7 @@
  * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
  */
 import {
-  toISOStringWithTimezone, scoreBundle, scoreCWV, toHumanReadable,
+  scoreBundle, scoreCWV, toHumanReadable, truncate,
 } from './utils.js';
 
 const INTERPOLATION_THRESHOLD = 10;
@@ -51,33 +51,27 @@ export default class CWVTimeLineChart {
   get groupBy() {
     const groupFn = (bundle) => {
       const slotTime = new Date(bundle.timeSlot);
-      slotTime.setMinutes(0);
-      slotTime.setSeconds(0);
-      if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
-      if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() - slotTime.getDay());
-      if (this.chartConfig.unit === 'month') slotTime.setDate(1);
-      return toISOStringWithTimezone(slotTime);
+      return truncate(slotTime, this.chartConfig.unit);
     };
 
-    groupFn.fillerFn = () => {
+    groupFn.fillerFn = (existing) => {
       const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
       // set start date depending on the unit
       const startDate = new Date(endDate);
+      // roll back to beginning of time
       if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
       if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
-      if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 12);
-      const slots = new Set();
+      if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+      const slots = new Set(existing);
       const slotTime = new Date(startDate);
-      slotTime.setMinutes(0);
-      slotTime.setSeconds(0);
-      if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
       // return Array.from(slots);
       let maxSlots = 1000;
       while (slotTime <= endDate) {
-        slots.add(toISOStringWithTimezone(slotTime));
+        const { unit } = this.chartConfig;
+        slots.add(truncate(slotTime, unit));
         if (this.chartConfig.unit === 'day') slotTime.setDate(slotTime.getDate() + 1);
         if (this.chartConfig.unit === 'hour') slotTime.setHours(slotTime.getHours() + 1);
-        if (this.chartConfig.unit === 'month') slotTime.setMonth(slotTime.getMonth() + 1);
+        if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
         maxSlots -= 1;
         if (maxSlots < 0) {
           console.error('Too many slots');
