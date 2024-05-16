@@ -319,6 +319,7 @@ const io = new IntersectionObserver((entries) => {
     const view = params.get('view') || 'week';
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
+    const focus = params.get('focus');
     const h1 = document.querySelector('h1');
     h1.textContent = ` ${DOMAIN}`;
     const img = document.createElement('img');
@@ -356,6 +357,11 @@ const io = new IntersectionObserver((entries) => {
       updateState();
       window.location.reload();
     });
+
+    if (focus) {
+      const keyMetric = document.getElementById(focus);
+      if (keyMetric) keyMetric.ariaSelected = 'true';
+    }
 
     const metrics = [...document.querySelectorAll('.key-metrics li')];
     metrics.forEach((e) => {
