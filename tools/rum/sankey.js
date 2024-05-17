@@ -63,7 +63,7 @@ const stages = [
         .filter((e) => !e.source.startsWith('http'))
         .length > 0,
       next: ['organic', 'campaign'],
-      color: 'green',
+      color: 'lightgreen',
     },
   },
   {
@@ -115,7 +115,7 @@ const stages = [
     },
     enter: {
       label: 'Enter',
-      color: 'green',
+      color: 'lightgreen',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
         .length > 0,
@@ -161,7 +161,7 @@ const stages = [
      *   - aborted (leave before complete, no more events)
      */
     load: {
-      color: 'green',
+      color: 'darkgreen',
       label: 'Complete Load',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
@@ -234,7 +234,7 @@ const stages = [
    * - none
    */
     click: {
-      color: 'green',
+      color: 'darkgreen',
       label: 'Click',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
@@ -242,6 +242,7 @@ const stages = [
       next: ['blind', 'internal', 'external', 'media'],
     },
     formsubmit: {
+      color: 'green',
       label: 'Form Submit',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'formsubmit')
@@ -304,6 +305,7 @@ const stages = [
      * 8. What's the click target, specifically
      */
     outclick: {
+      color: 'purple',
       label: (bundle) => 'Other' || bundle.events.filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
         .map((e) => new URL(e.target))
