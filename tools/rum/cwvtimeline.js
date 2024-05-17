@@ -8,9 +8,8 @@ import {
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
 import {
-  toISOStringWithTimezone,
   INTERPOLATION_THRESHOLD,
-  scoreBundle, scoreCWV, toHumanReadable, cwvInterpolationFn,
+  scoreBundle, scoreCWV, toHumanReadable, cwvInterpolationFn, truncate,
 } from './utils.js';
 import AbstractChart from './chart.js';
 
@@ -28,31 +27,32 @@ export default class CWVTimeLineChart extends AbstractChart {
   get groupBy() {
     const groupFn = (bundle) => {
       const slotTime = new Date(bundle.timeSlot);
-      slotTime.setMinutes(0);
-      slotTime.setSeconds(0);
-      if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
-      if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() - slotTime.getDay());
-      if (this.chartConfig.unit === 'month') slotTime.setDate(1);
-      return toISOStringWithTimezone(slotTime);
+      return truncate(slotTime, this.chartConfig.unit);
     };
 
-    groupFn.fillerFn = () => {
+    groupFn.fillerFn = (existing) => {
       const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
       // set start date depending on the unit
       const startDate = new Date(endDate);
+      // roll back to beginning of time
       if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
-      if (this.chartConfig.unit === 'week') startDate.setDate(endDate.getDate() - 7);
-      if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 12);
-      const slots = new Set();
+      if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
+      if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+      const slots = new Set(existing);
       const slotTime = new Date(startDate);
-      slotTime.setMinutes(0);
-      slotTime.setSeconds(0);
-      if (this.chartConfig.unit === 'day' || this.chartConfig.unit === 'week' || this.chartConfig.unit === 'month') slotTime.setHours(0);
+      // return Array.from(slots);
+      let maxSlots = 1000;
       while (slotTime <= endDate) {
-        slots.add(toISOStringWithTimezone(slotTime));
+        const { unit } = this.chartConfig;
+        slots.add(truncate(slotTime, unit));
         if (this.chartConfig.unit === 'day') slotTime.setDate(slotTime.getDate() + 1);
+        if (this.chartConfig.unit === 'hour') slotTime.setHours(slotTime.getHours() + 1);
         if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
-        if (this.chartConfig.unit === 'month') slotTime.setMonth(slotTime.getMonth() + 1);
+        maxSlots -= 1;
+        if (maxSlots < 0) {
+          console.error('Too many slots');
+          break;
+        }
       }
       return Array.from(slots);
     };

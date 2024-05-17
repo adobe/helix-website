@@ -12,6 +12,77 @@
 /* eslint-disable no-console, no-alert */
 
 (() => {
+  /**
+   * Returns the share URL for the sidekick extension.
+   * @private
+   * @param {Object} config The sidekick configuration
+   * @returns {string} The share URL
+   */
+  function getShareUrl(config) {
+    const { owner, repo, ref } = config;
+    const shareUrl = new URL('https://www.aem.live/tools/sidekick/');
+    shareUrl.search = new URLSearchParams([
+      ['giturl', `https://github.com/${owner}/${repo}/tree/${ref}`],
+    ]).toString();
+    return shareUrl.toString();
+  }
+
+  /**
+   * Warns the bookmarklet user about the deprecation of the
+   * sidekick bookmarklet.
+   * @private
+   */
+  function showDeprecationWarning() {
+    const EXT_HINT = 'hlxSidekickBookmarkletDeprecation';
+
+    // respect user choice
+    const later = +window.sessionStorage.getItem(EXT_HINT);
+    if (Date.now() - later < 86400000) {
+      return;
+    }
+
+    if (navigator.userAgent.includes('Headless')) {
+      return;
+    }
+
+    const installUrl = getShareUrl(window.hlx.sidekickConfig);
+    const installButtonText = 'Install now';
+    const laterButtonText = 'Remind me tomorrow';
+
+    const remindLater = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
+
+    const helpActions = window.hlx.sidekick.shadowRoot
+      .querySelector('.hlx-sk-overlay .modal .help-actions');
+
+    const installButton = document.createElement('button');
+    installButton.textContent = installButtonText;
+    installButton.title = installButtonText;
+    installButton.addEventListener('click', () => {
+      window.open(installUrl);
+      remindLater();
+    });
+
+    const laterButton = document.createElement('button');
+    laterButton.textContent = laterButtonText;
+    laterButton.title = laterButtonText;
+    laterButton.addEventListener('click', remindLater);
+
+    const buttonGroup = document.createElement('span');
+    buttonGroup.className = 'hlx-sk-modal-button-group';
+    buttonGroup.append(installButton);
+    buttonGroup.append(laterButton);
+
+    window.hlx.sidekick.showModal(
+      [
+        'The Sidekick bookmarklet has been deprecated.',
+        `Switch to the Sidekick extension today to stay productive.`,
+        buttonGroup,
+      ],
+      true,
+      1,
+    );
+  }
+
   if (!window.hlx || !window.hlx.sidekick) {
     window.hlx = window.hlx || {};
     const appScript = document.getElementById('hlx-sk-app');
@@ -34,6 +105,9 @@
         window.hlx.sidekickConfig = baseConfig;
         window.hlx.initSidekick();
       }
+      window.hlx.sidekick.addEventListener('contextloaded', () => {
+        showDeprecationWarning();
+      }, { once: true });
     });
     document.head.append(moduleScript);
   } else if (window.hlx.sidekick) {

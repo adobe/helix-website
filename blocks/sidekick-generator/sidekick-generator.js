@@ -1,17 +1,10 @@
 import createTag from '../../utils/tag.js';
 
 const browserExtensionSupported = [
+  'edg',
   'chrome',
   'safari',
 ].find((b) => window.navigator.userAgent.toLowerCase().includes(b));
-
-function help(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  // eslint-disable-next-line no-alert
-  alert('Instead of clicking this button, you need to drag it to your browser\'s bookmark bar.');
-  return false;
-}
 
 function run(evt) {
   if (evt) {
@@ -28,7 +21,7 @@ function run(evt) {
   });
 
   const {
-    giturl, project, token,
+    giturl, project,
   } = formData;
 
   if (!giturl) {
@@ -39,7 +32,10 @@ function run(evt) {
 
   let finalGitUrl = giturl;
   const giturlAsUrl = new URL(giturl);
-  if (giturlAsUrl.hostname.endsWith('hlx.page') || giturlAsUrl.hostname.endsWith('hlx.live')) {
+  if (giturlAsUrl.hostname.endsWith('hlx.page')
+    || giturlAsUrl.hostname.endsWith('hlx.live')
+    || giturlAsUrl.hostname.endsWith('aem.page')
+    || giturlAsUrl.hostname.endsWith('aem.live')) {
     const segs = giturlAsUrl.hostname.split('.')[0].split('--');
     const owner = segs[2];
     const repo = segs[1];
@@ -56,50 +52,6 @@ function run(evt) {
   usp.set('giturl', finalGitUrl);
   url.search = usp.toString();
   window.history.pushState({ finalGitUrl, project }, null, url.href);
-
-  // assemble bookmarklet config
-  const segs = new URL(finalGitUrl).pathname.substring(1).split('/');
-  const owner = segs[0];
-  const repo = segs[1];
-  const ref = segs[3] || 'main';
-
-  const config = {
-    owner,
-    repo,
-    ref,
-  };
-
-  // pass token
-  if (token) {
-    config.token = token;
-  }
-
-  // update bookmarklet link
-  const bm = document.getElementById('bookmark');
-  bm.href = [
-    // eslint-disable-next-line no-script-url
-    'javascript:',
-    '/* ** Franklin Sidekick Bookmarklet ** */',
-    '(() => {',
-    `const c=${JSON.stringify(config)};`,
-    'const s=document.createElement(\'script\');',
-    's.id=\'hlx-sk-app\';',
-    `s.src='${window.location.origin}/tools/sidekick/app.js';`,
-    's.dataset.config=JSON.stringify(c);',
-    'if(document.getElementById(\'hlx-sk-app\')){',
-    'document.getElementById(\'hlx-sk-app\').replaceWith(s);',
-    '} else {',
-    'document.head.append(s);',
-    '}',
-    '})();',
-  ].join('');
-  let title = 'Sidekick';
-  if (project) {
-    title = `${project} ${title}`;
-  }
-  bm.onclick = help;
-  bm.textContent = title;
-  bm.setAttribute('title', title);
 
   window.dispatchEvent(new CustomEvent('sidekickGeneratorReady'));
 }
@@ -175,27 +127,26 @@ export default async function decorate(el) {
   formContainer.insertBefore(form, formContainer.querySelector(':scope p:last-of-type'));
   formContainer.id = 'form-container';
 
-  // bookmarklet container
-  const bookmarkletContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
-  if (bookmarkletContainer) {
-    const bookmark = createTag('a', { id: 'bookmark', href: '#' }, 'Sidekick');
-    bookmarkletContainer.append(createTag('p', null, createTag('em', null, bookmark)));
-    bookmarkletContainer.id = 'sidekick-generator-bookmarklet';
-    bookmarkletContainer.style.paddingTop = '20px';
-    bookmarkletContainer.parentElement.classList.add('hidden');
+  // install container
+  const installContainer = el.querySelector(':scope > div:nth-of-type(2) > div');
+  if (installContainer) {
+    installContainer.id = 'sidekick-generator-bookmarklet';
+    installContainer.style.paddingTop = '20px';
+    installContainer.parentElement.classList.add('hidden');
 
     // chrome web store
-    const chromeLink = bookmarkletContainer.querySelector('a[title~="Chrome"]');
+    const chromeLink = installContainer.querySelector('a[title~="Chrome"]');
     if (chromeLink) {
       const webStoreIcon = document.createElement('img');
       webStoreIcon.src = '/img/chrome.svg';
       chromeLink.prepend(webStoreIcon);
-      if (!['chrome', 'edge'].includes(browserExtensionSupported)) {
+      chromeLink.setAttribute('target', '_blank');
+      if (!['chrome', 'edg'].includes(browserExtensionSupported)) {
         chromeLink.parentElement.parentElement.classList.add('hidden');
       }
     }
     // apple app store
-    const safariLink = bookmarkletContainer.querySelector('a[title~="Safari"]');
+    const safariLink = installContainer.querySelector('a[title~="Safari"]');
     if (safariLink) {
       const appStoreIcon = document.createElement('img');
       appStoreIcon.src = '/img/safari.svg';
@@ -224,8 +175,8 @@ export default async function decorate(el) {
   }
 
   window.addEventListener('sidekickGeneratorReady', () => {
-    // show bookmarklet container (default)
-    bookmarkletContainer.parentElement.classList.remove('hidden');
+    // show install container (default)
+    installContainer.parentElement.classList.remove('hidden');
   });
 
   init();

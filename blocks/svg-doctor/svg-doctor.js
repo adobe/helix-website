@@ -248,18 +248,39 @@ function removeColorFallbacks(svg) {
   });
 }
 
+function rewriteClassnames(svg, name) {
+  const style = svg.querySelector('style');
+  if (style) {
+    const newStyle = new CSSStyleSheet();
+    const obj = extractStyle(svg);
+    const selectors = Object.keys(obj);
+    selectors.forEach((selector) => {
+      const rule = JSON.stringify(obj[selector]).replaceAll('"', '');
+      const newClass = `${name}-${selector.replace('.', '')}`;
+      newStyle.insertRule(`.${newClass} ${rule}`);
+      const els = svg.querySelectorAll(selector);
+      // eslint-disable-next-line no-return-assign
+      els.forEach((el) => el.setAttribute('class', newClass));
+    });
+    // replace existing stylesheet content with rewritten classes
+    style.textContent = [...newStyle.cssRules].map((rule) => rule.cssText).join('\n');
+  }
+}
+
 function setupSVGDownload(form, block) {
   const downloadButton = form.querySelector('button');
   downloadButton.addEventListener('click', () => {
     const svg = block.querySelector('.preview > svg');
+    const title = toClassName(svg.querySelector('title').textContent) || svg.parentElement.dataset.name;
     removeColorFallbacks(svg);
+    rewriteClassnames(svg, title);
     const data = new XMLSerializer().serializeToString(svg);
     const blob = new Blob([data], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     // build temporary download link
     const a = createTag('a', {
       href: url,
-      download: `${toClassName(svg.querySelector('title').textContent) || svg.parentElement.dataset.name}.svg`,
+      download: title,
     });
     a.style.display = 'none';
     form.appendChild(a);
