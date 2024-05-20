@@ -80,7 +80,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
     acc.add(evt.checkpoint);
     return acc;
-  }, new Set())));
+  }, new Set())), 'every');
 
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons
