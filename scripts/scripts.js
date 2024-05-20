@@ -490,7 +490,7 @@ function decorateBreadcrumb(main) {
               Back
           </a>
       `);
-      document.querySelector('.default-content-wrapper').prepend(backBtn);
+      document.querySelector('.availability-wrapper, .default-content-wrapper').prepend(backBtn);
     }
   }
 
