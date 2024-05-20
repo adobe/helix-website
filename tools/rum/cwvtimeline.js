@@ -74,6 +74,7 @@ export default class CWVTimeLineChart {
         if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
         maxSlots -= 1;
         if (maxSlots < 0) {
+          // eslint-disable-next-line no-console
           console.error('Too many slots');
           break;
         }
