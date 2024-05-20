@@ -1,9 +1,16 @@
 .availability {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto var(--spacing-s) auto;
+  border-radius: var(--image-border-radius-l);
+  background: linear-gradient(135deg, var(--color-white), var(--color-accent-lightgreen-bg));
+}
+
+.availability .tooltip-wrapper {
   position: relative;
-  border: 1px solid var(--color-checkerboard-bg-border);
-  background: var(--checkerboard-background);
-  background-position: center;
-  background-size: var(--checkerboard-background-size);
+  max-width: calc(100% - 2ch);
 }
 
 .availability img,
@@ -12,11 +19,13 @@
   max-width: 100%;
   height: auto;
   aspect-ratio: 2 / 1;
+  border-radius: var(--image-border-radius-xxl);
+  background-color: var(--color-white);
   color: var(--bg-color-grey-2);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 33%);
 }
 
 .availability svg circle {
-  position: relative;
   stroke: var(--brand-color-purple);
   stroke-width: 0;
   fill: var(--brand-color-purple);
@@ -26,9 +35,9 @@
 
 .availability svg circle:hover,
 .availability svg circle[data-focus] {
-  stroke: var(--brand-color-dark-purple);
+  stroke: var(--color-accent-purple-bg);
   stroke-width: 33px;
-  fill: var(--brand-color-dark-purple);
+  fill: var(--color-accent-purple-bg);
 }
 
 .availability .tooltip {

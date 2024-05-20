@@ -109,7 +109,7 @@ function iterateThroughPins(pins, svg, tooltip, lastIndex = -1) {
     setTimeout(() => {
       iterateThroughPins(pins, svg, tooltip, randomIndex); // recursive call to focus another pin
     }, 200);
-  }, 6000);
+  }, 3000);
 }
 
 function buildTooltip() {
@@ -160,20 +160,22 @@ async function populateData(src, svg, tooltip) {
 export default function decorate(block) {
   const data = block.querySelector('a[href]');
   block.innerHTML = '';
-  if (data) {
-    const img = createTag('img', { src: '/blocks/availability/map.svg' });
-    img.addEventListener('load', async () => {
-      const req = await fetch(img.src);
-      const res = await req.text();
-      const temp = createTag('div');
-      temp.innerHTML = res;
-      const svg = temp.querySelector('svg');
+  const wrapper = createTag('div', { class: 'tooltip-wrapper' });
+  const img = createTag('img', { src: '/blocks/availability/map.svg' });
+  img.addEventListener('load', async () => {
+    const req = await fetch(img.src);
+    const res = await req.text();
+    const temp = createTag('div');
+    temp.innerHTML = res;
+    const svg = temp.querySelector('svg');
+    img.replaceWith(svg);
+    if (data) {
       svg.dataset.auto = true;
-      img.replaceWith(svg);
       const tooltip = buildTooltip();
-      block.prepend(tooltip);
+      wrapper.prepend(tooltip);
       populateData(data.href, svg, tooltip);
-    });
-    block.append(img);
-  }
+    }
+  });
+  wrapper.append(img);
+  block.append(wrapper);
 }
