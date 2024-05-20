@@ -161,6 +161,7 @@ export async function draw() {
   // set up filter from URL parameters
   updateFilter(params, filterText);
 
+  // eslint-disable-next-line no-console
   console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
 
   await timelinechart.draw();

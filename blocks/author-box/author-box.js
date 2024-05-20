@@ -54,6 +54,7 @@ function validateDate(dateTag, dateString) {
   if (!regex.test(dateString)) {
     dateTag.classList.add('publication-date-invalid');
     dateTag.setAttribute('title', 'invalid-date');
+    // eslint-disable-next-line no-console
     console.error('Invalid publication date format. Please use a format like Month DDth, YYYY (e.g., January 30th, 2024)');
   }
 }

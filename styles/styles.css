@@ -1997,6 +1997,7 @@ body.contact-template main .default-content-wrapper img {
 
 
 /* breadcrumb */
+/* stylelint-disable no-descending-specificity */
 
 .breadcrumb-wrapper {
   display: none;
