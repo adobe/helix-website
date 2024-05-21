@@ -82,7 +82,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
     acc.add(evt.checkpoint);
     return acc;
-  }, new Set())));
+  }, new Set())), 'every');
 
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons
@@ -163,6 +163,7 @@ export async function draw() {
   // set up filter from URL parameters
   updateFilter(params, filterText);
 
+  // eslint-disable-next-line no-console
   console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
 
   await herochart.draw();
@@ -323,6 +324,7 @@ const io = new IntersectionObserver((entries) => {
     const view = params.get('view') || 'week';
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
+    const focus = params.get('focus');
     const h1 = document.querySelector('h1');
     h1.textContent = ` ${DOMAIN}`;
     const img = document.createElement('img');
@@ -360,6 +362,11 @@ const io = new IntersectionObserver((entries) => {
       updateState();
       window.location.reload();
     });
+
+    if (focus) {
+      const keyMetric = document.getElementById(focus);
+      if (keyMetric) keyMetric.ariaSelected = 'true';
+    }
 
     const metrics = [...document.querySelectorAll('.key-metrics li')];
     metrics.forEach((e) => {

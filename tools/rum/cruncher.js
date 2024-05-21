@@ -293,9 +293,11 @@ export class DataChunks {
    * @param {string} facetName name of the facet
    * @param {groupByFn} facetValueFn function that returns the facet value –
    * can return multiple values
+   * @param {string} facetCombiner how to combine multiple values, default is 'some', can be 'every'
    */
-  addFacet(facetName, facetValueFn) {
+  addFacet(facetName, facetValueFn, facetCombiner = 'some') {
     this.facetFns[facetName] = facetValueFn;
+    this.facetFns[facetName].combiner = facetCombiner;
   }
 
   /**
@@ -388,8 +390,9 @@ export class DataChunks {
         // a facet can return multiple values
         const facetValue = this.facetFns[facetName](bundle);
         const facetValues = Array.isArray(facetValue) ? facetValue : [facetValue];
+        const facetCombiner = this.facetFns[facetName].combiner || 'some';
         // check if any of the values match
-        return values.some((value) => facetValues.includes(value));
+        return values[facetCombiner]((value) => facetValues.includes(value));
       });
       // only if all active filters have a match, then the bundle is included
       return matches.every((match) => match);
@@ -558,7 +561,13 @@ export class DataChunks {
           // we filter the bundles by all active filters,
           // except for the current facet (we want to see)
           // all values here.
-          .filterBundles(this.bundles, this.filters, [facetName])
+          .filterBundles(
+            this.bundles,
+            this.filters,
+            this.facetFns[facetName].combiner === 'some'
+              ? [facetName]
+              : [],
+          )
           .reduce(groupFn(facetValueFn), {});
         accOuter[facetName] = Object.entries(groupedByFacetIn)
           .reduce((accInner, [facetValue, bundles]) => {

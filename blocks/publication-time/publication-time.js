@@ -7,6 +7,7 @@ export default function decorate($block) {
   // Output the <relative-time> element as specified,
   // https://github.com/github/relative-time-element
   if (!document.lastModified) {
+    // eslint-disable-next-line no-console
     console.error('document.lastModified returns null');
   } else {
     const lastMod = new Date(document.lastModified);
