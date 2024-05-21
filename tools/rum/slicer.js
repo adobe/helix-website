@@ -130,6 +130,10 @@ function updateDataFacets(filterText, params, checkpoint) {
         });
       }
     });
+
+  if (typeof herochart.updateDataFacets === 'function') {
+    herochart.updateDataFacets(dataChunks);
+  }
 }
 
 function updateFilter(params, filterText) {

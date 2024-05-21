@@ -32,6 +32,7 @@ Chart.register(SankeyController, Flow);
 // modeling the flow of events
 const stages = [
   {
+    label: 'trafficsource',
     /*
      *  1.  Where is the traffic coming from:
      *   - referrer (can be domain or page)
@@ -43,10 +44,7 @@ const stages = [
           .filter((e) => e.source.startsWith('http'))
           .map((e) => new URL(e.source).hostname)
           .pop();
-        if (refhost.includes('google')) return 'Google';
-        if (refhost.includes('facebook')) return 'Facebook';
-        if (refhost.includes('twitter')) return 'Twitter';
-        return 'Other Referrer';
+        return `referrer:${refhost}`;
       },
       color: 'purple',
       // detection function
@@ -67,6 +65,7 @@ const stages = [
     },
   },
   {
+    label: 'traffictype',
     /*
      * 1.5 What kind of traffic is it:
      *   - organic
@@ -90,6 +89,7 @@ const stages = [
     },
   },
   {
+    label: 'entryevent',
     /*
      * 2.  What kind of entry event is it:
      *   - reload
@@ -123,7 +123,12 @@ const stages = [
     },
     navigate: {
       color: 'green',
-      label: 'Internal Navigation',
+      label: (bundle) => {
+        const nav = bundle.events.filter((e) => e.checkpoint === 'navigate')
+          .map((e) => new URL(e.source).pathname)
+          .pop();
+        return `navigate:${nav}`;
+      },
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'navigate')
         .length > 0,
@@ -131,6 +136,7 @@ const stages = [
     },
   },
   {
+    label: 'pagetype',
     /*
      * 3.  What kind of page is it
      *   - normal
@@ -154,6 +160,7 @@ const stages = [
     },
   },
   {
+    label: 'loadtype',
     /*
      * 4.  How is the page being loaded
      *   - partial (no lazy or lcp fired)
@@ -186,6 +193,7 @@ const stages = [
     },
   },
   {
+    label: 'contenttype',
     /*
      * 5.  What kind of content was consumed
       *  - none (no media or block whatsoever)
@@ -196,7 +204,7 @@ const stages = [
     nocontent: {
       label: 'No Content',
       color: 'black',
-      next: [],
+      next: ['click', 'formsubmit', 'nointeraction'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length === 0,
@@ -227,19 +235,20 @@ const stages = [
     },
   },
   {
-  /*
-   * 6.  What kind of interaction happened
-   * - click
-   * - formsubmit
-   * - none
-   */
+    label: 'interaction',
+    /*
+     * 6.  What kind of interaction happened
+     * - click
+     * - formsubmit
+     * - none
+     */
     click: {
       color: 'darkgreen',
       label: 'Click',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .length > 0,
-      next: ['blind', 'internal', 'external', 'media'],
+      next: ['blind', 'intclick', 'extclick', 'media'],
     },
     formsubmit: {
       color: 'green',
@@ -258,6 +267,7 @@ const stages = [
     },
   },
   {
+    label: 'clicktarget',
     /*
      * 7.  What's the type of click target
      * - blind (no href)
@@ -267,14 +277,16 @@ const stages = [
      */
     media: {
       label: 'Media Click',
+      next: [],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => e.target && e.target.indexOf('media_') > -1)
         .length > 0,
     },
-    external: {
+    extclick: {
       label: 'External Click',
       color: 'purple',
+      next: ['external:*'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => e.target && e.target.startsWith('http'))
@@ -282,9 +294,10 @@ const stages = [
         .length > 0,
     },
 
-    internal: {
+    intclick: {
       label: 'Internal Click',
       color: 'green',
+      next: ['internal:*'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
@@ -301,17 +314,34 @@ const stages = [
     },
   },
   {
+    label: 'exit',
     /*
      * 8. What's the click target, specifically
      */
-    outclick: {
-      color: 'purple',
-      label: (bundle) => 'Other' || bundle.events.filter((e) => e.checkpoint === 'click')
+    internal: {
+      color: 'green',
+      next: [],
+      label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
         .map((e) => new URL(e.target))
-        .map((t) => (t.hostname === new URL(bundle.url).hostname
-          ? t.pathname
-          : t.hostname))
+        .map((u) => u.pathname)
+        .map((p) => `internal:${p}`)
+        .pop(),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'click')
+        .filter((e) => !!e.target)
+        .filter((e) => e.target.indexOf('media_') === -1)
+        .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
+        .length > 0,
+    },
+    external: {
+      color: 'purple',
+      next: [],
+      label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
+        .filter((e) => !!e.target)
+        .map((e) => new URL(e.target))
+        .map((u) => u.hostname)
+        .map((h) => `external:${h}`)
         .pop(),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
@@ -324,9 +354,9 @@ const stages = [
   },
 ];
 const allStages = stages.reduce((acc, stage) => ({ ...acc, ...stage }), {});
+
 export default class SankeyChart extends AbstractChart {
   async draw() {
-    console.log('draw');
     const params = new URL(window.location.href).searchParams;
     this.chartConfig.focus = params.get('focus');
 
@@ -336,25 +366,41 @@ export default class SankeyChart extends AbstractChart {
       this.elems.lowDataWarning.ariaHidden = 'true';
     }
 
+    const MAX_FACETS = 7;
     this.dataChunks.group((bundle) => {
       const detectedFlows = [];
       // go through each stage
       stages.forEach((stage) => {
         let cont = false;
         // go through each flow step in the stage
-        Object.entries(stage).forEach(([key, step]) => {
+        Object.entries(stage)
+          .filter(([key]) => key !== 'label')
+          .forEach(([key, step]) => {
           // if we already detected a flow, skip the rest
-          if (cont) return;
-          if (step.detect(bundle)) {
-            if (typeof step.label === 'function') {
-              detectedFlows.push(step.label(bundle));
-              cont = true;
-            } else {
-              detectedFlows.push(key);
-              cont = true;
+            if (cont) return;
+            if (step.detect(bundle)) {
+              const flowLabel = typeof step.label === 'function' ? step.label(bundle) : key;
+              const flowValue = typeof step.label === 'function' ? step.label(bundle) : step.label;
+              if (stage.label
+                && Object.entries(this.dataChunks.facets[stage.label]).length > MAX_FACETS) {
+                // we have too many facets, so we need to group some
+                if (this.dataChunks.facets[stage.label]
+                  .slice(0, MAX_FACETS)
+                  .map(({ value }) => value)
+                  .includes(flowValue)) {
+                  // the top N values are shown as is
+                  detectedFlows.push(flowLabel);
+                } else {
+                  // console.assert(key !== 'reload', this.dataChunks.facets[stage.label]);
+                  // the rest is grouped into 'other'
+                  detectedFlows.push(`${key}:other`);
+                }
+              } else {
+                detectedFlows.push(flowLabel);
+                cont = true;
+              }
             }
-          }
-        });
+          });
       });
       // split into pairs
       const pairs = detectedFlows
@@ -363,9 +409,24 @@ export default class SankeyChart extends AbstractChart {
         .filter((pair) => pair.length === 2 && pair[0] && pair[1])
         // filter out forbidden pairs
         .filter((pair) => {
-          if (allStages[pair[0]] && Array.isArray(allStages[pair[0]].next)) {
-            return allStages[pair[0]].next.includes(pair[1]);
+          const first = pair[0].split(':')[0];
+          const second = pair[1].split(':')[0];
+
+          if (allStages[first] && Array.isArray(allStages[first].next)) {
+            if (allStages[first].next.includes(second)) {
+              // console.log('explicit allow', pair[0], '->', pair[1]);
+              return true;
+            } if (allStages[first].next
+              .filter((n) => n.endsWith(':*'))
+              .map((n) => n.slice(0, -2))
+              .includes(second)) {
+              // console.log('wildcard allow', pair[0], '->', pair[1]);
+              return true;
+            }
+            // console.log('forbidding', pair[0], '->', pair[1]);
+            return false;
           }
+          // console.log('implicit allow', pair[0], '->', pair[1]);
           return true;
         })
         .map((pair) => pair.join('->'));
@@ -382,27 +443,32 @@ export default class SankeyChart extends AbstractChart {
       .map((flow) => flow.split('->'))
       .flat()
       .reduce((acc, key) => {
+        const [prefix, suffix] = key.split(':');
         if (allStages[key] && allStages[key].label && typeof allStages[key].label === 'string') {
           acc[key] = allStages[key].label;
+        } else if (allStages[prefix] && allStages[prefix].label) {
+          acc[key] = suffix;
         } else {
           acc[key] = key;
         }
         return acc;
       }, {});
+    if (this.dataChunks.facets.contenttype?.length < 2) {
+      // console.log('setting contenttype label');
+      this.labels.nocontent = 'Default Content';
+    }
 
     this.columns = {} || Object.keys(this.dataChunks.aggregates)
       .map((flow) => flow.split('->'))
       .flat()
       .reduce((acc, key) => {
         stages.forEach((stage, column) => {
-          console.log('finding column for', key, column, stage);
           if (stage[key]) {
             acc[key] = column + 1;
           }
         });
         return acc;
       }, {});
-    console.log('this.columns', this.columns);
 
     if (this.chart && this.chart.data && this.dataChunks.bundles.length > 0) {
       this.chart.data.datasets[0].data = this.enriched;
@@ -416,7 +482,6 @@ export default class SankeyChart extends AbstractChart {
   }
 
   buildChart() {
-    console.log('charting', this.enriched);
     this.chart = new Chart(this.elems.canvas, {
       type: 'sankey',
       data: {
@@ -424,8 +489,8 @@ export default class SankeyChart extends AbstractChart {
           label: 'My sankey',
           data: this.enriched,
           labels: this.labels,
-          colorFrom: ({ raw }) => allStages[raw.from]?.color || 'purple',
-          colorTo: ({ raw }) => allStages[raw.to]?.color || 'gray',
+          colorFrom: ({ raw }) => allStages[raw.from.split(':')[0]]?.color || 'purple',
+          colorTo: ({ raw }) => allStages[raw.to.split(':')[0]]?.color || 'gray',
           columns: this.columns,
           colorMode: 'gradient', // or 'from' or 'to'
 
@@ -436,13 +501,30 @@ export default class SankeyChart extends AbstractChart {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  updateDataFacets(dataChunks) {
+    const facetcandidates = stages.filter((stage) => stage.label);
+
+    facetcandidates.forEach((facet) => {
+      dataChunks.addFacet(facet.label, (bundle) => Object.entries(facet)
+        .filter(([key]) => key !== 'label')
+        .reduce((acc, [key, step]) => {
+          if (acc.length > 0) return acc;
+          if (step.detect(bundle)) {
+            acc.push(typeof step.label === 'function' ? step.label(bundle) : step.label || key);
+          }
+          return acc;
+        }, []));
+    });
+  }
+
   render() {
     this.draw();
 
     if (this.enriched.length > 0) {
       this.buildChart();
     } else {
-      console.log('no data yet, skipping charting');
+      // console.log('no data yet, skipping charting');
     }
   }
 }
