@@ -2,6 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-height: 45vh;
   aspect-ratio: 16 / 9;
   margin: 0 auto var(--spacing-s) auto;
   border-radius: var(--image-border-radius-l);
@@ -10,7 +12,13 @@
 
 .availability .tooltip-wrapper {
   position: relative;
-  max-width: calc(100% - 2ch);
+  max-width: calc(100% - 6vw);
+}
+
+@media (min-width: 900px) {
+  .availability .tooltip-wrapper {
+    max-width: calc(100% - 6rem);
+  }
 }
 
 .availability img,
