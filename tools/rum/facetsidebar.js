@@ -44,6 +44,30 @@ const facetDecorators = {
   'utm.utm_keyword.target': {
     label: 'Keyword',
   },
+  trafficsource: {
+    label: 'Traffic Source',
+  },
+  traffictype: {
+    label: 'Traffic Type',
+  },
+  entryevent: {
+    label: 'Entry Event',
+  },
+  pagetype: {
+    label: 'Page Type',
+  },
+  contenttype: {
+    label: 'Content Type',
+  },
+  interaction: {
+    label: 'Interaction',
+  },
+  clicktarget: {
+    label: 'Click Target Type',
+  },
+  exit: {
+    label: 'Exit Link',
+  },
 };
 export default class FacetSidebar {
   constructor(dataChunks, elems) {

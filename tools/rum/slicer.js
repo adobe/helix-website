@@ -143,6 +143,16 @@ function updateFilter(params, filterText) {
       || key === 'userAgent'
       || (key === 'filter' && filterText.length > 2)
       || key === 'url'
+      // facets from sankey
+      || key === 'trafficsource'
+      || key === 'traffictype'
+      || key === 'entryevent'
+      || key === 'pagetype'
+      || key === 'loadtype'
+      || key === 'contenttype'
+      || key === 'interaction'
+      || key === 'clicktarget'
+      || key === 'exit'
       || key.endsWith('.source')
       || key.endsWith('.target')
       || key === 'checkpoint')
