@@ -42,6 +42,24 @@ export default class PieChart extends AbstractChart {
         this.chart.data.datasets[0].backgroundColor.push(colors[key] || '#888');
       });
 
+    if (drilldown === 'userAgent') {
+      // add a second dataset for the OS based on facets
+      this.chart.data.datasets[1] = {
+        data: this.dataChunks.facets.userAgent
+          .sort(({ value: leftkey }, { value: rightkey }) => leftkey.localeCompare(rightkey))
+          .map(({ value, weight }) => {
+            if (value.includes(':')) return 0;
+            return weight;
+          }),
+        backgroundColor: this.dataChunks.facets.userAgent
+          .sort(({ value: leftkey }, { value: rightkey }) => leftkey.localeCompare(rightkey))
+          .map(({ value }) => {
+            if (value.includes(':')) return 0;
+            return colors[value] || '#888';
+          }),
+      };
+    }
+
     this.chart.update();
   }
 
