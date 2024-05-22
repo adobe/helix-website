@@ -2,7 +2,7 @@
  * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
  */
 import {
-  scoreBundle, scoreCWV, toHumanReadable, truncate,
+  scoreCWV, toHumanReadable, truncate, weighBundle,
 } from './utils.js';
 
 const INTERPOLATION_THRESHOLD = 10;
@@ -223,10 +223,10 @@ export default class CWVTimeLineChart {
       dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'ni' ? bundle.weight : undefined));
       dataChunks.addSeries('noCWV', () => (0));
     } else {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
+      dataChunks.addSeries('goodCWV', (bundle) => weighBundle(bundle).good);
+      dataChunks.addSeries('poorCWV', (bundle) => weighBundle(bundle).poor);
+      dataChunks.addSeries('niCWV', (bundle) => weighBundle(bundle).ni);
+      dataChunks.addSeries('noCWV', (bundle) => weighBundle(bundle).no);
     }
 
     // interpolated series
