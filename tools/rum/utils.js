@@ -80,5 +80,5 @@ export function truncate(time, unit) {
 }
 
 export function escapeHTML(unsafe) {
-  return unsafe.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+  return unsafe.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
