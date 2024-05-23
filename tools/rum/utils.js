@@ -78,3 +78,7 @@ export function truncate(time, unit) {
   if (unit === 'month') t.setDate(1);
   return toISOStringWithTimezone(t);
 }
+
+export function escapeHTML(text) {
+  return text.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+}

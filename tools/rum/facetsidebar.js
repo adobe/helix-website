@@ -1,5 +1,5 @@
 import { pValue } from './cruncher.js';
-import { toHumanReadable, scoreCWV } from './utils.js';
+import { toHumanReadable, scoreCWV, escapeHTML } from './utils.js';
 
 const facetDecorators = {
   userAgent: {
@@ -101,7 +101,7 @@ export default class FacetSidebar {
       if (usePlaceholders && placeholders[labelText]) {
         return (`${placeholders[labelText]} [${labelText}]`);
       }
-      return (labelText);
+      return escapeHTML(labelText);
     };
 
     const numOptions = mode === 'all' ? 20 : 10;
