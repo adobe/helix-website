@@ -79,6 +79,6 @@ export function truncate(time, unit) {
   return toISOStringWithTimezone(t);
 }
 
-export function escapeHTML(text) {
-  return text.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+export function escapeHTML(unsafe) {
+  return unsafe.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 }
