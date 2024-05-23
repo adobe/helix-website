@@ -962,6 +962,8 @@ async function draw() {
   };
 
   updateKeyMetrics(keyMetrics);
+
+  console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
 async function loadData(scope) {
