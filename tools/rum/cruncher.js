@@ -227,12 +227,19 @@ class Facet {
    * @returns {Aggregate} metrics
    */
   get metrics() {
-    if (this.entries.length === 0) return {};
-    return Object.entries(this.parent.series)
+    if (this.metricsIn) return this.metricsIn;
+    if (this.entries.length === 0) {
+      this.metricsIn = {};
+      return this.metricsIn;
+    }
+
+    this.metricsIn = Object.entries(this.parent.series)
       .reduce((acc, [seriesName, valueFn]) => {
         acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
         return acc;
       }, {});
+
+    return this.metricsIn;
   }
 }
 
