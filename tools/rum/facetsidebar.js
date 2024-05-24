@@ -243,6 +243,7 @@ export default class FacetSidebar {
             let lcp = '-';
             let lcpScore = '';
             const lcpLI = document.createElement('li');
+            lcpLI.title = 'LCP';
             if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
               const lcpValue = entry.metrics.lcp.percentile(75);
               lcp = `${toHumanReadable(lcpValue / 1000)} s`;
@@ -257,6 +258,7 @@ export default class FacetSidebar {
             let cls = '-';
             let clsScore = '';
             const clsLI = document.createElement('li');
+            clsLI.title = 'CLS';
             if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
               const clsValue = entry.metrics.cls.percentile(75);
               cls = `${toHumanReadable(clsValue)}`;
@@ -271,6 +273,7 @@ export default class FacetSidebar {
             let inp = '-';
             let inpScore = '';
             const inpLI = document.createElement('li');
+            inpLI.title = 'INP';
             if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
               const inpValue = entry.metrics.inp.percentile(75);
               inp = `${toHumanReadable(inpValue / 1000)} s`;

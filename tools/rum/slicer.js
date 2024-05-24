@@ -196,6 +196,7 @@ export async function draw() {
   const mode = params.get('metrics');
   sidebar.updateFacets(focus, mode, ph);
 
+  // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
