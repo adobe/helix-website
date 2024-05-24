@@ -157,11 +157,19 @@ figure {
 
 figure .chart-container {
   position: relative;
-  min-height: 400px;
-  height: calc(100vh - 500px);
+  min-height: 100px;
   display: grid;
   justify-content: center;
 }
+
+figure .chart-container.solitary {
+  height: calc(100vh - 700px);
+}
+
+figure .chart-container.extra {
+  max-height: 100px;
+}
+
 
 #low-data-warning {
   color: red;

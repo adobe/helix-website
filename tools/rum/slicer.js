@@ -311,9 +311,19 @@ const io = new IntersectionObserver((entries) => {
 </div>
 
 <figure>
-  <div class="chart-container">
+  <div class="chart-container solitary">
     <canvas id="time-series"></canvas>
   </div>
+  <div class="chart-container extra">
+    <canvas id="extra-chart-1"></canvas>
+  </div>
+  <div class="chart-container extra">
+    <canvas id="extra-chart-2"></canvas>
+  </div>
+  <div class="chart-container extra">
+    <canvas id="extra-chart-3"></canvas>
+  </div>
+
   <div class="filter-tags"></div>
   <figcaption>
     <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>

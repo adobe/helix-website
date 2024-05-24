@@ -66,6 +66,16 @@ export function scoreBundle(bundle) {
 }
 
 export const INTERPOLATION_THRESHOLD = 10;
+
+export function simpleCWVInterpolationFn(metric, threshold) {
+  return (cwvs) => {
+    const valuedWeights = Object.values(cwvs)
+      .filter((value) => value.weight !== undefined)
+      .map((value) => value.weight)
+      .reduce((acc, value) => acc + value, 0);
+    return cwvs[threshold + metric].weight / valuedWeights;
+  };
+}
 export function cwvInterpolationFn(targetMetric, interpolateTo100) {
   return (cwvs) => {
     const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;

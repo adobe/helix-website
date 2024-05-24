@@ -9,7 +9,7 @@ import {
 import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
 import {
   INTERPOLATION_THRESHOLD,
-  scoreBundle, scoreCWV, toHumanReadable, cwvInterpolationFn, truncate,
+  scoreBundle, scoreCWV, toHumanReadable, cwvInterpolationFn, truncate, simpleCWVInterpolationFn,
 } from './utils.js';
 import AbstractChart from './chart.js';
 
@@ -67,26 +67,13 @@ export default class CWVTimeLineChart extends AbstractChart {
       type: 'bar',
       data: {
         labels: [],
-        datasets: [{
-          label: 'No CVW',
-          backgroundColor: '#888',
-          data: [],
-        },
-        {
-          label: 'Good',
-          backgroundColor: '#49cc93',
-          data: [],
-        },
-        {
-          label: 'Needs Improvement',
-          backgroundColor: '#ffa037',
-          data: [],
-        },
-        {
-          label: 'Poor',
-          backgroundColor: '#ff7c65',
-          data: [],
-        }],
+        datasets: [
+          {
+            label: 'Page Views',
+            backgroundColor: 'purple',
+            data: [],
+          },
+        ],
       },
       plugins: [
         {
@@ -162,7 +149,330 @@ export default class CWVTimeLineChart extends AbstractChart {
             },
           },
           y: {
+            display: true,
             stacked: true,
+            ticks: {
+              callback: (value) => toHumanReadable(value),
+            },
+          },
+        },
+      },
+    });
+
+    this.elems.canvas.parentNode.classList.remove('solitary');
+    const lcpcanvas = document.getElementById('extra-chart-1');
+    this.lcpchart = new Chart(lcpcanvas, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Good',
+            backgroundColor: '#49cc93',
+            data: [],
+          },
+          {
+            label: 'Needs Improvement',
+            backgroundColor: '#ffa037',
+            data: [],
+          },
+          {
+            label: 'Poor',
+            backgroundColor: '#ff7c65',
+            data: [],
+          }],
+      },
+      plugins: [
+        {
+          id: 'customCanvasBackgroundColor',
+          beforeDraw: (ch, _, options) => {
+            const { ctx } = ch;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = options.color || '#99ffff';
+            ctx.fillRect(0, 0, ch.width, ch.height);
+            ctx.restore();
+          },
+        },
+      ],
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          customCanvasBackgroundColor: {
+            color: 'white',
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const { datasets } = context.chart.data;
+                const value = context.parsed.y;
+                const i = context.dataIndex;
+                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
+
+                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+              },
+            },
+          },
+        },
+        interaction: {
+          mode: 'x',
+        },
+        animation: {
+          duration: 300,
+        },
+        datasets: {
+          bar: {
+            barPercentage: 1,
+            categoryPercentage: 0.9,
+            borderSkipped: false,
+            borderRadius: {
+              topLeft: 3,
+              topRight: 3,
+              bottomLeft: 3,
+              bottomRight: 3,
+            },
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            display: false,
+            offset: true,
+            time: {
+              displayFormats: {
+                day: 'EEE, MMM d',
+              },
+              unit: 'day',
+            },
+            stacked: true,
+            ticks: {
+              minRotation: 90,
+              maxRotation: 90,
+              autoSkip: false,
+            },
+          },
+          y: {
+            stacked: true,
+            display: false,
+            offset: true,
+            ticks: {
+              callback: (value) => toHumanReadable(value),
+            },
+          },
+        },
+      },
+    });
+
+    const clscanvas = document.getElementById('extra-chart-2');
+    this.clschart = new Chart(clscanvas, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Good',
+            backgroundColor: '#49cc93',
+            data: [],
+          },
+          {
+            label: 'Needs Improvement',
+            backgroundColor: '#ffa037',
+            data: [],
+          },
+          {
+            label: 'Poor',
+            backgroundColor: '#ff7c65',
+            data: [],
+          }],
+      },
+      plugins: [
+        {
+          id: 'customCanvasBackgroundColor',
+          beforeDraw: (ch, _, options) => {
+            const { ctx } = ch;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = options.color || '#99ffff';
+            ctx.fillRect(0, 0, ch.width, ch.height);
+            ctx.restore();
+          },
+        },
+      ],
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          customCanvasBackgroundColor: {
+            color: 'white',
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const { datasets } = context.chart.data;
+                const value = context.parsed.y;
+                const i = context.dataIndex;
+                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
+
+                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+              },
+            },
+          },
+        },
+        interaction: {
+          mode: 'x',
+        },
+        animation: {
+          duration: 300,
+        },
+        datasets: {
+          bar: {
+            barPercentage: 1,
+            categoryPercentage: 0.9,
+            borderSkipped: false,
+            borderRadius: {
+              topLeft: 3,
+              topRight: 3,
+              bottomLeft: 3,
+              bottomRight: 3,
+            },
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            display: false,
+            offset: true,
+            time: {
+              displayFormats: {
+                day: 'EEE, MMM d',
+              },
+              unit: 'day',
+            },
+            stacked: true,
+            ticks: {
+              minRotation: 90,
+              maxRotation: 90,
+              autoSkip: false,
+            },
+          },
+          y: {
+            stacked: true,
+            display: false,
+            offset: true,
+            ticks: {
+              callback: (value) => toHumanReadable(value),
+            },
+          },
+        },
+      },
+    });
+
+    const inpcanvas = document.getElementById('extra-chart-3');
+    this.inpchart = new Chart(inpcanvas, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Good',
+            backgroundColor: '#49cc93',
+            data: [],
+          },
+          {
+            label: 'Needs Improvement',
+            backgroundColor: '#ffa037',
+            data: [],
+          },
+          {
+            label: 'Poor',
+            backgroundColor: '#ff7c65',
+            data: [],
+          }],
+      },
+      plugins: [
+        {
+          id: 'customCanvasBackgroundColor',
+          beforeDraw: (ch, _, options) => {
+            const { ctx } = ch;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-over';
+            ctx.fillStyle = options.color || '#99ffff';
+            ctx.fillRect(0, 0, ch.width, ch.height);
+            ctx.restore();
+          },
+        },
+      ],
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          customCanvasBackgroundColor: {
+            color: 'white',
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const { datasets } = context.chart.data;
+                const value = context.parsed.y;
+                const i = context.dataIndex;
+                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
+
+                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+              },
+            },
+          },
+        },
+        interaction: {
+          mode: 'x',
+        },
+        animation: {
+          duration: 300,
+        },
+        datasets: {
+          bar: {
+            barPercentage: 1,
+            categoryPercentage: 0.9,
+            borderSkipped: false,
+            borderRadius: {
+              topLeft: 3,
+              topRight: 3,
+              bottomLeft: 3,
+              bottomRight: 3,
+            },
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            display: false,
+            offset: true,
+            time: {
+              displayFormats: {
+                day: 'EEE, MMM d',
+              },
+              unit: 'day',
+            },
+            stacked: true,
+            ticks: {
+              minRotation: 90,
+              maxRotation: 90,
+              autoSkip: false,
+            },
+          },
+          y: {
+            stacked: true,
+            display: false,
+            offset: true,
             ticks: {
               callback: (value) => toHumanReadable(value),
             },
@@ -178,6 +488,71 @@ export default class CWVTimeLineChart extends AbstractChart {
    */
   defineSeries() {
     const { dataChunks } = this;
+
+    dataChunks.addSeries('goodLCP', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'good' ? bundle.weight : undefined));
+    dataChunks.addSeries('poorLCP', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'poor' ? bundle.weight : undefined));
+    dataChunks.addSeries('niLCP', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'ni' ? bundle.weight : undefined));
+    dataChunks.addSeries('noLCP', () => (0));
+
+    dataChunks.addSeries('goodCLS', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'good' ? bundle.weight : undefined));
+    dataChunks.addSeries('poorCLS', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'poor' ? bundle.weight : undefined));
+    dataChunks.addSeries('niCLS', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'ni' ? bundle.weight : undefined));
+    dataChunks.addSeries('noCLS', () => (0));
+
+    dataChunks.addSeries('goodINP', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'good' ? bundle.weight : undefined));
+    dataChunks.addSeries('poorINP', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'poor' ? bundle.weight : undefined));
+    dataChunks.addSeries('niINP', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'ni' ? bundle.weight : undefined));
+    dataChunks.addSeries('noINP', () => (0));
+
+    // interpolated series
+    dataChunks.addInterpolation(
+      'iGoodLCP',
+      ['goodLCP', 'niLCP', 'poorLCP'],
+      simpleCWVInterpolationFn('LCP', 'good'),
+    );
+    dataChunks.addInterpolation(
+      'iNiLCP',
+      ['goodLCP', 'niLCP', 'poorLCP'],
+      simpleCWVInterpolationFn('LCP', 'ni'),
+    );
+    dataChunks.addInterpolation(
+      'iPoorLCP',
+      ['goodLCP', 'niLCP', 'poorLCP'],
+      simpleCWVInterpolationFn('LCP', 'poor'),
+    );
+
+    dataChunks.addInterpolation(
+      'iGoodCLS',
+      ['goodCLS', 'niCLS', 'poorCLS'],
+      simpleCWVInterpolationFn('CLS', 'good'),
+    );
+    dataChunks.addInterpolation(
+      'iNiCLS',
+      ['goodCLS', 'niCLS', 'poorCLS'],
+      simpleCWVInterpolationFn('CLS', 'ni'),
+    );
+    dataChunks.addInterpolation(
+      'iPoorCLS',
+      ['goodCLS', 'niCLS', 'poorCLS'],
+      simpleCWVInterpolationFn('CLS', 'poor'),
+    );
+
+    dataChunks.addInterpolation(
+      'iGoodINP',
+      ['goodINP', 'niINP', 'poorINP'],
+      simpleCWVInterpolationFn('INP', 'good'),
+    );
+    dataChunks.addInterpolation(
+      'iNiINP',
+      ['goodINP', 'niINP', 'poorINP'],
+      simpleCWVInterpolationFn('INP', 'ni'),
+    );
+    dataChunks.addInterpolation(
+      'iPoorINP',
+      ['goodINP', 'niINP', 'poorINP'],
+      simpleCWVInterpolationFn('INP', 'poor'),
+    );
+
     // aggregate series
     if (this.chartConfig.focus === 'lcp') {
       dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'good' ? bundle.weight : undefined));
@@ -290,29 +665,62 @@ export default class CWVTimeLineChart extends AbstractChart {
     const group = this.dataChunks.group(this.groupBy);
     const chartLabels = Object.keys(group).sort();
 
-    const iGoodCWVs = Object.entries(this.dataChunks.aggregates)
+    const iGoodLCPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iGoodCWV.weight);
-
-    const iNiCWVs = Object.entries(this.dataChunks.aggregates)
+      .map(([, totals]) => totals.iGoodLCP.weight);
+    const iNiLCPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iNiCWV.weight);
-
-    const iPoorCWVs = Object.entries(this.dataChunks.aggregates)
+      .map(([, totals]) => totals.iNiLCP.weight);
+    const iPoorLCPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iPoorCWV.weight);
+      .map(([, totals]) => totals.iPoorLCP.weight);
+    this.lcpchart.data.datasets[0].data = iGoodLCPs;
+    this.lcpchart.data.datasets[1].data = iNiLCPs;
+    this.lcpchart.data.datasets[2].data = iPoorLCPs;
 
-    const iNoCWVs = Object.entries(this.dataChunks.aggregates)
+    const iGoodCLSs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iNoCWV.weight);
+      .map(([, totals]) => totals.iGoodCLS.weight);
+    const iNiCLSs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iNiCLS.weight);
+    const iPoorCLSs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iPoorCLS.weight);
+    this.clschart.data.datasets[0].data = iGoodCLSs;
+    this.clschart.data.datasets[1].data = iNiCLSs;
+    this.clschart.data.datasets[2].data = iPoorCLSs;
 
-    this.chart.data.datasets[1].data = iGoodCWVs;
-    this.chart.data.datasets[2].data = iNiCWVs;
-    this.chart.data.datasets[3].data = iPoorCWVs;
-    this.chart.data.datasets[0].data = iNoCWVs;
+    const iGoodINPs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iGoodINP.weight);
+    const iNiINPs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iNiINP.weight);
+    const iPoorINPs = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.iPoorINP.weight);
+    this.inpchart.data.datasets[0].data = iGoodINPs;
+    this.inpchart.data.datasets[1].data = iNiINPs;
+    this.inpchart.data.datasets[2].data = iPoorINPs;
+
+    const allTraffic = Object.entries(this.dataChunks.aggregates)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, totals]) => totals.pageViews.sum);
+
+    this.chart.data.datasets[0].data = allTraffic;
 
     this.chart.data.labels = chartLabels;
+    this.lcpchart.data.labels = chartLabels;
+    this.clschart.data.labels = chartLabels;
+    this.inpchart.data.labels = chartLabels;
     this.chart.options.scales.x.time.unit = config.unit;
+
     this.chart.update();
+    this.lcpchart.update();
+    this.clschart.update();
+    this.inpchart.update();
+
+    console.log('this.lcpchart', this.lcpchart.data);
   }
 }
