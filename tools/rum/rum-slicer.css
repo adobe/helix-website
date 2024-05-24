@@ -153,6 +153,9 @@ figure {
   position: relative;
   margin: 0;
   margin-bottom: 16px;
+  display: grid;
+  grid-template-rows: 1fr 0fr;
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 
@@ -165,7 +168,8 @@ figure .chart-container {
 }
 
 figure .chart-container:nth-of-type(1) {
-  height: calc(100vh - 700px);
+  height: calc(100vh - 500px);
+  grid-area: 1 / 1 / 2 / 4;
 }
 
 figure .chart-container.solitary {
