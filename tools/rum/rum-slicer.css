@@ -180,7 +180,7 @@ figure .chart-container.solitary ~ .chart-container.extra {
   display: none;
 }
 
-figure .chart-container.extra {
+.chart-container.extra {
   max-height: 100px;
 }
 

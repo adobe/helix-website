@@ -290,14 +290,23 @@ const io = new IntersectionObserver((entries) => {
     <li id="lcp">
       <h2>LCP</h2>
       <p>0</p>
+      <div class="chart-container extra">
+        <canvas id="extra-chart-1"></canvas>
+      </div>
     </li>
     <li id="cls">
       <h2>CLS</h2>
       <p>0</p>
+      <div class="chart-container extra">
+        <canvas id="extra-chart-2"></canvas>
+      </div>
     </li>
     <li id="inp">
       <h2>INP</h2>
       <p>0</p>
+      <div class="chart-container extra">
+        <canvas id="extra-chart-3"></canvas>
+      </div>
     </li>
   </ul>
   <div class="key-metrics-more" aria-hidden="true">
@@ -314,16 +323,6 @@ const io = new IntersectionObserver((entries) => {
   <div class="chart-container solitary">
     <canvas id="time-series"></canvas>
   </div>
-  <div class="chart-container extra">
-    <canvas id="extra-chart-1"></canvas>
-  </div>
-  <div class="chart-container extra">
-    <canvas id="extra-chart-2"></canvas>
-  </div>
-  <div class="chart-container extra">
-    <canvas id="extra-chart-3"></canvas>
-  </div>
-
   <div class="filter-tags"></div>
   <figcaption>
     <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>

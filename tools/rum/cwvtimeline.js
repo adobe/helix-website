@@ -202,7 +202,7 @@ export default class CWVTimeLineChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: 'transparent',
           },
           tooltip: {
             callbacks: {
@@ -309,7 +309,7 @@ export default class CWVTimeLineChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: 'transparent',
           },
           tooltip: {
             callbacks: {
@@ -416,7 +416,7 @@ export default class CWVTimeLineChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: 'transparent',
           },
           tooltip: {
             callbacks: {
