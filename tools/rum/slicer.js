@@ -195,6 +195,8 @@ export async function draw() {
   const focus = params.get('focus');
   const mode = params.get('metrics');
   sidebar.updateFacets(focus, mode, ph);
+
+  console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
 async function fetchDomainKey(domain) {
