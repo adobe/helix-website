@@ -73,6 +73,80 @@ export default class CWVTimeLineChart extends AbstractChart {
             backgroundColor: 'purple',
             data: [],
           },
+          {
+            label: 'Good LCP',
+            backgroundColor: '#49cc93',
+            data: [],
+            yAxisID: 'lcp',
+          },
+          {
+            label: 'Needs Improvement LCP',
+            backgroundColor: '#ffa037',
+            data: [],
+            yAxisID: 'lcp',
+          },
+          {
+            label: 'Poor LCP',
+            backgroundColor: '#ff7c65',
+            data: [],
+            yAxisID: 'lcp',
+          },
+          {
+            label: 'Fake LCP Data',
+            backgroundColor: 'transparent',
+            data: [-2],
+            yAxisID: 'lcp',
+          },
+          {
+            label: 'Good CLS',
+            // slightly lighter green than #49cc93 which is the good LCP color
+            backgroundColor: '#6ed2a6',
+            data: [],
+            yAxisID: 'cls',
+          },
+          {
+            label: 'Needs Improvement CLS',
+            backgroundColor: '#ffa037',
+            data: [],
+            yAxisID: 'cls',
+          },
+          {
+            label: 'Poor CLS',
+            backgroundColor: '#ff7c65',
+            data: [],
+            yAxisID: 'cls',
+          },
+          {
+            label: 'Fake CLS Data',
+            backgroundColor: 'transparent',
+            data: [-2],
+            yAxisID: 'cls',
+          },
+          {
+            label: 'Good INP',
+            // slightly lighter green than #49cc93 which is the good LCP color
+            backgroundColor: '#6ed2a6',
+            data: [],
+            yAxisID: 'inp',
+          },
+          {
+            label: 'Needs Improvement INP',
+            backgroundColor: '#ffa037',
+            data: [],
+            yAxisID: 'inp',
+          },
+          {
+            label: 'Poor INP',
+            backgroundColor: '#ff7c65',
+            data: [],
+            yAxisID: 'inp',
+          },
+          {
+            label: 'Fake INP Data',
+            backgroundColor: 'blue',
+            data: [-2],
+            yAxisID: 'inp',
+          },
         ],
       },
       plugins: [
@@ -134,6 +208,12 @@ export default class CWVTimeLineChart extends AbstractChart {
           x: {
             type: 'time',
             display: true,
+            grid: {
+              display: false,
+            },
+            border: {
+              display: false,
+            },
             offset: true,
             time: {
               displayFormats: {
@@ -151,331 +231,47 @@ export default class CWVTimeLineChart extends AbstractChart {
           y: {
             display: true,
             stacked: true,
-            ticks: {
-              callback: (value) => toHumanReadable(value),
+            border: {
+              display: false,
             },
-          },
-        },
-      },
-    });
-
-    this.elems.canvas.parentNode.classList.remove('solitary');
-    const lcpcanvas = document.getElementById('extra-chart-1');
-    this.lcpchart = new Chart(lcpcanvas, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Good',
-            backgroundColor: '#49cc93',
-            data: [],
-          },
-          {
-            label: 'Needs Improvement',
-            backgroundColor: '#ffa037',
-            data: [],
-          },
-          {
-            label: 'Poor',
-            backgroundColor: '#ff7c65',
-            data: [],
-          }],
-      },
-      plugins: [
-        {
-          id: 'customCanvasBackgroundColor',
-          beforeDraw: (ch, _, options) => {
-            const { ctx } = ch;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = options.color || '#99ffff';
-            ctx.fillRect(0, 0, ch.width, ch.height);
-            ctx.restore();
-          },
-        },
-      ],
-      options: {
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          customCanvasBackgroundColor: {
-            color: 'white',
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const { datasets } = context.chart.data;
-                const value = context.parsed.y;
-                const i = context.dataIndex;
-                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
-
-                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+            ticks: {
+              callback: (value) => (value > 0
+                // normal value
+                ? toHumanReadable(value)
+                // there is no negative traffic, so we hide the label
+                : ''),
+            },
+            grid: {
+              color: (context) => {
+                if (context.tick.value > 0) return 'rgba(0, 0, 0, 0.1)';
+                return 'rgba(0, 0, 0, 0.0)';
               },
             },
+            // min: -7000,
           },
-        },
-        interaction: {
-          mode: 'x',
-        },
-        animation: {
-          duration: 300,
-        },
-        datasets: {
-          bar: {
-            barPercentage: 1,
-            categoryPercentage: 0.9,
-            borderSkipped: false,
-            borderRadius: {
-              topLeft: 3,
-              topRight: 3,
-              bottomLeft: 3,
-              bottomRight: 3,
-            },
-          },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            type: 'time',
+          lcp: {
             display: false,
-            offset: true,
-            time: {
-              displayFormats: {
-                day: 'EEE, MMM d',
-              },
-              unit: 'day',
-            },
             stacked: true,
-            ticks: {
-              minRotation: 90,
-              maxRotation: 90,
-              autoSkip: false,
-            },
+            axis: 'y',
+            reverse: false,
+            min: -3.0,
+            max: 4.5,
           },
-          y: {
+          cls: {
+            display: false,
             stacked: true,
+            axis: 'y',
+            reverse: false,
+            min: -2,
+            max: 6,
+          },
+          inp: {
             display: false,
-            offset: true,
-            ticks: {
-              callback: (value) => toHumanReadable(value),
-            },
-          },
-        },
-      },
-    });
-
-    const clscanvas = document.getElementById('extra-chart-2');
-    this.clschart = new Chart(clscanvas, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Good',
-            backgroundColor: '#49cc93',
-            data: [],
-          },
-          {
-            label: 'Needs Improvement',
-            backgroundColor: '#ffa037',
-            data: [],
-          },
-          {
-            label: 'Poor',
-            backgroundColor: '#ff7c65',
-            data: [],
-          }],
-      },
-      plugins: [
-        {
-          id: 'customCanvasBackgroundColor',
-          beforeDraw: (ch, _, options) => {
-            const { ctx } = ch;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = options.color || '#99ffff';
-            ctx.fillRect(0, 0, ch.width, ch.height);
-            ctx.restore();
-          },
-        },
-      ],
-      options: {
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          customCanvasBackgroundColor: {
-            color: 'white',
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const { datasets } = context.chart.data;
-                const value = context.parsed.y;
-                const i = context.dataIndex;
-                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
-
-                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
-              },
-            },
-          },
-        },
-        interaction: {
-          mode: 'x',
-        },
-        animation: {
-          duration: 300,
-        },
-        datasets: {
-          bar: {
-            barPercentage: 1,
-            categoryPercentage: 0.9,
-            borderSkipped: false,
-            borderRadius: {
-              topLeft: 3,
-              topRight: 3,
-              bottomLeft: 3,
-              bottomRight: 3,
-            },
-          },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            type: 'time',
-            display: false,
-            offset: true,
-            time: {
-              displayFormats: {
-                day: 'EEE, MMM d',
-              },
-              unit: 'day',
-            },
             stacked: true,
-            ticks: {
-              minRotation: 90,
-              maxRotation: 90,
-              autoSkip: false,
-            },
-          },
-          y: {
-            stacked: true,
-            display: false,
-            offset: true,
-            ticks: {
-              callback: (value) => toHumanReadable(value),
-            },
-          },
-        },
-      },
-    });
-
-    const inpcanvas = document.getElementById('extra-chart-3');
-    this.inpchart = new Chart(inpcanvas, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Good',
-            backgroundColor: '#49cc93',
-            data: [],
-          },
-          {
-            label: 'Needs Improvement',
-            backgroundColor: '#ffa037',
-            data: [],
-          },
-          {
-            label: 'Poor',
-            backgroundColor: '#ff7c65',
-            data: [],
-          }],
-      },
-      plugins: [
-        {
-          id: 'customCanvasBackgroundColor',
-          beforeDraw: (ch, _, options) => {
-            const { ctx } = ch;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = options.color || '#99ffff';
-            ctx.fillRect(0, 0, ch.width, ch.height);
-            ctx.restore();
-          },
-        },
-      ],
-      options: {
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          customCanvasBackgroundColor: {
-            color: 'white',
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const { datasets } = context.chart.data;
-                const value = context.parsed.y;
-                const i = context.dataIndex;
-                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
-
-                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
-              },
-            },
-          },
-        },
-        interaction: {
-          mode: 'x',
-        },
-        animation: {
-          duration: 300,
-        },
-        datasets: {
-          bar: {
-            barPercentage: 1,
-            categoryPercentage: 0.9,
-            borderSkipped: false,
-            borderRadius: {
-              topLeft: 3,
-              topRight: 3,
-              bottomLeft: 3,
-              bottomRight: 3,
-            },
-          },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            type: 'time',
-            display: false,
-            offset: true,
-            time: {
-              displayFormats: {
-                day: 'EEE, MMM d',
-              },
-              unit: 'day',
-            },
-            stacked: true,
-            ticks: {
-              minRotation: 90,
-              maxRotation: 90,
-              autoSkip: false,
-            },
-          },
-          y: {
-            stacked: true,
-            display: false,
-            offset: true,
-            ticks: {
-              callback: (value) => toHumanReadable(value),
-            },
+            axis: 'y',
+            reverse: false,
+            min: -1,
+            max: 9,
           },
         },
       },
@@ -667,60 +463,58 @@ export default class CWVTimeLineChart extends AbstractChart {
 
     const iGoodLCPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iGoodLCP.weight);
+      .map(([, totals]) => -totals.iGoodLCP.weight);
     const iNiLCPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iNiLCP.weight);
+      .map(([, totals]) => -totals.iNiLCP.weight);
     const iPoorLCPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iPoorLCP.weight);
-    this.lcpchart.data.datasets[0].data = iGoodLCPs;
-    this.lcpchart.data.datasets[1].data = iNiLCPs;
-    this.lcpchart.data.datasets[2].data = iPoorLCPs;
+      .map(([, totals]) => -totals.iPoorLCP.weight);
 
     const iGoodCLSs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iGoodCLS.weight);
+      .map(([, totals]) => -totals.iGoodCLS.weight);
     const iNiCLSs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iNiCLS.weight);
+      .map(([, totals]) => -totals.iNiCLS.weight);
     const iPoorCLSs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iPoorCLS.weight);
-    this.clschart.data.datasets[0].data = iGoodCLSs;
-    this.clschart.data.datasets[1].data = iNiCLSs;
-    this.clschart.data.datasets[2].data = iPoorCLSs;
+      .map(([, totals]) => -totals.iPoorCLS.weight);
 
     const iGoodINPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iGoodINP.weight);
+      .map(([, totals]) => -totals.iGoodINP.weight);
     const iNiINPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iNiINP.weight);
+      .map(([, totals]) => -totals.iNiINP.weight);
     const iPoorINPs = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.iPoorINP.weight);
-    this.inpchart.data.datasets[0].data = iGoodINPs;
-    this.inpchart.data.datasets[1].data = iNiINPs;
-    this.inpchart.data.datasets[2].data = iPoorINPs;
+      .map(([, totals]) => -totals.iPoorINP.weight);
 
     const allTraffic = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([, totals]) => totals.pageViews.sum);
 
     this.chart.data.datasets[0].data = allTraffic;
+    this.chart.data.datasets[1].data = iGoodLCPs;
+    this.chart.data.datasets[2].data = iNiLCPs;
+    this.chart.data.datasets[3].data = iPoorLCPs;
+    // 4 is fake data
+    this.chart.data.datasets[5].data = iGoodCLSs;
+    this.chart.data.datasets[6].data = iNiCLSs;
+    this.chart.data.datasets[7].data = iPoorCLSs;
+    // 8 is fake data
+    this.chart.data.datasets[9].data = iGoodINPs;
+    this.chart.data.datasets[10].data = iNiINPs;
+    this.chart.data.datasets[11].data = iPoorINPs;
+    // 12 is fake data
 
     this.chart.data.labels = chartLabels;
-    this.lcpchart.data.labels = chartLabels;
-    this.clschart.data.labels = chartLabels;
-    this.inpchart.data.labels = chartLabels;
     this.chart.options.scales.x.time.unit = config.unit;
+    // hack: we pretend this scale extends to the bottom as much as
+    // it extends to the top, so that the chart is centered
+    this.chart.options.scales.y.min = -Math.max(...allTraffic);
 
     this.chart.update();
-    this.lcpchart.update();
-    this.clschart.update();
-    this.inpchart.update();
-
-    console.log('this.lcpchart', this.lcpchart.data);
   }
 }
