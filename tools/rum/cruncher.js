@@ -41,6 +41,7 @@
  * @property {string} date - the base date of all bundles in the chunk
  * @property {RawBundle[]} rumBundles - the bundles, as retrieved from the server
  */
+
 /**
  * Calculates properties on the bundle, so that bundle-level filtering can be performed
  * @param {RawBundle} bundle the raw input bundle, without calculated properties
@@ -387,23 +388,57 @@ export class DataChunks {
    * @param {string[]} skipped facets to skip
    */
   filterBundles(bundles, filterSpec, skipped = []) {
+    const existenceFilter = ([facetName]) => this.facetFns[facetName];
+    const skipFilter = ([facetName]) => !skipped.includes(facetName);
+    const valuesExtractor = (attributeName, bundle, parent) => {
+      const facetValue = parent.facetFns[attributeName](bundle);
+      return Array.isArray(facetValue) ? facetValue : [facetValue];
+    };
+    const combinerExtractor = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
+    // eslint-disable-next-line max-len
+    return this.filtering(bundles, filterSpec, skipFilter, existenceFilter, valuesExtractor, combinerExtractor);
+  }
+
+  /**
+   * @private
+   * @param {Bundle[]} bundles
+   * @param {Object<string, string[]>} filterSpec
+   * @param skipFilter function to skip filters
+   * @param existenceFilter function to filter out non-existing attributes
+   * @param valuesExtractor function to extract the probed values
+   * @param combinerExtractor function to extract the combiner
+   * @returns {*}
+   */
+  filtering(bundles, filterSpec, skipFilter, existenceFilter, valuesExtractor, combinerExtractor) {
     const filterBy = Object.entries(filterSpec) // use the full filter spec
-      .filter(([facetName]) => !skipped.includes(facetName)) // except for skipped facets
-      .filter(([, filterValues]) => filterValues.length) // and filters that accept no values
-      .filter(([facetName]) => this.facetFns[facetName]); // and facets that don't exist
+      .filter(skipFilter) // except for skipped facets
+      .filter(([, desiredValues]) => desiredValues.length) // and filters that accept no values
+      .filter(existenceFilter); // and facets that don't exist
     return bundles.filter((bundle) => {
-      const matches = filterBy.map(([facetName, values]) => {
-        // get the facet values for the bundle, remember that
-        // a facet can return multiple values
-        const facetValue = this.facetFns[facetName](bundle);
-        const facetValues = Array.isArray(facetValue) ? facetValue : [facetValue];
-        const facetCombiner = this.facetFns[facetName].combiner || 'some';
-        // check if any of the values match
-        return values[facetCombiner]((value) => facetValues.includes(value));
+      const matches = filterBy.map(([attributeName, desiredValues]) => {
+        const actualValues = valuesExtractor(attributeName, bundle, this);
+        const combiner = combinerExtractor(attributeName, this);
+        return desiredValues[combiner]((value) => actualValues.includes(value));
       });
-      // only if all active filters have a match, then the bundle is included
       return matches.every((match) => match);
     });
+  }
+
+  /**
+   * Checks if a conversion has happened in the bundle.
+   * @param {Bundle} aBundle
+   * @param {Object<string, string[]>} filterSpec
+   * @param {string} combiner used to determine if all or some filters must match
+   * @returns {boolean}
+   */
+  hasConversion(aBundle, filterSpec, combiner) {
+    const existenceFilter = () => true;
+    const skipFilter = () => true;
+    const valuesExtractor = (attributeName, bundle) => bundle.events.map((e) => e[attributeName]);
+    const combinerExtractor = () => combiner || 'every';
+
+    // eslint-disable-next-line max-len
+    return this.filtering([aBundle], filterSpec, skipFilter, existenceFilter, valuesExtractor, combinerExtractor).length > 0;
   }
 
   filterBy(filterSpec) {
