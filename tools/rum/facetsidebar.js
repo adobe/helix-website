@@ -181,7 +181,7 @@ export default class FacetSidebar {
           const drillup = document.createElement('a');
           drillup.className = 'drillup';
           drillup.href = facetDecorators[facetName].drilldown;
-          drillup.title = 'Drill down to more details';
+          drillup.title = 'Return to previous level';
           drillup.textContent = '';
           drillup.addEventListener('click', () => {
             const drillupurl = new URL('explorer.html', window.location);
