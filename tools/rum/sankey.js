@@ -3,6 +3,7 @@ import {
   // eslint-disable-next-line import/extensions, import/no-unresolved
 } from 'https://esm.run/chartjs-chart-sankey';
 import AbstractChart from './chart.js';
+import { cssVariable } from './utils.js';
 
 const { Chart } = window;
 
@@ -46,7 +47,7 @@ const stages = [
           .pop();
         return `referrer:${refhost}`;
       },
-      color: 'purple',
+      color: cssVariable('--spectrum-purple-300'),
       // detection function
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
@@ -61,7 +62,7 @@ const stages = [
         .filter((e) => !e.source.startsWith('http'))
         .length > 0,
       next: ['organic', 'campaign'],
-      color: 'lightgreen',
+      color: cssVariable('--spectrum-green-300'),
     },
   },
   {
@@ -73,7 +74,7 @@ const stages = [
      */
     organic: {
       label: 'Organic',
-      color: 'green',
+      color: cssVariable('--spectrum-green-400'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'utm')
         .length === 0,
@@ -81,7 +82,7 @@ const stages = [
     },
     campaign: {
       label: 'Campaign',
-      color: 'darkred',
+      color: cssVariable('--spectrum-red-400'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'utm')
         .length > 0,
@@ -99,14 +100,14 @@ const stages = [
      */
     reload: {
       label: 'Reload',
-      color: 'gray',
+      color: cssVariable('--spectrum-gray-500'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'reload')
         .length > 0,
       next: ['top', '404'],
     },
     back_forward: {
-      color: 'gray',
+      color: cssVariable('--spectrum-gray-500'),
       label: 'Back/Forward',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'back_forward')
@@ -115,14 +116,14 @@ const stages = [
     },
     enter: {
       label: 'Enter',
-      color: 'lightgreen',
+      color: cssVariable('--spectrum-green-500'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
         .length > 0,
       next: ['top', '404'],
     },
     navigate: {
-      color: 'green',
+      color: cssVariable('--spectrum-green-500'),
       label: (bundle) => {
         const nav = bundle.events.filter((e) => e.checkpoint === 'navigate')
           .map((e) => new URL(e.source).pathname)
@@ -144,7 +145,7 @@ const stages = [
      */
     top: {
       label: 'Content Page',
-      color: 'green',
+      color: cssVariable('--spectrum-green-600'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === '404')
         .length === 0,
@@ -152,7 +153,7 @@ const stages = [
     },
     404: {
       label: '404',
-      color: 'black',
+      color: cssVariable('--spectrum-gray-900'),
       next: [],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === '404')
@@ -168,7 +169,7 @@ const stages = [
      *   - aborted (leave before complete, no more events)
      */
     load: {
-      color: 'darkgreen',
+      color: cssVariable('--spectrum-green-700'),
       label: 'Complete Load',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
@@ -176,7 +177,7 @@ const stages = [
       next: ['nocontent', 'initial', 'engaged', 'experiment'],
     },
     partial: {
-      color: 'orange',
+      color: cssVariable('--spectrum-orange-700'),
       label: 'Partial Load',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
@@ -184,7 +185,7 @@ const stages = [
       next: ['nocontent', 'initial', 'engaged', 'experiment'],
     },
     aborted: {
-      color: 'black',
+      color: cssVariable('--spectrum-gray-700'),
       label: 'Aborted Load',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'top')
@@ -203,7 +204,7 @@ const stages = [
       */
     nocontent: {
       label: 'No Content',
-      color: 'black',
+      color: cssVariable('--spectrum-gray-800'),
       next: ['click', 'formsubmit', 'nointeraction'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
@@ -211,7 +212,7 @@ const stages = [
     },
     experiment: {
       label: 'Experiment',
-      color: 'red',
+      color: cssVariable('--spectrum-red-800'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'experiment')
         .length > 0,
@@ -219,14 +220,14 @@ const stages = [
     },
     initial: {
       label: 'Initial Content',
-      color: 'lightgreen',
+      color: cssVariable('--spectrum-green-800'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length <= 3,
       next: ['click', 'formsubmit', 'nointeraction'],
     },
     engaged: {
-      color: 'green',
+      color: cssVariable('--spectrum-seafoam-800'), // greenish, but not too green
       label: 'Engaged Content',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
@@ -243,7 +244,7 @@ const stages = [
      * - none
      */
     click: {
-      color: 'darkgreen',
+      color: cssVariable('--spectrum-green-900'),
       label: 'Click',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
@@ -251,7 +252,7 @@ const stages = [
       next: ['blind', 'intclick', 'extclick', 'media'],
     },
     formsubmit: {
-      color: 'green',
+      color: cssVariable('--spectrum-seafoam-900'),
       label: 'Form Submit',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'formsubmit')
@@ -259,7 +260,7 @@ const stages = [
     },
     nointeraction: {
       label: 'No Interaction',
-      color: 'black',
+      color: cssVariable('--spectrum-gray-900'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click'
           || e.checkpoint === 'formsubmit')
@@ -276,6 +277,7 @@ const stages = [
      * - media (media)
      */
     media: {
+      color: cssVariable('--spectrum-yellow-1000'),
       label: 'Media Click',
       next: [],
       detect: (bundle) => bundle.events
@@ -285,7 +287,7 @@ const stages = [
     },
     extclick: {
       label: 'External Click',
-      color: 'purple',
+      color: cssVariable('--spectrum-purple-1000'),
       next: ['external:*'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
@@ -296,7 +298,7 @@ const stages = [
 
     intclick: {
       label: 'Internal Click',
-      color: 'green',
+      color: cssVariable('--spectrum-green-1000'),
       next: ['internal:*'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
@@ -306,7 +308,7 @@ const stages = [
     },
     blind: {
       label: 'Blind Click',
-      color: 'gray',
+      color: cssVariable('--spectrum-gray-900'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => !e.target)
@@ -319,7 +321,7 @@ const stages = [
      * 8. What's the click target, specifically
      */
     internal: {
-      color: 'green',
+      color: cssVariable('--spectrum-green-1100'),
       next: [],
       label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
@@ -335,7 +337,7 @@ const stages = [
         .length > 0,
     },
     external: {
-      color: 'purple',
+      color: cssVariable('--spectrum-purple-1100'),
       next: [],
       label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
@@ -358,6 +360,13 @@ const allStages = stages.reduce((acc, stage) => ({ ...acc, ...stage }), {});
 export default class SankeyChart extends AbstractChart {
   async draw() {
     const params = new URL(window.location.href).searchParams;
+
+    if (!params.get('drilldown')) {
+      const u = new URL(window.location.href);
+      u.searchParams.set('drilldown', 'userAgent');
+      window.history.replaceState({}, '', u);
+    }
+
     this.chartConfig.focus = params.get('focus');
 
     if (this.dataChunks.filtered.length < 1000) {
@@ -474,7 +483,6 @@ export default class SankeyChart extends AbstractChart {
       this.chart.data.datasets[0].data = this.enriched;
       this.chart.data.labels = this.labels;
       this.chart.data.columns = this.columns;
-      // const drilldown = params.get('drilldown') || 'checkpoint';
       this.chart.update();
     } else if (this.dataChunks.bundles.length > 0) {
       this.buildChart();
