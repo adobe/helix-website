@@ -3,25 +3,26 @@ import {
   // eslint-disable-next-line import/no-unresolved, import/extensions
 } from 'https://cdn.skypack.dev/chart.js@4.2.0';
 import AbstractChart from './chart.js';
+import { cssVariable } from './utils.js';
 
 const colors = {
-  'bot:social': '#ff5a3d',
-  'bot:search': '#ff7c65',
-  'bot:seo': '#ff7c65',
-  'bot:ads': '#ff7c65',
-  'bot:monitoring': '#ff7c65',
-  bot: '#ff7c65',
+  'bot:social': cssVariable('--spectrum-red-100'),
+  'bot:search': cssVariable('--spectrum-red-300'),
+  'bot:seo': cssVariable('--spectrum-red-600'),
+  'bot:ads': cssVariable('--spectrum-red-800'),
+  'bot:monitoring': cssVariable('--spectrum-red-1000'),
+  bot: cssVariable('--spectrum-red-1300'),
   // desktop linux is often a hidden bot, so we group them together
-  'desktop:linux': '#ffc78a',
-  desktop: '#ffa037',
-  'desktop:chromeos': '#ff7f00',
-  'desktop:windows': '#ffb75e',
+  'desktop:linux': cssVariable('--spectrum-magenta-900'),
+  desktop: cssVariable('--spectrum-fuchsia-1300'),
+  'desktop:chromeos': cssVariable('--spectrum-fuchsia-900'),
+  'desktop:windows': cssVariable('--spectrum-fuchsia-600'),
   /* a trick to group all apple devices together */
-  'desktop:mac': '#ff7f00',
-  'mobile:ios': '#2f995f',
-  'mobile:ipados': '#6bdfb1',
-  mobile: '#49cc93',
-  'mobile:android': '#3eb47f',
+  'desktop:mac': cssVariable('--spectrum-fuchsia-300'),
+  'mobile:ios': cssVariable('--spectrum-seafoam-300'),
+  'mobile:ipados': cssVariable('--spectrum-seafoam-500'),
+  mobile: cssVariable('--spectrum-seafoam-1300'),
+  'mobile:android': cssVariable('--spectrum-seafoam-900'),
 };
 
 function sortByUAClass(left, right) {
