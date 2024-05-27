@@ -491,6 +491,7 @@ export default class SankeyChart extends AbstractChart {
 
   buildChart() {
     Chart.defaults.font.family = 'Adobe Clean, sans-serif';
+    Chart.defaults.font.size = 16;
     this.chart = new Chart(this.elems.canvas, {
       type: 'sankey',
       data: {
