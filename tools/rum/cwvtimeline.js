@@ -16,6 +16,7 @@ import {
   truncate,
   simpleCWVInterpolationFn,
   cssVariable,
+  getGradient,
 } from './utils.js';
 import AbstractChart from './chart.js';
 
@@ -76,7 +77,17 @@ export default class CWVTimeLineChart extends AbstractChart {
         datasets: [
           {
             label: 'Page Views',
-            backgroundColor: cssVariable('--spectrum-purple-1300'),
+            // backgroundColor: cssVariable('--spectrum-purple-1300'),
+            backgroundColor: (context) => {
+              const { chart } = context;
+              const { ctx, chartArea } = chart;
+
+              if (!chartArea) {
+                // This case happens on initial chart load
+                return null;
+              }
+              return getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
+            },
             data: [],
           },
           {
