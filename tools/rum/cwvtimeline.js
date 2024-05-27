@@ -262,11 +262,14 @@ export default class CWVTimeLineChart extends AbstractChart {
               display: false,
             },
             ticks: {
-              callback: (value) => (value > 0
-                // normal value
-                ? toHumanReadable(value)
-                // there is no negative traffic, so we hide the label
-                : ''),
+              callback: (value) => {
+                if (value === 0) return '';
+                if (value > 0) return toHumanReadable(value);
+                console.log(value, 'smaller 0');
+                // @davidnuescheler tweak this some more
+                if (value < 0) return 'LCP';
+                return '';
+              },
             },
             grid: {
               color: (context) => {
@@ -281,7 +284,8 @@ export default class CWVTimeLineChart extends AbstractChart {
             stacked: true,
             axis: 'y',
             reverse: false,
-            min: -3.0,
+            // @davidnuescheler tweak this
+            min: -3.4,
             max: 4.5,
           },
           cls: {
@@ -289,7 +293,7 @@ export default class CWVTimeLineChart extends AbstractChart {
             stacked: true,
             axis: 'y',
             reverse: false,
-            min: -2,
+            min: -2.5,
             max: 6,
           },
           inp: {
@@ -297,7 +301,7 @@ export default class CWVTimeLineChart extends AbstractChart {
             stacked: true,
             axis: 'y',
             reverse: false,
-            min: -1,
+            min: -1.8,
             max: 9,
           },
         },
@@ -523,6 +527,7 @@ export default class CWVTimeLineChart extends AbstractChart {
       .map(([, totals]) => totals.pageViews.sum);
 
     this.chart.data.datasets[0].data = allTraffic;
+
     this.chart.data.datasets[1].data = iGoodLCPs;
     this.chart.data.datasets[2].data = iNiLCPs;
     this.chart.data.datasets[3].data = iPoorLCPs;
