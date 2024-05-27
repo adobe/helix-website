@@ -25,7 +25,9 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const timelinechart = new CWVTimeLineChart(dataChunks, elems);
+const herochart = window.slicer && window.slicer.Chart
+  ? new window.slicer.Chart(dataChunks, elems)
+  : new CWVTimeLineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 
 // set up metrics for dataChunks
@@ -128,6 +130,10 @@ function updateDataFacets(filterText, params, checkpoint) {
         });
       }
     });
+
+  if (typeof herochart.updateDataFacets === 'function') {
+    herochart.updateDataFacets(dataChunks);
+  }
 }
 
 function updateFilter(params, filterText) {
@@ -137,6 +143,16 @@ function updateFilter(params, filterText) {
       || key === 'userAgent'
       || (key === 'filter' && filterText.length > 2)
       || key === 'url'
+      // facets from sankey
+      || key === 'trafficsource'
+      || key === 'traffictype'
+      || key === 'entryevent'
+      || key === 'pagetype'
+      || key === 'loadtype'
+      || key === 'contenttype'
+      || key === 'interaction'
+      || key === 'clicktarget'
+      || key === 'exit'
       || key.endsWith('.source')
       || key.endsWith('.target')
       || key === 'checkpoint')
@@ -164,7 +180,7 @@ export async function draw() {
   // eslint-disable-next-line no-console
   console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
 
-  await timelinechart.draw();
+  await herochart.draw();
 
   updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
@@ -180,6 +196,7 @@ export async function draw() {
   const mode = params.get('metrics');
   sidebar.updateFacets(focus, mode, ph);
 
+  // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
@@ -225,6 +242,8 @@ export function updateState() {
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
   const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
   if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
+  const drilldown = new URL(window.location).searchParams.get('drilldown');
+  if (drilldown) url.searchParams.set('drilldown', drilldown);
 
   elems.facetsElement.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
@@ -315,7 +334,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
 
-    timelinechart.render();
+    herochart.render();
 
     const params = new URL(window.location).searchParams;
     elems.filterInput.value = params.get('filter');

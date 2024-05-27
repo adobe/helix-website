@@ -4,12 +4,15 @@ import { toHumanReadable, scoreCWV, escapeHTML } from './utils.js';
 const facetDecorators = {
   userAgent: {
     label: 'User Agent (Operating System and Browser)',
+    drilldown: 'share.html',
   },
   url: {
     label: 'URL',
+    drilldown: 'list.html',
   },
   checkpoint: {
     label: 'Checkpoint',
+    drilldown: 'flow.html',
   },
   filter: {
     hidden: true,
@@ -40,6 +43,30 @@ const facetDecorators = {
   },
   'utm.utm_keyword.target': {
     label: 'Keyword',
+  },
+  trafficsource: {
+    label: 'Traffic Source',
+  },
+  traffictype: {
+    label: 'Traffic Type',
+  },
+  entryevent: {
+    label: 'Entry Event',
+  },
+  pagetype: {
+    label: 'Page Type',
+  },
+  contenttype: {
+    label: 'Content Type',
+  },
+  interaction: {
+    label: 'Interaction',
+  },
+  clicktarget: {
+    label: 'Click Target Type',
+  },
+  exit: {
+    label: 'Exit Link',
   },
 };
 export default class FacetSidebar {
@@ -136,6 +163,36 @@ export default class FacetSidebar {
         const clipboard = document.createElement('span');
         clipboard.className = 'clipboard';
         legend.append(clipboard);
+        if (facetDecorators[facetName]?.drilldown && url.searchParams.get('drilldown') !== facetName) {
+          const drilldown = document.createElement('a');
+          drilldown.className = 'drilldown';
+          drilldown.href = facetDecorators[facetName].drilldown;
+          drilldown.title = 'Drill down to more details';
+          drilldown.textContent = '';
+          drilldown.addEventListener('click', () => {
+            const drilldownurl = new URL(drilldown.href, window.location);
+            drilldownurl.search = new URL(window.location).search;
+            drilldownurl.searchParams.delete(facetName);
+            drilldownurl.searchParams.set('drilldown', facetName);
+            drilldown.href = drilldownurl.href;
+          });
+          legend.append(drilldown);
+        } else if (url.searchParams.get('drilldown') === facetName) {
+          const drillup = document.createElement('a');
+          drillup.className = 'drillup';
+          drillup.href = facetDecorators[facetName].drilldown;
+          drillup.title = 'Drill down to more details';
+          drillup.textContent = '';
+          drillup.addEventListener('click', () => {
+            const drillupurl = new URL('explorer.html', window.location);
+            drillupurl.search = new URL(window.location).search;
+            drillupurl.searchParams.delete(facetName);
+            drillupurl.searchParams.delete('drilldown', facetName);
+            drillup.href = drillupurl.href;
+          });
+          legend.append(drillup);
+        }
+
         fieldSet.append(legend);
         tsv += `${facetName}\tcount\tlcp\tcls\tinp\r\n`;
         const filterKeys = facetName === 'checkpoint' && mode !== 'all';
@@ -186,6 +243,7 @@ export default class FacetSidebar {
             let lcp = '-';
             let lcpScore = '';
             const lcpLI = document.createElement('li');
+            lcpLI.title = 'LCP';
             if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
               const lcpValue = entry.metrics.lcp.percentile(75);
               lcp = `${toHumanReadable(lcpValue / 1000)} s`;
@@ -200,6 +258,7 @@ export default class FacetSidebar {
             let cls = '-';
             let clsScore = '';
             const clsLI = document.createElement('li');
+            clsLI.title = 'CLS';
             if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
               const clsValue = entry.metrics.cls.percentile(75);
               cls = `${toHumanReadable(clsValue)}`;
@@ -214,6 +273,7 @@ export default class FacetSidebar {
             let inp = '-';
             let inpScore = '';
             const inpLI = document.createElement('li');
+            inpLI.title = 'INP';
             if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
               const inpValue = entry.metrics.inp.percentile(75);
               inp = `${toHumanReadable(inpValue / 1000)} s`;

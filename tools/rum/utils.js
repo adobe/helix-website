@@ -65,6 +65,30 @@ export function scoreBundle(bundle) {
   return 'poor';
 }
 
+export const INTERPOLATION_THRESHOLD = 10;
+export function cwvInterpolationFn(targetMetric, interpolateTo100) {
+  return (cwvs) => {
+    const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
+    const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
+    if (interpolateTo100) {
+      return (cwvs[targetMetric].weight / valuedWeights);
+    }
+    if (valueCount < INTERPOLATION_THRESHOLD) {
+      // not enough data to interpolate
+      return 0;
+    }
+    // total weight
+    const totalWeight = cwvs.goodCWV.weight
+      + cwvs.niCWV.weight
+      + cwvs.poorCWV.weight
+      + cwvs.noCWV.weight;
+    // share of targetMetric compared to all CWV
+    const share = cwvs[targetMetric].weight / (valuedWeights);
+    // interpolate the share to the total weight
+    return Math.round(share * totalWeight);
+  };
+}
+
 export function truncate(time, unit) {
   const t = new Date(time);
   // truncate to the beginning of the hour
