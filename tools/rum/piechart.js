@@ -50,7 +50,11 @@ export default class PieChart extends AbstractChart {
     }
     const drilldown = params.get('drilldown');
 
-    this.dataChunks.group((bundle) => bundle[drilldown]);
+    const grfn = (bundle) => bundle[drilldown];
+    if (drilldown === 'userAgent') {
+      grfn.fillerFn = (existing) => Object.keys(colors).filter((key) => !key.includes(':')).concat(existing);
+    }
+    this.dataChunks.group(grfn);
 
     this.chart.data.labels = [];
     this.chart.data.datasets[0].data = [];
@@ -92,6 +96,8 @@ export default class PieChart extends AbstractChart {
         datasets: [{}],
       },
       options: {
+        borderRadius: 10,
+        borderWidth: 5,
         plugins: {
           legend: {
             display: true,
