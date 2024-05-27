@@ -97,7 +97,7 @@ export default class PieChart extends AbstractChart {
       },
       options: {
         borderRadius: 10,
-        borderWidth: 5,
+        borderWidth: 3,
         plugins: {
           legend: {
             display: true,
