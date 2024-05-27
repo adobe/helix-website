@@ -143,7 +143,7 @@ export default class CWVTimeLineChart extends AbstractChart {
           },
           {
             label: 'Fake INP Data',
-            backgroundColor: 'blue',
+            backgroundColor: 'transparent',
             data: [-2],
             yAxisID: 'inp',
           },
@@ -174,11 +174,21 @@ export default class CWVTimeLineChart extends AbstractChart {
           tooltip: {
             callbacks: {
               label: (context) => {
-                const { datasets } = context.chart.data;
                 const value = context.parsed.y;
-                const i = context.dataIndex;
-                const total = datasets.reduce((pv, cv) => pv + cv.data[i], 0);
+                // show page views as human readable
+                if (context.dataset.label === 'Page Views') return `${context.dataset.label}: ${toHumanReadable(value)}`;
+                // hide fake data
+                if (context.dataset.label.indexOf('Fake') > -1) return '';
 
+                const { datasets } = context.chart.data;
+                const i = context.dataIndex;
+                const cwvmetric = context.dataset.label.split(' ').pop();
+                const total = datasets
+                  .filter((dataset) => dataset.label.indexOf('Fake') === -1)
+                  .filter(({ label }) => label.indexOf(cwvmetric) > -1)
+                  .reduce((pv, cv) => (pv || 0) + (cv.data[i] || 0), 0);
+
+                if (value === 0 || total === 0) return '';
                 return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
               },
             },
