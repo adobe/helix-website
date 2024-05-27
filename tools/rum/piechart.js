@@ -43,7 +43,12 @@ export default class PieChart extends AbstractChart {
       this.elems.lowDataWarning.ariaHidden = 'true';
     }
 
-    const drilldown = params.get('drilldown') || 'userAgent';
+    if (!params.get('drilldown')) {
+      const u = new URL(window.location.href);
+      u.searchParams.set('drilldown', 'userAgent');
+      window.history.replaceState({}, '', u);
+    }
+    const drilldown = params.get('drilldown');
 
     this.dataChunks.group((bundle) => bundle[drilldown]);
 
