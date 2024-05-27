@@ -76,24 +76,24 @@ export default class CWVTimeLineChart extends AbstractChart {
         datasets: [
           {
             label: 'Page Views',
-            backgroundColor: cssVariable('--spectrum-global-color-purple-700'),
+            backgroundColor: cssVariable('--spectrum-purple-1300'),
             data: [],
           },
           {
             label: 'Good LCP',
-            backgroundColor: cssVariable('--spectrum-global-color-green-600'),
+            backgroundColor: cssVariable('--spectrum-green-600'),
             data: [],
             yAxisID: 'lcp',
           },
           {
             label: 'Needs Improvement LCP',
-            backgroundColor: cssVariable('--spectrum-global-color-orange-600'),
+            backgroundColor: cssVariable('--spectrum-orange-600'),
             data: [],
             yAxisID: 'lcp',
           },
           {
             label: 'Poor LCP',
-            backgroundColor: cssVariable('--spectrum-global-color-red-600'),
+            backgroundColor: cssVariable('--spectrum-red-600'),
             data: [],
             yAxisID: 'lcp',
           },
@@ -106,19 +106,19 @@ export default class CWVTimeLineChart extends AbstractChart {
           {
             label: 'Good CLS',
             // slightly lighter green than #49cc93 which is the good LCP color
-            backgroundColor: cssVariable('--spectrum-global-color-green-500'),
+            backgroundColor: cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
           },
           {
             label: 'Needs Improvement CLS',
-            backgroundColor: cssVariable('--spectrum-global-color-green-500'),
+            backgroundColor: cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
           },
           {
             label: 'Poor CLS',
-            backgroundColor: cssVariable('--spectrum-global-color-red-500'),
+            backgroundColor: cssVariable('--spectrum-red-500'),
             data: [],
             yAxisID: 'cls',
           },
@@ -131,19 +131,19 @@ export default class CWVTimeLineChart extends AbstractChart {
           {
             label: 'Good INP',
             // slightly lighter green than #49cc93 which is the good LCP color
-            backgroundColor: cssVariable('--spectrum-global-color-green-400'),
+            backgroundColor: cssVariable('--spectrum-green-400'),
             data: [],
             yAxisID: 'inp',
           },
           {
             label: 'Needs Improvement INP',
-            backgroundColor: cssVariable('--spectrum-global-color-orange-400'),
+            backgroundColor: cssVariable('--spectrum-orange-400'),
             data: [],
             yAxisID: 'inp',
           },
           {
             label: 'Poor INP',
-            backgroundColor: cssVariable('--spectrum-global-color-red-400'),
+            backgroundColor: cssVariable('--spectrum-red-400'),
             data: [],
             yAxisID: 'inp',
           },
