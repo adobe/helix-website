@@ -164,6 +164,10 @@ figure .chart-container {
   justify-content: center;
 }
 
+figure .chart-container.sankey {
+  height: calc(100vh - 300px);
+}
+
 #low-data-warning {
   color: red;
   display: inline-flex;
