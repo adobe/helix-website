@@ -15,15 +15,33 @@ function generateRandomNumber(max, excluding) {
 }
 
 /**
+ * Fetches data from a given URL.
+ * @param {string} url URL to fetch data from
+ * @returns {Promise<Object[]>} Fetched data, array of Objects
+ */
+async function fetchData(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('data could not be fetched from', url);
+    const { data } = await res.json();
+    return data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error: ', error);
+  }
+  return [];
+}
+
+/**
  * Overrides the tooltip's CSS styles based on the provided axis and pixel values.
  * @param {HTMLElement} tooltip Tooltip element whose style will be overridden
  * @param {string} axis Axis on which to apply the override
  * @param {number} pixels Number of pixels to shift the tooltip
  */
-function tooltipAfterOverride(tooltip, axis, pixels) {
+function applyTooltipOverride(tooltip, axis, pixels) {
   const block = tooltip.closest('.block');
   // check for existing style element
-  let style = tooltip.closest('.block').querySelector('style');
+  let style = block.querySelector('style');
   // if axis is 'reset,' reset previous tooltip override
   if (axis === 'reset') {
     // if unnecessary style element is found, remove the style element
@@ -37,13 +55,13 @@ function tooltipAfterOverride(tooltip, axis, pixels) {
   }
   // write tooltip override
   if (axis === 'left') {
-    // determine the operation sign for the css calculation based on the pixel value
-    // if pixels > 0, tooltip will shift to the left (-)
-    // else if pixels <= 0, tooltip will shift to the left (+)
+    /* determine the operation sign for the css calculation based on the pixel value
+        if pixels > 0, tooltip will shift to the left (-)
+        else if pixels <= 0, tooltip will shift to the right (+) */
     const op = pixels > 0 ? '-' : '+';
-    // NOTE: 6 is the width of tooltip::after
+    const TOOLTIP_POINTER_WIDTH = 6;
     const halfTip = Math.floor(tooltip.clientWidth / 2); // calculate half the width of the tooltip
-    const tooltipShift = (op === '+' ? Math.floor(pixels - 6) : Math.ceil(pixels + 6)); // adjust the shift value based on the pixels value
+    const tooltipShift = (op === '+' ? Math.floor(pixels - TOOLTIP_POINTER_WIDTH) : Math.ceil(pixels + TOOLTIP_POINTER_WIDTH)); // adjust the shift value based on the pixels value
     if (Math.abs(tooltipShift) >= halfTip) {
       // apply a max or min class to ensure tooltip fits in the bounding box of its parent
       style.textContent = `.availability .tooltip::after { ${axis}: calc(50% ${op} ${halfTip}px); }`;
@@ -67,12 +85,12 @@ function moveTooltip(tooltip, axis, direction) {
   if (axis === 'x') { // move horizontally
     // calculate and apply the new left position
     tooltip.style.left = `${(parseFloat(style.left, 10) + direction).toFixed(2)}px`;
-    tooltipAfterOverride(tooltip, 'left', direction);
+    applyTooltipOverride(tooltip, 'left', direction);
   } else if (axis === 'y') { // flip vertically
     tooltip.classList.add('flip');
     // get current transformation matrix of the tooltip
     const matrix = new DOMMatrix(window.getComputedStyle(tooltip).transform);
-    // apply new transformation to the tooltip mirror it vertically
+    // apply new transformation to the tooltip to mirror it vertically
     tooltip.style.transform = new DOMMatrix([
       matrix.a,
       matrix.b,
@@ -88,7 +106,7 @@ function moveTooltip(tooltip, axis, direction) {
  * Ensures the tooltip element stays within the given exterior bounding box.
  * @param {Object} exterior Bounding box of the exterior element
  * @param {Object} interior Bounding box of the interior element (tooltip)
- * @param {HTMLElement} tooltip tooltip element to move (if outside the bounding box)
+ * @param {HTMLElement} tooltip Tooltip element to move (if outside the bounding box)
  */
 function ensureTooltipInsideBoundingBox(exterior, interior, tooltip) {
   // check if tooltip fits within the left boundary of the exterior
@@ -122,12 +140,12 @@ function positionTooltip(tooltip, pin, svg) {
   const svgRect = svg.getBoundingClientRect();
   const tipRect = tooltip.getBoundingClientRect();
   // define a padding value to ensure the tooltip does not touch the edges of the SVG
-  const svgPadding = 6;
+  const SVG_PADDING = 6;
   // ensure the tooltip stays within the bounding box of the SVG, considering the padding
   ensureTooltipInsideBoundingBox({
-    left: svgRect.left + svgPadding,
-    top: svgRect.top + svgPadding,
-    right: svgRect.right - svgPadding,
+    left: svgRect.left + SVG_PADDING,
+    top: svgRect.top + SVG_PADDING,
+    right: svgRect.right - SVG_PADDING,
   }, tipRect, tooltip);
 }
 
@@ -144,7 +162,7 @@ function focusPin(pin, tooltip, svg) {
   // reset, rewrite, and reposition tooltip
   tooltip.classList = 'tooltip';
   tooltip.removeAttribute('style');
-  tooltipAfterOverride(svg.closest('.block'), 'reset');
+  applyTooltipOverride(svg.closest('.block'), 'reset');
   tooltip.textContent = pin.getAttribute('aria-label');
   positionTooltip(tooltip, pin, svg);
   tooltip.setAttribute('aria-hidden', false);
@@ -181,23 +199,43 @@ function iterateThroughPins(pins, svg, tooltip, lastIndex = -1) {
   }, 3000);
 }
 
-function buildTooltip() {
-  const tooltip = createTag('div', {
-    'aria-hidden': true,
-    class: 'tooltip',
-    id: 'availability-tooltip',
-  });
-  return tooltip;
+/**
+ * Enables hover interactions for a pin element.
+ * @param {SVGCircleElement} pin Pin element to enable interaction
+ * @param {HTMLElement} tooltip Tooltip element
+ * @param {SVGElement} svg SVG map element containing the pins
+ */
+function enablePinInteractions(pin, tooltip, svg) {
+  pin.addEventListener('mouseenter', () => focusPin(pin, tooltip, svg));
+  pin.addEventListener('mouseleave', () => unfocusPin(tooltip, svg));
 }
 
 /**
- * Fetches data from the given source, populates the SVG with pins representing cities,
- * and sets up event listeners for pin interactions.
+ * Creates a pin element for a city based on its coordinates.
+ * @param {Object} city City data
+ * @param {number} width Width of the SVG
+ * @param {number} height Height of the SVG
+ * @param {number} longUnit Unit for longitude positioning
+ * @param {number} latUnit Unit for latitude positioning
+ * @returns {SVGCircleElement} Created pin element
+ */
+function createPin(city, width, height, longUnit, latUnit) {
+  const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  pin.setAttribute('cx', ((width / 2) + (parseFloat(city.Longitude, 10) * longUnit)).toFixed(2));
+  pin.setAttribute('cy', ((height / 2) - (parseFloat(city.Latitude, 10) * latUnit)).toFixed(2));
+  const PIN_RADIUS = 33;
+  pin.setAttribute('r', PIN_RADIUS);
+  pin.setAttribute('aria-label', city.City);
+  return pin;
+}
+
+/**
+ * Fetches data from the given source and populates the SVG with pins representing cities.
  * @param {string} src URL to fetch the data from
  * @param {SVGElement} svg SVG element to populate with pins
- * @param {HTMLElement} tooltip tooltip element to display pin label
+ * @param {HTMLElement} tooltip Tooltip element to display pin label
  */
-async function populateData(src, svg, tooltip) {
+async function populateMap(src, svg, tooltip) {
   // create a group element to hold the pins separate from the map
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.id = 'availability-group';
@@ -206,63 +244,57 @@ async function populateData(src, svg, tooltip) {
   const width = svg.width.baseVal.value;
   const height = svg.height.baseVal.value;
   // calculate units for positioning pins based on latitude and longitude
-  const longUnit = (width / 2) / 180; // where longitude is -180° to 180°
-  const latUnit = (height / 2) / 90; // where latitude is -180° to 180°
-  // fetch the data from the provided source
-  const req = await fetch(src);
-  const { data } = await req.json();
-  // iterate over the data to create pins for each city
-  data.forEach((city) => {
-    const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    // position pin on map according to latitude and longitude
-    const cx = ((width / 2) + (parseFloat(city.Longitude, 10) * longUnit)).toFixed(2);
-    const cy = ((height / 2) - (parseFloat(city.Latitude, 10) * latUnit)).toFixed(2);
-    pin.setAttribute('cy', cy);
-    pin.setAttribute('cx', cx);
-    pin.setAttribute('r', 33);
-    pin.setAttribute('aria-label', city.City);
+  const longUnit = (width / 2) / 180; // where longitude range is -180° to 180°
+  const latUnit = (height / 2) / 90; // where latitude range is -180° to 180°
+  // fetch the cities data from the provided source
+  const cities = await fetchData(src);
+  // iterate over the cities data to create pins for each city
+  cities.forEach((city) => {
+    const pin = createPin(city, width, height, longUnit, latUnit);
     group.append(pin);
-    // enable pin hover interactions
-    pin.addEventListener('mouseenter', () => focusPin(pin, tooltip, svg));
-    pin.addEventListener('mouseleave', () => unfocusPin(tooltip, svg));
-    // disable auto-iteration when the user hovers over the SVG
-    svg.addEventListener('mouseenter', () => {
-      svg.dataset.auto = false;
-    });
-    // reenable auto-iteration when the user's hover leaves the SVG
-    svg.addEventListener('mouseleave', () => {
-      svg.dataset.auto = true;
-      unfocusPin(tooltip, svg);
-    });
+    enablePinInteractions(pin, tooltip, svg);
   });
   // auto-iterate through pins
   const pins = svg.querySelectorAll('circle');
   iterateThroughPins(pins, svg, tooltip);
+  // disable auto-iteration when the user hovers over the SVG
+  svg.addEventListener('mouseenter', () => {
+    svg.dataset.auto = false;
+  });
+  // reenable auto-iteration when the user's hover leaves the SVG
+  svg.addEventListener('mouseleave', () => {
+    svg.dataset.auto = true;
+    unfocusPin(tooltip, svg);
+  });
 }
 
 export default function decorate(block) {
-  // extract the data source within the block
+  // extract data source from the block
   const data = block.querySelector('a[href]');
   block.innerHTML = '';
-  // create a wrapper div element to position the tooltip
+  // create wrapper div element to position the tooltip
   const wrapper = createTag('div', { class: 'tooltip-wrapper' });
   // create an img element to load the SVG map
   const img = createTag('img', { src: '/blocks/availability/map.svg' });
   img.addEventListener('load', async () => {
     // after img load, fetch the SVG content from the img source
-    const req = await fetch(img.src);
-    const res = await req.text();
+    const res = await fetch(img.src);
+    const text = await res.text();
     // replace the img with the SVG element
     const temp = createTag('div');
-    temp.innerHTML = res;
+    temp.innerHTML = text;
     const svg = temp.querySelector('svg');
     img.replaceWith(svg);
-    // if data is available, initialize the tooltip and populate the SVG with city data
+    // if data is available, initialize the tooltip and populate the SVG map with city data
     if (data) {
-      svg.dataset.auto = true;
-      const tooltip = buildTooltip();
+      const tooltip = createTag('div', {
+        'aria-hidden': true,
+        class: 'tooltip',
+        id: 'availability-tooltip',
+      });
       wrapper.prepend(tooltip);
-      populateData(data.href, svg, tooltip);
+      populateMap(data.href, svg, tooltip);
+      svg.dataset.auto = true;
     }
   });
   wrapper.append(img);
