@@ -11,7 +11,7 @@ import {
   INTERPOLATION_THRESHOLD,
   scoreBundle,
   scoreCWV,
-  toHumanReadable,
+  // toHumanReadable,
   cwvInterpolationFn,
   truncate,
   simpleCWVInterpolationFn,
@@ -21,6 +21,21 @@ import {
 import AbstractChart from './chart.js';
 
 Chart.register(TimeScale, LinearScale, ...registerables);
+
+/**
+ * Returns a human readable number
+ * @param {Number} num a number
+ * @param {Number} precision the number of significant digits
+ * @returns {String} a human readable number
+ */
+function toHumanReadable(num, precision = 2) {
+  if (Number.isNaN(num)) return '-';
+  const formatter = new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumSignificantDigits: precision,
+  });
+  return formatter.format(num).toLocaleLowerCase();
+}
 
 // todo
 export default class CWVTimeLineChart extends AbstractChart {
@@ -265,9 +280,9 @@ export default class CWVTimeLineChart extends AbstractChart {
               callback: (value) => {
                 if (value === 0) return '';
                 if (value > 0) return toHumanReadable(value);
-                console.log(value, 'smaller 0');
-                // @davidnuescheler tweak this some more
-                if (value < 0) return 'LCP';
+                if (value / this.chart.options.scales.y.min < 0.3) return 'LCP';
+                if (value / this.chart.options.scales.y.min < 0.6) return 'CLS';
+                if (value / this.chart.options.scales.y.min < 1) return 'INP';
                 return '';
               },
             },
@@ -285,24 +300,24 @@ export default class CWVTimeLineChart extends AbstractChart {
             axis: 'y',
             reverse: false,
             // @davidnuescheler tweak this
-            min: -3.4,
-            max: 4.5,
+            min: -3,
+            max: 4.3,
           },
           cls: {
             display: false,
             stacked: true,
             axis: 'y',
             reverse: false,
-            min: -2.5,
-            max: 6,
+            min: -2,
+            max: 5.4,
           },
           inp: {
             display: false,
             stacked: true,
             axis: 'y',
             reverse: false,
-            min: -1.8,
-            max: 9,
+            min: -1,
+            max: 6.6,
           },
         },
       },
@@ -545,7 +560,7 @@ export default class CWVTimeLineChart extends AbstractChart {
     this.chart.options.scales.x.time.unit = config.unit;
     // hack: we pretend this scale extends to the bottom as much as
     // it extends to the top, so that the chart is centered
-    this.chart.options.scales.y.min = -Math.max(...allTraffic);
+    this.chart.options.scales.y.min = -Math.max(...allTraffic) * 0.8;
 
     this.chart.update();
   }

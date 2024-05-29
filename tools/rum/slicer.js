@@ -31,7 +31,7 @@ const herochart = window.slicer && window.slicer.Chart
 const sidebar = new FacetSidebar(dataChunks, elems);
 
 window.addEventListener('pageshow', () => {
-  herochart.render();
+  if (elems.canvas) herochart.render();
 });
 
 // set up metrics for dataChunks
