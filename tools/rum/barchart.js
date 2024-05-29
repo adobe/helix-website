@@ -97,7 +97,9 @@ export default class BarChart extends AbstractChart {
       u.searchParams.set('drilldown', 'url');
       window.history.replaceState({}, '', u);
     }
-    const drilldown = params.get('drilldown');
+    const drilldown = params.get('drilldown') === 'url' && params.get('domain') === 'all'
+      ? 'domain'
+      : params.get('drilldown');
 
     this.dataChunks.group((bundle) => bundle[drilldown]);
     const topgroups = Object.entries(this.dataChunks.aggregates)
