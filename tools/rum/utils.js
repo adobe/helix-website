@@ -106,3 +106,26 @@ export function truncate(time, unit) {
 export function escapeHTML(unsafe) {
   return unsafe.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
+
+export function cssVariable(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name);
+}
+
+let gradient;
+let width;
+let height;
+export function getGradient(ctx, chartArea, from, to) {
+  const chartWidth = chartArea.right - chartArea.left;
+  const chartHeight = chartArea.bottom - chartArea.top;
+  if (!gradient || width !== chartWidth || height !== chartHeight) {
+    // Create the gradient because this is either the first render
+    // or the size of the chart has changed
+    width = chartWidth;
+    height = chartHeight;
+    gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+    gradient.addColorStop(0, from);
+    gradient.addColorStop(1, to);
+  }
+
+  return gradient;
+}

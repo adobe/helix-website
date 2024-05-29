@@ -1,3 +1,4 @@
+@import url('colors.css');
 /* stylelint-disable no-descending-specificity */
 /* stylelint-disable selector-class-pattern */
 
@@ -161,6 +162,10 @@ figure .chart-container {
   height: calc(100vh - 500px);
   display: grid;
   justify-content: center;
+}
+
+figure .chart-container.sankey {
+  height: calc(100vh - 300px);
 }
 
 #low-data-warning {

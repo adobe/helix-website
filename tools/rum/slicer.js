@@ -30,6 +30,10 @@ const herochart = window.slicer && window.slicer.Chart
   : new CWVTimeLineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 
+window.addEventListener('pageshow', () => {
+  herochart.render();
+});
+
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
 dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));

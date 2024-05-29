@@ -6,7 +6,7 @@ import {
 import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
 import AbstractChart from './chart.js';
 import {
-  toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn,
+  toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn, cssVariable,
 } from './utils.js';
 
 Chart.register(LinearScale, ...registerables);
@@ -92,7 +92,12 @@ export default class BarChart extends AbstractChart {
 
     this.defineSeries();
 
-    const drilldown = params.get('drilldown') || 'url';
+    if (!params.get('drilldown')) {
+      const u = new URL(window.location.href);
+      u.searchParams.set('drilldown', 'url');
+      window.history.replaceState({}, '', u);
+    }
+    const drilldown = params.get('drilldown');
 
     this.dataChunks.group((bundle) => bundle[drilldown]);
     const topgroups = Object.entries(this.dataChunks.aggregates)
@@ -123,22 +128,22 @@ export default class BarChart extends AbstractChart {
         labels: [],
         datasets: [{
           label: 'No CVW',
-          backgroundColor: '#888',
+          backgroundColor: cssVariable('--spectrum-gray-600'),
           data: [],
         },
         {
           label: 'Good',
-          backgroundColor: '#49cc93',
+          backgroundColor: cssVariable('--spectrum-green-600'),
           data: [],
         },
         {
           label: 'Needs Improvement',
-          backgroundColor: '#ffa037',
+          backgroundColor: cssVariable('--spectrum-orange-600'),
           data: [],
         },
         {
           label: 'Poor',
-          backgroundColor: '#ff7c65',
+          backgroundColor: cssVariable('--spectrum-red-600'),
           data: [],
         }],
       },
@@ -182,6 +187,9 @@ export default class BarChart extends AbstractChart {
           },
           y: {
             stacked: true,
+            grid: {
+              display: false,
+            },
           },
         },
       },
