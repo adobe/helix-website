@@ -163,6 +163,7 @@ figure .chart-container {
   min-height: 100px;
   display: grid;
   justify-content: center;
+  height: calc(100vh - 400px);
 }
 
 figure .chart-container.sankey {
