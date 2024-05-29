@@ -165,22 +165,9 @@ figure .chart-container {
   justify-content: center;
 }
 
-figure .chart-container:nth-of-type(1) {
-  height: calc(100vh - 700px);
+figure .chart-container.sankey {
+  height: calc(100vh - 300px);
 }
-
-figure .chart-container.solitary {
-  height: calc(100vh - 400px);
-}
-
-figure .chart-container.solitary ~ .chart-container.extra {
-  display: none;
-}
-
-figure .chart-container.extra {
-  max-height: 100px;
-}
-
 
 #low-data-warning {
   color: red;

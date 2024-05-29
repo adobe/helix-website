@@ -115,6 +115,50 @@ export default class FacetSidebar {
     }
   }
 
+  computeTSV(facetName, mode, placeholders, show = {}, numOptions = 10) {
+    const facetEntries = this.dataChunks.facets[facetName];
+    const tsv = [];
+    const optionKeys = facetEntries.map((f) => f.value);
+    if (optionKeys.length) {
+      tsv.push(`${facetName}\tcount\tlcp\tcls\tinp`);
+      const filterKeys = facetName === 'checkpoint' && mode !== 'all';
+      const filteredKeys = filterKeys
+        ? optionKeys.filter((a) => !!(placeholders[a]))
+        : optionKeys;
+      const nbToShow = show[facetName] || numOptions;
+      facetEntries
+        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
+        .slice(0, nbToShow)
+        .forEach((entry) => {
+          const CWVDISPLAYTHRESHOLD = 10;
+          let lcp = '-';
+          if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
+            const lcpValue = entry.metrics.lcp.percentile(75);
+            lcp = `${toHumanReadable(lcpValue / 1000)} s`;
+          }
+
+          let cls = '-';
+          if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
+            const clsValue = entry.metrics.cls.percentile(75);
+            cls = `${toHumanReadable(clsValue)}`;
+          }
+
+          let inp = '-';
+          if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
+            const inpValue = entry.metrics.inp.percentile(75);
+            inp = `${toHumanReadable(inpValue / 1000)} s`;
+          }
+
+          tsv.push(`${entry.name}\t${entry.value}\t${lcp}\t${cls}\t${inp}`);
+        });
+      tsv.push(...facetEntries
+        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
+        .slice(0, nbToShow)
+        .map((entry) => `${entry.value}\t${entry.metrics.pageViews.sum}\t${entry.metrics.lcp.percentile(75)}\t${entry.metrics.cls.percentile(75)}\t${entry.metrics.inp.percentile(75)}`));
+    }
+    return tsv;
+  }
+
   updateFacets(focus, mode, placeholders, show = {}) {
     const createLabelHTML = (labelText, usePlaceholders) => {
       if (labelText.startsWith('https://') && labelText.includes('media_')) {
@@ -155,7 +199,6 @@ export default class FacetSidebar {
       const facetEntries = this.dataChunks.facets[facetName];
       const optionKeys = facetEntries.map((f) => f.value);
       if (optionKeys.length) {
-        let tsv = '';
         const fieldSet = document.createElement('fieldset');
         fieldSet.classList.add(`facet-${facetName}`);
         const legend = document.createElement('legend');
@@ -181,7 +224,7 @@ export default class FacetSidebar {
           const drillup = document.createElement('a');
           drillup.className = 'drillup';
           drillup.href = facetDecorators[facetName].drilldown;
-          drillup.title = 'Drill down to more details';
+          drillup.title = 'Return to previous level';
           drillup.textContent = '';
           drillup.addEventListener('click', () => {
             const drillupurl = new URL('explorer.html', window.location);
@@ -194,7 +237,6 @@ export default class FacetSidebar {
         }
 
         fieldSet.append(legend);
-        tsv += `${facetName}\tcount\tlcp\tcls\tinp\r\n`;
         const filterKeys = facetName === 'checkpoint' && mode !== 'all';
         const filteredKeys = filterKeys
           ? optionKeys.filter((a) => !!(placeholders[a]))
@@ -243,6 +285,7 @@ export default class FacetSidebar {
             let lcp = '-';
             let lcpScore = '';
             const lcpLI = document.createElement('li');
+            lcpLI.title = 'LCP';
             if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
               const lcpValue = entry.metrics.lcp.percentile(75);
               lcp = `${toHumanReadable(lcpValue / 1000)} s`;
@@ -257,6 +300,7 @@ export default class FacetSidebar {
             let cls = '-';
             let clsScore = '';
             const clsLI = document.createElement('li');
+            clsLI.title = 'CLS';
             if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
               const clsValue = entry.metrics.cls.percentile(75);
               cls = `${toHumanReadable(clsValue)}`;
@@ -271,6 +315,7 @@ export default class FacetSidebar {
             let inp = '-';
             let inpScore = '';
             const inpLI = document.createElement('li');
+            inpLI.title = 'INP';
             if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
               const inpValue = entry.metrics.inp.percentile(75);
               inp = `${toHumanReadable(inpValue / 1000)} s`;
@@ -281,20 +326,10 @@ export default class FacetSidebar {
             inpLI.classList.add(`score-${inpScore}`);
             inpLI.textContent = inp;
             ul.append(inpLI);
-            tsv += `${entry.name}\t${entry.value}\t${lcp}\t${cls}\t${inp}\r\n`;
 
             div.append(input, label, ul);
             fieldSet.append(div);
           });
-        // populate pastebuffer with overflow data
-        // ideally, this would be populated only when
-        // the user clicks the copy button, so that we
-        // don't waste cycles on rendering p75s that
-        // the user never sees.
-        tsv = facetEntries
-          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-          .slice(0, nbToShow)
-          .reduce((acc, entry) => `${acc}${entry.value}\t${entry.metrics.pageViews.sum}\t${entry.metrics.lcp.percentile(75)}\t${entry.metrics.cls.percentile(75)}\t${entry.metrics.inp.percentile(75)}\r\n`, tsv);
 
         if (filteredKeys.length > nbToShow) {
           // add "more" link
@@ -335,7 +370,8 @@ export default class FacetSidebar {
         }
 
         legend.addEventListener('click', () => {
-          navigator.clipboard.writeText(tsv);
+          const tsv = this.computeTSV(facetName, mode, placeholders, show, numOptions);
+          navigator.clipboard.writeText(tsv.join('\r\n'));
           const toast = document.getElementById('copied-toast');
           toast.ariaHidden = false;
           setTimeout(() => { toast.ariaHidden = true; }, 3000);
