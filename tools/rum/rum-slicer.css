@@ -71,6 +71,16 @@ main .title select {
   color: white;
 }
 
+main .title incognito-checkbox {
+  display: none;
+  margin-top: 10px;
+}
+
+main .title incognito-checkbox[mode="open"],
+main .title incognito-checkbox[mode="incognito"] {
+  display: inline-block;
+}
+
 main .title {
   padding-top: 8px;
   display: flex;
