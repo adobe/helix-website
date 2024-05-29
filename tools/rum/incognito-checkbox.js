@@ -1,8 +1,10 @@
-// HTML custom element
+function getPersistentToken() {
+  return localStorage.getItem('rum-bundler-token');
+}
 
 async function fetchDomainKey(domain) {
   try {
-    const auth = localStorage.getItem('rum-bundler-token');
+    const auth = getPersistentToken();
     const resp = await fetch(`https://rum.fastly-aem.page/domainkey/${domain}`, {
       headers: {
         authorization: `Bearer ${auth}`,
@@ -224,7 +226,11 @@ export default class IncognitoCheckbox extends HTMLElement {
     } else {
       this.domainkey = urlkey;
       this.setAttribute('domainkey', urlkey);
-      this.setAttribute('mode', 'open');
+      if (getPersistentToken()) {
+        this.setAttribute('mode', 'open');
+      } else {
+        this.setAttribute('mode', 'provided');
+      }
     }
     this.input.addEventListener('change', this.toggleEye.bind(this));
   }
