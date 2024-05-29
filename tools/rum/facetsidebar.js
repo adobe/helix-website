@@ -291,6 +291,9 @@ export default class FacetSidebar {
               lcp = `${toHumanReadable(lcpValue / 1000)} s`;
               lcpScore = scoreCWV(lcpValue, 'lcp');
               addSignificanceFlag(lcpLI, entry.metrics.lcp, this.dataChunks.totals.lcp);
+              lcpLI.title += ` - based on ${entry.metrics.lcp.count} samples`;
+            } else {
+              lcpLI.title += ` - not enough samples (${entry.metrics.lcp.count})`;
             }
             lcpLI.classList.add(`score-${lcpScore}`);
             lcpLI.textContent = lcp;
@@ -306,6 +309,9 @@ export default class FacetSidebar {
               cls = `${toHumanReadable(clsValue)}`;
               clsScore = scoreCWV(clsValue, 'cls');
               addSignificanceFlag(clsLI, entry.metrics.cls, this.dataChunks.totals.cls);
+              clsLI.title += ` - based on ${entry.metrics.cls.count} samples`;
+            } else {
+              clsLI.title += ` - not enough samples (${entry.metrics.cls.count})`;
             }
             clsLI.classList.add(`score-${clsScore}`);
             clsLI.textContent = cls;
@@ -321,6 +327,9 @@ export default class FacetSidebar {
               inp = `${toHumanReadable(inpValue / 1000)} s`;
               inpScore = scoreCWV(inpValue, 'inp');
               addSignificanceFlag(inpLI, entry.metrics.inp, this.dataChunks.totals.inp);
+              inpLI.title += ` - based on ${entry.metrics.inp.count} samples`;
+            } else {
+              inpLI.title += ` - not enough samples (${entry.metrics.inp.count})`;
             }
 
             inpLI.classList.add(`score-${inpScore}`);
