@@ -12,7 +12,6 @@ import IncognitoCheckbox from './incognito-checkbox.js';
 customElements.define('incognito-checkbox', IncognitoCheckbox);
 
 /* globals */
-let DOMAIN_KEY = '';
 let DOMAIN = 'www.thinktanked.org';
 
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
@@ -46,7 +45,6 @@ dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
 
 function setDomain(domain, key) {
   DOMAIN = domain;
-  DOMAIN_KEY = key;
   loader.domain = domain;
   loader.domainKey = key;
 }
@@ -240,7 +238,7 @@ export function updateState() {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
   });
-  url.searchParams.set('domainkey', DOMAIN_KEY);
+  url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
   window.history.replaceState({}, '', url);
 }
 
