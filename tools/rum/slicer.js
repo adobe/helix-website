@@ -329,7 +329,6 @@ const io = new IntersectionObserver((entries) => {
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
-      console.log('got data');
       await loadData(view);
       herochart.draw();
     });

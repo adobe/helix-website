@@ -277,12 +277,13 @@ export default class CWVTimeLineChart extends AbstractChart {
               display: false,
             },
             ticks: {
+              autoSkip: false,
               callback: (value) => {
                 if (value === 0) return '';
                 if (value > 0) return toHumanReadable(value);
-                if (value / this.chart.options.scales.y.min < 0.3) return 'LCP';
-                if (value / this.chart.options.scales.y.min < 0.6) return 'CLS';
-                if (value / this.chart.options.scales.y.min < 1) return 'INP';
+                if (value / this.chart.options.scales.y.min < 0.4) return 'LCP';
+                if (value / this.chart.options.scales.y.min < 0.8) return 'CLS';
+                if (value / this.chart.options.scales.y.min === 1) return 'INP';
                 return '';
               },
             },
@@ -560,7 +561,8 @@ export default class CWVTimeLineChart extends AbstractChart {
     this.chart.options.scales.x.time.unit = config.unit;
     // hack: we pretend this scale extends to the bottom as much as
     // it extends to the top, so that the chart is centered
-    this.chart.options.scales.y.min = -Math.max(...allTraffic) * 0.8;
+    this.chart.options.scales.y.min = -Math.max(...allTraffic) * 0.71;
+    this.chart.options.scales.y.max = Math.max(...allTraffic) * 1.0;
 
     this.chart.update();
   }
