@@ -6,16 +6,18 @@
         <script src="/scripts/scripts.js" type="module"></script>
         <link rel="stylesheet" href="/styles/styles.css" />
         <script type="module" defer="false">
-          import SkylineChart from './skyline.js';
-          import IncognitoCheckbox from './incognito-checkbox.js';
-          import FacetSidebar from './facetsidebar.js';
-          import ListFacet from './list-facet.js';
-          window.slicer = {
-            Chart: SkylineChart,
-          };
-          customElements.define('incognito-checkbox', IncognitoCheckbox);
-          customElements.define('facet-sidebar', FacetSidebar);
-          customElements.define('list-facet', ListFacet);
+    import SkylineChart from './skyline.js';
+    import IncognitoCheckbox from './incognito-checkbox.js';
+    import FacetSidebar from './facetsidebar.js';
+    import ListFacet from './list-facet.js';
+    import ThumbnailFacet from './thumbnail-facet.js';
+    window.slicer = {
+      Chart: SkylineChart,
+    };
+    customElements.define('incognito-checkbox', IncognitoCheckbox);
+    customElements.define('facet-sidebar', FacetSidebar);
+    customElements.define('list-facet', ListFacet);
+    customElements.define('thumbnail-facet', ThumbnailFacet);
         </script>
         <script src="./slicer.js" type="module"></script>
         <link rel="stylesheet" href="./rum-slicer.css">
@@ -147,6 +149,12 @@
             <list-facet facet="click.target" drilldown="list.html">
               <legend>Click Target (URL)</legend>
             </list-facet>
+            <list-facet facet="viewmedia.source" drilldown="list.html">
+              <legend>Media Source</legend>
+            </list-facet>
+            <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
+              <legend>Media Target</legend>
+            </thumbnail-facet>
             <list-facet facet="trafficsource">
               <legend>Traffic Source</legend>
             </list-facet>

@@ -175,7 +175,7 @@ export default class ListFacet extends HTMLElement {
           div.addEventListener('click', (evt) => {
             if (evt.target !== input) input.checked = !input.checked;
             evt.stopPropagation();
-            this.parentElement.dispatchEvent(new Event('change'), this);
+            this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
           });
 
           const label = document.createElement('label');

@@ -68,7 +68,7 @@ export default class FacetSidebar extends HTMLElement {
 
       if (mode) facetEl.setAttribute('mode', mode);
       if (focus) facetEl.setAttribute('focus', focus);
-      this.elems.facetsElement.append(facetEl);
+      if (facetEl) this.elems.facetsElement.append(facetEl);
     });
   }
 }

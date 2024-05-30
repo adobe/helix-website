@@ -244,7 +244,8 @@ const io = new IntersectionObserver((entries) => {
     sidebar.data = dataChunks;
     elems.sidebar = sidebar;
 
-    sidebar.addEventListener('change', () => {
+    sidebar.addEventListener('facetchange', () => {
+      console.log('sidebar change');
       updateState();
       draw();
     });
