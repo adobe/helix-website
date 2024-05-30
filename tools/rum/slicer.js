@@ -1,15 +1,17 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
-import CWVTimeLineChart from './cwvtimeline.js';
+import SkylineChart from './skyline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
 // eslint-disable-next-line import/no-relative-packages
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import FacetSidebar from './facetsidebar.js';
+import IncognitoCheckbox from './incognito-checkbox.js';
+
+customElements.define('incognito-checkbox', IncognitoCheckbox);
 
 /* globals */
-let DOMAIN_KEY = '';
 let DOMAIN = 'www.thinktanked.org';
 
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
@@ -27,12 +29,10 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = window.slicer && window.slicer.Chart
   ? new window.slicer.Chart(dataChunks, elems)
-  : new CWVTimeLineChart(dataChunks, elems);
+  : new SkylineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 
-window.addEventListener('pageshow', () => {
-  herochart.render();
-});
+window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
@@ -45,7 +45,6 @@ dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
 
 function setDomain(domain, key) {
   DOMAIN = domain;
-  DOMAIN_KEY = key;
   loader.domain = domain;
   loader.domainKey = key;
 }
@@ -204,25 +203,6 @@ export async function draw() {
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
-async function fetchDomainKey(domain) {
-  try {
-    const auth = localStorage.getItem('rum-bundler-token');
-    let org;
-    if (domain.endsWith(':all')) {
-      ([org] = domain.split(':'));
-    }
-    const resp = await fetch(`${API_ENDPOINT}/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
-      headers: {
-        authorization: `Bearer ${auth}`,
-      },
-    });
-    const json = await resp.json();
-    return (org ? json.orgkey : json.domainkey);
-  } catch {
-    return '';
-  }
-}
-
 async function loadData(scope) {
   const params = new URL(window.location.href).searchParams;
   const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
@@ -258,7 +238,7 @@ export function updateState() {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
   });
-  url.searchParams.set('domainkey', DOMAIN_KEY);
+  url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
   window.history.replaceState({}, '', url);
 }
 
@@ -280,6 +260,7 @@ const io = new IntersectionObserver((entries) => {
       <option value="month">Month</option>
       <option value="year">Year</option>
     </select>
+    <incognito-checkbox></incognito-checkbox>
   </div>
 </div>
 <div class="key-metrics">
@@ -320,7 +301,7 @@ const io = new IntersectionObserver((entries) => {
 </div>
 
 <figure>
-  <div class="chart-container">
+  <div class="chart-container solitary">
     <canvas id="time-series"></canvas>
   </div>
   <div class="filter-tags"></div>
@@ -341,12 +322,20 @@ const io = new IntersectionObserver((entries) => {
     elems.canvas = document.getElementById('time-series');
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
+    elems.incognito = document.querySelector('incognito-checkbox');
+
+    const params = new URL(window.location).searchParams;
+    const view = params.get('view') || 'week';
+
+    elems.incognito.addEventListener('change', async () => {
+      loader.domainKey = elems.incognito.getAttribute('domainkey');
+      await loadData(view);
+      herochart.draw();
+    });
 
     herochart.render();
 
-    const params = new URL(window.location).searchParams;
     elems.filterInput.value = params.get('filter');
-    const view = params.get('view') || 'week';
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
     const focus = params.get('focus');
@@ -370,15 +359,16 @@ const io = new IntersectionObserver((entries) => {
           // nothing
           }
         }
-        const domainkey = await fetchDomainKey(domain);
-        window.location = `${window.location.pathname}?domain=${domain}&view=month&domainkey=${domainkey}`;
+        window.location = `${window.location.pathname}?domain=${domain}&view=month`;
       }
     });
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
 
-    loadData(view);
+    if (elems.incognito.getAttribute('domainkey')) {
+      loadData(view);
+    }
 
     elems.filterInput.addEventListener('input', () => {
       updateState();

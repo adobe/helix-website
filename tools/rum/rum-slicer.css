@@ -71,6 +71,16 @@ main .title select {
   color: white;
 }
 
+main .title incognito-checkbox {
+  display: none;
+  margin-top: 10px;
+}
+
+main .title incognito-checkbox[mode="open"],
+main .title incognito-checkbox[mode="incognito"] {
+  display: inline-block;
+}
+
 main .title {
   padding-top: 8px;
   display: flex;
@@ -156,12 +166,14 @@ figure {
   margin-bottom: 16px;
 }
 
+
+
 figure .chart-container {
   position: relative;
-  min-height: 400px;
-  height: calc(100vh - 500px);
+  min-height: 100px;
   display: grid;
   justify-content: center;
+  height: calc(100vh - 400px);
 }
 
 figure .chart-container.sankey {
