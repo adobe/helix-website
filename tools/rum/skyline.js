@@ -1,6 +1,3 @@
-/*
- * Implements the CWV timeline chart (currently the only chart in the RUM explorer)
- */
 import {
   Chart, TimeScale, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
@@ -37,8 +34,13 @@ function toHumanReadable(num, precision = 2) {
   return formatter.format(num).toLocaleLowerCase();
 }
 
-// todo
-export default class CWVTimeLineChart extends AbstractChart {
+/**
+ * The SkylineChart is a unique type of multi-series bar chart that
+ * shows both the overall traffic levels as well as the distribution
+ * of each of the three core web vitals values within the given date
+ * range.
+ */
+export default class SkylineChart extends AbstractChart {
   /**
    * Returns a function that can group the data bundles based on the
    * configuration of the chart. As this is a timeline chart,

@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
-import CWVTimeLineChart from './cwvtimeline.js';
+import SkylineChart from './skyline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
@@ -29,7 +29,7 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = window.slicer && window.slicer.Chart
   ? new window.slicer.Chart(dataChunks, elems)
-  : new CWVTimeLineChart(dataChunks, elems);
+  : new SkylineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
