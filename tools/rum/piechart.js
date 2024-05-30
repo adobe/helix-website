@@ -1,9 +1,11 @@
 import {
-  Chart,
+  Chart, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
 } from 'chartjs';
 import AbstractChart from './chart.js';
 import { cssVariable } from './utils.js';
+
+Chart.register(...registerables);
 
 const colors = {
   'bot:social': cssVariable('--spectrum-red-100'),
