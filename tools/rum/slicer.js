@@ -12,7 +12,7 @@ import FacetSidebar from './facetsidebar.js';
 let DOMAIN_KEY = '';
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
 // const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
@@ -207,13 +207,17 @@ export async function draw() {
 async function fetchDomainKey(domain) {
   try {
     const auth = localStorage.getItem('rum-bundler-token');
-    const resp = await fetch(`https://rum.fastly-aem.page/domainkey/${domain}`, {
+    let org;
+    if (domain.endsWith(':all')) {
+      ([org] = domain.split(':'));
+    }
+    const resp = await fetch(`${API_ENDPOINT}/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
       headers: {
         authorization: `Bearer ${auth}`,
       },
     });
     const json = await resp.json();
-    return (json.domainkey);
+    return (org ? json.orgkey : json.domainkey);
   } catch {
     return '';
   }
@@ -358,11 +362,13 @@ const io = new IntersectionObserver((entries) => {
       // eslint-disable-next-line no-alert
       let domain = window.prompt('enter domain or URL');
       if (domain) {
-        try {
-          const url = new URL(domain);
-          domain = url.host;
-        } catch {
+        if (!domain.endsWith(':all')) {
+          try {
+            const url = new URL(domain);
+            domain = url.host;
+          } catch {
           // nothing
+          }
         }
         const domainkey = await fetchDomainKey(domain);
         window.location = `${window.location.pathname}?domain=${domain}&view=month&domainkey=${domainkey}`;

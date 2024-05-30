@@ -8,9 +8,11 @@ import { addCalculatedProps } from './cruncher.js';
 export default class DataLoader {
   constructor() {
     this.cache = new Map();
-    this.API_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+    this.API_ENDPOINT = 'https://rum.fastly-aem.page';
     this.DOMAIN = 'www.thinktanked.org';
     this.DOMAIN_KEY = '';
+    this.ORG = undefined;
+    this.SCOPE = undefined; // unused
   }
 
   flush() {
@@ -23,7 +25,11 @@ export default class DataLoader {
   }
 
   set domain(domain) {
-    this.DOMAIN = domain;
+    if (domain.endsWith(':all')) {
+      [this.ORG, this.SCOPE] = domain.split(':');
+    } else {
+      this.DOMAIN = domain;
+    }
     this.flush();
   }
 
@@ -35,8 +41,10 @@ export default class DataLoader {
   apiURL(datePath, hour) {
     const u = new URL(this.API_ENDPOINT);
     u.pathname = [
-      u.pathname,
-      this.DOMAIN,
+      ...(this.ORG
+        ? ['orgs', this.ORG, 'bundles']
+        : ['bundles', this.DOMAIN]
+      ),
       datePath,
       hour,
     ]
