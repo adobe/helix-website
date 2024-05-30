@@ -304,6 +304,8 @@ figcaption > span {
   border-bottom: 2px solid #ccc;
 }
 
+
+
 fieldset {
   --background-color: var(--light-indigo);
 
@@ -319,13 +321,13 @@ fieldset a:any-link {
   color: currentcolor;
 }
 
-fieldset.facet-user_agent {
+list-facet[facet="userAgent" ] fieldset {
   color: var(--dark-fuchsia);
 
   --background-color: var(--light-fuchsia);
 }
 
-fieldset.facet-url {
+list-facet[facet="url"] fieldset {
   color: var(--dark-purple);
 
   --background-color: var(--light-purple);
