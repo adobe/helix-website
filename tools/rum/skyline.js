@@ -1,9 +1,9 @@
 import {
   Chart, TimeScale, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
-} from 'https://cdn.skypack.dev/chart.js@4.2.0';
+} from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
-import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
+import * as luxon from 'chartjs-adapter-luxon';
 import {
   INTERPOLATION_THRESHOLD,
   scoreBundle,
@@ -17,6 +17,7 @@ import {
 } from './utils.js';
 import AbstractChart from './chart.js';
 
+console.log(luxon);
 Chart.register(TimeScale, LinearScale, ...registerables);
 
 /**
