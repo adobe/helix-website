@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
-import CWVTimeLineChart from './cwvtimeline.js';
+import SkylineChart from './skyline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
@@ -29,7 +29,7 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = window.slicer && window.slicer.Chart
   ? new window.slicer.Chart(dataChunks, elems)
-  : new CWVTimeLineChart(dataChunks, elems);
+  : new SkylineChart(dataChunks, elems);
 const sidebar = new FacetSidebar(dataChunks, elems);
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
@@ -301,7 +301,7 @@ const io = new IntersectionObserver((entries) => {
 </div>
 
 <figure>
-  <div class="chart-container">
+  <div class="chart-container solitary">
     <canvas id="time-series"></canvas>
   </div>
   <div class="filter-tags"></div>
@@ -329,7 +329,6 @@ const io = new IntersectionObserver((entries) => {
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
-      console.log('got data');
       await loadData(view);
       herochart.draw();
     });
