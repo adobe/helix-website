@@ -1,9 +1,9 @@
 import {
   Chart, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
-} from 'https://cdn.skypack.dev/chart.js@4.2.0';
+} from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
-import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
+import 'chartjs-adapter-luxon';
 import AbstractChart from './chart.js';
 import {
   toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn, cssVariable,
