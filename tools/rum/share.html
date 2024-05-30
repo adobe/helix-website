@@ -7,10 +7,16 @@
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
-    import PieChart from './piechart.js';
-    window.slicer = {
-      Chart: PieChart,
-    };
+  import PieChart from './piechart.js';
+  import IncognitoCheckbox from './incognito-checkbox.js';
+  import FacetSidebar from './facetsidebar.js';
+  import ListFacet from './list-facet.js';
+  window.slicer = {
+    Chart: PieChart,
+  };
+  customElements.define('incognito-checkbox', IncognitoCheckbox);
+  customElements.define('facet-sidebar', FacetSidebar);
+  customElements.define('list-facet', ListFacet);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -20,6 +26,155 @@
   <header></header>
   <main>
     <div>
+      <div id="deepmain">
+        <div class="output">
+          <div class="title">
+            <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
+            <div>
+              <select id="view">
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+              </select>
+              <incognito-checkbox></incognito-checkbox>
+            </div>
+          </div>
+          <div class="key-metrics">
+            <ul>
+              <li id="pageviews">
+                <h2>Pageviews</h2>
+                <p>0</p>
+              </li>
+              <li id="visits">
+                <h2>Visits</h2>
+                <p>0</p>
+              </li>
+              <li id="conversions">
+                <h2>Conversions</h2>
+                <p>0</p>
+              </li>
+              <li id="lcp">
+                <h2>LCP</h2>
+                <p>0</p>
+              </li>
+              <li id="cls">
+                <h2>CLS</h2>
+                <p>0</p>
+              </li>
+              <li id="inp">
+                <h2>INP</h2>
+                <p>0</p>
+              </li>
+            </ul>
+            <div class="key-metrics-more" aria-hidden="true">
+              <ul>
+                <li id="ttfb">
+                  <h2>TTFB</h2>
+                  <p>0</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+      
+          <figure>
+            <div class="chart-container solitary">
+              <canvas id="time-series"></canvas>
+            </div>
+            <div class="filter-tags"></div>
+            <figcaption>
+              <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy
+                reduced.</span>
+              <span id="timezone"></span>
+            </figcaption>
+          </figure>
+        </div>
+        <facet-sidebar>
+          <list-facet facet="userAgent" drilldown="share.html">
+            <legend>Device Type and Operating System</legend>
+            <dl>
+              <dt>desktop</dt>
+              <dd>All Desktop</dd>
+              <dt>desktop:windows</dt>
+              <dd>Windows Desktop</dd>
+              <dt>desktop:mac</dt>
+              <dd>Mac Desktop</dd>
+              <dt>desktop:linux</dt>
+              <dd>Linux Desktop</dd>
+              <dt>mobile</dt>
+              <dd>All Mobile</dd>
+              <dt>mobile:android</dt>
+              <dd>Android Mobile</dd>
+              <dt>mobile:ios</dt>
+              <dd>iOS Mobile</dd>
+              <dt>mobile:ipados</dt>
+              <dd>iPad Mobile</dd>
+              <dt>bot</dt>
+              <dd>All Bots</dd>
+              <dt>bot:seo</dt>
+              <dd>SEO Bot</dd>
+            </dl>
+          </list-facet>
+          <list-facet facet="url" drilldown="list.html">
+            <legend>URL</legend>
+          </list-facet>
+          <list-facet facet="checkpoint" drilldown="flow.html">
+            <legend>Checkpoints</legend>
+            <dl>
+              <dt>enter</dt>
+              <dd>Visit Entry</dd>
+              <dt>loadresource</dt>
+              <dd>Fragment Loaded</dd>
+              <dt>404</dt>
+              <dd>Not Found</dd>
+              <dt>viewblock</dt>
+              <dd>Block Viewed</dd>
+              <dt>viewmedia</dt>
+              <dd>Media Viewed</dd>
+              <dt>click</dt>
+              <dd>Clicked</dd>
+              <dt>error</dt>
+              <dd>JavaScript Error</dd>
+              <dt>utm</dt>
+              <dd>Marketing Campaigns</dd>
+              <dt>consent</dt>
+              <dd>Consent</dd>
+            </dl>
+          </list-facet>
+          <list-facet facet="foobar" drilldown="list.html">
+            <legend>Foo Bar</legend>
+          </list-facet>
+          <list-facet facet="click.source" drilldown="list.html">
+            <legend>Click Source (CSS Selector)</legend>
+          </list-facet>
+          <list-facet facet="click.target" drilldown="list.html">
+            <legend>Click Target (URL)</legend>
+          </list-facet>
+          <list-facet facet="trafficsource">
+            <legend>Traffic Source</legend>
+          </list-facet>
+          <list-facet facet="traffictype">
+            <legend>Traffic Type</legend>
+          </list-facet>
+          <list-facet facet="entryevent">
+            <legend>Entry Event</legend>
+          </list-facet>
+          <list-facet facet="pagetype">
+            <legend>Page Type</legend>
+          </list-facet>
+          <list-facet facet="contenttype">
+            <legend>Content Type</legend>
+          </list-facet>
+          <list-facet facet="interaction">
+            <legend>Interaction</legend>
+          </list-facet>
+          <list-facet facet="clicktarget">
+            <legend>Click Target Type</legend>
+          </list-facet>
+          <list-facet facet="exit">
+            <legend>Exit Link</legend>
+          </list-facet>
+        </facet-sidebar>
+      </div>
     </div>
   </main>
   <footer></footer>

@@ -4,13 +4,6 @@ import SkylineChart from './skyline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
-// eslint-disable-next-line import/no-relative-packages
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import FacetSidebar from './facetsidebar.js';
-import IncognitoCheckbox from './incognito-checkbox.js';
-
-customElements.define('incognito-checkbox', IncognitoCheckbox);
-
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
@@ -30,7 +23,6 @@ loader.apiEndpoint = API_ENDPOINT;
 const herochart = window.slicer && window.slicer.Chart
   ? new window.slicer.Chart(dataChunks, elems)
   : new SkylineChart(dataChunks, elems);
-const sidebar = new FacetSidebar(dataChunks, elems);
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
@@ -167,7 +159,6 @@ function updateFilter(params, filterText) {
 }
 
 export async function draw() {
-  const ph = await fetchPlaceholders('/tools/rum');
   const params = new URL(window.location).searchParams;
   const checkpoint = params.getAll('checkpoint');
 
@@ -197,7 +188,7 @@ export async function draw() {
 
   const focus = params.get('focus');
   const mode = params.get('metrics');
-  sidebar.updateFacets(focus, mode, ph);
+  elems.sidebar.updateFacets(focus, mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
@@ -233,7 +224,7 @@ export function updateState() {
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 
-  elems.facetsElement.querySelectorAll('input').forEach((e) => {
+  elems.sidebar.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
@@ -242,87 +233,28 @@ export function updateState() {
   window.history.replaceState({}, '', url);
 }
 
-sidebar.addEventListener('change', () => {
-  updateState();
-  draw();
-});
-
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
   // wait for decoration to have happened
   if (entries[0].isIntersecting) {
-    const mainInnerHTML = `<div class="output">
-<div class="title">
-  <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
-  <div>
-    <select id="view">
-      <option value="week">Week</option>
-      <option value="month">Month</option>
-      <option value="year">Year</option>
-    </select>
-    <incognito-checkbox></incognito-checkbox>
-  </div>
-</div>
-<div class="key-metrics">
-  <ul>
-    <li id="pageviews">
-      <h2>Pageviews</h2>
-      <p>0</p>
-    </li>
-    <li id="visits">
-      <h2>Visits</h2>
-      <p>0</p>
-    </li>
-    <li id="conversions">
-      <h2>Conversions</h2>
-      <p>0</p>
-    </li>
-    <li id="lcp">
-      <h2>LCP</h2>
-      <p>0</p>
-    </li>
-    <li id="cls">
-      <h2>CLS</h2>
-      <p>0</p>
-    </li>
-    <li id="inp">
-      <h2>INP</h2>
-      <p>0</p>
-    </li>
-  </ul>
-  <div class="key-metrics-more" aria-hidden="true">
-    <ul>
-      <li id="ttfb">
-        <h2>TTFB</h2>
-        <p>0</p>
-      </li>  
-    </ul>
-  </div>
-</div>
+    // const main = document.querySelector('main');
+    // main.innerHTML = mainInnerHTML;
 
-<figure>
-  <div class="chart-container solitary">
-    <canvas id="time-series"></canvas>
-  </div>
-  <div class="filter-tags"></div>
-  <figcaption>
-    <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>
-    <span id="timezone"></span>
-  </figcaption>
-</figure>
-</div>
-`;
+    const sidebar = document.querySelector('facet-sidebar');
+    sidebar.data = dataChunks;
+    elems.sidebar = sidebar;
 
-    const main = document.querySelector('main');
-    main.innerHTML = mainInnerHTML;
-
-    main.append(sidebar.rootElement);
+    sidebar.addEventListener('change', () => {
+      updateState();
+      draw();
+    });
 
     elems.viewSelect = document.getElementById('view');
     elems.canvas = document.getElementById('time-series');
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
     elems.incognito = document.querySelector('incognito-checkbox');
+    elems.filterInput = sidebar.elems.filterInput;
 
     const params = new URL(window.location).searchParams;
     const view = params.get('view') || 'week';
@@ -334,6 +266,7 @@ const io = new IntersectionObserver((entries) => {
     });
 
     herochart.render();
+    // sidebar.updateFacets();
 
     elems.filterInput.value = params.get('filter');
     elems.viewSelect.value = view;

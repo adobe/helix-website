@@ -38,6 +38,10 @@ main {
   margin-top: var(--nav-height);
 }
 
+body main > .section {
+  padding-top: 0;
+}
+
 /* general performance */
 
 main li.score-good {
@@ -331,6 +335,10 @@ list-facet[facet="url"] fieldset {
   color: var(--dark-purple);
 
   --background-color: var(--light-purple);
+}
+
+*[facet] > legend {
+  display: none;
 }
 
 legend {
@@ -634,7 +642,7 @@ a.drillup::after {
 /* split mode */
 
 @media (min-width: 1600px) {
-  main {
+  #deepmain {
     display: flex;
     gap: 16px;
     height: calc(100vh - var(--nav-height) - 32px);
@@ -644,13 +652,17 @@ a.drillup::after {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }  
 
-  main > div {
-    width: 100%;
+  #deepmain > div, #deepmain > facet-sidebar {
+    width: 50%;
   }
 
-  main #facets {
-    height: calc(100% - 70px);
-    overflow-y: scroll;
+  main div.output {
+    position: fixed;
+    width: 50vw;
+  }
+
+  facet-sidebar {
+    margin-left: calc(50vw + 16px);
   }
 
   body.appear {

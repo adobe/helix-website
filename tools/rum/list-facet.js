@@ -14,12 +14,7 @@ import { pValue } from './cruncher.js';
 export default class ListFacet extends HTMLElement {
   constructor() {
     super();
-    this.dataChunks = {};
     this.placeholders = undefined;
-  }
-
-  set data(data) {
-    this.dataChunks = data;
   }
 
   createLabelHTML(labelText) {
@@ -35,6 +30,10 @@ export default class ListFacet extends HTMLElement {
       return (`${this.placeholders[labelText]} [${labelText}]`);
     }
     return escapeHTML(labelText);
+  }
+
+  get dataChunks() {
+    return this.parentElement.parentElement.dataChunks;
   }
 
   computeTSV(numOptions = 10) {
@@ -87,6 +86,10 @@ export default class ListFacet extends HTMLElement {
   }
 
   connectedCallback() {
+    if (this.dataChunks) this.update();
+  }
+
+  update() {
     const facetName = this.getAttribute('facet');
     const facetEntries = this.dataChunks.facets[facetName];
     const optionKeys = facetEntries.map((f) => f.value);
@@ -108,11 +111,14 @@ export default class ListFacet extends HTMLElement {
     }
 
     if (optionKeys.length) {
-      const fieldSet = document.createElement('fieldset');
+      const fieldSet = this.querySelector('fieldset') || document.createElement('fieldset');
       fieldSet.classList.add(`facet-${facetName}`);
+      const legendText = this.querySelector('legend')?.textContent || facetName;
+
+      fieldSet.textContent = '';
 
       const legend = this.querySelector('legend') || document.createElement('legend');
-      if (legend.textContent === '') legend.textContent = facetName;
+      legend.textContent = legendText;
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
@@ -149,7 +155,7 @@ export default class ListFacet extends HTMLElement {
 
       fieldSet.append(legend);
       const filterKeys = facetName === 'checkpoint' && mode !== 'all';
-      const filteredKeys = filterKeys
+      const filteredKeys = filterKeys && this.placeholders
         ? optionKeys.filter((a) => !!(this.placeholders[a]))
         : optionKeys;
       facetEntries
@@ -169,7 +175,7 @@ export default class ListFacet extends HTMLElement {
           div.addEventListener('click', (evt) => {
             if (evt.target !== input) input.checked = !input.checked;
             evt.stopPropagation();
-            this.parent.dispatchEvent('change', this);
+            this.parentElement.dispatchEvent(new Event('change'), this);
           });
 
           const label = document.createElement('label');
@@ -259,7 +265,7 @@ export default class ListFacet extends HTMLElement {
         more.addEventListener('click', (evt) => {
           evt.preventDefault();
           // increase number of keys shown
-          this.parent.updateFacets(
+          this.parentElement.updateFacets(
             focus,
             mode,
             this.placeholders,
