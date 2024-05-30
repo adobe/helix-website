@@ -82,7 +82,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       return acc;
     }, []);
   });
-  dataChunks.addFacet('url', (bundle) => bundle.url);
+  dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
   dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
     acc.add(evt.checkpoint);
     return acc;
