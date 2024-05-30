@@ -2,8 +2,6 @@ import {
   Chart, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
 } from 'chartjs';
-// eslint-disable-next-line import/no-unresolved, import/extensions
-import 'chartjs-adapter-luxon';
 import AbstractChart from './chart.js';
 import {
   toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn, cssVariable,
