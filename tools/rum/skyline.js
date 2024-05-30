@@ -3,7 +3,7 @@ import {
   // eslint-disable-next-line import/no-unresolved, import/extensions
 } from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
-import * as luxon from 'chartjs-adapter-luxon';
+import 'chartjs-adapter-luxon';
 import {
   INTERPOLATION_THRESHOLD,
   scoreBundle,
@@ -17,7 +17,6 @@ import {
 } from './utils.js';
 import AbstractChart from './chart.js';
 
-console.log(luxon);
 Chart.register(TimeScale, LinearScale, ...registerables);
 
 /**
