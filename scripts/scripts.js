@@ -583,7 +583,7 @@ function loadFeedData() {
   window.siteindex = window.siteindex || { archive: { data: [] }, loaded: false };
   const offset = 0;
 
-  fetch(`/drafts/asthabharga/community-feeds.json?offset=${offset}`)
+  fetch(`/community-feeds.json?offset=${offset}`)
     .then((response) => response.json())
     .then((responseJson) => {
       window.siteindex.archive.data = responseJson?.archive?.data;
