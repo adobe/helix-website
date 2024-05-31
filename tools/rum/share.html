@@ -2,12 +2,15 @@
 
 <head>
   <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
+  <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.2"
+  }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
-    import PieChart from './piechart.js';
+    import PieChart from './charts/piechart.js';
     window.slicer = {
       Chart: PieChart,
     };

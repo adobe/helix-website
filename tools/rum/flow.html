@@ -2,16 +2,16 @@
 
 <head>
   <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
+  <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.2",
+    "chartjs-chart-sankey": "https://esm.sh/chartjs-chart-sankey@0.12.1?deps=chart.js@4.4.2"
+  }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <script src="
-  https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.1/dist/chartjs-chart-sankey.js
-  "></script>
   <script type="module" defer="false">
-    import SankeyChart from './sankey.js';
+    import SankeyChart from './charts/sankey.js';
     window.slicer = {
       Chart: SankeyChart,
     };
