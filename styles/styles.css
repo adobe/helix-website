@@ -1469,21 +1469,24 @@ body.docs-template main a.anchor-link.anchor-link-copied {
 
 /* docs-template & guides-template styles */
 body.docs-template main h1,
-body.guides-template main h1 {
+body.guides-template main h1,
+body.skills-template main h1 {
   font-size: var(--type-heading-xxl-size);
   line-height: var(--type-heading-xxl-lh);
   margin-bottom: var(--spacing-s);
 }
 
 body.docs-template main h2,
-body.guides-template main h2 {
+body.guides-template main h2,
+body.skills-template main h2 {
   font-size: var(--type-heading-xl-size);
   line-height: var(--type-heading-xl-lh);
   margin-bottom: var(--spacing-s);
 }
 
 body.docs-template main h3,
-body.guides-template main h3 {
+body.guides-template main h3,
+body.skills-template main h3 {
   font-size: var(--type-heading-m-size);
   line-height: var(--type-heading-m-lh);
   margin-bottom: var(--spacing-s);
@@ -1495,7 +1498,8 @@ body.docs-template main p {
   margin-bottom: var(--spacing-s);
 }
 
-body.guides-template main h3.icon-eyebrow svg {
+body.guides-template main h3.icon-eyebrow svg,
+body.skills-template main h3.icon-eyebrow svg {
   width: var(--type-heading-m-size);
 }
 
@@ -1514,7 +1518,8 @@ body.guides-template main h3.icon-eyebrow svg {
   }
 
   body.docs-template main h1,
-  body.guides-template main h1 {
+  body.guides-template main h1,
+  body.skills-template main h1 {
     line-height: 55px;
     margin-top: var(--spacing-s);
     margin-bottom: var(--spacing-ml);
@@ -1522,25 +1527,30 @@ body.guides-template main h3.icon-eyebrow svg {
 }
 
 /* Layout for Guide Template pages  */
-body.guides-template {
+body.guides-template,
+body.skills-template {
   display: block;
 }
 
-body.guides-template main.without-full-width-hero {
+body.guides-template main.without-full-width-hero,
+body.skills-template main.without-full-width-hero {
   min-height: 900px;
 }
 
-body.guides-template main .section {
+body.guides-template main .section,
+body.skills-template main .section {
   box-sizing: border-box;
 }
 
-body.guides-template main .section.heading {
+body.guides-template main .section.heading,
+body.skills-template main .section.heading {
   width: 100%;
   padding-top: 0;
   padding-bottom: 0;
 }
 
-body.guides-template main .section.content {
+body.guides-template main .section.content,
+body.skills-template main .section.content {
   max-width: 1200px;
   width: 100%;
   height: 100%;
@@ -1552,14 +1562,20 @@ body.guides-template main h2,
 body.guides-template main h3,
 body.guides-template main h4,
 body.guides-template main h5,
-body.guides-template main h6 {
+body.guides-template main h6,
+body.skills-template main h2,
+body.skills-template main h3,
+body.skills-template main h4,
+body.skills-template main h5,
+body.skills-template main h6 {
   font-weight: 700;
   margin-top: var(--spacing-s);
   scroll-margin: calc(var(--nav-height) + 1em + var(--breadcrumb-height));
 }
 
 /* separation for better readability in long section */
-body.guides-template main h2 {
+body.guides-template main h2,
+body.skills-template main h2 {
   border-bottom: 1px solid lightgrey;
   padding-bottom: var(--spacing-xs);
   padding-top: var(--spacing-xs);
@@ -1567,7 +1583,10 @@ body.guides-template main h2 {
 
 body.guides-template main p,
 body.guides-template main li,
-body.guides-template main a {
+body.guides-template main a,
+body.skills-template main p,
+body.skills-template main li,
+body.skills-template main a {
   color: var(--color-black);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
@@ -1578,7 +1597,13 @@ body.guides-template main h2 a,
 body.guides-template main h3 a,
 body.guides-template main h4 a,
 body.guides-template main h5 a,
-body.guides-template main h6 a {
+body.guides-template main h6 a,
+body.skills-template main h1 a,
+body.skills-template main h2 a,
+body.skills-template main h3 a,
+body.skills-template main h4 a,
+body.skills-template main h5 a,
+body.skills-template main h6 a {
   color: var(--color-black);
   font-size: inherit;
   line-height: inherit;
@@ -1592,11 +1617,13 @@ body main .faq dd a {
 }
 
 /* break long link </a> into separate lines, not overflowing */
-body.guides-template .default-content-wrapper a {
+body.guides-template .default-content-wrapper a,
+body.skills-template .default-content-wrapper a {
   overflow-wrap: break-word;
 }
 
-body.guides-template main .default-content-wrapper a {
+body.guides-template main .default-content-wrapper a,
+body.skills-template main .default-content-wrapper a {
   transition: all 0.2s ease-in-out;
   cursor: pointer;
 }
@@ -1606,7 +1633,8 @@ body.guides-template main .guides-back-btn a {
 }
 
 /* for SEO tap target */
-body.guides-template .default-content-wrapper ul > li > a {
+body.guides-template .default-content-wrapper ul > li > a,
+body.skills-template .default-content-wrapper ul > li > a {
   margin-bottom: 1em;
 }
 
@@ -1614,11 +1642,13 @@ body main .faq dd a:hover {
   color: var(--spectrum-blue);
 }
 
-body.guides-template main .default-content-wrapper a:hover {
+body.guides-template main .default-content-wrapper a:hover,
+body.skills-template main .default-content-wrapper a:hover {
   color: var(--spectrum-blue);
 }
 
-body.guides-template main .section.content a {
+body.guides-template main .section.content a,
+body.skills-template main .section.content a {
   overflow-wrap: break-word;
 }
 
@@ -1627,12 +1657,19 @@ body.guides-template main .default-content-wrapper h2 a:hover,
 body.guides-template main .default-content-wrapper h3 a:hover,
 body.guides-template main .default-content-wrapper h4 a:hover,
 body.guides-template main .default-content-wrapper h5 a:hover,
-body.guides-template main .default-content-wrapper h6 a:hover {
+body.guides-template main .default-content-wrapper h6 a:hover,
+body.skills-template main .default-content-wrapper h1 a:hover,
+body.skills-template main .default-content-wrapper h2 a:hover,
+body.skills-template main .default-content-wrapper h3 a:hover,
+body.skills-template main .default-content-wrapper h4 a:hover,
+body.skills-template main .default-content-wrapper h5 a:hover,
+body.skills-template main .default-content-wrapper h6 a:hover {
   color: var(--color-black);
   transition: var(--transition-ease-in-out);
 }
 
-body.guides-template main a.anchor-link:any-link::before {
+body.guides-template main a.anchor-link:any-link::before,
+body.skills-template main a.anchor-link:any-link::before {
   content: "#";
   position: absolute;
   left: -0.9rem;
@@ -1640,38 +1677,46 @@ body.guides-template main a.anchor-link:any-link::before {
   transition: var(--transition-ease-in-out);
 }
 
-body.guides-template main a.anchor-link:hover::before {
+body.guides-template main a.anchor-link:hover::before,
+body.skills-template main a.anchor-link:hover::before {
   text-decoration: none;
   opacity: 1;
 }
 
-body.guides-template main h2 a.anchor-link:any-link::before {
+body.guides-template main h2 a.anchor-link:any-link::before,
+body.skills-template main h2 a.anchor-link:any-link::before {
   left: -1.1rem;
 }
 
 @media screen and (min-width: 768px) {
-  body.guides-template main a.anchor-link:any-link::before {
+  body.guides-template main a.anchor-link:any-link::before,
+  body.skills-template main a.anchor-link:any-link::before {
     left: -1.25rem;
   }
 
-  body.guides-template main h2 a.anchor-link:any-link::before {
+  body.guides-template main h2 a.anchor-link:any-link::before,
+  body.skills-template main h2 a.anchor-link:any-link::before {
     left: -1.5rem;
   }
 }
 
 /* guide template - content side styles */
-body.guides-template .default-content-wrapper li {
+body.guides-template .default-content-wrapper li,
+body.skills-template .default-content-wrapper li {
   margin-bottom: 1em;
   padding-inline-start: 0.5em;
 }
 
-body.guides-template .default-content-wrapper ul {
+body.guides-template .default-content-wrapper ul,
+body.skills-template .default-content-wrapper ul {
   margin-bottom: 2em;
   padding-inline-start: 1.5em;
 }
 
 body.guides-template .default-content-wrapper ol,
-body.guides-template .columns ol {
+body.guides-template .columns ol,
+body.skills-template .default-content-wrapper ol,
+body.skills-template .columns ol {
   padding-inline-start: 1.5em;
   margin-top: 0.5em;
 }
@@ -1690,12 +1735,15 @@ body.guides-template .form {
 }
 
 /* for guides-template without hero section (.heading), like doc detail page */
-body.guides-template main.without-full-width-hero .default-content-wrapper h1 {
+body.guides-template main.without-full-width-hero .default-content-wrapper h1,
+body.skills-template main.without-full-width-hero .default-content-wrapper h1 {
   margin-top: var(--spacing-s);
 }
 
 body.guides-template main.without-full-width-hero .default-content-wrapper h2,
-body.guides-template main.without-full-width-hero .default-content-wrapper h3 {
+body.guides-template main.without-full-width-hero .default-content-wrapper h3,
+body.skills-template main.without-full-width-hero .default-content-wrapper h2,
+body.skills-template main.without-full-width-hero .default-content-wrapper h3 {
   letter-spacing: 0;
 }
 
@@ -1709,17 +1757,20 @@ body.guides-template main.without-full-width-hero .default-content-wrapper:first
   margin: 0 auto var(--spacing-s) auto;
 }
 
-body.guides-template main.without-full-width-hero .default-content-wrapper img {
+body.guides-template main.without-full-width-hero .default-content-wrapper img,
+body.skills-template main.without-full-width-hero .default-content-wrapper img {
   display: block;
   margin: var(--spacing-s) auto var(--spacing-xs);
 }
 
 /* for guides-template with hero section (.heading), like doc category page */
-body.guides-template main.has-full-width-hero .section.heading {
+body.guides-template main.has-full-width-hero .section.heading,
+body.skills-template main.has-full-width-hero .section.heading {
   padding-bottom: var(--spacing-xs);
 }
 
-body.guides-template main.has-full-width-hero .default-content-wrapper h2 {
+body.guides-template main.has-full-width-hero .default-content-wrapper h2,
+body.skills-template main.has-full-width-hero .default-content-wrapper h2 {
   font-weight: 900;
 }
 
@@ -1804,11 +1855,13 @@ body.guides-template .guides-back-btn span.icon {
 /* guides-template message box ENDS */
 
 @media screen and (min-width: 768px) {
-  body.guides-template main.has-full-width-hero .section.heading {
+  body.guides-template main.has-full-width-hero .section.heading,
+  body.skills-template main.has-full-width-hero .section.heading {
     padding-bottom: var(--spacing-s);
   }
 
-  body.guides-template main.without-full-width-hero .doc-detail-hero-image {
+  body.guides-template main.without-full-width-hero .doc-detail-hero-image,
+  body.skills-template main.without-full-width-hero .doc-detail-hero-image {
     border-radius: var(--image-border-radius-xxl);
   }
 
@@ -1818,7 +1871,8 @@ body.guides-template .guides-back-btn span.icon {
 }
 
 @media screen and (min-width: 900px) {
-  body.guides-template main {
+  body.guides-template main,
+  body.skills-template main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -1826,24 +1880,32 @@ body.guides-template .guides-back-btn span.icon {
     padding-bottom: var(--spacing-xxxl);
   }
 
-  body.guides-template main .section.content {
+  body.guides-template main .section.content,
+  body.skills-template main .section.content {
     width: calc(100% - 300px - var(--side-navigation-bar-gap));
     max-width: 900px;
   }
 
-  body.guides-template main .default-content-wrapper > p {
+  body.guides-template main .default-content-wrapper > p,
+  body.skills-template main .default-content-wrapper > p {
     margin-bottom: var(--spacing-s);
   }
 
-  body.guides-template main.has-full-width-hero .section.heading {
+  body.guides-template main.has-full-width-hero .section.heading,
+  body.skills-template main.has-full-width-hero .section.heading {
     padding-bottom: var(--spacing-xxxl);
   }
 
-  body.guides-template main.has-full-width-hero .card-list-wrapper {
+  body.guides-template main.has-full-width-hero .card-list-wrapper,
+  body.skills-template main.has-full-width-hero .card-list-wrapper {
     margin-bottom: var(--spacing-l);
   }
 
   body.guides-template
+    main.without-full-width-hero
+    .default-content-wrapper
+    h1,
+  body.skills-template
     main.without-full-width-hero
     .default-content-wrapper
     h1 {
@@ -1860,7 +1922,8 @@ body.guides-template .guides-back-btn span.icon {
   }
 }
 
-body.guides-template main .section.content .default-content-wrapper {
+body.guides-template main .section.content .default-content-wrapper,
+body.skills-template main .section.content .default-content-wrapper {
   width: 100%;
   height: 100%;
 }
