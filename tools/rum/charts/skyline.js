@@ -1,9 +1,9 @@
 import {
   Chart, TimeScale, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
-} from 'https://cdn.skypack.dev/chart.js@4.2.0';
+} from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
-import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
+import 'chartjs-adapter-luxon';
 import {
   INTERPOLATION_THRESHOLD,
   scoreBundle,
@@ -14,7 +14,7 @@ import {
   simpleCWVInterpolationFn,
   cssVariable,
   getGradient,
-} from './utils.js';
+} from '../utils.js';
 import AbstractChart from './chart.js';
 
 Chart.register(TimeScale, LinearScale, ...registerables);
@@ -112,18 +112,21 @@ export default class SkylineChart extends AbstractChart {
             backgroundColor: cssVariable('--spectrum-green-600'),
             data: [],
             yAxisID: 'lcp',
+            borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement LCP',
             backgroundColor: cssVariable('--spectrum-orange-600'),
             data: [],
             yAxisID: 'lcp',
+            borderSkipped: true,
           },
           {
             label: 'Poor LCP',
             backgroundColor: cssVariable('--spectrum-red-600'),
             data: [],
             yAxisID: 'lcp',
+            borderSkipped: 'bottom',
           },
           {
             label: 'Fake LCP Data',
@@ -137,18 +140,21 @@ export default class SkylineChart extends AbstractChart {
             backgroundColor: cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
+            borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement CLS',
             backgroundColor: cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
+            borderSkipped: true,
           },
           {
             label: 'Poor CLS',
             backgroundColor: cssVariable('--spectrum-red-500'),
             data: [],
             yAxisID: 'cls',
+            borderSkipped: 'bottom',
           },
           {
             label: 'Fake CLS Data',
@@ -162,18 +168,21 @@ export default class SkylineChart extends AbstractChart {
             backgroundColor: cssVariable('--spectrum-green-400'),
             data: [],
             yAxisID: 'inp',
+            borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement INP',
             backgroundColor: cssVariable('--spectrum-orange-400'),
             data: [],
             yAxisID: 'inp',
+            borderSkipped: true,
           },
           {
             label: 'Poor INP',
             backgroundColor: cssVariable('--spectrum-red-400'),
             data: [],
             yAxisID: 'inp',
+            borderSkipped: 'bottom',
           },
           {
             label: 'Fake INP Data',
@@ -280,12 +289,23 @@ export default class SkylineChart extends AbstractChart {
             },
             ticks: {
               autoSkip: false,
-              callback: (value) => {
+              maxTicksLimit: 16,
+              callback: (value, index) => {
                 if (value === 0) return '';
-                if (value > 0) return toHumanReadable(value);
-                if (value / this.chart.options.scales.y.min < 0.4) return 'LCP';
-                if (value / this.chart.options.scales.y.min < 0.8) return 'CLS';
-                if (value / this.chart.options.scales.y.min === 1) return 'INP';
+                if (value > 0) {
+                  this.clsAlreadyLabeled = false;
+                  this.lcpAlreadyLabeled = false;
+                  return toHumanReadable(value);
+                }
+                if (index === 0) return 'INP';
+                if (value / this.min < 0.4 && !this.lcpAlreadyLabeled) {
+                  this.lcpAlreadyLabeled = true;
+                  return 'LCP';
+                }
+                if (value / this.min < 0.7 && !this.clsAlreadyLabeled) {
+                  this.clsAlreadyLabeled = true;
+                  return 'CLS';
+                }
                 return '';
               },
             },
@@ -566,6 +586,10 @@ export default class SkylineChart extends AbstractChart {
     this.chart.options.scales.y.min = -Math.max(...allTraffic) * 0.71;
     this.chart.options.scales.y.max = Math.max(...allTraffic) * 1.0;
 
+    this.min = this.chart.options.scales.y.min;
+    this.stepSize = undefined;
+    this.clsAlreadyLabeled = false;
+    this.lcpAlreadyLabeled = false;
     this.chart.update();
   }
 }

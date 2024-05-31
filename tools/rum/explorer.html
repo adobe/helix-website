@@ -1,12 +1,17 @@
 <html>
-    <head>
-        <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <script src="/scripts/lib-franklin.js" type="module"></script>
-        <script src="/scripts/scripts.js" type="module"></script>
-        <link rel="stylesheet" href="/styles/styles.css" />
+
+<head>
+  <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
+  <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.2",
+    "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.2"
+  }}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/scripts/lib-franklin.js" type="module"></script>
+  <script src="/scripts/scripts.js" type="module"></script>
+  <link rel="stylesheet" href="/styles/styles.css" />
         <script type="module" defer="false">
-    import SkylineChart from './skyline.js';
+    import SkylineChart from './charts/skyline.js';
     import IncognitoCheckbox from './incognito-checkbox.js';
     import FacetSidebar from './facetsidebar.js';
     import ListFacet from './list-facet.js';
@@ -19,13 +24,20 @@
     customElements.define('list-facet', ListFacet);
     customElements.define('thumbnail-facet', ThumbnailFacet);
         </script>
-        <script src="./slicer.js" type="module"></script>
-        <link rel="stylesheet" href="./rum-slicer.css">
-    </head>
-    <body>
-    <header></header>
-    <main>
-      <div>
+  <script type="module" defer="false">
+    import SkylineChart from './skyline.js';
+    window.slicer = {
+      Chart: SkylineChart,
+    };
+  </script>
+  <script src="./slicer.js" type="module"></script>
+  <link rel="stylesheet" href="./rum-slicer.css">
+  </head>
+
+<body>
+  <header></header>
+  <main>
+    <div>
         <div id="deepmain">
           <div class="output">
             <div class="title">
@@ -181,14 +193,15 @@
             </list-facet>
           </facet-sidebar>
         </div>
-      </div>
-      </main>
-    <footer></footer>
-    <div id="copied-toast" class="toast" aria-hidden="true">
-        Rows copied to clipboard, ready to paste into spreasheet
-      </div>
-      <div id="shared-toast" class="toast" aria-hidden="true">
-        Link copied to clipboard, ready to share
-      </div>
-    </body>
+    </div>
+    </main>
+  <footer></footer>
+  <div id="copied-toast" class="toast" aria-hidden="true">
+    Rows copied to clipboard, ready to paste into spreasheet
+  </div>
+  <div id="shared-toast" class="toast" aria-hidden="true">
+    Link copied to clipboard, ready to share
+  </div>
+</body>
+
 </html>

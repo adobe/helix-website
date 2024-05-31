@@ -1,0 +1,121 @@
+.availability {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: 45vh;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto var(--spacing-s) auto;
+  border-radius: var(--image-border-radius-l);
+  background: linear-gradient(135deg, var(--color-white), var(--color-accent-lightgreen-bg));
+}
+
+.availability .tooltip-wrapper {
+  position: relative;
+  max-width: calc(100% - 6vw);
+}
+
+@media (min-width: 900px) {
+  .availability .tooltip-wrapper {
+    max-width: calc(100% - 6rem);
+  }
+}
+
+.availability img,
+.availability svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  border-radius: var(--image-border-radius-xxl);
+  background-color: var(--color-white);
+  color: var(--bg-color-grey-2);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 33%);
+}
+
+.availability svg circle {
+  stroke: var(--brand-color-purple);
+  stroke-width: 0;
+  fill: var(--brand-color-purple);
+  transition: fill .2s, stroke .2s, stroke-width .2s;
+  cursor: context-menu;
+}
+
+.availability svg circle:hover,
+.availability svg circle[data-focus] {
+  stroke: var(--color-accent-purple-bg);
+  stroke-width: 33px;
+  fill: var(--color-accent-purple-bg);
+}
+
+.availability .tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-50% - (9px + var(--type-detail-m-lh))));
+  width: max-content;
+  max-width: 100%;
+  border-radius: var(--input-border-radius);
+  padding: var(--spacing-xxxs) var(--spacing-xxs);
+  background-color: var(--overlay-curtain-bg-color);
+  color: var(--color-white);
+  font-size: var(--type-detail-m-size);
+  line-height: var(--type-detail-m-lh);
+  opacity: 1;
+  transition: opacity .4s;
+}
+
+@media (min-width: 900px) {
+  .availability .tooltip {
+    transform: translate(-50%, calc(-50% - (12px + var(--type-detail-m-lh))));
+  }
+}
+
+.availability .tooltip.min {
+  border-radius: var(--input-border-radius) var(--input-border-radius) var(--input-border-radius) 0;
+}
+
+.availability .tooltip.max {
+  border-radius: var(--input-border-radius) var(--input-border-radius) 0;
+}
+
+.availability .tooltip.min.flip {
+  border-radius: 0 var(--input-border-radius) var(--input-border-radius);
+}
+
+.availability .tooltip.max.flip {
+  border-radius: var(--input-border-radius) 0 var(--input-border-radius) var(--input-border-radius);
+}
+
+.availability .tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--overlay-curtain-bg-color);
+}
+
+.availability .tooltip.flip::after {
+  top: -6px;
+  bottom: unset;
+  border-top: 0;
+  border-bottom: 6px solid var(--overlay-curtain-bg-color);
+}
+
+.availability .tooltip.min::after {
+  left: 3px;
+  border-left: 0;
+}
+
+.availability .tooltip.max::after {
+  left: unset;
+  right: -3px;
+  border-right: 0;
+}
+
+.availability .tooltip[aria-hidden='true'] {
+  opacity: 0;
+}

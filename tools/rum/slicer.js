@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
-import SkylineChart from './skyline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
 
@@ -20,9 +19,7 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const herochart = window.slicer && window.slicer.Chart
-  ? new window.slicer.Chart(dataChunks, elems)
-  : new SkylineChart(dataChunks, elems);
+const herochart = new window.slicer.Chart(dataChunks, elems);
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
@@ -84,7 +81,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('filter', (bundle) => {
     // this function is also a bit weird, because it takes
     // the filtertext into consideration
-    const fullText = JSON.stringify(bundle).toLowerCase();
+    const fullText = bundle.url + bundle.events.map((e) => e.checkpoint).join(' ');
     const keywords = filterText
       .split(' ')
       .filter((word) => word.length > 2);
