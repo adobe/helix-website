@@ -10,12 +10,12 @@
   <script src="/scripts/lib-franklin.js" type="module"></script>
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
-        <script type="module" defer="false">
+  <script type="module" defer="false">
     import SkylineChart from './charts/skyline.js';
-    import IncognitoCheckbox from './incognito-checkbox.js';
-    import FacetSidebar from './facetsidebar.js';
-    import ListFacet from './list-facet.js';
-    import ThumbnailFacet from './thumbnail-facet.js';
+    import IncognitoCheckbox from './elements/incognito-checkbox.js';
+    import FacetSidebar from './elements/facetsidebar.js';
+    import ListFacet from './elements/list-facet.js';
+    import ThumbnailFacet from './elements/thumbnail-facet.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -23,12 +23,6 @@
     customElements.define('facet-sidebar', FacetSidebar);
     customElements.define('list-facet', ListFacet);
     customElements.define('thumbnail-facet', ThumbnailFacet);
-        </script>
-  <script type="module" defer="false">
-    import SkylineChart from './skyline.js';
-    window.slicer = {
-      Chart: SkylineChart,
-    };
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">

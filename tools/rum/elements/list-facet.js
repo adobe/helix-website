@@ -1,5 +1,5 @@
-import { scoreCWV, toHumanReadable, escapeHTML } from './utils.js';
-import { pValue } from './cruncher.js';
+import { scoreCWV, toHumanReadable, escapeHTML } from '../utils.js';
+import { pValue } from '../cruncher.js';
 
 /**
  * A custom HTML element to display a list of facets.
