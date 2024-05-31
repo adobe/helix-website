@@ -1,4 +1,7 @@
-import { createTag } from '../../scripts/scripts.js';
+import {
+  createTag,
+  loadFeedData,
+} from '../../scripts/scripts.js';
 
 export async function renderFeed(block) {
   if (!block) {
@@ -46,6 +49,7 @@ export async function renderFeed(block) {
 }
 
 export default async function decorate(block) {
+  loadFeedData();
   if (window?.siteindex?.loaded) {
     await renderFeed(block);
   } else {

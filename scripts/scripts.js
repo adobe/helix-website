@@ -579,7 +579,7 @@ export function buildAutoBlocks(main) {
   }
 }
 
-function loadFeedData() {
+export function loadFeedData() {
   window.siteindex = window.siteindex || { archive: { data: [] }, loaded: false };
   const offset = 0;
 
@@ -727,7 +727,6 @@ function loadDelayed() {
  * Decorates the page.
  */
 async function loadPage(doc) {
-  loadFeedData();
   await window.hlx.plugins.load('eager');
   await loadEager(doc);
   await window.hlx.plugins.load('lazy');
