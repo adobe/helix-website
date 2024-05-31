@@ -149,12 +149,8 @@ export default class FacetSidebar {
             inp = `${toHumanReadable(inpValue / 1000)} s`;
           }
 
-          tsv.push(`${entry.name}\t${entry.value}\t${lcp}\t${cls}\t${inp}`);
+          tsv.push(`${entry.value}\t${entry.metrics.pageViews.sum}\t${lcp}\t${cls}\t${inp}`);
         });
-      tsv.push(...facetEntries
-        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-        .slice(0, nbToShow)
-        .map((entry) => `${entry.value}\t${entry.metrics.pageViews.sum}\t${entry.metrics.lcp.percentile(75)}\t${entry.metrics.cls.percentile(75)}\t${entry.metrics.inp.percentile(75)}`));
     }
     return tsv;
   }
