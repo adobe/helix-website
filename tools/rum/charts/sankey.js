@@ -3,7 +3,7 @@ import { SankeyController, Flow } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
 import AbstractChart from './chart.js';
-import { cssVariable } from './utils.js';
+import { cssVariable } from '../utils.js';
 
 Chart.register(SankeyController, Flow, ...registerables);
 
