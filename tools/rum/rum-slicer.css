@@ -337,7 +337,7 @@ list-facet[facet="url"] fieldset {
   --background-color: var(--light-purple);
 }
 
-*[facet] > legend {
+*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
   display: none;
 }
 

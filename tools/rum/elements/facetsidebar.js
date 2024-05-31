@@ -59,14 +59,19 @@ export default class FacetSidebar extends HTMLElement {
     if (this.elems.filterInput.value) addFilterTag('text', this.elems.filterInput.value);
     if (focus) addFilterTag(focus);
 
+    const existingFacetElements = Array.from(this.elems.facetsElement.children);
+    existingFacetElements.forEach((facet) => {
+      facet.setAttribute('mode', 'hidden');
+    });
+
     const keys = Object.keys(this.dataChunks.facets)
       // only show facets that have no decorators or are not hidden
       .filter((key) => key !== 'filter');
     keys.forEach((facetName) => {
       const facetEl = this.querySelector(`[facet="${facetName}"]`);
-      console.assert(facetEl, `Facet ${facetName} not found in ${this.innerHTML}`);
+      console.assert(facetEl, `Facet ${facetName} not found in provided UI elements.`);
 
-      if (mode) facetEl.setAttribute('mode', mode);
+      facetEl.setAttribute('mode', mode || 'default');
       if (focus) facetEl.setAttribute('focus', focus);
       if (facetEl) this.elems.facetsElement.append(facetEl);
     });
