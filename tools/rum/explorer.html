@@ -18,6 +18,7 @@
     import ThumbnailFacet from './elements/thumbnail-facet.js';
     import LinkFacet from './elements/link-facet.js';
     import LiteralFacet from './elements/literal-facet.js';
+    import VitalsFacet from './elements/vitals-facet.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -27,6 +28,7 @@
     customElements.define('thumbnail-facet', ThumbnailFacet);
     customElements.define('link-facet', LinkFacet);
     customElements.define('literal-facet', LiteralFacet);
+    customElements.define('vitals-facet', VitalsFacet);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -99,6 +101,7 @@
             </figure>
           </div>
           <facet-sidebar>
+            
             <list-facet facet="userAgent" drilldown="share.html">
               <legend>Device Type and Operating System</legend>
               <dl>
