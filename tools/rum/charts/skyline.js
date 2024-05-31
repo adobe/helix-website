@@ -14,7 +14,7 @@ import {
   simpleCWVInterpolationFn,
   cssVariable,
   getGradient,
-} from './utils.js';
+} from '../utils.js';
 import AbstractChart from './chart.js';
 
 Chart.register(TimeScale, LinearScale, ...registerables);

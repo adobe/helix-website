@@ -3,7 +3,7 @@ import {
   // eslint-disable-next-line import/no-unresolved, import/extensions
 } from 'chartjs';
 import AbstractChart from './chart.js';
-import { cssVariable } from './utils.js';
+import { cssVariable } from '../utils.js';
 
 Chart.register(...registerables);
 

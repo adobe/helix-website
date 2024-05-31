@@ -5,7 +5,7 @@ import {
 import AbstractChart from './chart.js';
 import {
   toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn, cssVariable,
-} from './utils.js';
+} from '../utils.js';
 
 Chart.register(LinearScale, ...registerables);
 

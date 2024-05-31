@@ -1,4 +1,4 @@
-export default class BarChart {
+export default class AbstractChart {
   constructor(dataChunks, elems) {
     this.chartConfig = {};
     this.dataChunks = dataChunks;
