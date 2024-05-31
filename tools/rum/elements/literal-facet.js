@@ -7,15 +7,12 @@ import ListFacet from './list-facet.js';
  *   <legend>Referrer</legend>
  * </link-facet>
  */
-export default class LinkFacet extends ListFacet {
+export default class LiteralFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
-    if (labelText.startsWith('https://') || labelText.startsWith('http://')) {
-      return `<a href="${labelText}" target="_new">${labelText}</a>`;
-    }
     if (this.placeholders && this.placeholders[labelText]) {
-      return (`${this.placeholders[labelText]} [${labelText}]`);
+      return `<span class="value">${labelText}</span><span class="label">${this.placeholders[labelText]}</span>`;
     }
-    return escapeHTML(labelText);
+    return `<span class="value">${escapeHTML(labelText)}</span>`;
   }
 }

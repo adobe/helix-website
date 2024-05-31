@@ -426,15 +426,15 @@ fieldset li::after {
   opacity: 1;
 }
 
-#facets fieldset label span.count::before {
+#facets fieldset label span.count::before, #facets fieldset label span.value::before {
   content: ' (';
 }
 
-#facets fieldset label span.count::after {
+#facets fieldset label span.count::after, #facets fieldset label span.value::after {
   content: ')';
 }
 
-#facets list-facet[facet$=".source"] label span:nth-of-type(1) {
+#facets list-facet[facet$=".source"] label > span:nth-of-type(1) {
   font-family: monospace;
   font-size: 80%;
   background-color: var(--spectrum-blue-200);

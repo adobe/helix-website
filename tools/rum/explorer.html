@@ -16,7 +16,8 @@
     import FacetSidebar from './elements/facetsidebar.js';
     import ListFacet from './elements/list-facet.js';
     import ThumbnailFacet from './elements/thumbnail-facet.js';
-        import LinkFacet from './elements/link-facet.js';
+      import LinkFacet from './elements/link-facet.js';
+      import LiteralFacet from './elements/literal-facet.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -24,7 +25,8 @@
     customElements.define('facet-sidebar', FacetSidebar);
     customElements.define('list-facet', ListFacet);
     customElements.define('thumbnail-facet', ThumbnailFacet);
-        customElements.define('link-facet', LinkFacet);
+      customElements.define('link-facet', LinkFacet);
+      customElements.define('literal-facet', LiteralFacet);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -173,6 +175,13 @@
                 <dd>Direct Entry (or via App)</dd>
               </dl>
             </link-facet>
+            <list-facet facet="consent.source">
+              <legend>Consent Provider</legend>
+              <dl>
+                <dt>onetrust</dt>
+                <dd>OneTrust</dd>
+              </dl>
+            </list-facet>
             <list-facet facet="trafficsource">
               <legend>Traffic Source</legend>
             </list-facet>

@@ -19,7 +19,7 @@ export default class ListFacet extends HTMLElement {
 
   createLabelHTML(labelText) {
     if (this.placeholders && this.placeholders[labelText]) {
-      return (`${this.placeholders[labelText]} [${labelText}]`);
+      return `<span class="label">${this.placeholders[labelText]}</span><span class="value">${labelText}</span>`;
     }
     return escapeHTML(labelText);
   }
