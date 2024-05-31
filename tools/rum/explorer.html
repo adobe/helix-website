@@ -16,6 +16,7 @@
     import FacetSidebar from './elements/facetsidebar.js';
     import ListFacet from './elements/list-facet.js';
     import ThumbnailFacet from './elements/thumbnail-facet.js';
+        import LinkFacet from './elements/link-facet.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -23,6 +24,7 @@
     customElements.define('facet-sidebar', FacetSidebar);
     customElements.define('list-facet', ListFacet);
     customElements.define('thumbnail-facet', ThumbnailFacet);
+        customElements.define('link-facet', LinkFacet);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -120,9 +122,9 @@
                 <dd>SEO Bot</dd>
               </dl>
             </list-facet>
-            <list-facet facet="url" drilldown="list.html">
+            <link-facet facet="url" drilldown="list.html">
               <legend>URL</legend>
-            </list-facet>
+            </link-facet>
             <list-facet facet="checkpoint" drilldown="flow.html">
               <legend>Checkpoints</legend>
               <dl>
@@ -152,9 +154,9 @@
             <list-facet facet="click.source" drilldown="list.html">
               <legend>Click Source (CSS Selector)</legend>
             </list-facet>
-            <list-facet facet="click.target" drilldown="list.html">
+            <link-facet facet="click.target" drilldown="list.html">
               <legend>Click Target (URL)</legend>
-            </list-facet>
+            </link-facet>
             <list-facet facet="viewmedia.source" drilldown="list.html">
               <legend>Media Source</legend>
             </list-facet>
@@ -164,6 +166,13 @@
             <list-facet facet="viewblock.source" drilldown="list.html">
               <legend>Block (CSS Selector)</legend>
             </list-facet>
+            <link-facet facet="enter.source" drilldown="list.html">
+              <legend>Entry Source</legend>
+              <dl>
+                <dt>(direct)</dt>
+                <dd>Direct Entry (or via App)</dd>
+              </dl>
+            </link-facet>
             <list-facet facet="trafficsource">
               <legend>Traffic Source</legend>
             </list-facet>

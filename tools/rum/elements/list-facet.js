@@ -18,14 +18,6 @@ export default class ListFacet extends HTMLElement {
   }
 
   createLabelHTML(labelText) {
-    if (labelText.startsWith('https://') && labelText.includes('media_')) {
-      return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
-    }
-
-    if (labelText.startsWith('https://')) {
-      return `<a href="${labelText}" target="_new">${labelText}</a>`;
-    }
-
     if (this.placeholders && this.placeholders[labelText]) {
       return (`${this.placeholders[labelText]} [${labelText}]`);
     }
