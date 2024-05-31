@@ -2,10 +2,12 @@ import { escapeHTML } from '../utils.js';
 import ListFacet from './list-facet.js';
 
 /**
- * A custom HTML element to display a list of facets with links.
- * <link-facet facet="userAgent" drilldown="share.html" mode="all">
- *   <legend>Referrer</legend>
- * </link-facet>
+ * A custom HTML element to display a list of facets with literal
+ * values. If a placeholder has been provided, then the explanation
+ * will be shown after the literal value.
+ * <literal-facet facet="viewmedia.source" drilldown="share.html" mode="all">
+ *   <legend>Media Source</legend>
+ * </literal-facet>
  */
 export default class LiteralFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
