@@ -150,24 +150,21 @@
                 <dd>Consent</dd>
               </dl>
             </list-facet>
-            <list-facet facet="foobar" drilldown="list.html">
-              <legend>Foo Bar</legend>
-            </list-facet>
-            <list-facet facet="click.source" drilldown="list.html">
+            <literal-facet facet="click.source" drilldown="list.html">
               <legend>Click Source (CSS Selector)</legend>
-            </list-facet>
+            </literal-facet>
             <link-facet facet="click.target" drilldown="list.html">
               <legend>Click Target (URL)</legend>
             </link-facet>
-            <list-facet facet="viewmedia.source" drilldown="list.html">
-              <legend>Media Source</legend>
-            </list-facet>
+            <literal-facet facet="viewmedia.source" drilldown="list.html">
+              <legend>Media Source (CSS Selector)</legend>
+            </literal-facet>
             <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
               <legend>Media Target</legend>
             </thumbnail-facet>
-            <list-facet facet="viewblock.source" drilldown="list.html">
+            <literal-facet facet="viewblock.source" drilldown="list.html">
               <legend>Block (CSS Selector)</legend>
-            </list-facet>
+            </literal-facet>
             <link-facet facet="enter.source" drilldown="list.html">
               <legend>Entry Source</legend>
               <dl>
@@ -175,6 +172,7 @@
                 <dd>Direct Entry (or via App)</dd>
               </dl>
             </link-facet>
+
             <list-facet facet="consent.source">
               <legend>Consent Provider</legend>
               <dl>
@@ -182,6 +180,16 @@
                 <dd>OneTrust</dd>
               </dl>
             </list-facet>
+            <list-facet facet="consent.target">
+              <legend>Consent Dialog</legend>
+              <dl>
+                <dt>show</dt>
+                <dd>Dialog Shown</dd>
+                <dt>hidden</dt>
+                <dd>Dialog Hidden</dd>
+              </dl>
+            </list-facet>
+
             <list-facet facet="trafficsource">
               <legend>Traffic Source</legend>
             </list-facet>
