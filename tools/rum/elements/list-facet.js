@@ -180,7 +180,13 @@ export default class ListFacet extends HTMLElement {
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
-          label.innerHTML = `${this.createLabelHTML(entry.value)} (${toHumanReadable(entry.metrics.pageViews.sum)})`;
+          const valuespan = document.createElement('span');
+          const countspan = document.createElement('span');
+          countspan.className = 'count';
+          countspan.textContent = toHumanReadable(entry.metrics.pageViews.sum);
+          countspan.title = entry.metrics.pageViews.sum;
+          valuespan.innerHTML = this.createLabelHTML(entry.value);
+          label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
