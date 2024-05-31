@@ -76,6 +76,13 @@ function updateDataFacets(filterText, params, checkpoint) {
     return acc;
   }, new Set())), 'every');
 
+  dataChunks.addFacet('vitals', (bundle) => {
+    const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
+    return cwv
+      .filter((metric) => bundle[metric])
+      .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
+  });
+
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons
   dataChunks.addFacet('filter', (bundle) => {
@@ -145,6 +152,7 @@ function updateFilter(params, filterText) {
       || key === 'interaction'
       || key === 'clicktarget'
       || key === 'exit'
+      || key === 'vitals'
       || key.endsWith('.source')
       || key.endsWith('.target')
       || key === 'checkpoint')

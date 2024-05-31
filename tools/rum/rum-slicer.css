@@ -44,19 +44,19 @@ body main > .section {
 
 /* general performance */
 
-main li.score-good {
+main li.score-good, vitals-facet div[data-value^="good"] label {
   opacity: 1;
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
-main li.score-ni {
+main li.score-ni, vitals-facet div[data-value^="ni"] label {
   opacity: 1;
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
-main li.score-poor {
+main li.score-poor, vitals-facet div[data-value^="poor"] label {
   opacity: 1;
   color: var(--dark-red);
   background-color: var(--light-red);
@@ -357,7 +357,8 @@ fieldset > div:hover {
   background-color: #eee;
 }
 
-fieldset li {
+fieldset li,
+vitals-facet label {
   border: 1px solid currentcolor;
   border-radius: 8px;
   background-color: #eee;
@@ -379,7 +380,8 @@ fieldset li.significant {
   border-width: 3px;
 }
 
-fieldset li::after {
+fieldset li::after,
+vitals-facet label::after {
   content: ' ';
   background-color: currentcolor;
   width: 10px;
@@ -488,6 +490,60 @@ thumbnail-facet label span.count {
 
 thumbnail-facet fieldset div:hover label span.count {
   opacity: 0.1;
+}
+
+vitals-facet fieldset {
+  display: grid;
+  grid-template-areas: 
+  '. lcp-good cls-good inp-good'
+  '. lcp-ni cls-ni inp-ni'
+  '. lcp-poor cls-poor inp-poor';
+  grid-template-columns: 1fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 4pt;
+  padding: 4pt;
+  align-items: end;
+}
+
+#facets vitals-facet fieldset div {
+  display: grid;
+  grid-template-areas: 'check lab';
+  grid-template-columns: 20px 1fr;
+}
+
+#facets vitals-facet fieldset div[data-value="goodLCP"] {
+  grid-area: lcp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niLCP"] {
+  grid-area: lcp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorLCP"] {
+  grid-area: lcp-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodCLS"] {
+  grid-area: cls-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niCLS"] {
+  grid-area: cls-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorCLS"] {
+  grid-area: cls-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodINP"] {
+  grid-area: inp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niINP"] {
+  grid-area: inp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorINP"] {
+  grid-area: inp-poor;
 }
 
 #facets fieldset ul.cwv {
@@ -702,7 +758,8 @@ a.drillup::after {
     margin: 8px 4px;
   }
 
-  fieldset li {
+  fieldset li,
+  vitals-facet label {
     border-radius: 16px;
     padding: 4px 16px;
     font-size: 18px;
