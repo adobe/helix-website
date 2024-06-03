@@ -379,42 +379,85 @@ export class DataChunks {
   }
 
   /**
+   * Function used for skipping certain filtering attributes. The logic of the function
+   * depends on the context, for instance when filtering bundles, this function is chained
+   * as a filter function in order to skip certain attributes.
+   * @function skipFilterFn
+   * @param {string} attributeName the name of the attribute to skip.
+   * @returns {boolean} true if the attribute should be included or not.
+   */
+
+  /**
+   * Function used for whitelist filtering attributes. The logic of the function
+   * depends on the context, for instance when filtering bundles, this function is chained
+   * as a filter function in order to ditch attributes.
+   * @function existenceFilterFn
+   * @param {string} attributeName the name of the whitelisted attribute.
+   * @returns {boolean} true if the attribute should be included or not.
+   */
+
+  /**
+   * Function used for extracting the values for a certain attribute out of a dataset
+   * specific to the context.
+   * @function valuesExtractorFn
+   * @param {string} attributeName the name of the attribute to extract.
+   * @param {Bundle} bundle the dataset to extract the attribute from.
+   * @param {DataChunks} parent the parent object that contains the bundles.
+   * @returns {boolean} true if the attribute should be included or not.
+   */
+
+  /**
+   * Function used for inferring the combiner that's going to be used when
+   * filtering attributes.
+   * @function combinerExtractorFn
+   * @param {string} attributeName the name of the attribute to extract.
+   * @param {DataChunks} parent the parent object that contains the bundles.
+   * @returns {string} 'some' or 'every'.
+   */
+
+  /**
    * @private
    * @param {Bundle[]} bundles
    * @param {Object<string, string[]>} filterSpec
    * @param {string[]} skipped facets to skip
    */
   filterBundles(bundles, filterSpec, skipped = []) {
-    const existenceFilter = ([facetName]) => this.facetFns[facetName];
-    const skipFilter = ([facetName]) => !skipped.includes(facetName);
-    const valuesExtractor = (attributeName, bundle, parent) => {
+    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const skipFilterFn = function ([facetName]) {
+      return !skipped.includes(facetName);
+    };
+    const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
       return Array.isArray(facetValue) ? facetValue : [facetValue];
     };
-    const combinerExtractor = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
+    const combinerExtractorFn = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
     // eslint-disable-next-line max-len
-    return this.filtering(bundles, filterSpec, skipFilter, existenceFilter, valuesExtractor, combinerExtractor);
+    return this.applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn);
   }
 
   /**
    * @private
-   * @param {Bundle[]} bundles
-   * @param {Object<string, string[]>} filterSpec
-   * @param skipFilter function to skip filters
-   * @param existenceFilter function to filter out non-existing attributes
-   * @param valuesExtractor function to extract the probed values
-   * @param combinerExtractor function to extract the combiner
-   * @returns {*}
+   * @param {Bundle[]} bundles that will be filtered based on a filter specification.
+   * @param {Object<string, string[]>} filterSpec the filter specification.
+   * @param {skipFilterFn} skipFilterFn function to skip filters. Useful for skipping
+   * unwanted facets, in general skipping attributes.
+   * @param {existenceFilterFn} existenceFilterFn function to filter out non-existing attributes.
+   * This is used to skip facets that have not been added. In general,
+   * this can be used to whitelist attributes names.
+   * @param {valuesExtractorFn} valuesExtractorFn function to extract the probed values.
+   * @param {combinerExtractorFn} combinerExtractorFn function to extract the combiner.
+   * @returns {Bundle[]} the filtered bundles.
    */
-  filtering(bundles, filterSpec, skipFilter, existenceFilter, valuesExtractor, combinerExtractor) {
-    const filterBy = Object.entries(filterSpec) // use the full filter spec
-      .filter(skipFilter) // except for skipped facets
-      .filter(([, desiredValues]) => desiredValues.length) // and filters that accept no values
-      .filter(existenceFilter); // and facets that don't exist
+  // eslint-disable-next-line max-len
+  applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn) {
+    const filterBy = Object.entries(filterSpec)
+      .filter(skipFilterFn)
+      .filter(([, desiredValues]) => desiredValues.length)
+      .filter(existenceFilterFn);
     return bundles.filter((bundle) => {
       const matches = filterBy.map(([attributeName, desiredValues]) => {
-        const actualValues = valuesExtractor(attributeName, bundle, this);
-        const combiner = combinerExtractor(attributeName, this);
+        const actualValues = valuesExtractorFn(attributeName, bundle, this);
+        const combiner = combinerExtractorFn(attributeName, this);
         return desiredValues[combiner]((value) => actualValues.includes(value));
       });
       return matches.every((match) => match);
@@ -422,20 +465,24 @@ export class DataChunks {
   }
 
   /**
-   * Checks if a conversion has happened in the bundle.
-   * @param {Bundle} aBundle
-   * @param {Object<string, string[]>} filterSpec
-   * @param {string} combiner used to determine if all or some filters must match
-   * @returns {boolean}
+   * Checks if a conversion has happened in the bundle. A conversion means a business metric
+   * that has been achieved, for instance a click on a certain link.
+   * @param {Bundle} aBundle the bundle to check.
+   * @param {Object<string, string[]>} filterSpec uses the same format as the filter specification.
+   * For instance { checkpoint: ['click'] } means that inside a bundle an event that has the
+   * checkpoint attribute set to 'click' must exist.
+   * @param {string} combiner used to determine if all or some filters must match.
+   * By default, 'every' is used.
+   * @returns {boolean} the result of the check.
    */
   hasConversion(aBundle, filterSpec, combiner) {
-    const existenceFilter = () => true;
-    const skipFilter = () => true;
-    const valuesExtractor = (attributeName, bundle) => bundle.events.map((e) => e[attributeName]);
-    const combinerExtractor = () => combiner || 'every';
+    const existenceFilterFn = () => true;
+    const skipFilterFn = () => true;
+    const valuesExtractorFn = (attributeName, bundle) => bundle.events.map((e) => e[attributeName]);
+    const combinerExtractorFn = () => combiner || 'every';
 
     // eslint-disable-next-line max-len
-    return this.filtering([aBundle], filterSpec, skipFilter, existenceFilter, valuesExtractor, combinerExtractor).length > 0;
+    return this.applyFilter([aBundle], filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn).length > 0;
   }
 
   filterBy(filterSpec) {
