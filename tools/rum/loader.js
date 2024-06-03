@@ -11,7 +11,6 @@ export default class DataLoader {
     this.API_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
     this.DOMAIN = 'www.thinktanked.org';
     this.DOMAIN_KEY = '';
-    this.criteria = [{ checkpoint: 'click' }];
   }
 
   flush() {
