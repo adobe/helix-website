@@ -562,6 +562,19 @@ vitals-facet fieldset {
   height: 60px;
 }
 
+#facets link-facet img {
+  height: 40px;
+  width: 60px;
+  object-fit: cover;
+  display: block;
+  float: left;
+  margin-right: 8px;
+}
+
+#facets link-facet img.broken {
+  opacity: 0;
+}
+
 #facets fieldset div.load-more {
   grid-column: 2 / span 2;  
   display: block;
