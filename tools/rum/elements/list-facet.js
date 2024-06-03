@@ -84,7 +84,14 @@ export default class ListFacet extends HTMLElement {
   update() {
     const facetName = this.getAttribute('facet');
     const facetEntries = this.dataChunks.facets[facetName];
-    const optionKeys = facetEntries.map((f) => f.value);
+
+    const sort = this.getAttribute('sort') || 'count';
+
+    const optionKeys = facetEntries.map((f) => f.value)
+      .sort((a, b) => {
+        if (sort === 'count') return 0; // keep the order
+        return a.localeCompare(b);
+      });
 
     const url = new URL(window.location);
     const drilldownAtt = this.getAttribute('drilldown');
