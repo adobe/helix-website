@@ -117,6 +117,21 @@ function updateDataFacets(filterText, params, checkpoint) {
             .filter(({ target }) => target) // filter out empty targets
             .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
         ));
+
+        if (cp === 'loadresource') {
+          // loadresource.target are not discrete values, but the number
+          // of milliseconds it took to load the resource, so the best way
+          // to present this is to create a histogram
+          // we already have the `loadresource.target` facet, so we can
+          // extract the values from there and create a histogram
+          dataChunks.addHistogramFacet(
+            'loadresource.histogram',
+            'loadresource.target',
+            {
+              count: 10, min: 0, max: 10000, steps: 'quantiles',
+            },
+          );
+        }
       } else if (params.has('utm.source')) {
         params.getAll('utm.source').forEach((utmsource) => {
           dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
@@ -155,6 +170,7 @@ function updateFilter(params, filterText) {
       || key === 'vitals'
       || key.endsWith('.source')
       || key.endsWith('.target')
+      || key.endsWith('.histogram')
       || key === 'checkpoint')
     .reduce((acc, [key, value]) => {
       if (acc[key]) acc[key].push(value);
