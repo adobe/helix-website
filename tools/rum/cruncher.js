@@ -53,9 +53,6 @@ export function addCalculatedProps(bundle) {
       bundle.visit = true;
       if (e.source === '') e.source = '(direct)';
     }
-    if (e.checkpoint === 'click') {
-      bundle.conversion = true;
-    }
     if (e.checkpoint === 'cwv-inp') {
       bundle.cwvINP = e.value;
     }
