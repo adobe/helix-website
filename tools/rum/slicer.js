@@ -57,11 +57,36 @@ export function updateKeyMetrics(keyMetrics) {
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
 }
 
-function parseSearchParams(params, filter, transform) {
+/**
+ * Function used for filtering wanted parameters. Its implementation depends on the context,
+ * for instance when parsing for conversion parameters we care about those that start with
+ * `conversion.`.
+ * @function filterFn
+ * @param {string} paramName - The parameter name.
+ * @returns {boolean} - Returns true if the parameter will be further parsed, false otherwise.
+ */
+
+/**
+ * In some cases, it may just be that the parameters need to be transformed in some way.
+ * For instance, when parsing conversion parameters we want to remove the `conversion.` prefix
+ * from the parameter name.
+ * @function transformFn
+ * @param {[string, string]} paramPair - The pair of parameter name and its value.
+ * @returns {[string, string]} - The result of the transformation.
+ */
+
+/**
+ * Parse search parameters and return a dictionary.
+ * @param {URLSearchParams} params - The search parameters.
+ * @param {filterFn} filterFn - The filtering function.
+ * @param {transformFn} transformFn - The transformation function.
+ * @returns {Object<string, string[]>} - The dictionary of parameters.
+ */
+function parseSearchParams(params, filterFn, transformFn) {
   return Array.from(params
     .entries())
-    .filter(filter)
-    .map(transform)
+    .filter(filterFn)
+    .map(transformFn)
     .reduce((acc, [key, value]) => {
       if (acc[key]) acc[key].push(value);
       else acc[key] = [value];
@@ -71,12 +96,12 @@ function parseSearchParams(params, filter, transform) {
 
 function parseConversionSpec() {
   const params = new URL(window.location).searchParams;
-  const transform = ([key, value]) => [key.split('.')[1], value];
+  const transform = ([key, value]) => [key.replace('conversion.', ''), value];
   const filter = ([key]) => (key.startsWith('conversion.'));
   return parseSearchParams(params, filter, transform);
 }
 
-const conversionSpec = parseConversionSpec();
+const conversionSpec = parseConversionSpec() || { checkpoint: ['click'] };
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
