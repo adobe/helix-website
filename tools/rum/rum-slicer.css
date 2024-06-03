@@ -683,7 +683,8 @@ a.drillup::after {
 /* toasts */
 
 .toast {
-  position: absolute;
+  z-index: var(--nav-z-index);
+  position: fixed;
   display: block;
   width: fit-content;
   padding: 8px 32px;
