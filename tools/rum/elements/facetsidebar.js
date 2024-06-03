@@ -71,8 +71,8 @@ export default class FacetSidebar extends HTMLElement {
       const facetEl = this.querySelector(`[facet="${facetName}"]`);
       console.assert(facetEl, `Facet ${facetName} not found in provided UI elements.`);
 
-      facetEl.setAttribute('mode', mode || 'default');
-      if (focus) facetEl.setAttribute('focus', focus);
+      if (facetEl) facetEl.setAttribute('mode', mode || 'default');
+      if (facetEl && focus) facetEl.setAttribute('focus', focus);
       if (facetEl) this.elems.facetsElement.append(facetEl);
     });
   }
