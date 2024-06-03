@@ -11,7 +11,6 @@ export default class VitalsFacet extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('VitalsFacet connected', this);
     if (this.dataChunks) this.update();
   }
 
@@ -26,7 +25,6 @@ export default class VitalsFacet extends HTMLElement {
     const fieldSet = this.querySelector('fieldset') || document.createElement('fieldset');
     const legendText = this.querySelector('legend')?.textContent || facetName;
 
-    console.log('facetEntries', facetEntries);
     fieldSet.textContent = '';
 
     facetEntries.forEach(({ name, value, weight }) => {
