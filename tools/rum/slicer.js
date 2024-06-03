@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
-import { toHumanReadable, scoreCWV } from './utils.js';
+import { scoreCWV, toHumanReadable } from './utils.js';
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -57,8 +57,33 @@ export function updateKeyMetrics(keyMetrics) {
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
 }
 
+function parseSearchParams(params, filter, transform) {
+  return Array.from(params
+    .entries())
+    .filter(filter)
+    .map(transform)
+    .reduce((acc, [key, value]) => {
+      if (acc[key]) acc[key].push(value);
+      else acc[key] = [value];
+      return acc;
+    }, {});
+}
+
+function parseConversionSpec() {
+  const params = new URL(window.location).searchParams;
+  const transform = ([key, value]) => [key.split('.')[1], value];
+  const filter = ([key]) => (key.startsWith('conversion.'));
+  return parseSearchParams(params, filter, transform);
+}
+
+const conversionSpec = parseConversionSpec();
+
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+  dataChunks.addFacet(
+    'conversions',
+    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
+  );
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
     return parts.reduce((acc, _, i) => {
@@ -160,32 +185,27 @@ function updateDataFacets(filterText, params, checkpoint) {
 }
 
 function updateFilter(params, filterText) {
-  dataChunks.filter = Array.from(params
-    .entries())
-    .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
-      || key === 'userAgent'
-      || (key === 'filter' && filterText.length > 2)
-      || key === 'url'
-      // facets from sankey
-      || key === 'trafficsource'
-      || key === 'traffictype'
-      || key === 'entryevent'
-      || key === 'pagetype'
-      || key === 'loadtype'
-      || key === 'contenttype'
-      || key === 'interaction'
-      || key === 'clicktarget'
-      || key === 'exit'
-      || key === 'vitals'
-      || key.endsWith('.source')
-      || key.endsWith('.target')
-      || key.endsWith('.histogram')
-      || key === 'checkpoint')
-    .reduce((acc, [key, value]) => {
-      if (acc[key]) acc[key].push(value);
-      else acc[key] = [value];
-      return acc;
-    }, {});
+  const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
+    || key === 'userAgent'
+    || (key === 'filter' && filterText.length > 2)
+    || key === 'url'
+    || key === 'conversions'
+    // facets from sankey
+    || key === 'trafficsource'
+    || key === 'traffictype'
+    || key === 'entryevent'
+    || key === 'pagetype'
+    || key === 'loadtype'
+    || key === 'contenttype'
+    || key === 'interaction'
+    || key === 'clicktarget'
+    || key === 'exit'
+    || key === 'vitals'
+    || key.endsWith('.source')
+    || key.endsWith('.target')
+    || key === 'checkpoint';
+  const transform = ([key, value]) => [key, value];
+  dataChunks.filter = parseSearchParams(params, filter, transform);
 }
 
 export async function draw() {
@@ -206,13 +226,16 @@ export async function draw() {
 
   await herochart.draw();
 
+  const facets = dataChunks.facets.conversions;
+  const converted = facets?.find((f) => f.value === 'converted');
+
   updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
     cls: dataChunks.totals.cls.percentile(75),
     inp: dataChunks.totals.inp.percentile(75),
     ttfb: dataChunks.totals.ttfb.percentile(75),
-    conversions: dataChunks.totals.conversions.sum,
+    conversions: converted ? converted.weight : 0,
     visits: dataChunks.totals.visits.sum,
   });
 
@@ -260,6 +283,18 @@ export function updateState() {
     }
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
+
+  // with the conversion spec in form of dictionary
+  // need to put it back in the url by expanding the dictionary as follows
+  // the key is appended to conversion. and there can be multiple values for the same key
+  // conversion.key=value1&conversion.key=value2
+
+  Object.entries(conversionSpec).forEach(([key, values]) => {
+    values.forEach((value) => {
+      url.searchParams.append(`conversion.${key}`, value);
+    });
+  });
+
   window.history.replaceState({}, '', url);
 }
 
