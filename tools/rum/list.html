@@ -99,92 +99,127 @@
             </figcaption>
           </figure>
         </div>
-        <facet-sidebar>
-          <list-facet facet="userAgent" drilldown="share.html">
-            <legend>Device Type and Operating System</legend>
-            <dl>
-              <dt>desktop</dt>
-              <dd>All Desktop</dd>
-              <dt>desktop:windows</dt>
-              <dd>Windows Desktop</dd>
-              <dt>desktop:mac</dt>
-              <dd>Mac Desktop</dd>
-              <dt>desktop:linux</dt>
-              <dd>Linux Desktop</dd>
-              <dt>mobile</dt>
-              <dd>All Mobile</dd>
-              <dt>mobile:android</dt>
-              <dd>Android Mobile</dd>
-              <dt>mobile:ios</dt>
-              <dd>iOS Mobile</dd>
-              <dt>mobile:ipados</dt>
-              <dd>iPad Mobile</dd>
-              <dt>bot</dt>
-              <dd>All Bots</dd>
-              <dt>bot:seo</dt>
-              <dd>SEO Bot</dd>
-            </dl>
+          <facet-sidebar>
+            <list-facet facet="userAgent" drilldown="share.html">
+              <legend>Device Type and Operating System</legend>
+              <dl>
+                <dt>desktop</dt>
+                <dd>All Desktop</dd>
+                <dt>desktop:windows</dt>
+                <dd>Windows Desktop</dd>
+                <dt>desktop:mac</dt>
+                <dd>Mac Desktop</dd>
+                <dt>desktop:linux</dt>
+                <dd>Linux Desktop</dd>
+                <dt>desktop:chromeos</dt>
+                <dd>Chrome OS Desktop</dd>
+                <dt>mobile</dt>
+                <dd>All Mobile</dd>
+                <dt>mobile:android</dt>
+                <dd>Android Mobile</dd>
+                <dt>mobile:ios</dt>
+                <dd>iOS Mobile</dd>
+                <dt>mobile:ipados</dt>
+                <dd>iPad Mobile</dd>
+                <dt>bot</dt>
+                <dd>All Bots</dd>
+                <dt>bot:seo</dt>
+                <dd>SEO Bot</dd>
+                <dt>bot:search</dt>
+                <dd>Search Engine Crawler</dd>
+                <dt>bot:ads</dt>
+                <dd>Ad Bot</dd>
+                <dt>bot:social</dt>
+                <dd>Social Media Bot</dd>
+              </dl>
+              </list-facet>
+            <link-facet facet="url" drilldown="list.html" thumbnail="true">
+              <legend>URL</legend>
+            </link-facet>
+            <list-facet facet="checkpoint" drilldown="flow.html">
+              <legend>Checkpoints</legend>
+              <dl>
+                <dt>enter</dt>
+                <dd>Visit Entry</dd>
+                <dt>loadresource</dt>
+                <dd>Fragment Loaded</dd>
+                <dt>404</dt>
+                <dd>Not Found</dd>
+                <dt>viewblock</dt>
+                <dd>Block Viewed</dd>
+                <dt>viewmedia</dt>
+                <dd>Media Viewed</dd>
+                <dt>click</dt>
+                <dd>Clicked</dd>
+                <dt>error</dt>
+                <dd>JavaScript Error</dd>
+                <dt>utm</dt>
+                <dd>Marketing Campaigns</dd>
+                <dt>consent</dt>
+                <dd>Consent</dd>
+                <dt>navigate</dt>
+                <dd>Internal Navigation</dd>
+              </dl>
+              </list-facet>
+            <literal-facet facet="click.source" drilldown="list.html">
+              <legend>Click Source (CSS Selector)</legend>
+            </literal-facet>
+            <link-facet facet="click.target" drilldown="list.html">
+              <legend>Click Target (URL)</legend>
+            </link-facet>
+            <literal-facet facet="viewmedia.source" drilldown="list.html">
+              <legend>Media Source (CSS Selector)</legend>
+            </literal-facet>
+            <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
+              <legend>Media Target</legend>
+            </thumbnail-facet>
+            <literal-facet facet="viewblock.source" drilldown="list.html">
+              <legend>Block (CSS Selector)</legend>
+            </literal-facet>
+            <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
+              <legend>External Referrer</legend>
+              <dl>
+                <dt>(direct)</dt>
+                <dd>Direct Entry (or via App)</dd>
+              </dl>
+            </link-facet>
+            <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
+              <legend>Internal Referrer</legend>
+            </link-facet>
+            
+            <list-facet facet="consent.source">
+              <legend>Consent Provider</legend>
+              <dl>
+                <dt>onetrust</dt>
+                <dd>OneTrust</dd>
+              </dl>
+            </list-facet>
+            <list-facet facet="consent.target">
+              <legend>Consent Dialog</legend>
+              <dl>
+                <dt>show</dt>
+                <dd>Dialog Shown</dd>
+                <dt>hidden</dt>
+                <dd>Dialog Hidden</dd>
+              </dl>
+            </list-facet>
+          <link-facet facet="error.source">
+            <legend>Error Source</legend>
+          </link-facet>
+          <literal-facet facet="error.target">
+            <legend>Error Line</legend>
+          </literal-facet>
+          
+          <list-facet facet="loadresource.histogram" sort="asc">
+            <legend>Resource Load Time (ms)</legend>
           </list-facet>
-          <list-facet facet="url" drilldown="list.html">
-            <legend>URL</legend>
+          <list-facet facet="loadresource.source">
+            <legend>Resource Loaded</legend>
           </list-facet>
-          <list-facet facet="checkpoint" drilldown="flow.html">
-            <legend>Checkpoints</legend>
-            <dl>
-              <dt>enter</dt>
-              <dd>Visit Entry</dd>
-              <dt>loadresource</dt>
-              <dd>Fragment Loaded</dd>
-              <dt>404</dt>
-              <dd>Not Found</dd>
-              <dt>viewblock</dt>
-              <dd>Block Viewed</dd>
-              <dt>viewmedia</dt>
-              <dd>Media Viewed</dd>
-              <dt>click</dt>
-              <dd>Clicked</dd>
-              <dt>error</dt>
-              <dd>JavaScript Error</dd>
-              <dt>utm</dt>
-              <dd>Marketing Campaigns</dd>
-              <dt>consent</dt>
-              <dd>Consent</dd>
-            </dl>
-          </list-facet>
-          <list-facet facet="foobar" drilldown="list.html">
-            <legend>Foo Bar</legend>
-          </list-facet>
-          <list-facet facet="click.source" drilldown="list.html">
-            <legend>Click Source (CSS Selector)</legend>
-          </list-facet>
-          <list-facet facet="click.target" drilldown="list.html">
-            <legend>Click Target (URL)</legend>
-          </list-facet>
-          <list-facet facet="trafficsource">
-            <legend>Traffic Source</legend>
-          </list-facet>
-          <list-facet facet="traffictype">
-            <legend>Traffic Type</legend>
-          </list-facet>
-          <list-facet facet="entryevent">
-            <legend>Entry Event</legend>
-          </list-facet>
-          <list-facet facet="pagetype">
-            <legend>Page Type</legend>
-          </list-facet>
-          <list-facet facet="contenttype">
-            <legend>Content Type</legend>
-          </list-facet>
-          <list-facet facet="interaction">
-            <legend>Interaction</legend>
-          </list-facet>
-          <list-facet facet="clicktarget">
-            <legend>Click Target Type</legend>
-          </list-facet>
-          <list-facet facet="exit">
-            <legend>Exit Link</legend>
-          </list-facet>
-        </facet-sidebar>
+            <vitals-facet facet="vitals">
+              <legend>Experience Quality</legend>
+            </vitals-facet>
+          </facet-sidebar>
       </div>
     </div>
   </main>
