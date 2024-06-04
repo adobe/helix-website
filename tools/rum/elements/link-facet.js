@@ -21,6 +21,13 @@ export default class LinkFacet extends ListFacet {
     if (labelText.startsWith('https://') || labelText.startsWith('http://')) {
       return `<a href="${labelText}" target="_new">${labelText}</a>`;
     }
+    if (labelText.startsWith('referrer:')) {
+      return `<a href="${labelText.replace('referrer:', 'https://')}" target="_new">${labelText.replace('referrer:', '')}</a>`;
+    }
+    if (labelText.startsWith('navigate:')) {
+      const domain = new URL(window.location.href).searchParams.get('domain');
+      return `navigate from <a href="${labelText.replace('navigate:', `https://${domain}`)}" target="_new">${labelText.replace('navigate:', '')}</a>`;
+    }
     if (this.placeholders && this.placeholders[labelText]) {
       return (`${this.placeholders[labelText]} [${labelText}]`);
     }

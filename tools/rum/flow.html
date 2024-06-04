@@ -113,6 +113,8 @@
               <dd>Mac Desktop</dd>
               <dt>desktop:linux</dt>
               <dd>Linux Desktop</dd>
+              <dt>desktop:chromeos</dt>
+              <dd>Chrome OS Desktop</dd>
               <dt>mobile</dt>
               <dd>All Mobile</dd>
               <dt>mobile:android</dt>
@@ -125,11 +127,17 @@
               <dd>All Bots</dd>
               <dt>bot:seo</dt>
               <dd>SEO Bot</dd>
+              <dt>bot:search</dt>
+              <dd>Search Engine Crawler</dd>
+              <dt>bot:ads</dt>
+              <dd>Ad Bot</dd>
+              <dt>bot:social</dt>
+              <dd>Social Media Bot</dd>
             </dl>
           </list-facet>
-          <list-facet facet="url" drilldown="list.html">
+          <link-facet facet="url" drilldown="list.html" thumbnail="true">
             <legend>URL</legend>
-          </list-facet>
+          </link-facet>
           <list-facet facet="checkpoint" drilldown="flow.html">
             <legend>Checkpoints</legend>
             <dl>
@@ -151,26 +159,19 @@
               <dd>Marketing Campaigns</dd>
               <dt>consent</dt>
               <dd>Consent</dd>
+              <dt>navigate</dt>
+              <dd>Internal Navigation</dd>
             </dl>
           </list-facet>
-          <list-facet facet="foobar" drilldown="list.html">
-            <legend>Foo Bar</legend>
-          </list-facet>
-          <list-facet facet="click.source" drilldown="list.html">
-            <legend>Click Source (CSS Selector)</legend>
-          </list-facet>
-          <list-facet facet="click.target" drilldown="list.html">
-            <legend>Click Target (URL)</legend>
-          </list-facet>
-          <list-facet facet="trafficsource">
+          <link-facet facet="trafficsource">
             <legend>Traffic Source</legend>
-          </list-facet>
+          </link-facet>
           <list-facet facet="traffictype">
             <legend>Traffic Type</legend>
           </list-facet>
-          <list-facet facet="entryevent">
+          <link-facet facet="entryevent">
             <legend>Entry Event</legend>
-          </list-facet>
+          </link-facet>
           <list-facet facet="loadtype">
             <legend>Load Type</legend>
           </list-facet>
