@@ -129,6 +129,12 @@
                 <dd>All Bots</dd>
                 <dt>bot:seo</dt>
                 <dd>SEO Bot</dd>
+                <dt>bot:search</dt>
+                <dd>Search Engine Crawler</dd>
+                <dt>bot:ads</dt>
+                <dd>Ad Bot</dd>
+                <dt>bot:social</dt>
+                <dd>Social Media Bot</dd>
               </dl>
             </list-facet>
             <link-facet facet="url" drilldown="list.html" thumbnail="true">
@@ -155,6 +161,8 @@
                 <dd>Marketing Campaigns</dd>
                 <dt>consent</dt>
                 <dd>Consent</dd>
+                <dt>navigate</dt>
+                <dd>Internal Navigation</dd>
               </dl>
             </list-facet>
             <literal-facet facet="click.source" drilldown="list.html">
@@ -172,12 +180,15 @@
             <literal-facet facet="viewblock.source" drilldown="list.html">
               <legend>Block (CSS Selector)</legend>
             </literal-facet>
-            <link-facet facet="enter.source" drilldown="list.html">
-              <legend>Entry Source</legend>
+            <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
+              <legend>External Referrer</legend>
               <dl>
                 <dt>(direct)</dt>
                 <dd>Direct Entry (or via App)</dd>
               </dl>
+            </link-facet>
+            <link-facet facet="navigate.source" thumbnail="true">
+              <legend>Internal Referrer</legend>
             </link-facet>
 
             <list-facet facet="consent.source">
@@ -210,31 +221,6 @@
             
             <list-facet facet="loadresource.source">
               <legend>Resource Loaded</legend>
-            </list-facet>
-
-            <list-facet facet="trafficsource">
-              <legend>Traffic Source</legend>
-            </list-facet>
-            <list-facet facet="traffictype">
-              <legend>Traffic Type</legend>
-            </list-facet>
-            <list-facet facet="entryevent">
-              <legend>Entry Event</legend>
-            </list-facet>
-            <list-facet facet="pagetype">
-              <legend>Page Type</legend>
-            </list-facet>
-            <list-facet facet="contenttype">
-              <legend>Content Type</legend>
-            </list-facet>
-            <list-facet facet="interaction">
-              <legend>Interaction</legend>
-            </list-facet>
-            <list-facet facet="clicktarget">
-              <legend>Click Target Type</legend>
-            </list-facet>
-            <list-facet facet="exit">
-              <legend>Exit Link</legend>
             </list-facet>
           </facet-sidebar>
         </div>
