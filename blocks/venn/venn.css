@@ -84,6 +84,11 @@
   background-color: #fff7;
   font-size: var(--type-body-xs-size);
   line-height: 1.3;
+  opacity: 0.2;
+}
+
+.venn .venn-content li.venn-active {
+  opacity: 1;
 }
 
 .venn .venn-content li:not(:has(a)) {
