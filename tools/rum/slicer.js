@@ -71,10 +71,6 @@ function updateDataFacets(filterText, params, checkpoint) {
     }, []);
   });
   dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
-    acc.add(evt.checkpoint);
-    return acc;
-  }, new Set())), 'every');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
@@ -82,6 +78,11 @@ function updateDataFacets(filterText, params, checkpoint) {
       .filter((metric) => bundle[metric])
       .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
   });
+
+  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
+    acc.add(evt.checkpoint);
+    return acc;
+  }, new Set())), 'every');
 
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons

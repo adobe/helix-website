@@ -101,9 +101,6 @@
             </figure>
           </div>
           <facet-sidebar>
-            <vitals-facet facet="vitals">
-              <legend>Experience Quality</legend>
-            </vitals-facet>
             <list-facet facet="userAgent" drilldown="share.html">
               <legend>Device Type and Operating System</legend>
               <dl>
@@ -187,7 +184,7 @@
                 <dd>Direct Entry (or via App)</dd>
               </dl>
             </link-facet>
-            <link-facet facet="navigate.source" thumbnail="true">
+            <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
               <legend>Internal Referrer</legend>
             </link-facet>
 
@@ -222,6 +219,9 @@
             <list-facet facet="loadresource.source">
               <legend>Resource Loaded</legend>
             </list-facet>
+            <vitals-facet facet="vitals">
+              <legend>Experience Quality</legend>
+            </vitals-facet>
           </facet-sidebar>
         </div>
     </div>
