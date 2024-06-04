@@ -28,7 +28,7 @@ export default async function decorate(block) {
         li.textContent = li.textContent.replace(match[0], '');
       }
 
-      const p = ((level - start) / (end - start)) * 100;
+      const p = ((level - start + 1) / (end - start + 1)) * 100;
 
       li.style.background = `linear-gradient(90deg, rgba(0,255,0,1) 0%, rgba(255,255,255,1) ${p}%)`;
     }
