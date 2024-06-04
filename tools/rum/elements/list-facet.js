@@ -178,12 +178,11 @@ export default class ListFacet extends HTMLElement {
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
-          const valuespan = document.createElement('span');
           const countspan = document.createElement('span');
           countspan.className = 'count';
           countspan.textContent = toHumanReadable(entry.metrics.pageViews.sum);
           countspan.title = entry.metrics.pageViews.sum;
-          valuespan.innerHTML = this.createLabelHTML(entry.value);
+          const valuespan = this.createValueSpan(entry);
           label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
@@ -249,6 +248,34 @@ export default class ListFacet extends HTMLElement {
       });
       this.append(fieldSet);
     }
+  }
+
+  createValueSpan(entry) {
+    const valuespan = document.createElement('span');
+    valuespan.innerHTML = this.createLabelHTML(entry.value);
+    const highlightFromParam = this.getAttribute('highlight');
+    if (highlightFromParam) {
+      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam);
+      const highlights = highlightValue.split(' ')
+        .map((h) => h.trim())
+        .filter((h) => h.length > 0);
+      // get all text nodes, no matter how deep inside valuespan
+      const textNodes = [];
+      const walker = document.createTreeWalker(valuespan, NodeFilter.SHOW_TEXT, null, false);
+      let node = walker.nextNode();
+      while (node) {
+        textNodes.push(node);
+        node = walker.nextNode();
+      }
+      textNodes.forEach((textNode) => {
+        if (!highlights.length) return;
+        const text = textNode.textContent;
+        const placeholder = document.createElement('span');
+        placeholder.innerHTML = text.replace(new RegExp(`(${highlights.join('|')})`, 'gi'), '<mark>$1</mark>');
+        textNode.replaceWith(...placeholder.childNodes);
+      });
+    }
+    return valuespan;
   }
 
   createCWVChiclet(entry, metricName = 'lcp') {
