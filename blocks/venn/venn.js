@@ -17,8 +17,7 @@ function updateLevelParam(value) {
  * @param {number} value Value of the range.
  * @param {NodeListOf<HTMLLIElement>} lis List of <li> elements to update.
  */
-function updateVennDisplay(range, value, lis) {
-  range.value = value;
+function updateVennDisplay(value, lis) {
   lis.forEach((li) => {
     li.removeAttribute('style');
     const min = parseInt(li.dataset.min, 10);
