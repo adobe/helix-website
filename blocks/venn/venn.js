@@ -26,6 +26,7 @@ function updateVennDisplay(value, lis) {
       li.className = 'below-range';
     } else if (value >= min && value < max) {
       li.className = 'in-range';
+      // calculate the percentage position of 'value' within the range min - max
       li.style.setProperty('--venn-progress', `${((value - min + 1) / (max - min + 1)) * 100}%`);
     } else {
       li.className = 'exceeds-range';
@@ -49,11 +50,11 @@ export default async function decorate(block) {
   lis.forEach((wrapper) => {
     // identify skill from <a> tag
     const skill = wrapper.querySelector('a');
-    // separate skill level range
+    // separate skill level range from skill
     const levels = wrapper.textContent.replace(skill.textContent, '').trim();
     wrapper.innerHTML = skill.outerHTML;
     if (levels) {
-      // parse min and max from skill level range
+      // extract min and max from 'levels' string range
       const [min, max] = levels.replace('(', '').split(',').map((n) => parseInt(n, 10));
       if (sliderMin === 0 || min < sliderMin) sliderMin = min;
       if (sliderMax === 0 || max > sliderMax) sliderMax = max;
