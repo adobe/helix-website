@@ -80,6 +80,18 @@ function updateDataFacets(filterText, params, checkpoint) {
     return acc;
   }, new Set())), 'every');
 
+  if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
+    dataChunks.addFacet('lcp.target', (bundle) => bundle.events
+      .filter((evt) => evt.checkpoint === 'cwv-lcp')
+      .map((evt) => evt.target)
+      .filter((target) => target));
+
+    dataChunks.addFacet('lcp.source', (bundle) => bundle.events
+      .filter((evt) => evt.checkpoint === 'cwv-lcp')
+      .map((evt) => evt.source)
+      .filter((source) => source));
+  }
+
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons
   dataChunks.addFacet('filter', (bundle) => {
