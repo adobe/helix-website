@@ -34,21 +34,23 @@ export default class VitalsFacet extends HTMLElement {
       div.dataset.value = value;
       div.dataset.weight = weight;
       const label = document.createElement('label');
-      label.textContent = `${value.replace(/good|poor|ni/, '')}: ${toHumanReadable(weight)}`;
+      label.textContent = `${value.replace(/(good|poor|ni)(.+)$/, (_, m, metric) => {
+        if (m === 'ni') return `${metric} ni `;
+        return `${metric} ${m}`;
+      })}: ${toHumanReadable(weight)}`;
       label.htmlFor = `${name}=${value}`;
-      div.append(label);
       const input = document.createElement('input');
       input.type = 'checkbox';
       input.id = `${name}=${value}`;
       input.value = value;
-      input.checked = searchParams.has(facetName) && searchParams.get(facetName) === value;
+      input.checked = searchParams.has(facetName) && searchParams.getAll(facetName).includes(value);
 
       input.addEventListener('change', (evt) => {
         evt.stopPropagation();
         this.parentElement.parentElement.dispatchEvent(new Event('facetchange'));
       });
 
-      div.append(input);
+      div.append(input, label);
 
       fieldSet.append(div);
     });
