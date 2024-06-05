@@ -26,7 +26,7 @@ function updateVennDisplay(value, lis) {
       li.className = 'below-range';
     } else if (value >= min && value < max) {
       li.className = 'in-range';
-      li.style.setProperty('--venn-progress', `${parseInt((value / max) * 100, 10)}%`);
+      li.style.setProperty('--venn-progress', `${((value - min + 1) / (max - min + 1)) * 100}%`);
     } else {
       li.className = 'exceeds-range';
     }
@@ -70,7 +70,7 @@ export default async function decorate(block) {
   range.max = sliderMax;
   range.addEventListener('input', () => {
     updateLevelParam(range.value);
-    updateVennDisplay(range, parseInt(range.value, 10), lis);
+    updateVennDisplay(parseInt(range.value, 10), lis);
   });
   const label = createTag('label', { type: 'range', for: 'venn-slider' });
   label.textContent = 'Skill Level';
@@ -84,6 +84,7 @@ export default async function decorate(block) {
   // retrieve level query param
   const params = new URLSearchParams(window.location.search);
   const level = params.get('level') || sliderMin;
+  range.value = level;
   updateLevelParam(level);
-  updateVennDisplay(range, level, lis);
+  updateVennDisplay(level, lis);
 }
