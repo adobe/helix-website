@@ -381,7 +381,7 @@ fieldset li.significant {
 }
 
 fieldset li::after,
-vitals-facet label::after {
+vitals-facet label::before {
   content: ' ';
   background-color: currentcolor;
   width: 10px;
@@ -547,16 +547,47 @@ vitals-facet fieldset {
   '. lcp-good cls-good inp-good'
   '. lcp-ni cls-ni inp-ni'
   '. lcp-poor cls-poor inp-poor';
-  grid-template-columns: 1fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
   gap: 4pt;
   padding: 4pt;
   align-items: end;
 }
 
+vitals-facet fieldset label {
+  word-break: normal;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] {
+  opacity: 0.1;
+  width: 0;
+  height: 0;
+}
+
+#facets vitals-facet label::before {
+  margin-right: 8px;
+}
+
 #facets vitals-facet fieldset div {
   display: grid;
   grid-template-areas: 'check lab';
-  grid-template-columns: 20px 1fr;
+  grid-template-columns: 0 1fr;
+  grid-gap: 0;
+}
+
+#facets vitals-facet fieldset label {
+  text-align: start;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] + label::before {
+  border: 2px solid currentcolor;
+  background-color: transparent;
+  width: 8px;
+  height: 8px;
+}
+
+#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+  border: 2px solid currentcolor;
+  background-color: currentcolor;
 }
 
 #facets vitals-facet fieldset div[data-value="goodLCP"] {
