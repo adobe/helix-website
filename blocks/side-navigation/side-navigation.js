@@ -48,6 +48,7 @@ const handleSearchString = (clearQuery) => {
 export default async function decorate(block) {
   block.textContent = '';
   const aside = document.querySelector('aside');
+  if (!aside) return;
 
   // side navbar only exist on guide/documentation pages
   if (!document.body.classList.contains('guides-template')) {
