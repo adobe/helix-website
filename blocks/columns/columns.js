@@ -15,6 +15,34 @@ const animationConfig = {
 
 const getColorPatternIndex = (patternArray, currentIndex) => (currentIndex % patternArray.length);
 
+const exitFullScreen = (e) => {
+  if (e.key && e.key !== 'Escape') {
+    // ignore other keys
+    return;
+  }
+  const imgClone = document.querySelector('.columns.fullscreen-images img.fullscreen');
+  if (imgClone) {
+    imgClone.remove();
+  }
+};
+
+const enterFullScreen = (block, img) => {
+  img.addEventListener('click', (e) => {
+    e.stopPropagation();
+    exitFullScreen(e);
+    const imgUrl = new URL(img.src);
+    imgUrl.search = '';
+    const imgClone = img.cloneNode();
+    imgClone.src = imgUrl.toString();
+    imgClone.className = 'fullscreen';
+    imgClone.style.top = `${window.scrollY}px`;
+    imgClone.title = 'Click or hit ESC to exit full screen mode';
+    imgClone.addEventListener('click', exitFullScreen);
+    block.prepend(imgClone);
+  }, { capture: true });
+  img.parentElement.title = 'Click to view in full screen mode';
+};
+
 export default function decorate(block) {
   const classes = ['one', 'two', 'three', 'four', 'five'];
   const observer = new IntersectionObserver((entries) => {
@@ -38,7 +66,7 @@ export default function decorate(block) {
     if (img) {
       cell.classList.add('columns-image');
       observer.observe(img);
-      img.parentElement.closest('p').classList.add('image-wrapper-el');
+      img.parentElement.closest('p')?.classList.add('image-wrapper-el');
     } else {
       cell.classList.add('columns-content');
       const wrapper = document.createElement('div');
@@ -67,5 +95,14 @@ export default function decorate(block) {
 
   if (block.classList.contains('inview-animation')) {
     addInViewAnimationToMultipleElements(animationConfig.items, block, animationConfig.staggerTime);
+  }
+
+  if (block.classList.contains('fullscreen-images')) {
+    block.querySelectorAll('picture > img').forEach((img) => enterFullScreen(block, img));
+    if (block === document.querySelector('main .columns.fullscreen-images')) {
+      // add exit listeners once
+      document.body.addEventListener('click', exitFullScreen);
+      document.body.addEventListener('keyup', exitFullScreen);
+    }
   }
 }
