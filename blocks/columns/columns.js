@@ -38,7 +38,7 @@ const enterFullScreen = (block, img) => {
     imgClone.style.top = `${window.scrollY}px`;
     imgClone.addEventListener('click', exitFullScreen);
     block.prepend(imgClone);
-  });
+  }, { capture: true });
   img.parentElement.title = 'Click to view in full screen mode';
 };
 
@@ -98,7 +98,10 @@ export default function decorate(block) {
 
   if (block.classList.contains('fullscreen-images')) {
     block.querySelectorAll('picture > img').forEach((img) => enterFullScreen(block, img));
-    document.body.addEventListener('click', exitFullScreen);
-    document.body.addEventListener('keyup', exitFullScreen);
+    if (block === document.querySelector('main .columns.fullscreen-images')) {
+      // add exit listeners once
+      document.body.addEventListener('click', exitFullScreen);
+      document.body.addEventListener('keyup', exitFullScreen);
+    }
   }
 }
