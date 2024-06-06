@@ -101,7 +101,9 @@ function parseConversionSpec() {
   return parseSearchParams(params, filter, transform);
 }
 
-const conversionSpec = parseConversionSpec() || { checkpoint: ['click'] };
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
