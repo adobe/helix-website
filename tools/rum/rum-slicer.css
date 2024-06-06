@@ -38,21 +38,25 @@ main {
   margin-top: var(--nav-height);
 }
 
+body main > .section {
+  padding-top: 0;
+}
+
 /* general performance */
 
-main li.score-good {
+main li.score-good, vitals-facet div[data-value^="good"] label {
   opacity: 1;
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
-main li.score-ni {
+main li.score-ni, vitals-facet div[data-value^="ni"] label {
   opacity: 1;
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
-main li.score-poor {
+main li.score-poor, vitals-facet div[data-value^="poor"] label {
   opacity: 1;
   color: var(--dark-red);
   background-color: var(--light-red);
@@ -304,6 +308,8 @@ figcaption > span {
   border-bottom: 2px solid #ccc;
 }
 
+
+
 fieldset {
   --background-color: var(--light-indigo);
 
@@ -319,16 +325,20 @@ fieldset a:any-link {
   color: currentcolor;
 }
 
-fieldset.facet-user_agent {
+list-facet[facet="userAgent" ] fieldset {
   color: var(--dark-fuchsia);
 
   --background-color: var(--light-fuchsia);
 }
 
-fieldset.facet-url {
+list-facet[facet="url"] fieldset {
   color: var(--dark-purple);
 
   --background-color: var(--light-purple);
+}
+
+*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
+  display: none;
 }
 
 legend {
@@ -347,7 +357,8 @@ fieldset > div:hover {
   background-color: #eee;
 }
 
-fieldset li {
+fieldset li,
+vitals-facet label {
   border: 1px solid currentcolor;
   border-radius: 8px;
   background-color: #eee;
@@ -369,7 +380,8 @@ fieldset li.significant {
   border-width: 3px;
 }
 
-fieldset li::after {
+fieldset li::after,
+vitals-facet label::before {
   content: ' ';
   background-color: currentcolor;
   width: 10px;
@@ -396,6 +408,55 @@ fieldset li::after {
   grid-gap: 0 16px;
 }
 
+#facets fieldset div ~ div.more-container:last-of-type,
+#facets .more fieldset div ~ div.more-container:last-of-type,
+#facets .more-more fieldset div ~ div.more-container:last-of-type,
+#facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
+  display: grid;
+}
+
+#facets .more-all fieldset div.more-container div.load-more label {
+  display: none;
+}
+
+#facets .more-more-more fieldset div.more-container div.load-more label:first-of-type {
+  /* that's enough */
+  display: none;
+}
+
+#facets fieldset div:nth-child(11) ~ div {
+  display: none;
+}
+
+#facets .more-all fieldset div:nth-child(11) ~ div,
+#facets .more.more-all fieldset div:nth-child(11) ~ div{
+  display: grid;
+}
+
+#facets .more fieldset div:nth-child(11) ~ div {
+  display: grid;
+}
+
+#facets .more fieldset div:nth-child(21) ~ div {
+  display: none;
+}
+
+#facets .more-more fieldset div:nth-child(21) ~ div {
+  display: grid;
+}
+
+#facets .more-more fieldset div:nth-child(31) ~ div {
+  display: none;
+}
+
+#facets .more-more-more fieldset div:nth-child(31) ~ div {
+  display: grid;
+}
+
+#facets .more-more-more fieldset div:nth-child(41) ~ div {
+  display: none;
+}
+
 
 #facets fieldset input[type=checkbox] {
   grid-area: check;
@@ -406,6 +467,163 @@ fieldset li::after {
 #facets fieldset label {
   grid-area: lab;
   word-break: break-all;
+}
+
+#facets fieldset label span.count {
+  opacity: 0.6;
+}
+
+#facets fieldset div:hover span.count {
+  opacity: 1;
+}
+
+#facets fieldset label span.count::before, #facets fieldset label span.value::before {
+  content: ' (';
+}
+
+#facets literal-facet label span.value::before {
+  content: '';
+}
+
+#facets fieldset label span.count::after, #facets fieldset label span.value::after {
+  content: ')';
+}
+
+#facets literal-facet label span.value::after {
+  content: '';
+}
+
+#facets literal-facet label span.value {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+}
+
+thumbnail-facet input[type=checkbox] {
+  opacity: 0.1;
+  z-index: -1;
+}
+
+thumbnail-facet input[type=checkbox] + label {
+  margin-left: -30px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  place-content: start;
+}
+
+thumbnail-facet label > * {
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
+
+thumbnail-facet input[type=checkbox]:checked + label img {
+  /* add a blue glow */
+  box-shadow: 0 0 2px 2px var(--dark-blue);
+  margin: 2px;
+}
+
+thumbnail-facet label span.count::after, thumbnail-facet label span.count::before {
+  display: none;
+}
+
+thumbnail-facet label span.count {
+  z-index: 2;
+  background-color: white;
+  padding: 0 15px;
+  border-radius: 20px;
+  display: block;
+}
+
+thumbnail-facet fieldset div:hover label span.count {
+  opacity: 0.1;
+}
+
+vitals-facet fieldset {
+  display: grid;
+  grid-template-areas: 
+  '. lcp-good cls-good inp-good'
+  '. lcp-ni cls-ni inp-ni'
+  '. lcp-poor cls-poor inp-poor';
+  grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 4pt;
+  padding: 4pt;
+  align-items: end;
+}
+
+vitals-facet fieldset label {
+  word-break: normal;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] {
+  opacity: 0.1;
+  width: 0;
+  height: 0;
+}
+
+#facets vitals-facet label::before {
+  margin-right: 8px;
+}
+
+#facets vitals-facet fieldset div {
+  display: grid;
+  grid-template-areas: 'check lab';
+  grid-template-columns: 0 1fr;
+  grid-gap: 0;
+}
+
+#facets vitals-facet fieldset label {
+  text-align: start;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] + label::before {
+  border: 2px solid currentcolor;
+  background-color: transparent;
+  width: 8px;
+  height: 8px;
+}
+
+#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+  border: 2px solid currentcolor;
+  background-color: currentcolor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodLCP"] {
+  grid-area: lcp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niLCP"] {
+  grid-area: lcp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorLCP"] {
+  grid-area: lcp-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodCLS"] {
+  grid-area: cls-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niCLS"] {
+  grid-area: cls-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorCLS"] {
+  grid-area: cls-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodINP"] {
+  grid-area: inp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niINP"] {
+  grid-area: inp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorINP"] {
+  grid-area: inp-poor;
 }
 
 #facets fieldset ul.cwv {
@@ -422,6 +640,19 @@ fieldset li::after {
 
 #facets img {
   height: 60px;
+}
+
+#facets link-facet img {
+  height: 40px;
+  width: 60px;
+  object-fit: cover;
+  display: block;
+  float: left;
+  margin-right: 8px;
+}
+
+#facets link-facet img.broken {
+  opacity: 0;
 }
 
 #facets fieldset div.load-more {
@@ -621,7 +852,8 @@ a.drillup::after {
     margin: 8px 4px;
   }
 
-  fieldset li {
+  fieldset li,
+  vitals-facet label {
     border-radius: 16px;
     padding: 4px 16px;
     font-size: 18px;
@@ -633,7 +865,7 @@ a.drillup::after {
 /* split mode */
 
 @media (min-width: 1600px) {
-  main {
+  #deepmain {
     display: flex;
     gap: 16px;
     height: calc(100vh - var(--nav-height) - 32px);
@@ -643,13 +875,17 @@ a.drillup::after {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }  
 
-  main > div {
-    width: 100%;
+  #deepmain > div, #deepmain > facet-sidebar {
+    width: 50%;
   }
 
-  main #facets {
-    height: calc(100% - 70px);
-    overflow-y: scroll;
+  main div.output {
+    position: fixed;
+    width: 50vw;
+  }
+
+  facet-sidebar {
+    margin-left: calc(50vw + 16px);
   }
 
   body.appear {

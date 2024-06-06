@@ -99,9 +99,24 @@ export default class BarChart extends AbstractChart {
 
     const drilldowns = {
       url: (bundle) => bundle.domain || bundle.url,
+      'click.source': (bundle) => bundle.events
+        .filter((event) => event.checkpoint === 'click')
+        .filter((event) => event.source)
+        .map((event) => event.source),
+      'click.target': (bundle) => bundle.events
+        .filter((event) => event.checkpoint === 'click')
+        .filter((event) => event.target)
+        .map((event) => event.target),
     };
 
-    this.dataChunks.group((bundle) => drilldowns[drilldown](bundle));
+    const drilldownFn = (bundle) => (typeof drilldowns[drilldown] === 'function'
+      ? drilldowns[drilldown](bundle)
+      : bundle.events
+        .filter((event) => event.checkpoint === drilldown.split('.')[0])
+        .map((event) => event[drilldown.split('.')[1]])
+        .filter((value) => value));
+
+    this.dataChunks.group((bundle) => drilldownFn(bundle));
     const topgroups = Object.entries(this.dataChunks.aggregates)
       .sort(([, a], [, b]) => b.pageViews.sum - a.pageViews.sum)
       .slice(0, 30);

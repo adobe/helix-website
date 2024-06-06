@@ -579,6 +579,24 @@ export function buildAutoBlocks(main) {
   }
 }
 
+export function loadFeedData() {
+  window.siteindex = window.siteindex || { archive: { data: [] }, loaded: false };
+  const offset = 0;
+
+  fetch(`/community-feeds.json?offset=${offset}`)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      window.siteindex.archive.data = responseJson?.archive?.data;
+      window.siteindex.loaded = true;
+      const event = new Event('dataset-ready');
+      document.dispatchEvent(event);
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(`Error loading query index: ${error.message}`);
+    });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
