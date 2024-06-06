@@ -6,7 +6,7 @@ export function scoreValue(value, ni, poor) {
 }
 
 export function scoreCWV(value, name) {
-  if (!value) return null;
+  if (value === undefined || value === null) return null;
   const limits = {
     lcp: [2500, 4000],
     cls: [0.1, 0.25],

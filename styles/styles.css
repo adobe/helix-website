@@ -273,7 +273,8 @@ body.appear {
 .block.contained,
 .section.content > div,
 .default-content-wrapper,
-.contained-wrapper {
+.contained-wrapper,
+.feed.recent {
   max-width: var(--grid-mobile-container-width);
   margin-left: auto;
   margin-right: auto;
@@ -288,7 +289,8 @@ aside {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
-  .contained-wrapper {
+  .contained-wrapper,
+  .feed.recent {
     max-width: var(--grid-tablet-container-width);
   }
 }
@@ -297,7 +299,8 @@ aside {
   .block.contained,
   .default-content-wrapper,
   .franklin .gnav .submenu-content,
-  .contained-wrapper {
+  .contained-wrapper,
+  .feed.recent {
     max-width: 90%;
   }
 
@@ -325,7 +328,8 @@ aside {
   .contained-wrapper,
   .side-navigation-wrapper.expand,
   .side-navigation-wrapper.expand + .section.content,
-  .franklin .gnav .submenu-content {
+  .franklin .gnav .submenu-content,
+  .feed.recent {
     max-width: var(--grid-desktop-container-width);
   }
 

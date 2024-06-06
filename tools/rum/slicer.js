@@ -1,15 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
-import SkylineChart from './skyline.js';
 import DataLoader from './loader.js';
 import { toHumanReadable, scoreCWV } from './utils.js';
-
-// eslint-disable-next-line import/no-relative-packages
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import FacetSidebar from './facetsidebar.js';
-import IncognitoCheckbox from './incognito-checkbox.js';
-
-customElements.define('incognito-checkbox', IncognitoCheckbox);
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -27,10 +19,7 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-const herochart = window.slicer && window.slicer.Chart
-  ? new window.slicer.Chart(dataChunks, elems)
-  : new SkylineChart(dataChunks, elems);
-const sidebar = new FacetSidebar(dataChunks, elems);
+const herochart = new window.slicer.Chart(dataChunks, elems);
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
@@ -66,10 +55,6 @@ export function updateKeyMetrics(keyMetrics) {
   const inpElem = document.querySelector('#inp p');
   inpElem.textContent = `${toHumanReadable(keyMetrics.inp / 1000)} s`;
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
-
-  const ttfbElem = document.querySelector('#ttfb p');
-  ttfbElem.textContent = `${toHumanReadable(keyMetrics.ttfb / 1000)} s`;
-  ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
 
 function updateDataFacets(filterText, params, checkpoint) {
@@ -82,17 +67,37 @@ function updateDataFacets(filterText, params, checkpoint) {
     }, []);
   });
   dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
+
+  dataChunks.addFacet('vitals', (bundle) => {
+    const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
+    return cwv
+      .filter((metric) => bundle[metric])
+      .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
+  });
+
   dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
     acc.add(evt.checkpoint);
     return acc;
   }, new Set())), 'every');
+
+  if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
+    dataChunks.addFacet('lcp.target', (bundle) => bundle.events
+      .filter((evt) => evt.checkpoint === 'cwv-lcp')
+      .map((evt) => evt.target)
+      .filter((target) => target));
+
+    dataChunks.addFacet('lcp.source', (bundle) => bundle.events
+      .filter((evt) => evt.checkpoint === 'cwv-lcp')
+      .map((evt) => evt.source)
+      .filter((source) => source));
+  }
 
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons
   dataChunks.addFacet('filter', (bundle) => {
     // this function is also a bit weird, because it takes
     // the filtertext into consideration
-    const fullText = JSON.stringify(bundle).toLowerCase();
+    const fullText = bundle.url + bundle.events.map((e) => e.checkpoint).join(' ');
     const keywords = filterText
       .split(' ')
       .filter((word) => word.length > 2);
@@ -121,6 +126,21 @@ function updateDataFacets(filterText, params, checkpoint) {
             .filter(({ target }) => target) // filter out empty targets
             .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
         ));
+
+        if (cp === 'loadresource') {
+          // loadresource.target are not discrete values, but the number
+          // of milliseconds it took to load the resource, so the best way
+          // to present this is to create a histogram
+          // we already have the `loadresource.target` facet, so we can
+          // extract the values from there and create a histogram
+          dataChunks.addHistogramFacet(
+            'loadresource.histogram',
+            'loadresource.target',
+            {
+              count: 10, min: 0, max: 10000, steps: 'quantiles',
+            },
+          );
+        }
       } else if (params.has('utm.source')) {
         params.getAll('utm.source').forEach((utmsource) => {
           dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
@@ -156,8 +176,10 @@ function updateFilter(params, filterText) {
       || key === 'interaction'
       || key === 'clicktarget'
       || key === 'exit'
+      || key === 'vitals'
       || key.endsWith('.source')
       || key.endsWith('.target')
+      || key.endsWith('.histogram')
       || key === 'checkpoint')
     .reduce((acc, [key, value]) => {
       if (acc[key]) acc[key].push(value);
@@ -167,7 +189,6 @@ function updateFilter(params, filterText) {
 }
 
 export async function draw() {
-  const ph = await fetchPlaceholders('/tools/rum');
   const params = new URL(window.location).searchParams;
   const checkpoint = params.getAll('checkpoint');
 
@@ -197,7 +218,7 @@ export async function draw() {
 
   const focus = params.get('focus');
   const mode = params.get('metrics');
-  sidebar.updateFacets(focus, mode, ph);
+  elems.sidebar.updateFacets(focus, mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
@@ -233,7 +254,7 @@ export function updateState() {
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 
-  elems.facetsElement.querySelectorAll('input').forEach((e) => {
+  elems.sidebar.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
@@ -242,87 +263,29 @@ export function updateState() {
   window.history.replaceState({}, '', url);
 }
 
-sidebar.addEventListener('change', () => {
-  updateState();
-  draw();
-});
-
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
   // wait for decoration to have happened
   if (entries[0].isIntersecting) {
-    const mainInnerHTML = `<div class="output">
-<div class="title">
-  <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
-  <div>
-    <select id="view">
-      <option value="week">Week</option>
-      <option value="month">Month</option>
-      <option value="year">Year</option>
-    </select>
-    <incognito-checkbox></incognito-checkbox>
-  </div>
-</div>
-<div class="key-metrics">
-  <ul>
-    <li id="pageviews">
-      <h2>Pageviews</h2>
-      <p>0</p>
-    </li>
-    <li id="visits">
-      <h2>Visits</h2>
-      <p>0</p>
-    </li>
-    <li id="conversions">
-      <h2>Conversions</h2>
-      <p>0</p>
-    </li>
-    <li id="lcp">
-      <h2>LCP</h2>
-      <p>0</p>
-    </li>
-    <li id="cls">
-      <h2>CLS</h2>
-      <p>0</p>
-    </li>
-    <li id="inp">
-      <h2>INP</h2>
-      <p>0</p>
-    </li>
-  </ul>
-  <div class="key-metrics-more" aria-hidden="true">
-    <ul>
-      <li id="ttfb">
-        <h2>TTFB</h2>
-        <p>0</p>
-      </li>  
-    </ul>
-  </div>
-</div>
+    // const main = document.querySelector('main');
+    // main.innerHTML = mainInnerHTML;
 
-<figure>
-  <div class="chart-container solitary">
-    <canvas id="time-series"></canvas>
-  </div>
-  <div class="filter-tags"></div>
-  <figcaption>
-    <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>
-    <span id="timezone"></span>
-  </figcaption>
-</figure>
-</div>
-`;
+    const sidebar = document.querySelector('facet-sidebar');
+    sidebar.data = dataChunks;
+    elems.sidebar = sidebar;
 
-    const main = document.querySelector('main');
-    main.innerHTML = mainInnerHTML;
-
-    main.append(sidebar.rootElement);
+    sidebar.addEventListener('facetchange', () => {
+      console.log('sidebar change');
+      updateState();
+      draw();
+    });
 
     elems.viewSelect = document.getElementById('view');
     elems.canvas = document.getElementById('time-series');
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
     elems.incognito = document.querySelector('incognito-checkbox');
+    elems.filterInput = sidebar.elems.filterInput;
 
     const params = new URL(window.location).searchParams;
     const view = params.get('view') || 'week';
@@ -334,6 +297,7 @@ const io = new IntersectionObserver((entries) => {
     });
 
     herochart.render();
+    // sidebar.updateFacets();
 
     elems.filterInput.value = params.get('filter');
     elems.viewSelect.value = view;

@@ -92,6 +92,18 @@
   margin-right: auto;
 }
 
+/* full-screen images */
+.columns.fullscreen-images img:not(.fullscreen) {
+  cursor: pointer;
+}
+
+.columns.fullscreen-images img.fullscreen {
+  position: absolute;
+  left: 0;
+  z-index: calc(var(--nav-z-index) + 1);
+  width: 100%;
+}
+
 /* .center-image-small, adjust image size on sidekick extension page */
 .columns.center-image-small > div > div:last-of-type {
   display: grid;

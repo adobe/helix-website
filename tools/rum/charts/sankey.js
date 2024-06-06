@@ -1,13 +1,11 @@
-import {
-  SankeyController, Flow,
-  // eslint-disable-next-line import/extensions, import/no-unresolved
-} from 'https://esm.run/chartjs-chart-sankey';
+// eslint-disable-next-line import/no-unresolved
+import { SankeyController, Flow } from 'chartjs-chart-sankey';
+// eslint-disable-next-line import/no-unresolved
+import { Chart, registerables } from 'chartjs';
 import AbstractChart from './chart.js';
-import { cssVariable } from './utils.js';
+import { cssVariable } from '../utils.js';
 
-const { Chart } = window;
-
-Chart.register(SankeyController, Flow);
+Chart.register(SankeyController, Flow, ...registerables);
 
 /*
 * Some popular checkpoints

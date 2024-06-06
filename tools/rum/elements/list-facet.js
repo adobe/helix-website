@@ -1,6 +1,15 @@
-import { scoreCWV, toHumanReadable, escapeHTML } from './utils.js';
-import { pValue } from './cruncher.js';
+import { scoreCWV, toHumanReadable, escapeHTML } from '../utils.js';
+import { pValue } from '../cruncher.js';
 
+async function addSignificanceFlag(element, metric, baseline) {
+  const p = pValue(metric.values, baseline.values);
+  if (p < 0.05) {
+    element.classList.add('significant');
+  } else if (p < 0.1) {
+    element.classList.add('interesting');
+  }
+  element.dataset.pValue = p;
+}
 /**
  * A custom HTML element to display a list of facets.
  * <list-facet facet="userAgent" drilldown="share.html" mode="all">
@@ -14,34 +23,24 @@ import { pValue } from './cruncher.js';
 export default class ListFacet extends HTMLElement {
   constructor() {
     super();
-    this.dataChunks = {};
     this.placeholders = undefined;
   }
 
-  set data(data) {
-    this.dataChunks = data;
-  }
-
   createLabelHTML(labelText) {
-    if (labelText.startsWith('https://') && labelText.includes('media_')) {
-      return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
-    }
-
-    if (labelText.startsWith('https://')) {
-      return `<a href="${labelText}" target="_new">${labelText}</a>`;
-    }
-
     if (this.placeholders && this.placeholders[labelText]) {
-      return (`${this.placeholders[labelText]} [${labelText}]`);
+      return `<span class="label">${this.placeholders[labelText]}</span><span class="value">${labelText}</span>`;
     }
     return escapeHTML(labelText);
   }
 
-  computeTSV(numOptions = 10) {
+  get dataChunks() {
+    return this.parentElement.parentElement.dataChunks;
+  }
+
+  computeTSV() {
     const url = new URL(window.location);
     const facetName = this.getAttribute('facet');
     const mode = url.searchParams.get('mode') || this.getAttribute('mode');
-    const showAtt = this.getAttribute('show');
 
     const facetEntries = this.dataChunks.facets[facetName];
     const tsv = [];
@@ -52,10 +51,8 @@ export default class ListFacet extends HTMLElement {
       const filteredKeys = filterKeys
         ? optionKeys.filter((a) => !!(this.placeholders[a]))
         : optionKeys;
-      const nbToShow = showAtt || numOptions;
       facetEntries
         .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-        .slice(0, nbToShow)
         .forEach((entry) => {
           const CWVDISPLAYTHRESHOLD = 10;
           let lcp = '-';
@@ -76,27 +73,32 @@ export default class ListFacet extends HTMLElement {
             inp = `${toHumanReadable(inpValue / 1000)} s`;
           }
 
-          tsv.push(`${entry.name}\t${entry.value}\t${lcp}\t${cls}\t${inp}`);
+          tsv.push(`${entry.value}\t${entry.metrics.pageViews.sum}\t${lcp}\t${cls}\t${inp}`);
         });
-      tsv.push(...facetEntries
-        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-        .slice(0, nbToShow)
-        .map((entry) => `${entry.value}\t${entry.metrics.pageViews.sum}\t${entry.metrics.lcp.percentile(75)}\t${entry.metrics.cls.percentile(75)}\t${entry.metrics.inp.percentile(75)}`));
     }
     return tsv;
   }
 
   connectedCallback() {
+    if (this.dataChunks) this.update();
+  }
+
+  update() {
     const facetName = this.getAttribute('facet');
     const facetEntries = this.dataChunks.facets[facetName];
-    const optionKeys = facetEntries.map((f) => f.value);
+
+    const sort = this.getAttribute('sort') || 'count';
+
+    const optionKeys = facetEntries.map((f) => f.value)
+      .sort((a, b) => {
+        if (sort === 'count') return 0; // keep the order
+        return a.localeCompare(b);
+      });
 
     const url = new URL(window.location);
     const drilldownAtt = this.getAttribute('drilldown');
     const mode = url.searchParams.get('mode') || this.getAttribute('mode');
     const numOptions = mode === 'all' ? 20 : 10;
-    const nbToShow = this.getAttribute('show') || numOptions;
-    const focus = this.getAttribute('focus') || url.searchParams.get('focus');
 
     if (this.querySelector('dl')) {
       this.placeholders = Array.from(this.querySelectorAll('dl > dt + dd'))
@@ -108,11 +110,14 @@ export default class ListFacet extends HTMLElement {
     }
 
     if (optionKeys.length) {
-      const fieldSet = document.createElement('fieldset');
+      const fieldSet = this.querySelector('fieldset') || document.createElement('fieldset');
       fieldSet.classList.add(`facet-${facetName}`);
+      const legendText = this.querySelector('legend')?.textContent || facetName;
+
+      fieldSet.textContent = '';
 
       const legend = this.querySelector('legend') || document.createElement('legend');
-      if (legend.textContent === '') legend.textContent = facetName;
+      legend.textContent = legendText;
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
@@ -149,12 +154,11 @@ export default class ListFacet extends HTMLElement {
 
       fieldSet.append(legend);
       const filterKeys = facetName === 'checkpoint' && mode !== 'all';
-      const filteredKeys = filterKeys
+      const filteredKeys = filterKeys && this.placeholders
         ? optionKeys.filter((a) => !!(this.placeholders[a]))
         : optionKeys;
       facetEntries
         .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-        .slice(0, nbToShow)
         .forEach((entry) => {
           const div = document.createElement('div');
           const input = document.createElement('input');
@@ -169,88 +173,39 @@ export default class ListFacet extends HTMLElement {
           div.addEventListener('click', (evt) => {
             if (evt.target !== input) input.checked = !input.checked;
             evt.stopPropagation();
-            this.parent.dispatchEvent('change', this);
+            this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
           });
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
-          label.innerHTML = `${this.createLabelHTML(entry.value)} (${toHumanReadable(entry.metrics.pageViews.sum)})`;
+          const countspan = document.createElement('span');
+          countspan.className = 'count';
+          countspan.textContent = toHumanReadable(entry.metrics.pageViews.sum);
+          countspan.title = entry.metrics.pageViews.sum;
+          const valuespan = this.createValueSpan(entry);
+          label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
 
-          async function addSignificanceFlag(element, metric, baseline) {
-            const p = pValue(metric.values, baseline.values);
-            if (p < 0.05) {
-              element.classList.add('significant');
-            } else if (p < 0.1) {
-              element.classList.add('interesting');
-            }
-            element.dataset.pValue = p;
-          }
-
-          const CWVDISPLAYTHRESHOLD = 10;
           // display core web vital to facets
           // add lcp
-          let lcp = '-';
-          let lcpScore = '';
-          const lcpLI = document.createElement('li');
-          lcpLI.title = 'LCP';
-          if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
-            const lcpValue = entry.metrics.lcp.percentile(75);
-            lcp = `${toHumanReadable(lcpValue / 1000)} s`;
-            lcpScore = scoreCWV(lcpValue, 'lcp');
-            addSignificanceFlag(lcpLI, entry.metrics.lcp, this.dataChunks.totals.lcp);
-            lcpLI.title += ` - based on ${entry.metrics.lcp.count} samples`;
-          } else {
-            lcpLI.title += ` - not enough samples (${entry.metrics.lcp.count})`;
-          }
-          lcpLI.classList.add(`score-${lcpScore}`);
-          lcpLI.textContent = lcp;
+          const lcpLI = this.createCWVChiclet(entry, 'lcp');
           ul.append(lcpLI);
 
           // add cls
-          let cls = '-';
-          let clsScore = '';
-          const clsLI = document.createElement('li');
-          clsLI.title = 'CLS';
-          if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
-            const clsValue = entry.metrics.cls.percentile(75);
-            cls = `${toHumanReadable(clsValue)}`;
-            clsScore = scoreCWV(clsValue, 'cls');
-            addSignificanceFlag(clsLI, entry.metrics.cls, this.dataChunks.totals.cls);
-            clsLI.title += ` - based on ${entry.metrics.cls.count} samples`;
-          } else {
-            clsLI.title += ` - not enough samples (${entry.metrics.cls.count})`;
-          }
-          clsLI.classList.add(`score-${clsScore}`);
-          clsLI.textContent = cls;
+          const clsLI = this.createCWVChiclet(entry, 'cls');
           ul.append(clsLI);
 
           // add inp
-          let inp = '-';
-          let inpScore = '';
-          const inpLI = document.createElement('li');
-          inpLI.title = 'INP';
-          if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
-            const inpValue = entry.metrics.inp.percentile(75);
-            inp = `${toHumanReadable(inpValue / 1000)} s`;
-            inpScore = scoreCWV(inpValue, 'inp');
-            addSignificanceFlag(inpLI, entry.metrics.inp, this.dataChunks.totals.inp);
-            inpLI.title += ` - based on ${entry.metrics.inp.count} samples`;
-          } else {
-            inpLI.title += ` - not enough samples (${entry.metrics.inp.count})`;
-          }
-
-          inpLI.classList.add(`score-${inpScore}`);
-          inpLI.textContent = inp;
+          const inpLI = this.createCWVChiclet(entry, 'inp');
           ul.append(inpLI);
 
           div.append(input, label, ul);
           fieldSet.append(div);
         });
 
-      if (filteredKeys.length > nbToShow) {
+      if (filteredKeys.length > 10) {
         // add "more" link
         const div = document.createElement('div');
         div.className = 'load-more';
@@ -258,13 +213,15 @@ export default class ListFacet extends HTMLElement {
         more.textContent = 'more...';
         more.addEventListener('click', (evt) => {
           evt.preventDefault();
-          // increase number of keys shown
-          this.parent.updateFacets(
-            focus,
-            mode,
-            this.placeholders,
-            { [facetName]: nbToShow + numOptions },
-          );
+          if (this.classList.contains('more')) {
+            const mores = Array.from(this.classList)
+              .filter((c) => c.startsWith('more'));
+            // add a more-more-more with the length of
+            // the existing mores + 1
+            const moreClass = Array.from({ length: mores.length + 1 }, () => 'more').join('-');
+            this.classList.add(moreClass);
+          }
+          this.classList.add('more');
         });
 
         div.append(more);
@@ -273,13 +230,7 @@ export default class ListFacet extends HTMLElement {
         all.textContent = `all (${filteredKeys.length})`;
         all.addEventListener('click', (evt) => {
           evt.preventDefault();
-          // increase number of keys shown
-          this.updateFacets(
-            focus,
-            mode,
-            this.placeholders,
-            { [facetName]: filteredKeys.length },
-          );
+          this.classList.add('more-all');
         });
         div.append(all);
         const container = document.createElement('div');
@@ -297,5 +248,60 @@ export default class ListFacet extends HTMLElement {
       });
       this.append(fieldSet);
     }
+  }
+
+  createValueSpan(entry) {
+    const valuespan = document.createElement('span');
+    valuespan.innerHTML = this.createLabelHTML(entry.value);
+    const highlightFromParam = this.getAttribute('highlight');
+    if (highlightFromParam) {
+      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam);
+      const highlights = highlightValue.split(' ')
+        .map((h) => h.trim())
+        .filter((h) => h.length > 0);
+      // get all text nodes, no matter how deep inside valuespan
+      const textNodes = [];
+      const walker = document.createTreeWalker(valuespan, NodeFilter.SHOW_TEXT, null, false);
+      let node = walker.nextNode();
+      while (node) {
+        textNodes.push(node);
+        node = walker.nextNode();
+      }
+      textNodes.forEach((textNode) => {
+        if (!highlights.length) return;
+        const text = textNode.textContent;
+        const placeholder = document.createElement('span');
+        placeholder.innerHTML = text.replace(new RegExp(`(${highlights.join('|')})`, 'gi'), '<mark>$1</mark>');
+        textNode.replaceWith(...placeholder.childNodes);
+      });
+    }
+    return valuespan;
+  }
+
+  createCWVChiclet(entry, metricName = 'lcp') {
+    const CWVDISPLAYTHRESHOLD = 10;
+    let cwv = '-';
+    let score = '';
+    const li = document.createElement('li');
+    const fillEl = async () => {
+      li.title = metricName.toUpperCase();
+      if (entry.metrics[metricName] && entry.metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
+        const value = entry.metrics[metricName].percentile(75);
+        cwv = `${toHumanReadable(value / 1000)}`;
+        if (metricName === 'inp' || metricName === 'lcp') {
+          cwv += ' s';
+        }
+        score = scoreCWV(value, metricName);
+        addSignificanceFlag(li, entry.metrics[metricName], this.dataChunks.totals[metricName]);
+        li.title += ` - based on ${entry.metrics[metricName].count} samples`;
+      } else {
+        li.title += ` - not enough samples (${entry.metrics[metricName].count})`;
+      }
+      li.classList.add(`score-${score}`);
+      li.textContent = cwv;
+    };
+    // fill the element, but don't wait for it
+    fillEl();
+    return li;
   }
 }

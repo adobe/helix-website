@@ -305,6 +305,92 @@ export class DataChunks {
   addFacet(facetName, facetValueFn, facetCombiner = 'some') {
     this.facetFns[facetName] = facetValueFn;
     this.facetFns[facetName].combiner = facetCombiner;
+    this.resetData();
+  }
+
+  /**
+   * Adds a histogram facet, derived from an existing facet. This facet
+   * will group the data into buckets, based on the values of the base
+   * facet.
+   * You can specify the bucket size, limits and the type of bucketing.
+   * @param {string} facetName name of your new facet
+   * @param {string} baseFacet name of the base facet, from which to derive the histogram
+   * @param {object} bucketOptions
+   * @param {number} bucketOptions.count number of buckets
+   * @param {number} bucketOptions.min minimum value of the histogram
+   * @param {number} bucketOptions.max maximum value of the histogram
+   * @param {('linear'|'logarithmic'|'quantiles')} bucketOptions.steps type of bucketing, can be
+   * 'linear' (each bucket has the same value range), 'logarithmic' (same value range on
+   * logarithmic scale), or 'quantiles' (buckets are roughly equal in size based on the current
+   * facet values, but the bucket min/max values are less predictable)
+   * @param {function} formatter a number formatter
+   */
+  addHistogramFacet(facetName, baseFacet, {
+    count: bucketcount = 10,
+    min: absmin = -Infinity,
+    max: absmax = Infinity,
+    steps = 'linear',
+  }, formatter = Intl.NumberFormat(undefined, { maximumSignificantDigits: 2 })) {
+    const facetvalues = this.facets[baseFacet];
+    let quantilesteps;
+    const stepfns = {
+      // split the range into equal parts
+      linear: (min, max, total, step) => (((max - min) / total) * step) + min,
+      // split the range into exponential parts, so that the full range
+      // is covered
+      logarithmic: (min, max, total, step) => {
+        const range = max - min;
+        const logrange = Math.log(range);
+        const logstep = logrange / total;
+        return Math.exp(logstep * step) + min;
+      },
+      // split the range into roughly equal size buckets
+      // based on the current facet values (inefficient, needs
+      // memoization)
+      quantiles: (min, max, total, step) => {
+        if (quantilesteps === undefined) {
+          const allvalues = facetvalues
+            .filter(({ value }) => value !== undefined)
+            .map(({ value, weight }) => ({ value: Number.parseInt(value, 10), weight }))
+            .filter(({ value }) => value >= min)
+            .filter(({ value }) => value <= max)
+            .sort((a, b) => a.value - b.value);
+          const totalWeight = allvalues.reduce((acc, { weight }) => acc + weight, 0);
+          const stepWeight = totalWeight
+            / (total + (1 / total)); // add a little extra to make sure we have enough steps
+          let currentWeight = 0;
+          quantilesteps = allvalues.reduce((acc, { value, weight }) => {
+            currentWeight += weight;
+            if (currentWeight > stepWeight) {
+              acc.push(value);
+              currentWeight = 0;
+            }
+            return acc;
+          }, []);
+        }
+        return quantilesteps[step] || max;
+      },
+    };
+    const min = Math.max(absmin, facetvalues
+      .map(({ value }) => Number.parseInt(value, 10))
+      .reduce((acc, val) => Math.min(acc, val), absmax));
+    const max = Math.min(absmax, facetvalues
+      .map(({ value }) => Number.parseInt(value, 10))
+      .reduce((acc, val) => Math.max(acc, val), absmin));
+    const buckets = Array
+      .from({ length: bucketcount }, (_, i) => stepfns[steps](min, max, bucketcount, i));
+    this.addFacet(facetName, (bundle) => {
+      // find the facetvalue that has the current bundle
+      const facetmatch = facetvalues.find((f) => f.entries.some((e) => e.id === bundle.id));
+      if (!facetmatch) {
+        return [];
+      }
+      const facetvalue = Number.parseInt(facetmatch.value, 10);
+      const bucket = buckets.findIndex((b) => facetvalue < b);
+      return bucket !== -1
+        ? `<${formatter.format(buckets[bucket])}`
+        : `>=${formatter.format(buckets[bucketcount - 1])}`;
+    });
   }
 
   /**
