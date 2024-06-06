@@ -65,11 +65,11 @@ main li.score-poor, vitals-facet div[data-value^="poor"] label {
 /* heading */
 main .title div {
   display: flex;
-  align-items: center;
   gap: 1ch;
 }
 
 main .title select {
+  align-self: center;
   border: 2px solid var(--dark-blue);
   border-radius: 32px;
   padding: 2px 15px;
@@ -80,6 +80,7 @@ main .title select {
 
 main .title incognito-checkbox {
   display: none;
+  margin-bottom: 10px;
 }
 
 main .title incognito-checkbox[mode="open"],
