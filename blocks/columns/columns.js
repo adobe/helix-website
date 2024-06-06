@@ -36,6 +36,7 @@ const enterFullScreen = (block, img) => {
     imgClone.src = imgUrl.toString();
     imgClone.className = 'fullscreen';
     imgClone.style.top = `${window.scrollY}px`;
+    imgClone.title = 'Click or hit ESC to exit full screen mode';
     imgClone.addEventListener('click', exitFullScreen);
     block.prepend(imgClone);
   }, { capture: true });
