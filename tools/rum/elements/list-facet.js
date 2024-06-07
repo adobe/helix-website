@@ -287,7 +287,7 @@ export default class ListFacet extends HTMLElement {
       li.title = metricName.toUpperCase();
       if (entry.metrics[metricName] && entry.metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
         const value = entry.metrics[metricName].percentile(75);
-        cwv = `${toHumanReadable(value / 1000)}`;
+        cwv = `${toHumanReadable(value / (metricName === 'cls' ? 1 : 1000))}`;
         if (metricName === 'inp' || metricName === 'lcp') {
           cwv += ' s';
         }
