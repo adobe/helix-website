@@ -57,10 +57,10 @@ export function addCalculatedProps(bundle) {
       bundle.cwvINP = e.value;
     }
     if (e.checkpoint === 'cwv-lcp') {
-      bundle.cwvLCP = e.value;
+      bundle.cwvLCP = Math.max(e.value || 0, bundle.cwvLCP || 0);
     }
     if (e.checkpoint === 'cwv-cls') {
-      bundle.cwvCLS = e.value;
+      bundle.cwvCLS = Math.max(e.value || 0, bundle.cwvCLS || 0);
     }
     if (e.checkpoint === 'cwv-ttfb') {
       bundle.cwvTTFB = e.value;

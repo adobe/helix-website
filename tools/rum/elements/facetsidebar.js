@@ -69,6 +69,7 @@ export default class FacetSidebar extends HTMLElement {
       .filter((key) => key !== 'filter');
     keys.forEach((facetName) => {
       const facetEl = this.querySelector(`[facet="${facetName}"]`);
+      // eslint-disable-next-line no-console
       console.assert(facetEl, `Facet ${facetName} not found in provided UI elements.`);
 
       if (facetEl) facetEl.setAttribute('mode', mode || 'default');

@@ -338,7 +338,7 @@ const io = new IntersectionObserver((entries) => {
     elems.sidebar = sidebar;
 
     sidebar.addEventListener('facetchange', () => {
-      console.log('sidebar change');
+      // console.log('sidebar change');
       updateState();
       draw();
     });
