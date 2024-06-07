@@ -112,3 +112,5 @@ dist
 
 # Test results
 junit.xml
+# jetbrains files
+.idea/

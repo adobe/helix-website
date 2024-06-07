@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
-import { toHumanReadable, scoreCWV } from './utils.js';
+import { scoreCWV, toHumanReadable } from './utils.js';
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -57,8 +57,60 @@ export function updateKeyMetrics(keyMetrics) {
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
 }
 
+/**
+ * Function used for filtering wanted parameters. Its implementation depends on the context,
+ * for instance when parsing for conversion parameters we care about those that start with
+ * `conversion.`.
+ * @function filterFn
+ * @param {string} paramName - The parameter name.
+ * @returns {boolean} - Returns true if the parameter will be further parsed, false otherwise.
+ */
+
+/**
+ * In some cases, it may just be that the parameters need to be transformed in some way.
+ * For instance, when parsing conversion parameters we want to remove the `conversion.` prefix
+ * from the parameter name.
+ * @function transformFn
+ * @param {[string, string]} paramPair - The pair of parameter name and its value.
+ * @returns {[string, string]} - The result of the transformation.
+ */
+
+/**
+ * Parse search parameters and return a dictionary.
+ * @param {URLSearchParams} params - The search parameters.
+ * @param {filterFn} filterFn - The filtering function.
+ * @param {transformFn} transformFn - The transformation function.
+ * @returns {Object<string, string[]>} - The dictionary of parameters.
+ */
+function parseSearchParams(params, filterFn, transformFn) {
+  return Array.from(params
+    .entries())
+    .filter(filterFn)
+    .map(transformFn)
+    .reduce((acc, [key, value]) => {
+      if (acc[key]) acc[key].push(value);
+      else acc[key] = [value];
+      return acc;
+    }, {});
+}
+
+function parseConversionSpec() {
+  const params = new URL(window.location).searchParams;
+  const transform = ([key, value]) => [key.replace('conversion.', ''), value];
+  const filter = ([key]) => (key.startsWith('conversion.'));
+  return parseSearchParams(params, filter, transform);
+}
+
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+  dataChunks.addFacet(
+    'conversions',
+    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
+  );
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
     return parts.reduce((acc, _, i) => {
@@ -160,32 +212,28 @@ function updateDataFacets(filterText, params, checkpoint) {
 }
 
 function updateFilter(params, filterText) {
-  dataChunks.filter = Array.from(params
-    .entries())
-    .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
-      || key === 'userAgent'
-      || (key === 'filter' && filterText.length > 2)
-      || key === 'url'
-      // facets from sankey
-      || key === 'trafficsource'
-      || key === 'traffictype'
-      || key === 'entryevent'
-      || key === 'pagetype'
-      || key === 'loadtype'
-      || key === 'contenttype'
-      || key === 'interaction'
-      || key === 'clicktarget'
-      || key === 'exit'
-      || key === 'vitals'
-      || key.endsWith('.source')
-      || key.endsWith('.target')
-      || key.endsWith('.histogram')
-      || key === 'checkpoint')
-    .reduce((acc, [key, value]) => {
-      if (acc[key]) acc[key].push(value);
-      else acc[key] = [value];
-      return acc;
-    }, {});
+  const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
+    || key === 'userAgent'
+    || (key === 'filter' && filterText.length > 2)
+    || key === 'url'
+    || key === 'conversions'
+    // facets from sankey
+    || key === 'trafficsource'
+    || key === 'traffictype'
+    || key === 'entryevent'
+    || key === 'pagetype'
+    || key === 'loadtype'
+    || key === 'contenttype'
+    || key === 'interaction'
+    || key === 'clicktarget'
+    || key === 'exit'
+    || key === 'vitals'
+    || key.endsWith('.source')
+    || key.endsWith('.target')
+    || key.endsWith('.histogram')
+    || key === 'checkpoint';
+  const transform = ([key, value]) => [key, value];
+  dataChunks.filter = parseSearchParams(params, filter, transform);
 }
 
 export async function draw() {
@@ -206,13 +254,16 @@ export async function draw() {
 
   await herochart.draw();
 
+  const facets = dataChunks.facets.conversions;
+  const converted = facets?.find((f) => f.value === 'converted');
+
   updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
     cls: dataChunks.totals.cls.percentile(75),
     inp: dataChunks.totals.inp.percentile(75),
     ttfb: dataChunks.totals.ttfb.percentile(75),
-    conversions: dataChunks.totals.conversions.sum,
+    conversions: converted ? converted.weight : 0,
     visits: dataChunks.totals.visits.sum,
   });
 
@@ -260,6 +311,18 @@ export function updateState() {
     }
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
+
+  // with the conversion spec in form of dictionary
+  // need to put it back in the url by expanding the dictionary as follows
+  // the key is appended to conversion. and there can be multiple values for the same key
+  // conversion.key=value1&conversion.key=value2
+
+  Object.entries(conversionSpec).forEach(([key, values]) => {
+    values.forEach((value) => {
+      url.searchParams.append(`conversion.${key}`, value);
+    });
+  });
+
   window.history.replaceState({}, '', url);
 }
 
