@@ -509,9 +509,7 @@ export class DataChunks {
    */
   filterBundles(bundles, filterSpec, skipped = []) {
     const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
-    const skipFilterFn = function ([facetName]) {
-      return !skipped.includes(facetName);
-    };
+    const skipFilterFn = ([facetName]) => !skipped.includes(facetName);
     const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
       return Array.isArray(facetValue) ? facetValue : [facetValue];
