@@ -255,7 +255,7 @@ export default class ListFacet extends HTMLElement {
     valuespan.innerHTML = this.createLabelHTML(entry.value);
     const highlightFromParam = this.getAttribute('highlight');
     if (highlightFromParam) {
-      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam);
+      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam) || '';
       const highlights = highlightValue.split(' ')
         .map((h) => h.trim())
         .filter((h) => h.length > 0);
