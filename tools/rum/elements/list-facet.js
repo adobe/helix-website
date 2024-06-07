@@ -121,7 +121,31 @@ export default class ListFacet extends HTMLElement {
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
-      legend.append(clipboard);
+
+      const clipboardPaste = document.createElement('span');
+      clipboardPaste.className = 'clipboard-paste';
+      clipboardPaste.title = 'Paste from clipboard';
+
+      clipboardPaste.addEventListener('click', async () => {
+        // read the clipboard
+        const paste = navigator.clipboard.readText();
+        // split based on any newline character or space
+        const values = (await paste).split(/[\n\s]+/);
+        const pasted = [];
+        values.forEach((value) => {
+          const input = fieldSet.querySelector(`input[value="${value}"]`);
+          if (input) {
+            pasted.push(input);
+            input.checked = true;
+            input.parentElement.ariaSelected = true;
+          }
+        });
+        if (pasted.length) {
+          this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
+        }
+      });
+
+      legend.append(clipboard, clipboardPaste);
       if (drilldownAtt && url.searchParams.get('drilldown') !== facetName) {
         const drilldown = document.createElement('a');
         drilldown.className = 'drilldown';
@@ -239,7 +263,7 @@ export default class ListFacet extends HTMLElement {
         fieldSet.append(container);
       }
 
-      legend.addEventListener('click', () => {
+      clipboard.addEventListener('click', () => {
         const tsv = this.computeTSV(numOptions);
         navigator.clipboard.writeText(tsv.join('\r\n'));
         const toast = document.getElementById('copied-toast');
