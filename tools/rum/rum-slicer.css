@@ -655,6 +655,10 @@ vitals-facet fieldset label {
   opacity: 0;
 }
 
+#facets link-facet img.pagespeed {
+  width: 40px;
+}
+
 #facets fieldset div.load-more {
   grid-column: 2 / span 2;  
   display: block;
