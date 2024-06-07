@@ -95,13 +95,18 @@ function parseSearchParams(params, filterFn, transformFn) {
 }
 
 function parseConversionSpec() {
+  const fallback = { checkpoint: ['click'] };
   const params = new URL(window.location).searchParams;
   const transform = ([key, value]) => [key.replace('conversion.', ''), value];
   const filter = ([key]) => (key.startsWith('conversion.'));
-  return parseSearchParams(params, filter, transform);
+  const parsed = parseSearchParams(params, filter, transform);
+  // if nothing found in url it falls back to the previous behaviour that was
+  // defined by conversion meant clicks
+  if (Object.keys(parsed).length === 0) return fallback;
+  return parsed;
 }
 
-const conversionSpec = parseConversionSpec() || { checkpoint: ['click'] };
+const conversionSpec = parseConversionSpec();
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
