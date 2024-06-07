@@ -485,7 +485,9 @@ export default class SkylineChart extends AbstractChart {
 
   async draw() {
     const params = new URL(window.location).searchParams;
-    const view = params.get('view') || 'week';
+    const view = ['week', 'month', 'year'].indexOf(params.get('view')) !== -1
+      ? params.get('view')
+      : 'week';
     // TODO re-add. I think this should be a filter
     // eslint-disable-next-line no-unused-vars
     const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;

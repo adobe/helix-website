@@ -279,7 +279,7 @@ export default class ListFacet extends HTMLElement {
     valuespan.innerHTML = this.createLabelHTML(entry.value);
     const highlightFromParam = this.getAttribute('highlight');
     if (highlightFromParam) {
-      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam);
+      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam) || '';
       const highlights = highlightValue.split(' ')
         .map((h) => h.trim())
         .filter((h) => h.length > 0);
@@ -311,7 +311,7 @@ export default class ListFacet extends HTMLElement {
       li.title = metricName.toUpperCase();
       if (entry.metrics[metricName] && entry.metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
         const value = entry.metrics[metricName].percentile(75);
-        cwv = `${toHumanReadable(value / 1000)}`;
+        cwv = `${toHumanReadable(value / (metricName === 'cls' ? 1 : 1000))}`;
         if (metricName === 'inp' || metricName === 'lcp') {
           cwv += ' s';
         }
