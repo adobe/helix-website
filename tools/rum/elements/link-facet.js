@@ -16,7 +16,7 @@ export default class LinkFacet extends ListFacet {
       u.searchParams.set('proxyurl', labelText);
       return `
       <img loading="lazy" src="${u.href}" title="${labelText}" alt="thumbnail image for ${labelText}" onerror="this.classList.add('broken')">
-      <a href="https://pagespeed.web.dev/analysis?url=${labelText}" target="_new"><img title="PageSpeed Insights" alt="PageSpeed Insights" class="pagespeed" src="/tools/rum/pagespeed_48.png"></a>
+      <a href="https://pagespeed.web.dev/analysis?url=${encodeURIComponent(labelText)}" target="_new"><img title="PageSpeed Insights" alt="PageSpeed Insights" class="pagespeed" src="/tools/rum/pagespeed_48.png"></a>
       <a href="${labelText}" target="_new">${labelText}</a>`;
     }
     if (labelText.startsWith('https://') || labelText.startsWith('http://')) {
