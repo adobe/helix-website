@@ -817,6 +817,10 @@ a.drillup::after {
   margin-top: -20px;
 }
 
+facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+  display: none;
+}
+
 @media (min-width: 600px) {
   main .title h1 {
     font-size: var(--type-heading-l-size);
