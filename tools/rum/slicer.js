@@ -161,6 +161,10 @@ function updateDataFacets(filterText, params, checkpoint) {
     return matching;
   });
 
+  Object.entries(window.slicer.extraFacets || {}).forEach(([key, value]) => {
+    dataChunks.addFacet(key, value);
+  });
+
   // if we have a checkpoint filter, then we also want facets for
   // source and target
   checkpoint

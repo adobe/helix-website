@@ -817,6 +817,18 @@ a.drillup::after {
   margin-top: -20px;
 }
 
+facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+  display: none;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset legend span {
+  display: none;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset > div:hover {
+  background-color: transparent;
+}
+
 @media (min-width: 600px) {
   main .title h1 {
     font-size: var(--type-heading-l-size);
