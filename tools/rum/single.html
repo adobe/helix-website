@@ -21,6 +21,20 @@
     import VitalsFacet from './elements/vitals-facet.js';
     window.slicer = {
       Chart: SkylineChart,
+      extraFacets: {
+        clicktarget: (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'click')
+            .filter(({ target }) => target) // filter out empty targets
+            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+        ),
+        entersource: (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'enter')
+            .filter(({ source }) => source) // filter out empty sources
+            .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
+        ),
+      },
     };
     customElements.define('incognito-checkbox', IncognitoCheckbox);
     customElements.define('facet-sidebar', FacetSidebar);
@@ -102,7 +116,7 @@
           </figure>
         </div>
         <facet-sidebar aria-disabled="true">
-          <list-facet facet="userAgent" drilldown="share.html">
+          <list-facet facet="userAgent">
             <legend>Device Type and Operating System</legend>
             <dl>
               <dt>desktop</dt>
@@ -135,10 +149,10 @@
               <dd>Social Media Bot</dd>
             </dl>
           </list-facet>
-          <link-facet facet="click.target" drilldown="list.html">
+          <link-facet facet="clicktarget">
             <legend>Click Target (URL)</legend>
           </link-facet>
-          <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
+          <link-facet facet="entersource" thumbnail="false">
             <legend>External Referrer</legend>
             <dl>
               <dt>(direct)</dt>
