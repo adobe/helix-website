@@ -1,3 +1,7 @@
+function getPersistentToken() {
+  return localStorage.getItem('rum-bundler-token');
+}
+
 export default class URLSelector extends HTMLElement {
   constructor() {
     super();
@@ -17,6 +21,11 @@ export default class URLSelector extends HTMLElement {
           letter-spacing: -0.04em;
           border: 0;
         }
+
+        input:disabled {
+          background-color: none;
+          color: black;
+        }
       </style>
       <label for="url"><img src="https://www.aem.live/favicon.ico"></label>
       <input id="url" type="url">
@@ -29,6 +38,10 @@ export default class URLSelector extends HTMLElement {
     input.value = new URL(window.location.href).searchParams.get('domain');
     const img = this.querySelector('img');
     img.src = `https://www.google.com/s2/favicons?domain=${input.value}&sz=64`;
+
+    if (!getPersistentToken()) {
+      input.disabled = true;
+    }
 
     input.addEventListener('input', () => {
       this.dispatchEvent(new CustomEvent('change', { detail: input.value }));
