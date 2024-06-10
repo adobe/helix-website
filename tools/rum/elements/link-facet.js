@@ -11,6 +11,15 @@ export default class LinkFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
     const thumbnailAtt = this.getAttribute('thumbnail');
+    const pagespeedAtt = this.getAttribute('pagespeed');
+    if (pagespeedAtt && thumbnailAtt && labelText.startsWith('https://')) {
+      const u = new URL('https://www.aem.live/tools/rum/_ogimage');
+      u.searchParams.set('proxyurl', labelText);
+      return `
+      <img loading="lazy" src="${u.href}" title="${labelText}" alt="thumbnail image for ${labelText}" onerror="this.classList.add('broken')">
+      <a href="${labelText}" target="_new">${labelText}</a>
+      <a href="${pagespeedAtt}${labelText}" target="_new" class="icon pagespeed" title="Show pagespeed insights for ${labelText}">pagespeed</a>`;
+    }
     if (thumbnailAtt && labelText.startsWith('https://')) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
