@@ -86,6 +86,7 @@ export default class ListFacet extends HTMLElement {
   update() {
     const facetName = this.getAttribute('facet');
     const facetEntries = this.dataChunks.facets[facetName];
+    const enabled = !this.closest('facet-sidebar[aria-disabled="true"]');
 
     const sort = this.getAttribute('sort') || 'count';
 
@@ -194,11 +195,13 @@ export default class ListFacet extends HTMLElement {
             div.ariaSelected = true;
           }
           input.id = `${facetName}=${entry.value}`;
-          div.addEventListener('click', (evt) => {
-            if (evt.target !== input) input.checked = !input.checked;
-            evt.stopPropagation();
-            this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
-          });
+          if (enabled) {
+            div.addEventListener('click', (evt) => {
+              if (evt.target !== input) input.checked = !input.checked;
+              evt.stopPropagation();
+              this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
+            });
+          }
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
