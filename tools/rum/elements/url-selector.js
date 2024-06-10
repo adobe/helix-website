@@ -23,7 +23,7 @@ export default class URLSelector extends HTMLElement {
         }
 
         input:disabled {
-          background-color: none;
+          background-color: transparent;
           color: black;
         }
       </style>
