@@ -1,34 +1,63 @@
-export default class URLSelector extends HTMLHeadingElement {
+export default class URLSelector extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-    this.shadowRoot.innerHTML = `
+    this.template = `
       <style>
-        :host {
-          display: block;
-          margin: 1em 0;
-        }
         label {
           display: block;
-          font-weight: bold;
-          margin-bottom: 0.5em;
+          margin-right: 8px;
         }
+
         input {
           width: 100%;
-          padding: 0.5em;
-          font-size: 1em;
+          display: block;
+          font: inherit;
+          font-size: var(--type-heading-xl-size);
+          font-weight: 900;
+          letter-spacing: -0.04em;
+          border: 0;
         }
       </style>
-      <label for="url">URL</label>
-      <input id="url" type="url" placeholder="https://example.com">
+      <label for="url"><img src="https://www.aem.live/favicon.ico"></label>
+      <input id="url" type="url">
     `;
   }
 
-  get value() {
-    return this.shadowRoot.querySelector('input').value;
+  connectedCallback() {
+    this.innerHTML = this.template;
+    const input = this.querySelector('input');
+    input.value = new URL(window.location.href).searchParams.get('domain');
+    const img = this.querySelector('img');
+    img.src = `https://www.google.com/s2/favicons?domain=${input.value}&sz=64`;
+
+    input.addEventListener('input', () => {
+      this.dispatchEvent(new CustomEvent('change', { detail: input.value }));
+    });
+
+    input.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        this.dispatchEvent(new CustomEvent('submit', { detail: input.value }));
+      }
+    });
+
+    input.addEventListener('unfocus', () => {
+      this.dispatchEvent(new CustomEvent('submit', { detail: input.value }));
+    });
+
+    this.addEventListener('submit', (event) => {
+      try {
+        const entered = new URL(`https://${event.detail}`);
+        const goto = new URL(window.location.pathname, window.location.origin);
+        goto.searchParams.set('domain', entered.hostname);
+        goto.searchParams.set('view', 'month');
+        window.location.href = goto.href;
+      } catch (e) {
+        console.error('Invalid URL', e, event.detail);
+      }
+    });
   }
 
-  set value(value) {
-    this.shadowRoot.querySelector('input').value = value;
+  get value() {
+    return this.querySelector('input').value;
   }
 }

@@ -18,6 +18,7 @@
   import LinkFacet from './elements/link-facet.js';
   import LiteralFacet from './elements/literal-facet.js';
   import VitalsFacet from './elements/vitals-facet.js';
+  import URLSelector from './elements/url-selector.js';
   window.slicer = {
     Chart: PieChart,
   };
@@ -28,6 +29,7 @@
   customElements.define('link-facet', LinkFacet);
   customElements.define('literal-facet', LiteralFacet);
   customElements.define('vitals-facet', VitalsFacet);
+  customElements.define('url-selector', URLSelector);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -40,7 +42,7 @@
       <div id="deepmain">
         <div class="output">
           <div class="title">
-            <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
+            <url-selector>www.aem.live</url-selector>
             <div>
               <select id="view">
                 <option value="week">Week</option>
