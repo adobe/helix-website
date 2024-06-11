@@ -11,7 +11,7 @@ export default class LinkFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
     const thumbnailAtt = this.getAttribute('thumbnail');
-    if (thumbnailAtt && labelText.startsWith('https://')) {
+    if (thumbnailAtt && (labelText.startsWith('https://') || labelText.startsWith('android-app://'))) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
       return `
