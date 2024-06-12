@@ -694,6 +694,21 @@ vitals-facet fieldset label {
   left: 2px;
 }
 
+a.icon.help::after {
+  content: '?';
+}
+
+a.icon.help {
+  overflow: visible;
+  font-size: 15px;
+  display: inline-block;
+  font-weight: 900;
+  text-decoration: none;
+  text-align: center;
+  bottom: auto;
+  line-height: 14px;
+}
+
 .pagespeed {
   display: inline-block;
   margin-left: 0;
