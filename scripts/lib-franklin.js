@@ -14,14 +14,9 @@
 export function sampleRUM(checkpoint, data) {
   // eslint-disable-next-line max-len
   const timeShift = () => (window.performance ? window.performance.now() : Date.now() - window.hlx.rum.firstReadTime);
-  const SESSION_STORAGE_KEY = 'aem-rum';
   try {
     window.hlx = window.hlx || {};
     if (!window.hlx.rum) {
-      // eslint-disable-next-line max-len
-      const rumStorage = sessionStorage.getItem(SESSION_STORAGE_KEY) ? JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY)) : {};
-      rumStorage.pages = (rumStorage.pages ?? 0) + (Math.floor(Math.random() * 20) - 10) + 1;
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(rumStorage));
       const weight = new URLSearchParams(window.location.search).get('rum') === 'on' ? 1 : 100;
       const id = Array.from({ length: 75 }, (_, i) => String.fromCharCode(48 + i)).filter((a) => /\d|[A-Z]/i.test(a)).filter(() => Math.random() * 75 > 70).join('');
       const isSelected = (Math.random() * weight < 1);
