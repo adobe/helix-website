@@ -247,7 +247,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .length > 0,
-      next: ['blind', 'intclick', 'extclick', 'media'],
+      next: ['intclick', 'extclick', 'media'],
     },
     formsubmit: {
       color: cssVariable('--spectrum-seafoam-900'),
@@ -302,14 +302,6 @@ const stages = [
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
         .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
-        .length > 0,
-    },
-    blind: {
-      label: 'Blind Click',
-      color: cssVariable('--spectrum-gray-900'),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => !e.target)
         .length > 0,
     },
   },
