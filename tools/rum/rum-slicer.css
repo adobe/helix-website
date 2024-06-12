@@ -829,6 +829,10 @@ facet-sidebar[aria-disabled="true"] fieldset > div:hover {
   background-color: transparent;
 }
 
+facet-sidebar[aria-disabled="true"] div.quick-filter {
+  display: none;
+}
+
 @media (min-width: 600px) {
   main .title url-selector input {
     font-size: var(--type-heading-l-size);
