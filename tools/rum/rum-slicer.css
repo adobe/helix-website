@@ -95,7 +95,7 @@ main .title {
   align-items: center;
 }
 
-main .title h1 {
+main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
   font-size: var(--type-heading-m-size);
@@ -103,7 +103,7 @@ main .title h1 {
   align-items: center;
 }
 
-main .title h1 img {
+main .title url-selector img {
   height: 16px;
   margin-right: 8px;
 }
@@ -830,17 +830,17 @@ facet-sidebar[aria-disabled="true"] fieldset > div:hover {
 }
 
 @media (min-width: 600px) {
-  main .title h1 {
+  main .title url-selector input {
     font-size: var(--type-heading-l-size);
   }
 }
 
 @media (min-width: 900px) {
-  main .title h1 {
+  main .title url-selector input {
     font-size: var(--type-heading-xl-size);
   }
 
-  main .title h1 img {
+  main .title url-selector img {
     height: 32px;
   }
 
