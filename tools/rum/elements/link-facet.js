@@ -25,7 +25,7 @@ export default class LinkFacet extends ListFacet {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
       return `
-      <img loading="lazy" src="${u.href}" title="${labelText}" alt="thumbnail image for ${labelText}" onerror="${faviconAtt ? `this.src='https://www.google.com/s2/favicons?domain=${labelText}&sz=256'` : 'this.classList.add(\'broken\');'}">
+      <img loading="lazy" src="${u.href}" title="${labelText}" alt="thumbnail image for ${labelText}" onerror="${faviconAtt ? `this.src='https://www.google.com/s2/favicons?domain=${labelText}&sz=256';this.classList.add('favicon');` : 'this.classList.add(\'broken\');'}">
       <a href="${labelText}" target="_new">${labelText}</a>`;
     }
     if (labelText.startsWith('https://') || labelText.startsWith('http://')) {
