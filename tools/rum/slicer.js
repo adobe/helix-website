@@ -161,6 +161,10 @@ function updateDataFacets(filterText, params, checkpoint) {
     return matching;
   });
 
+  Object.entries(window.slicer.extraFacets || {}).forEach(([key, value]) => {
+    dataChunks.addFacet(key, value);
+  });
+
   // if we have a checkpoint filter, then we also want facets for
   // source and target
   checkpoint
@@ -366,27 +370,6 @@ const io = new IntersectionObserver((entries) => {
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
     const focus = params.get('focus');
-    const h1 = document.querySelector('h1');
-    h1.textContent = ` ${DOMAIN}`;
-    const img = document.createElement('img');
-    img.src = `https://${DOMAIN}/favicon.ico`;
-    img.addEventListener('error', () => {
-      img.src = './website.svg';
-    });
-    h1.prepend(img);
-    h1.addEventListener('click', async () => {
-      // eslint-disable-next-line no-alert
-      let domain = window.prompt('enter domain or URL');
-      if (domain) {
-        try {
-          const url = new URL(domain);
-          domain = url.host;
-        } catch {
-          // nothing
-        }
-        window.location = `${window.location.pathname}?domain=${domain}&view=month`;
-      }
-    });
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;

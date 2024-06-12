@@ -20,7 +20,7 @@ export default class LinkFacet extends ListFacet {
       <a href="${labelText}" target="_new">${labelText}</a>
       <a href="${pagespeedAtt}${encodeURIComponent(labelText)}" target="_new" class="icon pagespeed" title="Show pagespeed insights for ${labelText}">pagespeed</a>`;
     }
-    if (thumbnailAtt && labelText.startsWith('https://')) {
+    if (thumbnailAtt && (labelText.startsWith('https://') || labelText.startsWith('android-app://'))) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
       return `
