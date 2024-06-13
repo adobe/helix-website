@@ -165,8 +165,9 @@ function updateDataFacets(filterText, params, checkpoint) {
   });
 
   // if we have a checkpoint filter, then we also want facets for
-  // source and target
-  checkpoint
+  // source and target, the same applies to defined conversion checkpoints
+  // we need facets for source and target, too
+  Array.from(new Set([...checkpoint, ...conversionSpec.checkpoint]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
