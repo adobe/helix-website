@@ -22,7 +22,7 @@ Chart.register(SankeyController, Flow, ...registerables);
 // 'pagesviewed',
 'error',
 'navigate',
-'utm',
+'utm', // replace with 'paid'
 'reload',
 'back_forward',
 'lcp',
@@ -82,7 +82,7 @@ const stages = [
       label: 'Campaign',
       color: cssVariable('--spectrum-red-400'),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'utm')
+        .filter((e) => e.checkpoint === 'utm' || e.checkpoint === 'paid')
         .length > 0,
       next: ['enter'],
     },
