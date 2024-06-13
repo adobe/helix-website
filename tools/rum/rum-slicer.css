@@ -507,7 +507,7 @@ thumbnail-facet label {
   gap: 1em;
 }
 
-thumbnail-facet fieldset div {
+thumbnail-facet fieldset div:not(.more-container) {
   border-bottom: 1px solid currentcolor;
   padding-top: 4px;
   padding-bottom: 4px;
