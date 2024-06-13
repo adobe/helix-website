@@ -126,13 +126,17 @@ main .key-metrics ul {
   padding-left: 0;
 }
 
-main .key-metrics li h2 {
+main .key-metrics ul > * h2 {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: normal;
 }
 
-main .key-metrics li h2::before {
+main .key-metrics ul > * button {
+  font-size: 10px;
+}
+
+main .key-metrics ul > * h2::before {
   content: ' ';
   background-color: currentcolor;
   width: 8px;
@@ -142,26 +146,81 @@ main .key-metrics li h2::before {
   border-radius: 8px;
 }
 
-main .key-metrics li p {
+main .key-metrics ul > * p {
   font-weight: 600;
   font-size: 20px;
   margin: 8px 0;
 }
 
-.key-metrics li {
+.key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;
   background-color: #eee;
   padding: 4px 8px;
 }
 
-.key-metrics li[aria-selected="true"] {
+.key-metrics ul > *[aria-selected="true"] {
   background-color: #444;
   color: white;
 }
 
 .key-metrics [aria-hidden="true"] {
   display: none;
+}
+
+/* conversions custom element */
+
+conversion-tracker {
+  display: grid;
+  grid-template-areas: 
+  'heading heading button' 
+  'number empty button'
+  'number definition definition'
+  ;
+  grid-template-columns: 1fr 1fr 4em;
+  align-items: start;
+}
+
+conversion-tracker button {
+  border: 2px solid var(--spectrum-gray-700);
+  border-radius: 32px;
+  padding: 2px 8px;
+  background-color: var(--spectrum-gray-300);
+  color: var(--spectrum-gray-700);
+  grid-area: button;
+  font-weight: normal!important;
+}
+
+conversion-tracker button:disabled {
+  opacity: 0.5;
+}
+
+conversion-tracker h2 {
+  grid-area: heading;
+}
+
+conversion-tracker p {
+  grid-area: number;
+}
+
+conversion-tracker ol {
+  grid-area: definition;
+  padding-left: 0;
+  text-align: right;
+  font-size: small;
+  list-style: none;
+  line-height: 1.2;
+  color: var(--spectrum-gray-700);
+}
+
+conversion-tracker[mode="pending"] ol li {
+  background-color: var(--spectrum-yellow-200);
+  display: inline-block;
+}
+
+conversion-tracker ol li {
+  margin: 0;
+  padding: 0;
 }
 
 /* figure */
@@ -876,17 +935,17 @@ facet-sidebar[aria-disabled="true"] fieldset > div:hover {
     height: 32px;
   }
 
-  main .key-metrics li h2 {
+  main .key-metrics ul > * h2, main .key-metrics ul > * button {
     font-size: 14px;
   }
   
-  main .key-metrics li h2::before {
+  main .key-metrics ul > * h2::before {
     width: 14px;
     height: 14px;
     border-radius: 14px;
   }
   
-  main .key-metrics li p {
+  main .key-metrics ul > * p {
     font-size: 30px;
     margin: 16px 0;
   }
@@ -895,7 +954,7 @@ facet-sidebar[aria-disabled="true"] fieldset > div:hover {
     grid-gap: 16px;
   }
 
-  main .key-metrics li {
+  main .key-metrics ul > * {
     border-radius: 16px;
     padding: 8px 16px;
   }

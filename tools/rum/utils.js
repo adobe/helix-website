@@ -5,6 +5,28 @@ export function scoreValue(value, ni, poor) {
   return 'good';
 }
 
+export function isKnownFacet(key) {
+  return false // TODO: find a better way to filter out non-facet keys
+    || key === 'userAgent'
+    || key === 'url'
+    || key === 'conversions'
+    // facets from sankey
+    || key === 'trafficsource'
+    || key === 'traffictype'
+    || key === 'entryevent'
+    || key === 'pagetype'
+    || key === 'loadtype'
+    || key === 'contenttype'
+    || key === 'interaction'
+    || key === 'clicktarget'
+    || key === 'exit'
+    || key === 'vitals'
+    || key.endsWith('.source')
+    || key.endsWith('.target')
+    || key.endsWith('.histogram')
+    || key === 'checkpoint';
+}
+
 export function scoreCWV(value, name) {
   if (value === undefined || value === null) return null;
   const limits = {

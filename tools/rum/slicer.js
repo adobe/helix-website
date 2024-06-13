@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
-import { scoreCWV, toHumanReadable } from './utils.js';
+import { isKnownFacet, scoreCWV, toHumanReadable } from './utils.js';
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -217,25 +217,8 @@ function updateDataFacets(filterText, params, checkpoint) {
 
 function updateFilter(params, filterText) {
   const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
-    || key === 'userAgent'
-    || (key === 'filter' && filterText.length > 2)
-    || key === 'url'
-    || key === 'conversions'
-    // facets from sankey
-    || key === 'trafficsource'
-    || key === 'traffictype'
-    || key === 'entryevent'
-    || key === 'pagetype'
-    || key === 'loadtype'
-    || key === 'contenttype'
-    || key === 'interaction'
-    || key === 'clicktarget'
-    || key === 'exit'
-    || key === 'vitals'
-    || key.endsWith('.source')
-    || key.endsWith('.target')
-    || key.endsWith('.histogram')
-    || key === 'checkpoint';
+    || isKnownFacet(key)
+    || (key === 'filter' && filterText.length > 2);
   const transform = ([key, value]) => [key, value];
   dataChunks.filter = parseSearchParams(params, filter, transform);
 }
@@ -328,6 +311,7 @@ export function updateState() {
   });
 
   window.history.replaceState({}, '', url);
+  document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
 }
 
 const section = document.querySelector('main > div');
