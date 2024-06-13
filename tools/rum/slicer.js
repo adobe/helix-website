@@ -26,7 +26,6 @@ window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
 dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
-dataChunks.addSeries('conversions', (bundle) => (bundle.conversion ? bundle.weight : 0));
 dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
