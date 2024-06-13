@@ -49,7 +49,7 @@ export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
   const conversionsExtra = document.createElement('span');
   conversionsExtra.textContent = toHumanReadable((
-    100 * keyMetrics.conversions) / keyMetrics.visits);
+    100 * keyMetrics.conversions) / keyMetrics.pageViews);
   conversionsExtra.className = 'extra';
   document.querySelector('#conversions p').appendChild(conversionsExtra);
 
