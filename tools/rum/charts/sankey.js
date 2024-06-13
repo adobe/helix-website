@@ -258,7 +258,7 @@ const stages = [
     },
     nointeraction: {
       label: 'No Interaction',
-      color: cssVariable('--spectrum-gray-900'),
+      color: cssVariable('--spectrum-gray-100'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click'
           || e.checkpoint === 'formsubmit')
