@@ -152,6 +152,24 @@ main .key-metrics ul > * p {
   margin: 8px 0;
 }
 
+main .key-metrics ul > * p span.extra {
+  font-weight: normal;
+  font-size: 80%;
+  opacity: 0.6;
+}
+
+main .key-metrics ul > * p span.extra::before {
+  content: ' (';
+}
+
+main .key-metrics ul > #visits p span.extra::after {
+  content: ' pages per visit)';
+}
+
+main .key-metrics ul > #conversions p span.extra::after {
+  content: '%)';
+}
+
 .key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;
@@ -177,7 +195,7 @@ conversion-tracker {
   'number empty button'
   'number definition definition'
   ;
-  grid-template-columns: 1fr 1fr 4em;
+  grid-template-columns: 4fr 1fr 4em;
   align-items: start;
 }
 

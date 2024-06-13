@@ -41,7 +41,17 @@ function setDomain(domain, key) {
 export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
+  const visitsExtra = document.createElement('span');
+  visitsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+  visitsExtra.className = 'extra';
+  document.querySelector('#visits p').appendChild(visitsExtra);
+
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
+  const conversionsExtra = document.createElement('span');
+  conversionsExtra.textContent = toHumanReadable((
+    100 * keyMetrics.conversions) / keyMetrics.visits);
+  conversionsExtra.className = 'extra';
+  document.querySelector('#conversions p').appendChild(conversionsExtra);
 
   const lcpElem = document.querySelector('#lcp p');
   lcpElem.textContent = `${toHumanReadable(keyMetrics.lcp / 1000)} s`;
