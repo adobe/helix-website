@@ -76,7 +76,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'utm')
         .length === 0,
-      next: ['enter'],
+      next: ['enter', 'consent', 'noconsent'],
     },
     campaign: {
       label: 'Campaign',
@@ -84,7 +84,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'utm' || e.checkpoint === 'paid')
         .length > 0,
-      next: ['enter'],
+      next: ['enter', 'consent', 'noconsent'],
     },
   },
   {
@@ -109,6 +109,24 @@ const stages = [
       label: 'Back/Forward',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'back_forward')
+        .length > 0,
+      next: ['top', '404'],
+    },
+    consent: {
+      label: 'Consent Shown',
+      color: cssVariable('--spectrum-purple-500'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'consent')
+        .filter((e) => e.target === 'show')
+        .length > 0,
+      next: ['top', '404'],
+    },
+    noconsent: {
+      label: 'Consent Hidden',
+      color: cssVariable('--spectrum-seafoam-500'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'consent')
+        .filter((e) => e.target === 'hidden')
         .length > 0,
       next: ['top', '404'],
     },
@@ -202,7 +220,7 @@ const stages = [
       */
     nocontent: {
       label: 'No Content',
-      color: cssVariable('--spectrum-gray-800'),
+      color: cssVariable('--spectrum-gray-200'),
       next: ['click', 'formsubmit', 'nointeraction'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
