@@ -560,13 +560,22 @@ export class DataChunks {
    * @returns {boolean} the result of the check.
    */
   hasConversion(aBundle, filterSpec, combiner) {
-    const existenceFilterFn = () => true;
+    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
     const skipFilterFn = () => true;
-    const valuesExtractorFn = (attributeName, bundle) => bundle.events.map((e) => e[attributeName]);
+    const valuesExtractorFn = (attributeName, bundle, parent) => {
+      const facetValue = parent.facetFns[attributeName](bundle);
+      return Array.isArray(facetValue) ? facetValue : [facetValue];
+    };
     const combinerExtractorFn = () => combiner || 'every';
 
-    // eslint-disable-next-line max-len
-    return this.applyFilter([aBundle], filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn).length > 0;
+    return this.applyFilter(
+      [aBundle],
+      filterSpec,
+      skipFilterFn,
+      existenceFilterFn,
+      valuesExtractorFn,
+      combinerExtractorFn,
+    ).length > 0;
   }
 
   filterBy(filterSpec) {
