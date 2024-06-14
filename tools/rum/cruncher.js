@@ -560,7 +560,7 @@ export class DataChunks {
    * @returns {boolean} the result of the check.
    */
   hasConversion(aBundle, filterSpec, combiner) {
-    const existenceFilterFn = () => true;
+    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
     const skipFilterFn = () => true;
     const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
