@@ -43,6 +43,10 @@ export default class URLSelector extends HTMLElement {
       input.disabled = true;
     }
 
+    input.addEventListener('focus', () => {
+      input.select();
+    });
+
     input.addEventListener('input', () => {
       this.dispatchEvent(new CustomEvent('change', { detail: input.value }));
     });
