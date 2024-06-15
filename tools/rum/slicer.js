@@ -26,6 +26,10 @@ window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
 dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
+// a bounce is a visit without a click
+dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
+  ? bundle.weight
+  : 0));
 dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
@@ -40,9 +44,14 @@ function setDomain(domain, key) {
 /* update UX */
 export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
+  const pageViewsExtra = document.createElement('span');
+  pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+  pageViewsExtra.className = 'extra';
+  document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
   const visitsExtra = document.createElement('span');
-  visitsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+  visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
   visitsExtra.className = 'extra';
   document.querySelector('#visits p').appendChild(visitsExtra);
 
@@ -120,6 +129,7 @@ function updateDataFacets(filterText, params, checkpoint) {
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
   );
+
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
     return parts.reduce((acc, _, i) => {
@@ -262,6 +272,7 @@ export async function draw() {
     ttfb: dataChunks.totals.ttfb.percentile(75),
     conversions: converted ? converted.weight : 0,
     visits: dataChunks.totals.visits.sum,
+    bounces: dataChunks.totals.bounces.sum,
   });
 
   const focus = params.get('focus');

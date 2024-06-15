@@ -162,12 +162,16 @@ main .key-metrics ul > * p span.extra::before {
   content: ' (';
 }
 
-main .key-metrics ul > #visits p span.extra::after {
+main .key-metrics ul > #pageviews p span.extra::after {
   content: ' pages per visit)';
 }
 
 main .key-metrics ul > #conversions p span.extra::after {
   content: '%)';
+}
+
+main .key-metrics ul > #visits p span.extra::after {
+  content: '% bounces)';
 }
 
 .key-metrics > ul > * {
