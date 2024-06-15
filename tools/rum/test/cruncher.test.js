@@ -765,11 +765,11 @@ describe('DataChunks.hasConversion', () => {
     d.load(chunks);
 
     const spec = {
-      checkpoint: ['top'],
-      target: ['hidden'],
+      facetOne: ['top'],
+      facetTwo: ['hidden'],
     };
-    d.addFacet('checkpoint', (bundle) => bundle.events.map((e) => e.checkpoint));
-    d.addFacet('target', (bundle) => bundle.events.map((e) => e.target));
+    d.addFacet('facetOne', (bundle) => bundle.events.map((e) => e.checkpoint));
+    d.addFacet('facetTwo', (bundle) => bundle.events.map((e) => e.target));
     const facetValueFn = (bundle) => (d.hasConversion(bundle, spec) ? 'converted' : 'not-converted');
     d.addFacet('conversion', facetValueFn);
     const facets = d.facets.conversion;
