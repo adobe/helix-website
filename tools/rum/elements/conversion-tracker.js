@@ -24,12 +24,14 @@ export default class ConversionTracker extends HTMLElement {
     } else if (conversionDef.length === 1 && conversionDef[0][0] === 'checkpoint' && conversionDef[0][1] === 'click' && filterDef.length === 0) {
       this.button.textContent = 'default';
       this.button.disabled = true;
+      this.setAttribute('mode', 'default');
     } else if (conversionDef.length === 1 && conversionDef[0][0] === 'checkpoint' && conversionDef[0][1] === 'click' && filterDef.length > 0) {
       this.button.textContent = 'redefine';
       this.button.disabled = false;
     } else {
       this.button.textContent = 'reset';
       this.button.disabled = false;
+      this.setAttribute('mode', 'custom');
     }
   }
 

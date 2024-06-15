@@ -169,7 +169,7 @@ main .key-metrics ul > * p span.extra::before {
 }
 
 main .key-metrics ul > #pageviews p span.extra::after {
-  content: ' pages per visit)';
+  content: ' per visit)';
 }
 
 main .key-metrics ul > #conversions p span.extra::after {
@@ -239,6 +239,8 @@ conversion-tracker ol {
   list-style: none;
   line-height: 1.2;
   color: var(--spectrum-gray-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 conversion-tracker[mode="pending"] ol li {
@@ -249,6 +251,16 @@ conversion-tracker[mode="pending"] ol li {
 conversion-tracker ol li {
   margin: 0;
   padding: 0;
+}
+
+main .key-metrics ul > conversion-tracker[mode="pending"] h2::before {
+  background-color: var(--spectrum-yellow-200);
+  border: 1px solid var(--spectrum-yellow-700);
+}
+
+main .key-metrics ul > conversion-tracker[mode="custom"] h2::before {
+  background-color: var(--spectrum-fuchsia-200);
+  border: 1px solid var(--spectrum-fuchsia-700);
 }
 
 /* figure */
