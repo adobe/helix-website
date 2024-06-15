@@ -123,6 +123,8 @@ const conversionSpec = Object.keys(parseConversionSpec()).length
   ? parseConversionSpec()
   : { checkpoint: ['click'] };
 
+const isDefaultConversion = Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint[0] === 'click';
+
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
   dataChunks.addFacet(
@@ -187,7 +189,8 @@ function updateDataFacets(filterText, params, checkpoint) {
   // if we have a checkpoint filter, then we also want facets for
   // source and target, the same applies to defined conversion checkpoints
   // we need facets for source and target, too
-  Array.from(new Set([...checkpoint, ...conversionSpec.checkpoint]))
+  Array.from(new Set([...checkpoint, ...(
+    isDefaultConversion ? [] : conversionSpec.checkpoint)]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
