@@ -358,6 +358,13 @@ export function decorateGuideTemplate(main) {
   decorateGuideTemplateLinks(main);
 }
 
+export function decoratesSkillTemplate(main) {
+  if (!document.body.classList.contains('skills-template') || !main) return;
+  decorateGuideTemplateHeadings(main);
+  decorateGuideTemplateHero(main);
+  decorateGuideTemplateLinks(main);
+}
+
 /**
  * Clean up variant classes
  * Ex: marquee--small--contained- -> marquee small contained
@@ -608,6 +615,7 @@ export function decorateMain(main) {
   customDecorateButtons(main);
   decorateHeadings(main);
   decorateGuideTemplate(main);
+  decoratesSkillTemplate(main);
   decorateBlocks(main);
   decorateTitleSection(main);
   decorateSVGs(main);
