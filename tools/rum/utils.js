@@ -201,3 +201,18 @@ export function parseConversionSpec() {
   const filter = ([key]) => (key.startsWith('conversion.'));
   return parseSearchParams(params, filter, transform);
 }
+
+/**
+ * Conversion rates are computed as the ratio of conversions to visits. The conversion rate is
+ * capped at 100%.
+ * @param conversions the number of conversions
+ * @param visits the number of visits
+ * @returns {number}  the conversion rate as a percentage
+ */
+export function computeConversionRate(conversions, visits) {
+  const conversionRate = (100 * conversions) / visits;
+  if (conversionRate >= 0 && conversionRate <= 100) {
+    return conversionRate;
+  }
+  return 100;
+}

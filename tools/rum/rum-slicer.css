@@ -200,8 +200,8 @@ main .key-metrics ul > #visits p span.extra::after {
 
 conversion-tracker {
   display: grid;
-  grid-template-areas: 
-  'heading heading button' 
+  grid-template-areas:
+  'heading heading button'
   'number empty button'
   'number definition definition'
   ;
@@ -383,8 +383,8 @@ figcaption > span {
   background-color: var(--light-purple);
 }
 
-.filter-tags > span.filter-tag-lcp, 
-.filter-tags > span.filter-tag-cls, 
+.filter-tags > span.filter-tag-lcp,
+.filter-tags > span.filter-tag-cls,
 .filter-tags > span.filter-tag-inp,
 .filter-tags > span.filter-tag-conversions,
 .filter-tags > span.filter-tag-visits {
@@ -568,15 +568,17 @@ vitals-facet label::before {
   word-break: break-all;
 }
 
-#facets fieldset label span.count {
+#facets fieldset label span.count, #facets fieldset label span.extra {
   opacity: 0.6;
 }
 
-#facets fieldset div:hover span.count {
+#facets fieldset div:hover span.count, #facets fieldset div:hover span.extra {
   opacity: 1;
 }
 
-#facets fieldset label span.count::before, #facets fieldset label span.value::before {
+#facets fieldset label span.count::before,
+#facets fieldset label span.value::before,
+#facets fieldset label span.extra::before {
   content: ' (';
 }
 
@@ -587,6 +589,19 @@ vitals-facet label::before {
 #facets fieldset label span.count::after, #facets fieldset label span.value::after {
   content: ')';
 }
+
+#facets fieldset label span.extra::after {
+  content: '%)';
+}
+
+#facets fieldset span.interesting {
+    background: orange;
+}
+
+#facets fieldset span.significant {
+    background: red;
+}
+
 
 #facets literal-facet label span.value::after {
   content: '';
@@ -615,7 +630,7 @@ thumbnail-facet fieldset div:not(.more-container) {
 
 vitals-facet fieldset {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
   '. lcp-good cls-good inp-good'
   '. lcp-ni cls-ni inp-ni'
   '. lcp-poor cls-poor inp-poor';
@@ -759,7 +774,7 @@ vitals-facet fieldset label {
 }
 
 #facets fieldset div.load-more {
-  grid-column: 2 / span 2;  
+  grid-column: 2 / span 2;
   display: block;
   padding: 10px 0;
 }
@@ -994,18 +1009,18 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   main .key-metrics ul > * h2, main .key-metrics ul > * button {
     font-size: 14px;
   }
-  
+
   main .key-metrics ul > * h2::before {
     width: 14px;
     height: 14px;
     border-radius: 14px;
   }
-  
+
   main .key-metrics ul > * p {
     font-size: 30px;
     margin: 16px 0;
   }
-  
+
   main .key-metrics ul {
     grid-gap: 16px;
   }
@@ -1031,7 +1046,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     border-radius: 16px;
     padding: 4px 16px;
     font-size: 18px;
-  }  
+  }
 
   #facets link-facet  a .protocol {
     display: inline;
@@ -1054,7 +1069,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }  
+  }
 
   #deepmain > div, #deepmain > facet-sidebar {
     width: 50%;
@@ -1095,7 +1110,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 @media (min-width: 2000px) {
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }  
+  }
 
   #facets link-facet  a .protocol {
     display: inline;
