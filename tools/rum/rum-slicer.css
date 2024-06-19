@@ -801,7 +801,7 @@ a.drilldown::after {
   border: 6px solid transparent;
   border-top-color: currentcolor;
   top: 6px;
-  left: 2px;
+  left: 1px;
 }
 
 /* make a little upward pointing arrow from ::before and ::after for drillup */
