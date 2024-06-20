@@ -265,7 +265,7 @@ const stages = [
       detect: (bundle, dataChunks) => {
         const conversionSpec = parseConversionSpec();
         if (Object.keys(conversionSpec).length === 0) return false;
-        if (Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint[0] === 'click') return false;
+        if (Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint && conversionSpec.checkpoint[0] === 'click') return false;
         return dataChunks.hasConversion(bundle, conversionSpec, 'every');
       },
       next: [],
