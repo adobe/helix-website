@@ -2,7 +2,12 @@
 import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
 import {
-  parseConversionSpec, parseSearchParams, isKnownFacet, scoreCWV, toHumanReadable,
+  parseConversionSpec,
+  parseSearchParams,
+  isKnownFacet,
+  scoreCWV,
+  toHumanReadable,
+  computeConversionRate,
 } from './utils.js';
 
 /* globals */
@@ -36,7 +41,9 @@ dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-
+dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
+  ? bundle.weight
+  : 0));
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -59,8 +66,8 @@ export function updateKeyMetrics(keyMetrics) {
 
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
   const conversionsExtra = document.createElement('span');
-  conversionsExtra.textContent = toHumanReadable((
-    100 * keyMetrics.conversions) / keyMetrics.pageViews);
+  const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
+  conversionsExtra.textContent = toHumanReadable(conversionRate);
   conversionsExtra.className = 'extra';
   document.querySelector('#conversions p').appendChild(conversionsExtra);
 
@@ -81,7 +88,9 @@ const conversionSpec = Object.keys(parseConversionSpec()).length
   ? parseConversionSpec()
   : { checkpoint: ['click'] };
 
-const isDefaultConversion = Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint[0] === 'click';
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
@@ -148,7 +157,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   // source and target, the same applies to defined conversion checkpoints
   // we need facets for source and target, too
   Array.from(new Set([...checkpoint, ...(
-    isDefaultConversion ? [] : conversionSpec.checkpoint)]))
+    isDefaultConversion ? [] : conversionSpec.checkpoint || [])]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
@@ -222,16 +231,13 @@ export async function draw() {
 
   await herochart.draw();
 
-  const facets = dataChunks.facets.conversions;
-  const converted = facets?.find((f) => f.value === 'converted');
-
   updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
     cls: dataChunks.totals.cls.percentile(75),
     inp: dataChunks.totals.inp.percentile(75),
     ttfb: dataChunks.totals.ttfb.percentile(75),
-    conversions: converted ? converted.weight : 0,
+    conversions: dataChunks.totals.conversions.sum,
     visits: dataChunks.totals.visits.sum,
     bounces: dataChunks.totals.bounces.sum,
   });
