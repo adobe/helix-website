@@ -220,7 +220,7 @@ export default class ListFacet extends HTMLElement {
           const visits = entry.metrics.visits.sum;
           const conversionRate = computeConversionRate(conversions, visits);
           conversionspan.textContent = toHumanReadable(conversionRate);
-          conversionspan.title = conversionRate;
+          conversionspan.title = entry.metrics.conversions.sum;
 
           label.append(valuespan, countspan, conversionspan);
 
