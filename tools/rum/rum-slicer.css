@@ -594,15 +594,6 @@ vitals-facet label::before {
   content: '%)';
 }
 
-#facets fieldset span.interesting {
-    background: orange;
-}
-
-#facets fieldset span.significant {
-    background: red;
-}
-
-
 #facets literal-facet label span.value::after {
   content: '';
 }
