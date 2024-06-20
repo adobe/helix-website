@@ -157,7 +157,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   // source and target, the same applies to defined conversion checkpoints
   // we need facets for source and target, too
   Array.from(new Set([...checkpoint, ...(
-    isDefaultConversion ? [] : conversionSpec.checkpoint)]))
+    isDefaultConversion ? [] : conversionSpec.checkpoint || [])]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
