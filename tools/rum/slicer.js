@@ -88,7 +88,9 @@ const conversionSpec = Object.keys(parseConversionSpec()).length
   ? parseConversionSpec()
   : { checkpoint: ['click'] };
 
-const isDefaultConversion = Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint[0] === 'click';
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
