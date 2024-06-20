@@ -154,7 +154,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       .split(' ')
       .filter((word) => word.length > 2);
     const matching = keywords
-      .filter((word) => fullText.indexOf(word) > -1);
+      .filter((word) => fullText.toLowerCase().indexOf(word.toLowerCase()) > -1);
     if (matching.length === keywords.length && filterText.length > 2) {
       matching.push(params.get('filter'));
     }
