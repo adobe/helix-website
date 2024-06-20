@@ -132,13 +132,17 @@ main .key-metrics ul {
   padding-left: 0;
 }
 
-main .key-metrics li h2 {
+main .key-metrics ul > * h2 {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: normal;
 }
 
-main .key-metrics li h2::before {
+main .key-metrics ul > * button {
+  font-size: 10px;
+}
+
+main .key-metrics ul > * h2::before {
   content: ' ';
   background-color: currentcolor;
   width: 8px;
@@ -148,26 +152,115 @@ main .key-metrics li h2::before {
   border-radius: 8px;
 }
 
-main .key-metrics li p {
+main .key-metrics ul > * p {
   font-weight: 600;
   font-size: 20px;
   margin: 8px 0;
 }
 
-.key-metrics li {
+main .key-metrics ul > * p span.extra {
+  font-weight: normal;
+  font-size: 80%;
+  opacity: 0.6;
+}
+
+main .key-metrics ul > * p span.extra::before {
+  content: ' (';
+}
+
+main .key-metrics ul > #pageviews p span.extra::after {
+  content: ' per visit)';
+}
+
+main .key-metrics ul > #conversions p span.extra::after {
+  content: '%)';
+}
+
+main .key-metrics ul > #visits p span.extra::after {
+  content: '% bounces)';
+}
+
+.key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;
   background-color: #eee;
   padding: 4px 8px;
 }
 
-.key-metrics li[aria-selected="true"] {
+.key-metrics ul > *[aria-selected="true"] {
   background-color: #444;
   color: white;
 }
 
 .key-metrics [aria-hidden="true"] {
   display: none;
+}
+
+/* conversions custom element */
+
+conversion-tracker {
+  display: grid;
+  grid-template-areas:
+  'heading heading button'
+  'number empty button'
+  'number definition definition'
+  ;
+  grid-template-columns: 4fr 1fr 4em;
+  align-items: start;
+}
+
+conversion-tracker button {
+  border: 2px solid var(--spectrum-gray-700);
+  border-radius: 32px;
+  padding: 2px 8px;
+  background-color: var(--spectrum-gray-300);
+  color: var(--spectrum-gray-700);
+  grid-area: button;
+  font-weight: normal!important;
+}
+
+conversion-tracker button:disabled {
+  opacity: 0.5;
+}
+
+conversion-tracker h2 {
+  grid-area: heading;
+}
+
+conversion-tracker p {
+  grid-area: number;
+}
+
+conversion-tracker ol {
+  grid-area: definition;
+  padding-left: 0;
+  text-align: right;
+  font-size: small;
+  list-style: none;
+  line-height: 1.2;
+  color: var(--spectrum-gray-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+conversion-tracker[mode="pending"] ol li {
+  background-color: var(--spectrum-yellow-200);
+  display: inline-block;
+}
+
+conversion-tracker ol li {
+  margin: 0;
+  padding: 0;
+}
+
+main .key-metrics ul > conversion-tracker[mode="pending"] h2::before {
+  background-color: var(--spectrum-yellow-200);
+  border: 1px solid var(--spectrum-yellow-700);
+}
+
+main .key-metrics ul > conversion-tracker[mode="custom"] h2::before {
+  background-color: var(--spectrum-fuchsia-200);
+  border: 1px solid var(--spectrum-fuchsia-700);
 }
 
 /* figure */
@@ -290,8 +383,8 @@ figcaption > span {
   background-color: var(--light-purple);
 }
 
-.filter-tags > span.filter-tag-lcp, 
-.filter-tags > span.filter-tag-cls, 
+.filter-tags > span.filter-tag-lcp,
+.filter-tags > span.filter-tag-cls,
 .filter-tags > span.filter-tag-inp,
 .filter-tags > span.filter-tag-conversions,
 .filter-tags > span.filter-tag-visits {
@@ -475,15 +568,17 @@ vitals-facet label::before {
   word-break: break-all;
 }
 
-#facets fieldset label span.count {
+#facets fieldset label span.count, #facets fieldset label span.extra {
   opacity: 0.6;
 }
 
-#facets fieldset div:hover span.count {
+#facets fieldset div:hover span.count, #facets fieldset div:hover span.extra {
   opacity: 1;
 }
 
-#facets fieldset label span.count::before, #facets fieldset label span.value::before {
+#facets fieldset label span.count::before,
+#facets fieldset label span.value::before,
+#facets fieldset label span.extra::before {
   content: ' (';
 }
 
@@ -493,6 +588,10 @@ vitals-facet label::before {
 
 #facets fieldset label span.count::after, #facets fieldset label span.value::after {
   content: ')';
+}
+
+#facets fieldset label span.extra::after {
+  content: '%)';
 }
 
 #facets literal-facet label span.value::after {
@@ -522,7 +621,7 @@ thumbnail-facet fieldset div:not(.more-container) {
 
 vitals-facet fieldset {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
   '. lcp-good cls-good inp-good'
   '. lcp-ni cls-ni inp-ni'
   '. lcp-poor cls-poor inp-poor';
@@ -666,7 +765,7 @@ vitals-facet fieldset label {
 }
 
 #facets fieldset div.load-more {
-  grid-column: 2 / span 2;  
+  grid-column: 2 / span 2;
   display: block;
   padding: 10px 0;
 }
@@ -898,26 +997,26 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: 32px;
   }
 
-  main .key-metrics li h2 {
+  main .key-metrics ul > * h2, main .key-metrics ul > * button {
     font-size: 14px;
   }
-  
-  main .key-metrics li h2::before {
+
+  main .key-metrics ul > * h2::before {
     width: 14px;
     height: 14px;
     border-radius: 14px;
   }
-  
-  main .key-metrics li p {
+
+  main .key-metrics ul > * p {
     font-size: 30px;
     margin: 16px 0;
   }
-  
+
   main .key-metrics ul {
     grid-gap: 16px;
   }
 
-  main .key-metrics li {
+  main .key-metrics ul > * {
     border-radius: 16px;
     padding: 8px 16px;
   }
@@ -938,7 +1037,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     border-radius: 16px;
     padding: 4px 16px;
     font-size: 18px;
-  }  
+  }
 
   #facets link-facet  a .protocol {
     display: inline;
@@ -961,7 +1060,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }  
+  }
 
   #deepmain > div, #deepmain > facet-sidebar {
     width: 50%;
@@ -1002,7 +1101,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 @media (min-width: 2000px) {
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }  
+  }
 
   #facets link-facet  a .protocol {
     display: inline;

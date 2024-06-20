@@ -1,4 +1,6 @@
-import { scoreCWV, toHumanReadable, escapeHTML } from '../utils.js';
+import {
+  computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
+} from '../utils.js';
 import { pValue } from '../cruncher.js';
 
 async function addSignificanceFlag(element, metric, baseline) {
@@ -210,7 +212,17 @@ export default class ListFacet extends HTMLElement {
           countspan.textContent = toHumanReadable(entry.metrics.pageViews.sum);
           countspan.title = entry.metrics.pageViews.sum;
           const valuespan = this.createValueSpan(entry);
-          label.append(valuespan, countspan);
+
+          const conversionspan = document.createElement('span');
+          conversionspan.className = 'extra';
+
+          const conversions = entry.metrics.conversions.sum;
+          const visits = entry.metrics.visits.sum;
+          const conversionRate = computeConversionRate(conversions, visits);
+          conversionspan.textContent = toHumanReadable(conversionRate);
+          conversionspan.title = entry.metrics.conversions.sum;
+
+          label.append(valuespan, countspan, conversionspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');

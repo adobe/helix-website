@@ -1,7 +1,14 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
-import { scoreCWV, toHumanReadable } from './utils.js';
+import {
+  parseConversionSpec,
+  parseSearchParams,
+  isKnownFacet,
+  scoreCWV,
+  toHumanReadable,
+  computeConversionRate,
+} from './utils.js';
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -26,12 +33,17 @@ window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
 dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
-dataChunks.addSeries('conversions', (bundle) => (bundle.conversion ? bundle.weight : 0));
+// a bounce is a visit without a click
+dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
+  ? bundle.weight
+  : 0));
 dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-
+dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
+  ? bundle.weight
+  : 0));
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -41,8 +53,23 @@ function setDomain(domain, key) {
 /* update UX */
 export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
+  const pageViewsExtra = document.createElement('span');
+  pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+  pageViewsExtra.className = 'extra';
+  document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
+  const visitsExtra = document.createElement('span');
+  visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
+  visitsExtra.className = 'extra';
+  document.querySelector('#visits p').appendChild(visitsExtra);
+
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
+  const conversionsExtra = document.createElement('span');
+  const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
+  conversionsExtra.textContent = toHumanReadable(conversionRate);
+  conversionsExtra.className = 'extra';
+  document.querySelector('#conversions p').appendChild(conversionsExtra);
 
   const lcpElem = document.querySelector('#lcp p');
   lcpElem.textContent = `${toHumanReadable(keyMetrics.lcp / 1000)} s`;
@@ -57,53 +84,13 @@ export function updateKeyMetrics(keyMetrics) {
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
 }
 
-/**
- * Function used for filtering wanted parameters. Its implementation depends on the context,
- * for instance when parsing for conversion parameters we care about those that start with
- * `conversion.`.
- * @function filterFn
- * @param {string} paramName - The parameter name.
- * @returns {boolean} - Returns true if the parameter will be further parsed, false otherwise.
- */
-
-/**
- * In some cases, it may just be that the parameters need to be transformed in some way.
- * For instance, when parsing conversion parameters we want to remove the `conversion.` prefix
- * from the parameter name.
- * @function transformFn
- * @param {[string, string]} paramPair - The pair of parameter name and its value.
- * @returns {[string, string]} - The result of the transformation.
- */
-
-/**
- * Parse search parameters and return a dictionary.
- * @param {URLSearchParams} params - The search parameters.
- * @param {filterFn} filterFn - The filtering function.
- * @param {transformFn} transformFn - The transformation function.
- * @returns {Object<string, string[]>} - The dictionary of parameters.
- */
-function parseSearchParams(params, filterFn, transformFn) {
-  return Array.from(params
-    .entries())
-    .filter(filterFn)
-    .map(transformFn)
-    .reduce((acc, [key, value]) => {
-      if (acc[key]) acc[key].push(value);
-      else acc[key] = [value];
-      return acc;
-    }, {});
-}
-
-function parseConversionSpec() {
-  const params = new URL(window.location).searchParams;
-  const transform = ([key, value]) => [key.replace('conversion.', ''), value];
-  const filter = ([key]) => (key.startsWith('conversion.'));
-  return parseSearchParams(params, filter, transform);
-}
-
 const conversionSpec = Object.keys(parseConversionSpec()).length
   ? parseConversionSpec()
   : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
@@ -111,6 +98,7 @@ function updateDataFacets(filterText, params, checkpoint) {
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
   );
+
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
     return parts.reduce((acc, _, i) => {
@@ -166,8 +154,10 @@ function updateDataFacets(filterText, params, checkpoint) {
   });
 
   // if we have a checkpoint filter, then we also want facets for
-  // source and target
-  checkpoint
+  // source and target, the same applies to defined conversion checkpoints
+  // we need facets for source and target, too
+  Array.from(new Set([...checkpoint, ...(
+    isDefaultConversion ? [] : conversionSpec.checkpoint || [])]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
@@ -217,25 +207,8 @@ function updateDataFacets(filterText, params, checkpoint) {
 
 function updateFilter(params, filterText) {
   const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
-    || key === 'userAgent'
-    || (key === 'filter' && filterText.length > 2)
-    || key === 'url'
-    || key === 'conversions'
-    // facets from sankey
-    || key === 'trafficsource'
-    || key === 'traffictype'
-    || key === 'entryevent'
-    || key === 'pagetype'
-    || key === 'loadtype'
-    || key === 'contenttype'
-    || key === 'interaction'
-    || key === 'clicktarget'
-    || key === 'exit'
-    || key === 'vitals'
-    || key.endsWith('.source')
-    || key.endsWith('.target')
-    || key.endsWith('.histogram')
-    || key === 'checkpoint';
+    || isKnownFacet(key)
+    || (key === 'filter' && filterText.length > 2);
   const transform = ([key, value]) => [key, value];
   dataChunks.filter = parseSearchParams(params, filter, transform);
 }
@@ -258,17 +231,15 @@ export async function draw() {
 
   await herochart.draw();
 
-  const facets = dataChunks.facets.conversions;
-  const converted = facets?.find((f) => f.value === 'converted');
-
   updateKeyMetrics({
     pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
     cls: dataChunks.totals.cls.percentile(75),
     inp: dataChunks.totals.inp.percentile(75),
     ttfb: dataChunks.totals.ttfb.percentile(75),
-    conversions: converted ? converted.weight : 0,
+    conversions: dataChunks.totals.conversions.sum,
     visits: dataChunks.totals.visits.sum,
+    bounces: dataChunks.totals.bounces.sum,
   });
 
   const focus = params.get('focus');
@@ -328,6 +299,7 @@ export function updateState() {
   });
 
   window.history.replaceState({}, '', url);
+  document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
 }
 
 const section = document.querySelector('main > div');
