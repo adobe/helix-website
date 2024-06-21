@@ -1,10 +1,22 @@
 import {
   computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
 } from '../utils.js';
-import { pValue } from '../cruncher.js';
+import { tTest, zTestTwoProportions } from '../cruncher.js';
 
 async function addSignificanceFlag(element, metric, baseline) {
-  const p = pValue(metric.values, baseline.values);
+  let p = 1;
+  if (Array.isArray(metric.values) && Array.isArray(baseline.values)) {
+    // for two arrays of values, we use a t-test
+    p = tTest(metric.values, baseline.values);
+  } else if (
+    typeof metric.total === 'number'
+    && typeof metric.conversions === 'number'
+    && typeof baseline.total === 'number'
+    && typeof baseline.conversions === 'number'
+  ) {
+    // for two proportions, we use a z-test
+    p = zTestTwoProportions(metric.total, metric.conversions, baseline.total, baseline.conversions);
+  }
   if (p < 0.05) {
     element.classList.add('significant');
   } else if (p < 0.1) {
@@ -215,6 +227,19 @@ export default class ListFacet extends HTMLElement {
 
           const conversionspan = document.createElement('span');
           conversionspan.className = 'extra';
+
+          // we need to divide the totals by average weight
+          // so that we don't overestimate the significance
+          const avgWeight = this.dataChunks.totals.pageViews.weight
+            / this.dataChunks.totals.pageViews.count;
+
+          addSignificanceFlag(conversionspan, {
+            total: entry.metrics.pageViews.sum / avgWeight,
+            conversions: entry.metrics.conversions.sum / avgWeight,
+          }, {
+            total: this.dataChunks.totals.pageViews.sum / avgWeight,
+            conversions: this.dataChunks.totals.conversions.sum / avgWeight,
+          });
 
           const conversions = entry.metrics.conversions.sum;
           const visits = entry.metrics.visits.sum;
