@@ -557,9 +557,23 @@ export class DataChunks {
    * checkpoint attribute set to 'click' must exist.
    * @param {string} combiner used to determine if all or some filters must match.
    * By default, 'every' is used.
+   * @param {boolean} isVisiting calculate the conversion of the visiting
+   * set instead of the entire dataset. Useful when calculating the conversion
+   * rate in relation to visits
    * @returns {boolean} the result of the check.
    */
-  hasConversion(aBundle, filterSpec, combiner) {
+  hasConversion(aBundle, filterSpec, combiner, isVisiting = true) {
+    if (isVisiting) {
+      // the visiting filter is just about `enter` checkpoints
+      // see addCalculatedProps function
+      const checkpoints = filterSpec.checkpoint;
+      if (checkpoints) {
+        checkpoints.push('enter');
+      } else {
+        filterSpec.checkpoint = ['enter'];
+      }
+    }
+
     const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
     const skipFilterFn = () => true;
     const valuesExtractorFn = (attributeName, bundle, parent) => {
