@@ -3,7 +3,7 @@ import { SankeyController, Flow } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
 import AbstractChart from './chart.js';
-import { cssVariable } from '../utils.js';
+import { cssVariable, parseConversionSpec } from '../utils.js';
 
 Chart.register(SankeyController, Flow, ...registerables);
 
@@ -22,7 +22,7 @@ Chart.register(SankeyController, Flow, ...registerables);
 // 'pagesviewed',
 'error',
 'navigate',
-'utm',
+'utm', // replace with 'paid'
 'reload',
 'back_forward',
 'lcp',
@@ -76,15 +76,15 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'utm')
         .length === 0,
-      next: ['enter'],
+      next: ['enter', 'consent', 'noconsent'],
     },
     campaign: {
       label: 'Campaign',
       color: cssVariable('--spectrum-red-400'),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'utm')
+        .filter((e) => e.checkpoint === 'utm' || e.checkpoint === 'paid')
         .length > 0,
-      next: ['enter'],
+      next: ['enter', 'consent', 'noconsent'],
     },
   },
   {
@@ -109,6 +109,24 @@ const stages = [
       label: 'Back/Forward',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'back_forward')
+        .length > 0,
+      next: ['top', '404'],
+    },
+    consent: {
+      label: 'Consent Shown',
+      color: cssVariable('--spectrum-purple-500'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'consent')
+        .filter((e) => e.target === 'show')
+        .length > 0,
+      next: ['top', '404'],
+    },
+    noconsent: {
+      label: 'Consent Hidden',
+      color: cssVariable('--spectrum-seafoam-500'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'consent')
+        .filter((e) => e.target === 'hidden')
         .length > 0,
       next: ['top', '404'],
     },
@@ -202,8 +220,8 @@ const stages = [
       */
     nocontent: {
       label: 'No Content',
-      color: cssVariable('--spectrum-gray-800'),
-      next: ['click', 'formsubmit', 'nointeraction'],
+      color: cssVariable('--spectrum-gray-200'),
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length === 0,
@@ -214,7 +232,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'experiment')
         .length > 0,
-      next: ['click', 'formsubmit', 'nointeraction'],
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
     initial: {
       label: 'Initial Content',
@@ -222,7 +240,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length <= 3,
-      next: ['click', 'formsubmit', 'nointeraction'],
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
     engaged: {
       color: cssVariable('--spectrum-seafoam-800'), // greenish, but not too green
@@ -230,7 +248,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length > 3,
-      next: ['click', 'formsubmit', 'nointeraction'],
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
   },
   {
@@ -241,13 +259,24 @@ const stages = [
      * - formsubmit
      * - none
      */
+    convert: {
+      color: cssVariable('--spectrum-fuchsia-300'),
+      label: 'Conversion',
+      detect: (bundle, dataChunks) => {
+        const conversionSpec = parseConversionSpec();
+        if (Object.keys(conversionSpec).length === 0) return false;
+        if (Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint && conversionSpec.checkpoint[0] === 'click') return false;
+        return dataChunks.hasConversion(bundle, conversionSpec, 'every');
+      },
+      next: [],
+    },
     click: {
       color: cssVariable('--spectrum-green-900'),
       label: 'Click',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .length > 0,
-      next: ['blind', 'intclick', 'extclick', 'media'],
+      next: ['intclick', 'extclick', 'media'],
     },
     formsubmit: {
       color: cssVariable('--spectrum-seafoam-900'),
@@ -258,7 +287,7 @@ const stages = [
     },
     nointeraction: {
       label: 'No Interaction',
-      color: cssVariable('--spectrum-gray-900'),
+      color: cssVariable('--spectrum-gray-100'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click'
           || e.checkpoint === 'formsubmit')
@@ -302,14 +331,6 @@ const stages = [
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
         .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
-        .length > 0,
-    },
-    blind: {
-      label: 'Blind Click',
-      color: cssVariable('--spectrum-gray-900'),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => !e.target)
         .length > 0,
     },
   },
@@ -385,7 +406,7 @@ export default class SankeyChart extends AbstractChart {
           .forEach(([key, step]) => {
           // if we already detected a flow, skip the rest
             if (cont) return;
-            if (step.detect(bundle)) {
+            if (step.detect(bundle, this.dataChunks)) {
               const flowLabel = typeof step.label === 'function' ? step.label(bundle) : key;
               const flowValue = typeof step.label === 'function' ? step.label(bundle) : step.label;
               if (stage.label
@@ -520,7 +541,7 @@ export default class SankeyChart extends AbstractChart {
         .filter(([key]) => key !== 'label')
         .reduce((acc, [key, step]) => {
           if (acc.length > 0) return acc;
-          if (step.detect(bundle)) {
+          if (step.detect(bundle, dataChunks)) {
             acc.push(typeof step.label === 'function' ? step.label(bundle) : step.label || key);
           }
           return acc;

@@ -1,4 +1,6 @@
-import { scoreCWV, toHumanReadable, escapeHTML } from '../utils.js';
+import {
+  computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
+} from '../utils.js';
 import { pValue } from '../cruncher.js';
 
 async function addSignificanceFlag(element, metric, baseline) {
@@ -86,6 +88,7 @@ export default class ListFacet extends HTMLElement {
   update() {
     const facetName = this.getAttribute('facet');
     const facetEntries = this.dataChunks.facets[facetName];
+    const enabled = !this.closest('facet-sidebar[aria-disabled="true"]');
 
     const sort = this.getAttribute('sort') || 'count';
 
@@ -121,7 +124,31 @@ export default class ListFacet extends HTMLElement {
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
-      legend.append(clipboard);
+
+      const clipboardPaste = document.createElement('span');
+      clipboardPaste.className = 'clipboard-paste';
+      clipboardPaste.title = 'Paste from clipboard';
+
+      clipboardPaste.addEventListener('click', async () => {
+        // read the clipboard
+        const paste = navigator.clipboard.readText();
+        // split based on any newline character or space
+        const values = (await paste).split(/[\n\s]+/);
+        const pasted = [];
+        values.forEach((value) => {
+          const input = fieldSet.querySelector(`input[value="${value}"]`);
+          if (input) {
+            pasted.push(input);
+            input.checked = true;
+            input.parentElement.ariaSelected = true;
+          }
+        });
+        if (pasted.length) {
+          this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
+        }
+      });
+
+      legend.append(clipboard, clipboardPaste);
       if (drilldownAtt && url.searchParams.get('drilldown') !== facetName) {
         const drilldown = document.createElement('a');
         drilldown.className = 'drilldown';
@@ -170,11 +197,13 @@ export default class ListFacet extends HTMLElement {
             div.ariaSelected = true;
           }
           input.id = `${facetName}=${entry.value}`;
-          div.addEventListener('click', (evt) => {
-            if (evt.target !== input) input.checked = !input.checked;
-            evt.stopPropagation();
-            this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
-          });
+          if (enabled) {
+            div.addEventListener('click', (evt) => {
+              if (evt.target !== input) input.checked = !input.checked;
+              evt.stopPropagation();
+              this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
+            });
+          }
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
@@ -183,7 +212,17 @@ export default class ListFacet extends HTMLElement {
           countspan.textContent = toHumanReadable(entry.metrics.pageViews.sum);
           countspan.title = entry.metrics.pageViews.sum;
           const valuespan = this.createValueSpan(entry);
-          label.append(valuespan, countspan);
+
+          const conversionspan = document.createElement('span');
+          conversionspan.className = 'extra';
+
+          const conversions = entry.metrics.conversions.sum;
+          const visits = entry.metrics.visits.sum;
+          const conversionRate = computeConversionRate(conversions, visits);
+          conversionspan.textContent = toHumanReadable(conversionRate);
+          conversionspan.title = entry.metrics.conversions.sum;
+
+          label.append(valuespan, countspan, conversionspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
@@ -239,7 +278,7 @@ export default class ListFacet extends HTMLElement {
         fieldSet.append(container);
       }
 
-      legend.addEventListener('click', () => {
+      clipboard.addEventListener('click', () => {
         const tsv = this.computeTSV(numOptions);
         navigator.clipboard.writeText(tsv.join('\r\n'));
         const toast = document.getElementById('copied-toast');
@@ -255,7 +294,7 @@ export default class ListFacet extends HTMLElement {
     valuespan.innerHTML = this.createLabelHTML(entry.value);
     const highlightFromParam = this.getAttribute('highlight');
     if (highlightFromParam) {
-      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam);
+      const highlightValue = new URL(window.location).searchParams.get(highlightFromParam) || '';
       const highlights = highlightValue.split(' ')
         .map((h) => h.trim())
         .filter((h) => h.length > 0);
@@ -287,7 +326,7 @@ export default class ListFacet extends HTMLElement {
       li.title = metricName.toUpperCase();
       if (entry.metrics[metricName] && entry.metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
         const value = entry.metrics[metricName].percentile(75);
-        cwv = `${toHumanReadable(value / 1000)}`;
+        cwv = `${toHumanReadable(value / (metricName === 'cls' ? 1 : 1000))}`;
         if (metricName === 'inp' || metricName === 'lcp') {
           cwv += ' s';
         }

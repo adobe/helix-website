@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
     import SkylineChart from './charts/skyline.js';
+    import ConversionTracker from './elements/conversion-tracker.js';
     import IncognitoCheckbox from './elements/incognito-checkbox.js';
     import FacetSidebar from './elements/facetsidebar.js';
     import ListFacet from './elements/list-facet.js';
@@ -19,6 +20,7 @@
     import LinkFacet from './elements/link-facet.js';
     import LiteralFacet from './elements/literal-facet.js';
     import VitalsFacet from './elements/vitals-facet.js';
+    import URLSelector from './elements/url-selector.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -29,6 +31,8 @@
     customElements.define('link-facet', LinkFacet);
     customElements.define('literal-facet', LiteralFacet);
     customElements.define('vitals-facet', VitalsFacet);
+    customElements.define('url-selector', URLSelector);
+    customElements.define('conversion-tracker', ConversionTracker);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -41,7 +45,7 @@
         <div id="deepmain">
           <div class="output">
             <div class="title">
-              <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
+              <url-selector>www.aem.live</url-selector>
               <div>
                 <select id="view">
                   <option value="week">Week</option>
@@ -61,10 +65,10 @@
                   <h2>Visits</h2>
                   <p>0</p>
                 </li>
-                <li id="conversions" title="Page views with a user click">
+                <conversion-tracker id="conversions" title="Page views with a user click">
                   <h2>Conversions</h2>
                   <p>0</p>
-                </li>
+                </conversion-tracker>
                 <li id="lcp" title="Largest Contentful Paint">
                   <h2>LCP</h2>
                   <p>0</p>
@@ -134,7 +138,8 @@
                 <dd>Social Media Bot</dd>
               </dl>
             </list-facet>
-            <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
+            <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter"
+              pagespeed="https://pagespeed.web.dev/analysis?url=">
               <legend>URL</legend>
             </link-facet>
             <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
@@ -154,7 +159,7 @@
                 <dd>Clicked</dd>
                 <dt>error</dt>
                 <dd>JavaScript Error</dd>
-                <dt>utm</dt>
+                <dt>paid</dt>
                 <dd>Marketing Campaigns</dd>
                 <dt>consent</dt>
                 <dd>Consent</dd>
@@ -177,7 +182,7 @@
             <literal-facet facet="viewblock.source" drilldown="list.html">
               <legend>Block (CSS Selector)</legend>
             </literal-facet>
-            <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
+            <link-facet facet="enter.source" drilldown="list.html" thumbnail="true" favicon="true">
               <legend>External Referrer</legend>
               <dl>
                 <dt>(direct)</dt>
@@ -204,6 +209,31 @@
                 <dd>Dialog Hidden</dd>
               </dl>
             </list-facet>
+
+            <list-facet facet="paid.source">
+              <legend>Ad Network</legend>
+              <dl>
+                <dt>google</dt>
+                <dd>Google Ads</dd>
+                <dt>doubleclick</dt>
+                <dd>DoubleClick</dd>
+                <dt>microsoft</dt>
+                <dd>Microsoft Ads</dd>
+                <dt>facebook</dt>
+                <dd>Facebook Ads</dd>
+                <dt>twitter</dt>
+                <dd>Twitter Ads</dd>
+                <dt>linkedin</dt>
+                <dd>LinkedIn Ads</dd>
+                <dt>Pinterest</dt>
+                <dd>Pinterest Ads</dd>
+                <dt>tiktok</dt>
+                <dd>TikTok Ads</dd>
+              </dl>
+            </list-facet>
+            <literal-facet facet="paid.target">
+              <legend>Click Tracking Parameter</legend>
+            </literal-facet>
 
             <link-facet facet="error.source">
               <legend>Error Source</legend>

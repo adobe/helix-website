@@ -1,7 +1,14 @@
 // eslint-disable-next-line import/no-relative-packages
 import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
-import { toHumanReadable, scoreCWV } from './utils.js';
+import {
+  parseConversionSpec,
+  parseSearchParams,
+  isKnownFacet,
+  scoreCWV,
+  toHumanReadable,
+  computeConversionRate,
+} from './utils.js';
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -26,12 +33,17 @@ window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
 dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
-dataChunks.addSeries('conversions', (bundle) => (bundle.conversion ? bundle.weight : 0));
+// a bounce is a visit without a click
+dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
+  ? bundle.weight
+  : 0));
 dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-
+dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
+  ? bundle.weight
+  : 0));
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -41,8 +53,23 @@ function setDomain(domain, key) {
 /* update UX */
 export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
+  const pageViewsExtra = document.createElement('span');
+  pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+  pageViewsExtra.className = 'extra';
+  document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
+  const visitsExtra = document.createElement('span');
+  visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
+  visitsExtra.className = 'extra';
+  document.querySelector('#visits p').appendChild(visitsExtra);
+
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
+  const conversionsExtra = document.createElement('span');
+  const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
+  conversionsExtra.textContent = toHumanReadable(conversionRate);
+  conversionsExtra.className = 'extra';
+  document.querySelector('#conversions p').appendChild(conversionsExtra);
 
   const lcpElem = document.querySelector('#lcp p');
   lcpElem.textContent = `${toHumanReadable(keyMetrics.lcp / 1000)} s`;
@@ -57,8 +84,21 @@ export function updateKeyMetrics(keyMetrics) {
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
 }
 
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
+
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+  dataChunks.addFacet(
+    'conversions',
+    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
+  );
+
   dataChunks.addFacet('userAgent', (bundle) => {
     const parts = bundle.userAgent.split(':');
     return parts.reduce((acc, _, i) => {
@@ -102,16 +142,22 @@ function updateDataFacets(filterText, params, checkpoint) {
       .split(' ')
       .filter((word) => word.length > 2);
     const matching = keywords
-      .filter((word) => fullText.indexOf(word) > -1);
+      .filter((word) => fullText.toLowerCase().indexOf(word.toLowerCase()) > -1);
     if (matching.length === keywords.length && filterText.length > 2) {
       matching.push(params.get('filter'));
     }
     return matching;
   });
 
+  Object.entries(window.slicer.extraFacets || {}).forEach(([key, value]) => {
+    dataChunks.addFacet(key, value);
+  });
+
   // if we have a checkpoint filter, then we also want facets for
-  // source and target
-  checkpoint
+  // source and target, the same applies to defined conversion checkpoints
+  // we need facets for source and target, too
+  Array.from(new Set([...checkpoint, ...(
+    isDefaultConversion ? [] : conversionSpec.checkpoint || [])]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
@@ -160,32 +206,11 @@ function updateDataFacets(filterText, params, checkpoint) {
 }
 
 function updateFilter(params, filterText) {
-  dataChunks.filter = Array.from(params
-    .entries())
-    .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
-      || key === 'userAgent'
-      || (key === 'filter' && filterText.length > 2)
-      || key === 'url'
-      // facets from sankey
-      || key === 'trafficsource'
-      || key === 'traffictype'
-      || key === 'entryevent'
-      || key === 'pagetype'
-      || key === 'loadtype'
-      || key === 'contenttype'
-      || key === 'interaction'
-      || key === 'clicktarget'
-      || key === 'exit'
-      || key === 'vitals'
-      || key.endsWith('.source')
-      || key.endsWith('.target')
-      || key.endsWith('.histogram')
-      || key === 'checkpoint')
-    .reduce((acc, [key, value]) => {
-      if (acc[key]) acc[key].push(value);
-      else acc[key] = [value];
-      return acc;
-    }, {});
+  const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
+    || isKnownFacet(key)
+    || (key === 'filter' && filterText.length > 2);
+  const transform = ([key, value]) => [key, value];
+  dataChunks.filter = parseSearchParams(params, filter, transform);
 }
 
 export async function draw() {
@@ -214,6 +239,7 @@ export async function draw() {
     ttfb: dataChunks.totals.ttfb.percentile(75),
     conversions: dataChunks.totals.conversions.sum,
     visits: dataChunks.totals.visits.sum,
+    bounces: dataChunks.totals.bounces.sum,
   });
 
   const focus = params.get('focus');
@@ -260,7 +286,20 @@ export function updateState() {
     }
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
+
+  // with the conversion spec in form of dictionary
+  // need to put it back in the url by expanding the dictionary as follows
+  // the key is appended to conversion. and there can be multiple values for the same key
+  // conversion.key=value1&conversion.key=value2
+
+  Object.entries(conversionSpec).forEach(([key, values]) => {
+    values.forEach((value) => {
+      url.searchParams.append(`conversion.${key}`, value);
+    });
+  });
+
   window.history.replaceState({}, '', url);
+  document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
 }
 
 const section = document.querySelector('main > div');
@@ -303,27 +342,6 @@ const io = new IntersectionObserver((entries) => {
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
     const focus = params.get('focus');
-    const h1 = document.querySelector('h1');
-    h1.textContent = ` ${DOMAIN}`;
-    const img = document.createElement('img');
-    img.src = `https://${DOMAIN}/favicon.ico`;
-    img.addEventListener('error', () => {
-      img.src = './website.svg';
-    });
-    h1.prepend(img);
-    h1.addEventListener('click', async () => {
-      // eslint-disable-next-line no-alert
-      let domain = window.prompt('enter domain or URL');
-      if (domain) {
-        try {
-          const url = new URL(domain);
-          domain = url.host;
-        } catch {
-          // nothing
-        }
-        window.location = `${window.location.pathname}?domain=${domain}&view=month`;
-      }
-    });
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
