@@ -330,6 +330,22 @@ export class DataChunks {
     steps = 'linear',
   }, formatter = Intl.NumberFormat(undefined, { maximumSignificantDigits: 2 })) {
     const facetvalues = this.facets[baseFacet];
+
+    const createBundleFacetMap = (facetValues) => facetValues.reduce((acc, facet) => {
+      facet.entries.forEach((aBundle) => {
+        acc[aBundle.id] = acc[aBundle.id] ? [...acc[aBundle.id], facet] : [facet];
+      });
+      return acc;
+    }, {});
+
+    // inside a facet there are entries
+    // a entry is a array of bundles
+    // a bundle is a object with a id
+    // need to create a map of bundles as a key and as values the facets where it belongs to
+    // because then we need to use it in the facets value function
+    // this is mainly to avoid looping through all the facets for each bundle
+    const bundleFacetMap = createBundleFacetMap(facetvalues);
+
     let quantilesteps;
     const stepfns = {
       // split the range into equal parts
@@ -379,11 +395,14 @@ export class DataChunks {
       .from({ length: bucketcount }, (_, i) => stepfns[steps](min, max, bucketcount, i));
     this.addFacet(facetName, (bundle) => {
       // find the facetvalue that has the current bundle
-      const facetmatch = facetvalues.find((f) => f.entries.some((e) => e.id === bundle.id));
+      const facetmatch = bundleFacetMap[bundle.id];
+      // const facetmatch = facetvalues.find((f) => f.entries.some((e) => e.id === bundle.id));
       if (!facetmatch) {
         return [];
       }
-      const facetvalue = Number.parseInt(facetmatch.value, 10);
+      // pick the first element from the array
+      const facetvalue = Number.parseInt(facetmatch[0].value, 10);
+      // const facetvalue = Number.parseInt(facetmatch.value, 10);
       const bucket = buckets.findIndex((b) => facetvalue < b);
       return bucket !== -1
         ? `<${formatter.format(buckets[bucket])}`
