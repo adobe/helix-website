@@ -40,19 +40,24 @@ class AdminOrgs extends LitElement {
   }
 
   async init() {
-    token = localStorage.getItem('rum-bundler-token');
+    token = localStorage.getItem('rum-admin-token');
+    if (!token) {
+      token = localStorage.getItem('rum-bundler-token');
+    }
     if (!token) {
       token = prompt('Please enter your key');
       if (!token) {
         this.denied = true;
         return;
       }
+      localStorage.setItem('rum-admin-token', token);
     }
 
     const res = await fetchAPI('/orgs');
     if (!res.ok) {
-      if ([401, 403].includses(res.status)) {
+      if ([401, 403].includes(res.status)) {
         this.denied = true;
+        localStorage.setItem('rum-admin-token', '');
       } else {
         // TODO: show error
         console.error(`failed to fetch (${res.status}): `, res);
