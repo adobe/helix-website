@@ -38,28 +38,23 @@ export function scoreCWV(value, name) {
   return scoreValue(value, ...limits[name]);
 }
 export const UA_KEY = 'userAgent';
-export function toHumanReadable(num) {
-  const dp = 3;
-  let number = num;
-  const thresh = 1000;
 
-  if (Math.abs(num) < thresh) {
-    const precision = (Math.log10(number) < 0) ? 2 : (dp - 1) - Math.floor(Math.log10(number));
-    return `${number.toFixed(precision)}`;
-  }
+/**
+ * Returns a human readable number
+ * @param {Number} num a number
+ * @param {Number} precision the number of significant digits
+ * @returns {String} a human readable number
+ */
+export function toHumanReadable(num, precision = 2) {
+  if (Number.isNaN(num)) return '-';
+  const formatter = new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumSignificantDigits: precision,
+  });
+  return formatter.format(num).toLocaleLowerCase();
+}
 
-  const units = ['k', 'm', 'g', 't', 'p'];
-  let u = -1;
-  const r = 10 ** dp;
-
-  do {
-    number /= thresh;
-    u += 1;
-  } while (Math.round(Math.abs(number) * r) / r >= thresh && u < units.length - 1);
-
-  const precision = (dp - 1) - Math.floor(Math.log10(number));
-  return `${number.toFixed(precision)}${units[u]}`;
-} export function toISOStringWithTimezone(date) {
+export function toISOStringWithTimezone(date) {
   // Pad a number to 2 digits
   const pad = (n) => `${Math.floor(Math.abs(n))}`.padStart(2, '0');
 
@@ -286,20 +281,8 @@ export function roundToConfidenceInterval(
     Math.min(2, Number.isNaN(maxPrecision) ? Infinity : maxPrecision),
     common,
   );
-  // we don't want to show too many zeros, so we use k, m, g, etc.
-  const exponentSuffixes = ['k', 'm', 'g', 't', 'p'];
-  const { value, exponent } = exponentSuffixes.reduce((acc, suffix) => {
-    if (acc.value >= 1000) {
-      return { value: acc.value / 1000, exponent: suffix };
-    }
-    return acc;
-  }, { value: total, exponent: '' });
 
-  const nf = new Intl.NumberFormat('en-US', {
-    maximumSignificantDigits: precision,
-  });
-
-  const rounded = nf.format(value) + exponent;
+  const rounded = toHumanReadable(total, precision);
   if (fuzzy
     && samples < total
     && rounded.match(/\.[\d]+/)

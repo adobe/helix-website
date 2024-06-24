@@ -20,17 +20,17 @@ describe('number-format', () => {
     assert.strictEqual(roundToConfidenceInterval(1000000), '1m');
     assert.strictEqual(roundToConfidenceInterval(10000000), '10m');
     assert.strictEqual(roundToConfidenceInterval(100000000), '100m');
-    assert.strictEqual(roundToConfidenceInterval(1000000000), '1g');
-    assert.strictEqual(roundToConfidenceInterval(10000000000), '10g');
-    assert.strictEqual(roundToConfidenceInterval(100000000000), '100g');
+    assert.strictEqual(roundToConfidenceInterval(1000000000), '1b');
+    assert.strictEqual(roundToConfidenceInterval(10000000000), '10b');
+    assert.strictEqual(roundToConfidenceInterval(100000000000), '100b');
     assert.strictEqual(roundToConfidenceInterval(1000000000000), '1t');
     assert.strictEqual(roundToConfidenceInterval(10000000000000), '10t');
     assert.strictEqual(roundToConfidenceInterval(100000000000000), '100t');
-    assert.strictEqual(roundToConfidenceInterval(1000000000000000), '1p');
-    assert.strictEqual(roundToConfidenceInterval(10000000000000000), '10p');
-    assert.strictEqual(roundToConfidenceInterval(100000000000000000), '100p');
-    assert.strictEqual(roundToConfidenceInterval(1000000000000000000), '1,000p');
-    assert.strictEqual(roundToConfidenceInterval(10000000000000000000), '10,000p');
+    assert.strictEqual(roundToConfidenceInterval(1000000000000000), '1000t');
+    assert.strictEqual(roundToConfidenceInterval(10000000000000000), '10,000t');
+    assert.strictEqual(roundToConfidenceInterval(100000000000000000), '100,000t');
+    assert.strictEqual(roundToConfidenceInterval(1000000000000000000), '1,000,000t');
+    assert.strictEqual(roundToConfidenceInterval(10000000000000000000), '10,000,000t');
   });
 
   it('supports decimal places', () => {
@@ -45,14 +45,14 @@ describe('number-format', () => {
     assert.strictEqual(roundToConfidenceInterval(3141592, 300), '3.1m');
     assert.strictEqual(roundToConfidenceInterval(314159265, 3000), '310m');
     // when accuracy is getting fuzzy, we switch to fractional notation
-    assert.strictEqual(roundToConfidenceInterval(3141592653, 30), '3⅛g');
+    assert.strictEqual(roundToConfidenceInterval(3141592653, 30), '3⅛b');
     assert.strictEqual(roundToConfidenceInterval(
       3141592653,
       300000,
-    ), '3.142g');
+    ), '3.142b');
     assert.strictEqual(roundToConfidenceInterval(
       3141592653,
       3000,
-    ), '3.1g');
+    ), '3.1b');
   });
 });
