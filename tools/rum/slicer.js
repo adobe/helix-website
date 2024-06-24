@@ -53,23 +53,29 @@ function setDomain(domain, key) {
 /* update UX */
 export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
-  const pageViewsExtra = document.createElement('span');
-  pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
-  pageViewsExtra.className = 'extra';
-  document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+  if (keyMetrics.visits > 0) {
+    const pageViewsExtra = document.createElement('span');
+    pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+    pageViewsExtra.className = 'extra';
+    document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+  }
 
   document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
-  const visitsExtra = document.createElement('span');
-  visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
-  visitsExtra.className = 'extra';
-  document.querySelector('#visits p').appendChild(visitsExtra);
+  if (keyMetrics.visits > 0) {
+    const visitsExtra = document.createElement('span');
+    visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
+    visitsExtra.className = 'extra';
+    document.querySelector('#visits p').appendChild(visitsExtra);
+  }
 
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
-  const conversionsExtra = document.createElement('span');
-  const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
-  conversionsExtra.textContent = toHumanReadable(conversionRate);
-  conversionsExtra.className = 'extra';
-  document.querySelector('#conversions p').appendChild(conversionsExtra);
+  if (keyMetrics.visits > 0) {
+    const conversionsExtra = document.createElement('span');
+    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
+    conversionsExtra.textContent = toHumanReadable(conversionRate);
+    conversionsExtra.className = 'extra';
+    document.querySelector('#conversions p').appendChild(conversionsExtra);
+  }
 
   const lcpElem = document.querySelector('#lcp p');
   lcpElem.textContent = `${toHumanReadable(keyMetrics.lcp / 1000)} s`;
