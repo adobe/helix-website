@@ -54,7 +54,7 @@ export function updateKeyMetrics() {
   document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
   document.querySelector('#pageviews p number-format').setAttribute('sample-size', dataChunks.totals.pageViews.count);
   if (dataChunks.totals.visits.sum > 0) {
-    const pageViewsExtra = document.createElement('number-format');
+    const pageViewsExtra = document.querySelector('#pageviews p number-format.extra') || document.createElement('number-format');
     pageViewsExtra.textContent = dataChunks.totals.pageViews.sum / dataChunks.totals.visits.sum;
     pageViewsExtra.setAttribute('precision', 1);
     pageViewsExtra.className = 'extra';
@@ -65,7 +65,7 @@ export function updateKeyMetrics() {
   document.querySelector('#visits p number-format').setAttribute('sample-size', dataChunks.totals.visits.count);
   document.querySelector('#visits p number-format').setAttribute('total', dataChunks.totals.pageViews.sum);
   if (dataChunks.totals.visits.sum > 0) {
-    const visitsExtra = document.createElement('number-format');
+    const visitsExtra = document.querySelector('#visits p number-format.extra') || document.createElement('number-format');
     visitsExtra.textContent = (100 * dataChunks.totals.bounces.sum) / dataChunks.totals.visits.sum;
     visitsExtra.setAttribute('precision', 1);
     visitsExtra.setAttribute('total', 100);
@@ -77,7 +77,7 @@ export function updateKeyMetrics() {
   document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
   document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
   if (dataChunks.totals.visits.sum > 0) {
-    const conversionsExtra = document.createElement('number-format');
+    const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
     conversionsExtra.textContent = computeConversionRate(
       dataChunks.totals.conversions.sum,
       dataChunks.totals.visits.sum,
