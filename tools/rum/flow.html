@@ -21,6 +21,7 @@
     import LiteralFacet from './elements/literal-facet.js';
     import VitalsFacet from './elements/vitals-facet.js';
     import URLSelector from './elements/url-selector.js';
+    import NumberFormat from './elements/number-format.js';
     window.slicer = {
       Chart: SankeyChart,
     };
@@ -34,6 +35,7 @@
   customElements.define('vitals-facet', VitalsFacet);
   customElements.define('url-selector', URLSelector);
   customElements.define('conversion-tracker', ConversionTracker);
+  customElements.define('number-format', NumberFormat);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
