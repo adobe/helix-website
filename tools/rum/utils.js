@@ -282,7 +282,10 @@ export function roundToConfidenceInterval(
     }
     return acc;
   }, 0), Number.isNaN(maxPrecision) ? Infinity : maxPrecision);
-  const precision = Math.max(2, common);
+  const precision = Math.max(
+    Math.min(2, maxPrecision),
+    common,
+  );
   // we don't want to show too many zeros, so we use k, m, g, etc.
   const exponentSuffixes = ['k', 'm', 'g', 't', 'p'];
   const { value, exponent } = exponentSuffixes.reduce((acc, suffix) => {
