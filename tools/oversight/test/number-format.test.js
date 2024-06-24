@@ -45,7 +45,7 @@ describe('number-format', () => {
     assert.strictEqual(roundToConfidenceInterval(3141592, 300), '3.1m');
     assert.strictEqual(roundToConfidenceInterval(314159265, 3000), '310m');
     // when accuracy is getting fuzzy, we switch to fractional notation
-    assert.strictEqual(roundToConfidenceInterval(3141592653, 30), '3⅛b');
+    assert.strictEqual(roundToConfidenceInterval(3141592653, 30), '3.1b');
     assert.strictEqual(roundToConfidenceInterval(
       3141592653,
       300000,

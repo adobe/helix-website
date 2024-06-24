@@ -263,7 +263,6 @@ export function roundToConfidenceInterval(
   total,
   samples = total,
   maxPrecision = Infinity,
-  fuzzy = true,
 ) {
   const max = total + samplingError(total, samples);
   const min = total - samplingError(total, samples);
@@ -283,15 +282,5 @@ export function roundToConfidenceInterval(
   );
 
   const rounded = toHumanReadable(total, precision);
-  if (fuzzy
-    && samples < total
-    && rounded.match(/\.[\d]+/)
-    && rounded.match(/\.[\d]+/)[0].length > common) {
-    return rounded.replace(/\.[\d]+/, (match) => {
-      const fraction = Number(`0.${match.slice(1)}`);
-      // find the closest vulgar fraction
-      return findNearestVulgarFraction(fraction);
-    });
-  }
   return rounded;
 }
