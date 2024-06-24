@@ -92,6 +92,14 @@ export function updateKeyMetrics() {
   const lcpElem = document.querySelector('#lcp p number-format');
   lcpElem.textContent = dataChunks.totals.lcp.percentile(75) / 1000;
   lcpElem.closest('li').className = `score-${scoreCWV(dataChunks.totals.lcp.percentile(75), 'lcp')}`;
+  if (dataChunks.totals.ttfb.count > 0) {
+    const lcpExtra = document.querySelector('#lcp p number-format.extra') || document.createElement('number-format');
+    lcpExtra.textContent = dataChunks.totals.ttfb.percentile(75) / 1000;
+    lcpExtra.setAttribute('precision', 1);
+    lcpExtra.setAttribute('fuzzy', false);
+    lcpExtra.className = 'extra';
+    document.querySelector('#lcp p').appendChild(lcpExtra);
+  }
 
   const clsElem = document.querySelector('#cls p number-format');
   clsElem.textContent = dataChunks.totals.cls.percentile(75);
