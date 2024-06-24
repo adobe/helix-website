@@ -575,6 +575,74 @@ vitals-facet label::before {
   word-break: break-all;
 }
 
+#facets fieldset div:has(number-format)::after {
+  content: '';
+  height: 2px;
+  width: 100%;
+  opacity: 0.5;
+  grid-column: 1 / 3;
+}
+
+#facets fieldset div:has(number-format.frac-1-of-total)::after {
+  background-color: currentcolor;
+  
+}
+
+/* a gradient from currentcolor to transparent that is 7/8 of the width */
+#facets fieldset div:has(number-format.frac-⅞-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 87.5%, transparent 87.5%, transparent 100%);
+}
+
+/* 4/5 */
+#facets fieldset div:has(number-format.frac-⅘-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 80%, transparent 80%, transparent 100%);
+}
+
+/* 3/4 */
+#facets fieldset div:has(number-format.frac-¾-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 75%, transparent 75%, transparent 100%);
+}
+
+/* 5/8 */
+#facets fieldset div:has(number-format.frac-⅝-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 62.5%, transparent 62.5%, transparent 100%);
+}
+
+/* 2/3 */
+#facets fieldset div:has(number-format.frac-⅔-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 66.666%, transparent 66.666%, transparent 100%);
+}
+
+/* 1/2 */
+#facets fieldset div:has(number-format.frac-½-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 50%, transparent 50%, transparent 100%);
+}
+
+/* 3/8 */
+#facets fieldset div:has(number-format.frac-⅜-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 37.5%, transparent 37.5%, transparent 100%);
+}
+
+/* 1/3 */
+#facets fieldset div:has(number-format.frac-⅓-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 33.333%, transparent 33.333%, transparent 100%);
+}
+
+/* 1/4 */
+#facets fieldset div:has(number-format.frac-¼-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 25%, transparent 25%, transparent 100%);
+}
+
+/* 1/5 */
+#facets fieldset div:has(number-format.frac-⅕-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 20%, transparent 20%, transparent 100%);
+}
+
+/* 1/8 */
+#facets fieldset div:has(number-format.frac-⅛-of-total)::after {
+  background: linear-gradient(to right, currentcolor 0%, currentcolor 12.5%, transparent 12.5%, transparent 100%);
+}
+
 #facets fieldset label .count, #facets fieldset label .extra {
   opacity: 0.6;
 }

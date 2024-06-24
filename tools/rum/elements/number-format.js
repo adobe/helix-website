@@ -44,7 +44,7 @@ export default class NumberFormat extends HTMLElement {
       // if the total is given, add the percentage class
       if (!Number.isNaN(total) && total > 0) {
         const fraction = number / total;
-        this.classList.add(`${findNearestVulgarFraction(fraction)}-of-total`);
+        this.classList.add(`frac-${findNearestVulgarFraction(fraction)}-of-total`);
       }
     }
     // resume observing
