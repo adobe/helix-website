@@ -158,25 +158,25 @@ main .key-metrics ul > * p {
   margin: 8px 0;
 }
 
-main .key-metrics ul > * p span.extra {
+main .key-metrics ul > * p .extra {
   font-weight: normal;
   font-size: 80%;
   opacity: 0.6;
 }
 
-main .key-metrics ul > * p span.extra::before {
+main .key-metrics ul > * p .extra::before {
   content: ' (';
 }
 
-main .key-metrics ul > #pageviews p span.extra::after {
+main .key-metrics ul > #pageviews p .extra::after {
   content: ' per visit)';
 }
 
-main .key-metrics ul > #conversions p span.extra::after {
+main .key-metrics ul > #conversions p .extra::after {
   content: '%)';
 }
 
-main .key-metrics ul > #visits p span.extra::after {
+main .key-metrics ul > #visits p .extra::after {
   content: '% bounces)';
 }
 

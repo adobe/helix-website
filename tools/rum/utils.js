@@ -216,3 +216,88 @@ export function computeConversionRate(conversions, visits) {
   }
   return 100;
 }
+
+/**
+ * Determines the sampling error based on a binomial distribution.
+ * Each sample is a Bernoulli trial, where the probability of success is the
+ * proportion of the total population that has the attribute of interest.
+ * The sampling error is calculated as the standard error of the proportion.
+ * @param {number} total the expectation value of the total population
+ * @param {number} samples the number of successful trials (i.e. samples)
+ */
+export function samplingError(total, samples) {
+  const weight = total / samples;
+
+  const variance = weight * weight * samples;
+  const standardError = Math.sqrt(variance);
+  const marginOfError = 1.96 * standardError;
+  // round up to the nearest integer
+  return Math.round(marginOfError);
+}
+
+const vulgarFractions = {
+  0: '0',
+  0.125: '⅛',
+  0.2: '⅕',
+  0.25: '¼',
+  0.333: '⅓',
+  0.375: '⅜',
+  0.5: '½',
+  0.625: '⅝',
+  0.666: '⅔',
+  0.75: '¾',
+  0.8: '⅘',
+  0.875: '⅞',
+  1: '1',
+};
+
+export function findNearestVulgarFraction(fraction) {
+  const closest = Object.keys(vulgarFractions).reduce((acc, key) => {
+    if (Math.abs(fraction - key) < Math.abs(fraction - acc)) {
+      return key;
+    }
+    return acc;
+  }, 0);
+  return vulgarFractions[closest];
+}
+
+export function roundToConfidenceInterval(total, samples = total, maxPrecision = Infinity) {
+  const max = total + samplingError(total, samples);
+  const min = total - samplingError(total, samples);
+  // determine the number of significant digits that max and min have in common
+  // e.g. 3.14 and 3.16 have 2 significant digits in common
+  const maxStr = max.toPrecision(`${max}`.length);
+  const minStr = min.toPrecision(`${min}`.length);
+  const common = Math.min(maxStr.split('').reduce((acc, digit, i) => {
+    if (digit === minStr[i]) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0), Number.isNaN(maxPrecision) ? Infinity : maxPrecision);
+  const precision = Math.max(2, common);
+  // we don't want to show too many zeros, so we use k, m, g, etc.
+  const exponentSuffixes = ['k', 'm', 'g', 't', 'p'];
+  const { value, exponent } = exponentSuffixes.reduce((acc, suffix) => {
+    if (acc.value >= 1000) {
+      return { value: acc.value / 1000, exponent: suffix };
+    }
+    return acc;
+  }, { value: total, exponent: '' });
+
+  const nf = new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: precision,
+  });
+
+  const rounded = nf.format(value) + exponent;
+  if (
+    samples < total
+    && rounded.match(/\.[\d]+/)
+    && rounded.match(/\.[\d]+/)[0].length > common) {
+    return rounded.replace(/\.[\d]+/, (match) => {
+      const fraction = Number(`0.${match.slice(1)}`);
+      // find the closest vulgar fraction
+      return findNearestVulgarFraction(fraction);
+    });
+  }
+  return rounded;
+}
