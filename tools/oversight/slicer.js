@@ -52,27 +52,38 @@ function setDomain(domain, key) {
 
 /* update UX */
 export function updateKeyMetrics(keyMetrics) {
-  document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
-  if (keyMetrics.visits > 0) {
-    const pageViewsExtra = document.createElement('span');
-    pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+  document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
+  document.querySelector('#pageviews p number-format').setAttribute('sample-size', dataChunks.totals.pageViews.count);
+  if (dataChunks.totals.visits.sum > 0) {
+    const pageViewsExtra = document.createElement('number-format');
+    pageViewsExtra.textContent = (keyMetrics.pageViews / keyMetrics.visits);
+    pageViewsExtra.setAttribute('precision', 1);
     pageViewsExtra.className = 'extra';
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
   }
 
-  document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
-  if (keyMetrics.visits > 0) {
-    const visitsExtra = document.createElement('span');
-    visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
+  document.querySelector('#visits p number-format').textContent = dataChunks.totals.visits.sum;
+  document.querySelector('#visits p number-format').setAttribute('sample-size', dataChunks.totals.visits.count);
+  document.querySelector('#visits p number-format').setAttribute('total', dataChunks.totals.pageViews.sum);
+  if (dataChunks.totals.visits.sum > 0) {
+    const visitsExtra = document.createElement('number-format');
+    visitsExtra.textContent = (100 * dataChunks.totals.bounces.sum) / dataChunks.totals.visits.sum;
+    visitsExtra.setAttribute('precision', 1);
+    visitsExtra.setAttribute('total', 100);
     visitsExtra.className = 'extra';
     document.querySelector('#visits p').appendChild(visitsExtra);
   }
 
-  document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
-  if (keyMetrics.visits > 0) {
-    const conversionsExtra = document.createElement('span');
-    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
-    conversionsExtra.textContent = toHumanReadable(conversionRate);
+  document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
+  if (dataChunks.totals.visits.sum > 0) {
+    const conversionsExtra = document.createElement('number-format');
+    conversionsExtra.textContent = computeConversionRate(
+      dataChunks.totals.conversions.sum,
+      dataChunks.totals.visits.sum,
+    );
+    // this is a bit of fake precision, but it's good enough for now
+    conversionsExtra.setAttribute('precision', 2);
+    conversionsExtra.setAttribute('total', 100);
     conversionsExtra.className = 'extra';
     document.querySelector('#conversions p').appendChild(conversionsExtra);
   }
@@ -238,14 +249,10 @@ export async function draw() {
   await herochart.draw();
 
   updateKeyMetrics({
-    pageViews: dataChunks.totals.pageViews.sum,
     lcp: dataChunks.totals.lcp.percentile(75),
     cls: dataChunks.totals.cls.percentile(75),
     inp: dataChunks.totals.inp.percentile(75),
     ttfb: dataChunks.totals.ttfb.percentile(75),
-    conversions: dataChunks.totals.conversions.sum,
-    visits: dataChunks.totals.visits.sum,
-    bounces: dataChunks.totals.bounces.sum,
   });
 
   const focus = params.get('focus');
