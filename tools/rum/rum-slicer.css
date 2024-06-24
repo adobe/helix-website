@@ -576,9 +576,22 @@ vitals-facet label::before {
   opacity: 1;
 }
 
+#facets fieldset label span.extra {
+  display: none;
+}
+
+#facets fieldset label span.extra.interesting {
+  display: inline;
+  opacity: 0.8;
+}
+
+#facets fieldset label span.extra.significant {
+  display: inline;
+  opacity: 0.9;
+}
+
 #facets fieldset label span.count::before,
-#facets fieldset label span.value::before,
-#facets fieldset label span.extra::before {
+#facets fieldset label span.value::before {
   content: ' (';
 }
 
@@ -587,11 +600,11 @@ vitals-facet label::before {
 }
 
 #facets fieldset label span.count::after, #facets fieldset label span.value::after {
-  content: ')';
+  content: ') ';
 }
 
 #facets fieldset label span.extra::after {
-  content: '%)';
+  content: '% conversion rate';
 }
 
 #facets literal-facet label span.value::after {

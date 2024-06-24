@@ -155,6 +155,61 @@ class InterpolatedAggregate {
     return value;
   }
 }
+
+function standardNormalCDF(x) {
+  // Approximation of the standard normal CDF using the Hastings algorithm
+  const t = 1 / (1 + 0.2316419 * Math.abs(x));
+  const d = 0.3989423 * Math.exp((-x * x) / 2);
+  const prob = d * t * (0.3193815
+    + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+
+  if (x > 0) {
+    return 1 - prob;
+  }
+  return prob;
+}
+
+function getZTestPValue(Z) {
+  // Approximate the p-value using the standard normal distribution
+  // This is a simplified approximation and may not be as accurate as using a
+  // Z-table or more advanced methods
+  const absZ = Math.abs(Z);
+  const pValue = 2 * (1 - standardNormalCDF(absZ));
+  return pValue;
+}
+
+/**
+ * Performs a Z Test between two proportions. This test assumes that the data
+ * is normally distributed and will calculate the p-value for the difference
+ * between the two proportions.
+ * @param {number} sample1 the sample size of the first group (e.g. total number of visitors)
+ * @param {number} conversions1 the number of conversions in the first group
+ * @param {number} sample2 the sample size of the second group
+ * @param {number} conversions2 the number of conversions in the second group
+ * @returns {number} the p-value, a value between 0 and 1
+ */
+export function zTestTwoProportions(sample1, conversions1, sample2, conversions2) {
+  // Calculate the conversion rates
+  const p1 = conversions1 / sample1;
+  const p2 = conversions2 / sample2;
+
+  if (p1 === p2) {
+    return 1;
+  }
+
+  // Calculate the pooled proportion
+  const p = (conversions1 + conversions2) / (sample1 + sample2);
+
+  // Calculate the standard error
+  const SE = Math.sqrt(p * (1 - p) * (1 / sample1 + 1 / sample2));
+
+  // Calculate the Z-score
+  const Z = (p1 - p2) / SE;
+
+  // Calculate the p-value
+  return getZTestPValue(Z);
+}
+
 /**
  * The error function, also known as the Gauss error function.
  * @param {number} x the value to calculate the error function for
@@ -187,7 +242,7 @@ function erf(x1) {
  * @param {number[]} right the second data set
  * @returns {number} the p-value, a value between 0 and 1
  */
-export function pValue(left, right) {
+export function tTest(left, right) {
   const meanLeft = left.reduce((acc, value) => acc + value, 0) / left.length;
   const meanRight = right.reduce((acc, value) => acc + value, 0) / right.length;
   const varianceLeft = left.reduce((acc, value) => acc + (value - meanLeft) ** 2, 0) / left.length;

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { readFileSync } from 'node:fs';
-import { DataChunks, addCalculatedProps } from '../cruncher.js';
+import { DataChunks, addCalculatedProps, zTestTwoProportions } from '../cruncher.js';
 
 describe('cruncher.js helper functions', () => {
   it('addCalculatedProps()', () => {
@@ -151,6 +151,11 @@ describe('cruncher.js helper functions', () => {
     assert.equal(after.visit, undefined);
     assert.equal(after.conversion, undefined);
     assert.equal(after.cwvINP, 24);
+  });
+
+  it('zTestTwoProportions()', () => {
+    const p = zTestTwoProportions(100, 1000, 100, 1000);
+    assert.equal(p, 1);
   });
 });
 
