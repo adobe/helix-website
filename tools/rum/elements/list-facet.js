@@ -237,7 +237,7 @@ export default class ListFacet extends HTMLElement {
             total: entry.metrics.visits.sum / avgWeight,
             conversions: entry.metrics.conversions.sum / avgWeight,
           }, {
-            total: this.dataChunks.totals.pageViews.sum / avgWeight,
+            total: this.dataChunks.totals.visits.sum / avgWeight,
             conversions: this.dataChunks.totals.conversions.sum / avgWeight,
           });
 
