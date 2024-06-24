@@ -56,7 +56,7 @@ export function updateKeyMetrics() {
   if (dataChunks.totals.visits.sum > 0) {
     const pageViewsExtra = document.querySelector('#pageviews p number-format.extra') || document.createElement('number-format');
     pageViewsExtra.textContent = dataChunks.totals.pageViews.sum / dataChunks.totals.visits.sum;
-    pageViewsExtra.setAttribute('precision', 1);
+    pageViewsExtra.setAttribute('precision', 2);
     pageViewsExtra.className = 'extra';
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
   }

@@ -15,7 +15,7 @@ export default class NumberFormat extends HTMLElement {
   updateState() {
     // stop observing while updating
     this.mutationObserver.disconnect();
-    const number = parseFloat(this.textContent);
+    const number = parseFloat(this.getAttribute('title')) || parseFloat(this.textContent, 10);
     const sampleSize = parseInt(this.getAttribute('sample-size'), 10);
     const total = parseInt(this.getAttribute('total'), 10);
     const precision = parseInt(this.getAttribute('precision'), 10);
