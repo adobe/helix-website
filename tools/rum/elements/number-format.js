@@ -19,6 +19,7 @@ export default class NumberFormat extends HTMLElement {
     const sampleSize = parseInt(this.getAttribute('sample-size'), 10);
     const total = parseInt(this.getAttribute('total'), 10);
     const precision = parseInt(this.getAttribute('precision'), 10);
+    const fuzzy = this.getAttribute('fuzzy') !== 'false';
     if (Number.isNaN(number)) {
       this.textContent = '-';
     } else {
@@ -26,6 +27,7 @@ export default class NumberFormat extends HTMLElement {
         number,
         Number.isNaN(sampleSize) ? 0 : sampleSize,
         precision,
+        fuzzy,
       );
 
       // set the title to the original number

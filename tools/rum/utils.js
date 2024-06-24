@@ -226,6 +226,9 @@ export function computeConversionRate(conversions, visits) {
  * @param {number} samples the number of successful trials (i.e. samples)
  */
 export function samplingError(total, samples) {
+  if (samples === 0) {
+    return 0;
+  }
   const weight = total / samples;
 
   const variance = weight * weight * samples;
@@ -261,7 +264,12 @@ export function findNearestVulgarFraction(fraction) {
   return vulgarFractions[closest];
 }
 
-export function roundToConfidenceInterval(total, samples = total, maxPrecision = Infinity) {
+export function roundToConfidenceInterval(
+  total,
+  samples = total,
+  maxPrecision = Infinity,
+  fuzzy = true,
+) {
   const max = total + samplingError(total, samples);
   const min = total - samplingError(total, samples);
   // determine the number of significant digits that max and min have in common
@@ -289,8 +297,8 @@ export function roundToConfidenceInterval(total, samples = total, maxPrecision =
   });
 
   const rounded = nf.format(value) + exponent;
-  if (
-    samples < total
+  if (fuzzy
+    && samples < total
     && rounded.match(/\.[\d]+/)
     && rounded.match(/\.[\d]+/)[0].length > common) {
     return rounded.replace(/\.[\d]+/, (match) => {
