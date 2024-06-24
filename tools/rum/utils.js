@@ -283,7 +283,7 @@ export function roundToConfidenceInterval(
     return acc;
   }, 0), Number.isNaN(maxPrecision) ? Infinity : maxPrecision);
   const precision = Math.max(
-    Math.min(2, maxPrecision),
+    Math.min(2, Number.isNaN(maxPrecision) ? Infinity : maxPrecision),
     common,
   );
   // we don't want to show too many zeros, so we use k, m, g, etc.
