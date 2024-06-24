@@ -234,7 +234,7 @@ export default class ListFacet extends HTMLElement {
             / this.dataChunks.totals.pageViews.count;
 
           addSignificanceFlag(conversionspan, {
-            total: entry.metrics.pageViews.sum / avgWeight,
+            total: entry.metrics.visits.sum / avgWeight,
             conversions: entry.metrics.conversions.sum / avgWeight,
           }, {
             total: this.dataChunks.totals.pageViews.sum / avgWeight,
