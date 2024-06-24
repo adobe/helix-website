@@ -6,7 +6,6 @@ import {
   parseSearchParams,
   isKnownFacet,
   scoreCWV,
-  toHumanReadable,
   computeConversionRate,
 } from './utils.js';
 
@@ -51,12 +50,12 @@ function setDomain(domain, key) {
 }
 
 /* update UX */
-export function updateKeyMetrics(keyMetrics) {
+export function updateKeyMetrics() {
   document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
   document.querySelector('#pageviews p number-format').setAttribute('sample-size', dataChunks.totals.pageViews.count);
   if (dataChunks.totals.visits.sum > 0) {
     const pageViewsExtra = document.createElement('number-format');
-    pageViewsExtra.textContent = (keyMetrics.pageViews / keyMetrics.visits);
+    pageViewsExtra.textContent = dataChunks.totals.pageViews.sum / dataChunks.totals.visits.sum;
     pageViewsExtra.setAttribute('precision', 1);
     pageViewsExtra.className = 'extra';
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
@@ -75,6 +74,8 @@ export function updateKeyMetrics(keyMetrics) {
   }
 
   document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
+  document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+  document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
   if (dataChunks.totals.visits.sum > 0) {
     const conversionsExtra = document.createElement('number-format');
     conversionsExtra.textContent = computeConversionRate(
@@ -88,17 +89,17 @@ export function updateKeyMetrics(keyMetrics) {
     document.querySelector('#conversions p').appendChild(conversionsExtra);
   }
 
-  const lcpElem = document.querySelector('#lcp p');
-  lcpElem.textContent = `${toHumanReadable(keyMetrics.lcp / 1000)} s`;
-  lcpElem.closest('li').className = `score-${scoreCWV(keyMetrics.lcp, 'lcp')}`;
+  const lcpElem = document.querySelector('#lcp p number-format');
+  lcpElem.textContent = dataChunks.totals.lcp.percentile(75) / 1000;
+  lcpElem.closest('li').className = `score-${scoreCWV(dataChunks.totals.lcp.percentile(75), 'lcp')}`;
 
-  const clsElem = document.querySelector('#cls p');
-  clsElem.textContent = `${toHumanReadable(keyMetrics.cls)}`;
-  clsElem.closest('li').className = `score-${scoreCWV(keyMetrics.cls, 'cls')}`;
+  const clsElem = document.querySelector('#cls p number-format');
+  clsElem.textContent = dataChunks.totals.cls.percentile(75);
+  clsElem.closest('li').className = `score-${scoreCWV(dataChunks.totals.cls.percentile(75), 'cls')}`;
 
-  const inpElem = document.querySelector('#inp p');
-  inpElem.textContent = `${toHumanReadable(keyMetrics.inp / 1000)} s`;
-  inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
+  const inpElem = document.querySelector('#inp p number-format');
+  inpElem.textContent = dataChunks.totals.inp.percentile(75) / 1000;
+  inpElem.closest('li').className = `score-${scoreCWV(dataChunks.totals.inp.percentile(75), 'inp')}`;
 }
 
 const conversionSpec = Object.keys(parseConversionSpec()).length
@@ -248,12 +249,7 @@ export async function draw() {
 
   await herochart.draw();
 
-  updateKeyMetrics({
-    lcp: dataChunks.totals.lcp.percentile(75),
-    cls: dataChunks.totals.cls.percentile(75),
-    inp: dataChunks.totals.inp.percentile(75),
-    ttfb: dataChunks.totals.ttfb.percentile(75),
-  });
+  updateKeyMetrics();
 
   const focus = params.get('focus');
   const mode = params.get('metrics');

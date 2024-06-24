@@ -180,6 +180,11 @@ main .key-metrics ul > #visits p .extra::after {
   content: '% bounces)';
 }
 
+main .key-metrics ul > #lcp p number-format::after,
+main .key-metrics ul > #inp p number-format::after{
+  content: 's';
+}
+
 .key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;
