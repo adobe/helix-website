@@ -165,7 +165,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === '404')
         .length === 0,
-      next: ['load', 'partial', 'aborted'],
+      next: ['nocontent', 'initial', 'engaged', 'experiment'],
     },
     404: {
       label: '404',
@@ -174,39 +174,6 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === '404')
         .length > 0,
-    },
-  },
-  {
-    label: 'loadtype',
-    /*
-     * 4.  How is the page being loaded
-     *   - partial (no lazy or lcp fired)
-     *   - complete
-     *   - aborted (leave before complete, no more events)
-     */
-    load: {
-      color: cssVariable('--spectrum-green-700'),
-      label: 'Complete Load',
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
-        .length > 0,
-      next: ['nocontent', 'initial', 'engaged', 'experiment'],
-    },
-    partial: {
-      color: cssVariable('--spectrum-orange-700'),
-      label: 'Partial Load',
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
-        .length === 0,
-      next: ['nocontent', 'initial', 'engaged', 'experiment'],
-    },
-    aborted: {
-      color: cssVariable('--spectrum-gray-700'),
-      label: 'Aborted Load',
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'top')
-        .length === 0,
-      next: [],
     },
   },
   {
