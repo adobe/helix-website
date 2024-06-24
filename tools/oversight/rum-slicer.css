@@ -187,6 +187,10 @@ main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
   content: 's';
 }
 
+main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
+  content: '';
+}
+
 .key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;

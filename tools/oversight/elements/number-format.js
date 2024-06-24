@@ -22,6 +22,7 @@ export default class NumberFormat extends HTMLElement {
     const fuzzy = this.getAttribute('fuzzy') !== 'false';
     if (Number.isNaN(number)) {
       this.textContent = '-';
+      this.setAttribute('title', 'no data available');
     } else {
       this.textContent = roundToConfidenceInterval(
         number,
