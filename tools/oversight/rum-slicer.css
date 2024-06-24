@@ -622,6 +622,11 @@ vitals-facet label::before {
   content: '% conversion rate';
 }
 
+#facets fieldset label number-format[title="0"].extra::after {
+  content: ' conversions';
+}
+
+
 #facets literal-facet label span.value::after {
   content: '';
 }
