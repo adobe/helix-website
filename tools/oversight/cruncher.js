@@ -234,6 +234,26 @@ function erf(x1) {
   return sign * y;
 }
 
+function compute(data) {
+  let sum = 0;
+  let variance = 0;
+
+  // Calculate sum
+  for (let i = 0; i < data.length; i += 1) {
+    sum += data[i];
+  }
+
+  const mean = sum / data.length;
+
+  // Calculate variance
+  for (let i = 0; i < data.length; i += 1) {
+    variance += (data[i] - mean) ** 2;
+  }
+
+  variance /= data.length;
+
+  return { mean, variance };
+}
 /**
  * Performs a significance test on the data. The test assumes
  * that the data is normally distributed and will calculate
@@ -243,11 +263,8 @@ function erf(x1) {
  * @returns {number} the p-value, a value between 0 and 1
  */
 export function tTest(left, right) {
-  const meanLeft = left.reduce((acc, value) => acc + value, 0) / left.length;
-  const meanRight = right.reduce((acc, value) => acc + value, 0) / right.length;
-  const varianceLeft = left.reduce((acc, value) => acc + (value - meanLeft) ** 2, 0) / left.length;
-  const varianceRight = right
-    .reduce((acc, value) => acc + (value - meanRight) ** 2, 0) / right.length;
+  const { mean: meanLeft, variance: varianceLeft } = compute(left);
+  const { mean: meanRight, variance: varianceRight } = compute(right);
   const pooledVariance = (varianceLeft + varianceRight) / 2;
   const tValue = (meanLeft - meanRight) / Math
     .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
