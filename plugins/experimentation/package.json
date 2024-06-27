@@ -1,13 +1,11 @@
 {
   "name": "@adobe/aem-experimentation",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
     "lint:js": "eslint src",
     "lint:css": "stylelint src/**/*.css",
-    "lint": "npm run lint:js && npm run lint:css",
-    "start": "http-server . -p 3000",
-    "test": "playwright test"
+    "lint": "npm run lint:js && npm run lint:css"
   },
   "repository": {
     "type": "git",
@@ -30,18 +28,10 @@
   "homepage": "https://github.com/adobe/aem-experimentation#readme",
   "devDependencies": {
     "@babel/eslint-parser": "7.22.15",
-    "@playwright/test": "1.44.0",
-    "@semantic-release/changelog": "6.0.3",
-    "@semantic-release/git": "10.0.1",
-    "@semantic-release/npm": "12.0.1",
     "eslint": "8.48.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.28.1",
-    "http-server": "14.1.1",
-    "monocart-coverage-reports": "2.8.2",
-    "semantic-release": "23.1.1",
     "stylelint": "15.10.3",
     "stylelint-config-standard": "34.0.0"
-  },
-  "private": true
+  }
 }
