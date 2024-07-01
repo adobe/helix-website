@@ -7,15 +7,19 @@ import { addCalculatedProps } from './cruncher.js';
 
 export default class DataLoader {
   constructor() {
-    this.cache = new Map();
     this.API_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
     this.DOMAIN = 'www.thinktanked.org';
     this.DOMAIN_KEY = '';
     this.granularity = 'month';
   }
 
-  flush() {
-    this.cache.clear();
+  async init() {
+    this.cache = await caches.open('bundles');
+  }
+
+  async flush() {
+    await caches.delete('bundles');
+    this.cache = await caches.open('bundles');
   }
 
   set domainKey(key) {
@@ -47,6 +51,17 @@ export default class DataLoader {
     return u.toString();
   }
 
+  async fetchBundles(apiRequestURL) {
+    const cacheResponse = await this.cache.match(apiRequestURL);
+    if (cacheResponse) {
+      return cacheResponse;
+    }
+    const networkResponse = await fetch(apiRequestURL);
+    const networkResponseClone = networkResponse.clone();
+    this.cache.put(apiRequestURL, networkResponseClone);
+    return networkResponse;
+  }
+
   async fetchUTCMonth(utcISOString) {
     this.granularity = 'month';
     const [date] = utcISOString.split('T');
@@ -54,7 +69,7 @@ export default class DataLoader {
     dateSplits.pop();
     const monthPath = dateSplits.join('/');
     const apiRequestURL = this.apiURL(monthPath);
-    const resp = await fetch(apiRequestURL);
+    const resp = await this.fetchBundles(apiRequestURL);
     const json = await resp.json();
     const { rumBundles } = json;
     rumBundles.forEach((bundle) => addCalculatedProps(bundle));
@@ -66,7 +81,7 @@ export default class DataLoader {
     const [date] = utcISOString.split('T');
     const datePath = date.split('-').join('/');
     const apiRequestURL = this.apiURL(datePath);
-    const resp = await fetch(apiRequestURL);
+    const resp = await this.fetchBundles(apiRequestURL);
     const json = await resp.json();
     const { rumBundles } = json;
     rumBundles.forEach((bundle) => addCalculatedProps(bundle));
@@ -79,7 +94,7 @@ export default class DataLoader {
     const datePath = date.split('-').join('/');
     const hour = time.split(':')[0];
     const apiRequestURL = this.apiURL(datePath, hour);
-    const resp = await fetch(apiRequestURL);
+    const resp = await this.fetchBundles(apiRequestURL);
     const json = await resp.json();
     const { rumBundles } = json;
     rumBundles.forEach((bundle) => addCalculatedProps(bundle));
