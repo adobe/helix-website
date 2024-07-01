@@ -48,24 +48,30 @@
  * @returns {Bundle} a bundle with additional properties
  */
 export function addCalculatedProps(bundle) {
-  bundle.events.forEach((e) => {
+  for (let i = 0; i < bundle.events.length; i += 1) {
+    const e = bundle.events[i];
     if (e.checkpoint === 'enter') {
       bundle.visit = true;
       if (e.source === '') e.source = '(direct)';
+      break;
     }
     if (e.checkpoint === 'cwv-inp') {
       bundle.cwvINP = e.value;
+      break;
     }
     if (e.checkpoint === 'cwv-lcp') {
       bundle.cwvLCP = Math.max(e.value || 0, bundle.cwvLCP || 0);
+      break;
     }
     if (e.checkpoint === 'cwv-cls') {
       bundle.cwvCLS = Math.max(e.value || 0, bundle.cwvCLS || 0);
+      break;
     }
     if (e.checkpoint === 'cwv-ttfb') {
       bundle.cwvTTFB = e.value;
+      break;
     }
-  });
+  }
   return bundle;
 }
 
