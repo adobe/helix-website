@@ -256,17 +256,20 @@ export async function draw() {
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
-async function loadData(scope) {
+async function loadData(scope, chart) {
   const params = new URL(window.location.href).searchParams;
   const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
+  const startDate = params.get('startDate') ? `${params.get('startDate')}T00:00:00` : null;
 
-  if (scope === 'week') {
+  if (startDate && endDate) {
+    dataChunks.load(await loader.fetchDateRange(startDate, endDate));
+    chart.config.startDate = startDate;
+    chart.config.endDate = endDate;
+  } else if (scope === 'week') {
     dataChunks.load(await loader.fetchLastWeek(endDate));
-  }
-  if (scope === 'month') {
+  } else if (scope === 'month') {
     dataChunks.load(await loader.fetchPrevious31Days(endDate));
-  }
-  if (scope === 'year') {
+  } else if (scope === 'year') {
     dataChunks.load(await loader.fetchPrevious12Months(endDate));
   }
 
@@ -337,7 +340,7 @@ const io = new IntersectionObserver((entries) => {
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
-      await loadData(view);
+      await loadData(view, herochart);
       herochart.draw();
     });
 
@@ -353,7 +356,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view);
+      loadData(view, herochart);
     }
 
     elems.filterInput.addEventListener('input', () => {

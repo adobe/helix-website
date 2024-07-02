@@ -10,6 +10,10 @@ export default class AbstractChart {
     this.chartConfig = config;
   }
 
+  get config() {
+    return this.chartConfig || {};
+  }
+
   render() {
     throw new Error('render method must be implemented', this);
   }

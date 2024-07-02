@@ -57,11 +57,15 @@ export default class SkylineChart extends AbstractChart {
     groupFn.fillerFn = (existing) => {
       const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
       // set start date depending on the unit
-      const startDate = new Date(endDate);
+      let startDate = new Date(endDate);
       // roll back to beginning of time
       if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
       if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
       if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+      if (this.chartConfig.startDate) {
+        // nevermind, we have a start date in the config, let's use that
+        startDate = new Date(this.chartConfig.startDate);
+      }
       const slots = new Set(existing);
       const slotTime = new Date(startDate);
       // return Array.from(slots);
@@ -525,7 +529,7 @@ export default class SkylineChart extends AbstractChart {
 
     const config = configs[view];
 
-    this.config = config;
+    this.config = { ...config, ...this.config };
     this.defineSeries();
 
     // group by date, according to the chart config
