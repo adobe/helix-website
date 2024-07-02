@@ -3,6 +3,10 @@
  * filtering, aggregating, and summarizing the data.
  */
 /* eslint-disable max-classes-per-file */
+// eslint-disable-next-line camelcase
+import init, { t_test } from './enigma.js';
+
+await init();
 /**
  * @typedef {Object} RawEvent - a raw RUM event
  * @property {string} checkpoint - the name of the event that happened
@@ -276,6 +280,18 @@ export function tTest(left, right) {
     .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
   const p = 1 - (0.5 + 0.5 * erf(tValue / Math.sqrt(2)));
   return p;
+}
+
+/**
+ * Performs a significance test on the data. The test assumes
+ * that the data is normally distributed and will calculate
+ * the p-value for the difference between the two data sets.
+ * @param {number[]} left the first data set
+ * @param {number[]} right the second data set
+ * @returns {number} the p-value, a value between 0 and 1
+ */
+export function tTestWasm(left, right) {
+  return t_test(new Uint32Array(left), new Uint32Array(right));
 }
 
 class Facet {
