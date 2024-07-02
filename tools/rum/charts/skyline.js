@@ -8,7 +8,7 @@ import {
   INTERPOLATION_THRESHOLD,
   scoreBundle,
   scoreCWV,
-  // toHumanReadable,
+  toHumanReadable,
   cwvInterpolationFn,
   truncate,
   simpleCWVInterpolationFn,
@@ -18,21 +18,6 @@ import {
 import AbstractChart from './chart.js';
 
 Chart.register(TimeScale, LinearScale, ...registerables);
-
-/**
- * Returns a human readable number
- * @param {Number} num a number
- * @param {Number} precision the number of significant digits
- * @returns {String} a human readable number
- */
-function toHumanReadable(num, precision = 2) {
-  if (Number.isNaN(num)) return '-';
-  const formatter = new Intl.NumberFormat('en-US', {
-    notation: 'compact',
-    maximumSignificantDigits: precision,
-  });
-  return formatter.format(num).toLocaleLowerCase();
-}
 
 /**
  * The SkylineChart is a unique type of multi-series bar chart that

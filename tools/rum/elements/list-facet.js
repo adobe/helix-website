@@ -1,5 +1,5 @@
 import {
-  computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
+  computeConversionRate, escapeHTML, scoreCWV,
 } from '../utils.js';
 import { tTest, zTestTwoProportions } from '../cruncher.js';
 
@@ -72,19 +72,19 @@ export default class ListFacet extends HTMLElement {
           let lcp = '-';
           if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
             const lcpValue = entry.metrics.lcp.percentile(75);
-            lcp = `${toHumanReadable(lcpValue / 1000)} s`;
+            lcp = `${(lcpValue / 1000)} s`;
           }
 
           let cls = '-';
           if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
             const clsValue = entry.metrics.cls.percentile(75);
-            cls = `${toHumanReadable(clsValue)}`;
+            cls = `${(clsValue)}`;
           }
 
           let inp = '-';
           if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
             const inpValue = entry.metrics.inp.percentile(75);
-            inp = `${toHumanReadable(inpValue / 1000)} s`;
+            inp = `${(inpValue / 1000)} s`;
           }
 
           tsv.push(`${entry.value}\t${entry.metrics.pageViews.sum}\t${lcp}\t${cls}\t${inp}`);
@@ -219,13 +219,15 @@ export default class ListFacet extends HTMLElement {
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
-          const countspan = document.createElement('span');
+          const countspan = document.createElement('number-format');
           countspan.className = 'count';
-          countspan.textContent = toHumanReadable(entry.metrics.pageViews.sum);
-          countspan.title = entry.metrics.pageViews.sum;
+          countspan.textContent = entry.metrics.pageViews.sum;
+          countspan.setAttribute('sample-size', entry.metrics.pageViews.count);
+          countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
+          countspan.setAttribute('fuzzy', 'false');
           const valuespan = this.createValueSpan(entry);
 
-          const conversionspan = document.createElement('span');
+          const conversionspan = document.createElement('number-format');
           conversionspan.className = 'extra';
 
           // we need to divide the totals by average weight
@@ -244,8 +246,8 @@ export default class ListFacet extends HTMLElement {
           const conversions = entry.metrics.conversions.sum;
           const visits = entry.metrics.visits.sum;
           const conversionRate = computeConversionRate(conversions, visits);
-          conversionspan.textContent = toHumanReadable(conversionRate);
-          conversionspan.title = entry.metrics.conversions.sum;
+          conversionspan.textContent = conversionRate;
+          conversionspan.setAttribute('precision', 2);
 
           label.append(valuespan, countspan, conversionspan);
 
@@ -347,14 +349,17 @@ export default class ListFacet extends HTMLElement {
     let cwv = '-';
     let score = '';
     const li = document.createElement('li');
+    const nf = document.createElement('number-format');
+    nf.setAttribute('precision', 2);
+    nf.setAttribute('fuzzy', 'false');
     const fillEl = async () => {
       li.title = metricName.toUpperCase();
       if (entry.metrics[metricName] && entry.metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
         const value = entry.metrics[metricName].percentile(75);
-        cwv = `${toHumanReadable(value / (metricName === 'cls' ? 1 : 1000))}`;
-        if (metricName === 'inp' || metricName === 'lcp') {
-          cwv += ' s';
-        }
+        cwv = metricName !== 'cls'
+          ? value / 1000
+          : (Math.round(value * 100) / 100);
+        nf.textContent = cwv;
         score = scoreCWV(value, metricName);
         addSignificanceFlag(li, entry.metrics[metricName], this.dataChunks.totals[metricName]);
         li.title += ` - based on ${entry.metrics[metricName].count} samples`;
@@ -362,7 +367,7 @@ export default class ListFacet extends HTMLElement {
         li.title += ` - not enough samples (${entry.metrics[metricName].count})`;
       }
       li.classList.add(`score-${score}`);
-      li.textContent = cwv;
+      li.append(nf);
     };
     // fill the element, but don't wait for it
     fillEl();

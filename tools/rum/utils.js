@@ -38,28 +38,23 @@ export function scoreCWV(value, name) {
   return scoreValue(value, ...limits[name]);
 }
 export const UA_KEY = 'userAgent';
-export function toHumanReadable(num) {
-  const dp = 3;
-  let number = num;
-  const thresh = 1000;
 
-  if (Math.abs(num) < thresh) {
-    const precision = (Math.log10(number) < 0) ? 2 : (dp - 1) - Math.floor(Math.log10(number));
-    return `${number.toFixed(precision)}`;
-  }
+/**
+ * Returns a human readable number
+ * @param {Number} num a number
+ * @param {Number} precision the number of significant digits
+ * @returns {String} a human readable number
+ */
+export function toHumanReadable(num, precision = 2) {
+  if (Number.isNaN(num)) return '-';
+  const formatter = new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumSignificantDigits: precision,
+  });
+  return formatter.format(num).toLocaleLowerCase();
+}
 
-  const units = ['k', 'm', 'g', 't', 'p'];
-  let u = -1;
-  const r = 10 ** dp;
-
-  do {
-    number /= thresh;
-    u += 1;
-  } while (Math.round(Math.abs(number) * r) / r >= thresh && u < units.length - 1);
-
-  const precision = (dp - 1) - Math.floor(Math.log10(number));
-  return `${number.toFixed(precision)}${units[u]}`;
-} export function toISOStringWithTimezone(date) {
+export function toISOStringWithTimezone(date) {
   // Pad a number to 2 digits
   const pad = (n) => `${Math.floor(Math.abs(n))}`.padStart(2, '0');
 
@@ -215,4 +210,77 @@ export function computeConversionRate(conversions, visits) {
     return conversionRate;
   }
   return 100;
+}
+
+/**
+ * Determines the sampling error based on a binomial distribution.
+ * Each sample is a Bernoulli trial, where the probability of success is the
+ * proportion of the total population that has the attribute of interest.
+ * The sampling error is calculated as the standard error of the proportion.
+ * @param {number} total the expectation value of the total population
+ * @param {number} samples the number of successful trials (i.e. samples)
+ */
+export function samplingError(total, samples) {
+  if (samples === 0) {
+    return 0;
+  }
+  const weight = total / samples;
+
+  const variance = weight * weight * samples;
+  const standardError = Math.sqrt(variance);
+  const marginOfError = 1.96 * standardError;
+  // round up to the nearest integer
+  return Math.round(marginOfError);
+}
+
+const vulgarFractions = {
+  0: '0',
+  0.125: '⅛',
+  0.2: '⅕',
+  0.25: '¼',
+  0.333: '⅓',
+  0.375: '⅜',
+  0.5: '½',
+  0.625: '⅝',
+  0.666: '⅔',
+  0.75: '¾',
+  0.8: '⅘',
+  0.875: '⅞',
+  1: '1',
+};
+
+export function findNearestVulgarFraction(fraction) {
+  const closest = Object.keys(vulgarFractions).reduce((acc, key) => {
+    if (Math.abs(fraction - key) < Math.abs(fraction - acc)) {
+      return key;
+    }
+    return acc;
+  }, 0);
+  return vulgarFractions[closest];
+}
+
+export function roundToConfidenceInterval(
+  total,
+  samples = total,
+  maxPrecision = Infinity,
+) {
+  const max = total + samplingError(total, samples);
+  const min = total - samplingError(total, samples);
+  // determine the number of significant digits that max and min have in common
+  // e.g. 3.14 and 3.16 have 2 significant digits in common
+  const maxStr = max.toPrecision(`${max}`.length);
+  const minStr = min.toPrecision(`${min}`.length);
+  const common = Math.min(maxStr.split('').reduce((acc, digit, i) => {
+    if (digit === minStr[i]) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0), Number.isNaN(maxPrecision) ? Infinity : maxPrecision);
+  const precision = Math.max(
+    Math.min(2, Number.isNaN(maxPrecision) ? Infinity : maxPrecision),
+    common,
+  );
+
+  const rounded = toHumanReadable(total, precision);
+  return rounded;
 }

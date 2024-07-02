@@ -158,26 +158,41 @@ main .key-metrics ul > * p {
   margin: 8px 0;
 }
 
-main .key-metrics ul > * p span.extra {
+main .key-metrics ul > * p .extra {
   font-weight: normal;
   font-size: 80%;
   opacity: 0.6;
 }
 
-main .key-metrics ul > * p span.extra::before {
+main .key-metrics ul > * p .extra::before {
   content: ' (';
 }
 
-main .key-metrics ul > #pageviews p span.extra::after {
+main .key-metrics ul > #pageviews p .extra::after {
   content: ' per visit)';
 }
 
-main .key-metrics ul > #conversions p span.extra::after {
+main .key-metrics ul > #conversions p .extra::after {
   content: '%)';
 }
 
-main .key-metrics ul > #visits p span.extra::after {
+main .key-metrics ul > #visits p .extra::after {
   content: '% bounces)';
+}
+
+main .key-metrics ul > #lcp p number-format::after,
+main .key-metrics ul > #inp p number-format::after,
+main facet-sidebar ul.cwv > li[title^="LCP"] number-format::after,
+main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
+  content: 's';
+}
+
+main .key-metrics ul > #lcp number-format.extra::after {
+  content: 's caused by TTFB)'
+}
+
+main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
+  content: '';
 }
 
 .key-metrics > ul > * {
@@ -568,29 +583,29 @@ vitals-facet label::before {
   word-break: break-all;
 }
 
-#facets fieldset label span.count, #facets fieldset label span.extra {
+#facets fieldset label .count, #facets fieldset label .extra {
   opacity: 0.6;
 }
 
-#facets fieldset div:hover span.count, #facets fieldset div:hover span.extra {
+#facets fieldset div:hover .count, #facets fieldset div:hover .extra {
   opacity: 1;
 }
 
-#facets fieldset label span.extra {
+#facets fieldset label .extra {
   display: none;
 }
 
-#facets fieldset label span.extra.interesting {
+#facets fieldset label .extra.interesting {
   display: inline;
   opacity: 0.8;
 }
 
-#facets fieldset label span.extra.significant {
+#facets fieldset label .extra.significant {
   display: inline;
   opacity: 0.9;
 }
 
-#facets fieldset label span.count::before,
+#facets fieldset label .count::before,
 #facets fieldset label span.value::before {
   content: ' (';
 }
@@ -599,13 +614,18 @@ vitals-facet label::before {
   content: '';
 }
 
-#facets fieldset label span.count::after, #facets fieldset label span.value::after {
+#facets fieldset label .count::after, #facets fieldset label span.value::after {
   content: ') ';
 }
 
-#facets fieldset label span.extra::after {
+#facets fieldset label .extra::after {
   content: '% conversion rate';
 }
+
+#facets fieldset label number-format[title="0"].extra::after {
+  content: ' conversions';
+}
+
 
 #facets literal-facet label span.value::after {
   content: '';
