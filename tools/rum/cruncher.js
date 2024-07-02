@@ -3,6 +3,10 @@
  * filtering, aggregating, and summarizing the data.
  */
 /* eslint-disable max-classes-per-file */
+// eslint-disable-next-line camelcase
+import init, { t_test } from './enigma.js';
+
+await init();
 /**
  * @typedef {Object} RawEvent - a raw RUM event
  * @property {string} checkpoint - the name of the event that happened
@@ -48,24 +52,30 @@
  * @returns {Bundle} a bundle with additional properties
  */
 export function addCalculatedProps(bundle) {
-  bundle.events.forEach((e) => {
+  for (let i = 0; i < bundle.events.length; i += 1) {
+    const e = bundle.events[i];
     if (e.checkpoint === 'enter') {
       bundle.visit = true;
       if (e.source === '') e.source = '(direct)';
+      break;
     }
     if (e.checkpoint === 'cwv-inp') {
       bundle.cwvINP = e.value;
+      break;
     }
     if (e.checkpoint === 'cwv-lcp') {
       bundle.cwvLCP = Math.max(e.value || 0, bundle.cwvLCP || 0);
+      break;
     }
     if (e.checkpoint === 'cwv-cls') {
       bundle.cwvCLS = Math.max(e.value || 0, bundle.cwvCLS || 0);
+      break;
     }
     if (e.checkpoint === 'cwv-ttfb') {
       bundle.cwvTTFB = e.value;
+      break;
     }
-  });
+  }
   return bundle;
 }
 
@@ -234,6 +244,26 @@ function erf(x1) {
   return sign * y;
 }
 
+function compute(data) {
+  let sum = 0;
+  let variance = 0;
+
+  // Calculate sum
+  for (let i = 0; i < data.length; i += 1) {
+    sum += data[i];
+  }
+
+  const mean = sum / data.length;
+
+  // Calculate variance
+  for (let i = 0; i < data.length; i += 1) {
+    variance += (data[i] - mean) ** 2;
+  }
+
+  variance /= data.length;
+
+  return { mean, variance };
+}
 /**
  * Performs a significance test on the data. The test assumes
  * that the data is normally distributed and will calculate
@@ -243,16 +273,25 @@ function erf(x1) {
  * @returns {number} the p-value, a value between 0 and 1
  */
 export function tTest(left, right) {
-  const meanLeft = left.reduce((acc, value) => acc + value, 0) / left.length;
-  const meanRight = right.reduce((acc, value) => acc + value, 0) / right.length;
-  const varianceLeft = left.reduce((acc, value) => acc + (value - meanLeft) ** 2, 0) / left.length;
-  const varianceRight = right
-    .reduce((acc, value) => acc + (value - meanRight) ** 2, 0) / right.length;
+  const { mean: meanLeft, variance: varianceLeft } = compute(left);
+  const { mean: meanRight, variance: varianceRight } = compute(right);
   const pooledVariance = (varianceLeft + varianceRight) / 2;
   const tValue = (meanLeft - meanRight) / Math
     .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
   const p = 1 - (0.5 + 0.5 * erf(tValue / Math.sqrt(2)));
   return p;
+}
+
+/**
+ * Performs a significance test on the data. The test assumes
+ * that the data is normally distributed and will calculate
+ * the p-value for the difference between the two data sets.
+ * @param {number[]} left the first data set
+ * @param {number[]} right the second data set
+ * @returns {number} the p-value, a value between 0 and 1
+ */
+export function tTestWasm(left, right) {
+  return t_test(new Uint32Array(left), new Uint32Array(right));
 }
 
 class Facet {
