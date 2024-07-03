@@ -225,6 +225,11 @@ export default class IncognitoCheckbox extends HTMLElement {
       refreshURL.searchParams.delete('returnToken');
       window.location.href = refreshURL.href;
     }
+    if (u.searchParams.get('returnTo') && getPersistentToken()) {
+      const returnTo = new URL(u.searchParams.get('returnTo'));
+      returnTo.searchParams.set('returnToken', getPersistentToken());
+      window.location.href = returnTo.href;
+    }
 
     if (urlkey === 'incognito' || !urlkey) {
       this.setAttribute('mode', 'loading');
@@ -253,11 +258,6 @@ export default class IncognitoCheckbox extends HTMLElement {
       this.setAttribute('domainkey', urlkey);
       if (getPersistentToken()) {
         this.setAttribute('mode', 'open');
-        if (u.searchParams.get('returnTo')) {
-          const returnTo = new URL(u.searchParams.get('returnTo'));
-          returnTo.searchParams.set('returnToken', getPersistentToken());
-          window.location.href = returnTo.href;
-        }
       } else {
         this.setAttribute('mode', 'provided');
       }
