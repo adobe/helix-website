@@ -11,6 +11,7 @@ export default class DataLoader {
     this.API_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
     this.DOMAIN = 'www.thinktanked.org';
     this.DOMAIN_KEY = '';
+    this.granularity = 'month';
   }
 
   flush() {
@@ -47,6 +48,7 @@ export default class DataLoader {
   }
 
   async fetchUTCMonth(utcISOString) {
+    this.granularity = 'month';
     const [date] = utcISOString.split('T');
     const dateSplits = date.split('-');
     dateSplits.pop();
@@ -60,6 +62,7 @@ export default class DataLoader {
   }
 
   async fetchUTCDay(utcISOString) {
+    this.granularity = 'day';
     const [date] = utcISOString.split('T');
     const datePath = date.split('-').join('/');
     const apiRequestURL = this.apiURL(datePath);
@@ -71,6 +74,7 @@ export default class DataLoader {
   }
 
   async fetchUTCHour(utcISOString) {
+    this.granularity = 'hour';
     const [date, time] = utcISOString.split('T');
     const datePath = date.split('-').join('/');
     const hour = time.split(':')[0];
@@ -116,5 +120,39 @@ export default class DataLoader {
     }
     const chunks = Promise.all(promises);
     return chunks;
+  }
+
+  async fetchDateRange(startDate, endDate = new Date().toISOString()) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const hoursInRange = Math.floor((end - start) / (1000 * 60 * 60));
+    const daysInRange = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+    const monthsInRange = Math.floor((end - start) / (1000 * 60 * 60 * 24 * 30));
+    let promises = [];
+    if (daysInRange < 0) {
+      throw new Error('Start date must be before end date');
+    } else if (hoursInRange < 200) {
+      // fetch each hour
+      promises = Array.from({ length: hoursInRange + 1 }, (_, i) => {
+        const date = new Date(start);
+        date.setHours(date.getHours() + i + 1);
+        return date.toISOString();
+      }).map((hour) => this.fetchUTCHour(hour));
+    } else if (daysInRange < 200) {
+      // fetch each day
+      promises = Array.from({ length: daysInRange + 1 }, (_, i) => {
+        const date = new Date(start);
+        date.setDate(date.getDate() + i + 1);
+        return date.toISOString();
+      }).map((day) => this.fetchUTCDay(day));
+    } else {
+      // fetch each month
+      promises = Array.from({ length: monthsInRange + 1 }, (_, i) => {
+        const date = new Date(start);
+        date.setMonth(date.getMonth() + i + 1);
+        return date.toISOString();
+      }).map((month) => this.fetchUTCMonth(month));
+    }
+    return Promise.all(promises);
   }
 }
