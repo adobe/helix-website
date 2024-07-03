@@ -45,7 +45,7 @@ export default class URLSelector extends HTMLElement {
       // detect a click with shift key pressed
       img.addEventListener('click', (event) => {
         if (event.shiftKey) {
-          const targetlocation = new URL('https://www.aem.live/tools/oversight/explorer.html');
+          const targetlocation = new URL('https://oversight-trampoline--helix-website--adobe.aem.live/tools/oversight/explorer.html');
           targetlocation.searchParams.set('domain', input.value);
           targetlocation.searchParams.set('returnTo', window.location.href);
           window.location.href = targetlocation.href;
