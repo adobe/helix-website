@@ -255,6 +255,45 @@ export function tTest(left, right) {
   return p;
 }
 
+/**
+ * @typedef Line
+ * @type {Object}
+ * @property {number} slope the slope of the linear function,
+ * i.e. increase of y for every increase of x
+ * @property {number} intercept the intercept of the linear function,
+ * i.e. the value of y for x equals zero
+ */
+/**
+ * Peform a linear ordinary squares regression against an array.
+ * This regression takes the array index as the independent variable
+ * and the data in the array as the dependent variable.
+ * @param {number[]} data an array of input data
+ * @returns {Line} the slope and intercept of the regression function
+ */
+export function linearRegression(data) {
+  const { length: n } = data;
+
+  if (n === 0) {
+    throw new Error('Array must contain at least one element.');
+  }
+
+  // Calculate sumX and sumX2 using Gauss's formulas
+  const sumX = ((n - 1) * n) / 2;
+  const sumX2 = ((n - 1) * n * (2 * n - 1)) / 6;
+
+  // Calculate sumY and sumXY using reduce with destructuring
+  const { sumY, sumXY } = data.reduce((acc, y, x) => {
+    acc.sumY += y;
+    acc.sumXY += x * y;
+    return acc;
+  }, { sumY: 0, sumXY: 0 });
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  return { slope, intercept };
+}
+
 class Facet {
   constructor(parent, value, name) {
     this.parent = parent;
