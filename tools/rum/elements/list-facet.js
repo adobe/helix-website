@@ -1,13 +1,13 @@
 import {
   computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
 } from '../utils.js';
-import { tTest, zTestTwoProportions } from '../cruncher.js';
+import { tTestWasm, zTestTwoProportions } from '../cruncher.js';
 
 async function addSignificanceFlag(element, metric, baseline) {
   let p = 1;
   if (Array.isArray(metric.values) && Array.isArray(baseline.values)) {
     // for two arrays of values, we use a t-test
-    p = tTest(metric.values, baseline.values);
+    p = tTestWasm(metric.values, baseline.values);
   } else if (
     typeof metric.total === 'number'
     && typeof metric.conversions === 'number'

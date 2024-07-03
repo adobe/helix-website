@@ -24,6 +24,7 @@ const elems = {};
 const dataChunks = new DataChunks();
 
 const loader = new DataLoader();
+await loader.init();
 loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
