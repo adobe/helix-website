@@ -41,6 +41,16 @@ export default class URLSelector extends HTMLElement {
 
     if (!getPersistentToken()) {
       input.disabled = true;
+
+      // detect a click with shift key pressed
+      img.addEventListener('click', (event) => {
+        if (event.shiftKey) {
+          const targetlocation = new URL('https://www.aem.live/tools/oversight/explorer.html');
+          targetlocation.searchParams.set('domain', input.value);
+          targetlocation.searchParams.set('returnTo', window.location.href);
+          window.location.href = targetlocation.href;
+        }
+      });
     }
 
     input.addEventListener('focus', () => {
