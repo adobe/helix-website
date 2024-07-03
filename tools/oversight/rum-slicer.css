@@ -645,6 +645,21 @@ thumbnail-facet label {
   gap: 1em;
 }
 
+thumbnail-facet label > span {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+thumbnail-facet label span.filename {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+  line-height: 0.9;
+}
+
 thumbnail-facet fieldset div:not(.more-container) {
   border-bottom: 1px solid currentcolor;
   padding-top: 4px;
