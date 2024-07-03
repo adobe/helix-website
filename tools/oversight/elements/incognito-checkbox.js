@@ -218,6 +218,14 @@ export default class IncognitoCheckbox extends HTMLElement {
     const u = new URL(window.location.href);
 
     const urlkey = u.searchParams.get('domainkey');
+    const returnToken = u.searchParams.get('returnToken');
+    if (returnToken) {
+      localStorage.setItem('rum-bundler-token', returnToken);
+      const refreshURL = new URL(window.location.href);
+      refreshURL.searchParams.delete('returnToken');
+      window.location.href = refreshURL.href;
+    }
+
     if (urlkey === 'incognito' || !urlkey) {
       this.setAttribute('mode', 'loading');
       fetchDomainKey(u.searchParams.get('domain')).then((domainkey) => {
