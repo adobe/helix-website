@@ -16,6 +16,7 @@ import {
   getGradient,
 } from '../utils.js';
 import AbstractChart from './chart.js';
+import { linearRegression } from '../cruncher.js';
 
 Chart.register(TimeScale, LinearScale, ...registerables);
 
@@ -582,5 +583,15 @@ export default class SkylineChart extends AbstractChart {
     this.clsAlreadyLabeled = false;
     this.lcpAlreadyLabeled = false;
     this.chart.update();
+
+    // add trend indicators
+    const trafficTrend = linearRegression(allTraffic);
+    const iGoodLCPTrend = linearRegression(iGoodLCPs);
+    const iGoodCLSTrend = linearRegression(iGoodCLSs);
+    const iGoodINPTrend = linearRegression(iGoodINPs);
+    document.querySelector('.key-metrics #pageviews number-format').setAttribute('trend', trafficTrend.slope > 0 ? 'rising' : 'falling');
+    document.querySelector('.key-metrics #lcp number-format').setAttribute('trend', iGoodLCPTrend.slope > 0 ? 'rising' : 'falling');
+    document.querySelector('.key-metrics #cls number-format').setAttribute('trend', iGoodCLSTrend.slope > 0 ? 'rising' : 'falling');
+    document.querySelector('.key-metrics #inp number-format').setAttribute('trend', iGoodINPTrend.slope > 0 ? 'rising' : 'falling');
   }
 }

@@ -195,6 +195,23 @@ main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
   content: '';
 }
 
+main .key-metrics number-format[trend="falling"],
+main .key-metrics #lcp number-format[trend="rising"],
+main .key-metrics #cls number-format[trend="rising"],
+main .key-metrics #inp number-format[trend="rising"] {
+  border-bottom: 1px solid;
+  border-color: var(--spectrum-red-600);
+}
+
+main .key-metrics number-format[trend="rising"],
+/* more isn't always better */
+main .key-metrics #lcp number-format[trend="falling"],
+main .key-metrics #cls number-format[trend="falling"],
+main .key-metrics #inp number-format[trend="falling"] {
+  border-bottom: 1px solid;
+  border-color: var(--spectrum-green-600);
+}
+
 .key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;
