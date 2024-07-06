@@ -12,7 +12,6 @@ import {
   loadBlock,
   loadCSS,
   loadScript,
-  getAllMetadata,
   getMetadata,
   decorateBlock,
 } from './lib-franklin.js';
@@ -38,9 +37,10 @@ window.hlx.plugins.add('performance', {
 });
 
 window.hlx.plugins.add('experimentation', {
-  condition: () => getMetadata('experiment')
-    || Object.keys(getAllMetadata('campaign')).length
-    || Object.keys(getAllMetadata('audience')).length,
+  condition: () => document.head.querySelector('[name^="experiment"],[name^="campaign-"],[name^="audience-"]')
+    || document.head.querySelector('[property^="campaign:-"],[property^="audience:-"]')
+    || document.querySelector('.section[class*="experiment-"],.section[class*="audience-"],.section[class*="campaign-"]')
+    || [...document.querySelectorAll('.section-metadata div')].some((d) => d.textContent.match(/Experiment|Campaign|Audience/i)),
   options: { audiences: AUDIENCES },
   load: 'eager',
   url: '/plugins/experimentation/src/index.js',

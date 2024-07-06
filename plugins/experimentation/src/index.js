@@ -94,12 +94,18 @@ export function getMetadata(name) {
  */
 export function getAllMetadata(scope) {
   const value = getMetadata(scope);
-  return [...document.head.querySelectorAll(`meta[name^="${scope}-"]`)]
-    .reduce((res, meta) => {
-      const key = toCamelCase(meta.name.substring(scope.length + 1));
-      res[key] = meta.getAttribute('content');
-      return res;
-    }, value ? { value } : {});
+  const metaTags = document.head.querySelectorAll(`meta[name^="${scope}-"], meta[property^="${scope}:-"]`);
+
+  return [...metaTags].reduce((res, meta) => {
+    const key = meta.getAttribute('name')
+      ? meta.getAttribute('name').substring(scope.length + 1)
+      : meta.getAttribute('property').substring(scope.length + 2);
+
+    const camelCaseKey = toCamelCase(key);
+    res[camelCaseKey] = meta.getAttribute('content');
+    
+    return res;
+  }, value ? { value } : {});
 }
 
 /**
