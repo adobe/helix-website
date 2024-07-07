@@ -531,7 +531,11 @@ async function decorateCampaignPills(container, options) {
 
 function createAudience(audience, isSelected, options) {
   const url = new URL(window.location.href);
-  url.searchParams.set(options.audiencesQueryParameter, audience);
+  if (audience !== 'default') {
+    url.searchParams.set(options.audiencesQueryParameter, audience);
+  } else {
+    url.searchParams.delete(options.audiencesQueryParameter);
+  }
 
   return {
     label: `<code>${audience}</code>`,
