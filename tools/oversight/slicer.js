@@ -7,6 +7,7 @@ import {
   isKnownFacet,
   scoreCWV,
   computeConversionRate,
+  reclassifyConsent,
 } from './utils.js';
 
 /* globals */
@@ -141,10 +142,12 @@ function updateDataFacets(filterText, params, checkpoint) {
       .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
   });
 
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
-    acc.add(evt.checkpoint);
-    return acc;
-  }, new Set())), 'every');
+  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events
+    .map(reclassifyConsent)
+    .reduce((acc, evt) => {
+      acc.add(evt.checkpoint);
+      return acc;
+    }, new Set())), 'every');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
     dataChunks.addFacet('lcp.target', (bundle) => bundle.events
@@ -187,6 +190,7 @@ function updateDataFacets(filterText, params, checkpoint) {
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
+          .map(reclassifyConsent)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ source }) => source) // filter out empty sources
           .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
@@ -194,6 +198,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       if (cp !== 'utm') { // utm.target is different from the other checkpoints
         dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
           bundle.events
+            .map(reclassifyConsent)
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
             .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
