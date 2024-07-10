@@ -21,7 +21,7 @@ export default class ConversionTracker extends HTMLElement {
     if (this.getAttribute('mode') === 'pending') {
       this.button.textContent = 'confirm';
       this.button.disabled = false;
-    } else if (conversionDef.length === 1 && conversionDef[0][0] === 'checkpoint' && conversionDef[0][1] === 'click' && filterDef.length === 0) {
+    } else if (conversionDef.length === 0 || (conversionDef.length === 1 && conversionDef[0][0] === 'checkpoint' && conversionDef[0][1] === 'click' && filterDef.length === 0)) {
       this.button.textContent = 'default';
       this.button.disabled = true;
       this.setAttribute('mode', 'default');
@@ -31,6 +31,8 @@ export default class ConversionTracker extends HTMLElement {
     } else {
       this.button.textContent = 'reset';
       this.button.disabled = false;
+      this.querySelector('h2').textContent = 'Conversions';
+      this.title = 'Custom conversion definition';
       this.setAttribute('mode', 'custom');
     }
   }
