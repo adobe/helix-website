@@ -41,6 +41,11 @@ dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
+dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
+  checkpoint: ['click'],
+})
+  ? bundle.weight
+  : 0));
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
   ? bundle.weight
   : 0));
@@ -50,6 +55,14 @@ function setDomain(domain, key) {
   loader.domainKey = key;
 }
 
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 0
+  || (Object.keys(conversionSpec).length === 1
+    && conversionSpec.checkpoint
+    && conversionSpec.checkpoint[0] === 'click');
 /* update UX */
 export function updateKeyMetrics() {
   document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
@@ -74,11 +87,27 @@ export function updateKeyMetrics() {
     document.querySelector('#visits p').appendChild(visitsExtra);
   }
 
-  document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
-  document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+  if (isDefaultConversion) {
+    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.engagement.sum;
+    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.engagement.count);
+  } else {
+    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
+    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+  }
+
   document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
-  if (dataChunks.totals.visits.sum > 0) {
-    const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
+  const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
+  if (dataChunks.totals.pageViews.sum > 0 && isDefaultConversion) {
+    conversionsExtra.textContent = computeConversionRate(
+      dataChunks.totals.engagement.sum,
+      dataChunks.totals.pageViews.sum,
+    );
+    // this is a bit of fake precision, but it's good enough for now
+    conversionsExtra.setAttribute('precision', 2);
+    conversionsExtra.setAttribute('total', 100);
+    conversionsExtra.className = 'extra';
+    document.querySelector('#conversions p').appendChild(conversionsExtra);
+  } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
     conversionsExtra.textContent = computeConversionRate(
       dataChunks.totals.conversions.sum,
       dataChunks.totals.visits.sum,
@@ -110,14 +139,6 @@ export function updateKeyMetrics() {
   inpElem.textContent = dataChunks.totals.inp.percentile(75) / 1000;
   inpElem.closest('li').className = `score-${scoreCWV(dataChunks.totals.inp.percentile(75), 'inp')}`;
 }
-
-const conversionSpec = Object.keys(parseConversionSpec()).length
-  ? parseConversionSpec()
-  : { checkpoint: ['click'] };
-
-const isDefaultConversion = Object.keys(conversionSpec).length === 1
-  && conversionSpec.checkpoint
-  && conversionSpec.checkpoint[0] === 'click';
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
