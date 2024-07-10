@@ -46,7 +46,6 @@ export function sampleRUM(checkpoint, data) {
     }
     document.dispatchEvent(new CustomEvent('rum', { detail: { checkpoint, data } }));
   } catch (error) {
-    console.log('RUM error', error);
     // something went wrong
   }
 }
