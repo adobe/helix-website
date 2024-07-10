@@ -834,9 +834,6 @@ export function setup() {
   window.hlx.templates = new TemplatesRegistry();
 
   sampleRUM.collectBaseURL = `${window.location.origin}/.rum`;
-  if (!window.location.origin.includes('localhost')) {
-    sampleRUM.baseURL = window.location.origin;
-  }
 
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
