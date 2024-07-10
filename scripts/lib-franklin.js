@@ -46,6 +46,7 @@ export function sampleRUM(checkpoint, data) {
     }
     document.dispatchEvent(new CustomEvent('rum', { detail: { checkpoint, data } }));
   } catch (error) {
+    console.log('RUM error', error);
     // something went wrong
   }
 }
@@ -832,6 +833,11 @@ export function setup() {
   window.hlx.patchBlockConfig = [];
   window.hlx.plugins = new PluginsRegistry();
   window.hlx.templates = new TemplatesRegistry();
+
+  sampleRUM.collectBaseURL = `${window.location.origin}/.rum`;
+  if (!window.location.origin.includes('localhost')) {
+    sampleRUM.baseURL = window.location.origin;
+  }
 
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
