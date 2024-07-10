@@ -69,6 +69,7 @@ export default class URLSelector extends HTMLElement {
         goto.searchParams.set('view', 'month');
         window.location.href = goto.href;
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Invalid URL', e, event.detail);
       }
     });
