@@ -65,7 +65,7 @@ const stages = [
         .map((e) => `variant:${e.source} ${e.target}`)
         .pop(),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'experiment')
+        .filter((e) => e.checkpoint === 'variant')
         .length > 0,
         next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     }
@@ -261,19 +261,19 @@ export default class SankeyChart extends AbstractChart {
 
           if (allStages[first] && Array.isArray(allStages[first].next)) {
             if (allStages[first].next.includes(second)) {
-              console.log('explicit allow', pair[0], '->', pair[1]);
+              // console.log('explicit allow', pair[0], '->', pair[1]);
               return true;
             } if (allStages[first].next
               .filter((n) => n.endsWith(':*'))
               .map((n) => n.slice(0, -2))
               .includes(second)) {
-              console.log('wildcard allow', pair[0], '->', pair[1]);
+              // console.log('wildcard allow', pair[0], '->', pair[1]);
               return true;
             }
-            console.log('forbidding', pair[0], '->', pair[1]);
+            // console.log('forbidding', pair[0], '->', pair[1]);
             return false;
           }
-          console.log('implicit allow', pair[0], '->', pair[1]);
+          // console.log('implicit allow', pair[0], '->', pair[1]);
           return true;
         })
         .map((pair) => pair.join('->'));
