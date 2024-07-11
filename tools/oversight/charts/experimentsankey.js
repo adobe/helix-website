@@ -41,9 +41,9 @@ const stages = [
       */
     experiment: {
       label: (bundle) => bundle.events
-      .filter((e) => e.checkpoint === 'experiment')
-      .map((e) => `experiment:${e.source}`)
-      .pop(),
+        .filter((e) => e.checkpoint === 'experiment')
+        .map((e) => `experiment:${e.source}`)
+        .pop(),
       color: cssVariable('--spectrum-red-800'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'experiment')
@@ -55,8 +55,8 @@ const stages = [
     label: 'variant',
     /*
      * 5.5.  What variant is selected
-     * - variant  
-     * 
+     * - variant
+     *
      */
     variant: {
       color: cssVariable('--spectrum-fuchsia-300'),
@@ -67,8 +67,8 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'variant')
         .length > 0,
-        next: ['click', 'convert', 'formsubmit', 'nointeraction'],
-    }
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
+    },
   },
   {
     label: 'interaction',
