@@ -196,9 +196,11 @@ export default class ListFacet extends HTMLElement {
       const filteredKeys = filterKeys && this.placeholders
         ? optionKeys.filter((a) => !!(this.placeholders[a]))
         : optionKeys;
-      facetEntries
-        .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-        .forEach((entry) => {
+
+      const paint = (start = 0, end = numOptions) => {
+        const entries = facetEntries
+          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value));
+        entries.slice(start, end).forEach((entry) => {
           const div = document.createElement('div');
           const input = document.createElement('input');
           input.type = 'checkbox';
@@ -268,10 +270,22 @@ export default class ListFacet extends HTMLElement {
           ul.append(inpLI);
 
           div.append(input, label, ul);
-          fieldSet.append(div);
-        });
 
-      if (filteredKeys.length > 10) {
+          const more = fieldSet.querySelector('.more-container');
+          if (more) {
+            more.before(div);
+          } else {
+            fieldSet.append(div);
+          }
+        });
+      };
+
+      paint();
+
+      if (filteredKeys.length > numOptions) {
+        const container = document.createElement('div');
+        container.classList.add('more-container');
+
         // add "more" link
         const div = document.createElement('div');
         div.className = 'load-more';
@@ -279,15 +293,13 @@ export default class ListFacet extends HTMLElement {
         more.textContent = 'more...';
         more.addEventListener('click', (evt) => {
           evt.preventDefault();
-          if (this.classList.contains('more')) {
-            const mores = Array.from(this.classList)
-              .filter((c) => c.startsWith('more'));
-            // add a more-more-more with the length of
-            // the existing mores + 1
-            const moreClass = Array.from({ length: mores.length + 1 }, () => 'more').join('-');
-            this.classList.add(moreClass);
+          const start = fieldSet.children.length - 2; // minus the "legend" and "more" container
+          const end = start + numOptions;
+          paint(start, end);
+
+          if (end >= filteredKeys.length) {
+            container.remove();
           }
-          this.classList.add('more');
         });
 
         div.append(more);
@@ -296,11 +308,14 @@ export default class ListFacet extends HTMLElement {
         all.textContent = `all (${filteredKeys.length})`;
         all.addEventListener('click', (evt) => {
           evt.preventDefault();
-          this.classList.add('more-all');
+
+          const start = fieldSet.children.length - 2; // minus the "legend" and "more" container
+          paint(start, filteredKeys.length);
+
+          container.remove();
         });
         div.append(all);
-        const container = document.createElement('div');
-        container.classList.add('more-container');
+
         container.append(div);
         fieldSet.append(container);
       }
