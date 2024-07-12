@@ -220,7 +220,7 @@ export default class ListFacet extends HTMLElement {
             });
           }
 
-          const metrics = entry.getMetrics(['pageViews', 'visits', 'conversions']);
+          const metrics = entry.getMetrics(['pageViews', 'visits']);
 
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
@@ -233,24 +233,30 @@ export default class ListFacet extends HTMLElement {
           const conversionspan = document.createElement('span');
           conversionspan.className = 'extra';
 
-          // we need to divide the totals by average weight
-          // so that we don't overestimate the significance
-          const avgWeight = this.dataChunks.totals.pageViews.weight
-            / this.dataChunks.totals.pageViews.count;
+          const $this = this;
+          const drawConversion = () => {
+            // we need to divide the totals by average weight
+            // so that we don't overestimate the significance
+            const m = entry.getMetrics(['conversions']);
+            const avgWeight = $this.dataChunks.totals.pageViews.weight
+              / $this.dataChunks.totals.pageViews.count;
 
-          addSignificanceFlag(conversionspan, {
-            total: metrics.visits.sum / avgWeight,
-            conversions: metrics.conversions.sum / avgWeight,
-          }, {
-            total: this.dataChunks.totals.visits.sum / avgWeight,
-            conversions: this.dataChunks.totals.conversions.sum / avgWeight,
-          });
+            addSignificanceFlag(conversionspan, {
+              total: metrics.visits.sum / avgWeight,
+              conversions: m.conversions.sum / avgWeight,
+            }, {
+              total: $this.dataChunks.totals.visits.sum / avgWeight,
+              conversions: $this.dataChunks.totals.conversions.sum / avgWeight,
+            });
 
-          const conversions = metrics.conversions.sum;
-          const visits = metrics.visits.sum;
-          const conversionRate = computeConversionRate(conversions, visits);
-          conversionspan.textContent = toHumanReadable(conversionRate);
-          conversionspan.title = metrics.conversions.sum;
+            const conversions = m.conversions.sum;
+            const visits = metrics.visits.sum;
+            const conversionRate = computeConversionRate(conversions, visits);
+            conversionspan.textContent = toHumanReadable(conversionRate);
+            conversionspan.title = m.conversions.sum;
+          };
+
+          window.setTimeout(drawConversion, 0);
 
           label.append(valuespan, countspan, conversionspan);
 
