@@ -247,7 +247,7 @@ export default class ListFacet extends HTMLElement {
           conversionspan.textContent = toHumanReadable(conversionRate);
           conversionspan.title = entry.metrics.conversions.sum;
 
-          label.append(valuespan, countspan, conversionspan);
+          label.append(countspan, valuespan, conversionspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
