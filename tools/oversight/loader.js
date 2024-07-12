@@ -17,10 +17,9 @@ export default class DataLoader {
     this.cache = await caches.open('bundles');
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async flush() {
-    // await caches.delete('bundles');
-    // this.cache = await caches.open('bundles');
+    await caches.delete('bundles');
+    this.cache = await caches.open('bundles');
   }
 
   set domainKey(key) {
