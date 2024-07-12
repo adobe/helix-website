@@ -505,10 +505,12 @@ fieldset li[class$="-"] {
 
 fieldset li.interesting {
   border-width: 2px;
+  padding: 2px 5px;
 }
 
 fieldset li.significant {
   border-width: 3px;
+  padding: 2px 4px;
 }
 
 fieldset li::after,
