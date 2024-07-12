@@ -390,7 +390,7 @@ export default class ListFacet extends HTMLElement {
       li.textContent = cwv;
     };
     // fill the element, but don't wait for it
-    fillEl();
+    window.setTimeout(fillEl, 0);
     return li;
   }
 }
