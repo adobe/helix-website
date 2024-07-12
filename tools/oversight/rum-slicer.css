@@ -109,9 +109,7 @@ main .title url-selector img {
 }
 
 main .title url-selector input {
-  background: linear-gradient(90deg, var(--spectrum-gray-900), var(--spectrum-purple-900));
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--spectrum-gray-700);
 }
 
 .title button {
