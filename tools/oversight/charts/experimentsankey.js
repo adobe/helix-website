@@ -65,7 +65,7 @@ const stages = [
         .map((e) => `variant:${e.source} ${e.target}`)
         .pop(),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'variant')
+        .filter((e) => e.checkpoint === 'experiment')
         .length > 0,
       next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
