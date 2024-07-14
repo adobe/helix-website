@@ -833,6 +833,8 @@ export function setup() {
   window.hlx.plugins = new PluginsRegistry();
   window.hlx.templates = new TemplatesRegistry();
 
+  sampleRUM.collectBaseURL = `${window.location.origin}/.rum`;
+
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
     try {
