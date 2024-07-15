@@ -214,7 +214,6 @@ function updateDataFacets(filterText, params, checkpoint) {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
           .map(reclassifyConsent)
-          .map(reclassifyAcquisition)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ source }) => source) // filter out empty sources
           .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
@@ -222,7 +221,6 @@ function updateDataFacets(filterText, params, checkpoint) {
       dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
         bundle.events
           .map(reclassifyConsent)
-          .map(reclassifyAcquisition)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ target }) => target) // filter out empty targets
           .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
@@ -241,6 +239,31 @@ function updateDataFacets(filterText, params, checkpoint) {
             count: 10, min: 0, max: 10000, steps: 'quantiles',
           },
         );
+      }
+
+      // a bit of special handling here, so we can split the acquisition source
+      if (cp === 'acquisition') {
+        dataChunks.addFacet('acquisition.source', (bundle) => Array.from(
+          bundle.events
+            .map(reclassifyAcquisition)
+            .filter((evt) => evt.checkpoint === cp)
+            .filter(({ source }) => source) // filter out empty sources
+            .map(({ source }) => source.split(':'))
+            /*
+            const parts = bundle.userAgent.split(':');
+            return parts.reduce((acc, _, i) => {
+              acc.push(parts.slice(0, i + 1).join(':'));
+              return acc;
+            }, []);
+            */
+            .map((source) => source
+              .reduce((acc, _, i) => {
+                acc.push(source.slice(0, i + 1).join(':'));
+                return acc;
+              }, [])
+              .filter((s) => s))
+            .pop(),
+        ));
       }
     });
 
