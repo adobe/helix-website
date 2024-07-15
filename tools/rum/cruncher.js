@@ -233,8 +233,17 @@ function erf(x1) {
 
   return sign * y;
 }
-
-function compute(data) {
+/**
+ * @typedef {Object} MeanVariance
+ * @property {number} mean - the mean of a dataset
+ * @property {number} variance - the variance of a dataset
+ */
+/**
+ * Calculate mean and variance of a dataset.
+ * @param {number[]} data - the input data
+ * @returns {MeanVariance} mean and variance of the input dataset
+ */
+function calcMeanVariance(data) {
   let sum = 0;
   let variance = 0;
 
@@ -263,8 +272,8 @@ function compute(data) {
  * @returns {number} the p-value, a value between 0 and 1
  */
 export function tTest(left, right) {
-  const { mean: meanLeft, variance: varianceLeft } = compute(left);
-  const { mean: meanRight, variance: varianceRight } = compute(right);
+  const { mean: meanLeft, variance: varianceLeft } = calcMeanVariance(left);
+  const { mean: meanRight, variance: varianceRight } = calcMeanVariance(right);
   const pooledVariance = (varianceLeft + varianceRight) / 2;
   const tValue = (meanLeft - meanRight) / Math
     .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
