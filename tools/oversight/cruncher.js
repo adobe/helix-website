@@ -342,19 +342,34 @@ class Facet {
    * @returns {Aggregate} metrics
    */
   get metrics() {
-    if (this.metricsIn) return this.metricsIn;
-    if (this.entries.length === 0) {
+    return this.getMetrics(Object.keys(this.parent.series));
+  }
+
+  getMetrics(series) {
+    if (!series || series.length === 0) return {};
+    const res = {};
+    const needed = [];
+    if (this.metricsIn) {
+      series.forEach((s) => {
+        if (this.metricsIn[s]) {
+          res[s] = this.metricsIn[s];
+        } else {
+          needed.push(s);
+        }
+      });
+    } else {
       this.metricsIn = {};
-      return this.metricsIn;
+      needed.push(...series);
     }
 
-    this.metricsIn = Object.entries(this.parent.series)
-      .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
-        return acc;
-      }, {});
-
-    return this.metricsIn;
+    if (needed.length) {
+      needed.forEach((s) => {
+        const valueFn = this.parent.series[s];
+        this.metricsIn[s] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
+        res[s] = this.metricsIn[s];
+      });
+    }
+    return res;
   }
 }
 

@@ -69,25 +69,26 @@ export default class ListFacet extends HTMLElement {
         .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
         .forEach((entry) => {
           const CWVDISPLAYTHRESHOLD = 10;
+          const metrics = entry.getMetrics(['pageViews', 'lcp', 'cls', 'inp']);
           let lcp = '-';
-          if (entry.metrics.lcp && entry.metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
-            const lcpValue = entry.metrics.lcp.percentile(75);
+          if (metrics.lcp && metrics.lcp.count >= CWVDISPLAYTHRESHOLD) {
+            const lcpValue = metrics.lcp.percentile(75);
             lcp = `${(lcpValue / 1000)} s`;
           }
 
           let cls = '-';
-          if (entry.metrics.cls && entry.metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
-            const clsValue = entry.metrics.cls.percentile(75);
+          if (metrics.cls && metrics.cls.count >= CWVDISPLAYTHRESHOLD) {
+            const clsValue = metrics.cls.percentile(75);
             cls = `${(clsValue)}`;
           }
 
           let inp = '-';
-          if (entry.metrics.inp && entry.metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
-            const inpValue = entry.metrics.inp.percentile(75);
+          if (metrics.inp && metrics.inp.count >= CWVDISPLAYTHRESHOLD) {
+            const inpValue = metrics.inp.percentile(75);
             inp = `${(inpValue / 1000)} s`;
           }
 
-          tsv.push(`${entry.value}\t${entry.metrics.pageViews.sum}\t${lcp}\t${cls}\t${inp}`);
+          tsv.push(`${entry.value}\t${metrics.pageViews.sum}\t${lcp}\t${cls}\t${inp}`);
         });
     }
     return tsv;
@@ -219,12 +220,14 @@ export default class ListFacet extends HTMLElement {
             });
           }
 
+          const metrics = entry.getMetrics(['pageViews', 'visits', 'conversions']);
+
           const label = document.createElement('label');
           label.setAttribute('for', `${facetName}-${entry.value}`);
           const countspan = document.createElement('number-format');
           countspan.className = 'count';
-          countspan.textContent = entry.metrics.pageViews.sum;
-          countspan.setAttribute('sample-size', entry.metrics.pageViews.count);
+          countspan.textContent = metrics.pageViews.sum;
+          countspan.setAttribute('sample-size', metrics.pageViews.count);
           countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
           countspan.setAttribute('fuzzy', 'false');
           const valuespan = this.createValueSpan(entry);
@@ -238,15 +241,15 @@ export default class ListFacet extends HTMLElement {
             / this.dataChunks.totals.pageViews.count;
 
           addSignificanceFlag(conversionspan, {
-            total: entry.metrics.visits.sum / avgWeight,
-            conversions: entry.metrics.conversions.sum / avgWeight,
+            total: metrics.visits.sum / avgWeight,
+            conversions: metrics.conversions.sum / avgWeight,
           }, {
             total: this.dataChunks.totals.visits.sum / avgWeight,
             conversions: this.dataChunks.totals.conversions.sum / avgWeight,
           });
 
-          const conversions = entry.metrics.conversions.sum;
-          const visits = entry.metrics.visits.sum;
+          const conversions = metrics.conversions.sum;
+          const visits = metrics.visits.sum;
           const conversionRate = computeConversionRate(conversions, visits);
           conversionspan.textContent = conversionRate;
           conversionspan.setAttribute('precision', 2);
@@ -368,18 +371,19 @@ export default class ListFacet extends HTMLElement {
     nf.setAttribute('precision', 2);
     nf.setAttribute('fuzzy', 'false');
     const fillEl = async () => {
+      const metrics = entry.getMetrics([metricName]);
       li.title = metricName.toUpperCase();
-      if (entry.metrics[metricName] && entry.metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
-        const value = entry.metrics[metricName].percentile(75);
+      if (metrics[metricName] && metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
+        const value = metrics[metricName].percentile(75);
         cwv = metricName !== 'cls'
           ? value / 1000
           : (Math.round(value * 100) / 100);
         nf.textContent = cwv;
         score = scoreCWV(value, metricName);
-        addSignificanceFlag(li, entry.metrics[metricName], this.dataChunks.totals[metricName]);
-        li.title += ` - based on ${entry.metrics[metricName].count} samples`;
+        addSignificanceFlag(li, metrics[metricName], this.dataChunks.totals[metricName]);
+        li.title += ` - based on ${metrics[metricName].count} samples`;
       } else {
-        li.title += ` - not enough samples (${entry.metrics[metricName].count})`;
+        li.title += ` - not enough samples (${metrics[metricName].count})`;
       }
       li.classList.add(`score-${score}`);
       li.append(nf);
