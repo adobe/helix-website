@@ -110,7 +110,7 @@ const categoryTypeLookup = {
   print: 'owned',
 };
 
-function vendor(origin) {
+export function vendor(origin) {
   return vendorClassifications
     .reduce((result, classification) => (
       !result && classification.regex.test(origin)
@@ -140,11 +140,11 @@ function paidowned(origin, vendorResult, categoryResult) {
   return vendorTypeLookup[vendorResult] || categoryTypeLookup[categoryResult] || '';
 }
 
-export default function classifyAcquisition(origin, isPaid = false) {
+export function classifyAcquisition(origin, isPaid = false) {
   const vendorResult = vendor(origin);
   const categoryResult = category(origin, vendorResult);
   const paidOwnedResult = isPaid
-    ? 'paid'
+    ? (typeof isPaid === 'string' && isPaid) || 'paid'
     : paidowned(origin, vendorResult, categoryResult);
 
   let result = paidOwnedResult;

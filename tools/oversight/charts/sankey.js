@@ -3,7 +3,9 @@ import { SankeyController, Flow } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
 import AbstractChart from './chart.js';
-import { cssVariable, parseConversionSpec } from '../utils.js';
+import {
+  cssVariable, parseConversionSpec, reclassifyAcquisition, reclassifyEnter,
+} from '../utils.js';
 
 Chart.register(SankeyController, Flow, ...registerables);
 
@@ -51,7 +53,7 @@ const stages = [
         .filter((e) => e.checkpoint === 'enter')
         .filter((e) => e.source.startsWith('http'))
         .length > 0,
-      next: ['organic', 'campaign'],
+      next: ['earned', 'owned', 'paid'],
     },
     direct: {
       label: 'Direct',
@@ -59,7 +61,7 @@ const stages = [
         .filter((e) => e.checkpoint === 'enter')
         .filter((e) => !e.source.startsWith('http'))
         .length > 0,
-      next: ['organic', 'campaign'],
+      next: ['earned', 'owned', 'paid'],
       color: cssVariable('--spectrum-green-300'),
     },
   },
@@ -70,19 +72,36 @@ const stages = [
      *   - organic
      *  - campaign (utm params present)
      */
-    organic: {
-      label: 'Organic',
+    earned: {
+      label: 'Earned',
       color: cssVariable('--spectrum-green-400'),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'utm')
+        .filter((e) => e.checkpoint === 'utm'
+          || e.checkpoint === 'paid'
+          || e.checkpoint === 'email'
+          || e.checkpoint === 'acquisition')
         .length === 0,
       next: ['enter', 'consent', 'noconsent'],
     },
-    campaign: {
-      label: 'Campaign',
+    owned: {
+      label: 'Owned',
+      color: cssVariable('--spectrum-teal-400'),
+      detect: (bundle) => bundle.events
+        // .map(reclassifyAcquisition)
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter((e) => e.source.startsWith('owned'))
+        .length > 0,
+      next: ['enter', 'consent', 'noconsent'],
+    },
+    paid: {
+      label: 'Paid',
       color: cssVariable('--spectrum-red-400'),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'utm' || e.checkpoint === 'paid')
+        // .map(reclassifyAcquisition)
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter((e) => e.source.startsWith('paid'))
         .length > 0,
       next: ['enter', 'consent', 'noconsent'],
     },
@@ -301,45 +320,6 @@ const stages = [
         .length > 0,
     },
   },
-  {
-    label: 'exit',
-    /*
-     * 8. What's the click target, specifically
-     */
-    internal: {
-      color: cssVariable('--spectrum-green-1100'),
-      next: [],
-      label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
-        .filter((e) => !!e.target)
-        .map((e) => new URL(e.target))
-        .map((u) => u.pathname)
-        .map((p) => `internal:${p}`)
-        .pop(),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => !!e.target)
-        .filter((e) => e.target.indexOf('media_') === -1)
-        .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
-        .length > 0,
-    },
-    external: {
-      color: cssVariable('--spectrum-purple-1100'),
-      next: [],
-      label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
-        .filter((e) => !!e.target)
-        .map((e) => new URL(e.target))
-        .map((u) => u.hostname)
-        .map((h) => `external:${h}`)
-        .pop(),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => e.target)
-        .filter((e) => e.target.indexOf('media_') === -1)
-        // only external links for now
-        .filter((e) => new URL(e.target).hostname !== new URL(bundle.url).hostname)
-        .length > 0,
-    },
-  },
 ];
 const allStages = stages.reduce((acc, stage) => ({ ...acc, ...stage }), {});
 
@@ -362,7 +342,11 @@ export default class SankeyChart extends AbstractChart {
     }
 
     const MAX_FACETS = 7;
-    this.dataChunks.group((bundle) => {
+    this.dataChunks.group((b) => {
+      const bundle = b;
+      bundle.events = b.events
+        .map(reclassifyAcquisition)
+        .reduce(reclassifyEnter, []);
       const detectedFlows = [];
       // go through each stage
       stages.forEach((stage) => {

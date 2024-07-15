@@ -1,5 +1,5 @@
 import classifyConsent from './consent.js';
-import classifyAcquisition from './acquisition.js';
+import { classifyAcquisition, vendor } from './acquisition.js';
 
 /* helpers */
 export function scoreValue(value, ni, poor) {
@@ -310,5 +310,34 @@ export function reclassifyAcquisition({ source, target, checkpoint }) {
     const acquisition = classifyAcquisition(source, false);
     if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
   }
+  /* reclassify earned acquisition – I don't like this, because it kills the enter checkpoint
+  else if (checkpoint === 'enter' && !allEvents.find((evt) => evt.checkpoint === 'acquisition'
+    || evt.checkpoint === 'utm'
+    || evt.checkpoint === 'paid'
+    || evt.checkpoint === 'email')) {
+    const acquisition = classifyAcquisition(source, 'earned');
+    if (acquisition) return { checkpoint: 'acquisition', source: `${acquisition}` };
+  }
+  */
   return { source, target, checkpoint };
+}
+
+export function reclassifyEnter(acc, event) {
+  if (event.checkpoint === 'enter') acc.referrer = event.source;
+  if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
+  if (acc.referrer && acc.acquisition && (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')) {
+    const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
+    const [rGroup, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
+    const group = aGroup || 'earned';
+    const category = rCategory || aCategory;
+    const vndr = rVendor || aVendor;
+    const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
+    acc.push({ checkpoint: 'acquisition', source: newsrc });
+    if (acc.acquisition !== newsrc) {
+      console.log('reclassified', acc.acquisition, 'with', acc.referrer, 'to', newsrc);
+    }
+  } else {
+    acc.push(event);
+  }
+  return acc;
 }
