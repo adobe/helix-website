@@ -255,7 +255,7 @@ function updateDataFacets(filterText, params, checkpoint) {
                 return acc;
               }, [])
               .filter((s) => s))
-            .pop(),
+            .pop() || [],
         ));
       }
     });
