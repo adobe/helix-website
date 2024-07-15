@@ -1,5 +1,5 @@
 import classifyConsent from './consent.js';
-import { classifyAcquisition, vendor } from './acquisition.js';
+import { classifyAcquisition } from './acquisition.js';
 
 /* helpers */
 export function scoreValue(value, ni, poor) {
@@ -327,16 +327,17 @@ export function reclassifyEnter(acc, event) {
   if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
   if (acc.referrer && acc.acquisition && (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')) {
     const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
-    const [rGroup, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
-    const group = aGroup || 'earned';
+    const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
+    const group = aGroup || 'owned';
     const category = rCategory || aCategory;
     const vndr = rVendor || aVendor;
     const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
     acc.push({ checkpoint: 'acquisition', source: newsrc });
     if (acc.acquisition !== newsrc) {
-      console.log('reclassified', acc.acquisition, 'with', acc.referrer, 'to', newsrc);
+      // console.log('reclassified', acc.acquisition, 'with', acc.referrer, 'to', newsrc);
     }
-  } else {
+  }
+  if (event.checkpoint !== 'acquisition') {
     acc.push(event);
   }
   return acc;

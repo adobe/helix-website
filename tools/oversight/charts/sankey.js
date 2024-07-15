@@ -34,25 +34,84 @@ Chart.register(SankeyController, Flow, ...registerables);
 const stages = [
   {
     label: 'trafficsource',
+    max_values: 20,
     /*
      *  1.  Where is the traffic coming from:
      *   - referrer (can be domain or page)
      *   - direct
      */
+    social: {
+      label: 'Social',
+      next: ['paid', 'owned', 'earned'],
+      color: cssVariable('--spectrum-red-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/social/))
+        .length > 0,
+    },
+    search: {
+      label: 'Search',
+      next: ['paid', 'owned', 'earned'],
+      color: cssVariable('--spectrum-blue-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/search/))
+        .length > 0,
+    },
+    display: {
+      label: 'Display',
+      next: ['paid'],
+      color: cssVariable('--spectrum-red-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/display/))
+        .length > 0,
+    },
+    video: {
+      label: 'Video',
+      next: ['paid', 'owned', 'earned'],
+      color: cssVariable('--spectrum-orange-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/video/))
+        .length > 0,
+    },
+    email: {
+      label: 'Email',
+      next: ['owned'],
+      color: cssVariable('--spectrum-yellow-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/email/))
+        .length > 0,
+    },
+    local: {
+      label: 'Local',
+      next: ['owned', 'paid'],
+      color: cssVariable('--spectrum-chartreuse-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/local/))
+        .length > 0,
+    },
     referrer: {
-      label: (bundle) => {
-        const refhost = bundle.events.filter((e) => e.checkpoint === 'enter')
-          .filter((e) => e.source.startsWith('http'))
-          .map((e) => new URL(e.source).hostname)
-          .pop();
-        return `referrer:${refhost}`;
-      },
+      label: 'Referrer',
       color: cssVariable('--spectrum-purple-300'),
       // detection function
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
         .filter((e) => e.source.startsWith('http'))
-        .length > 0,
+        .length > 0
+        && bundle.events
+          .filter((e) => e.checkpoint === 'acquisition')
+          .filter((e) => e.source)
+          .length === 0,
       next: ['earned', 'owned', 'paid'],
     },
     direct: {
@@ -85,7 +144,7 @@ const stages = [
     },
     owned: {
       label: 'Owned',
-      color: cssVariable('--spectrum-teal-400'),
+      color: cssVariable('--spectrum-orange-400'),
       detect: (bundle) => bundle.events
         // .map(reclassifyAcquisition)
         .filter((e) => e.checkpoint === 'acquisition')
@@ -354,6 +413,7 @@ export default class SankeyChart extends AbstractChart {
         // go through each flow step in the stage
         Object.entries(stage)
           .filter(([key]) => key !== 'label')
+          .filter(([key]) => key !== 'max_values')
           .forEach(([key, step]) => {
           // if we already detected a flow, skip the rest
             if (cont) return;
@@ -361,10 +421,11 @@ export default class SankeyChart extends AbstractChart {
               const flowLabel = typeof step.label === 'function' ? step.label(bundle) : key;
               const flowValue = typeof step.label === 'function' ? step.label(bundle) : step.label;
               if (stage.label
-                && Object.entries(this.dataChunks.facets[stage.label]).length > MAX_FACETS) {
+                && Object.entries(this.dataChunks.facets[stage.label]).length
+                > (stage.max_values || stage.max_values || MAX_FACETS)) {
                 // we have too many facets, so we need to group some
                 if (this.dataChunks.facets[stage.label]
-                  .slice(0, MAX_FACETS)
+                  .slice(0, stage.max_values || stage.max_values || MAX_FACETS)
                   .map(({ value }) => value)
                   .includes(flowValue)) {
                   // the top N values are shown as is
@@ -490,6 +551,7 @@ export default class SankeyChart extends AbstractChart {
     facetcandidates.forEach((facet) => {
       dataChunks.addFacet(facet.label, (bundle) => Object.entries(facet)
         .filter(([key]) => key !== 'label')
+        .filter(([key]) => key !== 'max_values')
         .reduce((acc, [key, step]) => {
           if (acc.length > 0) return acc;
           if (step.detect(bundle, dataChunks)) {
