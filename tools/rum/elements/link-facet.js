@@ -23,7 +23,6 @@ export default class LinkFacet extends ListFacet {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
       return `
-      <img loading="lazy" src="${u.href}" title="${labelText}" alt="thumbnail image for ${labelText}" onerror="this.classList.add('broken')">
       <a href="${labelText}" target="_new">${labelURLParts(labelText)}</a>
       <a href="${pagespeedAtt}${encodeURIComponent(labelText)}" target="_new" class="icon pagespeed" title="Show pagespeed insights for ${labelText}">pagespeed</a>`;
     }
