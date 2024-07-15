@@ -66,10 +66,10 @@
                 <h2>Visits</h2>
                 <p><number-format>0</number-format></p>
               </li>
-              <conversion-tracker id="conversions" title="Page views with a user click">
-                <h2>Conversions</h2>
+              <conversion-tracker id="conversions" title="Page views with a user click outside a consent dialog">
+                <h2>Engagement</h2>
                 <p><number-format>0</number-format></p>
-                </conversion-tracker>
+              </conversion-tracker>
               <li id="lcp" title="Largest Contentful Paint">
                 <h2>LCP</h2>
                 <p><number-format precision="2" fuzzy="false">0</number-format></p>
@@ -198,6 +198,12 @@
               <dl>
                 <dt>onetrust</dt>
                 <dd>OneTrust</dd>
+                <dt>truste</dt>
+                <dd>TrustArc</dd>
+                <dt>usercentrics</dt>
+                <dd>Usercentrics</dd>
+                <dt>cybot</dt>
+                <dd>Cybot</dd>
               </dl>
             </list-facet>
             <list-facet facet="consent.target">
@@ -207,6 +213,10 @@
                 <dd>Dialog Shown</dd>
                 <dt>hidden</dt>
                 <dd>Dialog Hidden</dd>
+                <dt>accept</dt>
+                <dd>Consent provided</dd>
+                <dt>reject</dt>
+                <dd>Consent withheld</dd>
               </dl>
             </list-facet>
             <link-facet facet="error.source">
