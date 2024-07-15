@@ -249,13 +249,6 @@ function updateDataFacets(filterText, params, checkpoint) {
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ source }) => source) // filter out empty sources
             .map(({ source }) => source.split(':'))
-            /*
-            const parts = bundle.userAgent.split(':');
-            return parts.reduce((acc, _, i) => {
-              acc.push(parts.slice(0, i + 1).join(':'));
-              return acc;
-            }, []);
-            */
             .map((source) => source
               .reduce((acc, _, i) => {
                 acc.push(source.slice(0, i + 1).join(':'));
