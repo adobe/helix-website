@@ -384,6 +384,20 @@ const io = new IntersectionObserver((entries) => {
     if (params.get('metrics') === 'all') {
       document.querySelector('.key-metrics-more').ariaHidden = false;
     }
+
+    const labLink = document.querySelector('.lab a');
+    if (labLink) {
+      const updateLabLink = (url) => {
+        const current = new URL(labLink.href);
+        current.search = url.search;
+        labLink.href = current.toString();
+      };
+      updateLabLink(new URL(window.location.href));
+
+      document.addEventListener('urlstatechange', (ev) => {
+        updateLabLink(ev.detail);
+      });
+    }
   }
 });
 

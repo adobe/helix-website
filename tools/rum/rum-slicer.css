@@ -261,6 +261,11 @@ main .key-metrics ul > conversion-tracker[mode="custom"] h2::before {
   border: 1px solid var(--spectrum-fuchsia-700);
 }
 
+.lab {
+  font-size: 16px;
+  margin: 10px 0 0;
+}
+
 /* figure */
 
 figure {
@@ -276,7 +281,7 @@ figure .chart-container {
   min-height: 100px;
   display: grid;
   justify-content: center;
-  height: calc(100vh - 400px);
+  height: calc(100vh - 450px);
 }
 
 figure .chart-container.sankey {
