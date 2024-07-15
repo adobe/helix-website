@@ -1051,13 +1051,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     padding-top: 0;
   }
 
-  #facets link-facet label {
-    /* don't let the line wrap */
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
   #facets link-facet  a .protocol {
     display: none;
     opacity: 0.6;
