@@ -3,57 +3,35 @@
 <head>
   <title>RUM Admin | Orgs | AEM Live</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script type="importmap">{
-    "imports": {
-      "@spectrum-web-components/": "https://www.unpkg.com/@spectrum-web-components/",
-      "lit": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/if-defined.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/repeat.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/class-map.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/style-map.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/until.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/live.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/when.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/join.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "lit/directives/unsafe-html.js": "https://cdn.jsdelivr.net/gh/lit/dist@3.1.4/all/lit-all.min.js",
-      "@lit/": "https://www.unpkg.com/@lit/",
-      "lit-html/": "https://www.unpkg.com/lit-html/",
-      "lit/decorators.js": "https://www.unpkg.com/lit@3.1.4/decorators.js",
-      "lit/directive.js": "https://www.unpkg.com/lit-html@3.1.4/directive.js",
-      "lit/async-directive.js": "https://www.unpkg.com/lit-html@3.1.4/async-directive.js",
-      "@lit-labs/": "https://www.unpkg.com/@lit-labs/",
-      "@floating-ui/dom": "https://www.unpkg.com/@floating-ui/dom@1.6.5/dist/floating-ui.dom.browser.min.mjs",
-      "@floating-ui/core": "https://www.unpkg.com/@floating-ui/core@1.6.2/dist/floating-ui.core.browser.min.mjs"
-    }
-  }</script>
   <script src="/scripts/lib-franklin.js" type="module"></script>
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
-  <script type="module" defer="false">
-    import "@spectrum-web-components/theme@0.42.5/sp-theme.js";
-    import "@spectrum-web-components/progress-circle@0.42.5/sp-progress-circle.js";
-    import "@spectrum-web-components/theme@0.42.5/express/scale-medium.js";
-    import "@spectrum-web-components/theme@0.42.5/express/theme-light.js";
-  </script>
-  <style>
-    #deepmain {
-      display: flex;
-      flex-direction: column;
-      margin: auto;
-      max-width: 1440px;
-    }
-  </style>
   <script src="./orgs.js" type="module"></script>
+  <link rel="stylesheet" href="./orgs.css">
 </head>
 
 <body>
   <header></header>
   <main>
     <div>
-      <div id="deepmain">
-        <sp-theme theme="express" color="light" scale="medium">
-          <admin-orgs></admin-orgs>
-        </sp-theme>
+      <div id="rumadmin">
+        <h1 class="title">Manage Orgs</h1>
+        <div class="topbar">
+          <div id="org-selector">
+            <input list="org-list" id="org-selected" name="selected-org" placeholder="Select an org" />
+            <datalist id="org-list"></datalist>
+
+            <button id="btn-create-org">Create Org</button>
+          </div>
+
+          <div id="org-actions">
+            <button id="btn-add-domains">Add Domains</button>
+            <button id="btn-remove-domains" disabled>Remove Selected</button>
+          </div>
+        </div>
+        <div id="org-details">
+          <p class="empty-message">No org selected</p>
+        </div>
       </div>
     </div>
   </main>

@@ -1,7 +1,3 @@
-/* eslint-disable import/no-unresolved */
-import { html, LitElement } from 'lit';
-import styles from './orgs.css.js';
-
 const API = 'https://rum.fastly-aem.page';
 
 let token;
@@ -13,30 +9,54 @@ const fetchAPI = async (path, opts = {}) => fetch(`${API}${path}`, {
   },
 });
 
-class AdminOrgs extends LitElement {
-  static properties = {
-    denied: { type: Boolean },
-    ready: { type: Boolean },
-    orgs: { type: Array },
-    selectedOrg: { type: String },
-    invalidOrg: { type: Boolean },
-    domains: { type: Array },
-  };
+/** @type {Console} */
+const log = Object.fromEntries(
+  Object.entries(console).map(([key, fn]) => {
+    if (typeof fn !== 'function') {
+      return [key, fn];
+    }
+    return [key, fn.bind(null, '[admin/orgs.js]')];
+  }),
+);
 
-  static get styles() {
-    return [styles];
-  }
+/** @type {HTMLDivElement} */
+const mainDiv = document.getElementById('rumadmin');
+/** @type {HTMLDivElement} */
+const orgDetails = document.getElementById('org-details');
+/** @type {HTMLDivElement} */
+const orgActionsDiv = document.getElementById('org-actions');
+/** @type {HTMLInputElement} */
+const orgSelectedInput = document.getElementById('org-selected');
+/** @type {HTMLButtonElement} */
+const btnAddDomains = document.getElementById('btn-add-domains');
+/** @type {HTMLButtonElement} */
+const btnRemoveDomains = document.getElementById('btn-remove-domains');
+/** @type {HTMLButtonElement} */
+const btnCreateOrg = document.getElementById('btn-create-org');
+/** @type {HTMLDataListElement} */
+const orgDataList = document.getElementById('org-list');
 
-  domains = [];
+const store = new (class {
+  /** @type {string} */
+  selectedOrg = undefined;
 
-  orgs = [];
+  /** @type {boolean} */
+  denied = false;
 
-  async connectedCallback() {
-    super.connectedCallback();
+  /** @type {boolean} */
+  error = false;
 
-    // fetch orgs, on 404
-    await this.init();
-    this.ready = true;
+  /**
+   * org => domain map
+   * @type {Map<string, string[]>}
+   */
+  orgDomainMap = new Map();
+
+  /** @type {Set<string>} */
+  selectedDomains = new Set();
+
+  get orgDomains() {
+    return this.orgDomainMap.get(this.selectedOrg);
   }
 
   async init() {
@@ -59,240 +79,362 @@ class AdminOrgs extends LitElement {
         this.denied = true;
         localStorage.setItem('rum-admin-token', '');
       } else {
-        // TODO: show error
-        console.error(`failed to fetch (${res.status}): `, res);
+        log.error(`failed to fetch (${res.status}): `, res);
+        this.error = true;
       }
       return;
     }
 
+    this.error = false;
+    this.denied = false;
     const { orgs } = await res.json();
-    console.debug('loaded orgs: ', orgs);
     this.orgs = orgs;
+    log.debug('loaded orgs: ', orgs);
 
-    // fetch needed components
-    await import('@spectrum-web-components/combobox@0.42.5/sp-combobox.js');
-    await import('@spectrum-web-components/table@0.42.5/sp-table.js');
-    await import('@spectrum-web-components/table@0.42.5/sp-table-head.js');
-    await import('@spectrum-web-components/table@0.42.5/sp-table-head-cell.js');
-    await import('@spectrum-web-components/table@0.42.5/sp-table-cell.js');
-    // await import('@spectrum-web-components/button@0.42.5/sp-button.js');
-    await import('@spectrum-web-components/alert-dialog@0.42.5/sp-alert-dialog.js');
-    await import('@spectrum-web-components/textfield@0.42.5/sp-textfield.js');
-    await import('@spectrum-web-components/dialog@0.42.5/sp-dialog-wrapper.js');
-    await import('@spectrum-web-components/overlay@0.42.5/overlay-trigger.js');
-  }
-
-  onOrgChange(e) {
-    const org = e.target.value;
-    console.log('org selected: ', org);
-    this.domains = [];
-
-    if (!this.orgs.includes(org)) {
-      this.selectedOrg = org;
-      this.invalidOrg = true;
-      return;
+    // if org is selected, load it
+    const selectedOrg = new URLSearchParams(window.location.search).get('org');
+    if (selectedOrg) {
+      await this.setSelectedOrg(selectedOrg);
     }
-    this.loadDomains(org).then(() => {
-      this.selectedOrg = org;
-      this.invalidOrg = false;
-    });
   }
 
-  async loadDomains(org = this.selectedOrg) {
-    const res = await fetchAPI(`/orgs/${org}/domains`);
+  async setSelectedOrg(orgId) {
+    this.selectedDomains = new Set();
+    try {
+      await this.fetchDomains(orgId);
+    } catch (e) {
+      this.error = e.message;
+      this.selectedOrg = undefined;
+      return false;
+    }
+    this.selectedOrg = orgId;
+    return true;
+  }
+
+  selectDomain(domain, selected = true) {
+    this.selectedDomains[selected ? 'add' : 'delete'](domain);
+    return this.selectedDomains.size;
+  }
+
+  async fetchDomains(orgId) {
+    if (this.orgDomainMap.has(orgId)) {
+      return this.orgDomainMap.get(orgId);
+    }
+
+    const res = await fetchAPI(`/orgs/${orgId}`);
     if (!res.ok) {
-      console.error(`failed to fetch (${res.status}): `, res);
-      return;
+      log.error(`failed to fetch (${res.status}): `, res);
+      throw Error('failed to fetch org');
     }
 
     const { domains } = await res.json();
-    console.debug('loaded domains: ', domains);
-    this.domains = domains;
+    log.debug(`loaded domains for '${orgId}'`, domains);
+    this.orgDomainMap.set(orgId, domains);
+    return domains;
   }
 
-  domainRow(domain) {
-    return html`
-      <sp-table-row>
-        <sp-table-cell>
-          <div class="table-cell-row">
-            <div class="row-content">
-              <p>${domain}</p>
-            </div>
-
-            <div class="row-actions">
-              <overlay-trigger type="modal">
-                <sp-dialog-wrapper
-                    id="remove-domain-dialog"
-                    slot="click-content"
-                    headline="Remove domain?"
-                    dismissable
-                    dismiss-label="Close"
-                    underlay>
-                      <div class="confirm-dialog">
-                        <div class="confirm-dialog__actions">
-                          <sp-button 
-                            variant="negative"
-                            @click=${this.onRemoveDomain(domain)}>Remove</sp-button>
-                          <sp-button 
-                            variant="secondary" 
-                            onclick="javascript: this.dispatchEvent(new Event('close', {bubbles: true, composed: true}));">
-                            Cancel
-                          </sp-button>
-                        </div>
-                      </div>
-                </sp-dialog-wrapper>
-              <sp-button slot="trigger" variant="negative">Remove</sp-button>
-            </overlay-trigger>
-          </div>
-        </div>
-        </sp-table-cell>
-      </sp-table-row>`;
-  }
-
-  orgTable() {
-    if (this.invalidOrg) {
-      return html`<div></div>`;
+  async createOrg(orgId, domains = []) {
+    if (this.orgs.includes(orgId)) {
+      throw Error('org already exists');
     }
 
-    return html`
-      <sp-table>
-        <sp-table-head>
-          <sp-table-head-cell>Domains</sp-table-head-cell>
-        </sp-table-head>
-        <sp-table-body>
-          ${this.domains.map((domain) => this.domainRow(domain))}
-        </sp-table-body>
-      </sp-table>`;
-  }
-
-  onRemoveDomain(domain) {
-    return async () => {
-      console.log('remove domain: ', domain);
-
-      const dialog = this.shadowRoot.querySelector('sp-dialog-wrapper#remove-domain-dialog');
-      const resp = await fetchAPI(`/orgs/${this.selectedOrg}/domains/${domain}`, { method: 'DELETE' });
-      if (!resp.ok) {
-        console.error(`failed to remove domain (${resp.status}): `, resp);
-        // TODO: error toast
-        return;
-      }
-
-      // await this.loadDomains();
-      this.domains = this.domains.filter((d) => d !== domain);
-      this.requestUpdate();
-
-      dialog.dispatchEvent(new Event('close', { bubbles: true, composed: true }));
-    };
-  }
-
-  async onAddDomains() {
-    const dialog = this.shadowRoot.querySelector('sp-dialog-wrapper#add-domains-dialog');
-    const textfield = dialog.querySelector('sp-textfield');
-    const domains = textfield.value.split(/,|\n/).map((d) => d.trim()).filter((d) => d);
-    console.log('add domains: ', domains);
-
-    const resp = await fetchAPI(`/orgs/${this.selectedOrg}/domains`, {
+    // eslint-disable-next-line no-param-reassign
+    domains = [...new Set(domains)];
+    const res = await fetchAPI('/orgs', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ domains }),
+      body: JSON.stringify({ id: orgId, domains }),
+      headers: { 'Content-Type': 'application/json' },
     });
-    if (!resp.ok) {
-      console.error(`failed to add domains (${resp.status}): `, resp);
+    if (!res.ok) {
+      log.error(`failed to create org (${res.status}): `, res);
+      throw Error('failed to create org');
+    }
+    const { orgkey } = await res.json();
+    this.orgs.push(orgId);
+    this.orgDomainMap.set(orgId, domains);
+    return orgkey;
+  }
+
+  async addDomains(orgId, domains) {
+    const res = await fetchAPI(`/orgs/${orgId}`, {
+      method: 'POST',
+      body: JSON.stringify({ domains }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      log.error(`failed to add domains (${res.status}): `, res);
+      throw Error('failed to add domains');
+    }
+    const currentDomains = this.orgDomainMap.get(orgId);
+    const newDomains = [...new Set([...currentDomains, ...domains])];
+    this.orgDomainMap.set(orgId, newDomains);
+    return newDomains;
+  }
+
+  async removeDomains(orgId, domains) {
+    const removed = {};
+    // eslint-disable-next-line no-restricted-syntax
+    for (const domain of domains) {
+      // eslint-disable-next-line no-await-in-loop
+      const res = await fetchAPI(`/orgs/${orgId}/domains/${domain}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        log.error(`failed to remove domain '${domain}' (${res.status}): `, res);
+      } else {
+        removed[domain] = true;
+        this.selectedDomains.delete(domain);
+      }
+    }
+    const currentDomains = this.orgDomainMap.get(orgId);
+    const newDomains = currentDomains.filter((d) => !removed[d]);
+    this.orgDomainMap.set(orgId, newDomains);
+    return newDomains;
+  }
+})();
+
+/**
+ * @param {{
+*  title: string;
+*  content: string;
+*  acceptText?: string
+*  cancelText?: string;
+*  onAccept?: (self: HTMLDivElement) => boolean|Promise<boolean>;
+*  onCancel?: (self: HTMLDivElement) => boolean|Promise<boolean>;
+* }} param0
+* @returns {HTMLDivElement}
+*/
+const createModal = ({
+  title,
+  content = '',
+  acceptText = 'OK',
+  cancelText = 'Cancel',
+  onAccept = () => {},
+  onCancel = () => {},
+}) => {
+  const modal = document.createElement('div');
+  modal.classList.add('modal');
+  modal.innerHTML = /* html */`
+   <div class="modal-content">
+     <span class="cancel">&times;</span>
+     <h2 class="modal-title">${title}</h2>
+     <div class="content">${content}</div>
+     <div class="modal-actions"> 
+       <button id="btn-accept" class="accept">${acceptText}</button>
+       <button id="btn-cancel" class="cancel">${cancelText}</button>
+     </div>
+   </div>`;
+
+  const cancelBtns = modal.querySelectorAll('.cancel');
+  const acceptBtn = modal.querySelector('.accept');
+  cancelBtns.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (await onCancel(modal) !== false) {
+        modal.remove();
+      }
+    });
+  });
+  acceptBtn.addEventListener('click', async () => {
+    if (await onAccept(modal) !== false) {
+      modal.remove();
+    }
+  });
+
+  mainDiv.appendChild(modal);
+  return modal;
+};
+
+const updateOrgDataList = (orgs) => {
+  orgDataList.innerHTML = '';
+  orgs.forEach((org) => {
+    const option = document.createElement('option');
+    option.value = org;
+    orgDataList.appendChild(option);
+  });
+};
+
+const enableOrgActions = (enabled = true) => {
+  orgActionsDiv.style.display = enabled ? 'block' : 'none';
+};
+
+const createDomainRow = (org, domain) => {
+  const row = document.createElement('div');
+  row.classList.add('domain-row');
+  row.innerHTML = /* html */`
+    <div class="cell-checkbox"><input type="checkbox"/></div>
+    <div class="cell-domain">${domain}</div>
+    <div class="cell-domain-actions">
+      <button class="btn btn-danger">Remove</button>
+    </div>`;
+
+  const checkbox = row.querySelector('input[type="checkbox"]');
+  const btnRemove = row.querySelector('.btn-danger');
+
+  checkbox.addEventListener('change', (e) => {
+    const checkedCount = store.selectDomain(domain, e.target.checked);
+    if (checkedCount > 0) {
+      btnRemoveDomains.disabled = false;
+    } else {
+      btnRemoveDomains.disabled = true;
+    }
+  });
+
+  btnRemove.addEventListener('click', async () => {
+    createModal({
+      title: 'Remove domain',
+      content: /* html */`
+        <p>Are you sure you want to remove domain '${domain}' from ${org}?</p>
+      `,
+      onAccept: async () => {
+        try {
+          await store.removeDomains(org, [domain]);
+          row.remove();
+        } catch (e) {
+          // TODO: toast error
+          return false;
+        }
+        return true;
+      },
+    });
+  });
+  return row;
+};
+
+const updateDomainTable = (domains = []) => {
+  orgDetails.innerHTML = '';
+  if (domains.length) {
+    domains.forEach((domain) => {
+      orgDetails.appendChild(
+        createDomainRow(store.selectedOrg, domain),
+      );
+    });
+  } else {
+    orgDetails.innerHTML = '<p class="empty-message">No domains in org</p>';
+  }
+};
+
+(async () => {
+  mainDiv.classList.add('unauth');
+  await store.init();
+  if (store.denied) {
+    // TODO: ask for token again
+    return;
+  }
+  if (store.error) {
+    // TODO: show error
+    return;
+  }
+  mainDiv.classList.remove('unauth');
+
+  const { orgs, selectedOrg } = store;
+  updateOrgDataList(orgs);
+
+  if (selectedOrg) {
+    orgSelectedInput.value = selectedOrg;
+    enableOrgActions();
+    updateDomainTable(store.orgDomains);
+  }
+
+  // watch for org selection change
+  orgSelectedInput.addEventListener('change', async (e) => {
+    const orgId = e.target.value;
+    log.debug('selected org: ', orgId);
+    const ok = await store.setSelectedOrg(orgId);
+    enableOrgActions(ok);
+    updateDomainTable(store.orgDomains);
+    const url = new URL(window.location.href);
+    url.searchParams.set('org', orgId);
+    window.history.replaceState({}, '', url);
+  });
+
+  // attach create org button
+  btnCreateOrg.addEventListener('click', () => {
+    createModal({
+      title: 'Create new org',
+      content: /* html */`
+        <input type="text" placeholder="Name" />
+        <textarea placeholder="List of domain(s), separated by spaces/commas"></textarea>
+      `,
+      onAccept: async (modal) => {
+        const name = modal.querySelector('input').value;
+        const domains = modal.querySelector('textarea').value.split(/[ ,]+/);
+        log.debug('creating org: ', name, domains);
+
+        if (!name || name.includes(' ')) {
+          modal.querySelector('input').setCustomValidity('Invalid org name');
+          return false;
+        }
+
+        try {
+          const key = await store.createOrg(name, domains);
+          if (!key) {
+            return false;
+          }
+        } catch (e) {
+          // TODO: toast error
+          return false;
+        }
+
+        // TODO: toast success
+        return true;
+      },
+    });
+  });
+
+  // attach add domains button
+  btnAddDomains.addEventListener('click', () => {
+    if (!store.selectedOrg) {
       return;
     }
 
-    // await this.loadDomains();
-    this.domains = [...new Set([...this.domains, ...domains])];
-    this.requestUpdate();
+    createModal({
+      title: `Add domains to ${store.selectedOrg}`,
+      content: /* html */`
+        <textarea placeholder="List of domain(s), separated by spaces/commas"></textarea>
+      `,
+      onAccept: async (modal) => {
+        const newDomains = modal.querySelector('textarea').value.split(/[ ,]+/);
+        log.debug(`adding domains to '${store.selectedOrg}': `, newDomains);
+        try {
+          const domains = await store.addDomains(store.selectedOrg, newDomains);
+          updateDomainTable(domains);
+        } catch (e) {
+          // TODO: toast error
+          return false;
+        }
 
-    dialog.dispatchEvent(new Event('close', { bubbles: true, composed: true }));
-  }
+        // TODO: toast success
+        return true;
+      },
+    });
+  });
 
-  orgActions() {
-    if (this.invalidOrg) {
-      return html`<div></div>`;
+  // attach remove domains button
+  btnRemoveDomains.addEventListener('click', () => {
+    if (!store.selectedOrg) {
+      return;
+    }
+    if (!store.selectedDomains.size) {
+      return;
     }
 
-    return html`
-      <div class="org-actions">
-        <overlay-trigger type="modal">
-          <sp-dialog-wrapper
-              id="add-domains-dialog"
-              slot="click-content"
-              headline="Add domains"
-              dismissable
-              dismiss-label="Close"
-              underlay
-              footer="">
-                <div class="confirm-dialog">
-                  <div class="confirm-dialog__content">
-                    <sp-textfield label="Domains" multiline placeholder="Enter domains, comma and/or line delimited"></sp-textfield>
-                  </div>
+    createModal({
+      title: 'Remove domains',
+      content: /* html */`
+        <p>Are you sure you want to remove ${store.selectedDomains.size} domains from ${store.selectedOrg}?</p>
+      `,
+      onAccept: async () => {
+        try {
+          const domains = await store.removeDomains(store.selectedOrg, [...store.selectedDomains]);
+          updateDomainTable(domains);
+        } catch (e) {
+          // TODO: toast error
+          return false;
+        }
 
-                  <div class="confirm-dialog__actions">
-                    <sp-button 
-                      variant="primary"
-                      @click=${this.onAddDomains}>Add</sp-button>
-                    <sp-button 
-                      variant="secondary" 
-                      onclick="javascript: this.dispatchEvent(new Event('close', {bubbles: true, composed: true}));">
-                      Cancel
-                    </sp-button>
-                  </div>
-                </div>
-          </sp-dialog-wrapper>
-          <sp-button slot="trigger" variant="primary">Add domains</sp-button>
-        </overlay-trigger>
-      </div>`;
-  }
-
-  view() {
-    if (this.denied) {
-      return html`<div>Access Denied</div>`;
-    }
-
-    return html`
-      <div class="container">
-        <div id="nav">
-          <sp-combobox 
-            .options=${this.orgs.map((o) => ({ itemText: o, value: o }))}
-            @change=${this.onOrgChange}
-            ?invalid=${this.invalidOrg}
-          >
-            <sp-help-text slot="negative-help-text">
-              Invalid org selected
-            </sp-help-text>
-          </sp-combobox>
-          ${this.selectedOrg
-    ? this.orgActions()
-    : ''
-}
-        </div>
-
-        <div id="main">
-          ${this.selectedOrg
-    ? this.orgTable(this.domains)
-    : html`<div class="note"><p>Select an org</p></div>`}
-        </div>
-      </div>`;
-  }
-
-  render() {
-    return html`
-      <div class="container">
-      <h1>RUM Org Manager</h1>
-${
-  this.ready
-    ? this.view()
-    : html`
-      <div class="loader">
-        <sp-progress-circle indeterminate></sp-progress-circle>
-      </div>`
-}
-      </div>`;
-  }
-}
-
-customElements.define('admin-orgs', AdminOrgs);
+        // TODO: toast success
+        return true;
+      },
+    });
+  });
+})();
