@@ -471,12 +471,12 @@ fieldset li[class$="-"] {
 
 fieldset li.interesting {
   border-width: 2px;
-  padding: 2px 5px;
+  padding: 2px 16px;
 }
 
 fieldset li.significant {
   border-width: 3px;
-  padding: 2px 4px;
+  padding: 2px 14px;
 }
 
 fieldset li::after,
