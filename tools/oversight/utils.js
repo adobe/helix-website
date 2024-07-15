@@ -190,11 +190,14 @@ export function parseSearchParams(params, filterFn, transformFn) {
       return acc;
     }, {});
 }
+const cached = {};
 export function parseConversionSpec() {
+  if (cached.conversionSpec) return cached.conversionSpec;
   const params = new URL(window.location).searchParams;
   const transform = ([key, value]) => [key.replace('conversion.', ''), value];
   const filter = ([key]) => (key.startsWith('conversion.'));
-  return parseSearchParams(params, filter, transform);
+  cached.conversionSpec = parseSearchParams(params, filter, transform);
+  return cached.conversionSpec;
 }
 
 /**

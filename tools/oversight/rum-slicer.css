@@ -505,10 +505,12 @@ fieldset li[class$="-"] {
 
 fieldset li.interesting {
   border-width: 2px;
+  padding: 2px 5px;
 }
 
 fieldset li.significant {
   border-width: 3px;
+  padding: 2px 4px;
 }
 
 fieldset li::after,
@@ -545,49 +547,6 @@ vitals-facet label::before {
 #facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
   display: grid;
 }
-
-#facets .more-all fieldset div.more-container div.load-more label {
-  display: none;
-}
-
-#facets .more-more-more fieldset div.more-container div.load-more label:first-of-type {
-  /* that's enough */
-  display: none;
-}
-
-#facets fieldset div:nth-child(11) ~ div {
-  display: none;
-}
-
-#facets .more-all fieldset div:nth-child(11) ~ div,
-#facets .more.more-all fieldset div:nth-child(11) ~ div{
-  display: grid;
-}
-
-#facets .more fieldset div:nth-child(11) ~ div {
-  display: grid;
-}
-
-#facets .more fieldset div:nth-child(21) ~ div {
-  display: none;
-}
-
-#facets .more-more fieldset div:nth-child(21) ~ div {
-  display: grid;
-}
-
-#facets .more-more fieldset div:nth-child(31) ~ div {
-  display: none;
-}
-
-#facets .more-more-more fieldset div:nth-child(31) ~ div {
-  display: grid;
-}
-
-#facets .more-more-more fieldset div:nth-child(41) ~ div {
-  display: none;
-}
-
 
 #facets fieldset input[type=checkbox] {
   grid-area: check;
