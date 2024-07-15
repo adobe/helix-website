@@ -136,31 +136,9 @@ export default class ListFacet extends HTMLElement {
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
+      clipboard.title = 'Copy facet rows to clipboard';
 
-      const clipboardPaste = document.createElement('span');
-      clipboardPaste.className = 'clipboard-paste';
-      clipboardPaste.title = 'Paste from clipboard';
-
-      clipboardPaste.addEventListener('click', async () => {
-        // read the clipboard
-        const paste = navigator.clipboard.readText();
-        // split based on any newline character or space
-        const values = (await paste).split(/[\n\s]+/);
-        const pasted = [];
-        values.forEach((value) => {
-          const input = fieldSet.querySelector(`input[value="${value}"]`);
-          if (input) {
-            pasted.push(input);
-            input.checked = true;
-            input.parentElement.ariaSelected = true;
-          }
-        });
-        if (pasted.length) {
-          this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
-        }
-      });
-
-      legend.append(clipboard, clipboardPaste);
+      legend.append(clipboard);
 
       fieldSet.append(legend);
       const filterKeys = facetName === 'checkpoint' && mode !== 'all';

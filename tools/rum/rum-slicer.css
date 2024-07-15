@@ -760,8 +760,6 @@ vitals-facet fieldset label {
   font-size: 0;
 }
 
-.clipboard-paste::after,
-.clipboard-paste::before,
 .icon::after,
 .icon::before {
   content: "";
