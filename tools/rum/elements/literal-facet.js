@@ -5,7 +5,7 @@ import ListFacet from './list-facet.js';
  * A custom HTML element to display a list of facets with literal
  * values. If a placeholder has been provided, then the explanation
  * will be shown after the literal value.
- * <literal-facet facet="viewmedia.source" drilldown="share.html" mode="all">
+ * <literal-facet facet="viewmedia.source" mode="all">
  *   <legend>Media Source</legend>
  * </literal-facet>
  */

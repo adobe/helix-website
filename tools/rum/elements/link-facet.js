@@ -9,7 +9,7 @@ function labelURLParts(url) {
 
 /**
  * A custom HTML element to display a list of facets with links.
- * <link-facet facet="userAgent" drilldown="share.html" mode="all">
+ * <link-facet facet="userAgent" mode="all">
  *   <legend>Referrer</legend>
  * </link-facet>
  */

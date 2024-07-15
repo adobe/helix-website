@@ -3,7 +3,7 @@ import ListFacet from './list-facet.js';
 
 /**
  * A custom HTML element to display a list of facets with thumbnails.
- * <thumbnail-facet facet="userAgent" drilldown="share.html" mode="all">
+ * <thumbnail-facet facet="userAgent" mode="all">
  *   <legend>User Agent</legend>
  *   <dl>
  *    <dt>desktop</dt>
