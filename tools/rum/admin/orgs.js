@@ -357,7 +357,7 @@ const updateDomainTable = (domains = []) => {
       `,
       onAccept: async (modal) => {
         const name = modal.querySelector('input').value;
-        const domains = modal.querySelector('textarea').value.split(/[ ,]+/);
+        const domains = modal.querySelector('textarea').value.split(/[\s,]+/);
         log.debug('creating org: ', name, domains);
 
         if (!name || name.includes(' ')) {
@@ -393,7 +393,7 @@ const updateDomainTable = (domains = []) => {
         <textarea placeholder="List of domain(s), separated by spaces/commas"></textarea>
       `,
       onAccept: async (modal) => {
-        const newDomains = modal.querySelector('textarea').value.split(/[ ,]+/);
+        const newDomains = modal.querySelector('textarea').value.split(/[\s,]+/);
         log.debug(`adding domains to '${store.selectedOrg}': `, newDomains);
         try {
           const domains = await store.addDomains(store.selectedOrg, newDomains);
