@@ -595,7 +595,7 @@ vitals-facet label::before {
 }
 
 #facets fieldset label .extra::after {
-  content: '% conversion rate';
+  content: '% rate';
 }
 
 #facets fieldset label number-format[title="0"].extra::after {

@@ -1,3 +1,5 @@
+import classifyConsent from './consent.js';
+
 /* helpers */
 export function scoreValue(value, ni, poor) {
   if (value >= poor) return 'poor';
@@ -286,4 +288,12 @@ export function roundToConfidenceInterval(
 
   const rounded = toHumanReadable(total, precision);
   return rounded;
+}
+
+export function reclassifyConsent({ source, target, checkpoint }) {
+  if (checkpoint === 'click' && source) {
+    const consent = classifyConsent(source);
+    if (consent) return consent;
+  }
+  return { source, target, checkpoint };
 }
