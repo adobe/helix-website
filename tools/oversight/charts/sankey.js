@@ -119,7 +119,12 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
         .filter((e) => !e.source.startsWith('http'))
-        .length > 0,
+        .length > 0
+        || bundle.events
+          .filter((e) => e.checkpoint === 'acquisition')
+          .filter((e) => e.source)
+          .filter(({ source }) => source.match(/direct/))
+          .length > 0,
       next: ['earned', 'owned', 'paid'],
       color: cssVariable('--spectrum-green-300'),
     },
@@ -137,8 +142,8 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'utm'
           || e.checkpoint === 'paid'
-          || e.checkpoint === 'email'
-          || e.checkpoint === 'acquisition')
+          || (e.checkpoint === 'acquisition' && e.source && !e.source.startsWith('earned'))
+          || e.checkpoint === 'email')
         .length === 0,
       next: ['enter', 'consent', 'noconsent'],
     },

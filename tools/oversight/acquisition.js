@@ -36,6 +36,7 @@ const vendorClassifications = [
   { regex: /yandex/i, result: 'yandex' },
   { regex: /baidu/i, result: 'baidu' },
   { regex: /amazon|ctv/i, result: 'amazon' },
+  { regex: /direct/i, result: 'direct' },
 ];
 
 /* is the vendor paid or owned */
@@ -44,6 +45,7 @@ const vendorTypeLookup = {
   reddit: 'paid',
   tiktok: 'paid',
   amazon: 'paid',
+  direct: 'earned',
 };
 
 const categoryClassifications = [
@@ -97,6 +99,7 @@ const vendorCategoryLookup = {
   amazon: 'display',
   yandex: 'search',
   baidu: 'search',
+  direct: 'direct',
 };
 
 const categoryTypeLookup = {

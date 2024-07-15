@@ -322,20 +322,24 @@ export function reclassifyAcquisition({ source, target, checkpoint }) {
   return { source, target, checkpoint };
 }
 
-export function reclassifyEnter(acc, event) {
+export function reclassifyEnter(acc, event, i, allEvents) {
+  const has = (cp) => allEvents.find((evt) => evt.checkpoint === cp);
+
   if (event.checkpoint === 'enter') acc.referrer = event.source;
   if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
-  if (acc.referrer && acc.acquisition && (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')) {
+  if (
+    // we need to reclassify when we have seen both enter and acquisition
+    (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')
+    // but if there is no acquisition, we reclassify the enter event
+    && ((!has('acquisition')) || (acc.acquisition && acc.referrer))) {
     const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
     const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
-    const group = aGroup || 'owned';
+    const group = aGroup || 'earned';
     const category = rCategory || aCategory;
     const vndr = rVendor || aVendor;
     const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
+    // console.log('reclassifyEnter', acc.referrer, acc.acquisition, newsrc);
     acc.push({ checkpoint: 'acquisition', source: newsrc });
-    if (acc.acquisition !== newsrc) {
-      // console.log('reclassified', acc.acquisition, 'with', acc.referrer, 'to', newsrc);
-    }
   }
   if (event.checkpoint !== 'acquisition') {
     acc.push(event);
