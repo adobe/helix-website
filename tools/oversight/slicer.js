@@ -8,6 +8,7 @@ import {
   scoreCWV,
   computeConversionRate,
   reclassifyConsent,
+  reclassifyAcquisition,
 } from './utils.js';
 
 /* globals */
@@ -165,6 +166,7 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events
     .map(reclassifyConsent)
+    .map(reclassifyAcquisition)
     .reduce((acc, evt) => {
       acc.add(evt.checkpoint);
       return acc;
@@ -212,6 +214,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
           .map(reclassifyConsent)
+          .map(reclassifyAcquisition)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ source }) => source) // filter out empty sources
           .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
@@ -220,6 +223,7 @@ function updateDataFacets(filterText, params, checkpoint) {
         dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
           bundle.events
             .map(reclassifyConsent)
+            .map(reclassifyAcquisition)
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
             .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),

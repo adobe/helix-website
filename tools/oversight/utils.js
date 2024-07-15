@@ -1,4 +1,5 @@
 import classifyConsent from './consent.js';
+import classifyAcquisition from './acquisition.js';
 
 /* helpers */
 export function scoreValue(value, ni, poor) {
@@ -294,6 +295,20 @@ export function reclassifyConsent({ source, target, checkpoint }) {
   if (checkpoint === 'click' && source) {
     const consent = classifyConsent(source);
     if (consent) return consent;
+  }
+  return { source, target, checkpoint };
+}
+
+export function reclassifyAcquisition({ source, target, checkpoint }) {
+  if (checkpoint === 'utm' && (source === 'utm_source' || source === 'utm_medium')) {
+    const acquisition = classifyAcquisition(target);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  } else if (checkpoint === 'paid') {
+    const acquisition = classifyAcquisition(source, true);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  } else if (checkpoint === 'email') {
+    const acquisition = classifyAcquisition(source, false);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
   }
   return { source, target, checkpoint };
 }
