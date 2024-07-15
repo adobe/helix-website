@@ -14,10 +14,11 @@ import ListFacet from './list-facet.js';
 export default class ThumbnailFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
+    const fileName = labelText.split('/').pop().replace(/\?.*/, '');
     if (labelText.startsWith('https://') && labelText.includes('media_')) {
-      return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
-    } if (labelText.startsWith('http')) {
-      return `<img src="${labelText}">`;
+      return `<img src="${labelText}?width=750&format=webply&optimize=medium" title="${escapeHTML(labelText)}"><span class="filename">${escapeHTML(fileName)}</span>`;
+    } if (labelText.startsWith('http') && labelText.match(/\.(jpeg|jpg|gif|png|svg|webp)$/)) {
+      return `<img src="${labelText}" title="${escapeHTML(labelText)}"><span class="filename">${escapeHTML(fileName)}</span>`;
     }
     return escapeHTML(labelText);
   }

@@ -48,6 +48,9 @@ export default class NumberFormat extends HTMLElement {
         this.classList.add(`${findNearestVulgarFraction(fraction)}-of-total`);
       }
     }
+    if (this.getAttribute('trend')) {
+      this.title += ` and ${this.getAttribute('trend')}`;
+    }
     // resume observing
     this.mutationObserver.observe(this, { childList: true });
   }
