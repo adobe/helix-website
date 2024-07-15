@@ -385,6 +385,7 @@ const io = new IntersectionObserver((entries) => {
       document.querySelector('.key-metrics-more').ariaHidden = false;
     }
 
+    // update the lab link with the current url search params
     const labLink = document.querySelector('.lab a');
     if (labLink) {
       const updateLabLink = (url) => {
