@@ -1,5 +1,5 @@
 import {
-  computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
+  escapeHTML, scoreCWV, toHumanReadable,
 } from '../utils.js';
 import { tTest, zTestTwoProportions } from '../cruncher.js';
 
@@ -230,35 +230,7 @@ export default class ListFacet extends HTMLElement {
           countspan.title = metrics.pageViews.sum;
           const valuespan = this.createValueSpan(entry);
 
-          const conversionspan = document.createElement('span');
-          conversionspan.className = 'extra';
-
-          const $this = this;
-          const drawConversion = () => {
-            // we need to divide the totals by average weight
-            // so that we don't overestimate the significance
-            const m = entry.getMetrics(['conversions']);
-            const avgWeight = $this.dataChunks.totals.pageViews.weight
-              / $this.dataChunks.totals.pageViews.count;
-
-            addSignificanceFlag(conversionspan, {
-              total: metrics.visits.sum / avgWeight,
-              conversions: m.conversions.sum / avgWeight,
-            }, {
-              total: $this.dataChunks.totals.visits.sum / avgWeight,
-              conversions: $this.dataChunks.totals.conversions.sum / avgWeight,
-            });
-
-            const conversions = m.conversions.sum;
-            const visits = metrics.visits.sum;
-            const conversionRate = computeConversionRate(conversions, visits);
-            conversionspan.textContent = toHumanReadable(conversionRate);
-            conversionspan.title = m.conversions.sum;
-          };
-
-          window.setTimeout(drawConversion, 0);
-
-          label.append(countspan, valuespan, conversionspan);
+          label.append(countspan, valuespan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
