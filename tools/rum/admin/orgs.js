@@ -28,6 +28,8 @@ const orgActionsDiv = document.getElementById('org-actions');
 /** @type {HTMLInputElement} */
 const orgSelectedInput = document.getElementById('org-selected');
 /** @type {HTMLButtonElement} */
+const btnShowOrgkey = document.getElementById('btn-show-orgkey');
+/** @type {HTMLButtonElement} */
 const btnAddDomains = document.getElementById('btn-add-domains');
 /** @type {HTMLButtonElement} */
 const btnRemoveDomains = document.getElementById('btn-remove-domains');
@@ -54,6 +56,9 @@ const store = new (class {
 
   /** @type {Set<string>} */
   selectedDomains = new Set();
+
+  /** @type {Map<string, string>} */
+  orgkeyMap = new Map();
 
   get orgDomains() {
     return this.orgDomainMap.get(this.selectedOrg);
@@ -116,6 +121,22 @@ const store = new (class {
     return this.selectedDomains.size;
   }
 
+  async getOrgkey(orgId) {
+    if (this.orgkeyMap.has(orgId)) {
+      return this.orgkeyMap.get(orgId);
+    }
+
+    const res = await fetchAPI(`/orgs/${orgId}/key`);
+    if (!res.ok) {
+      log.error(`failed to fetch orgkey (${res.status}): `, res);
+      throw Error('failed to fetch orgkey');
+    }
+
+    const { orgkey } = await res.json();
+    this.orgkeyMap.set(orgId, orgkey);
+    return orgkey;
+  }
+
   async fetchDomains(orgId) {
     if (this.orgDomainMap.has(orgId)) {
       return this.orgDomainMap.get(orgId);
@@ -152,6 +173,7 @@ const store = new (class {
     const { orgkey } = await res.json();
     this.orgs.push(orgId);
     this.orgDomainMap.set(orgId, domains);
+    this.orgkeyMap.set(orgId, orgkey);
     return orgkey;
   }
 
@@ -313,6 +335,13 @@ const updateDomainTable = (domains = []) => {
   }
 };
 
+const showOrgkey = (key) => {
+  const orgkeyInput = btnShowOrgkey.previousElementSibling;
+  orgkeyInput.value = key;
+  orgkeyInput.style.display = key ? 'unset' : 'none';
+  btnShowOrgkey.innerText = `${key ? 'Hide' : 'Show'} orgkey`;
+};
+
 (async () => {
   mainDiv.classList.add('unauth');
   await store.init();
@@ -340,11 +369,25 @@ const updateDomainTable = (domains = []) => {
     const orgId = e.target.value;
     log.debug('selected org: ', orgId);
     const ok = await store.setSelectedOrg(orgId);
+    showOrgkey();
     enableOrgActions(ok);
     updateDomainTable(store.orgDomains);
     const url = new URL(window.location.href);
     url.searchParams.set('org', orgId);
     window.history.replaceState({}, '', url);
+  });
+
+  // show/hide orgkey
+  btnShowOrgkey.addEventListener('click', async () => {
+    if (!store.selectedOrg) {
+      return;
+    }
+
+    let orgkey;
+    if (btnShowOrgkey.innerText.startsWith('Show')) {
+      orgkey = await store.getOrgkey(store.selectedOrg);
+    }
+    showOrgkey(orgkey);
   });
 
   // attach create org button

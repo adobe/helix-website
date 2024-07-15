@@ -23,6 +23,10 @@
   display: none;
 }
 
+#rumadmin .topbar #org-actions .orgkey {
+  width: 300px;
+}
+
 #rumadmin #org-details {
   margin: 20px 0;
 }
