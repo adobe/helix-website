@@ -219,40 +219,28 @@ function updateDataFacets(filterText, params, checkpoint) {
           .filter(({ source }) => source) // filter out empty sources
           .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
       ));
-      if (cp !== 'utm') { // utm.target is different from the other checkpoints
-        dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
-          bundle.events
-            .map(reclassifyConsent)
-            .map(reclassifyAcquisition)
-            .filter((evt) => evt.checkpoint === cp)
-            .filter(({ target }) => target) // filter out empty targets
-            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
-        ));
+      dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
+        bundle.events
+          .map(reclassifyConsent)
+          .map(reclassifyAcquisition)
+          .filter((evt) => evt.checkpoint === cp)
+          .filter(({ target }) => target) // filter out empty targets
+          .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+      ));
 
-        if (cp === 'loadresource') {
-          // loadresource.target are not discrete values, but the number
-          // of milliseconds it took to load the resource, so the best way
-          // to present this is to create a histogram
-          // we already have the `loadresource.target` facet, so we can
-          // extract the values from there and create a histogram
-          dataChunks.addHistogramFacet(
-            'loadresource.histogram',
-            'loadresource.target',
-            {
-              count: 10, min: 0, max: 10000, steps: 'quantiles',
-            },
-          );
-        }
-      } else if (params.has('utm.source')) {
-        params.getAll('utm.source').forEach((utmsource) => {
-          dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
-            bundle.events
-              .filter((evt) => evt.checkpoint === 'utm')
-              .filter((evt) => evt.source === utmsource)
-              .filter((evt) => evt.target)
-              .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
-          ));
-        });
+      if (cp === 'loadresource') {
+        // loadresource.target are not discrete values, but the number
+        // of milliseconds it took to load the resource, so the best way
+        // to present this is to create a histogram
+        // we already have the `loadresource.target` facet, so we can
+        // extract the values from there and create a histogram
+        dataChunks.addHistogramFacet(
+          'loadresource.histogram',
+          'loadresource.target',
+          {
+            count: 10, min: 0, max: 10000, steps: 'quantiles',
+          },
+        );
       }
     });
 
