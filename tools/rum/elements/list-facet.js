@@ -230,7 +230,7 @@ export default class ListFacet extends HTMLElement {
           countspan.title = metrics.pageViews.sum;
           const valuespan = this.createValueSpan(entry);
 
-          label.append(countspan, valuespan);
+          label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
