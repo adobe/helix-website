@@ -261,11 +261,6 @@ main .key-metrics ul > conversion-tracker[mode="custom"] h2::before {
   border: 1px solid var(--spectrum-fuchsia-700);
 }
 
-.lab {
-  font-size: 16px;
-  margin: 10px 0 0;
-}
-
 /* figure */
 
 figure {
@@ -340,13 +335,17 @@ figcaption {
   font-style: italic;
   display: flex;
   align-items: center;
-  justify-content: end;
   flex-wrap: wrap;
 }
 
 figcaption > span {
   display: inline-flex;
   align-items: center;
+  margin-left: 2px;
+}
+
+figcaption span.lab {
+  flex-grow: 1;
 }
 
 #low-data-warning[aria-hidden=true] {
