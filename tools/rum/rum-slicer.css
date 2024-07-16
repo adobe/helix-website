@@ -542,6 +542,7 @@ thumbnail-facet label span.filename {
   border: 1px solid var(--spectrum-blue-400);
   padding: 2px 4px;
   line-height: 1.4;
+  margin-left: 4px;
 }
 
 thumbnail-facet label span.count {
