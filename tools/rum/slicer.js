@@ -295,17 +295,6 @@ export function updateState() {
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
 
-  // with the conversion spec in form of dictionary
-  // need to put it back in the url by expanding the dictionary as follows
-  // the key is appended to conversion. and there can be multiple values for the same key
-  // conversion.key=value1&conversion.key=value2
-
-  Object.entries(conversionSpec).forEach(([key, values]) => {
-    values.forEach((value) => {
-      url.searchParams.append(`conversion.${key}`, value);
-    });
-  });
-
   window.history.replaceState({}, '', url);
   document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
 }
