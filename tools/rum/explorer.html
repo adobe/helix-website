@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
     import SkylineChart from './charts/skyline.js';
-    import ConversionTracker from './elements/conversion-tracker.js';
     import IncognitoCheckbox from './elements/incognito-checkbox.js';
     import FacetSidebar from './elements/facetsidebar.js';
     import ListFacet from './elements/list-facet.js';
@@ -32,7 +31,6 @@
     customElements.define('literal-facet', LiteralFacet);
     customElements.define('vitals-facet', VitalsFacet);
     customElements.define('url-selector', URLSelector);
-    customElements.define('conversion-tracker', ConversionTracker);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -65,10 +63,10 @@
                   <h2>Visits</h2>
                   <p>0</p>
                 </li>
-                <conversion-tracker id="conversions" title="Page views with a user click">
+                <li id="conversions" title="Page views with a user click">
                   <h2>Conversions</h2>
                   <p>0</p>
-                </conversion-tracker>
+                </li>
                 <li id="lcp" title="Largest Contentful Paint">
                   <h2>LCP</h2>
                   <p>0</p>
