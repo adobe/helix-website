@@ -88,6 +88,10 @@ export function updateKeyMetrics(keyMetrics) {
   const inpElem = document.querySelector('#inp p');
   inpElem.textContent = `${toHumanReadable(keyMetrics.inp / 1000)} s`;
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
+
+  const ttfbElem = document.querySelector('#ttfb p');
+  ttfbElem.textContent = `${toHumanReadable(keyMetrics.ttfb / 1000)} s`;
+  ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
 
 const conversionSpec = Object.keys(parseConversionSpec()).length
