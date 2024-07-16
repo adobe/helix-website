@@ -1,5 +1,5 @@
 import {
-  computeConversionRate, escapeHTML, scoreCWV, toHumanReadable,
+  escapeHTML, scoreCWV, toHumanReadable,
 } from '../utils.js';
 import { tTest, zTestTwoProportions } from '../cruncher.js';
 
@@ -26,7 +26,7 @@ async function addSignificanceFlag(element, metric, baseline) {
 }
 /**
  * A custom HTML element to display a list of facets.
- * <list-facet facet="userAgent" drilldown="share.html" mode="all">
+ * <list-facet facet="userAgent" mode="all">
  *   <legend>User Agent</legend>
  *   <dl>
  *    <dt>desktop</dt>
@@ -112,7 +112,6 @@ export default class ListFacet extends HTMLElement {
       });
 
     const url = new URL(window.location);
-    const drilldownAtt = this.getAttribute('drilldown');
     const mode = url.searchParams.get('mode') || this.getAttribute('mode');
     const numOptions = mode === 'all' ? 20 : 10;
 
@@ -137,60 +136,9 @@ export default class ListFacet extends HTMLElement {
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
+      clipboard.title = 'Copy facet rows to clipboard';
 
-      const clipboardPaste = document.createElement('span');
-      clipboardPaste.className = 'clipboard-paste';
-      clipboardPaste.title = 'Paste from clipboard';
-
-      clipboardPaste.addEventListener('click', async () => {
-        // read the clipboard
-        const paste = navigator.clipboard.readText();
-        // split based on any newline character or space
-        const values = (await paste).split(/[\n\s]+/);
-        const pasted = [];
-        values.forEach((value) => {
-          const input = fieldSet.querySelector(`input[value="${value}"]`);
-          if (input) {
-            pasted.push(input);
-            input.checked = true;
-            input.parentElement.ariaSelected = true;
-          }
-        });
-        if (pasted.length) {
-          this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
-        }
-      });
-
-      legend.append(clipboard, clipboardPaste);
-      if (drilldownAtt && url.searchParams.get('drilldown') !== facetName) {
-        const drilldown = document.createElement('a');
-        drilldown.className = 'drilldown';
-        drilldown.href = drilldownAtt;
-        drilldown.title = 'Drill down to more details';
-        drilldown.textContent = '';
-        drilldown.addEventListener('click', () => {
-          const drilldownurl = new URL(drilldown.href, window.location);
-          drilldownurl.search = new URL(window.location).search;
-          drilldownurl.searchParams.delete(facetName);
-          drilldownurl.searchParams.set('drilldown', facetName);
-          drilldown.href = drilldownurl.href;
-        });
-        legend.append(drilldown);
-      } else if (url.searchParams.get('drilldown') === facetName) {
-        const drillup = document.createElement('a');
-        drillup.className = 'drillup';
-        drillup.href = 'explorer.html';
-        drillup.title = 'Return to previous level';
-        drillup.textContent = '';
-        drillup.addEventListener('click', () => {
-          const drillupurl = new URL(drillup.href, window.location);
-          drillupurl.search = new URL(window.location).search;
-          drillupurl.searchParams.delete(facetName);
-          drillupurl.searchParams.delete('drilldown', facetName);
-          drillup.href = drillupurl.href;
-        });
-        legend.append(drillup);
-      }
+      legend.append(clipboard);
 
       fieldSet.append(legend);
       const filterKeys = facetName === 'checkpoint' && mode !== 'all';
@@ -230,35 +178,7 @@ export default class ListFacet extends HTMLElement {
           countspan.title = metrics.pageViews.sum;
           const valuespan = this.createValueSpan(entry);
 
-          const conversionspan = document.createElement('span');
-          conversionspan.className = 'extra';
-
-          const $this = this;
-          const drawConversion = () => {
-            // we need to divide the totals by average weight
-            // so that we don't overestimate the significance
-            const m = entry.getMetrics(['conversions']);
-            const avgWeight = $this.dataChunks.totals.pageViews.weight
-              / $this.dataChunks.totals.pageViews.count;
-
-            addSignificanceFlag(conversionspan, {
-              total: metrics.visits.sum / avgWeight,
-              conversions: m.conversions.sum / avgWeight,
-            }, {
-              total: $this.dataChunks.totals.visits.sum / avgWeight,
-              conversions: $this.dataChunks.totals.conversions.sum / avgWeight,
-            });
-
-            const conversions = m.conversions.sum;
-            const visits = metrics.visits.sum;
-            const conversionRate = computeConversionRate(conversions, visits);
-            conversionspan.textContent = toHumanReadable(conversionRate);
-            conversionspan.title = m.conversions.sum;
-          };
-
-          window.setTimeout(drawConversion, 0);
-
-          label.append(valuespan, countspan, conversionspan);
+          label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
