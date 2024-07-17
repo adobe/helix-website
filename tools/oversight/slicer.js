@@ -161,11 +161,11 @@ function updateDataFacets(filterText, params, checkpoint) {
     u.pathname = u.pathname.split('/')
       .map((segment) => {
         // only numbers and longer than 5 characters: probably an id, censor it
-        if (segment.length > 5 && /^\d+$/.test(segment)) {
+        if (segment.length >= 5 && /^\d+$/.test(segment)) {
           return '<number>';
         }
         // only hex characters and longer than 8 characters: probably a hash, censor it
-        if (segment.length > 5 && /^[0-9a-f]+$/i.test(segment)) {
+        if (segment.length >= 8 && /^[0-9a-f]+$/i.test(segment)) {
           return '<hex>';
         }
         // base64 encoded data, censor it
