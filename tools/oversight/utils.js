@@ -1,4 +1,5 @@
 import classifyConsent from './consent.js';
+import { classifyAcquisition } from './acquisition.js';
 
 /* helpers */
 export function scoreValue(value, ni, poor) {
@@ -296,4 +297,52 @@ export function reclassifyConsent({ source, target, checkpoint }) {
     if (consent) return consent;
   }
   return { source, target, checkpoint };
+}
+
+export function reclassifyAcquisition({ source, target, checkpoint }) {
+  if (checkpoint === 'utm' && (source === 'utm_source' || source === 'utm_medium')) {
+    const acquisition = classifyAcquisition(target);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  } else if (checkpoint === 'paid') {
+    const acquisition = classifyAcquisition(source, true);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  } else if (checkpoint === 'email') {
+    const acquisition = classifyAcquisition(source, false);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  }
+  /* reclassify earned acquisition – I don't like this, because it kills the enter checkpoint
+  else if (checkpoint === 'enter' && !allEvents.find((evt) => evt.checkpoint === 'acquisition'
+    || evt.checkpoint === 'utm'
+    || evt.checkpoint === 'paid'
+    || evt.checkpoint === 'email')) {
+    const acquisition = classifyAcquisition(source, 'earned');
+    if (acquisition) return { checkpoint: 'acquisition', source: `${acquisition}` };
+  }
+  */
+  return { source, target, checkpoint };
+}
+
+export function reclassifyEnter(acc, event, i, allEvents) {
+  const has = (cp) => allEvents.find((evt) => evt.checkpoint === cp);
+
+  if (event.checkpoint === 'enter') acc.referrer = event.source;
+  if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
+  if (
+    // we need to reclassify when we have seen both enter and acquisition
+    (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')
+    // but if there is no acquisition, we reclassify the enter event
+    && ((!has('acquisition')) || (acc.acquisition && acc.referrer))) {
+    const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
+    const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
+    const group = aGroup || 'earned';
+    const category = rCategory || aCategory;
+    const vndr = rVendor || aVendor;
+    const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
+    // console.log('reclassifyEnter', acc.referrer, acc.acquisition, newsrc);
+    acc.push({ checkpoint: 'acquisition', source: newsrc });
+  }
+  if (event.checkpoint !== 'acquisition') {
+    acc.push(event);
+  }
+  return acc;
 }
