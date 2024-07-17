@@ -2,6 +2,7 @@ import { escapeHTML } from '../utils.js';
 import ListFacet from './list-facet.js';
 
 function urlDecode(part, rich = false) {
+  if (!part) return '/';
   // replace %3C(number|hex|base64|uuid)%3E with <...> (ignore case for the url encoding)
 
   return rich
