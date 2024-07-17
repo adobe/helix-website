@@ -155,7 +155,35 @@ function updateDataFacets(filterText, params, checkpoint) {
       return acc;
     }, []);
   });
-  dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
+  dataChunks.addFacet('url', (bundle) => {
+    if (bundle.domain) return bundle.domain;
+    const u = new URL(bundle.url);
+    u.pathname = u.pathname.split('/')
+      .map((segment) => {
+        // only numbers and longer than 5 characters: probably an id, censor it
+        if (segment.length > 5 && /^\d+$/.test(segment)) {
+          return '<number>';
+        }
+        // only hex characters and longer than 8 characters: probably a hash, censor it
+        if (segment.length > 5 && /^[0-9a-f]+$/i.test(segment)) {
+          return '<hex>';
+        }
+        // base64 encoded data, censor it
+        if (segment.length > 32 && /^[a-zA-Z0-9+/]+$/.test(segment)) {
+          return '<base64>';
+        }
+        // probable UUID, censor it
+        if (segment.length > 35 && /^[0-9a-f-]+$/.test(segment)) {
+          return '<uuid>';
+        }
+        // just too long
+        if (segment.length > 40) {
+          return '...';
+        }
+        return segment;
+      }).join('/');
+    return u.toString();
+  });
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];

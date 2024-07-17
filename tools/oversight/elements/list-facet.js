@@ -204,7 +204,6 @@ export default class ListFacet extends HTMLElement {
         const prefix = entries.slice(start, end)
           .map((entry) => entry.value)
           .reduce((acc, entry) => {
-            console.log('prefix', acc);
             // find longest common prefix between acc and entry
             let i = 0;
             while (i < acc.length && i < entry.length && acc[i] === entry[i]) {

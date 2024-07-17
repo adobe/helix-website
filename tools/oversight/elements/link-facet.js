@@ -1,14 +1,23 @@
 import { escapeHTML } from '../utils.js';
 import ListFacet from './list-facet.js';
 
+function urlDecode(part, rich = false) {
+  // replace %3C(number|hex|base64|uuid)%3E with <...> (ignore case for the url encoding)
+
+  return rich
+    ? part.replace(/%3C(number|hex|base64|uuid)%3E/gi, '<span class="withheld">$1</span>')
+    : part.replace(/%3[Cc](number|hex|base64|uuid)%3[Ee]/g, '<$1>');
+}
+
 function labelURLParts(url, prefix) {
   if (prefix && url.startsWith(prefix)) {
-    return `<span class="collapse" title="${url}">${prefix}</span><span class="suffix" title="${url}">${url.replace(prefix, '')}</span>`;
+    return `<span class="collapse" title="${url}">${prefix}</span><span class="suffix" title="${urlDecode(url)}">${urlDecode(url.replace(prefix, ''), true)}</span>`;
   }
   const u = new URL(url);
   return ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash']
+    .map((part) => ({ part, value: u[part], full: u.href }))
     .reduce(
-      (acc, part) => `${acc}<span class="${part}" title="${u.href}" prefix="${prefix}">${u[part]}</span>`,
+      (acc, { part, value, full }) => `${acc}<span class="${part}" title="${full}">${value}</span>`,
       '',
     );
 }
@@ -25,6 +34,14 @@ export default class LinkFacet extends ListFacet {
     const thumbnailAtt = this.getAttribute('thumbnail');
     const pagespeedAtt = this.getAttribute('pagespeed');
     const faviconAtt = this.getAttribute('favicon');
+    const isCensored = labelText.includes('...')
+      || labelText.includes('<number>') || labelText.includes('%3Cnumber%3E')
+      || labelText.includes('<hex>') || labelText.includes('%3Chex%3E')
+      || labelText.includes('<base64>') || labelText.includes('%3Cbase64%3E')
+      || labelText.includes('<uuid>') || labelText.includes('%3Cuuid%3E');
+    if (isCensored) {
+      return labelURLParts(labelText, prefix);
+    }
     if (pagespeedAtt && thumbnailAtt && labelText.startsWith('https://')) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);

@@ -605,7 +605,8 @@ vitals-facet label::before {
   content: '';
 }
 
-#facets literal-facet label span.value {
+#facets literal-facet label span.value,
+#facets link-facet label span.withheld {
   font-family: monospace;
   font-size: 80%;
   background-color: var(--spectrum-blue-200);
@@ -741,11 +742,11 @@ vitals-facet fieldset label {
   height: 60px;
 }
 
-#facets link-facet a span.collapse {
+#facets link-facet span.collapse {
   display: none;
 }
 
-#facets link-facet a span.collapse + span.suffix::before {
+#facets link-facet span.collapse + span.suffix::before {
   content: '...';
 }
 
