@@ -201,6 +201,17 @@ export default class ListFacet extends HTMLElement {
       const paint = (start = 0, end = numOptions) => {
         const entries = facetEntries
           .filter((entry) => !filterKeys || filteredKeys.includes(entry.value));
+        const prefix = entries.slice(start, end)
+          .map((entry) => entry.value)
+          .reduce((acc, entry) => {
+            console.log('prefix', acc);
+            // find longest common prefix between acc and entry
+            let i = 0;
+            while (i < acc.length && i < entry.length && acc[i] === entry[i]) {
+              i += 1;
+            }
+            return acc.slice(0, i);
+          }, entries[0].value);
         entries.slice(start, end).forEach((entry) => {
           const div = document.createElement('div');
           const input = document.createElement('input');
@@ -230,7 +241,7 @@ export default class ListFacet extends HTMLElement {
           countspan.setAttribute('sample-size', metrics.pageViews.count);
           countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
           countspan.setAttribute('fuzzy', 'false');
-          const valuespan = this.createValueSpan(entry);
+          const valuespan = this.createValueSpan(entry, prefix);
 
           const conversionspan = document.createElement('number-format');
           conversionspan.className = 'extra';
@@ -340,9 +351,9 @@ export default class ListFacet extends HTMLElement {
     }
   }
 
-  createValueSpan(entry) {
+  createValueSpan(entry, prefix) {
     const valuespan = document.createElement('span');
-    valuespan.innerHTML = this.createLabelHTML(entry.value);
+    valuespan.innerHTML = this.createLabelHTML(entry.value, prefix);
     const highlightFromParam = this.getAttribute('highlight');
     if (highlightFromParam) {
       const highlightValue = new URL(window.location).searchParams.get(highlightFromParam) || '';

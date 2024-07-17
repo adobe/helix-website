@@ -741,6 +741,14 @@ vitals-facet fieldset label {
   height: 60px;
 }
 
+#facets link-facet a span.collapse {
+  display: none;
+}
+
+#facets link-facet a span.collapse + span.suffix::before {
+  content: '...';
+}
+
 #facets link-facet a .protocol::after {
   content: '//';
 }
@@ -1061,10 +1069,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     font-size: 18px;
   }
 
-  #facets link-facet  a .protocol {
-    display: inline;
-  }
-
   #facets link-facet  a .hostname {
     display: inline;
   }
@@ -1123,10 +1127,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 @media (min-width: 2000px) {
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
-
-  #facets link-facet  a .protocol {
-    display: inline;
   }
 
   #facets link-facet  a .hostname {
