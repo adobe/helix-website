@@ -293,9 +293,8 @@ export async function draw() {
 
   updateKeyMetrics();
 
-  const focus = params.get('focus');
   const mode = params.get('metrics');
-  elems.sidebar.updateFacets(focus, mode);
+  elems.sidebar.updateFacets(mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
@@ -329,8 +328,6 @@ export function updateState() {
   url.searchParams.set('view', elems.viewSelect.value);
   if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
-  const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
-  if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 
@@ -395,7 +392,6 @@ const io = new IntersectionObserver((entries) => {
     elems.filterInput.value = params.get('filter');
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
-    const focus = params.get('focus');
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
@@ -412,23 +408,6 @@ const io = new IntersectionObserver((entries) => {
     elems.viewSelect.addEventListener('input', () => {
       updateState();
       window.location.reload();
-    });
-
-    if (focus) {
-      const keyMetric = document.getElementById(focus);
-      if (keyMetric) keyMetric.ariaSelected = 'true';
-    }
-
-    const metrics = [...document.querySelectorAll('.key-metrics li')];
-    metrics.forEach((e) => {
-      e.addEventListener('click', (evt) => {
-        const metric = evt.currentTarget.id;
-        const selected = evt.currentTarget.ariaSelected === 'true';
-        metrics.forEach((m) => { m.ariaSelected = false; });
-        if (metric !== 'pageviews') e.ariaSelected = !selected;
-        updateState();
-        draw();
-      });
     });
 
     if (params.get('metrics') === 'all') {
