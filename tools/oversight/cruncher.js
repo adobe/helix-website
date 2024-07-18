@@ -553,7 +553,7 @@ export class DataChunks {
 
   resetData() {
     // data that has been filtered
-    this.filteredIn = [];
+    this.filteredIn = null;
     // filtered data that has been grouped
     this.groupedIn = {};
     // grouped data that has been aggregated
@@ -738,7 +738,7 @@ export class DataChunks {
   }
 
   get filtered() {
-    if (this.filteredIn.length) return this.filteredIn;
+    if (this.filteredIn) return this.filteredIn;
     if (Object.keys(this.filters).length === 0) return this.bundles; // no filter, return all
     if (Object.keys(this.facetFns).length === 0) return this.bundles; // no facets, return all
     this.filteredIn = this.filterBundles(this.bundles, this.filters);

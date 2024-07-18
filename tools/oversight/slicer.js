@@ -189,7 +189,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('filter', (bundle) => {
     // this function is also a bit weird, because it takes
     // the filtertext into consideration
-    const fullText = bundle.url + bundle.events.map((e) => e.checkpoint).join(' ');
+    const fullText = `${bundle.url} ${bundle.events.map((e) => e.checkpoint).join(' ')}`;
     const keywords = filterText
       .split(' ')
       .filter((word) => word.length > 2);

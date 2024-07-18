@@ -337,6 +337,9 @@ export default class ListFacet extends HTMLElement {
         setTimeout(() => { toast.ariaHidden = true; }, 3000);
       });
       this.append(fieldSet);
+    } else {
+      const fieldSet = this.querySelector('fieldset');
+      if (fieldSet) fieldSet.remove();
     }
   }
 
