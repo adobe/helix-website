@@ -45,7 +45,7 @@ export default class FacetSidebar extends HTMLElement {
     });
   }
 
-  updateFacets(focus, mode) {
+  updateFacets(mode) {
     const filterTags = document.querySelector('.filter-tags');
     filterTags.textContent = '';
     const addFilterTag = (name, value) => {
@@ -57,7 +57,6 @@ export default class FacetSidebar extends HTMLElement {
     };
 
     if (this.elems.filterInput.value) addFilterTag('text', this.elems.filterInput.value);
-    if (focus) addFilterTag(focus);
 
     const existingFacetElements = Array.from(this.elems.facetsElement.children);
     existingFacetElements.forEach((facet) => {
@@ -73,7 +72,6 @@ export default class FacetSidebar extends HTMLElement {
       console.assert(facetEl, `Facet ${facetName} not found in provided UI elements.`);
 
       if (facetEl) facetEl.setAttribute('mode', mode || 'default');
-      if (facetEl && focus) facetEl.setAttribute('focus', focus);
       if (facetEl) this.elems.facetsElement.append(facetEl);
     });
   }
