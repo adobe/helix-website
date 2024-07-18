@@ -61,7 +61,6 @@ function sortByUAClass(left, right) {
 export default class PieChart extends AbstractChart {
   async draw() {
     const params = new URL(window.location.href).searchParams;
-    this.chartConfig.focus = params.get('focus');
 
     if (this.dataChunks.filtered.length < 1000) {
       this.elems.lowDataWarning.ariaHidden = 'false';

@@ -96,13 +96,11 @@ export function simpleCWVInterpolationFn(metric, threshold) {
     return cwvs[threshold + metric].weight / valuedWeights;
   };
 }
-export function cwvInterpolationFn(targetMetric, interpolateTo100) {
+export function cwvInterpolationFn(targetMetric) {
   return (cwvs) => {
     const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
     const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
-    if (interpolateTo100) {
-      return (cwvs[targetMetric].weight / valuedWeights);
-    }
+
     if (valueCount < INTERPOLATION_THRESHOLD) {
       // not enough data to interpolate
       return 0;
