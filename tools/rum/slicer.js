@@ -28,6 +28,14 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
+
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
@@ -41,7 +49,7 @@ dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
+dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, conversionSpec)
   ? bundle.weight
   : 0));
 function setDomain(domain, key) {
@@ -71,7 +79,7 @@ export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
   if (keyMetrics.visits > 0) {
     const conversionsExtra = document.createElement('span');
-    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
+    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.pageViews);
     conversionsExtra.textContent = toHumanReadable(conversionRate);
     conversionsExtra.className = 'extra';
     document.querySelector('#conversions p').appendChild(conversionsExtra);
@@ -93,14 +101,6 @@ export function updateKeyMetrics(keyMetrics) {
   ttfbElem.textContent = `${toHumanReadable(keyMetrics.ttfb / 1000)} s`;
   ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
-
-const conversionSpec = Object.keys(parseConversionSpec()).length
-  ? parseConversionSpec()
-  : { checkpoint: ['click'] };
-
-const isDefaultConversion = Object.keys(conversionSpec).length === 1
-  && conversionSpec.checkpoint
-  && conversionSpec.checkpoint[0] === 'click';
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
