@@ -9,25 +9,44 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
+ [hidden] {
+  display: none !important;
+}
 
- .hlx-preview-overlay {
-  z-index: 999;
+.hlx-highlight {
+  --highlight-size: .5rem;
+
+  outline-color: #888;
+  outline-offset: calc(-1 * var(--highlight-size));
+  outline-style: dashed;
+  outline-width: var(--highlight-size);
+  background-color: #8882;
+}
+
+.hlx-preview-overlay {
+  z-index: 99999;
   position: fixed;
-  bottom: 32px;
-  right: 32px;
   color: #eee;
+  font-size: 1rem;
   font-weight: 600;
-  font-size: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: .5rem;
+  inset: auto auto 1em;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .hlx-badge {
-  border-radius: 32px;
-  background-color: #888;
+  --color: #888;
+
+  border-radius: 2em;
+  background-color: var(--color);
+  border-style: solid;
+  border-color: #fff;
   color: #eee;
-  padding: 16px 32px;
+  padding: 1em 1.5em;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -35,14 +54,18 @@
   font-size: inherit;
   overflow: initial;
   margin: 0;
-  line-height: 1.5;
+  justify-content: space-between;
   text-transform: none;
-  font-family: system-ui, sans-serif;
 }
 
 .hlx-badge:focus,
 .hlx-badge:hover {
-  background-color: #888;
+  --color: #888;
+}
+
+.hlx-badge:focus-visible {
+  outline-style: solid;
+  outline-width: .25em;
 }
 
 .hlx-badge > span {
@@ -81,16 +104,22 @@
 
 .hlx-popup {
   position: absolute;
-  bottom: 64px;
-  right: 0;
+  display: grid;
+  grid-template:
+    "header" min-content
+    "content" 1fr;
+  bottom: 6.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  max-height: calc(100vh - 100px - var(--nav-height, 100px));
+  max-width: calc(100vw - 2em);
+  min-width: calc(300px - 2em);
   background-color: #444;
-  min-width: 300px;
   border-radius: 16px;
   box-shadow: 0 0 10px #000;
   font-size: 12px;
   text-align: initial;
   white-space: initial;
-  line-height: 1.5;
 }
 
 .hlx-popup a:any-link {
@@ -100,19 +129,25 @@
   display: inline-block;
   border-radius: 20px;
   text-decoration: none;
-  word-break: normal;
 }
 
 .hlx-popup-header {
   display: grid;
+  grid-area: header;
   grid-template:
-    "label actions"
+    "label actions" 
     "description actions"
     / 1fr min-content;
   background-color: #222;
   border-radius: 16px 16px 0 0;
   padding: 24px 16px;
-  gap: 0 16px;
+}
+
+.hlx-popup-items {
+  overflow-y: auto;
+  grid-area: content;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 .hlx-popup-header-label {
@@ -129,11 +164,8 @@
   flex-direction: column;
 }
 
-.hlx-popup h4,
-.hlx-popup h5 {
-  font-family: system-ui, sans-serif;
+.hlx-popup h4, .hlx-popup h5 {
   margin: 0;
-  color: inherit;
 }
 
 .hlx-popup h4 {
@@ -144,27 +176,22 @@
   font-size: 14px;
 }
 
-.hlx-popup p,
-.hlx-popup code {
+
+.hlx-popup p {
   margin: 0;
-  padding: 0;
-  background: inherit;
-  border: inherit;
-  color: inherit;
-  font-size: inherit;
-  line-height: 1.5;
 }
 
 .hlx-popup::before {
-  content: "";
+  content: '';
   width: 0;
   height: 0;
   position: absolute;
   border-left: 15px solid transparent;
-  border-right: 15px solid transparent;    
+  border-right: 15px solid transparent;
   border-top: 15px solid #444;
   bottom: -15px;
-  right: 30px;
+  right: 50%;
+  transform: translateX(50%);
 }
 
 .hlx-hidden {
@@ -173,28 +200,29 @@
 
 .hlx-badge.is-active,
 .hlx-badge[aria-pressed="true"] {
-  background-color: #280;
+  --color: #280;
 }
 
 .hlx-badge.is-inactive,
 .hlx-badge[aria-pressed="false"] {
-  background-color: #fa0f00;
+  --color: #fa0f00;
 }
 
 .hlx-popup-item {
   display: grid;
   grid-template:
-    "label actions" 
+    "label actions"
     "description actions"
     / 1fr min-content;
-  margin: 16px;
-  padding: 16px;
-  border-radius: 16px;
-  gap: 0 16px;
+  margin: 1em;
+  padding: 1em;
+  border-radius: 1em;
+  gap: .5em 1em;
 }
 
 .hlx-popup-item-label {
   grid-area: label;
+  white-space: nowrap;
 }
 
 .hlx-popup-item-description {
@@ -215,10 +243,47 @@
   flex: 0 0 auto;
 }
 
-/* stylelint-disable-next-line media-feature-range-notation */
-@media (min-width: 900px) {
+@media (width >= 600px) {
+  .hlx-highlight {
+    --highlight-size: .75rem;
+  }
+
   .hlx-preview-overlay {
-    flex-flow: row-reverse wrap-reverse;
-    justify-content: flex-start;
+    right: 1em;
+    align-items: end;
+    font-size: 1.25rem;
+  }
+
+  .hlx-popup {
+    right: 0;
+    left: auto;
+    transform: none;
+    min-width: 300px;
+    bottom: 8em;
+  }
+
+  .hlx-popup::before {
+    right: 26px;
+    transform: none;
+  }
+}
+
+@media (width >= 900px) {
+  .hlx-highlight {
+    --highlight-size: 1rem;
+  }
+  
+  .hlx-preview-overlay {
+    flex-flow: row wrap-reverse;
+    justify-content: flex-end;
+    font-size: 1.5rem;
+  }
+
+  .hlx-popup {
+    bottom: 9em;
+  }
+
+  .hlx-popup::before {
+    right: 32px;
   }
 }
