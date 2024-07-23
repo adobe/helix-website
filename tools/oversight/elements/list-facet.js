@@ -254,18 +254,7 @@ export default class ListFacet extends HTMLElement {
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
 
-          // display core web vital to facets
-          // add lcp
-          const lcpLI = this.createCWVChiclet(entry, 'lcp');
-          ul.append(lcpLI);
-
-          // add cls
-          const clsLI = this.createCWVChiclet(entry, 'cls');
-          ul.append(clsLI);
-
-          // add inp
-          const inpLI = this.createCWVChiclet(entry, 'inp');
-          ul.append(inpLI);
+          this.addChiclets(ul, entry);
 
           div.append(input, label, ul);
           fieldSet.append(div);
@@ -372,5 +361,20 @@ export default class ListFacet extends HTMLElement {
     // fill the element, but don't wait for it
     fillEl();
     return li;
+  }
+
+  addChiclets(ul, entry) {
+    // display core web vital to facets
+    // add lcp
+    const lcpLI = this.createCWVChiclet(entry, 'lcp');
+    ul.append(lcpLI);
+
+    // add cls
+    const clsLI = this.createCWVChiclet(entry, 'cls');
+    ul.append(clsLI);
+
+    // add inp
+    const inpLI = this.createCWVChiclet(entry, 'inp');
+    ul.append(inpLI);
   }
 }
