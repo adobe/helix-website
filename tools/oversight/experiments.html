@@ -16,6 +16,7 @@
     import IncognitoCheckbox from './elements/incognito-checkbox.js';
     import FacetSidebar from './elements/facetsidebar.js';
     import ListFacet from './elements/list-facet.js';
+    import VariantListFacet from './elements/variant-list-facet.js';
     import ThumbnailFacet from './elements/thumbnail-facet.js';
     import LinkFacet from './elements/link-facet.js';
     import LiteralFacet from './elements/literal-facet.js';
@@ -29,6 +30,7 @@
       customElements.define('incognito-checkbox', IncognitoCheckbox);
       customElements.define('facet-sidebar', FacetSidebar);
       customElements.define('list-facet', ListFacet);
+      customElements.define('variant-list-facet', VariantListFacet);
       customElements.define('thumbnail-facet', ThumbnailFacet);
       customElements.define('link-facet', LinkFacet);
       customElements.define('literal-facet', LiteralFacet);
@@ -189,9 +191,9 @@
             <list-facet facet="contenttype">
               <legend>Experiment</legend>
             </list-facet>
-            <list-facet facet="variant">
+            <variant-list-facet facet="variant">
               <legend>Variant</legend>
-            </list-facet>
+            </variant-list-facet>
             <list-facet facet="interaction">
               <legend>Interaction</legend>
             </list-facet>

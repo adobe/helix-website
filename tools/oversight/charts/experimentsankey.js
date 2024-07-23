@@ -285,7 +285,6 @@ export default class SankeyChart extends AbstractChart {
         to: flow.split('->')[1],
         flow: pageViews.sum,
       }));
-
     this.labels = Object.keys(this.dataChunks.aggregates)
       .map((flow) => flow.split('->'))
       .flat()
