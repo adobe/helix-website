@@ -22,7 +22,6 @@ export default class VariantListFacet extends ListFacet {
     const samples = entry.weight;
     const conversions = entry.metricsIn.conversions.sum;
     const parentSeries = entry.parent.seriesIn;
-    console.log(entry);
     let controlEntryKey = Object.keys(parentSeries).filter(
       (el) => (el.endsWith('control')),
     );
@@ -31,10 +30,8 @@ export default class VariantListFacet extends ListFacet {
         (el) => (el.endsWith('challenger-1')),
       );
     }
-    console.log(controlEntryKey);
-    console.log(parentSeries[controlEntryKey]);
-    const controlSamples = parentSeries[controlEntryKey].conversions.weight;
-    const controlConversions = parentSeries[controlEntryKey].conversions.sum;
+    const controlSamples = parentSeries[controlEntryKey]?.conversions.weight ?? samples;
+    const controlConversions = parentSeries[controlEntryKey]?.conversions.sum ?? conversions;
     const li = document.createElement('li');
     const nf = document.createElement('number-format');
     nf.setAttribute('precision', 2);
@@ -54,7 +51,7 @@ export default class VariantListFacet extends ListFacet {
         }
         li.classList.add(`score-${score}`);
         li.title += ` - ${conversions} conversions out of ${samples} samples`;
-      } else if (metricName === 'stat sig' && !controlEntryKey[0].includes(entry.value)) {
+      } else if (metricName === 'stat sig' && !controlEntryKey?.includes(entry.value)) {
         const statSig = 100 - zTestTwoProportions(
           controlSamples,
           controlConversions,
