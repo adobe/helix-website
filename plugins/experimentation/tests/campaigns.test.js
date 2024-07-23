@@ -67,10 +67,10 @@ test.describe('Page-level campaigns', () => {
     });
     await goToAndRunCampaign(page, '/tests/fixtures/campaigns/page-level?campaign=foo');
     expect(await page.evaluate(() => window.rumCalls)).toContainEqual([
-      'campaign',
+      'audience',
       expect.objectContaining({
-        source: 'campaign-foo',
-        target: 'foo',
+        source: 'foo',
+        target: 'foo:bar',
       }),
     ]);
   });

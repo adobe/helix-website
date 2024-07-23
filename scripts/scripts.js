@@ -38,7 +38,7 @@ window.hlx.plugins.add('performance', {
 
 window.hlx.plugins.add('experimentation', {
   condition: () => document.head.querySelector('[name^="experiment"],[name^="campaign-"],[name^="audience-"]')
-    || document.head.querySelector('[property^="campaign:-"],[property^="audience:-"],[property^="campaign-"],[property^="audience-"]')
+    || document.head.querySelector('[property^="campaign:"],[property^="audience:"]')
     || document.querySelector('.section[class*="experiment-"],.section[class*="audience-"],.section[class*="campaign-"]')
     || [...document.querySelectorAll('.section-metadata div')].some((d) => d.textContent.match(/Experiment|Campaign|Audience/i)),
   options: { audiences: AUDIENCES },

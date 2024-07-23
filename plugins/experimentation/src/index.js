@@ -78,6 +78,16 @@ export function toCamelCase(name) {
 }
 
 /**
+ * Removes all leading hyphens from a string.
+ * @param {String} after the string to remove the leading hyphens from, usually is colon
+ * @returns {String} The string without leading hyphens
+ */
+export function removeLeadingHyphens(inputString) {
+  // Remove all leading hyphens which are converted from the space in metadata
+  return inputString.replace(/^(-+)/, '');
+}
+
+/**
  * Retrieves the content of metadata tags.
  * @param {String} name The metadata name (or property)
  * @returns {String} The metadata value(s)
@@ -94,16 +104,17 @@ export function getMetadata(name) {
  */
 export function getAllMetadata(scope) {
   const value = getMetadata(scope);
-  const metaTags = document.head.querySelectorAll(`meta[name^="${scope}-"], meta[property^="${scope}:-"]`);
 
+  const metaTags = document.head.querySelectorAll(`meta[name^="${scope}"], meta[property^="${scope}:"]`);
   return [...metaTags].reduce((res, meta) => {
-    const key = meta.getAttribute('name')
-      ? meta.getAttribute('name').substring(scope.length + 1)
-      : meta.getAttribute('property').substring(scope.length + 2);
+    const key = removeLeadingHyphens(
+      meta.getAttribute('name')
+        ? meta.getAttribute('name').substring(scope.length)
+        : meta.getAttribute('property').substring(scope.length + 1),
+    );
 
     const camelCaseKey = toCamelCase(key);
     res[camelCaseKey] = meta.getAttribute('content');
-    
     return res;
   }, value ? { value } : {});
 }
@@ -584,14 +595,19 @@ async function getExperimentConfig(pluginOptions, metadata, overrides) {
     label: 'Control',
   };
 
+  // get the custom labels for the variants names
+  const labelNames = stringToArray(metadata.names);
   pages.forEach((page, i) => {
     const vname = `challenger-${i + 1}`;
+    //  label with custom name or default
+    const customLabel = labelNames.length > i ? labelNames[i] : `Challenger ${i + 1}`;
+
     variantNames.push(vname);
     variants[vname] = {
       percentageSplit: `${splits[i].toFixed(4)}`,
       pages: [page],
       blocks: [],
-      label: `Challenger ${i + 1}`,
+      label: customLabel,
     };
   });
   inferEmptyPercentageSplits(Object.values(variants));
@@ -649,6 +665,7 @@ async function getExperimentConfig(pluginOptions, metadata, overrides) {
 
   return config;
 }
+
 /**
  * Parses the campaign manifest.
  */
@@ -676,6 +693,8 @@ async function runExperiment(document, pluginOptions) {
     (el, config, result) => {
       const { id, selectedVariant, variantNames } = config;
       const variant = result ? selectedVariant : variantNames[0];
+      el.dataset.experiment = id;
+      el.dataset.variant = variant;
       el.classList.add(`experiment-${toClassName(id)}`);
       el.classList.add(`variant-${toClassName(variant)}`);
       window.hlx?.rum?.sampleRUM('experiment', {
@@ -777,10 +796,12 @@ async function runCampaign(document, pluginOptions) {
     (el, config, result) => {
       const { selectedCampaign = 'default' } = config;
       const campaign = result ? toClassName(selectedCampaign) : 'default';
+      el.dataset.audience = selectedCampaign;
+      el.dataset.audiences = Object.keys(pluginOptions.audiences).join(',');
       el.classList.add(`campaign-${campaign}`);
-      window.hlx?.rum?.sampleRUM('campaign', {
-        source: el.className,
-        target: campaign,
+      window.hlx?.rum?.sampleRUM('audience', {
+        source: campaign,
+        target: Object.keys(pluginOptions.audiences).join(':'),
       });
       document.dispatchEvent(new CustomEvent('aem:experimentation', {
         detail: {
@@ -847,6 +868,7 @@ function getUrlFromAudienceConfig(config) {
 }
 
 async function serveAudience(document, pluginOptions) {
+  document.body.dataset.audiences = Object.keys(pluginOptions.audiences).join(',');
   return applyAllModifications(
     pluginOptions.audiencesMetaTagPrefix,
     pluginOptions.audiencesQueryParameter,
@@ -857,10 +879,11 @@ async function serveAudience(document, pluginOptions) {
     (el, config, result) => {
       const { selectedAudience = 'default' } = config;
       const audience = result ? toClassName(selectedAudience) : 'default';
+      el.dataset.audience = audience;
       el.classList.add(`audience-${audience}`);
       window.hlx?.rum?.sampleRUM('audience', {
-        source: el.className,
-        target: audience,
+        source: audience,
+        target: Object.keys(pluginOptions.audiences).join(':'),
       });
       document.dispatchEvent(new CustomEvent('aem:experimentation', {
         detail: {

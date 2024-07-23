@@ -213,9 +213,9 @@ function createVariant(experiment, variantName, config, options) {
   experimentURL.searchParams.set(options.experimentsQueryParameter, `${experiment}/${variantName}`);
 
   return {
-    label: `<code>${variantName}</code>`,
+    label: `<code>${variant.label}</code>`,
     description: `
-      <p>${variant.label}</p>
+      <p>${variantName}</p>
       <p class="percentage">(${percentage} split)</p>
       <p class="performance"></p>`,
     actions: [{ label: 'Simulate', href: experimentURL.href }],

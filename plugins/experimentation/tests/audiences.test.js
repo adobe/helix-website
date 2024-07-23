@@ -59,8 +59,8 @@ test.describe('Page-level audiences', () => {
     expect(await page.evaluate(() => window.rumCalls)).toContainEqual([
       'audience',
       expect.objectContaining({
-        source: 'audience-foo',
-        target: 'foo',
+        source: 'foo',
+        target: 'foo:bar',
       }),
     ]);
   });
