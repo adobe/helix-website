@@ -226,7 +226,7 @@ export default class ListFacet extends HTMLElement {
           label.setAttribute('for', `${facetName}-${entry.value}`);
           const countspan = document.createElement('number-format');
           countspan.className = 'count';
-          countspan.textContent = metrics.pageViews.sum;
+          countspan.textContent = this.computeCount(entry);
           countspan.setAttribute('sample-size', metrics.pageViews.count);
           countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
           countspan.setAttribute('fuzzy', 'false');
@@ -369,6 +369,11 @@ export default class ListFacet extends HTMLElement {
       });
     }
     return valuespan;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  computeCount(entry) {
+    return entry.metrics.pageViews.sum;
   }
 
   createCWVChiclet(entry, metricName = 'lcp') {

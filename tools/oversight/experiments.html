@@ -3,35 +3,41 @@
 <head>
   <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
   <script type="importmap">{"imports": {
-    "chartjs": "https://esm.sh/chart.js@4.4.2"
+    "chartjs": "https://esm.sh/chart.js@4.4.2",
+    "chartjs-chart-sankey": "https://esm.sh/chartjs-chart-sankey@0.12.1?deps=chart.js@4.4.2"
   }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
-        import BarChart from './charts/barchart.js';
-        import IncognitoCheckbox from './elements/incognito-checkbox.js';
-        import FacetSidebar from './elements/facetsidebar.js';
-        import ListFacet from './elements/list-facet.js';
-        import ThumbnailFacet from './elements/thumbnail-facet.js';
-        import LinkFacet from './elements/link-facet.js';
-        import LiteralFacet from './elements/literal-facet.js';
-        import VitalsFacet from './elements/vitals-facet.js';
-        import URLSelector from './elements/url-selector.js';
-        import NumberFormat from './elements/number-format.js';
-        window.slicer = {
-          Chart: BarChart,
-        };
-        customElements.define('incognito-checkbox', IncognitoCheckbox);
-        customElements.define('facet-sidebar', FacetSidebar);
-        customElements.define('list-facet', ListFacet);
-        customElements.define('thumbnail-facet', ThumbnailFacet);
-        customElements.define('link-facet', LinkFacet);
-        customElements.define('literal-facet', LiteralFacet);
-        customElements.define('vitals-facet', VitalsFacet);
-        customElements.define('url-selector', URLSelector);
-        customElements.define('number-format', NumberFormat);
+    import SankeyChart from './charts/experimentsankey.js';
+    import ConversionTracker from './elements/conversion-tracker.js';
+    import IncognitoCheckbox from './elements/incognito-checkbox.js';
+    import FacetSidebar from './elements/facetsidebar.js';
+    import ListFacet from './elements/list-facet.js';
+    import VariantListFacet from './elements/variant-list-facet.js';
+    import ThumbnailFacet from './elements/thumbnail-facet.js';
+    import LinkFacet from './elements/link-facet.js';
+    import LiteralFacet from './elements/literal-facet.js';
+    import VitalsFacet from './elements/vitals-facet.js';
+    import URLSelector from './elements/url-selector.js';
+    import NumberFormat from './elements/number-format.js';
+    window.slicer = {
+      Chart: SankeyChart,
+    };
+
+      customElements.define('incognito-checkbox', IncognitoCheckbox);
+      customElements.define('facet-sidebar', FacetSidebar);
+      customElements.define('list-facet', ListFacet);
+      customElements.define('variant-list-facet', VariantListFacet);
+      customElements.define('thumbnail-facet', ThumbnailFacet);
+      customElements.define('link-facet', LinkFacet);
+      customElements.define('literal-facet', LiteralFacet);
+      customElements.define('vitals-facet', VitalsFacet);
+      customElements.define('url-selector', URLSelector);
+      customElements.define('conversion-tracker', ConversionTracker);
+      customElements.define('number-format', NumberFormat);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -64,8 +70,8 @@
                 <h2>Visits</h2>
                 <p><number-format>0</number-format></p>
               </li>
-              <conversion-tracker id="conversions" title="Page views with a user click outside a consent dialog">
-                <h2>Engagement</h2>
+              <conversion-tracker id="conversions" title="Page views with a user click">
+                <h2>Conversions</h2>
                 <p><number-format>0</number-format></p>
               </conversion-tracker>
               <li id="lcp" title="Largest Contentful Paint">
@@ -102,6 +108,7 @@
             </figcaption>
           </figure>
         </div>
+
           <facet-sidebar>
             <list-facet facet="userAgent" drilldown="share.html">
               <legend>Device Type and Operating System</legend>
@@ -156,90 +163,58 @@
                 <dd>Clicked</dd>
                 <dt>error</dt>
                 <dd>JavaScript Error</dd>
-                <dt>utm</dt>
+                <dt>paid</dt>
                 <dd>Marketing Campaigns</dd>
                 <dt>consent</dt>
                 <dd>Consent</dd>
                 <dt>navigate</dt>
                 <dd>Internal Navigation</dd>
-                <dt>audiences</dt>
-                <dd>User Segments</dd>
+                <dt>experiment</dt>
+                <dd>Experiment</dd>
               </dl>
             </list-facet>
-            <literal-facet facet="click.source" drilldown="list.html">
-              <legend>Click Source (CSS Selector)</legend>
-            </literal-facet>
-            <link-facet facet="click.target" drilldown="list.html">
-              <legend>Click Target (URL)</legend>
+            <link-facet facet="trafficsource">
+              <legend>Traffic Source</legend>
             </link-facet>
-            <literal-facet facet="viewmedia.source" drilldown="list.html">
-              <legend>Media Source (CSS Selector)</legend>
-            </literal-facet>
-            <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
-              <legend>Media Target</legend>
-            </thumbnail-facet>
-            <literal-facet facet="viewblock.source" drilldown="list.html">
-              <legend>Block (CSS Selector)</legend>
-            </literal-facet>
-            <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
-              <legend>External Referrer</legend>
-              <dl>
-                <dt>(direct)</dt>
-                <dd>Direct Entry (or via App)</dd>
-              </dl>
-            </link-facet>
-            <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
-              <legend>Internal Referrer</legend>
-            </link-facet>
-
-            <list-facet facet="consent.source">
-              <legend>Consent Provider</legend>
-              <dl>
-                <dt>onetrust</dt>
-                <dd>OneTrust</dd>
-                <dt>truste</dt>
-                <dd>TrustArc</dd>
-                <dt>usercentrics</dt>
-                <dd>Usercentrics</dd>
-                <dt>cybot</dt>
-                <dd>Cybot</dd>
-              </dl>
+            <list-facet facet="traffictype">
+              <legend>Traffic Type</legend>
             </list-facet>
-            <list-facet facet="consent.target">
-              <legend>Consent Dialog</legend>
-              <dl>
-                <dt>show</dt>
-                <dd>Dialog Shown</dd>
-                <dt>hidden</dt>
-                <dd>Dialog Hidden</dd>
-                <dt>accept</dt>
-                <dd>Consent provided</dd>
-                <dt>reject</dt>
-                <dd>Consent withheld</dd>
-              </dl>
-            </list-facet>
-            <link-facet facet="error.source">
-              <legend>Error Source</legend>
+            <link-facet facet="entryevent">
+              <legend>Entry Event</legend>
             </link-facet>
-            <literal-facet facet="error.target">
-              <legend>Error Line</legend>
-            </literal-facet>
-            
-            <list-facet facet="loadresource.histogram" sort="asc">
-              <legend>Resource Load Time (ms)</legend>
+            <list-facet facet="loadtype">
+              <legend>Load Type</legend>
             </list-facet>
-            <list-facet facet="loadresource.source">
-              <legend>Resource Loaded</legend>
+            <list-facet facet="pagetype">
+              <legend>Page Type</legend>
+            </list-facet>
+            <list-facet facet="contenttype">
+              <legend>Experiment</legend>
+            </list-facet>
+            <variant-list-facet facet="variant">
+              <legend>Variant</legend>
+            </variant-list-facet>
+            <list-facet facet="interaction">
+              <legend>Interaction</legend>
+            </list-facet>
+            <list-facet facet="clicktarget">
+              <legend>Click Target Type</legend>
+            </list-facet>
+            <list-facet facet="exit">
+              <legend>Exit Link</legend>
             </list-facet>
             <vitals-facet facet="vitals">
               <legend>Experience Quality</legend>
             </vitals-facet>
-            <audience-literal-facet facet="audience.source" drilldown="list.html">
-              <legend>Audiences</legend>
-            </audience-literal-facet>
+            <thumbnail-facet facet="lcp.target">
+              <legend>LCP Image</legend>
+              </thunbnail-facet>
+              <literal-facet facet="lcp.source">
+                <legend>LCP Element</legend>
+              </literal-facet>
           </facet-sidebar>
-        </div>
-        </div>
+          </div>
+          </div>
   </main>
   <footer></footer>
   <div id="copied-toast" class="toast" aria-hidden="true">

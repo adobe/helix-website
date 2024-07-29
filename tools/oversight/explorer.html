@@ -20,6 +20,7 @@
     import LinkFacet from './elements/link-facet.js';
     import LiteralFacet from './elements/literal-facet.js';
     import VitalsFacet from './elements/vitals-facet.js';
+    import AudienceListFacet from './elements/audience-list-facet.js';
     import URLSelector from './elements/url-selector.js';
     import NumberFormat from './elements/number-format.js';
     window.slicer = {
@@ -35,6 +36,7 @@
     customElements.define('url-selector', URLSelector);
     customElements.define('conversion-tracker', ConversionTracker);
     customElements.define('number-format', NumberFormat);
+    customElements.define('audience-literal-facet', AudienceListFacet);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -168,6 +170,8 @@
                 <dd>Internal Navigation</dd>
                 <dt>cwv-lcp</dt>
                 <dd>Largest Contentful Paint</dd>
+                <dt>audiences</dt>
+                <dd>User Segments</dd>
               </dl>
             </list-facet>
             <literal-facet facet="click.source" drilldown="list.html">
@@ -307,6 +311,9 @@
             <thumbnail-facet facet="cwv-lcp.target">
               <legend>LCP Element (Preview)</legend>
             </thumbnail-facet>
+            <audience-literal-facet facet="audience.source" drilldown="list.html">
+              <legend>Audiences</legend>
+            </audience-literal-facet>
           </facet-sidebar>
         </div>
     </div>
