@@ -57,7 +57,7 @@ export default class BarChart extends AbstractChart {
   }
 
   async draw() {
-    const params = new URL(window.location.href).searchParams;
+    let params = new URL(window.location.href).searchParams;
 
     if (this.dataChunks.filtered.length < 1000) {
       this.elems.lowDataWarning.ariaHidden = 'false';
@@ -71,7 +71,9 @@ export default class BarChart extends AbstractChart {
       const u = new URL(window.location.href);
       u.searchParams.set('drilldown', 'url');
       window.history.replaceState({}, '', u);
+      params = u.searchParams;
     }
+
     const drilldown = params.get('drilldown');
 
     const drilldowns = {
