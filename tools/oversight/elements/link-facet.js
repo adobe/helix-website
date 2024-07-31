@@ -33,7 +33,6 @@ export default class LinkFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText, prefix) {
     const thumbnailAtt = this.getAttribute('thumbnail');
-    const pagespeedAtt = this.getAttribute('pagespeed');
     const faviconAtt = this.getAttribute('favicon');
     const isCensored = labelText.includes('...')
       || labelText.includes('<number>') || labelText.includes('%3Cnumber%3E')
@@ -43,13 +42,12 @@ export default class LinkFacet extends ListFacet {
     if (isCensored) {
       return labelURLParts(labelText, prefix);
     }
-    if (pagespeedAtt && thumbnailAtt && labelText.startsWith('https://')) {
+    if (thumbnailAtt && labelText.startsWith('https://')) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
       return `
       <img loading="lazy" src="${u.href}" title="${labelText}" alt="thumbnail image for ${labelText}" onerror="this.classList.add('broken')">
-      <a href="${labelText}" target="_new">${labelURLParts(labelText, prefix)}</a>
-      <a href="${pagespeedAtt}${encodeURIComponent(labelText)}" target="_new" class="icon pagespeed" title="Show pagespeed insights for ${labelText}">pagespeed</a>`;
+      <a href="${labelText}" target="_new">${labelURLParts(labelText, prefix)}</a>`;
     }
     if (thumbnailAtt && (labelText.startsWith('http://') || labelText.startsWith('https://') || labelText.startsWith('android-app://'))) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');

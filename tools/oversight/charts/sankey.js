@@ -397,8 +397,6 @@ export default class SankeyChart extends AbstractChart {
       window.history.replaceState({}, '', u);
     }
 
-    this.chartConfig.focus = params.get('focus');
-
     if (this.dataChunks.filtered.length < 1000) {
       this.elems.lowDataWarning.ariaHidden = 'false';
     } else {
