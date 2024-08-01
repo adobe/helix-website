@@ -45,7 +45,7 @@ export default class FacetSidebar extends HTMLElement {
     });
   }
 
-  updateFacets(focus, mode) {
+  updateFacets(focus, mode, contenttype) {
     const filterTags = document.querySelector('.filter-tags');
     filterTags.textContent = '';
     const addFilterTag = (name, value) => {
@@ -76,5 +76,13 @@ export default class FacetSidebar extends HTMLElement {
       if (facetEl && focus) facetEl.setAttribute('focus', focus);
       if (facetEl) this.elems.facetsElement.append(facetEl);
     });
+
+    // for the experiment sankey, hide variants if no experiments have been selected for filtering
+    const variantFacet = document.getElementsByTagName('variant-list-facet')[0];
+    if (!contenttype?.startsWith('experiment:')) {
+      variantFacet.hidden = true;
+    } else {
+      variantFacet.hidden = false;
+    }
   }
 }

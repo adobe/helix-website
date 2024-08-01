@@ -261,7 +261,8 @@ export async function draw() {
 
   const focus = params.get('focus');
   const mode = params.get('metrics');
-  elems.sidebar.updateFacets(focus, mode);
+  const contenttype = params.get('contenttype');
+  elems.sidebar.updateFacets(focus, mode, contenttype);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
