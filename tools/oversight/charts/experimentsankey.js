@@ -7,28 +7,6 @@ import { cssVariable, parseConversionSpec } from '../utils.js';
 
 Chart.register(SankeyController, Flow, ...registerables);
 
-/*
-* Some popular checkpoints
-    'loadresource',
-'cwv',
-'click',
-'top',
-'lazy',
-'viewmedia',
-'viewblock',
-'leave',
-'load',
-'enter',
-// 'pagesviewed',
-'error',
-'navigate',
-'utm', // replace with 'paid'
-'reload',
-'back_forward',
-'lcp',
-'missingresource',
-*/
-// modeling the flow of events
 const stages = [
   {
     label: 'contenttype',

@@ -2,14 +2,11 @@ import { zTestTwoProportions } from '../cruncher.js';
 import ListFacet from './list-facet.js';
 
 /**
- * A custom HTML element to display a list of facets.
- * <list-facet facet="userAgent" drilldown="share.html" mode="all">
- *   <legend>User Agent</legend>
- *   <dl>
- *    <dt>desktop</dt>
- *    <dd>Chrome 90.0.4430.93 (Windows 10)</dd>
- *   </dl>
- * </list-facet>
+ * A custom HTML element based on "list-facet" used to display a list of variant facets
+ * along with conversion percentage and statistical signficance metrics.
+ * <variant-list-facet facet="userAgent" drilldown="share.html" mode="all">
+ *   <legend>Variant</legend>
+ * </variant-list-facet>
  */
 export default class VariantListFacet extends ListFacet {
   constructor() {
