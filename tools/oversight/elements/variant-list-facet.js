@@ -48,7 +48,7 @@ export default class VariantListFacet extends ListFacet {
         }
         li.classList.add(`score-${score}`);
         li.title += ` - ${conversions} conversions out of ${samples} samples`;
-      } else if (metricName === 'stat sig' && !controlEntryKey?.includes(entry.value)) {
+      } else if (metricName === 'stat sig' && !controlEntryKey[0]?.includes(entry.value)) {
         const statSig = 100 - zTestTwoProportions(
           controlSamples,
           controlConversions,
