@@ -344,6 +344,12 @@ const stages = [
 const allStages = stages.reduce((acc, stage) => ({ ...acc, ...stage }), {});
 
 export default class SankeyChart extends AbstractChart {
+  constructor(dataChunks, elems) {
+    super(dataChunks, elems);
+    this.stages = stages;
+    this.allStages = allStages;
+  }
+
   async draw() {
     const params = new URL(window.location.href).searchParams;
 
@@ -365,7 +371,7 @@ export default class SankeyChart extends AbstractChart {
     this.dataChunks.group((bundle) => {
       const detectedFlows = [];
       // go through each stage
-      stages.forEach((stage) => {
+      this.stages.forEach((stage) => {
         let cont = false;
         // go through each flow step in the stage
         Object.entries(stage)
@@ -407,11 +413,11 @@ export default class SankeyChart extends AbstractChart {
           const first = pair[0].split(':')[0];
           const second = pair[1].split(':')[0];
 
-          if (allStages[first] && Array.isArray(allStages[first].next)) {
-            if (allStages[first].next.includes(second)) {
+          if (this.allStages[first] && Array.isArray(this.allStages[first].next)) {
+            if (this.allStages[first].next.includes(second)) {
               // console.log('explicit allow', pair[0], '->', pair[1]);
               return true;
-            } if (allStages[first].next
+            } if (this.allStages[first].next
               .filter((n) => n.endsWith(':*'))
               .map((n) => n.slice(0, -2))
               .includes(second)) {
@@ -439,9 +445,9 @@ export default class SankeyChart extends AbstractChart {
       .flat()
       .reduce((acc, key) => {
         const [prefix, suffix] = key.split(':');
-        if (allStages[key] && allStages[key].label && typeof allStages[key].label === 'string') {
-          acc[key] = allStages[key].label;
-        } else if (allStages[prefix] && allStages[prefix].label) {
+        if (this.allStages[key] && this.allStages[key].label && typeof this.allStages[key].label === 'string') {
+          acc[key] = this.allStages[key].label;
+        } else if (this.allStages[prefix] && this.allStages[prefix].label) {
           acc[key] = suffix;
         } else {
           acc[key] = key;
@@ -457,7 +463,7 @@ export default class SankeyChart extends AbstractChart {
       .map((flow) => flow.split('->'))
       .flat()
       .reduce((acc, key) => {
-        stages.forEach((stage, column) => {
+        this.stages.forEach((stage, column) => {
           if (stage[key]) {
             acc[key] = column + 1;
           }
@@ -487,8 +493,8 @@ export default class SankeyChart extends AbstractChart {
           label: 'My sankey',
           data: this.enriched,
           labels: this.labels,
-          colorFrom: ({ raw }) => allStages[raw.from.split(':')[0]]?.color || 'purple',
-          colorTo: ({ raw }) => allStages[raw.to.split(':')[0]]?.color || 'gray',
+          colorFrom: ({ raw }) => this.allStages[raw.from.split(':')[0]]?.color || 'purple',
+          colorTo: ({ raw }) => this.allStages[raw.to.split(':')[0]]?.color || 'gray',
           columns: this.columns,
           colorMode: 'gradient', // or 'from' or 'to'
 
@@ -501,7 +507,7 @@ export default class SankeyChart extends AbstractChart {
 
   // eslint-disable-next-line class-methods-use-this
   updateDataFacets(dataChunks) {
-    const facetcandidates = stages.filter((stage) => stage.label);
+    const facetcandidates = this.stages.filter((stage) => stage.label);
 
     facetcandidates.forEach((facet) => {
       dataChunks.addFacet(facet.label, (bundle) => Object.entries(facet)

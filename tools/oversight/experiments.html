@@ -11,7 +11,7 @@
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
-    import SankeyChart from './charts/experimentsankey.js';
+    import ExperimentSankeyChart from './charts/experimentsankey.js';
     import ConversionTracker from './elements/conversion-tracker.js';
     import IncognitoCheckbox from './elements/incognito-checkbox.js';
     import FacetSidebar from './elements/facetsidebar.js';
@@ -24,7 +24,7 @@
     import URLSelector from './elements/url-selector.js';
     import NumberFormat from './elements/number-format.js';
     window.slicer = {
-      Chart: SankeyChart,
+      Chart: ExperimentSankeyChart,
     };
 
       customElements.define('incognito-checkbox', IncognitoCheckbox);
