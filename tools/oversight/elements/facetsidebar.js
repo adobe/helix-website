@@ -77,7 +77,7 @@ export default class FacetSidebar extends HTMLElement {
       if (facetEl) this.elems.facetsElement.append(facetEl);
     });
 
-    // for the experiment sankey, hide variants if no experiments have been selected for filtering
+    // for the experiment sankey, hide variant facet if no experiment has been chosen for filtering
     const variantFacet = document.getElementsByTagName('variant-list-facet')[0];
     if (!contenttype?.startsWith('experiment:')) {
       variantFacet.hidden = true;
