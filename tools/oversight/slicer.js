@@ -33,6 +33,10 @@ window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
+dataChunks.addSeries('contentRequests', (bundle) => bundle.events
+  .filter((e) => e.checkpoint === 'loadresource')
+  .filter((e) => e.source && e.source.indexOf('.html') === -1)
+  .reduce((acc) => acc + (0.2 * bundle.weight), bundle.weight));
 dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
 // a bounce is a visit without a click
 dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
@@ -68,12 +72,19 @@ const isDefaultConversion = Object.keys(conversionSpec).length === 0
 export function updateKeyMetrics() {
   document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
   document.querySelector('#pageviews p number-format').setAttribute('sample-size', dataChunks.totals.pageViews.count);
+
+  console.log('content requests', dataChunks.totals.contentRequests);
   if (dataChunks.totals.visits.sum > 0) {
     const pageViewsExtra = document.querySelector('#pageviews p number-format.extra') || document.createElement('number-format');
     pageViewsExtra.textContent = dataChunks.totals.pageViews.sum / dataChunks.totals.visits.sum;
     pageViewsExtra.setAttribute('precision', 2);
     pageViewsExtra.className = 'extra';
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+
+    if (document.querySelector('#pageviews.crs')) {
+      document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.contentRequests.sum;
+      pageViewsExtra.textContent = dataChunks.totals.pageViews.sum;
+    }
   }
 
   document.querySelector('#visits p number-format').textContent = dataChunks.totals.visits.sum;
