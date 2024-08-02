@@ -1036,10 +1036,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: calc(100vh - var(--nav-height) - 32px);
   }
 
-  main .key-metrics ul {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-
   #deepmain > div, #deepmain > facet-sidebar {
     width: 50%;
   }
@@ -1064,12 +1060,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-  }
-}
-
-@media (min-width: 2000px) {
-  main .key-metrics ul {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
 
