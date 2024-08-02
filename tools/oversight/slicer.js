@@ -73,7 +73,6 @@ export function updateKeyMetrics() {
   document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
   document.querySelector('#pageviews p number-format').setAttribute('sample-size', dataChunks.totals.pageViews.count);
 
-  console.log('content requests', dataChunks.totals.contentRequests);
   if (dataChunks.totals.visits.sum > 0) {
     const pageViewsExtra = document.querySelector('#pageviews p number-format.extra') || document.createElement('number-format');
     pageViewsExtra.textContent = dataChunks.totals.pageViews.sum / dataChunks.totals.visits.sum;
