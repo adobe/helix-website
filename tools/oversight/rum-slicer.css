@@ -1072,13 +1072,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 }
 
-@media (min-width: 2000px) {
-  #facets link-facet  a .protocol {
-    display: inline;
-  }
-
-}
-
 footer.footer-wrapper.appear {
   display: none;
 }
