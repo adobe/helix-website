@@ -11,11 +11,12 @@
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
-    import SankeyChart from './charts/sankey.js';
+    import ExperimentSankeyChart from './charts/experimentsankey.js';
     import ConversionTracker from './elements/conversion-tracker.js';
     import IncognitoCheckbox from './elements/incognito-checkbox.js';
     import FacetSidebar from './elements/facetsidebar.js';
     import ListFacet from './elements/list-facet.js';
+    import VariantListFacet from './elements/variant-list-facet.js';
     import ThumbnailFacet from './elements/thumbnail-facet.js';
     import LinkFacet from './elements/link-facet.js';
     import LiteralFacet from './elements/literal-facet.js';
@@ -23,12 +24,13 @@
     import URLSelector from './elements/url-selector.js';
     import NumberFormat from './elements/number-format.js';
     window.slicer = {
-      Chart: SankeyChart,
+      Chart: ExperimentSankeyChart,
     };
 
       customElements.define('incognito-checkbox', IncognitoCheckbox);
       customElements.define('facet-sidebar', FacetSidebar);
       customElements.define('list-facet', ListFacet);
+      customElements.define('variant-list-facet', VariantListFacet);
       customElements.define('thumbnail-facet', ThumbnailFacet);
       customElements.define('link-facet', LinkFacet);
       customElements.define('literal-facet', LiteralFacet);
@@ -68,8 +70,8 @@
                 <h2>Visits</h2>
                 <p><number-format>0</number-format></p>
               </li>
-              <conversion-tracker id="conversions" title="Page views with a user click outside a consent dialog">
-                <h2>Engagement</h2>
+              <conversion-tracker id="conversions" title="Page views with a user click">
+                <h2>Conversions</h2>
                 <p><number-format>0</number-format></p>
               </conversion-tracker>
               <li id="lcp" title="Largest Contentful Paint">
@@ -186,9 +188,12 @@
             <list-facet facet="pagetype">
               <legend>Page Type</legend>
             </list-facet>
-            <list-facet facet="contenttype">
-              <legend>Content Type</legend>
+            <list-facet facet="contenttype" drilldown="experiments.html">
+              <legend>Experiment</legend>
             </list-facet>
+            <variant-list-facet facet="variant" drilldown="experiments.html">
+              <legend>Variant</legend>
+            </variant-list-facet>
             <list-facet facet="interaction">
               <legend>Interaction</legend>
             </list-facet>

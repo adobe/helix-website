@@ -98,13 +98,18 @@ export default class ListFacet extends HTMLElement {
     if (this.dataChunks) this.update();
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  reorderFacetEntries(facetEntries) {
+    return facetEntries;
+  }
+
   update() {
     const facetName = this.getAttribute('facet');
-    const facetEntries = this.dataChunks.facets[facetName];
+    let facetEntries = this.dataChunks.facets[facetName];
     const enabled = !this.closest('facet-sidebar[aria-disabled="true"]');
 
+    facetEntries = this.reorderFacetEntries(facetEntries);
     const sort = this.getAttribute('sort') || 'count';
-
     const optionKeys = facetEntries.map((f) => f.value)
       .sort((a, b) => {
         if (sort === 'count') return 0; // keep the order
@@ -211,6 +216,7 @@ export default class ListFacet extends HTMLElement {
             }
             return acc.slice(0, i);
           }, entries[0].value);
+
         entries.slice(start, end).forEach((entry) => {
           const div = document.createElement('div');
           const input = document.createElement('input');
@@ -272,21 +278,7 @@ export default class ListFacet extends HTMLElement {
 
           label.append(valuespan, countspan, conversionspan);
 
-          const ul = document.createElement('ul');
-          ul.classList.add('cwv');
-
-          // display core web vital to facets
-          // add lcp
-          const lcpLI = this.createCWVChiclet(entry, 'lcp');
-          ul.append(lcpLI);
-
-          // add cls
-          const clsLI = this.createCWVChiclet(entry, 'cls');
-          ul.append(clsLI);
-
-          // add inp
-          const inpLI = this.createCWVChiclet(entry, 'inp');
-          ul.append(inpLI);
+          const ul = this.addVitalMetrics(entry);
 
           div.append(input, label, ul);
 
@@ -410,5 +402,23 @@ export default class ListFacet extends HTMLElement {
     // fill the element, but don't wait for it
     window.setTimeout(fillEl, 0);
     return li;
+  }
+
+  addVitalMetrics(entry) {
+    const ul = document.createElement('ul');
+    ul.classList.add('cwv');
+    // display core web vital to facets
+    // add lcp
+    const lcpLI = this.createCWVChiclet(entry, 'lcp');
+    ul.append(lcpLI);
+
+    // add cls
+    const clsLI = this.createCWVChiclet(entry, 'cls');
+    ul.append(clsLI);
+
+    // add inp
+    const inpLI = this.createCWVChiclet(entry, 'inp');
+    ul.append(inpLI);
+    return ul;
   }
 }

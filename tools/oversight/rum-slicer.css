@@ -226,6 +226,54 @@ main .key-metrics #inp number-format[trend="falling"] {
   display: none;
 }
 
+.stat-bar-container {
+  margin-bottom: 10px;
+  height: 40px;
+  width: 340px;
+  border: 1px solid #000;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #e0e0e0;
+  position: relative;
+}
+
+.stat-bar-container.winner {
+  border-color: var(--dark-green);
+}
+
+.stat-bar-container.loser {
+  border-color: var(--dark-red);
+}
+
+.stat-bar-container.significant {
+  border-width: 3px;
+}
+
+.stat-bar-fill {
+  position: absolute;
+  height: 100%;
+  background-color: lightgray;
+  border-right: 2px solid gray;
+}
+
+.stat-bar-fill.winner {
+  background-color: var(--light-green);
+}
+
+.stat-bar-fill.loser {
+  background-color: var(--light-red);
+}
+
+.stat-bar-text {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+}
+
 /* conversions custom element */
 
 conversion-tracker {

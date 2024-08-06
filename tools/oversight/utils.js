@@ -20,6 +20,7 @@ export function isKnownFacet(key) {
     || key === 'pagetype'
     || key === 'loadtype'
     || key === 'contenttype'
+    || key === 'variant'
     || key === 'interaction'
     || key === 'clicktarget'
     || key === 'exit'
