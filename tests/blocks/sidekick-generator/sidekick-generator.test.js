@@ -68,4 +68,15 @@ describe('Sidekick Generator', () => {
     expect(backLink).to.exist;
     expect(backLink.href).to.equal('https://www.adobe.com/');
   });
+
+  it('displays project in title', async () => {
+    window.history.pushState(
+      {},
+      '',
+      `${window.location.href}&from=https%3A%2F%2Fwww.adobe.com%2F&giturl=https%3A%2F%2Fgithub.com%2Fadobe%2Ffoo-website&project=Foo&hlx3=true&token=1234`,
+    );
+    const generator = document.querySelector('.sidekick-generator');
+    await decorate(generator);
+    expect(document.title).to.match(/^Foo/);
+  });
 });
