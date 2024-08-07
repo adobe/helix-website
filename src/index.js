@@ -43,6 +43,9 @@ export const DEFAULT_OPTIONS = {
   // Experimentation related properties
   experimentsMetaTagPrefix: 'experiment',
   experimentsQueryParameter: 'experiment',
+
+  // Redecoration function for fragments
+  decorateFunction: () => {},
 };
 
 /**
@@ -341,7 +344,8 @@ function createModificationsHandler(
     const url = await getExperienceUrl(ns.config);
     let res;
     if (url && new URL(url, window.location.origin).pathname !== window.location.pathname) {
-      res = await replaceInner(url, el);
+      // eslint-disable-next-line no-await-in-loop
+      res = await replaceInner(new URL(url, window.location.origin).pathname, el);
     } else {
       res = url;
     }
@@ -377,7 +381,7 @@ function depluralizeProps(obj, props = []) {
 async function getManifestEntriesForCurrentPage(urlString) {
   try {
     const url = new URL(urlString, window.location.origin);
-    const response = await fetch(url);
+    const response = await fetch(url.pathname);
     const json = await response.json();
     return json.data
       .map((entry) => Object.keys(entry).reduce((res, k) => {
@@ -434,7 +438,9 @@ function watchMutationsAndApplyFragments(
       let res;
       if (url && new URL(url, window.location.origin).pathname !== window.location.pathname) {
         // eslint-disable-next-line no-await-in-loop
-        res = await replaceInner(url, el, entry.selector);
+        res = await replaceInner(new URL(url, window.location.origin).pathname, el, entry.selector);
+        // eslint-disable-next-line no-await-in-loop
+        await pluginOptions.decorateFunction(el);
       } else {
         res = url;
       }
@@ -594,8 +600,11 @@ async function getExperimentConfig(pluginOptions, metadata, overrides) {
     label: 'Control',
   };
 
-  // get the custom labels for the variants names
-  const labelNames = stringToArray(metadata.names);
+  // get the customized name for the variant in page metadata and manifest
+  const labelNames = stringToArray(metadata.name)?.length
+    ? stringToArray(metadata.name)
+    : stringToArray(depluralizeProps(metadata, ['variantName']).variantName);
+
   pages.forEach((page, i) => {
     const vname = `challenger-${i + 1}`;
     //  label with custom name or default
@@ -621,7 +630,7 @@ async function getExperimentConfig(pluginOptions, metadata, overrides) {
 
   const config = {
     id,
-    label: metadata.name || `Experiment ${metadata.value || metadata.experiment}`,
+    label: `Experiment ${metadata.value || metadata.experiment}`,
     status: metadata.status || 'active',
     audiences,
     endDate,
@@ -670,9 +679,9 @@ async function getExperimentConfig(pluginOptions, metadata, overrides) {
  */
 function parseExperimentManifest(entries) {
   return Object.values(Object.groupBy(
-    entries.map((e) => depluralizeProps(e, ['experiment', 'variant', 'split'])),
+    entries.map((e) => depluralizeProps(e, ['experiment', 'variant', 'split', 'name'])),
     ({ experiment }) => experiment,
-  )).map(aggregateEntries('experiment', ['split', 'url', 'variant']));
+  )).map(aggregateEntries('experiment', ['split', 'url', 'variant', 'name']));
 }
 
 function getUrlFromExperimentConfig(config) {
@@ -916,7 +925,12 @@ export async function loadLazy(document, options = {}) {
   if (!isDebugEnabled) {
     return;
   }
-  // eslint-disable-next-line import/no-cycle
-  const preview = await import('./preview.js');
-  preview.default(document, pluginOptions);
+  // eslint-disable-next-line import/no-unresolved
+  const preview = await import('https://opensource.adobe.com/aem-experimentation/preview.js');
+  const context = {
+    getMetadata,
+    toClassName,
+    debug,
+  };
+  preview.default.call(context, document, pluginOptions);
 }
