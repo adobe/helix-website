@@ -180,7 +180,15 @@ function updateDataFacets(filterText, params, checkpoint) {
           bundle.events
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
-            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+            .reduce((acc, { target }) => {
+              const mi = target.indexOf('/media_');
+              if (mi) {
+                acc.add(target.substring(mi + 1));
+              } else {
+                acc.add(target);
+              }
+              return acc;
+            }, new Set()),
         ));
 
         if (cp === 'loadresource') {
