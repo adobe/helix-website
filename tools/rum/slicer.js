@@ -182,7 +182,7 @@ function updateDataFacets(filterText, params, checkpoint) {
             .filter(({ target }) => target) // filter out empty targets
             .reduce((acc, { target }) => {
               const mi = target.indexOf('/media_');
-              if (mi) {
+              if (cp === 'viewmedia' && mi) {
                 acc.add(target.substring(mi + 1));
               } else {
                 acc.add(target);
