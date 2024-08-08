@@ -181,9 +181,13 @@ function updateDataFacets(filterText, params, checkpoint) {
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
             .reduce((acc, { target }) => {
-              const mi = target.indexOf('/media_');
-              if (cp === 'viewmedia' && mi) {
-                acc.add(target.substring(mi + 1));
+              if (typeof target === 'string') {
+                const mi = target.indexOf('/media_');
+                if (cp === 'viewmedia' && mi) {
+                  acc.add(target.substring(mi + 1));
+                } else {
+                  acc.add(target);
+                }
               } else {
                 acc.add(target);
               }
