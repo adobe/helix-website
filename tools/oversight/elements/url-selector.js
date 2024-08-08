@@ -62,16 +62,17 @@ export default class URLSelector extends HTMLElement {
     });
 
     this.addEventListener('submit', (event) => {
+      let domain = event.detail;
       try {
-        const entered = new URL(`https://${event.detail}`);
-        const goto = new URL(window.location.pathname, window.location.origin);
-        goto.searchParams.set('domain', entered.hostname);
-        goto.searchParams.set('view', 'month');
-        window.location.href = goto.href;
+        const entered = new URL(`https://${domain}`);
+        domain = entered.hostname;
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Invalid URL', e, event.detail);
+        // ignore, some domains are not valid URLs
       }
+      const goto = new URL(window.location.pathname, window.location.origin);
+      goto.searchParams.set('domain', domain);
+      goto.searchParams.set('view', 'month');
+      window.location.href = goto.href;
     });
   }
 
