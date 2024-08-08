@@ -104,6 +104,9 @@ export function updateKeyMetrics(keyMetrics) {
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+
+  dataChunks.addFacet('type', (bundle) => bundle.hostType);
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
