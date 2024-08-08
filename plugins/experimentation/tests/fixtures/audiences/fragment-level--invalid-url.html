@@ -1,0 +1,23 @@
+<html>
+<head>
+  <script type="module" src="/tests/fixtures/scripts.js"></script>
+  <meta name="audience-manifest" content="invalid"/>
+  <script>
+    window.AUDIENCES = {
+      foo: () => true,
+      bar: () => false,
+    }
+  </script>
+</head>
+<body>
+  <main>
+    <div>
+      <div>
+        <div class="fragment">
+          <div>Hello World!</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

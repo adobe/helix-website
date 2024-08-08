@@ -1,0 +1,29 @@
+{
+  "data": [
+      {
+          "Page": "/tests/fixtures/audiences/fragment-level",
+          "Audience": "Foo",
+          "Selector": ".fragment",
+          "Url": "/tests/fixtures/audiences/variant-1"
+      },
+      {
+          "Page": "/tests/fixtures/audiences/fragment-level",
+          "Audience": "Bar",
+          "Selector": ".fragment",
+          "Url": "/tests/fixtures/audiences/variant-2"
+      },
+      {
+          "Page": "/tests/fixtures/audiences/fragment-level--async",
+          "Audience": "Foo",
+          "Selector": ".fragment",
+          "Url": "/tests/fixtures/audiences/variant-1"
+      },
+      {
+          "Page": "/tests/fixtures/audiences/fragment-level--async",
+          "Audience": "Bar",
+          "Selector": ".fragment",
+          "Url": "/tests/fixtures/audiences/variant-2"
+      }
+  ],
+  ":type": "sheet"
+}

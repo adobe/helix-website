@@ -1,0 +1,18 @@
+<html>
+<head>
+  <meta name="campaign-foo" content="/tests/fixtures/campaigns/variant-1"/>
+  <meta name="campaign-bar" content="/tests/fixtures/campaigns/variant-2"/>
+  <script type="module" src="/tests/fixtures/scripts.js"></script>
+  <script>
+    window.AUDIENCES = {
+      foo: () => true,
+      bar: () => true,
+    }
+  </script>
+</head>
+<body>
+  <main>
+    <div>Hello World!</div>
+  </main>
+</body>
+</html>
