@@ -287,6 +287,7 @@ test.describe('Fragment-level experiments', () => {
             'challenger-1': expect.objectContaining({ percentageSplit: '0.3333' }),
             'challenger-2': expect.objectContaining({ percentageSplit: '0.3333' }),
           },
+          label: expect.stringMatching(/Experiment Baz/),
         }),
         servedExperience: expect.stringMatching(/\/tests\/fixtures\/experiments\/(fragment|section)-level/),
       }),

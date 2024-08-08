@@ -83,7 +83,7 @@ To customize the labels, add a new entry in the page metadata or section metadat
 |---------------------|--------------------------------------------------------------|
 | Experiment          | Hero Test                                                    |
 | Experiment Variants | [https://{ref}--{repo}--{org}.hlx.page/my-page-variant-1](), [https://{ref}--{repo}--{org}.hlx.page/my-page-variant-2](), [https://{ref}--{repo}--{org}.hlx.page/my-page-variant-3]() |
-| Experiment Names    |  foo1, foo2, foo3                                                 |
+| Experiment Variant Names    |  foo1, foo2, foo3                                                 |
 
 The names defined will match with the corresponding variants in sequence. If the number of names provided is less than the number of variants, the default naming will be applied for the remaining variants.
 

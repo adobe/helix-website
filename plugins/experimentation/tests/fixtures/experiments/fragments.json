@@ -4,6 +4,7 @@
           "Page": "/tests/fixtures/experiments/fragment-level",
           "Experiment": "Baz",
           "Variant": "challenger-1",
+          "Names": "C1",
           "Selector": ".fragment",
           "Url": "/tests/fixtures/experiments/section-level-v1"
       },
@@ -11,6 +12,7 @@
           "Page": "/tests/fixtures/experiments/fragment-level",
           "Experiment": "Baz",
           "Variant": "challenger-2",
+          "Names": "C2",
           "Selector": ".fragment",
           "Url": "/tests/fixtures/experiments/section-level-v2"
       },
@@ -18,6 +20,7 @@
           "Page": "/tests/fixtures/experiments/fragment-level--async",
           "Experiment": "Baz",
           "Variant": "challenger-1",
+          "Names": "C1",
           "Selector": ".fragment",
           "Url": "/tests/fixtures/experiments/section-level-v1"
       },
@@ -25,6 +28,7 @@
           "Page": "/tests/fixtures/experiments/fragment-level--async",
           "Experiment": "Baz",
           "Variant": "challenger-2",
+          "Names": "C2",
           "Selector": ".fragment",
           "Url": "/tests/fixtures/experiments/section-level-v2"
       }

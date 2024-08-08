@@ -80,6 +80,17 @@ export function createTag(tag, attributes, html) {
   return el;
 }
 
+function buildHeroBlock(main) {
+  const h1 = main.querySelector('main > div > h1');
+  const picture = main.querySelector('main > div > p > picture');
+  // eslint-disable-next-line no-bitwise
+  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+    const section = document.createElement('div');
+    section.append(buildBlock('hero', { elems: [picture, h1] }));
+    main.prepend(section);
+  }
+}
+
 /**
  * Adds one or more URLs to the dependencies for publishing.
  * @param {string|[string]} url The URL(s) to add as dependencies
@@ -561,25 +572,25 @@ function buildAuthorBox(main) {
   main.append(div);
 }
 
-// Properly decorate fragments that were pulled in
-document.addEventListener('aem:experimentation', (ev) => {
-  // Do not redecorate the default content
-  if (ev.detail.variant === 'control' || ev.detail?.campaign === 'default' || ev.detail?.audience === 'default') {
-    return;
+function redecorateIfHeroBlock(heroElement) {
+  const parent = heroElement.parentElement.parentElement;
+  [...heroElement.children].reverse().forEach((el) => parent.prepend(el));
+  heroElement.parentElement.remove();
+  heroElement.remove();
+  // Rebuild and redecorate the hero block
+  buildHeroBlock(parent);
+  decorateBlocks(parent);
+  loadBlocks(parent);
+}
+
+export function decorateFunction(element) {
+  if (element.classList.contains('hero')) {
+    redecorateIfHeroBlock(element);
+  } else if (element.classList.contains('block')) {
+    decorateBlock(element);
+    loadBlock(element);
   }
-  // Rebuild the autoblock as needed
-  if (ev.detail.element.classList.contains('hero')) {
-    const parent = ev.detail.element.parentElement.parentElement;
-    [...ev.detail.element.children].reverse().forEach((el) => parent.prepend(el));
-    ev.detail.element.remove();
-    decorateBlocks(parent);
-    loadBlocks(parent);
-  } else if (ev.detail.element.classList.contains('block')) {
-    // Otherwise, just reset the replaced blocks and redecorate them
-    decorateBlock(ev.detail.element);
-    loadBlock(ev.detail.element);
-  }
-});
+}
 
 // --------------- Main functions here ---------------- //
 
