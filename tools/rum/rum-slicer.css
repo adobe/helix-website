@@ -98,9 +98,11 @@ main .title {
 main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-right: 8px;
   font-size: var(--type-heading-m-size);
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 main .title url-selector img {
