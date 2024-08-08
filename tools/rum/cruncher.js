@@ -21,6 +21,7 @@
  * @property {string} timeSlot - the hourly timesot that this bundle belongs to
  * @property {string} url - the URL of the request, without URL parameters
  * @property {string} userAgent - the user agent class, for instance desktop:windows or mobile:ios
+ * @property {string} hostType - the type of host, for instance 'helix' or 'aemcs'
  * @property {number} weight - the weight, or sampling ratio 1:n of the bundle
  * @property {RawEvent} events - the list of events that make up the bundle
  */
