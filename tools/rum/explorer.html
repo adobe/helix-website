@@ -19,6 +19,7 @@
     import LinkFacet from './elements/link-facet.js';
     import LiteralFacet from './elements/literal-facet.js';
     import VitalsFacet from './elements/vitals-facet.js';
+    import FileFacet from './elements/file-facet.js';
     import URLSelector from './elements/url-selector.js';
     window.slicer = {
       Chart: SkylineChart,
@@ -30,6 +31,7 @@
     customElements.define('link-facet', LinkFacet);
     customElements.define('literal-facet', LiteralFacet);
     customElements.define('vitals-facet', VitalsFacet);
+    customElements.define('file-facet', FileFacet);
     customElements.define('url-selector', URLSelector);
   </script>
   <script src="./slicer.js" type="module"></script>
@@ -173,9 +175,9 @@
             <literal-facet facet="viewmedia.source">
               <legend>Media Source (CSS Selector)</legend>
             </literal-facet>
-            <thumbnail-facet facet="viewmedia.target">
+            <file-facet facet="viewmedia.target">
               <legend>Media Target</legend>
-            </thumbnail-facet>
+            </file-facet>
             <literal-facet facet="viewblock.source">
               <legend>Block (CSS Selector)</legend>
             </literal-facet>
