@@ -495,39 +495,43 @@ export default class SkylineChart extends AbstractChart {
     const group = this.dataChunks.group(this.groupBy);
     const chartLabels = Object.keys(group).sort();
 
-    const iGoodLCPs = Object.entries(this.dataChunks.aggregates)
+    const {
+      iGoodLCPs,
+      iNiLCPs,
+      iPoorLCPs,
+      iGoodCLSs,
+      iNiCLSs,
+      iPoorCLSs,
+      iGoodINPs,
+      iNiINPs,
+      iPoorINPs,
+      allTraffic,
+    } = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodLCP.weight);
-    const iNiLCPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiLCP.weight);
-    const iPoorLCPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorLCP.weight);
-
-    const iGoodCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodCLS.weight);
-    const iNiCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiCLS.weight);
-    const iPoorCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorCLS.weight);
-
-    const iGoodINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodINP.weight);
-    const iNiINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiINP.weight);
-    const iPoorINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorINP.weight);
-
-    const allTraffic = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.pageViews.sum);
+      .reduce((acc, [, totals]) => {
+        acc.iGoodLCPs.push(-totals.iGoodLCP.weight);
+        acc.iNiLCPs.push(-totals.iNiLCP.weight);
+        acc.iPoorLCPs.push(-totals.iPoorLCP.weight);
+        acc.iGoodCLSs.push(-totals.iGoodCLS.weight);
+        acc.iNiCLSs.push(-totals.iNiCLS.weight);
+        acc.iPoorCLSs.push(-totals.iPoorCLS.weight);
+        acc.iGoodINPs.push(-totals.iGoodINP.weight);
+        acc.iNiINPs.push(-totals.iNiINP.weight);
+        acc.iPoorINPs.push(-totals.iPoorINP.weight);
+        acc.allTraffic.push(totals.pageViews.sum);
+        return acc;
+      }, {
+        iGoodLCPs: [],
+        iNiLCPs: [],
+        iPoorLCPs: [],
+        iGoodCLSs: [],
+        iNiCLSs: [],
+        iPoorCLSs: [],
+        iGoodINPs: [],
+        iNiINPs: [],
+        iPoorINPs: [],
+        allTraffic: [],
+      });
 
     this.chart.data.datasets[0].data = allTraffic;
 
