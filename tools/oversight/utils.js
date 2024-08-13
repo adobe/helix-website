@@ -12,6 +12,7 @@ export function isKnownFacet(key) {
   return false // TODO: find a better way to filter out non-facet keys
     || key === 'userAgent'
     || key === 'url'
+    || key === 'type'
     || key === 'conversions'
     // facets from sankey
     || key === 'trafficsource'
