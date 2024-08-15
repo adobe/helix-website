@@ -1,1 +1,1 @@
-document.documentElement.classList.add('indexing-test2');
+document.documentElement.classList.add('indexing-test3');
