@@ -745,8 +745,4 @@ if (window.location.hostname === 'www.hlx.live') {
 }
 */
 
-if (!window.hlx.pageLoaded) {
-  // prevent re-entry
-  window.hlx.pageLoaded = true;
-  loadPage(document);
-}
+loadPage(document);
