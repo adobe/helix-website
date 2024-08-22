@@ -22,15 +22,12 @@ function updateVennDisplay(value, lis) {
     li.removeAttribute('style');
     const min = parseInt(li.dataset.min, 10);
     const max = parseInt(li.dataset.max, 10);
-    if (value < min) {
-      li.className = 'below-range';
-    } else if (value >= min && value < max) {
+    if (value < min) li.className = 'below-range';
+    else if (value >= min && value < max) {
       li.className = 'in-range';
       // calculate the percentage position of 'value' within the range min - max
       li.style.setProperty('--venn-progress', `${((value - min + 1) / (max - min + 1)) * 100}%`);
-    } else {
-      li.className = 'exceeds-range';
-    }
+    } else li.className = 'exceeds-range';
   });
 }
 
@@ -65,7 +62,9 @@ export default async function decorate(block) {
 
   // build skill slider
   const slider = createTag('div', { class: 'venn-slider' });
-  const range = createTag('input', { type: 'range', name: 'venn-slider', step: 1 });
+  const range = createTag('input', {
+    type: 'range', name: 'venn-slider', id: 'venn-slider', step: 1,
+  });
   // set range min and max based on skill level values
   range.min = sliderMin;
   range.max = sliderMax;
@@ -86,6 +85,5 @@ export default async function decorate(block) {
   const params = new URLSearchParams(window.location.search);
   const level = params.get('level') || sliderMin;
   range.value = level;
-  updateLevelParam(level);
   updateVennDisplay(level, lis);
 }
