@@ -17,8 +17,8 @@
 }
 
 .venn .venn-content .venn-content-left {
-  background-color: var(--color-accent-yellow-bg);
-  border: 2px solid var(--color-accent-yellow-content);
+  background-color: #F4FADE;
+  border: 2px solid var(--color-accent-lightgreen-content);
   border-bottom: 0;
   border-radius: 50vw 50vw 0 0;
   padding-top: 18vw;
