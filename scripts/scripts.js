@@ -709,7 +709,7 @@ async function loadLazy(doc) {
   sampleRUM('lazy');
 
   // check to see if this is reflected in google indexed page
-  document.documentElement.classList.add('index-test');
+  document.documentElement.classList.add('index-test-scripts-js-2024-08-23');
 }
 
 /**
