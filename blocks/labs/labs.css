@@ -19,3 +19,12 @@
   text-decoration: underline;
   font-weight: 700;
 }
+
+.home-template .labs {
+  margin-left: 25%;
+  margin-right: 25%;
+  margin-top: -2em;
+  z-index: 10;
+  position: relative;
+  text-align: center;
+}
