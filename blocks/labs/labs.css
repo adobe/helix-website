@@ -13,3 +13,9 @@
   font-size: var(--type-heading-m-size);
   text-transform: uppercase;
 }
+
+.labs a {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 700;
+}
