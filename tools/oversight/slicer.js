@@ -180,7 +180,7 @@ function updateDataFacets(filterText, params, checkpoint) {
           return '<uuid>';
         }
         // just too long
-        if (segment.length > 40) {
+        if (segment.length > 60) {
           return '...';
         }
         return segment;
