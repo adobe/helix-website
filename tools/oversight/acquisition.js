@@ -114,32 +114,21 @@ const categoryTypeLookup = {
 };
 
 export function vendor(origin) {
-  return vendorClassifications
-    .reduce((result, classification) => (
-      !result && classification.regex.test(origin)
-        ? classification.result
-        : result), '');
+  const result = vendorClassifications.find(({ regex }) => regex.test(origin));
+  return result ? result.result : '';
 }
 
 function category(origin, vendorResult) {
-  const categoryResult = categoryClassifications
-    .reduce((result, classification) => (
-      !result && classification.regex.test(origin)
-        ? classification.result
-        : result), '');
+  const categoryResult = categoryClassifications.find(({ regex }) => regex.test(origin));
 
-  if (categoryResult) return categoryResult;
+  if (categoryResult) return categoryResult.result;
   return vendorCategoryLookup[vendorResult] || '';
 }
 
 function paidowned(origin, vendorResult, categoryResult) {
-  const paidOwnedResult = paidOwnedClassifications
-    .reduce((result, classification) => (
-      !result && classification.regex.test(origin)
-        ? classification.result
-        : result), '');
+  const paidOwnedResult = paidOwnedClassifications.find(({ regex }) => regex.test(origin));
 
-  if (paidOwnedResult) return paidOwnedResult;
+  if (paidOwnedResult) return paidOwnedResult.result;
   return vendorTypeLookup[vendorResult] || categoryTypeLookup[categoryResult] || '';
 }
 
