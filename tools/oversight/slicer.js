@@ -158,7 +158,8 @@ function updateDataFacets(filterText, params, checkpoint) {
       return acc;
     }, []);
   });
-  dataChunks.addFacet('url', (bundle) => {
+
+  const urlFn = (bundle) => {
     if (bundle.domain) return bundle.domain;
     const u = new URL(bundle.url);
     u.pathname = u.pathname.split('/')
@@ -186,7 +187,9 @@ function updateDataFacets(filterText, params, checkpoint) {
         return segment;
       }).join('/');
     return u.toString();
-  });
+  };
+  dataChunks.addFacet('url', urlFn);
+  dataChunks.addFacet('url!', urlFn, 'none');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
