@@ -699,8 +699,31 @@ export class DataChunks {
       .filter(existenceFilterFn);
     return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
       const actualValues = valuesExtractorFn(attributeName, bundle, this);
-      const combiner = combinerExtractorFn(attributeName, this);
-      return desiredValues[combiner]((value) => actualValues.includes(value));
+
+      const combiners = {
+        // if some elements match, then return true (partial inclusion)
+        some: 'some',
+        // if some elements do not match, then return true (partial exclusion)
+        none: 'some',
+        // if every element matches, then return true (full inclusion)
+        every: 'every',
+        // if every element does not match, then return true (full exclusion)
+        never: 'every',
+      };
+
+      const negators = {
+        some: (value) => value,
+        every: (value) => value,
+        none: (value) => !value,
+        never: (value) => !value,
+      };
+      // this can be some, every, or none
+      const combinerprefence = combinerExtractorFn(attributeName, this);
+
+      const combiner = combiners[combinerprefence];
+      const negator = negators[combinerprefence];
+
+      return desiredValues[combiner]((value) => negator(actualValues.includes(value)));
     }));
   }
 
