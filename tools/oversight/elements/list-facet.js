@@ -224,7 +224,12 @@ export default class ListFacet extends HTMLElement {
           input.id = `${facetName}=${entry.value}`;
           if (enabled) {
             div.addEventListener('click', (evt) => {
-              if (evt.target !== input) input.checked = !input.checked;
+              if (!evt.shiftKey && evt.target !== input) {
+                input.checked = !input.checked;
+              } else if (evt.shiftKey) {
+                // use the shift key to indicate a negation
+                input.indeterminate = true;
+              }
               evt.stopPropagation();
               this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);
             });
