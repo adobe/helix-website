@@ -431,6 +431,7 @@ export class DataChunks {
 
   resetFacets() {
     this.facetFns = {};
+    this.facetCombiners = {};
   }
 
   /**
@@ -442,7 +443,7 @@ export class DataChunks {
    */
   addFacet(facetName, facetValueFn, facetCombiner = 'some') {
     this.facetFns[facetName] = facetValueFn;
-    this.facetFns[facetName].combiner = facetCombiner;
+    this.facetCombiners[facetName] = facetCombiner;
     this.resetData();
   }
 
@@ -673,7 +674,7 @@ export class DataChunks {
       const facetValue = parent.facetFns[attributeName](bundle);
       return Array.isArray(facetValue) ? facetValue : [facetValue];
     };
-    const combinerExtractorFn = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
+    const combinerExtractorFn = (attributeName, parent) => parent.facetCombiners[attributeName] || 'some';
     // eslint-disable-next-line max-len
     return this.applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn);
   }
@@ -919,7 +920,7 @@ export class DataChunks {
           .filterBundles(
             this.bundles,
             this.filters,
-            this.facetFns[facetName].combiner === 'some'
+            this.facetCombiners[facetName] === 'some'
               ? [facetName]
               : [],
           )
