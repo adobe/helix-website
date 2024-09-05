@@ -736,6 +736,11 @@ vitals-facet fieldset label {
   background-color: var(--light-blue)
 }
 
+#facets div[aria-checked=mixed] {
+  opacity: 0.7;
+  filter: brightness(0.7);
+}
+
 #facets div[aria-selected]:hover {
   background-color: #eee;
 }

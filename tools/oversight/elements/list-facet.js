@@ -221,6 +221,10 @@ export default class ListFacet extends HTMLElement {
             // addFilterTag(facetName, entry.value);
             div.ariaSelected = true;
           }
+          input.indeterminate = url.searchParams.getAll(`${facetName}!`).includes(entry.value);
+          if (input.indeterminate) {
+            div.ariaChecked = 'mixed';
+          }
           input.id = `${facetName}=${entry.value}`;
           if (enabled) {
             div.addEventListener('click', (evt) => {
