@@ -490,7 +490,7 @@ function decorateBreadcrumb(main) {
               Back
           </a>
       `);
-      document.querySelector('.default-content-wrapper').prepend(backBtn);
+      document.querySelector('.availability-wrapper, .default-content-wrapper').prepend(backBtn);
     }
   }
 
@@ -577,6 +577,24 @@ export function buildAutoBlocks(main) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
   }
+}
+
+export function loadFeedData() {
+  window.siteindex = window.siteindex || { archive: { data: [] }, loaded: false };
+  const offset = 0;
+
+  fetch(`/community-feeds.json?offset=${offset}`)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      window.siteindex.archive.data = responseJson?.archive?.data;
+      window.siteindex.loaded = true;
+      const event = new Event('dataset-ready');
+      document.dispatchEvent(event);
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(`Error loading query index: ${error.message}`);
+    });
 }
 
 /**
@@ -689,6 +707,9 @@ async function loadLazy(doc) {
   window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
+
+  // check to see if this is reflected in google indexed page
+  document.documentElement.classList.add('index-test-scripts-js-2024-08-23');
 }
 
 /**

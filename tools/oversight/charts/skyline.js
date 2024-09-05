@@ -1,38 +1,24 @@
 import {
   Chart, TimeScale, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
-} from 'https://cdn.skypack.dev/chart.js@4.2.0';
+} from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
-import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
+import 'chartjs-adapter-luxon';
 import {
   INTERPOLATION_THRESHOLD,
   scoreBundle,
   scoreCWV,
-  // toHumanReadable,
+  toHumanReadable,
   cwvInterpolationFn,
   truncate,
   simpleCWVInterpolationFn,
   cssVariable,
   getGradient,
-} from './utils.js';
+} from '../utils.js';
 import AbstractChart from './chart.js';
+import { linearRegression } from '../cruncher.js';
 
 Chart.register(TimeScale, LinearScale, ...registerables);
-
-/**
- * Returns a human readable number
- * @param {Number} num a number
- * @param {Number} precision the number of significant digits
- * @returns {String} a human readable number
- */
-function toHumanReadable(num, precision = 2) {
-  if (Number.isNaN(num)) return '-';
-  const formatter = new Intl.NumberFormat('en-US', {
-    notation: 'compact',
-    maximumSignificantDigits: precision,
-  });
-  return formatter.format(num).toLocaleLowerCase();
-}
 
 /**
  * The SkylineChart is a unique type of multi-series bar chart that
@@ -57,11 +43,15 @@ export default class SkylineChart extends AbstractChart {
     groupFn.fillerFn = (existing) => {
       const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
       // set start date depending on the unit
-      const startDate = new Date(endDate);
+      let startDate = new Date(endDate);
       // roll back to beginning of time
       if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
       if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
       if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+      if (this.chartConfig.startDate) {
+        // nevermind, we have a start date in the config, let's use that
+        startDate = new Date(this.chartConfig.startDate);
+      }
       const slots = new Set(existing);
       const slotTime = new Date(startDate);
       // return Array.from(slots);
@@ -112,18 +102,21 @@ export default class SkylineChart extends AbstractChart {
             backgroundColor: cssVariable('--spectrum-green-600'),
             data: [],
             yAxisID: 'lcp',
+            borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement LCP',
             backgroundColor: cssVariable('--spectrum-orange-600'),
             data: [],
             yAxisID: 'lcp',
+            borderSkipped: true,
           },
           {
             label: 'Poor LCP',
             backgroundColor: cssVariable('--spectrum-red-600'),
             data: [],
             yAxisID: 'lcp',
+            borderSkipped: 'bottom',
           },
           {
             label: 'Fake LCP Data',
@@ -137,18 +130,21 @@ export default class SkylineChart extends AbstractChart {
             backgroundColor: cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
+            borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement CLS',
             backgroundColor: cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
+            borderSkipped: true,
           },
           {
             label: 'Poor CLS',
             backgroundColor: cssVariable('--spectrum-red-500'),
             data: [],
             yAxisID: 'cls',
+            borderSkipped: 'bottom',
           },
           {
             label: 'Fake CLS Data',
@@ -162,18 +158,21 @@ export default class SkylineChart extends AbstractChart {
             backgroundColor: cssVariable('--spectrum-green-400'),
             data: [],
             yAxisID: 'inp',
+            borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement INP',
             backgroundColor: cssVariable('--spectrum-orange-400'),
             data: [],
             yAxisID: 'inp',
+            borderSkipped: true,
           },
           {
             label: 'Poor INP',
             backgroundColor: cssVariable('--spectrum-red-400'),
             data: [],
             yAxisID: 'inp',
+            borderSkipped: 'bottom',
           },
           {
             label: 'Fake INP Data',
@@ -280,12 +279,23 @@ export default class SkylineChart extends AbstractChart {
             },
             ticks: {
               autoSkip: false,
-              callback: (value) => {
+              maxTicksLimit: 16,
+              callback: (value, index) => {
                 if (value === 0) return '';
-                if (value > 0) return toHumanReadable(value);
-                if (value / this.chart.options.scales.y.min < 0.4) return 'LCP';
-                if (value / this.chart.options.scales.y.min < 0.8) return 'CLS';
-                if (value / this.chart.options.scales.y.min === 1) return 'INP';
+                if (value > 0) {
+                  this.clsAlreadyLabeled = false;
+                  this.lcpAlreadyLabeled = false;
+                  return toHumanReadable(value);
+                }
+                if (index === 0) return 'INP';
+                if (value / this.min < 0.4 && !this.lcpAlreadyLabeled) {
+                  this.lcpAlreadyLabeled = true;
+                  return 'LCP';
+                }
+                if (value / this.min < 0.7 && !this.clsAlreadyLabeled) {
+                  this.clsAlreadyLabeled = true;
+                  return 'CLS';
+                }
                 return '';
               },
             },
@@ -398,46 +408,28 @@ export default class SkylineChart extends AbstractChart {
       simpleCWVInterpolationFn('INP', 'poor'),
     );
 
-    // aggregate series
-    if (this.chartConfig.focus === 'lcp') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else if (this.chartConfig.focus === 'cls') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else if (this.chartConfig.focus === 'inp') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
-    }
+    dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
+    dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
+    dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
+    dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
 
     // interpolated series
     dataChunks.addInterpolation(
       'iGoodCWV', // name of the series
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'], // calculate from these series
-      cwvInterpolationFn('goodCWV', this.chartConfig.focus), // interpolation function
+      cwvInterpolationFn('goodCWV'), // interpolation function
     );
 
     dataChunks.addInterpolation(
       'iNiCWV',
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
-      cwvInterpolationFn('niCWV', this.chartConfig.focus),
+      cwvInterpolationFn('niCWV'),
     );
 
     dataChunks.addInterpolation(
       'iPoorCWV',
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
-      cwvInterpolationFn('poorCWV', this.chartConfig.focus),
+      cwvInterpolationFn('poorCWV'),
     );
 
     dataChunks.addInterpolation(
@@ -447,11 +439,6 @@ export default class SkylineChart extends AbstractChart {
         goodCWV, niCWV, poorCWV, noCWV,
       }) => {
         const valueCount = goodCWV.count + niCWV.count + poorCWV.count;
-        if (this.chartConfig.focus) {
-          // we have a focus, so this series can stay at 0
-          // as all other series are interpolated to 100%
-          return 0;
-        }
         if (valueCount < INTERPOLATION_THRESHOLD) {
           // not enough data to interpolate the other values, so
           // we report as if there are no CWV at all
@@ -465,11 +452,12 @@ export default class SkylineChart extends AbstractChart {
 
   async draw() {
     const params = new URL(window.location).searchParams;
-    const view = params.get('view') || 'week';
+    const view = ['week', 'month', 'year'].indexOf(params.get('view')) !== -1
+      ? params.get('view')
+      : 'week';
     // TODO re-add. I think this should be a filter
     // eslint-disable-next-line no-unused-vars
     const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
-    const focus = params.get('focus');
 
     if (this.dataChunks.filtered.length < 1000) {
       this.elems.lowDataWarning.ariaHidden = 'false';
@@ -482,67 +470,68 @@ export default class SkylineChart extends AbstractChart {
         view,
         unit: 'day',
         units: 30,
-        focus,
         endDate,
       },
       week: {
         view,
         unit: 'hour',
         units: 24 * 7,
-        focus,
         endDate,
       },
       year: {
         view,
         unit: 'week',
         units: 52,
-        focus,
         endDate,
       },
     };
 
     const config = configs[view];
 
-    this.config = config;
+    this.config = { ...config, ...this.config };
     this.defineSeries();
 
     // group by date, according to the chart config
     const group = this.dataChunks.group(this.groupBy);
     const chartLabels = Object.keys(group).sort();
 
-    const iGoodLCPs = Object.entries(this.dataChunks.aggregates)
+    const {
+      iGoodLCPs,
+      iNiLCPs,
+      iPoorLCPs,
+      iGoodCLSs,
+      iNiCLSs,
+      iPoorCLSs,
+      iGoodINPs,
+      iNiINPs,
+      iPoorINPs,
+      allTraffic,
+    } = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodLCP.weight);
-    const iNiLCPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiLCP.weight);
-    const iPoorLCPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorLCP.weight);
-
-    const iGoodCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodCLS.weight);
-    const iNiCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiCLS.weight);
-    const iPoorCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorCLS.weight);
-
-    const iGoodINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodINP.weight);
-    const iNiINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiINP.weight);
-    const iPoorINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorINP.weight);
-
-    const allTraffic = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.pageViews.sum);
+      .reduce((acc, [, totals]) => {
+        acc.iGoodLCPs.push(-totals.iGoodLCP.weight);
+        acc.iNiLCPs.push(-totals.iNiLCP.weight);
+        acc.iPoorLCPs.push(-totals.iPoorLCP.weight);
+        acc.iGoodCLSs.push(-totals.iGoodCLS.weight);
+        acc.iNiCLSs.push(-totals.iNiCLS.weight);
+        acc.iPoorCLSs.push(-totals.iPoorCLS.weight);
+        acc.iGoodINPs.push(-totals.iGoodINP.weight);
+        acc.iNiINPs.push(-totals.iNiINP.weight);
+        acc.iPoorINPs.push(-totals.iPoorINP.weight);
+        acc.allTraffic.push(totals.pageViews.sum);
+        return acc;
+      }, {
+        iGoodLCPs: [],
+        iNiLCPs: [],
+        iPoorLCPs: [],
+        iGoodCLSs: [],
+        iNiCLSs: [],
+        iPoorCLSs: [],
+        iGoodINPs: [],
+        iNiINPs: [],
+        iPoorINPs: [],
+        allTraffic: [],
+      });
 
     this.chart.data.datasets[0].data = allTraffic;
 
@@ -566,6 +555,20 @@ export default class SkylineChart extends AbstractChart {
     this.chart.options.scales.y.min = -Math.max(...allTraffic) * 0.71;
     this.chart.options.scales.y.max = Math.max(...allTraffic) * 1.0;
 
+    this.min = this.chart.options.scales.y.min;
+    this.stepSize = undefined;
+    this.clsAlreadyLabeled = false;
+    this.lcpAlreadyLabeled = false;
     this.chart.update();
+
+    // add trend indicators
+    const trafficTrend = linearRegression(allTraffic);
+    const iGoodLCPTrend = linearRegression(iGoodLCPs);
+    const iGoodCLSTrend = linearRegression(iGoodCLSs);
+    const iGoodINPTrend = linearRegression(iGoodINPs);
+    document.querySelector('.key-metrics #pageviews number-format').setAttribute('trend', trafficTrend.slope > 0 ? 'rising' : 'falling');
+    document.querySelector('.key-metrics #lcp number-format').setAttribute('trend', iGoodLCPTrend.slope > 0 ? 'rising' : 'falling');
+    document.querySelector('.key-metrics #cls number-format').setAttribute('trend', iGoodCLSTrend.slope > 0 ? 'rising' : 'falling');
+    document.querySelector('.key-metrics #inp number-format').setAttribute('trend', iGoodINPTrend.slope > 0 ? 'rising' : 'falling');
   }
 }

@@ -1,13 +1,11 @@
 import {
   Chart, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
-} from 'https://cdn.skypack.dev/chart.js@4.2.0';
-// eslint-disable-next-line import/no-unresolved, import/extensions
-import 'https://cdn.skypack.dev/chartjs-adapter-luxon@1.3.1';
+} from 'chartjs';
 import AbstractChart from './chart.js';
 import {
-  toHumanReadable, scoreCWV, scoreBundle, cwvInterpolationFn, cssVariable,
-} from './utils.js';
+  toHumanReadable, scoreBundle, cwvInterpolationFn, cssVariable,
+} from '../utils.js';
 
 Chart.register(LinearScale, ...registerables);
 
@@ -15,46 +13,29 @@ const INTERPOLATION_THRESHOLD = 10;
 export default class BarChart extends AbstractChart {
   defineSeries() {
     const { dataChunks } = this;
-    // aggregate series
-    if (this.chartConfig.focus === 'lcp') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else if (this.chartConfig.focus === 'cls') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else if (this.chartConfig.focus === 'inp') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
-    }
+
+    dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
+    dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
+    dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
+    dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
 
     // interpolated series
     dataChunks.addInterpolation(
       'iGoodCWV', // name of the series
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'], // calculate from these series
-      cwvInterpolationFn('goodCWV', this.chartConfig.focus), // interpolation function
+      cwvInterpolationFn('goodCWV'), // interpolation function
     );
 
     dataChunks.addInterpolation(
       'iNiCWV',
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
-      cwvInterpolationFn('niCWV', this.chartConfig.focus),
+      cwvInterpolationFn('niCWV'),
     );
 
     dataChunks.addInterpolation(
       'iPoorCWV',
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
-      cwvInterpolationFn('poorCWV', this.chartConfig.focus),
+      cwvInterpolationFn('poorCWV'),
     );
 
     dataChunks.addInterpolation(
@@ -64,11 +45,6 @@ export default class BarChart extends AbstractChart {
         goodCWV, niCWV, poorCWV, noCWV,
       }) => {
         const valueCount = goodCWV.count + niCWV.count + poorCWV.count;
-        if (this.chartConfig.focus) {
-          // we have a focus, so this series can stay at 0
-          // as all other series are interpolated to 100%
-          return 0;
-        }
         if (valueCount < INTERPOLATION_THRESHOLD) {
           // not enough data to interpolate the other values, so
           // we report as if there are no CWV at all
@@ -81,8 +57,7 @@ export default class BarChart extends AbstractChart {
   }
 
   async draw() {
-    const params = new URL(window.location.href).searchParams;
-    this.chartConfig.focus = params.get('focus');
+    let params = new URL(window.location.href).searchParams;
 
     if (this.dataChunks.filtered.length < 1000) {
       this.elems.lowDataWarning.ariaHidden = 'false';
@@ -96,14 +71,31 @@ export default class BarChart extends AbstractChart {
       const u = new URL(window.location.href);
       u.searchParams.set('drilldown', 'url');
       window.history.replaceState({}, '', u);
+      params = u.searchParams;
     }
+
     const drilldown = params.get('drilldown');
 
     const drilldowns = {
       url: (bundle) => bundle.domain || bundle.url,
+      'click.source': (bundle) => bundle.events
+        .filter((event) => event.checkpoint === 'click')
+        .filter((event) => event.source)
+        .map((event) => event.source),
+      'click.target': (bundle) => bundle.events
+        .filter((event) => event.checkpoint === 'click')
+        .filter((event) => event.target)
+        .map((event) => event.target),
     };
 
-    this.dataChunks.group((bundle) => drilldowns[drilldown](bundle));
+    const drilldownFn = (bundle) => (typeof drilldowns[drilldown] === 'function'
+      ? drilldowns[drilldown](bundle)
+      : bundle.events
+        .filter((event) => event.checkpoint === drilldown.split('.')[0])
+        .map((event) => event[drilldown.split('.')[1]])
+        .filter((value) => value));
+
+    this.dataChunks.group((bundle) => drilldownFn(bundle));
     const topgroups = Object.entries(this.dataChunks.aggregates)
       .sort(([, a], [, b]) => b.pageViews.sum - a.pageViews.sum)
       .slice(0, 30);

@@ -21,6 +21,7 @@
  * @property {string} timeSlot - the hourly timesot that this bundle belongs to
  * @property {string} url - the URL of the request, without URL parameters
  * @property {string} userAgent - the user agent class, for instance desktop:windows or mobile:ios
+ * @property {string} hostType - the type of host, for instance 'helix' or 'aemcs'
  * @property {number} weight - the weight, or sampling ratio 1:n of the bundle
  * @property {RawEvent} events - the list of events that make up the bundle
  */
@@ -41,6 +42,7 @@
  * @property {string} date - the base date of all bundles in the chunk
  * @property {RawBundle[]} rumBundles - the bundles, as retrieved from the server
  */
+
 /**
  * Calculates properties on the bundle, so that bundle-level filtering can be performed
  * @param {RawBundle} bundle the raw input bundle, without calculated properties
@@ -52,17 +54,14 @@ export function addCalculatedProps(bundle) {
       bundle.visit = true;
       if (e.source === '') e.source = '(direct)';
     }
-    if (e.checkpoint === 'click') {
-      bundle.conversion = true;
-    }
     if (e.checkpoint === 'cwv-inp') {
       bundle.cwvINP = e.value;
     }
     if (e.checkpoint === 'cwv-lcp') {
-      bundle.cwvLCP = e.value;
+      bundle.cwvLCP = Math.max(e.value || 0, bundle.cwvLCP || 0);
     }
     if (e.checkpoint === 'cwv-cls') {
-      bundle.cwvCLS = e.value;
+      bundle.cwvCLS = Math.max(e.value || 0, bundle.cwvCLS || 0);
     }
     if (e.checkpoint === 'cwv-ttfb') {
       bundle.cwvTTFB = e.value;
@@ -157,6 +156,61 @@ class InterpolatedAggregate {
     return value;
   }
 }
+
+function standardNormalCDF(x) {
+  // Approximation of the standard normal CDF using the Hastings algorithm
+  const t = 1 / (1 + 0.2316419 * Math.abs(x));
+  const d = 0.3989423 * Math.exp((-x * x) / 2);
+  const prob = d * t * (0.3193815
+    + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+
+  if (x > 0) {
+    return 1 - prob;
+  }
+  return prob;
+}
+
+function getZTestPValue(Z) {
+  // Approximate the p-value using the standard normal distribution
+  // This is a simplified approximation and may not be as accurate as using a
+  // Z-table or more advanced methods
+  const absZ = Math.abs(Z);
+  const pValue = 2 * (1 - standardNormalCDF(absZ));
+  return pValue;
+}
+
+/**
+ * Performs a Z Test between two proportions. This test assumes that the data
+ * is normally distributed and will calculate the p-value for the difference
+ * between the two proportions.
+ * @param {number} sample1 the sample size of the first group (e.g. total number of visitors)
+ * @param {number} conversions1 the number of conversions in the first group
+ * @param {number} sample2 the sample size of the second group
+ * @param {number} conversions2 the number of conversions in the second group
+ * @returns {number} the p-value, a value between 0 and 1
+ */
+export function zTestTwoProportions(sample1, conversions1, sample2, conversions2) {
+  // Calculate the conversion rates
+  const p1 = conversions1 / sample1;
+  const p2 = conversions2 / sample2;
+
+  if (p1 === p2) {
+    return 1;
+  }
+
+  // Calculate the pooled proportion
+  const p = (conversions1 + conversions2) / (sample1 + sample2);
+
+  // Calculate the standard error
+  const SE = Math.sqrt(p * (1 - p) * (1 / sample1 + 1 / sample2));
+
+  // Calculate the Z-score
+  const Z = (p1 - p2) / SE;
+
+  // Calculate the p-value
+  return getZTestPValue(Z);
+}
+
 /**
  * The error function, also known as the Gauss error function.
  * @param {number} x the value to calculate the error function for
@@ -180,7 +234,36 @@ function erf(x1) {
 
   return sign * y;
 }
+/**
+ * @typedef {Object} MeanVariance
+ * @property {number} mean - the mean of a dataset
+ * @property {number} variance - the variance of a dataset
+ */
+/**
+ * Calculate mean and variance of a dataset.
+ * @param {number[]} data - the input data
+ * @returns {MeanVariance} mean and variance of the input dataset
+ */
+function calcMeanVariance(data) {
+  let sum = 0;
+  let variance = 0;
 
+  // Calculate sum
+  for (let i = 0; i < data.length; i += 1) {
+    sum += data[i];
+  }
+
+  const mean = sum / data.length;
+
+  // Calculate variance
+  for (let i = 0; i < data.length; i += 1) {
+    variance += (data[i] - mean) ** 2;
+  }
+
+  variance /= data.length;
+
+  return { mean, variance };
+}
 /**
  * Performs a significance test on the data. The test assumes
  * that the data is normally distributed and will calculate
@@ -189,12 +272,9 @@ function erf(x1) {
  * @param {number[]} right the second data set
  * @returns {number} the p-value, a value between 0 and 1
  */
-export function pValue(left, right) {
-  const meanLeft = left.reduce((acc, value) => acc + value, 0) / left.length;
-  const meanRight = right.reduce((acc, value) => acc + value, 0) / right.length;
-  const varianceLeft = left.reduce((acc, value) => acc + (value - meanLeft) ** 2, 0) / left.length;
-  const varianceRight = right
-    .reduce((acc, value) => acc + (value - meanRight) ** 2, 0) / right.length;
+export function tTest(left, right) {
+  const { mean: meanLeft, variance: varianceLeft } = calcMeanVariance(left);
+  const { mean: meanRight, variance: varianceRight } = calcMeanVariance(right);
   const pooledVariance = (varianceLeft + varianceRight) / 2;
   const tValue = (meanLeft - meanRight) / Math
     .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
@@ -227,19 +307,34 @@ class Facet {
    * @returns {Aggregate} metrics
    */
   get metrics() {
-    if (this.metricsIn) return this.metricsIn;
-    if (this.entries.length === 0) {
+    return this.getMetrics(Object.keys(this.parent.series));
+  }
+
+  getMetrics(series) {
+    if (!series || series.length === 0) return {};
+    const res = {};
+    const needed = [];
+    if (this.metricsIn) {
+      series.forEach((s) => {
+        if (this.metricsIn[s]) {
+          res[s] = this.metricsIn[s];
+        } else {
+          needed.push(s);
+        }
+      });
+    } else {
       this.metricsIn = {};
-      return this.metricsIn;
+      needed.push(...series);
     }
 
-    this.metricsIn = Object.entries(this.parent.series)
-      .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
-        return acc;
-      }, {});
-
-    return this.metricsIn;
+    if (needed.length) {
+      needed.forEach((s) => {
+        const valueFn = this.parent.series[s];
+        this.metricsIn[s] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
+        res[s] = this.metricsIn[s];
+      });
+    }
+    return res;
   }
 }
 
@@ -305,6 +400,111 @@ export class DataChunks {
   addFacet(facetName, facetValueFn, facetCombiner = 'some') {
     this.facetFns[facetName] = facetValueFn;
     this.facetFns[facetName].combiner = facetCombiner;
+    this.resetData();
+  }
+
+  /**
+   * Adds a histogram facet, derived from an existing facet. This facet
+   * will group the data into buckets, based on the values of the base
+   * facet.
+   * You can specify the bucket size, limits and the type of bucketing.
+   * @param {string} facetName name of your new facet
+   * @param {string} baseFacet name of the base facet, from which to derive the histogram
+   * @param {object} bucketOptions
+   * @param {number} bucketOptions.count number of buckets
+   * @param {number} bucketOptions.min minimum value of the histogram
+   * @param {number} bucketOptions.max maximum value of the histogram
+   * @param {('linear'|'logarithmic'|'quantiles')} bucketOptions.steps type of bucketing, can be
+   * 'linear' (each bucket has the same value range), 'logarithmic' (same value range on
+   * logarithmic scale), or 'quantiles' (buckets are roughly equal in size based on the current
+   * facet values, but the bucket min/max values are less predictable)
+   * @param {function} formatter a number formatter
+   */
+  addHistogramFacet(facetName, baseFacet, {
+    count: bucketcount = 10,
+    min: absmin = -Infinity,
+    max: absmax = Infinity,
+    steps = 'linear',
+  }, formatter = Intl.NumberFormat(undefined, { maximumSignificantDigits: 2 })) {
+    const facetvalues = this.facets[baseFacet];
+
+    const createBundleFacetMap = (facetValues) => facetValues.reduce((acc, facet) => {
+      facet.entries.forEach((aBundle) => {
+        acc[aBundle.id] = acc[aBundle.id] ? [...acc[aBundle.id], facet] : [facet];
+      });
+      return acc;
+    }, {});
+
+    // inside a facet there are entries
+    // a entry is a array of bundles
+    // a bundle is a object with a id
+    // need to create a map of bundles as a key and as values the facets where it belongs to
+    // because then we need to use it in the facets value function
+    // this is mainly to avoid looping through all the facets for each bundle
+    const bundleFacetMap = createBundleFacetMap(facetvalues);
+
+    let quantilesteps;
+    const stepfns = {
+      // split the range into equal parts
+      linear: (min, max, total, step) => (((max - min) / total) * step) + min,
+      // split the range into exponential parts, so that the full range
+      // is covered
+      logarithmic: (min, max, total, step) => {
+        const range = max - min;
+        const logrange = Math.log(range);
+        const logstep = logrange / total;
+        return Math.exp(logstep * step) + min;
+      },
+      // split the range into roughly equal size buckets
+      // based on the current facet values (inefficient, needs
+      // memoization)
+      quantiles: (min, max, total, step) => {
+        if (quantilesteps === undefined) {
+          const allvalues = facetvalues
+            .filter(({ value }) => value !== undefined)
+            .map(({ value, weight }) => ({ value: Number.parseInt(value, 10), weight }))
+            .filter(({ value }) => value >= min)
+            .filter(({ value }) => value <= max)
+            .sort((a, b) => a.value - b.value);
+          const totalWeight = allvalues.reduce((acc, { weight }) => acc + weight, 0);
+          const stepWeight = totalWeight
+            / (total + (1 / total)); // add a little extra to make sure we have enough steps
+          let currentWeight = 0;
+          quantilesteps = allvalues.reduce((acc, { value, weight }) => {
+            currentWeight += weight;
+            if (currentWeight > stepWeight) {
+              acc.push(value);
+              currentWeight = 0;
+            }
+            return acc;
+          }, []);
+        }
+        return quantilesteps[step] || max;
+      },
+    };
+    const min = Math.max(absmin, facetvalues
+      .map(({ value }) => Number.parseInt(value, 10))
+      .reduce((acc, val) => Math.min(acc, val), absmax));
+    const max = Math.min(absmax, facetvalues
+      .map(({ value }) => Number.parseInt(value, 10))
+      .reduce((acc, val) => Math.max(acc, val), absmin));
+    const buckets = Array
+      .from({ length: bucketcount }, (_, i) => stepfns[steps](min, max, bucketcount, i));
+    this.addFacet(facetName, (bundle) => {
+      // find the facetvalue that has the current bundle
+      const facetmatch = bundleFacetMap[bundle.id];
+      // const facetmatch = facetvalues.find((f) => f.entries.some((e) => e.id === bundle.id));
+      if (!facetmatch) {
+        return [];
+      }
+      // pick the first element from the array
+      const facetvalue = Number.parseInt(facetmatch[0].value, 10);
+      // const facetvalue = Number.parseInt(facetmatch.value, 10);
+      const bucket = buckets.findIndex((b) => facetvalue < b);
+      return bucket !== -1
+        ? `<${formatter.format(buckets[bucket])}`
+        : `>=${formatter.format(buckets[bucketcount - 1])}`;
+    });
   }
 
   /**
@@ -315,7 +515,7 @@ export class DataChunks {
 
   resetData() {
     // data that has been filtered
-    this.filteredIn = [];
+    this.filteredIn = null;
     // filtered data that has been grouped
     this.groupedIn = {};
     // grouped data that has been aggregated
@@ -381,29 +581,117 @@ export class DataChunks {
   }
 
   /**
+   * Function used for skipping certain filtering attributes. The logic of the function
+   * depends on the context, for instance when filtering bundles, this function is chained
+   * as a filter function in order to skip certain attributes.
+   * @function skipFilterFn
+   * @param {string} attributeName the name of the attribute to skip.
+   * @returns {boolean} true if the attribute should be included or not.
+   */
+
+  /**
+   * Function used for whitelist filtering attributes. The logic of the function
+   * depends on the context, for instance when filtering bundles, this function is chained
+   * as a filter function in order to ditch attributes.
+   * @function existenceFilterFn
+   * @param {string} attributeName the name of the whitelisted attribute.
+   * @returns {boolean} true if the attribute should be included or not.
+   */
+
+  /**
+   * Function used for extracting the values for a certain attribute out of a dataset
+   * specific to the context.
+   * @function valuesExtractorFn
+   * @param {string} attributeName the name of the attribute to extract.
+   * @param {Bundle} bundle the dataset to extract the attribute from.
+   * @param {DataChunks} parent the parent object that contains the bundles.
+   * @returns {boolean} true if the attribute should be included or not.
+   */
+
+  /**
+   * Function used for inferring the combiner that's going to be used when
+   * filtering attributes.
+   * @function combinerExtractorFn
+   * @param {string} attributeName the name of the attribute to extract.
+   * @param {DataChunks} parent the parent object that contains the bundles.
+   * @returns {string} 'some' or 'every'.
+   */
+
+  /**
    * @private
    * @param {Bundle[]} bundles
    * @param {Object<string, string[]>} filterSpec
    * @param {string[]} skipped facets to skip
    */
   filterBundles(bundles, filterSpec, skipped = []) {
-    const filterBy = Object.entries(filterSpec) // use the full filter spec
-      .filter(([facetName]) => !skipped.includes(facetName)) // except for skipped facets
-      .filter(([, filterValues]) => filterValues.length) // and filters that accept no values
-      .filter(([facetName]) => this.facetFns[facetName]); // and facets that don't exist
+    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const skipFilterFn = ([facetName]) => !skipped.includes(facetName);
+    const valuesExtractorFn = (attributeName, bundle, parent) => {
+      const facetValue = parent.facetFns[attributeName](bundle);
+      return Array.isArray(facetValue) ? facetValue : [facetValue];
+    };
+    const combinerExtractorFn = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
+    // eslint-disable-next-line max-len
+    return this.applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn);
+  }
+
+  /**
+   * @private
+   * @param {Bundle[]} bundles that will be filtered based on a filter specification.
+   * @param {Object<string, string[]>} filterSpec the filter specification.
+   * @param {skipFilterFn} skipFilterFn function to skip filters. Useful for skipping
+   * unwanted facets, in general skipping attributes.
+   * @param {existenceFilterFn} existenceFilterFn function to filter out non-existing attributes.
+   * This is used to skip facets that have not been added. In general,
+   * this can be used to whitelist attributes names.
+   * @param {valuesExtractorFn} valuesExtractorFn function to extract the probed values.
+   * @param {combinerExtractorFn} combinerExtractorFn function to extract the combiner.
+   * @returns {Bundle[]} the filtered bundles.
+   */
+  // eslint-disable-next-line max-len
+  applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn) {
+    const filterBy = Object.entries(filterSpec)
+      .filter(skipFilterFn)
+      .filter(([, desiredValues]) => desiredValues.length)
+      .filter(existenceFilterFn);
     return bundles.filter((bundle) => {
-      const matches = filterBy.map(([facetName, values]) => {
-        // get the facet values for the bundle, remember that
-        // a facet can return multiple values
-        const facetValue = this.facetFns[facetName](bundle);
-        const facetValues = Array.isArray(facetValue) ? facetValue : [facetValue];
-        const facetCombiner = this.facetFns[facetName].combiner || 'some';
-        // check if any of the values match
-        return values[facetCombiner]((value) => facetValues.includes(value));
+      const matches = filterBy.map(([attributeName, desiredValues]) => {
+        const actualValues = valuesExtractorFn(attributeName, bundle, this);
+        const combiner = combinerExtractorFn(attributeName, this);
+        return desiredValues[combiner]((value) => actualValues.includes(value));
       });
-      // only if all active filters have a match, then the bundle is included
       return matches.every((match) => match);
     });
+  }
+
+  /**
+   * Checks if a conversion has happened in the bundle. A conversion means a business metric
+   * that has been achieved, for instance a click on a certain link.
+   * @param {Bundle} aBundle the bundle to check.
+   * @param {Object<string, string[]>} filterSpec uses the same format as the filter specification.
+   * For instance { checkpoint: ['click'] } means that inside a bundle an event that has the
+   * checkpoint attribute set to 'click' must exist.
+   * @param {string} combiner used to determine if all or some filters must match.
+   * By default, 'every' is used.
+   * @returns {boolean} the result of the check.
+   */
+  hasConversion(aBundle, filterSpec, combiner) {
+    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const skipFilterFn = () => true;
+    const valuesExtractorFn = (attributeName, bundle, parent) => {
+      const facetValue = parent.facetFns[attributeName](bundle);
+      return Array.isArray(facetValue) ? facetValue : [facetValue];
+    };
+    const combinerExtractorFn = () => combiner || 'every';
+
+    return this.applyFilter(
+      [aBundle],
+      filterSpec,
+      skipFilterFn,
+      existenceFilterFn,
+      valuesExtractorFn,
+      combinerExtractorFn,
+    ).length > 0;
   }
 
   filterBy(filterSpec) {
@@ -412,7 +700,7 @@ export class DataChunks {
   }
 
   get filtered() {
-    if (this.filteredIn.length) return this.filteredIn;
+    if (this.filteredIn) return this.filteredIn;
     if (Object.keys(this.filters).length === 0) return this.bundles; // no filter, return all
     if (Object.keys(this.facetFns).length === 0) return this.bundles; // no facets, return all
     this.filteredIn = this.filterBundles(this.bundles, this.filters);

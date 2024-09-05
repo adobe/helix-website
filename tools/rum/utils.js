@@ -5,8 +5,31 @@ export function scoreValue(value, ni, poor) {
   return 'good';
 }
 
+export function isKnownFacet(key) {
+  return false // TODO: find a better way to filter out non-facet keys
+    || key === 'userAgent'
+    || key === 'url'
+    || key === 'type'
+    || key === 'conversions'
+    // facets from sankey
+    || key === 'trafficsource'
+    || key === 'traffictype'
+    || key === 'entryevent'
+    || key === 'pagetype'
+    || key === 'loadtype'
+    || key === 'contenttype'
+    || key === 'interaction'
+    || key === 'clicktarget'
+    || key === 'exit'
+    || key === 'vitals'
+    || key.endsWith('.source')
+    || key.endsWith('.target')
+    || key.endsWith('.histogram')
+    || key === 'checkpoint';
+}
+
 export function scoreCWV(value, name) {
-  if (!value) return null;
+  if (value === undefined || value === null) return null;
   const limits = {
     lcp: [2500, 4000],
     cls: [0.1, 0.25],
@@ -76,13 +99,10 @@ export function simpleCWVInterpolationFn(metric, threshold) {
     return cwvs[threshold + metric].weight / valuedWeights;
   };
 }
-export function cwvInterpolationFn(targetMetric, interpolateTo100) {
+export function cwvInterpolationFn(targetMetric) {
   return (cwvs) => {
     const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
     const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
-    if (interpolateTo100) {
-      return (cwvs[targetMetric].weight / valuedWeights);
-    }
     if (valueCount < INTERPOLATION_THRESHOLD) {
       // not enough data to interpolate
       return 0;
@@ -138,4 +158,62 @@ export function getGradient(ctx, chartArea, from, to) {
   }
 
   return gradient;
+}
+/**
+ * Function used for filtering wanted parameters. Its implementation depends on the context,
+ * for instance when parsing for conversion parameters we care about those that start with
+ * `conversion.`.
+ * @function filterFn
+ * @param {string} paramName - The parameter name.
+ * @returns {boolean} - Returns true if the parameter will be further parsed, false otherwise.
+ */
+/**
+ * In some cases, it may just be that the parameters need to be transformed in some way.
+ * For instance, when parsing conversion parameters we want to remove the `conversion.` prefix
+ * from the parameter name.
+ * @function transformFn
+ * @param {[string, string]} paramPair - The pair of parameter name and its value.
+ * @returns {[string, string]} - The result of the transformation.
+ */
+/**
+ * Parse search parameters and return a dictionary.
+ * @param {URLSearchParams} params - The search parameters.
+ * @param {filterFn} filterFn - The filtering function.
+ * @param {transformFn} transformFn - The transformation function.
+ * @returns {Object<string, string[]>} - The dictionary of parameters.
+ */
+export function parseSearchParams(params, filterFn, transformFn) {
+  return Array.from(params
+    .entries())
+    .filter(filterFn)
+    .map(transformFn)
+    .reduce((acc, [key, value]) => {
+      if (acc[key]) acc[key].push(value);
+      else acc[key] = [value];
+      return acc;
+    }, {});
+}
+const cached = {};
+export function parseConversionSpec() {
+  if (cached.conversionSpec) return cached.conversionSpec;
+  const params = new URL(window.location).searchParams;
+  const transform = ([key, value]) => [key.replace('conversion.', ''), value];
+  const filter = ([key]) => (key.startsWith('conversion.'));
+  cached.conversionSpec = parseSearchParams(params, filter, transform);
+  return cached.conversionSpec;
+}
+
+/**
+ * Conversion rates are computed as the ratio of conversions to visits. The conversion rate is
+ * capped at 100%.
+ * @param conversions the number of conversions
+ * @param visits the number of visits
+ * @returns {number}  the conversion rate as a percentage
+ */
+export function computeConversionRate(conversions, visits) {
+  const conversionRate = (100 * conversions) / visits;
+  if (conversionRate >= 0 && conversionRate <= 100) {
+    return conversionRate;
+  }
+  return 100;
 }

@@ -89,3 +89,17 @@
 .card-list-wrapper .cards .cards-card-details {
   overflow-x: hidden;
 }
+
+/* card cateogry filtering */
+.cards-wrapper .category-filter-wrapper {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  justify-content: start;
+  align-items: center;
+}
+
+.cards-wrapper .category-filter-wrapper select {
+  font-size: var(--type-body-l-size);
+  max-width: 20rem;
+}

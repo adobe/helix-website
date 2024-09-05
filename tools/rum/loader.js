@@ -25,7 +25,7 @@ export default class DataLoader {
   }
 
   set domain(domain) {
-    if (domain.endsWith(':all')) {
+    if (domain.endsWith(':all') && domain !== 'aem.live:all') {
       [this.ORG, this.SCOPE] = domain.split(':');
     } else {
       this.DOMAIN = domain;

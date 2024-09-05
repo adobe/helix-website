@@ -6,18 +6,35 @@ async function fetchDomainKey(domain) {
   try {
     const auth = getPersistentToken();
     let org;
-    if (domain.endsWith(':all')) {
+    if (domain.endsWith(':all') && domain !== 'aem.live:all') {
       ([org] = domain.split(':'));
     }
-    const resp = await fetch(`https://rum.fastly-aem.page/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
+    const issueResp = await fetch(`https://rum.fastly-aem.page/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
       headers: {
         authorization: `Bearer ${auth}`,
       },
     });
-    const json = await resp.json();
-    return (org ? json.orgkey : json.domainkey);
-  } catch {
-    return '';
+    let domainkey = '';
+    try {
+      domainkey = (await issueResp.json())[org ? 'orgkey' : 'domainkey'];
+    } catch (e) {
+      // no domainkey
+    }
+    if (issueResp.status === 403 || domainkey === '') {
+      // you don't have an admin key
+      // let's see if we can get access anyway
+      const n = new Date();
+      const y = n.getFullYear();
+      const m = String(n.getMonth() + 1).padStart(2, '0');
+      const d = String(n.getDate()).padStart(2, '0');
+      const probeResp = await fetch(`https://rum.fastly-aem.page/bundles/${domain}/${y}/${m}/${d}?domainkey=open`);
+      if (probeResp.status === 200) {
+        return 'open';
+      }
+    }
+    return domainkey;
+  } catch (e) {
+    return 'error';
   }
 }
 
@@ -208,7 +225,7 @@ export default class IncognitoCheckbox extends HTMLElement {
     if (urlkey === 'incognito' || !urlkey) {
       this.setAttribute('mode', 'loading');
       fetchDomainKey(u.searchParams.get('domain')).then((domainkey) => {
-        if (!domainkey) {
+        if (domainkey === 'error') {
           this.setAttribute('mode', 'error');
           return;
         }
