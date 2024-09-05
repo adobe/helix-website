@@ -913,6 +913,20 @@ export class DataChunks {
 
     this.facetsIn = Object.entries(this.facetFns)
       .reduce((accOuter, [facetName, facetValueFn]) => {
+        // build a list of skipped facets
+        const skipped = [];
+
+        if (this.facetCombiners[facetName] === 'some' || this.facetCombiners[facetName] === 'none') {
+          // if we are using a combiner that requires not all values to match, then we skip the
+          // current facet, so that all possible values are shown, not just the ones that match
+          // in combination with the ones already selected
+          skipped.push(facetName);
+        }
+        if (this.facetCombiners[`${facetName}!`] && ['none', 'never'].includes(this.facetCombiners[`${facetName}!`])) {
+          // if we have a negated facet, then we skip the negated facet
+          // so that we can show all values, not just the ones that do not match
+          skipped.push(`${facetName}!`);
+        }
         const groupedByFacetIn = this
           // we filter the bundles by all active filters,
           // except for the current facet (we want to see)
@@ -920,9 +934,7 @@ export class DataChunks {
           .filterBundles(
             this.bundles,
             this.filters,
-            this.facetCombiners[facetName] === 'some'
-              ? [facetName]
-              : [],
+            skipped,
           )
           .reduce(groupFn(facetValueFn), {});
         accOuter[facetName] = Object.entries(groupedByFacetIn)
