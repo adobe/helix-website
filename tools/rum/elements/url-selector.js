@@ -37,7 +37,7 @@ export default class URLSelector extends HTMLElement {
     const input = this.querySelector('input');
     input.value = new URL(window.location.href).searchParams.get('domain');
     const img = this.querySelector('img');
-    img.src = `https://www.google.com/s2/favicons?domain=${input.value}&sz=64`;
+    img.src = `https://www.google.com/s2/favicons?domain=${input.value.split(':')[0]}&sz=64`;
 
     if (!getPersistentToken()) {
       input.disabled = true;
