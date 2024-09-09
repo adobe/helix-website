@@ -25,6 +25,28 @@ export async function renderFeed(block) {
     const desc = createTag('p', { class: 'desc' }, page.Description);
     div.appendChild(desc);
 
+    gridDiv.appendChild(div);
+
+    requestAnimationFrame(() => {
+      const lineHeight = parseFloat(getComputedStyle(desc).lineHeight);
+      const maxHeight = lineHeight * 6;
+      const descHeight = desc.scrollHeight;
+
+      if (descHeight > maxHeight) {
+        const readMore = createTag('span', { class: 'read-more' }, 'Read more');
+        readMore.addEventListener('click', () => {
+          if (desc.classList.contains('expanded')) {
+            desc.classList.remove('expanded');
+            readMore.textContent = 'Read more';
+          } else {
+            desc.classList.add('expanded');
+            readMore.textContent = 'Read less';
+          }
+        });
+        desc.insertAdjacentElement('afterend', readMore);
+      }
+    });
+
     const title = createTag('p', { class: 'link' });
     const a = createTag('a', {
       href: page.URL, target: '_blank',

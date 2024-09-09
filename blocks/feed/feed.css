@@ -50,6 +50,32 @@
   line-height: var(--type-body-s-lh);
 }
 
+.feed.recent .desc {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.feed.recent .desc.expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.feed.recent .read-more {
+  color: var(--tabs-active-color);
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 5px;
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  text-decoration: underline;
+}
+
 @media screen and (min-width: 768px) {
   .feed.recent > div > div {
     grid-template-columns: 1fr 1fr 1fr;
