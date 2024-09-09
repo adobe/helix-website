@@ -381,6 +381,14 @@ export function updateState() {
     });
   });
 
+  // iterate over all existing URL parameters and keep those that are known facets
+  // and end with ~, so that we can keep the state of the facets
+  searchParams.forEach((value, key) => {
+    if (key.endsWith('~') && isKnownFacet(key)) {
+      url.searchParams.set(key, value);
+    }
+  });
+
   window.history.replaceState({}, '', url);
   document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
 }
