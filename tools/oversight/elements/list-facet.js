@@ -114,7 +114,7 @@ export default class ListFacet extends HTMLElement {
     const url = new URL(window.location);
     const drilldownAtt = this.getAttribute('drilldown');
     const mode = url.searchParams.get('mode') || this.getAttribute('mode');
-    const numOptions = mode === 'all' ? 20 : 10;
+    const numOptions = parseInt(url.searchParams.get(`${facetName}~`), 10) || 10;
 
     if (this.querySelector('dl')) {
       this.placeholders = Array.from(this.querySelectorAll('dl > dt + dd'))
@@ -318,12 +318,15 @@ export default class ListFacet extends HTMLElement {
         const div = document.createElement('div');
         div.className = 'load-more';
         const more = document.createElement('label');
-        more.textContent = 'more...';
+        more.textContent = 'more…';
         more.addEventListener('click', (evt) => {
           evt.preventDefault();
           const start = fieldSet.children.length - 2; // minus the "legend" and "more" container
           const end = start + numOptions;
           paint(start, end);
+          const usp = new URLSearchParams(window.location.search);
+          usp.set(`${facetName}~`, end);
+          window.history.pushState({}, '', `${window.location.pathname}?${usp}`);
 
           if (end >= filteredKeys.length) {
             container.remove();
