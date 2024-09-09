@@ -1,6 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { truncate, escapeHTML, computeConversionRate } from '../utils.js';
+import {
+  truncate, escapeHTML, computeConversionRate, isKnownFacet,
+} from '../utils.js';
 
 describe('truncate', () => {
   it('truncates to the beginning of the hour', () => {
@@ -71,5 +73,17 @@ describe('computeConversionRate', () => {
   it('its 100% for 2 conversion and 1 visits', () => {
     const result = computeConversionRate(0, 0);
     assert.strictEqual(result, 100);
+  });
+
+  describe('check valid facets', () => {
+    assert.ok(isKnownFacet('userAgent'));
+    assert.ok(!isKnownFacet('browser'));
+
+    assert.ok(isKnownFacet('checkpoint.source'));
+    assert.ok(!isKnownFacet('checkpoint.value'));
+
+    assert.ok(isKnownFacet('url!'));
+    assert.ok(isKnownFacet('url~'));
+    assert.ok(!isKnownFacet('url+'));
   });
 });

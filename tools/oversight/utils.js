@@ -4,27 +4,45 @@ import { classifyAcquisition } from './acquisition.js';
 /* helpers */
 
 export function isKnownFacet(key) {
-  return false // TODO: find a better way to filter out non-facet keys
-    || key === 'userAgent'
-    || key === 'url'
-    || key === 'url!'
-    || key === 'type'
-    || key === 'conversions'
+  const baseFacets = [
+    'userAgent',
+    'url',
+    'type',
+    'conversions',
+    'checkpoint',
     // facets from sankey
-    || key === 'trafficsource'
-    || key === 'traffictype'
-    || key === 'entryevent'
-    || key === 'pagetype'
-    || key === 'loadtype'
-    || key === 'contenttype'
-    || key === 'interaction'
-    || key === 'clicktarget'
-    || key === 'exit'
-    || key === 'vitals'
-    || key.endsWith('.source')
-    || key.endsWith('.target')
-    || key.endsWith('.histogram')
-    || key === 'checkpoint';
+    'trafficsource',
+    'traffictype',
+    'entryevent',
+    'pagetype',
+    'loadtype',
+    'contenttype',
+    'interaction',
+    'clicktarget',
+    'exit',
+    'vitals',
+  ];
+
+  const suffixes = [
+    'source',
+    'target',
+    'histogram',
+  ];
+
+  const modifiers = [
+    '!', // indicates a negation, and allows us to select a negative facet
+    '~', // indicates a count, and allows us to control how many items are shown
+  ];
+
+  const facetPattern = /^(?<facet>[a-z]+)(\.(?<suffix>[a-z]+))?(?<qualifier>[!~])?$/i;
+  const match = facetPattern.exec(key);
+  if (match) {
+    const { facet, suffix, qualifier } = match.groups;
+    return baseFacets.includes(facet)
+      && (!suffix || suffixes.includes(suffix))
+      && (!qualifier || modifiers.includes(qualifier));
+  }
+  return false;
 }
 
 export function scoreCWV(value, name) {

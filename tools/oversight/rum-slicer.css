@@ -187,6 +187,12 @@ main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
   content: 's';
 }
 
+/* as of 2024, all iOS CWV values are fake, so we hide them a bit */
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
 main .key-metrics ul > #lcp number-format.extra::after {
   content: 's caused by TTFB)'
 }
