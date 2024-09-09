@@ -186,8 +186,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       }).join('/');
     return u.toString();
   };
-  dataChunks.addFacet('url', urlFn);
-  dataChunks.addFacet('url!', urlFn, 'never');
+  dataChunks.addFacet('url', urlFn, 'some', 'never');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
