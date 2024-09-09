@@ -440,10 +440,17 @@ export class DataChunks {
    * @param {groupByFn} facetValueFn function that returns the facet value –
    * can return multiple values
    * @param {string} facetCombiner how to combine multiple values, default is 'some', can be 'every'
+   * @param {string} negativeCombiner how to combine multiple values for the negative facet,
+   * possible values are 'none' and 'never'. Only when this parameter is set, a negative facet
+   * will be created.
    */
-  addFacet(facetName, facetValueFn, facetCombiner = 'some') {
+  addFacet(facetName, facetValueFn, facetCombiner = 'some', negativeCombiner = undefined) {
     this.facetFns[facetName] = facetValueFn;
     this.facetCombiners[facetName] = facetCombiner;
+    if (negativeCombiner) {
+      this.facetFns[`${facetName}!`] = facetValueFn;
+      this.facetCombiners[`${facetName}!`] = negativeCombiner;
+    }
     this.resetData();
   }
 
