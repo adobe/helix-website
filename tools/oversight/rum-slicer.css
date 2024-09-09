@@ -98,9 +98,11 @@ main .title {
 main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-right: 8px;
   font-size: var(--type-heading-m-size);
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 main .title url-selector img {
@@ -109,9 +111,7 @@ main .title url-selector img {
 }
 
 main .title url-selector input {
-  background: linear-gradient(90deg, var(--spectrum-gray-900), var(--spectrum-purple-900));
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--spectrum-gray-700);
 }
 
 .title button {
@@ -193,6 +193,23 @@ main .key-metrics ul > #lcp number-format.extra::after {
 
 main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
   content: '';
+}
+
+main .key-metrics number-format[trend="falling"],
+main .key-metrics #lcp number-format[trend="rising"],
+main .key-metrics #cls number-format[trend="rising"],
+main .key-metrics #inp number-format[trend="rising"] {
+  border-bottom: 1px solid;
+  border-color: var(--spectrum-red-600);
+}
+
+main .key-metrics number-format[trend="rising"],
+/* more isn't always better */
+main .key-metrics #lcp number-format[trend="falling"],
+main .key-metrics #cls number-format[trend="falling"],
+main .key-metrics #inp number-format[trend="falling"] {
+  border-bottom: 1px solid;
+  border-color: var(--spectrum-green-600);
 }
 
 .key-metrics > ul > * {
@@ -488,10 +505,12 @@ fieldset li[class$="-"] {
 
 fieldset li.interesting {
   border-width: 2px;
+  padding: 2px 5px;
 }
 
 fieldset li.significant {
   border-width: 3px;
+  padding: 2px 4px;
 }
 
 fieldset li::after,
@@ -528,49 +547,6 @@ vitals-facet label::before {
 #facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
   display: grid;
 }
-
-#facets .more-all fieldset div.more-container div.load-more label {
-  display: none;
-}
-
-#facets .more-more-more fieldset div.more-container div.load-more label:first-of-type {
-  /* that's enough */
-  display: none;
-}
-
-#facets fieldset div:nth-child(11) ~ div {
-  display: none;
-}
-
-#facets .more-all fieldset div:nth-child(11) ~ div,
-#facets .more.more-all fieldset div:nth-child(11) ~ div{
-  display: grid;
-}
-
-#facets .more fieldset div:nth-child(11) ~ div {
-  display: grid;
-}
-
-#facets .more fieldset div:nth-child(21) ~ div {
-  display: none;
-}
-
-#facets .more-more fieldset div:nth-child(21) ~ div {
-  display: grid;
-}
-
-#facets .more-more fieldset div:nth-child(31) ~ div {
-  display: none;
-}
-
-#facets .more-more-more fieldset div:nth-child(31) ~ div {
-  display: grid;
-}
-
-#facets .more-more-more fieldset div:nth-child(41) ~ div {
-  display: none;
-}
-
 
 #facets fieldset input[type=checkbox] {
   grid-area: check;
@@ -619,7 +595,7 @@ vitals-facet label::before {
 }
 
 #facets fieldset label .extra::after {
-  content: '% conversion rate';
+  content: '% rate';
 }
 
 #facets fieldset label number-format[title="0"].extra::after {
@@ -631,7 +607,8 @@ vitals-facet label::before {
   content: '';
 }
 
-#facets literal-facet label span.value {
+#facets literal-facet label span.value,
+#facets link-facet label span.withheld {
   font-family: monospace;
   font-size: 80%;
   background-color: var(--spectrum-blue-200);
@@ -643,6 +620,21 @@ thumbnail-facet label {
   display: flex;
   align-items: center;
   gap: 1em;
+}
+
+thumbnail-facet label > span {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+thumbnail-facet label span.filename {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+  line-height: 0.9;
 }
 
 thumbnail-facet fieldset div:not(.more-container) {
@@ -744,12 +736,25 @@ vitals-facet fieldset label {
   background-color: var(--light-blue)
 }
 
+#facets div[aria-checked=mixed] {
+  opacity: 0.7;
+  filter: brightness(0.7);
+}
+
 #facets div[aria-selected]:hover {
   background-color: #eee;
 }
 
 #facets img {
   height: 60px;
+}
+
+#facets link-facet span.collapse {
+  display: none;
+}
+
+#facets link-facet span.collapse + span.suffix::before {
+  content: '...';
 }
 
 #facets link-facet a .protocol::after {
@@ -798,7 +803,8 @@ vitals-facet fieldset label {
 
 #facets fieldset div.load-more {
   grid-column: 2 / span 2;
-  display: block;
+  display: flex;
+  justify-content: left;
   padding: 10px 0;
 }
 
@@ -833,34 +839,6 @@ vitals-facet fieldset label {
   border-radius: 2px;
   width: 10px;
   left: 2px;
-}
-
-.pagespeed {
-  display: inline-block;
-  margin-left: 0;
-  vertical-align: text-bottom;
-}
-
-.pagespeed::before {
-  border: 3px solid;
-  border-left: 0;
-  border-bottom: 0;
-  border-top-right-radius: 12px;
-  top: 2px;
-  left: 2px;
-  height: 10px;
-  width: 10px;
-  transform: rotate(-45deg);
-}
-
-.pagespeed::after {
-  height: 2px;
-  border-bottom: 1px solid;
-  background: currentcolor;
-  bottom: 6px;
-  left: 3px;
-  width: 10px;
-  transform: rotate(-70deg);
 }
 
 .clipboard-paste::before {
@@ -1010,14 +988,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   main .title url-selector input {
     font-size: var(--type-heading-l-size);
   }
-
-  #facets link-facet  a .protocol {
-    display: none;
-  }
-
-  #facets link-facet  a .hostname {
-    display: inline;
-  }
 }
 
 @media (min-width: 900px) {
@@ -1070,14 +1040,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     padding: 4px 16px;
     font-size: 18px;
   }
-
-  #facets link-facet  a .protocol {
-    display: inline;
-  }
-
-  #facets link-facet  a .hostname {
-    display: inline;
-  }
 }
 
 
@@ -1088,10 +1050,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     display: flex;
     gap: 16px;
     height: calc(100vh - var(--nav-height) - 32px);
-  }
-
-  main .key-metrics ul {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 
   #deepmain > div, #deepmain > facet-sidebar {
@@ -1118,29 +1076,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-  }
-
-  #facets link-facet  a .protocol {
-    display: none;
-    opacity: 0.6;
-  }
-
-  #facets link-facet  a .hostname {
-    display: inline;
-  }
-}
-
-@media (min-width: 2000px) {
-  main .key-metrics ul {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
-
-  #facets link-facet  a .protocol {
-    display: inline;
-  }
-
-  #facets link-facet  a .hostname {
-    display: inline;
   }
 }
 

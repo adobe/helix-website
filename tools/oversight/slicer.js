@@ -7,16 +7,16 @@ import {
   isKnownFacet,
   scoreCWV,
   computeConversionRate,
+  reclassifyConsent,
+  reclassifyAcquisition,
 } from './utils.js';
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
-// const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
-// const UA_KEY = 'user_agent';
 
 const elems = {};
 
@@ -40,6 +40,11 @@ dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
+dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
+  checkpoint: ['click'],
+})
+  ? bundle.weight
+  : 0));
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
   ? bundle.weight
   : 0));
@@ -49,6 +54,14 @@ function setDomain(domain, key) {
   loader.domainKey = key;
 }
 
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 0
+  || (Object.keys(conversionSpec).length === 1
+    && conversionSpec.checkpoint
+    && conversionSpec.checkpoint[0] === 'click');
 /* update UX */
 export function updateKeyMetrics() {
   document.querySelector('#pageviews p number-format').textContent = dataChunks.totals.pageViews.sum;
@@ -73,11 +86,27 @@ export function updateKeyMetrics() {
     document.querySelector('#visits p').appendChild(visitsExtra);
   }
 
-  document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
-  document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+  if (isDefaultConversion) {
+    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.engagement.sum;
+    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.engagement.count);
+  } else {
+    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
+    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+  }
+
   document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
-  if (dataChunks.totals.visits.sum > 0) {
-    const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
+  const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
+  if (dataChunks.totals.pageViews.sum > 0 && isDefaultConversion) {
+    conversionsExtra.textContent = computeConversionRate(
+      dataChunks.totals.engagement.sum,
+      dataChunks.totals.pageViews.sum,
+    );
+    // this is a bit of fake precision, but it's good enough for now
+    conversionsExtra.setAttribute('precision', 2);
+    conversionsExtra.setAttribute('total', 100);
+    conversionsExtra.className = 'extra';
+    document.querySelector('#conversions p').appendChild(conversionsExtra);
+  } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
     conversionsExtra.textContent = computeConversionRate(
       dataChunks.totals.conversions.sum,
       dataChunks.totals.visits.sum,
@@ -110,16 +139,11 @@ export function updateKeyMetrics() {
   inpElem.closest('li').className = `score-${scoreCWV(dataChunks.totals.inp.percentile(75), 'inp')}`;
 }
 
-const conversionSpec = Object.keys(parseConversionSpec()).length
-  ? parseConversionSpec()
-  : { checkpoint: ['click'] };
-
-const isDefaultConversion = Object.keys(conversionSpec).length === 1
-  && conversionSpec.checkpoint
-  && conversionSpec.checkpoint[0] === 'click';
-
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+
+  dataChunks.addFacet('type', (bundle) => bundle.hostType);
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -132,7 +156,38 @@ function updateDataFacets(filterText, params, checkpoint) {
       return acc;
     }, []);
   });
-  dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
+
+  const urlFn = (bundle) => {
+    if (bundle.domain) return bundle.domain;
+    const u = new URL(bundle.url);
+    u.pathname = u.pathname.split('/')
+      .map((segment) => {
+        // only numbers and longer than 5 characters: probably an id, censor it
+        if (segment.length >= 5 && /^\d+$/.test(segment)) {
+          return '<number>';
+        }
+        // only hex characters and longer than 8 characters: probably a hash, censor it
+        if (segment.length >= 8 && /^[0-9a-f]+$/i.test(segment)) {
+          return '<hex>';
+        }
+        // base64 encoded data, censor it
+        if (segment.length > 32 && /^[a-zA-Z0-9+/]+$/.test(segment)) {
+          return '<base64>';
+        }
+        // probable UUID, censor it
+        if (segment.length > 35 && /^[0-9a-f-]+$/.test(segment)) {
+          return '<uuid>';
+        }
+        // just too long
+        if (segment.length > 60) {
+          return '...';
+        }
+        return segment;
+      }).join('/');
+    return u.toString();
+  };
+  dataChunks.addFacet('url', urlFn);
+  dataChunks.addFacet('url!', urlFn, 'never');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
@@ -141,10 +196,13 @@ function updateDataFacets(filterText, params, checkpoint) {
       .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
   });
 
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
-    acc.add(evt.checkpoint);
-    return acc;
-  }, new Set())), 'every');
+  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events
+    .map(reclassifyConsent)
+    .map(reclassifyAcquisition)
+    .reduce((acc, evt) => {
+      acc.add(evt.checkpoint);
+      return acc;
+    }, new Set())), 'every');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
     dataChunks.addFacet('lcp.target', (bundle) => bundle.events
@@ -163,7 +221,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('filter', (bundle) => {
     // this function is also a bit weird, because it takes
     // the filtertext into consideration
-    const fullText = bundle.url + bundle.events.map((e) => e.checkpoint).join(' ');
+    const fullText = `${bundle.url} ${bundle.events.map((e) => e.checkpoint).join(' ')}`;
     const keywords = filterText
       .split(' ')
       .filter((word) => word.length > 2);
@@ -187,42 +245,50 @@ function updateDataFacets(filterText, params, checkpoint) {
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
+          .map(reclassifyConsent)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ source }) => source) // filter out empty sources
           .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
       ));
-      if (cp !== 'utm') { // utm.target is different from the other checkpoints
-        dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
-          bundle.events
-            .filter((evt) => evt.checkpoint === cp)
-            .filter(({ target }) => target) // filter out empty targets
-            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
-        ));
+      dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
+        bundle.events
+          .map(reclassifyConsent)
+          .filter((evt) => evt.checkpoint === cp)
+          .filter(({ target }) => target) // filter out empty targets
+          .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+      ));
 
-        if (cp === 'loadresource') {
-          // loadresource.target are not discrete values, but the number
-          // of milliseconds it took to load the resource, so the best way
-          // to present this is to create a histogram
-          // we already have the `loadresource.target` facet, so we can
-          // extract the values from there and create a histogram
-          dataChunks.addHistogramFacet(
-            'loadresource.histogram',
-            'loadresource.target',
-            {
-              count: 10, min: 0, max: 10000, steps: 'quantiles',
-            },
-          );
-        }
-      } else if (params.has('utm.source')) {
-        params.getAll('utm.source').forEach((utmsource) => {
-          dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
-            bundle.events
-              .filter((evt) => evt.checkpoint === 'utm')
-              .filter((evt) => evt.source === utmsource)
-              .filter((evt) => evt.target)
-              .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
-          ));
-        });
+      if (cp === 'loadresource') {
+        // loadresource.target are not discrete values, but the number
+        // of milliseconds it took to load the resource, so the best way
+        // to present this is to create a histogram
+        // we already have the `loadresource.target` facet, so we can
+        // extract the values from there and create a histogram
+        dataChunks.addHistogramFacet(
+          'loadresource.histogram',
+          'loadresource.target',
+          {
+            count: 10, min: 0, max: 10000, steps: 'quantiles',
+          },
+        );
+      }
+
+      // a bit of special handling here, so we can split the acquisition source
+      if (cp === 'acquisition') {
+        dataChunks.addFacet('acquisition.source', (bundle) => Array.from(
+          bundle.events
+            .map(reclassifyAcquisition)
+            .filter((evt) => evt.checkpoint === cp)
+            .filter(({ source }) => source) // filter out empty sources
+            .map(({ source }) => source.split(':'))
+            .map((source) => source
+              .reduce((acc, _, i) => {
+                acc.push(source.slice(0, i + 1).join(':'));
+                return acc;
+              }, [])
+              .filter((s) => s))
+            .pop() || [],
+        ));
       }
     });
 
@@ -259,9 +325,8 @@ export async function draw() {
 
   updateKeyMetrics();
 
-  const focus = params.get('focus');
   const mode = params.get('metrics');
-  elems.sidebar.updateFacets(focus, mode);
+  elems.sidebar.updateFacets(mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
@@ -283,8 +348,6 @@ async function loadData(scope, chart) {
   } else if (scope === 'year') {
     dataChunks.load(await loader.fetchPrevious12Months(endDate));
   }
-
-  draw();
 }
 
 export function updateState() {
@@ -295,13 +358,13 @@ export function updateState() {
   url.searchParams.set('view', elems.viewSelect.value);
   if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
-  const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
-  if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 
   elems.sidebar.querySelectorAll('input').forEach((e) => {
-    if (e.checked) {
+    if (e.indeterminate) {
+      url.searchParams.append(`${e.id.split('=')[0]}!`, e.value);
+    } else if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
   });
@@ -352,7 +415,7 @@ const io = new IntersectionObserver((entries) => {
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
       await loadData(view, herochart);
-      herochart.draw();
+      draw();
     });
 
     herochart.render();
@@ -361,13 +424,12 @@ const io = new IntersectionObserver((entries) => {
     elems.filterInput.value = params.get('filter');
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
-    const focus = params.get('focus');
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view, herochart);
+      loadData(view, herochart).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {
@@ -378,23 +440,6 @@ const io = new IntersectionObserver((entries) => {
     elems.viewSelect.addEventListener('input', () => {
       updateState();
       window.location.reload();
-    });
-
-    if (focus) {
-      const keyMetric = document.getElementById(focus);
-      if (keyMetric) keyMetric.ariaSelected = 'true';
-    }
-
-    const metrics = [...document.querySelectorAll('.key-metrics li')];
-    metrics.forEach((e) => {
-      e.addEventListener('click', (evt) => {
-        const metric = evt.currentTarget.id;
-        const selected = evt.currentTarget.ariaSelected === 'true';
-        metrics.forEach((m) => { m.ariaSelected = false; });
-        if (metric !== 'pageviews') e.ariaSelected = !selected;
-        updateState();
-        draw();
-      });
     });
 
     if (params.get('metrics') === 'all') {

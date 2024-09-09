@@ -14,10 +14,18 @@ import ListFacet from './list-facet.js';
 export default class ThumbnailFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
-    if (labelText.startsWith('https://') && labelText.includes('media_')) {
-      return `<img src="${labelText}?width=750&format=webply&optimize=medium"">`;
-    } if (labelText.startsWith('http')) {
-      return `<img src="${labelText}">`;
+    const fileName = labelText.split('/').pop().replace(/\?.*/, '');
+    const isMediaStr = labelText.startsWith('media_');
+    if ((labelText.startsWith('https://') && labelText.includes('media_')) || isMediaStr) {
+      let src = labelText;
+      if (isMediaStr) {
+        const domain = new URL(window.location.href).searchParams.get('domain');
+        // cannot work in all cases (context path...), but good enough for now
+        src = `https://${domain}/${labelText}`;
+      }
+      return `<img src="${src}?width=750&format=webply&optimize=medium" title="${escapeHTML(labelText)}"><span class="filename">${escapeHTML(fileName)}</span>`;
+    } if (labelText.startsWith('http') && labelText.match(/\.(jpeg|jpg|gif|png|svg|webp)$/)) {
+      return `<img src="${labelText}" title="${escapeHTML(labelText)}"><span class="filename">${escapeHTML(fileName)}</span>`;
     }
     return escapeHTML(labelText);
   }

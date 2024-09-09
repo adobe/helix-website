@@ -13,11 +13,9 @@ import {
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
-// const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
-// const UA_KEY = 'user_agent';
 
 const elems = {};
 
@@ -27,6 +25,14 @@ const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
+
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
 
@@ -41,7 +47,7 @@ dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
+dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, conversionSpec)
   ? bundle.weight
   : 0));
 function setDomain(domain, key) {
@@ -71,7 +77,7 @@ export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
   if (keyMetrics.visits > 0) {
     const conversionsExtra = document.createElement('span');
-    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.visits);
+    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.pageViews);
     conversionsExtra.textContent = toHumanReadable(conversionRate);
     conversionsExtra.className = 'extra';
     document.querySelector('#conversions p').appendChild(conversionsExtra);
@@ -88,18 +94,17 @@ export function updateKeyMetrics(keyMetrics) {
   const inpElem = document.querySelector('#inp p');
   inpElem.textContent = `${toHumanReadable(keyMetrics.inp / 1000)} s`;
   inpElem.closest('li').className = `score-${scoreCWV(keyMetrics.inp, 'inp')}`;
+
+  const ttfbElem = document.querySelector('#ttfb p');
+  ttfbElem.textContent = `${toHumanReadable(keyMetrics.ttfb / 1000)} s`;
+  ttfbElem.closest('li').className = `score-${scoreCWV(keyMetrics.ttfb, 'ttfb')}`;
 }
-
-const conversionSpec = Object.keys(parseConversionSpec()).length
-  ? parseConversionSpec()
-  : { checkpoint: ['click'] };
-
-const isDefaultConversion = Object.keys(conversionSpec).length === 1
-  && conversionSpec.checkpoint
-  && conversionSpec.checkpoint[0] === 'click';
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+
+  dataChunks.addFacet('type', (bundle) => bundle.hostType);
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -143,7 +148,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('filter', (bundle) => {
     // this function is also a bit weird, because it takes
     // the filtertext into consideration
-    const fullText = bundle.url + bundle.events.map((e) => e.checkpoint).join(' ');
+    const fullText = `${bundle.url} ${bundle.events.map((e) => e.checkpoint).join(' ')}`;
     const keywords = filterText
       .split(' ')
       .filter((word) => word.length > 2);
@@ -176,7 +181,19 @@ function updateDataFacets(filterText, params, checkpoint) {
           bundle.events
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
-            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+            .reduce((acc, { target }) => {
+              if (typeof target === 'string') {
+                const mi = target.indexOf('/media_');
+                if (cp === 'viewmedia' && mi) {
+                  acc.add(target.substring(mi + 1));
+                } else {
+                  acc.add(target);
+                }
+              } else {
+                acc.add(target);
+              }
+              return acc;
+            }, new Set()),
         ));
 
         if (cp === 'loadresource') {
@@ -248,9 +265,8 @@ export async function draw() {
     bounces: dataChunks.totals.bounces.sum,
   });
 
-  const focus = params.get('focus');
   const mode = params.get('metrics');
-  elems.sidebar.updateFacets(focus, mode);
+  elems.sidebar.updateFacets(mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
@@ -281,10 +297,6 @@ export function updateState() {
   url.searchParams.set('view', elems.viewSelect.value);
   if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
-  const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
-  if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
-  const drilldown = new URL(window.location).searchParams.get('drilldown');
-  if (drilldown) url.searchParams.set('drilldown', drilldown);
 
   elems.sidebar.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
@@ -292,17 +304,6 @@ export function updateState() {
     }
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
-
-  // with the conversion spec in form of dictionary
-  // need to put it back in the url by expanding the dictionary as follows
-  // the key is appended to conversion. and there can be multiple values for the same key
-  // conversion.key=value1&conversion.key=value2
-
-  Object.entries(conversionSpec).forEach(([key, values]) => {
-    values.forEach((value) => {
-      url.searchParams.append(`conversion.${key}`, value);
-    });
-  });
 
   window.history.replaceState({}, '', url);
   document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
@@ -347,7 +348,6 @@ const io = new IntersectionObserver((entries) => {
     elems.filterInput.value = params.get('filter');
     elems.viewSelect.value = view;
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
-    const focus = params.get('focus');
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
@@ -366,25 +366,23 @@ const io = new IntersectionObserver((entries) => {
       window.location.reload();
     });
 
-    if (focus) {
-      const keyMetric = document.getElementById(focus);
-      if (keyMetric) keyMetric.ariaSelected = 'true';
-    }
-
-    const metrics = [...document.querySelectorAll('.key-metrics li')];
-    metrics.forEach((e) => {
-      e.addEventListener('click', (evt) => {
-        const metric = evt.currentTarget.id;
-        const selected = evt.currentTarget.ariaSelected === 'true';
-        metrics.forEach((m) => { m.ariaSelected = false; });
-        if (metric !== 'pageviews') e.ariaSelected = !selected;
-        updateState();
-        draw();
-      });
-    });
-
     if (params.get('metrics') === 'all') {
       document.querySelector('.key-metrics-more').ariaHidden = false;
+    }
+
+    // update the lab link with the current url search params
+    const labLink = document.querySelector('.lab a');
+    if (labLink) {
+      const updateLabLink = (url) => {
+        const current = new URL(labLink.href);
+        current.search = url.search;
+        labLink.href = current.toString();
+      };
+      updateLabLink(new URL(window.location.href));
+
+      document.addEventListener('urlstatechange', (ev) => {
+        updateLabLink(ev.detail);
+      });
     }
   }
 });

@@ -21,6 +21,7 @@
  * @property {string} timeSlot - the hourly timesot that this bundle belongs to
  * @property {string} url - the URL of the request, without URL parameters
  * @property {string} userAgent - the user agent class, for instance desktop:windows or mobile:ios
+ * @property {string} hostType - the type of host, for instance 'helix' or 'aemcs'
  * @property {number} weight - the weight, or sampling ratio 1:n of the bundle
  * @property {RawEvent} events - the list of events that make up the bundle
  */
@@ -106,12 +107,16 @@ function groupFn(groupByFn) {
  * @typedef {Object} Aggregate - an object that contains aggregate metrics
  */
 class Aggregate {
-  constructor(parent = null) {
+  constructor(parentProvider = () => null) {
     this.count = 0;
     this.sum = 0;
     this.weight = 0;
     this.values = [];
-    this.parent = parent;
+    this.parentProvider = parentProvider;
+  }
+
+  get parent() {
+    return this.parentProvider();
   }
 
   get min() {
@@ -233,7 +238,36 @@ function erf(x1) {
 
   return sign * y;
 }
+/**
+ * @typedef {Object} MeanVariance
+ * @property {number} mean - the mean of a dataset
+ * @property {number} variance - the variance of a dataset
+ */
+/**
+ * Calculate mean and variance of a dataset.
+ * @param {number[]} data - the input data
+ * @returns {MeanVariance} mean and variance of the input dataset
+ */
+function calcMeanVariance(data) {
+  let sum = 0;
+  let variance = 0;
 
+  // Calculate sum
+  for (let i = 0; i < data.length; i += 1) {
+    sum += data[i];
+  }
+
+  const mean = sum / data.length;
+
+  // Calculate variance
+  for (let i = 0; i < data.length; i += 1) {
+    variance += (data[i] - mean) ** 2;
+  }
+
+  variance /= data.length;
+
+  return { mean, variance };
+}
 /**
  * Performs a significance test on the data. The test assumes
  * that the data is normally distributed and will calculate
@@ -243,16 +277,52 @@ function erf(x1) {
  * @returns {number} the p-value, a value between 0 and 1
  */
 export function tTest(left, right) {
-  const meanLeft = left.reduce((acc, value) => acc + value, 0) / left.length;
-  const meanRight = right.reduce((acc, value) => acc + value, 0) / right.length;
-  const varianceLeft = left.reduce((acc, value) => acc + (value - meanLeft) ** 2, 0) / left.length;
-  const varianceRight = right
-    .reduce((acc, value) => acc + (value - meanRight) ** 2, 0) / right.length;
+  const { mean: meanLeft, variance: varianceLeft } = calcMeanVariance(left);
+  const { mean: meanRight, variance: varianceRight } = calcMeanVariance(right);
   const pooledVariance = (varianceLeft + varianceRight) / 2;
   const tValue = (meanLeft - meanRight) / Math
     .sqrt(pooledVariance * (1 / left.length + 1 / right.length));
   const p = 1 - (0.5 + 0.5 * erf(tValue / Math.sqrt(2)));
   return p;
+}
+
+/**
+ * @typedef Line
+ * @type {Object}
+ * @property {number} slope the slope of the linear function,
+ * i.e. increase of y for every increase of x
+ * @property {number} intercept the intercept of the linear function,
+ * i.e. the value of y for x equals zero
+ */
+/**
+ * Peform a linear ordinary squares regression against an array.
+ * This regression takes the array index as the independent variable
+ * and the data in the array as the dependent variable.
+ * @param {number[]} data an array of input data
+ * @returns {Line} the slope and intercept of the regression function
+ */
+export function linearRegression(data) {
+  const { length: n } = data;
+
+  if (n === 0) {
+    throw new Error('Array must contain at least one element.');
+  }
+
+  // Calculate sumX and sumX2 using Gauss's formulas
+  const sumX = ((n - 1) * n) / 2;
+  const sumX2 = ((n - 1) * n * (2 * n - 1)) / 6;
+
+  // Calculate sumY and sumXY using reduce with destructuring
+  const { sumY, sumXY } = data.reduce((acc, y, x) => {
+    acc.sumY += y;
+    acc.sumXY += x * y;
+    return acc;
+  }, { sumY: 0, sumXY: 0 });
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  return { slope, intercept };
 }
 
 class Facet {
@@ -280,19 +350,34 @@ class Facet {
    * @returns {Aggregate} metrics
    */
   get metrics() {
-    if (this.metricsIn) return this.metricsIn;
-    if (this.entries.length === 0) {
+    return this.getMetrics(Object.keys(this.parent.series));
+  }
+
+  getMetrics(series) {
+    if (!series || series.length === 0) return {};
+    const res = {};
+    const needed = [];
+    if (this.metricsIn) {
+      series.forEach((s) => {
+        if (this.metricsIn[s]) {
+          res[s] = this.metricsIn[s];
+        } else {
+          needed.push(s);
+        }
+      });
+    } else {
       this.metricsIn = {};
-      return this.metricsIn;
+      needed.push(...series);
     }
 
-    this.metricsIn = Object.entries(this.parent.series)
-      .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
-        return acc;
-      }, {});
-
-    return this.metricsIn;
+    if (needed.length) {
+      needed.forEach((s) => {
+        const valueFn = this.parent.series[s];
+        this.metricsIn[s] = this.entries.reduce(aggregateFn(valueFn), new Aggregate());
+        res[s] = this.metricsIn[s];
+      });
+    }
+    return res;
   }
 }
 
@@ -346,6 +431,7 @@ export class DataChunks {
 
   resetFacets() {
     this.facetFns = {};
+    this.facetCombiners = {};
   }
 
   /**
@@ -357,7 +443,7 @@ export class DataChunks {
    */
   addFacet(facetName, facetValueFn, facetCombiner = 'some') {
     this.facetFns[facetName] = facetValueFn;
-    this.facetFns[facetName].combiner = facetCombiner;
+    this.facetCombiners[facetName] = facetCombiner;
     this.resetData();
   }
 
@@ -473,7 +559,7 @@ export class DataChunks {
 
   resetData() {
     // data that has been filtered
-    this.filteredIn = [];
+    this.filteredIn = null;
     // filtered data that has been grouped
     this.groupedIn = {};
     // grouped data that has been aggregated
@@ -588,7 +674,7 @@ export class DataChunks {
       const facetValue = parent.facetFns[attributeName](bundle);
       return Array.isArray(facetValue) ? facetValue : [facetValue];
     };
-    const combinerExtractorFn = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
+    const combinerExtractorFn = (attributeName, parent) => parent.facetCombiners[attributeName] || 'some';
     // eslint-disable-next-line max-len
     return this.applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn);
   }
@@ -612,14 +698,34 @@ export class DataChunks {
       .filter(skipFilterFn)
       .filter(([, desiredValues]) => desiredValues.length)
       .filter(existenceFilterFn);
-    return bundles.filter((bundle) => {
-      const matches = filterBy.map(([attributeName, desiredValues]) => {
-        const actualValues = valuesExtractorFn(attributeName, bundle, this);
-        const combiner = combinerExtractorFn(attributeName, this);
-        return desiredValues[combiner]((value) => actualValues.includes(value));
-      });
-      return matches.every((match) => match);
-    });
+    return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
+      const actualValues = valuesExtractorFn(attributeName, bundle, this);
+
+      const combiners = {
+        // if some elements match, then return true (partial inclusion)
+        some: 'some',
+        // if some elements do not match, then return true (partial exclusion)
+        none: 'some',
+        // if every element matches, then return true (full inclusion)
+        every: 'every',
+        // if every element does not match, then return true (full exclusion)
+        never: 'every',
+      };
+
+      const negators = {
+        some: (value) => value,
+        every: (value) => value,
+        none: (value) => !value,
+        never: (value) => !value,
+      };
+      // this can be some, every, or none
+      const combinerprefence = combinerExtractorFn(attributeName, this);
+
+      const combiner = combiners[combinerprefence];
+      const negator = negators[combinerprefence];
+
+      return desiredValues[combiner]((value) => negator(actualValues.includes(value)));
+    }));
   }
 
   /**
@@ -658,7 +764,7 @@ export class DataChunks {
   }
 
   get filtered() {
-    if (this.filteredIn.length) return this.filteredIn;
+    if (this.filteredIn) return this.filteredIn;
     if (Object.keys(this.filters).length === 0) return this.bundles; // no filter, return all
     if (Object.keys(this.facetFns).length === 0) return this.bundles; // no facets, return all
     this.filteredIn = this.filterBundles(this.bundles, this.filters);
@@ -722,7 +828,7 @@ export class DataChunks {
               aggregateFn(valueFn),
               // we reference the totals object here, so that we can
               // calculate the share and percentage metrics
-              new Aggregate(this.totals[seriesName]),
+              new Aggregate(() => this.totals[seriesName]),
             );
             return accInner;
           }, {});
@@ -768,20 +874,17 @@ export class DataChunks {
     // go over each function in this.series and each value in filteredIn
     // and appy the function to the value
     if (Object.keys(this.totalsIn).length) return this.totalsIn;
-    const parentTotals = Object.entries(this.series)
+    this.totalsIn = Object.entries(this.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filtered.reduce(
+        const parent = this.filtered.reduce(
           aggregateFn(valueFn),
           new Aggregate(),
         );
-        return acc;
-      }, {});
-    this.totalsIn = Object.entries(this.series)
-      .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filtered.reduce(
-          aggregateFn(valueFn),
-          new Aggregate(parentTotals[seriesName]),
-        );
+        // we need to clone the aggregate object, so that we can use it as its own parent
+        // this is necessary for calculating the share and percentage metrics
+        // the alternative would be to calculate the totals for each group twice (which is slower)
+        acc[seriesName] = Object.assign(Object.create(Object.getPrototypeOf(parent)), parent);
+        acc[seriesName].parentProvider = () => parent;
         return acc;
       }, {});
     return this.totalsIn;
@@ -810,6 +913,20 @@ export class DataChunks {
 
     this.facetsIn = Object.entries(this.facetFns)
       .reduce((accOuter, [facetName, facetValueFn]) => {
+        // build a list of skipped facets
+        const skipped = [];
+
+        if (this.facetCombiners[facetName] === 'some' || this.facetCombiners[facetName] === 'none') {
+          // if we are using a combiner that requires not all values to match, then we skip the
+          // current facet, so that all possible values are shown, not just the ones that match
+          // in combination with the ones already selected
+          skipped.push(facetName);
+        }
+        if (this.facetCombiners[`${facetName}!`] && ['none', 'never'].includes(this.facetCombiners[`${facetName}!`])) {
+          // if we have a negated facet, then we skip the negated facet
+          // so that we can show all values, not just the ones that do not match
+          skipped.push(`${facetName}!`);
+        }
         const groupedByFacetIn = this
           // we filter the bundles by all active filters,
           // except for the current facet (we want to see)
@@ -817,9 +934,7 @@ export class DataChunks {
           .filterBundles(
             this.bundles,
             this.filters,
-            this.facetFns[facetName].combiner === 'some'
-              ? [facetName]
-              : [],
+            skipped,
           )
           .reduce(groupFn(facetValueFn), {});
         accOuter[facetName] = Object.entries(groupedByFacetIn)

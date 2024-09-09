@@ -5,14 +5,18 @@ function getPersistentToken() {
 async function fetchDomainKey(domain) {
   try {
     const auth = getPersistentToken();
-    const issueResp = await fetch(`https://rum.fastly-aem.page/domainkey/${domain}`, {
+    let org;
+    if (domain.endsWith(':all') && domain !== 'aem.live:all') {
+      ([org] = domain.split(':'));
+    }
+    const issueResp = await fetch(`https://rum.fastly-aem.page/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
       headers: {
         authorization: `Bearer ${auth}`,
       },
     });
     let domainkey = '';
     try {
-      domainkey = (await issueResp.json()).domainkey;
+      domainkey = (await issueResp.json())[org ? 'orgkey' : 'domainkey'];
     } catch (e) {
       // no domainkey
     }

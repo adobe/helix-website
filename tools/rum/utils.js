@@ -9,6 +9,7 @@ export function isKnownFacet(key) {
   return false // TODO: find a better way to filter out non-facet keys
     || key === 'userAgent'
     || key === 'url'
+    || key === 'type'
     || key === 'conversions'
     // facets from sankey
     || key === 'trafficsource'
@@ -98,13 +99,10 @@ export function simpleCWVInterpolationFn(metric, threshold) {
     return cwvs[threshold + metric].weight / valuedWeights;
   };
 }
-export function cwvInterpolationFn(targetMetric, interpolateTo100) {
+export function cwvInterpolationFn(targetMetric) {
   return (cwvs) => {
     const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
     const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
-    if (interpolateTo100) {
-      return (cwvs[targetMetric].weight / valuedWeights);
-    }
     if (valueCount < INTERPOLATION_THRESHOLD) {
       // not enough data to interpolate
       return 0;
@@ -195,11 +193,14 @@ export function parseSearchParams(params, filterFn, transformFn) {
       return acc;
     }, {});
 }
+const cached = {};
 export function parseConversionSpec() {
+  if (cached.conversionSpec) return cached.conversionSpec;
   const params = new URL(window.location).searchParams;
   const transform = ([key, value]) => [key.replace('conversion.', ''), value];
   const filter = ([key]) => (key.startsWith('conversion.'));
-  return parseSearchParams(params, filter, transform);
+  cached.conversionSpec = parseSearchParams(params, filter, transform);
+  return cached.conversionSpec;
 }
 
 /**

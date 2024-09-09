@@ -1,14 +1,14 @@
+import classifyConsent from './consent.js';
+import { classifyAcquisition } from './acquisition.js';
+
 /* helpers */
-export function scoreValue(value, ni, poor) {
-  if (value >= poor) return 'poor';
-  if (value >= ni) return 'ni';
-  return 'good';
-}
 
 export function isKnownFacet(key) {
   return false // TODO: find a better way to filter out non-facet keys
     || key === 'userAgent'
     || key === 'url'
+    || key === 'url!'
+    || key === 'type'
     || key === 'conversions'
     // facets from sankey
     || key === 'trafficsource'
@@ -29,14 +29,34 @@ export function isKnownFacet(key) {
 
 export function scoreCWV(value, name) {
   if (value === undefined || value === null) return null;
-  const limits = {
-    lcp: [2500, 4000],
-    cls: [0.1, 0.25],
-    inp: [200, 500],
-    ttfb: [800, 1800],
-  };
-  return scoreValue(value, ...limits[name]);
+  let poor;
+  let ni;
+  // this is unrolled on purpose as this method becomes a bottleneck
+  if (name === 'lcp') {
+    poor = 4000;
+    ni = 2500;
+  }
+  if (name === 'cls') {
+    poor = 0.25;
+    ni = 0.1;
+  }
+  if (name === 'inp') {
+    poor = 500;
+    ni = 200;
+  }
+  if (name === 'ttfb') {
+    poor = 1800;
+    ni = 800;
+  }
+  if (value >= poor) {
+    return 'poor';
+  }
+  if (value >= ni) {
+    return 'ni';
+  }
+  return 'good';
 }
+
 export const UA_KEY = 'userAgent';
 
 /**
@@ -93,13 +113,11 @@ export function simpleCWVInterpolationFn(metric, threshold) {
     return cwvs[threshold + metric].weight / valuedWeights;
   };
 }
-export function cwvInterpolationFn(targetMetric, interpolateTo100) {
+export function cwvInterpolationFn(targetMetric) {
   return (cwvs) => {
     const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
     const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
-    if (interpolateTo100) {
-      return (cwvs[targetMetric].weight / valuedWeights);
-    }
+
     if (valueCount < INTERPOLATION_THRESHOLD) {
       // not enough data to interpolate
       return 0;
@@ -190,11 +208,14 @@ export function parseSearchParams(params, filterFn, transformFn) {
       return acc;
     }, {});
 }
+const cached = {};
 export function parseConversionSpec() {
+  if (cached.conversionSpec) return cached.conversionSpec;
   const params = new URL(window.location).searchParams;
   const transform = ([key, value]) => [key.replace('conversion.', ''), value];
   const filter = ([key]) => (key.startsWith('conversion.'));
-  return parseSearchParams(params, filter, transform);
+  cached.conversionSpec = parseSearchParams(params, filter, transform);
+  return cached.conversionSpec;
 }
 
 /**
@@ -283,4 +304,60 @@ export function roundToConfidenceInterval(
 
   const rounded = toHumanReadable(total, precision);
   return rounded;
+}
+
+export function reclassifyConsent({ source, target, checkpoint }) {
+  if (checkpoint === 'click' && source) {
+    const consent = classifyConsent(source);
+    if (consent) return consent;
+  }
+  return { source, target, checkpoint };
+}
+
+export function reclassifyAcquisition({ source, target, checkpoint }) {
+  if (checkpoint === 'utm' && (source === 'utm_source' || source === 'utm_medium')) {
+    const acquisition = classifyAcquisition(target);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  } else if (checkpoint === 'paid') {
+    const acquisition = classifyAcquisition(source, true);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  } else if (checkpoint === 'email') {
+    const acquisition = classifyAcquisition(source, false);
+    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
+  }
+  /* reclassify earned acquisition – I don't like this, because it kills the enter checkpoint
+  else if (checkpoint === 'enter' && !allEvents.find((evt) => evt.checkpoint === 'acquisition'
+    || evt.checkpoint === 'utm'
+    || evt.checkpoint === 'paid'
+    || evt.checkpoint === 'email')) {
+    const acquisition = classifyAcquisition(source, 'earned');
+    if (acquisition) return { checkpoint: 'acquisition', source: `${acquisition}` };
+  }
+  */
+  return { source, target, checkpoint };
+}
+
+export function reclassifyEnter(acc, event, i, allEvents) {
+  const has = (cp) => allEvents.find((evt) => evt.checkpoint === cp);
+
+  if (event.checkpoint === 'enter') acc.referrer = event.source;
+  if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
+  if (
+    // we need to reclassify when we have seen both enter and acquisition
+    (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')
+    // but if there is no acquisition, we reclassify the enter event
+    && ((acc.acquisition && acc.referrer) || (!has('acquisition')))) {
+    const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
+    const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
+    const group = aGroup || 'earned';
+    const category = rCategory || aCategory;
+    const vndr = rVendor || aVendor;
+    const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
+    // console.log('reclassifyEnter', acc.referrer, acc.acquisition, newsrc);
+    acc.push({ checkpoint: 'acquisition', source: newsrc });
+  }
+  if (event.checkpoint !== 'acquisition') {
+    acc.push(event);
+  }
+  return acc;
 }

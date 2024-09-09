@@ -1,0 +1,43 @@
+<html>
+
+<head>
+  <title>RUM Admin | Orgs | AEM Live</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/scripts/lib-franklin.js" type="module"></script>
+  <script src="/scripts/scripts.js" type="module"></script>
+  <link rel="stylesheet" href="/styles/styles.css" />
+  <script src="./orgs.js" type="module"></script>
+  <link rel="stylesheet" href="./orgs.css">
+</head>
+
+<body>
+  <header></header>
+  <main>
+    <div>
+      <div id="rumadmin">
+        <h1 class="title">Manage Orgs</h1>
+        <div class="topbar">
+          <div id="org-selector">
+            <input list="org-list" id="org-selected" name="selected-org" placeholder="Select an org" />
+            <datalist id="org-list"></datalist>
+
+            <button id="btn-create-org">Create Org</button>
+          </div>
+
+          <div id="org-actions">
+            <input class="orgkey" style="display:none;" disabled />
+            <button id="btn-show-orgkey">Show orgkey</button>
+            <button id="btn-add-domains">Add Domains</button>
+            <button id="btn-remove-domains" disabled>Remove Selected</button>
+          </div>
+        </div>
+        <div id="org-details">
+          <p class="empty-message">No org selected</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer></footer>
+</body>
+
+</html>

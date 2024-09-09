@@ -701,6 +701,99 @@ describe('DataChunks', () => {
       'mobile:ios',
     ]);
   });
+
+  it('DataChunk.filter(userAgent) negation', () => {
+    const chunks1 = [
+      {
+        date: '2024-05-06',
+        rumBundles: [
+          {
+            id: 'one',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/developer/tutorial',
+            userAgent: 'desktop:windows',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 100,
+              },
+            ],
+          },
+          {
+            id: 'two',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'desktop',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'click',
+              },
+            ],
+          },
+          {
+            id: 'three',
+            host: 'www.aem.live',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.aem.live/home',
+            userAgent: 'mobile:ios',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'visible',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'viewmedia',
+                target: 'some_image.png',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    const d = new DataChunks();
+    d.load(chunks1);
+
+    // define facet functions
+    d.addFacet(
+      // as a convention, we use ! to indicate negation. When used in URL parameters, this
+      // looks like a nice filter:  ?userAgent!=desktop
+      'userAgent!',
+      (bundle) => {
+        const parts = bundle.userAgent.split(':');
+        return parts.reduce((acc, _, i) => {
+          acc.push(parts.slice(0, i + 1).join(':'));
+          return acc;
+        }, []);
+      },
+      // this sets up the negation filter, it means that the filter will match if at least
+      // one of the values in the facet is not in the filter
+      'none',
+    );
+
+    // set an example filter
+    d.filter = {
+      host: ['www.aem.live'],
+      // this is a negation filter
+      'userAgent!': ['desktop'],
+    };
+
+    assert.equal(d.filtered.length, 1);
+  });
 });
 describe('DataChunks.hasConversion', () => {
   it('will tag bundles with convert and not-convert based on a filter spec', () => {

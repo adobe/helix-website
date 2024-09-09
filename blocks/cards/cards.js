@@ -10,7 +10,7 @@ export default function decorate(block) {
   const classes = ['one', 'two', 'three', 'four', 'five'];
   const row = block.children[0];
   if (row) {
-    block.classList.add(classes[row.children.length - 1]);
+    if (classes[row.children.length - 1]) block.classList.add(classes[row.children.length - 1]);
   }
   block.querySelectorAll(':scope > div > div').forEach((cell) => {
     if (cell.firstChild) {

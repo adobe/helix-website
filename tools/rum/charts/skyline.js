@@ -418,46 +418,28 @@ export default class SkylineChart extends AbstractChart {
       simpleCWVInterpolationFn('INP', 'poor'),
     );
 
-    // aggregate series
-    if (this.chartConfig.focus === 'lcp') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvLCP, 'lcp') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else if (this.chartConfig.focus === 'cls') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvCLS, 'cls') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else if (this.chartConfig.focus === 'inp') {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreCWV(bundle.cwvINP, 'inp') === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', () => (0));
-    } else {
-      dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
-      dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
-      dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
-      dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
-    }
+    dataChunks.addSeries('goodCWV', (bundle) => (scoreBundle(bundle) === 'good' ? bundle.weight : undefined));
+    dataChunks.addSeries('poorCWV', (bundle) => (scoreBundle(bundle) === 'poor' ? bundle.weight : undefined));
+    dataChunks.addSeries('niCWV', (bundle) => (scoreBundle(bundle) === 'ni' ? bundle.weight : undefined));
+    dataChunks.addSeries('noCWV', (bundle) => (scoreBundle(bundle) === null ? bundle.weight : undefined));
 
     // interpolated series
     dataChunks.addInterpolation(
       'iGoodCWV', // name of the series
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'], // calculate from these series
-      cwvInterpolationFn('goodCWV', this.chartConfig.focus), // interpolation function
+      cwvInterpolationFn('goodCWV'), // interpolation function
     );
 
     dataChunks.addInterpolation(
       'iNiCWV',
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
-      cwvInterpolationFn('niCWV', this.chartConfig.focus),
+      cwvInterpolationFn('niCWV'),
     );
 
     dataChunks.addInterpolation(
       'iPoorCWV',
       ['goodCWV', 'niCWV', 'poorCWV', 'noCWV'],
-      cwvInterpolationFn('poorCWV', this.chartConfig.focus),
+      cwvInterpolationFn('poorCWV'),
     );
 
     dataChunks.addInterpolation(
