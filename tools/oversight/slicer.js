@@ -156,7 +156,8 @@ function updateDataFacets(filterText, params, checkpoint) {
       return acc;
     }, []);
   });
-  dataChunks.addFacet('url', (bundle) => {
+
+  const urlFn = (bundle) => {
     if (bundle.domain) return bundle.domain;
     const u = new URL(bundle.url);
     u.pathname = u.pathname.split('/')
@@ -184,7 +185,9 @@ function updateDataFacets(filterText, params, checkpoint) {
         return segment;
       }).join('/');
     return u.toString();
-  });
+  };
+  dataChunks.addFacet('url', urlFn);
+  dataChunks.addFacet('url!', urlFn, 'never');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
@@ -359,7 +362,9 @@ export function updateState() {
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 
   elems.sidebar.querySelectorAll('input').forEach((e) => {
-    if (e.checked) {
+    if (e.indeterminate) {
+      url.searchParams.append(`${e.id.split('=')[0]}!`, e.value);
+    } else if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
   });

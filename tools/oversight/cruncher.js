@@ -431,6 +431,7 @@ export class DataChunks {
 
   resetFacets() {
     this.facetFns = {};
+    this.facetCombiners = {};
   }
 
   /**
@@ -442,7 +443,7 @@ export class DataChunks {
    */
   addFacet(facetName, facetValueFn, facetCombiner = 'some') {
     this.facetFns[facetName] = facetValueFn;
-    this.facetFns[facetName].combiner = facetCombiner;
+    this.facetCombiners[facetName] = facetCombiner;
     this.resetData();
   }
 
@@ -673,7 +674,7 @@ export class DataChunks {
       const facetValue = parent.facetFns[attributeName](bundle);
       return Array.isArray(facetValue) ? facetValue : [facetValue];
     };
-    const combinerExtractorFn = (attributeName, parent) => parent.facetFns[attributeName].combiner || 'some';
+    const combinerExtractorFn = (attributeName, parent) => parent.facetCombiners[attributeName] || 'some';
     // eslint-disable-next-line max-len
     return this.applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn);
   }
@@ -699,8 +700,31 @@ export class DataChunks {
       .filter(existenceFilterFn);
     return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
       const actualValues = valuesExtractorFn(attributeName, bundle, this);
-      const combiner = combinerExtractorFn(attributeName, this);
-      return desiredValues[combiner]((value) => actualValues.includes(value));
+
+      const combiners = {
+        // if some elements match, then return true (partial inclusion)
+        some: 'some',
+        // if some elements do not match, then return true (partial exclusion)
+        none: 'some',
+        // if every element matches, then return true (full inclusion)
+        every: 'every',
+        // if every element does not match, then return true (full exclusion)
+        never: 'every',
+      };
+
+      const negators = {
+        some: (value) => value,
+        every: (value) => value,
+        none: (value) => !value,
+        never: (value) => !value,
+      };
+      // this can be some, every, or none
+      const combinerprefence = combinerExtractorFn(attributeName, this);
+
+      const combiner = combiners[combinerprefence];
+      const negator = negators[combinerprefence];
+
+      return desiredValues[combiner]((value) => negator(actualValues.includes(value)));
     }));
   }
 
@@ -889,6 +913,20 @@ export class DataChunks {
 
     this.facetsIn = Object.entries(this.facetFns)
       .reduce((accOuter, [facetName, facetValueFn]) => {
+        // build a list of skipped facets
+        const skipped = [];
+
+        if (this.facetCombiners[facetName] === 'some' || this.facetCombiners[facetName] === 'none') {
+          // if we are using a combiner that requires not all values to match, then we skip the
+          // current facet, so that all possible values are shown, not just the ones that match
+          // in combination with the ones already selected
+          skipped.push(facetName);
+        }
+        if (this.facetCombiners[`${facetName}!`] && ['none', 'never'].includes(this.facetCombiners[`${facetName}!`])) {
+          // if we have a negated facet, then we skip the negated facet
+          // so that we can show all values, not just the ones that do not match
+          skipped.push(`${facetName}!`);
+        }
         const groupedByFacetIn = this
           // we filter the bundles by all active filters,
           // except for the current facet (we want to see)
@@ -896,9 +934,7 @@ export class DataChunks {
           .filterBundles(
             this.bundles,
             this.filters,
-            this.facetFns[facetName].combiner === 'some'
-              ? [facetName]
-              : [],
+            skipped,
           )
           .reduce(groupFn(facetValueFn), {});
         accOuter[facetName] = Object.entries(groupedByFacetIn)
