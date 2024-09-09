@@ -47,7 +47,6 @@
 
     const installUrl = getShareUrl(window.hlx.sidekickConfig);
     const installButtonText = 'Install now';
-    const laterButtonText = 'Remind me tomorrow';
 
     const remindLater = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
 
@@ -62,24 +61,22 @@
       remindLater();
     });
 
-    const laterButton = document.createElement('button');
-    laterButton.textContent = laterButtonText;
-    laterButton.title = laterButtonText;
-    laterButton.addEventListener('click', remindLater);
-
     const buttonGroup = document.createElement('span');
     buttonGroup.className = 'hlx-sk-modal-button-group';
     buttonGroup.append(installButton);
-    buttonGroup.append(laterButton);
 
     window.hlx.sidekick.showModal(
       [
-        'The Sidekick bookmarklet has been deprecated.',
+        'The Sidekick bookmarklet is no longer supported.',
         `Switch to the Sidekick extension today to stay productive.`,
         buttonGroup,
       ],
       true,
       1,
+      () => {
+        window.hlx.sidekick.replaceWith('');
+        delete window.hlx.sidekick;
+      },
     );
   }
 
