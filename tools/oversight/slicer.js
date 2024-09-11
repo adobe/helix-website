@@ -155,7 +155,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       acc.push(parts.slice(0, i + 1).join(':'));
       return acc;
     }, []);
-  });
+  }, 'some', 'none');
 
   const urlFn = (bundle) => {
     if (bundle.domain) return bundle.domain;
@@ -186,8 +186,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       }).join('/');
     return u.toString();
   };
-  dataChunks.addFacet('url', urlFn);
-  dataChunks.addFacet('url!', urlFn, 'never');
+  dataChunks.addFacet('url', urlFn, 'some', 'never');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
@@ -202,7 +201,7 @@ function updateDataFacets(filterText, params, checkpoint) {
     .reduce((acc, evt) => {
       acc.add(evt.checkpoint);
       return acc;
-    }, new Set())), 'every');
+    }, new Set())), 'every', 'none');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
     dataChunks.addFacet('lcp.target', (bundle) => bundle.events
