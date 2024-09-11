@@ -35,51 +35,32 @@
   function showDeprecationWarning() {
     const EXT_HINT = 'hlxSidekickBookmarkletDeprecation';
 
-    // respect user choice
-    const later = +window.sessionStorage.getItem(EXT_HINT);
-    if (Date.now() - later < 86400000) {
-      return;
-    }
-
     if (navigator.userAgent.includes('Headless')) {
       return;
     }
 
     const installUrl = getShareUrl(window.hlx.sidekickConfig);
     const installButtonText = 'Install now';
-    const laterButtonText = 'Remind me tomorrow';
-
-    const remindLater = () => window.sessionStorage.setItem(EXT_HINT, Date.now());
-
-    const helpActions = window.hlx.sidekick.shadowRoot
-      .querySelector('.hlx-sk-overlay .modal .help-actions');
 
     const installButton = document.createElement('button');
     installButton.textContent = installButtonText;
     installButton.title = installButtonText;
     installButton.addEventListener('click', () => {
       window.open(installUrl);
-      remindLater();
     });
-
-    const laterButton = document.createElement('button');
-    laterButton.textContent = laterButtonText;
-    laterButton.title = laterButtonText;
-    laterButton.addEventListener('click', remindLater);
-
-    const buttonGroup = document.createElement('span');
-    buttonGroup.className = 'hlx-sk-modal-button-group';
-    buttonGroup.append(installButton);
-    buttonGroup.append(laterButton);
 
     window.hlx.sidekick.showModal(
       [
-        'The Sidekick bookmarklet has been deprecated.',
+        'The Sidekick bookmarklet is no longer supported.',
         `Switch to the Sidekick extension today to stay productive.`,
-        buttonGroup,
+        installButton,
       ],
       true,
       1,
+      () => {
+        window.hlx.sidekick.replaceWith('');
+        delete window.hlx.sidekick;
+      },
     );
   }
 

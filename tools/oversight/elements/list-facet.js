@@ -230,7 +230,7 @@ export default class ListFacet extends HTMLElement {
             div.addEventListener('click', (evt) => {
               if (!evt.shiftKey && evt.target !== input) {
                 input.checked = !input.checked;
-              } else if (evt.shiftKey) {
+              } else if (evt.shiftKey && this.dataChunks.facets[`${facetName}!`]) {
                 // use the shift key to indicate a negation
                 input.indeterminate = true;
               }
