@@ -14,6 +14,8 @@ export default class DataLoader {
     this.ORG = undefined;
     this.SCOPE = undefined; // unused
     this.granularity = 'month';
+    this.enrichURL = undefined;
+    this.classifications = new Set();
   }
 
   flush() {
@@ -37,6 +39,39 @@ export default class DataLoader {
   set apiEndpoint(endpoint) {
     this.API_ENDPOINT = endpoint;
     this.flush();
+  }
+
+  set enrich(url) {
+    this.enrichURL = url;
+  }
+
+  /**
+   *
+   * @param {object[]} data a list of objects
+   * @param {string[]} keys a list of keys
+   * @returns an object where each key is a value from the data list where any of the
+   * parameters in keys are present
+   */
+  organizeClassifications(data, keys) {
+    return data.reduce((acc, item) => {
+      const key = Object.keys(item).find((k) => keys.includes(k));
+      if (!key) {
+        return acc;
+      }
+      acc[item[key]] = item;
+      Object.keys(item).forEach((k) => this.classifications.add(k));
+      return acc;
+    }, {});
+  }
+
+  async fetchEnrichedData() {
+    if (!this.enrichURL || this.enrichedData) {
+      return this.enrichedData;
+    }
+    const resp = await fetch(this.enrichURL);
+    const json = await resp.json();
+    this.enrichedData = this.organizeClassifications(json.data, ['path', 'url']);
+    return this.enrichedData;
   }
 
   apiURL(datePath, hour) {
@@ -65,7 +100,7 @@ export default class DataLoader {
     const resp = await fetch(apiRequestURL);
     const json = await resp.json();
     const { rumBundles } = json;
-    rumBundles.forEach((bundle) => addCalculatedProps(bundle));
+    rumBundles.forEach((bundle) => addCalculatedProps(bundle, this.enrichedData));
     return { date, rumBundles };
   }
 
@@ -77,7 +112,7 @@ export default class DataLoader {
     const resp = await fetch(apiRequestURL);
     const json = await resp.json();
     const { rumBundles } = json;
-    rumBundles.forEach((bundle) => addCalculatedProps(bundle));
+    rumBundles.forEach((bundle) => addCalculatedProps(bundle, this.enrichedData));
     return { date, rumBundles };
   }
 
@@ -90,7 +125,7 @@ export default class DataLoader {
     const resp = await fetch(apiRequestURL);
     const json = await resp.json();
     const { rumBundles } = json;
-    rumBundles.forEach((bundle) => addCalculatedProps(bundle));
+    rumBundles.forEach((bundle) => addCalculatedProps(bundle, this.enrichedData));
     return { date, hour, rumBundles };
   }
 

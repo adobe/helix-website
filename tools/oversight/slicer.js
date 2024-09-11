@@ -25,6 +25,9 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
+loader.enrich = new URLSearchParams(window.location.search).get('enrich');
+await loader.fetchEnrichedData();
+
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
 window.addEventListener('pageshow', () => elems.canvas && herochart.render());
@@ -236,6 +239,23 @@ function updateDataFacets(filterText, params, checkpoint) {
     dataChunks.addFacet(key, value);
   });
 
+  if (loader.classifications.size) {
+    const skip = ['path', 'url', 'image', 'description', 'content'];
+    Array.from(loader.classifications)
+      .filter((key) => !skip.includes(key))
+      .forEach((key) => {
+        const facetname = `extra.${key}`;
+        dataChunks.addFacet(facetname, (bundle) => bundle.extra && bundle.extra[key]);
+
+        const uifacet = document.createElement('list-facet');
+        const legend = document.createElement('legend');
+        legend.textContent = `Enriched: ${key}`;
+        uifacet.appendChild(legend);
+        uifacet.setAttribute('facet', facetname);
+        elems.sidebar.appendChild(uifacet);
+      });
+  }
+
   // if we have a checkpoint filter, then we also want facets for
   // source and target, the same applies to defined conversion checkpoints
   // we need facets for source and target, too
@@ -357,6 +377,7 @@ export function updateState() {
   url.searchParams.set('view', elems.viewSelect.value);
   if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
+  if (searchParams.get('enrich')) url.searchParams.set('enrich', searchParams.get('enrich'));
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 

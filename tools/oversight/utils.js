@@ -21,6 +21,8 @@ export function isKnownFacet(key) {
     'clicktarget',
     'exit',
     'vitals',
+    // extra facets
+    'extra',
   ];
 
   const suffixes = [
@@ -39,7 +41,7 @@ export function isKnownFacet(key) {
   if (match) {
     const { facet, suffix, qualifier } = match.groups;
     return baseFacets.includes(facet)
-      && (!suffix || suffixes.includes(suffix))
+      && (!suffix || suffixes.includes(suffix) || facet === 'extra')
       && (!qualifier || modifiers.includes(qualifier));
   }
   return false;

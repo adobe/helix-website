@@ -46,9 +46,10 @@
 /**
  * Calculates properties on the bundle, so that bundle-level filtering can be performed
  * @param {RawBundle} bundle the raw input bundle, without calculated properties
+ * @param {object[]} classifications the list of classifications to use for the bundle
  * @returns {Bundle} a bundle with additional properties
  */
-export function addCalculatedProps(bundle) {
+export function addCalculatedProps(bundle, classifications = {}) {
   bundle.events.forEach((e) => {
     if (e.checkpoint === 'enter') {
       bundle.visit = true;
@@ -67,6 +68,13 @@ export function addCalculatedProps(bundle) {
       bundle.cwvTTFB = e.value;
     }
   });
+  if (classifications[bundle.url]) {
+    bundle.extra = classifications[bundle.url];
+  } else if (classifications[bundle.host]) {
+    bundle.extra = classifications[bundle.host];
+  } else if (classifications[new URL(bundle.url).pathname]) {
+    bundle.extra = classifications[new URL(bundle.url).pathname];
+  }
   return bundle;
 }
 
