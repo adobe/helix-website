@@ -4,6 +4,7 @@
  * file to here.
  */
 import { addCalculatedProps } from './cruncher.js';
+import ffetch from './ffetch.js';
 
 export default class DataLoader {
   constructor() {
@@ -68,9 +69,24 @@ export default class DataLoader {
     if (!this.enrichURL || this.enrichedData) {
       return this.enrichedData;
     }
-    const resp = await fetch(this.enrichURL);
-    const json = await resp.json();
-    this.enrichedData = this.organizeClassifications(json.data, ['path', 'url']);
+    const allentries = await ffetch(this.enrichURL)
+      .follow('path', 'document')
+      .map((entry) => {
+        const { document: doc } = entry;
+        if (doc) {
+          doc.querySelectorAll('head meta').forEach((meta) => {
+            const name = meta.getAttribute('name') || meta.getAttribute('property');
+            const content = meta.getAttribute('content');
+            if (name && content) {
+              entry[name] = content.toLowerCase();
+            }
+          });
+        }
+        delete entry.document;
+        return entry;
+      })
+      .all();
+    this.enrichedData = this.organizeClassifications(allentries, ['path', 'url']);
     return this.enrichedData;
   }
 

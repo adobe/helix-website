@@ -240,7 +240,23 @@ function updateDataFacets(filterText, params, checkpoint) {
   });
 
   if (loader.classifications.size) {
-    const skip = ['path', 'url', 'image', 'description', 'content'];
+    const skip = [
+      'path',
+      'url',
+      'image',
+      'description',
+      'og:title',
+      'og:description',
+      'og:image',
+      'og:image:secure_url',
+      'og:url',
+      'twitter:title',
+      'twitter:description',
+      'twitter:card',
+      'twitter:image',
+      'og:image:alt',
+      'hlx:proxyUrl',
+      'content'];
     Array.from(loader.classifications)
       .filter((key) => !skip.includes(key))
       .forEach((key) => {

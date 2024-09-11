@@ -108,8 +108,12 @@ function follow(upstream, context, name, newName, maxInFlight = 5) {
   return map(upstream, context, async (entry) => {
     const value = entry[name];
     if (value) {
-      const resp = await fetch(value);
-      return { ...entry, [newName || name]: resp.ok ? parseHtml(await resp.text()) : null };
+      try {
+        const resp = await fetch(value);
+        return { ...entry, [newName || name]: resp.ok ? parseHtml(await resp.text()) : null };
+      } catch (e) {
+        return { ...entry, [newName || name]: null };
+      }
     }
     return entry;
   }, maxInFlight);
