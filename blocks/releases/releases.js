@@ -15,7 +15,7 @@ function mdToHTML(md) {
 const displayNames = {
   'helix-pipeline-service': 'Delivery Pipeline',
   'helix-admin': 'Admin API',
-  'helix-config': 'Config Service',
+  'helix-config-service': 'Configuration Service',
   'helix-importer-ui': 'Content Importer',
   'helix-cli': 'Command Line Interface',
   'helix-sidekick-extension': 'Sidekick Extension',
