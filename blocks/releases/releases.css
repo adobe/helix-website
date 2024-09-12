@@ -26,6 +26,10 @@
     background-color: #FFEBD4;
 }
 
+.releases .release-aem-lib {
+    background-color: #CFEBF8;
+}
+
 .releases .release-helix-config {
     background-color: #EDD1FF;
 }
@@ -71,6 +75,7 @@
 .releases .helix-sidekick-extension .release-helix-sidekick-extension,
 .releases .helix-cli .release-helix-cli,
 .releases .helix-config .release-helix-config,
+.releases .aem-lib .release-aem-lib,
 .releases .franklin-sidekick-library .release-franklin-sidekick-library {
     display: block;
 }

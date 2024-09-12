@@ -20,6 +20,7 @@ const displayNames = {
   'helix-cli': 'Command Line Interface',
   'helix-sidekick-extension': 'Sidekick Extension',
   'franklin-sidekick-library': 'Sidekick Library',
+  'aem-lib': 'AEM Library',
 };
 
 function createRelease(release) {
