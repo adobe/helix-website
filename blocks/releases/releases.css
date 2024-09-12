@@ -22,9 +22,12 @@
     background-color: #F4F8CF;
 }
 
-
 .releases .release-helix-cli {
     background-color: #FFEBD4;
+}
+
+.releases .release-helix-config {
+    background-color: #EDD1FF;
 }
 
 .releases .release {
@@ -63,10 +66,11 @@
 }
 
 .releases .helix-admin .release-helix-admin,
-.releases .helix-pipeline-service .release-helix-pipeline-service, 
-.releases .helix-importer-ui .release-helix-importer-ui, 
+.releases .helix-pipeline-service .release-helix-pipeline-service,
+.releases .helix-importer-ui .release-helix-importer-ui,
 .releases .helix-sidekick-extension .release-helix-sidekick-extension,
 .releases .helix-cli .release-helix-cli,
+.releases .helix-config .release-helix-config,
 .releases .franklin-sidekick-library .release-franklin-sidekick-library {
     display: block;
 }
