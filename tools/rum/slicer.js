@@ -361,7 +361,9 @@ const io = new IntersectionObserver((entries) => {
       draw();
     });
 
-    elems.viewSelect.addEventListener('input', () => {
+    console.log('elems.viewSelect', elems.viewSelect);
+    elems.viewSelect.addEventListener('change', () => {
+      console.log('view change');
       updateState();
       window.location.reload();
     });

@@ -21,6 +21,7 @@
     import VitalsFacet from './elements/vitals-facet.js';
     import FileFacet from './elements/file-facet.js';
     import URLSelector from './elements/url-selector.js';
+    import TimeRangePicker from './elements/timerange-picker.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -33,9 +34,11 @@
     customElements.define('vitals-facet', VitalsFacet);
     customElements.define('file-facet', FileFacet);
     customElements.define('url-selector', URLSelector);
+    customElements.define('time-range-picker', TimeRangePicker);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
+  <link rel="stylesheet" href="./elements/timerange-picker.css">
   </head>
 
 <body>
@@ -47,11 +50,25 @@
             <div class="title">
               <url-selector>www.aem.live</url-selector>
               <div>
-                <select id="view">
+                <!-- <select id="view" style="display: none;">
                   <option value="week">Week</option>
                   <option value="month">Month</option>
                   <option value="year">Year</option>
-                </select>
+                </select> -->
+                <time-range-picker id="view">
+                  <ul>
+                    <li data-value="0:12:00">Last 12 hours</li>
+                    <li data-value="0:24:00" aria-selected="true" >Last 24 hours</li>
+                    <li data-value="today">Today</li>
+                    <!-- <li data-value="2:00:00">Last 2 days</li> -->
+                    <li data-value="3:00:00">Last 3 days</li>
+                    <!-- <li data-value="5:00:00">Last 5 days</li> -->
+                    <li data-value="week">Last week</li>
+                    <li data-value="month">Last month</li>
+                    <li data-value="year">Last year</li>
+                    <li data-value="custom">Custom</li>
+                  </ul>
+                </time-range-picker>                
                 <incognito-checkbox></incognito-checkbox>
               </div>
             </div>
@@ -269,6 +286,7 @@
   <div id="shared-toast" class="toast" aria-hidden="true">
     Link copied to clipboard, ready to share
   </div>
+  <!-- <script src="./elements/timerange-picker.js"></script> -->
 </body>
 
 </html>
