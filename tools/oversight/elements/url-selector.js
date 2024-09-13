@@ -7,12 +7,12 @@ export default class URLSelector extends HTMLElement {
     super();
     this.template = `
       <style>
-        label {
+        url-selector label {
           display: block;
           margin-right: 8px;
         }
 
-        input {
+        url-selector input {
           width: 100%;
           display: block;
           font: inherit;
@@ -22,7 +22,7 @@ export default class URLSelector extends HTMLElement {
           border: 0;
         }
 
-        input:disabled {
+        url-selector input:disabled {
           background-color: transparent;
           color: black;
         }
