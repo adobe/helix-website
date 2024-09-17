@@ -293,8 +293,6 @@ async function loadData(config) {
   if (scope === 'custom') {
     dataChunks.load(await loader.fetchPeriod(startDate, endDate));
   }
-
-  draw();
 }
 
 export function updateState() {
@@ -362,8 +360,9 @@ const io = new IntersectionObserver((entries) => {
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
+
       await loadData(elems.viewSelect.value);
-      herochart.draw();
+      draw();
     });
 
     herochart.render();
@@ -381,7 +380,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(elems.viewSelect.value);
+      loadData(elems.viewSelect.value).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {
