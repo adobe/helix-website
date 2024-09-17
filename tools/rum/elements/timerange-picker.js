@@ -54,7 +54,6 @@ export default class TimeRangePicker extends HTMLElement {
     this.datetimeWrapperElement = null;
 
     this.id = this.getAttribute('id');
-    console.log('id', this.id);
   }
 
   connectedCallback() {
@@ -96,11 +95,11 @@ export default class TimeRangePicker extends HTMLElement {
 
     this.registerListeners();
 
-    if (defaultValue) {
-      // defaultOption.dispatchEvent(new Event('click'));
-      // this.updateTimeframe(value);
-      this.value = defaultValue;
-    }
+    // if (defaultValue) {
+    //   // defaultOption.dispatchEvent(new Event('click'));
+    //   // this.updateTimeframe(value);
+    //   this.value = defaultValue;
+    // }
   }
 
   initValue() {
@@ -121,7 +120,11 @@ export default class TimeRangePicker extends HTMLElement {
     const $this = this;
     options.forEach((option) => {
       option.addEventListener('click', () => {
-        $this.value = option.dataset.value;
+        $this.value = {
+          value: option.dataset.value,
+          from: $this.fromElement.value || null,
+          to: $this.toElement.value || null,
+        };
 
         // update to and from
         // $this.updateTimeframe(option.dataset.value);
@@ -137,13 +140,20 @@ export default class TimeRangePicker extends HTMLElement {
   }
 
   get value() {
-    return this.inputElement.dataset.value;
+    return {
+      value: this.inputElement.dataset.value,
+      from: this.fromElement.value,
+      to: this.toElement.value,
+    };
   }
 
-  set value(value) {
-    console.log('set value', value);
+  set value(config) {
+    console.log('set value', config);
+    const { value, from, to } = config;
+    const {
+      inputElement, dropdownElement, fromElement, toElement,
+    } = this;
 
-    const { inputElement, dropdownElement } = this;
     const option = dropdownElement.querySelector(`li[data-value="${value}"]`);
     if (!option) {
       console.error('Invalid value', value);
@@ -159,7 +169,19 @@ export default class TimeRangePicker extends HTMLElement {
 
     dropdownElement.hidden = true;
 
-    this.updateTimeframe(value);
+    if (from) {
+      fromElement.value = toDateTimeLocal(new Date(from));
+    }
+
+    if (to) {
+      toElement.value = toDateTimeLocal(new Date(to));
+    }
+
+    this.updateTimeframe({
+      value,
+      from,
+      to,
+    });
 
     this.dispatchEvent(new Event('change', {
       detail: {
@@ -170,8 +192,7 @@ export default class TimeRangePicker extends HTMLElement {
     }));
   }
 
-  updateTimeframe(value) {
-    console.log('updateTimeframe', value);
+  updateTimeframe({ value, to = null }) {
     const { fromElement, toElement } = this;
 
     const now = new Date();
@@ -179,7 +200,9 @@ export default class TimeRangePicker extends HTMLElement {
     [fromElement, toElement].forEach((field) => {
       field.readOnly = true;
     });
-    toElement.value = toDateTimeLocal(now);
+    if (!to) {
+      toElement.value = toDateTimeLocal(now);
+    }
     this.toggleCustomTimeframe(value === 'custom');
     if (value.includes(':')) {
       const [days, hours, mins] = value.split(':').map((v) => parseInt(v, 10));

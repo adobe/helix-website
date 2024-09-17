@@ -125,4 +125,58 @@ export default class DataLoader {
     const chunks = Promise.all(promises);
     return chunks;
   }
+
+  async fetchPeriod(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date();
+
+    const diff = end.getTime() - start.getTime();
+    if (diff < 0) {
+      throw new Error('Start date must be before end date');
+    }
+
+    const promises = [];
+
+    console.log('fetchPeriod', start.toString(), end.toString());
+
+    if (diff < (1000 * 60 * 60 * 24)) {
+      // less than a day
+      const hours = Math.round(diff / (1000 * 60 * 60));
+
+      for (let i = 0; i < hours; i += 1) {
+        console.log('fetching hour', start.toString());
+        promises.push(this.fetchUTCHour(start.toISOString()));
+        start.setTime(start.getTime() + (1000 * 60 * 60));
+      }
+    } else if (diff < (1000 * 60 * 60 * 24 * 7)) {
+      // less than a week
+      const days = Math.round(diff / (1000 * 60 * 60 * 24));
+
+      for (let i = 0; i < days; i += 1) {
+        console.log('fetching day', start.toString());
+        promises.push(this.fetchUTCDay(start.toISOString()));
+        start.setDate(start.getDate() + 1);
+      }
+    } else if (diff < (1000 * 60 * 60 * 24 * 31)) {
+      // less than a month
+      const days = Math.round(diff / (1000 * 60 * 60 * 24));
+
+      for (let i = 0; i < days; i += 1) {
+        console.log('fetching day', start.toString());
+        promises.push(this.fetchUTCDay(start.toISOString()));
+        start.setDate(start.getDate() + 1);
+      }
+    } else {
+      const months = end.getMonth() - start.getMonth() + 1;
+
+      for (let i = 0; i < months; i += 1) {
+        console.log('fetching month', start.toString());
+        promises.push(this.fetchUTCMonth(start.toISOString()));
+        start.setMonth(start.getMonth() + 1);
+      }
+    }
+
+    const chunks = Promise.all(promises);
+    return chunks;
+  }
 }
