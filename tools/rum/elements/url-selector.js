@@ -3,6 +3,9 @@ function getPersistentToken() {
 }
 
 export default class URLSelector extends HTMLElement {
+  /** @type {HTMLDataListElement} */
+  datalist = null;
+
   constructor() {
     super();
     this.template = `
@@ -28,19 +31,40 @@ export default class URLSelector extends HTMLElement {
         }
       </style>
       <label for="url"><img src="https://www.aem.live/favicon.ico"></label>
-      <input id="url" type="url">
+      <input id="url" type="url" list="rum-domain-suggestions">
+      <datalist id="rum-domain-suggestions"></datalist>
     `;
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     this.innerHTML = this.template;
+    this.datalist = this.querySelector('datalist');
     const input = this.querySelector('input');
     input.value = new URL(window.location.href).searchParams.get('domain');
     const img = this.querySelector('img');
     img.src = `https://www.google.com/s2/favicons?domain=${input.value.split(':')[0]}&sz=64`;
 
-    if (!getPersistentToken()) {
+    const token = getPersistentToken();
+    if (!token) {
       input.disabled = true;
+      this.datalist.remove();
+    } else {
+      const resp = await fetch('https://rum.fastly-aem.page/domains?suggested=true', {
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${token}`,
+        },
+      });
+      if (!resp.ok) {
+        this.datalist.remove();
+      } else {
+        const { domains } = await resp.json();
+        domains.forEach((domain) => {
+          const option = document.createElement('option');
+          option.value = domain;
+          this.datalist.appendChild(option);
+        });
+      }
     }
 
     input.addEventListener('focus', () => {
