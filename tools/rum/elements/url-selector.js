@@ -33,7 +33,7 @@ export default class URLSelector extends HTMLElement {
     `;
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     this.innerHTML = this.template;
     const datalist = this.querySelector('datalist');
     const input = this.querySelector('input');
@@ -46,22 +46,25 @@ export default class URLSelector extends HTMLElement {
       input.disabled = true;
       datalist.remove();
     } else {
-      const resp = await fetch('https://rum.fastly-aem.page/domains?suggested=true', {
+      fetch('https://rum.fastly-aem.page/domains?suggested=true', {
         headers: {
           accept: 'application/json',
           authorization: `Bearer ${token}`,
         },
-      });
-      if (!resp.ok) {
+      }).then(async (resp) => {
+        if (!resp.ok) {
+          datalist.remove();
+        } else {
+          const { domains } = await resp.json();
+          domains.forEach((domain) => {
+            const option = document.createElement('option');
+            option.value = domain;
+            datalist.appendChild(option);
+          });
+        }
+      }).catch(() => {
         datalist.remove();
-      } else {
-        const { domains } = await resp.json();
-        domains.forEach((domain) => {
-          const option = document.createElement('option');
-          option.value = domain;
-          datalist.appendChild(option);
-        });
-      }
+      });
     }
 
     input.addEventListener('focus', () => {
