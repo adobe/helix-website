@@ -35,6 +35,7 @@ export default class URLSelector extends HTMLElement {
 
   async connectedCallback() {
     this.innerHTML = this.template;
+    const datalist = this.querySelector('datalist');
     const input = this.querySelector('input');
     input.value = new URL(window.location.href).searchParams.get('domain');
     const img = this.querySelector('img');
@@ -43,7 +44,7 @@ export default class URLSelector extends HTMLElement {
     const token = getPersistentToken();
     if (!token) {
       input.disabled = true;
-      this.datalist.remove();
+      datalist.remove();
 
       // detect a click with shift key pressed
       img.addEventListener('click', (event) => {
@@ -62,13 +63,13 @@ export default class URLSelector extends HTMLElement {
         },
       });
       if (!resp.ok) {
-        this.datalist.remove();
+        datalist.remove();
       } else {
         const { domains } = await resp.json();
         domains.forEach((domain) => {
           const option = document.createElement('option');
           option.value = domain;
-          this.datalist.appendChild(option);
+          datalist.appendChild(option);
         });
       }
     }
