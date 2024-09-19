@@ -358,7 +358,7 @@ const io = new IntersectionObserver((entries) => {
     let startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
     const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
-    if (startDate && endDate) {
+    if (startDate || endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       if (start > end) {

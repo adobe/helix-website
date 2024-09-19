@@ -102,8 +102,8 @@ export default class DataLoader {
     return { date, hour, rumBundles: this.filterByDateRange(rumBundles, start, end) };
   }
 
-  async fetchLastWeek() {
-    const date = new Date();
+  async fetchLastWeek(endDate) {
+    const date = endDate ? new Date(endDate) : new Date();
     const hoursInWeek = 7 * 24;
     const promises = [];
     for (let i = 0; i < hoursInWeek; i += 1) {
@@ -128,7 +128,7 @@ export default class DataLoader {
 
   async fetchPrevious12Months(endDate) {
     const date = endDate ? new Date(endDate) : new Date();
-    const months = 12;
+    const months = 13; // 13 to include 2 partial months (first and last)
     const promises = [];
     for (let i = 0; i < months; i += 1) {
       promises.push(this.fetchUTCMonth(date.toISOString()));

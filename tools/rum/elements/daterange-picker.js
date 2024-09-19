@@ -1,3 +1,13 @@
+function debounce(func, wait) {
+  let timeout;
+  // eslint-disable-next-line func-names
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
 // date management
 function pad(number) {
   return number.toString().padStart(2, '0');
@@ -239,6 +249,17 @@ export default class TimeRangePicker extends HTMLElement {
         };
       });
     });
+
+    const setValue = () => {
+      $this.value = {
+        value: 'custom',
+        from: this.fromElement.value,
+        to: this.toElement.value,
+      };
+    };
+
+    this.fromElement.addEventListener('change', debounce(setValue, 500));
+    this.toElement.addEventListener('change', debounce(setValue, 500));
   }
 
   get value() {

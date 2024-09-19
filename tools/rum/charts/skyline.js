@@ -481,12 +481,8 @@ export default class SkylineChart extends AbstractChart {
     const view = params.get('view');
 
     // eslint-disable-next-line no-unused-vars
-    let startDate = null;
-    let endDate = null;
-    if (view === 'custom') {
-      startDate = params.get('startDate');
-      endDate = params.get('endDate');
-    }
+    const startDate = params.get('startDate');
+    const endDate = params.get('endDate');
 
     console.log('startDate', startDate);
     console.log('endDate', endDate);
