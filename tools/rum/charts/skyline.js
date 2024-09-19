@@ -65,6 +65,7 @@ export default class SkylineChart extends AbstractChart {
         if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
         if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
         if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+        if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 1);
       } else {
         startDate = new Date(this.chartConfig.startDate);
       }
@@ -79,6 +80,7 @@ export default class SkylineChart extends AbstractChart {
         if (this.chartConfig.unit === 'day') slotTime.setDate(slotTime.getDate() + 1);
         if (this.chartConfig.unit === 'hour') slotTime.setHours(slotTime.getHours() + 1);
         if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
+        if (this.chartConfig.unit === 'month') slotTime.setMonth(slotTime.getMonth() + 1);
         maxSlots -= 1;
         if (maxSlots < 0) {
           // eslint-disable-next-line no-console
@@ -478,10 +480,6 @@ export default class SkylineChart extends AbstractChart {
     const params = new URL(window.location).searchParams;
     const view = params.get('view');
 
-    // const view = ['week', 'month', 'year'].indexOf(params.get('view')) !== -1
-    //   ? params.get('view')
-    //   : 'week';
-
     // eslint-disable-next-line no-unused-vars
     let startDate = null;
     let endDate = null;
@@ -519,9 +517,9 @@ export default class SkylineChart extends AbstractChart {
       } else if (diff < (1000 * 60 * 60 * 24 * 365)) {
         // less than a year
         console.log('chart draw - less than a year');
-        customView = 'year';
-        unit = 'month';
-        units = 12;
+        customView = 'week';
+        unit = 'week';
+        units = Math.round(diff / (1000 * 60 * 60 * 24 * 7));
       }
     }
 
@@ -569,6 +567,8 @@ export default class SkylineChart extends AbstractChart {
     };
 
     const config = configs[view];
+
+    console.log('config', config);
 
     this.config = config;
     this.defineSeries();

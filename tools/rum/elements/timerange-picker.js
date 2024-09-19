@@ -3,24 +3,17 @@ function pad(number) {
   return number.toString().padStart(2, '0');
 }
 
-function toDateTimeLocal(date) {
+function toDateString(date) {
   // convert date
   const year = date.getFullYear();
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
   // convert time
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
+  // const hours = pad(date.getHours());
+  // const minutes = pad(date.getMinutes());
 
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function calculatePastDate(days, hours, mins, now = new Date()) {
-  const newDate = now;
-  if (days > 0) newDate.setDate(newDate.getDate() - days);
-  if (hours > 0) newDate.setHours(newDate.getHours() - hours);
-  if (mins > 0) newDate.seMinutes(newDate.geMinutes() - mins);
-  return newDate;
+  // return `${year}-${month}-${day}T${hours}:${minutes}`;
+  return `${year}-${month}-${day}`;
 }
 
 const TEMPLATE = `
@@ -33,11 +26,11 @@ const TEMPLATE = `
     <div class="form-field datetime-wrapper" hidden>
       <div class="form-field datetime-field" aria-hidden="true">
         <label for="date-from">From</label>
-        <input name="date-from" type="datetime-local" readonly />
+        <input name="date-from" type="date" readonly />
       </div>
       <div class="form-field datetime-field" aria-hidden="true">
         <label for="date-to">To</label>
-        <input name="date-to" type="datetime-local" readonly />
+        <input name="date-to" type="date" readonly />
       </div>
     </div>
   </div>
@@ -94,17 +87,11 @@ export default class TimeRangePicker extends HTMLElement {
     this.datetimeWrapperElement = this.querySelector('.datetime-wrapper');
 
     this.registerListeners();
-
-    // if (defaultValue) {
-    //   // defaultOption.dispatchEvent(new Event('click'));
-    //   // this.updateTimeframe(value);
-    //   this.value = defaultValue;
-    // }
   }
 
   initValue() {
     const { toElement } = this;
-    toElement.value = toDateTimeLocal(new Date());
+    toElement.value = toDateString(new Date());
   }
 
   registerListeners() {
@@ -125,16 +112,6 @@ export default class TimeRangePicker extends HTMLElement {
           from: $this.fromElement.value || null,
           to: $this.toElement.value || null,
         };
-
-        // update to and from
-        // $this.updateTimeframe(option.dataset.value);
-
-        // inputElement.value = option.textContent;
-        // inputElement.setAttribute('aria-expanded', false);
-        // dropdownElement.hidden = true;
-        // options.forEach((o) => o.setAttribute('aria-selected', o === option));
-
-        // inputElement.dispatchEvent(new Event('change', { detail: option.dataset.value }));
       });
     });
   }
@@ -170,11 +147,11 @@ export default class TimeRangePicker extends HTMLElement {
     dropdownElement.hidden = true;
 
     if (from) {
-      fromElement.value = toDateTimeLocal(new Date(from));
+      fromElement.value = toDateString(new Date(from));
     }
 
     if (to) {
-      toElement.value = toDateTimeLocal(new Date(to));
+      toElement.value = toDateString(new Date(to));
     }
 
     this.updateTimeframe({
@@ -201,29 +178,21 @@ export default class TimeRangePicker extends HTMLElement {
       field.readOnly = true;
     });
     if (!to) {
-      toElement.value = toDateTimeLocal(now);
+      toElement.value = toDateString(now);
     }
     this.toggleCustomTimeframe(value === 'custom');
-    if (value.includes(':')) {
-      const [days, hours, mins] = value.split(':').map((v) => parseInt(v, 10));
-      const date = calculatePastDate(days, hours, mins);
-      fromElement.value = toDateTimeLocal(date);
-    } else if (value === 'today') {
-      const midnight = now;
-      midnight.setHours(0, 0, 0, 0);
-      fromElement.value = toDateTimeLocal(midnight);
-    } else if (value === 'week') {
+    if (value === 'week') {
       const lastWeek = now;
       lastWeek.setHours(7 * 24, 0, 0, 0);
-      fromElement.value = toDateTimeLocal(lastWeek);
+      fromElement.value = toDateString(lastWeek);
     } else if (value === 'month') {
       const lastMonth = now;
       lastMonth.setMonth(now.getMonth() - 1);
-      fromElement.value = toDateTimeLocal(lastMonth);
+      fromElement.value = toDateString(lastMonth);
     } else if (value === 'year') {
       const lastYear = now;
       lastYear.setFullYear(now.getFullYear() - 1);
-      fromElement.value = toDateTimeLocal(lastYear);
+      fromElement.value = toDateString(lastYear);
     } else if (value === 'custom') {
       [fromElement, toElement].forEach((field) => {
         field.removeAttribute('readonly');
@@ -241,28 +210,3 @@ export default class TimeRangePicker extends HTMLElement {
     });
   }
 }
-
-// function keepToFromCurrent(doc) {
-//   const to = doc.getElementById('date-to');
-//   to.setAttribute('max', toDateTimeLocal(new Date()));
-//   const timeframe = doc.getElementById('view');
-//   if (timeframe.value !== 'Custom') {
-//     const options = [...timeframe.parentElement.querySelectorAll('ul > li')];
-//     const { value } = options.find((o) => o.textContent === timeframe.value).dataset;
-//     updateTimeframe(value);
-//   }
-// }
-
-// registerListeners(document);
-
-// function initDateTo(doc) {
-//   const to = doc.getElementById('date-to');
-//   to.value = toDateTimeLocal(new Date());
-
-//   // setInterval(() => {
-//   //   keepToFromCurrent(doc);
-//   // }, 60 * 100);
-// }
-
-// initDateTo(document);
-// updateTimeframe('1:00:00');

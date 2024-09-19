@@ -155,38 +155,26 @@ export default class DataLoader {
     // for all cases: +2 to cover bondary cases: start and end might be on a different UTC day
     // (will be filtered out by start / end range filter)
 
-    if (diff < (1000 * 60 * 60 * 24)) {
-      // less than a day
-      const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60) + 2;
-
-      for (let i = 0; i < hours; i += 1) {
-        console.log('fetching hour', start.toString());
-        promises.push(this.fetchUTCHour(start.toISOString(), originalStart, end));
-        start.setTime(start.getTime() + (1000 * 60 * 60));
-      }
-    } else if (diff < (1000 * 60 * 60 * 24 * 7)) {
+    if (diff < (1000 * 60 * 60 * 24 * 7)) {
       // less than a week
-      // +2 to cover bondary cases: start and end might be on a different UTC day
       const days = end.getDate() - start.getDate() + 2;
 
       for (let i = 0; i < days; i += 1) {
         console.log('fetching day', start.toString());
         promises.push(this.fetchUTCDay(start.toISOString(), originalStart, end));
-        // promises.push(this.fetchUTCDay(start.toISOString()));
         start.setDate(start.getDate() + 1);
       }
     } else if (diff < (1000 * 60 * 60 * 24 * 31)) {
       // less than a month
-      const days = end.getDate() - start.getDate() + 2;
+      const days = Math.round((diff / (1000 * 60 * 60 * 24))) + 1;
 
       for (let i = 0; i < days; i += 1) {
         console.log('fetching day', start.toString());
         promises.push(this.fetchUTCDay(start.toISOString(), originalStart, end));
-        // promises.push(this.fetchUTCDay(start.toISOString()));
         start.setDate(start.getDate() + 1);
       }
     } else {
-      const months = end.getMonth() - start.getMonth() + 2;
+      const months = Math.round(diff / (1000 * 60 * 60 * 24 * 31)) + 1;
 
       for (let i = 0; i < months; i += 1) {
         console.log('fetching month', start.toString());
