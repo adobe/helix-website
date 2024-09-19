@@ -8,13 +8,145 @@ function toDateString(date) {
   const year = date.getFullYear();
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
-  // convert time
-  // const hours = pad(date.getHours());
-  // const minutes = pad(date.getMinutes());
 
-  // return `${year}-${month}-${day}T${hours}:${minutes}`;
   return `${year}-${month}-${day}`;
 }
+
+const STYLES = `
+  .form-field.picker-field {
+    position: relative;
+    display: block;
+  }
+
+  .form-field.picker-field input {
+    width: 100%;
+    font: inherit;
+    border-color: var(--gray-100);
+    border: 2px solid var(--gray-300);
+    padding: 0.4em 0.85em;
+    background-color: var(--gray-100);
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    border-radius: 4px;
+    min-width: 200px;
+  }
+
+  @media (width >= 900px) {
+    .daterange-wrapper {
+      grid-area: daterange;
+    }
+    
+    @media (width >= 900px) {
+        .log-viewer form#daterange-form > .daterange-wrapper {
+            grid-area: daterange;
+        }
+    }
+  }
+
+  .daterange-wrapper {
+    display: grid;
+
+    /* grid-template-columns: auto 1fr auto; */
+    align-items: end;
+    gap: var(--spacing-l);
+  }
+
+  .form-field.picker-field input ~ ul li {
+    padding: 0.4em 0;
+    padding-left: 2rem;
+    cursor: pointer;
+  }
+
+  .picker-field  ul.menu li:last-child {
+    position: relative;
+    margin-top: 16px;
+  }
+
+  .picker-field ul.menu li:last-child::before {
+    content: '';
+    position: absolute;
+    top: calc((-0.5 * 16px) - (2px / 2));
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--gray-200);
+  }
+
+  .picker-field .datetime-wrapper {
+    display: none;
+    min-width: 500px;
+    background-color: white;
+  }
+
+  .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px 12px;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    margin-top: 4px;
+    border-radius: 4px;
+    padding: calc(0.4em + 2px);
+    background-color: white;
+    box-shadow: var(--grey-700);
+    z-index: 10;
+  }
+
+  .picker-field ul {
+    list-style: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    margin: 0;
+    border-radius: 8px;
+    padding: calc(0.4em + 2px);
+    background-color: white;
+    box-shadow: var(--grey-700);
+    z-index: 20;
+  }
+
+  .picker-field ul.menu:not([hidden]) + .datetime-wrapper {
+    display: none;
+  }
+
+  .picker-field input ~ .datetime-wrapper .form-field {
+    margin-top: 0;
+  }
+
+  @media (width >= 740px) {
+    .datetime-wrapper {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 900px) {
+    .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (width >= 1200px) {
+    .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      position: absolute;
+    }
+  }
+
+  .picker-field .datetime-wrapper .datetime-field {
+    display: block;
+  }
+
+  .picker-field .datetime-wrapper .datetime-field label {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+`;
 
 const TEMPLATE = `
   <div class="form-field picker-field">
@@ -22,7 +154,7 @@ const TEMPLATE = `
       type="text"
       aria-haspopup="listbox"
       readonly />
-    <ul class="menu" id="timeframe-menu" aria-labelledby="timeframe" role="listbox" hidden></ul>
+    <ul class="menu" id="daterange-menu" aria-labelledby="daterange" role="listbox" hidden></ul>
     <div class="form-field datetime-wrapper" hidden>
       <div class="form-field datetime-field" aria-hidden="true">
         <label for="date-from">From</label>
@@ -55,10 +187,13 @@ export default class TimeRangePicker extends HTMLElement {
   }
 
   initDOM() {
-    console.log('initDOM');
+    this.attachShadow({ mode: 'open' });
+
+    const style = document.createElement('style');
+    style.textContent = STYLES;
 
     const section = document.createElement('section');
-    section.className = 'form-field timeframe-wrapper';
+    section.className = 'form-field daterange-wrapper';
     section.innerHTML = TEMPLATE;
 
     const sul = section.querySelector('ul');
@@ -77,14 +212,16 @@ export default class TimeRangePicker extends HTMLElement {
 
     console.log('defaultValue', defaultValue);
 
-    this.innerHTML = '';
-    this.appendChild(section);
+    this.shadowRoot.innerHTML = '';
+    // this.innerHTML = '';
+    this.shadowRoot.appendChild(style);
+    this.shadowRoot.appendChild(section);
 
-    this.inputElement = this.querySelector('input');
-    this.dropdownElement = this.querySelector('ul');
-    this.fromElement = this.querySelector('[name="date-from"]');
-    this.toElement = this.querySelector('[name="date-to"]');
-    this.datetimeWrapperElement = this.querySelector('.datetime-wrapper');
+    this.inputElement = this.shadowRoot.querySelector('input');
+    this.dropdownElement = this.shadowRoot.querySelector('ul');
+    this.fromElement = this.shadowRoot.querySelector('[name="date-from"]');
+    this.toElement = this.shadowRoot.querySelector('[name="date-to"]');
+    this.datetimeWrapperElement = this.shadowRoot.querySelector('.datetime-wrapper');
 
     this.registerListeners();
   }

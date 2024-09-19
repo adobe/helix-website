@@ -21,7 +21,7 @@
     import VitalsFacet from './elements/vitals-facet.js';
     import FileFacet from './elements/file-facet.js';
     import URLSelector from './elements/url-selector.js';
-    import TimeRangePicker from './elements/timerange-picker.js';
+    import DateRangePicker from './elements/daterange-picker.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -34,11 +34,10 @@
     customElements.define('vitals-facet', VitalsFacet);
     customElements.define('file-facet', FileFacet);
     customElements.define('url-selector', URLSelector);
-    customElements.define('time-range-picker', TimeRangePicker);
+    customElements.define('daterange-picker', DateRangePicker);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
-  <link rel="stylesheet" href="./elements/timerange-picker.css">
   </head>
 
 <body>
@@ -50,14 +49,14 @@
             <div class="title">
               <url-selector>www.aem.live</url-selector>
               <div>
-                <time-range-picker id="view">
+                <daterange-picker id="view">
                   <ul hidden>
                     <li data-value="week">Last week</li>
                     <li data-value="month" aria-selected="true">Last month</li>
                     <li data-value="year">Last year</li>
                     <li data-value="custom">Custom</li>
                   </ul>
-                </time-range-picker>                
+                </daterange-picker>                
                 <incognito-checkbox></incognito-checkbox>
               </div>
             </div>
