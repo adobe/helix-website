@@ -149,6 +149,7 @@ const STYLES = `
 `;
 
 const TEMPLATE = `
+<section classs="form-field daterange-wrapper">
   <div class="form-field picker-field">
     <input
       type="text"
@@ -166,6 +167,7 @@ const TEMPLATE = `
       </div>
     </div>
   </div>
+  </section>
 `;
 
 export default class TimeRangePicker extends HTMLElement {
@@ -192,9 +194,7 @@ export default class TimeRangePicker extends HTMLElement {
     const style = document.createElement('style');
     style.textContent = STYLES;
 
-    const section = document.createElement('section');
-    section.className = 'form-field daterange-wrapper';
-    section.innerHTML = TEMPLATE;
+    const section = document.createRange().createContextualFragment(TEMPLATE);
 
     const sul = section.querySelector('ul');
     const options = this.querySelectorAll('ul li');
@@ -213,7 +213,7 @@ export default class TimeRangePicker extends HTMLElement {
     console.log('defaultValue', defaultValue);
 
     this.shadowRoot.innerHTML = '';
-    // this.innerHTML = '';
+
     this.shadowRoot.appendChild(style);
     this.shadowRoot.appendChild(section);
 
