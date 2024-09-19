@@ -13,12 +13,18 @@ function toDateString(date) {
 }
 
 const STYLES = `
-  .form-field.picker-field {
+  .daterange-wrapper {
+    display: grid;
+    align-items: end;
+    gap: var(--spacing-l);
+  }
+
+  .input-wrapper, .daterange-wrapper {
     position: relative;
     display: block;
   }
 
-  .form-field.picker-field input {
+  input {
     width: 100%;
     font: inherit;
     border-color: var(--gray-100);
@@ -43,26 +49,18 @@ const STYLES = `
     }
   }
 
-  .daterange-wrapper {
-    display: grid;
-
-    /* grid-template-columns: auto 1fr auto; */
-    align-items: end;
-    gap: var(--spacing-l);
-  }
-
-  .form-field.picker-field input ~ ul li {
+  input ~ ul li {
     padding: 0.4em 0;
     padding-left: 2rem;
     cursor: pointer;
   }
 
-  .picker-field  ul.menu li:last-child {
+  ul.menu li:last-child {
     position: relative;
     margin-top: 16px;
   }
 
-  .picker-field ul.menu li:last-child::before {
+  ul.menu li:last-child::before {
     content: '';
     position: absolute;
     top: calc((-0.5 * 16px) - (2px / 2));
@@ -72,13 +70,13 @@ const STYLES = `
     background-color: var(--gray-200);
   }
 
-  .picker-field .datetime-wrapper {
+  .input-wrapper {
     display: none;
     min-width: 500px;
     background-color: white;
   }
 
-  .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+  input[data-custom='true'] ~ .input-wrapper {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 16px 12px;
@@ -93,7 +91,7 @@ const STYLES = `
     z-index: 10;
   }
 
-  .picker-field ul {
+  ul {
     list-style: none;
     position: absolute;
     left: 0;
@@ -107,67 +105,62 @@ const STYLES = `
     z-index: 20;
   }
 
-  .picker-field ul.menu:not([hidden]) + .datetime-wrapper {
+  ul.menu:not([hidden]) + .input-wrapper {
     display: none;
   }
 
-  .picker-field input ~ .datetime-wrapper .form-field {
-    margin-top: 0;
-  }
-
   @media (width >= 740px) {
-    .datetime-wrapper {
+    .input-wrapper {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+   input[data-custom='true'] ~ .input-wrapper {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (width >= 900px) {
-    .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+    input[data-custom='true'] ~ .input-wrapper {
       grid-template-columns: minmax(0, 1fr);
     }
   }
 
   @media (width >= 1200px) {
-    .picker-field input[data-custom='true'] ~ .datetime-wrapper {
+    input[data-custom='true'] ~ .input-wrapper {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       position: absolute;
     }
   }
 
-  .picker-field .datetime-wrapper .datetime-field {
+ .date-field {
     display: block;
+    margin-top: 0;
   }
 
-  .picker-field .datetime-wrapper .datetime-field label {
+  .date-field label {
     display: block;
     margin-bottom: 0.5em;
   }
 `;
 
 const TEMPLATE = `
-<section classs="form-field daterange-wrapper">
-  <div class="form-field picker-field">
-    <input
-      type="text"
-      aria-haspopup="listbox"
-      readonly />
-    <ul class="menu" id="daterange-menu" aria-labelledby="daterange" role="listbox" hidden></ul>
-    <div class="form-field datetime-wrapper" hidden>
-      <div class="form-field datetime-field" aria-hidden="true">
-        <label for="date-from">From</label>
-        <input name="date-from" type="date" readonly />
-      </div>
-      <div class="form-field datetime-field" aria-hidden="true">
-        <label for="date-to">To</label>
-        <input name="date-to" type="date" readonly />
-      </div>
+<section class="daterange-wrapper">
+  <input
+    type="text"
+    aria-haspopup="listbox"
+    readonly />
+  <ul class="menu" aria-labelledby="daterange" role="listbox" hidden></ul>
+  <div class="input-wrapper" hidden>
+    <div class="date-field" aria-hidden="true">
+      <label for="date-from">From</label>
+      <input name="date-from" type="date" readonly />
+    </div>
+    <div class="date-field" aria-hidden="true">
+      <label for="date-to">To</label>
+      <input name="date-to" type="date" readonly />
     </div>
   </div>
-  </section>
+</section>
 `;
 
 export default class TimeRangePicker extends HTMLElement {
@@ -199,18 +192,13 @@ export default class TimeRangePicker extends HTMLElement {
     const sul = section.querySelector('ul');
     const options = this.querySelectorAll('ul li');
 
-    let defaultValue = null;
     options.forEach((option) => {
-      if (option.getAttribute('aria-selected') === 'true') {
-        defaultValue = option.dataset.value;
-      } else {
+      if (option.getAttribute('aria-selected') !== 'true') {
         option.setAttribute('aria-selected', false);
       }
       option.dataset.role = 'option';
       sul.appendChild(option);
     });
-
-    console.log('defaultValue', defaultValue);
 
     this.shadowRoot.innerHTML = '';
 
@@ -221,7 +209,7 @@ export default class TimeRangePicker extends HTMLElement {
     this.dropdownElement = this.shadowRoot.querySelector('ul');
     this.fromElement = this.shadowRoot.querySelector('[name="date-from"]');
     this.toElement = this.shadowRoot.querySelector('[name="date-to"]');
-    this.datetimeWrapperElement = this.shadowRoot.querySelector('.datetime-wrapper');
+    this.datetimeWrapperElement = this.shadowRoot.querySelector('.input-wrapper');
 
     this.registerListeners();
   }
@@ -262,7 +250,6 @@ export default class TimeRangePicker extends HTMLElement {
   }
 
   set value(config) {
-    console.log('set value', config);
     const { value, from, to } = config;
     const {
       inputElement, dropdownElement, fromElement, toElement,
@@ -270,7 +257,6 @@ export default class TimeRangePicker extends HTMLElement {
 
     const option = dropdownElement.querySelector(`li[data-value="${value}"]`);
     if (!option) {
-      console.error('Invalid value', value);
       return;
     }
 
