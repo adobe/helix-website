@@ -89,13 +89,41 @@
         "passReferrer": {
           "type": "boolean",
           "description": "Append the referrer URL as a query param on new URL button click"
+        },
+        "isBadge": {
+          "type": "boolean",
+          "description": "Opens the URL in a palette instead of a new tab"
+        },
+        "badgeVariant": {
+          "type": "string",
+          "description": "The variant of the badge following the Adobe Spectrum badge variants",
+          "enum": [
+            "gray",
+            "red",
+            "orange",
+            "yellow",
+            "chartreuse",
+            "celery",
+            "green",
+            "seafoam",
+            "cyan",
+            "blue",
+            "indigo",
+            "purple",
+            "fuchsia",
+            "magenta"
+          ],
+          "dependentRequired": [
+            "isBadge"
+          ]
         }
       },
       "required": [ "id" ],
       "anyOf": [
         { "required": [ "url" ] },
         { "required": [ "event" ] },
-        { "required": [ "isContainer" ] }
+        { "required": [ "isContainer" ] },
+        { "required": [ "isBadge" ] }
       ],
       "additionalProperties": false
     },
@@ -132,6 +160,20 @@
   "description": "Sidekick configuration",
   "type": "object",
   "properties": {
+    "contentSourceType": {
+      "type": "string",
+      "description": "The type of the content source",
+      "examples": [
+        "onedrive",
+        "gdrive",
+        "markup"
+      ]
+    },
+    "contentSourceUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "The URL of the content source"
+    },
     "extends": {
       "type": "string",
       "description": "Extend another project's sidekick configuration",
@@ -175,7 +217,8 @@
       "items": { "$ref": "#/$defs/plugin" }
     },
     "redirect": {
-      "type": "url",
+      "type": "string",
+      "format": "uri",
       "description": "Loads the sidekick configuration from a different URL"
     },
     "specialViews": {
