@@ -47,18 +47,6 @@ const STYLES = `
     min-width: 200px;
   }
 
-  @media (width >= 900px) {
-    .daterange-wrapper {
-      grid-area: daterange;
-    }
-    
-    @media (width >= 900px) {
-        .log-viewer form#daterange-form > .daterange-wrapper {
-            grid-area: daterange;
-        }
-    }
-  }
-
   input ~ ul li {
     padding: 0.4em 0;
     padding-left: 2rem;
@@ -90,14 +78,14 @@ const STYLES = `
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 16px 12px;
-    left: 0;
     right: 0;
     top: calc(100% + 8px);
     margin-top: 4px;
     border-radius: 4px;
     padding: calc(0.4em + 2px);
     background-color: white;
-    box-shadow: var(--grey-700);
+    border: 1px solid var(--gray-100);
+    box-shadow: 5px 5px 5px var(--gray-700);
     z-index: 10;
   }
 
@@ -111,7 +99,8 @@ const STYLES = `
     border-radius: 8px;
     padding: calc(0.4em + 2px);
     background-color: white;
-    box-shadow: var(--grey-700);
+    border: 1px solid var(--gray-100);
+    box-shadow: 5px 5px 5px var(--gray-700);
     z-index: 20;
   }
 
