@@ -152,19 +152,16 @@ export default class DataLoader {
 
     console.log('fetchPeriod', start.toString(), end.toString());
 
-    // for all cases: +2 to cover bondary cases: start and end might be on a different UTC day
-    // (will be filtered out by start / end range filter)
-
-    if (diff < (1000 * 60 * 60 * 24 * 7)) {
+    if (diff <= (1000 * 60 * 60 * 24 * 7)) {
       // less than a week
-      const days = end.getDate() - start.getDate() + 2;
+      const days = Math.round((diff / (1000 * 60 * 60 * 24))) + 1;
 
       for (let i = 0; i < days; i += 1) {
         console.log('fetching day', start.toString());
         promises.push(this.fetchUTCDay(start.toISOString(), originalStart, end));
         start.setDate(start.getDate() + 1);
       }
-    } else if (diff < (1000 * 60 * 60 * 24 * 31)) {
+    } else if (diff <= (1000 * 60 * 60 * 24 * 31)) {
       // less than a month
       const days = Math.round((diff / (1000 * 60 * 60 * 24))) + 1;
 

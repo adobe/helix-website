@@ -316,7 +316,7 @@ export default class TimeRangePicker extends HTMLElement {
     if (value === 'week') {
       if (!fromElement.value) {
         const lastWeek = now;
-        lastWeek.setHours(-6 * 24, 0, 0, 0);
+        lastWeek.setHours(-7 * 24, 0, 0, 0);
         fromElement.value = toDateString(lastWeek);
       }
       if (!toElement.value) {
