@@ -313,7 +313,8 @@ export default class TimeRangePicker extends HTMLElement {
     }));
   }
 
-  updateTimeframe({ value, to = null }) {
+  updateTimeframe({ value }) {
+    // maintain the readonly state of the date fields and default value
     const { fromElement, toElement } = this;
 
     const now = new Date();
@@ -321,22 +322,35 @@ export default class TimeRangePicker extends HTMLElement {
     [fromElement, toElement].forEach((field) => {
       field.readOnly = true;
     });
-    if (!to) {
-      toElement.value = toDateString(now);
-    }
     this.toggleCustomTimeframe(value === 'custom');
+
     if (value === 'week') {
-      const lastWeek = now;
-      lastWeek.setHours(7 * 24, 0, 0, 0);
-      fromElement.value = toDateString(lastWeek);
+      if (!fromElement.value) {
+        const lastWeek = now;
+        lastWeek.setHours(7 * 24, 0, 0, 0);
+        fromElement.value = toDateString(lastWeek);
+      }
+      if (!toElement.value) {
+        toElement.value = toDateString(now);
+      }
     } else if (value === 'month') {
-      const lastMonth = now;
-      lastMonth.setMonth(now.getMonth() - 1);
-      fromElement.value = toDateString(lastMonth);
+      if (!fromElement.value) {
+        const lastMonth = now;
+        lastMonth.setMonth(now.getMonth() - 1);
+        fromElement.value = toDateString(lastMonth);
+      }
+      if (!toElement.value) {
+        toElement.value = toDateString(now);
+      }
     } else if (value === 'year') {
-      const lastYear = now;
-      lastYear.setFullYear(now.getFullYear() - 1);
-      fromElement.value = toDateString(lastYear);
+      if (!fromElement.value) {
+        const lastYear = now;
+        lastYear.setFullYear(now.getFullYear() - 1);
+        fromElement.value = toDateString(lastYear);
+      }
+      if (!toElement.value) {
+        toElement.value = toDateString(now);
+      }
     } else if (value === 'custom') {
       [fromElement, toElement].forEach((field) => {
         field.removeAttribute('readonly');

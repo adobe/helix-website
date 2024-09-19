@@ -351,21 +351,8 @@ const io = new IntersectionObserver((entries) => {
       window.history.replaceState({}, '', url);
     }
 
-    let startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+    const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
     const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
-
-    if (startDate || endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      if (start > end) {
-        start.setTime(end.getTime() - 1000 * 60 * 60 * 24);
-        startDate = start.toISOString();
-        params.set('startDate', startDate);
-        const url = new URL(window.location.href);
-        url.search = params.toString();
-        window.history.replaceState({}, '', url);
-      }
-    }
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
