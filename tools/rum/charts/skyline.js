@@ -509,7 +509,7 @@ export default class SkylineChart extends AbstractChart {
         console.log('chart draw - week view', (diff / (1000 * 60 * 60)));
         customView = 'week';
         unit = 'hour';
-        units = (diff / (1000 * 60 * 60));
+        units = Math.round(diff / (1000 * 60 * 60));
       } else if (diff < (1000 * 60 * 60 * 24 * 31)) {
         // less than a month
         console.log('chart draw - less than a month');
