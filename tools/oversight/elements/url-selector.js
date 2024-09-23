@@ -2,6 +2,10 @@ function getPersistentToken() {
   return localStorage.getItem('rum-bundler-token');
 }
 
+function isIncognitoMode() {
+  return new URL(window.location.href).searchParams.get('domainkey') === 'incognito';
+}
+
 export default class URLSelector extends HTMLElement {
   constructor() {
     super();
@@ -41,8 +45,7 @@ export default class URLSelector extends HTMLElement {
     const img = this.querySelector('img');
     img.src = `https://www.google.com/s2/favicons?domain=${input.value.split(':')[0]}&sz=64`;
 
-    const token = getPersistentToken();
-    if (!token) {
+    if (!getPersistentToken()) {
       input.disabled = true;
       datalist.remove();
 
@@ -55,27 +58,32 @@ export default class URLSelector extends HTMLElement {
           window.location.href = targetlocation.href;
         }
       });
-    } else {
-      fetch('https://rum.fastly-aem.page/domains?suggested=true', {
-        headers: {
-          accept: 'application/json',
-          authorization: `Bearer ${token}`,
-        },
-      }).then(async (resp) => {
-        if (!resp.ok) {
-          datalist.remove();
-        } else {
-          const { domains } = await resp.json();
-          domains.forEach((domain) => {
-            const option = document.createElement('option');
-            option.value = domain;
-            datalist.appendChild(option);
-          });
-        }
-      }).catch(() => {
-        datalist.remove();
-      });
     }
+
+    input.addEventListener('mouseover', () => {
+      const token = getPersistentToken();
+      if (token && !isIncognitoMode()) {
+        fetch('https://rum.fastly-aem.page/domains?suggested=true', {
+          headers: {
+            accept: 'application/json',
+            authorization: `Bearer ${token}`,
+          },
+        }).then(async (resp) => {
+          if (!resp.ok) {
+            datalist.remove();
+          } else {
+            const { domains } = await resp.json();
+            domains.forEach((domain) => {
+              const option = document.createElement('option');
+              option.value = domain;
+              datalist.appendChild(option);
+            });
+          }
+        }).catch(() => {
+          datalist.remove();
+        });
+      }
+    }, { once: true });
 
     input.addEventListener('focus', () => {
       input.select();
