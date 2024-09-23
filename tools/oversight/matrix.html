@@ -1,17 +1,18 @@
 <html>
 
 <head>
-  <title>Oversight Skyline | AEM Live</title>
+  <title>Oversight Matxix | AEM Live</title>
   <script type="importmap">{"imports": {
     "chartjs": "https://esm.sh/chart.js@4.4.2",
-    "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.2"
+    "chartjs-chart-matrix": "https://esm.sh/chartjs-chart-matrix@2.0.1?deps=chart.js@4.4.2",
+    "cartocolor": "https://esm.sh/cartocolor@5.0.2"
   }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
   <script src="/scripts/scripts.js" type="module"></script>
   <link rel="stylesheet" href="/styles/styles.css" />
   <script type="module" defer="false">
-    import SkylineChart from './charts/skyline.js';
+    import MatrixChart from './charts/matrix.js';
     import ConversionTracker from './elements/conversion-tracker.js';
     import IncognitoCheckbox from './elements/incognito-checkbox.js';
     import FacetSidebar from './elements/facetsidebar.js';
@@ -23,7 +24,7 @@
     import URLSelector from './elements/url-selector.js';
     import NumberFormat from './elements/number-format.js';
     window.slicer = {
-      Chart: SkylineChart,
+      Chart: MatrixChart,
     };
     customElements.define('incognito-checkbox', IncognitoCheckbox);
     customElements.define('facet-sidebar', FacetSidebar);
