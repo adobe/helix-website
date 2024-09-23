@@ -279,18 +279,26 @@ export default class TimeRangePicker extends HTMLElement {
 
     dropdownElement.hidden = true;
 
+    let dateFrom = new Date(from);
+    let dateTo = new Date(to);
+    if (dateFrom > dateTo) {
+      // swap the 2 dates
+      dateFrom = new Date(to);
+      dateTo = new Date(from);
+    }
+
     if (from) {
-      fromElement.value = toDateString(new Date(from));
+      fromElement.value = toDateString(dateFrom);
     }
 
     if (to) {
-      toElement.value = toDateString(new Date(to));
+      toElement.value = toDateString(dateTo);
     }
 
     this.updateTimeframe({
       value,
-      from,
-      to,
+      from: this.fromElement.value,
+      to: this.toElement.value,
     });
 
     this.dispatchEvent(new Event('change', {
