@@ -707,6 +707,9 @@ async function loadLazy(doc) {
   window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
+
+  // check to see if this is reflected in google indexed page
+  document.documentElement.classList.add('index-test-scripts-js-2024-08-23');
 }
 
 /**

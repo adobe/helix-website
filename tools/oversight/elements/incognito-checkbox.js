@@ -5,14 +5,18 @@ function getPersistentToken() {
 async function fetchDomainKey(domain) {
   try {
     const auth = getPersistentToken();
-    const issueResp = await fetch(`https://rum.fastly-aem.page/domainkey/${domain}`, {
+    let org;
+    if (domain.endsWith(':all') && domain !== 'aem.live:all') {
+      ([org] = domain.split(':'));
+    }
+    const issueResp = await fetch(`https://rum.fastly-aem.page/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
       headers: {
         authorization: `Bearer ${auth}`,
       },
     });
     let domainkey = '';
     try {
-      domainkey = (await issueResp.json()).domainkey;
+      domainkey = (await issueResp.json())[org ? 'orgkey' : 'domainkey'];
     } catch (e) {
       // no domainkey
     }
@@ -218,6 +222,19 @@ export default class IncognitoCheckbox extends HTMLElement {
     const u = new URL(window.location.href);
 
     const urlkey = u.searchParams.get('domainkey');
+    const returnToken = u.searchParams.get('returnToken');
+    if (returnToken) {
+      localStorage.setItem('rum-bundler-token', returnToken);
+      const refreshURL = new URL(window.location.href);
+      refreshURL.searchParams.delete('returnToken');
+      window.location.href = refreshURL.href;
+    }
+    if (u.searchParams.get('returnTo') && getPersistentToken()) {
+      const returnTo = new URL(u.searchParams.get('returnTo'));
+      returnTo.searchParams.set('returnToken', getPersistentToken());
+      window.location.href = returnTo.href;
+    }
+
     if (urlkey === 'incognito' || !urlkey) {
       this.setAttribute('mode', 'loading');
       fetchDomainKey(u.searchParams.get('domain')).then((domainkey) => {

@@ -2,45 +2,122 @@ import classifyConsent from './consent.js';
 import { classifyAcquisition } from './acquisition.js';
 
 /* helpers */
-export function scoreValue(value, ni, poor) {
-  if (value >= poor) return 'poor';
-  if (value >= ni) return 'ni';
-  return 'good';
-}
 
 export function isKnownFacet(key) {
-  return false // TODO: find a better way to filter out non-facet keys
-    || key === 'userAgent'
-    || key === 'url'
-    || key === 'conversions'
+  const checkpoints = [
+    'loadresource',
+    'cwv',
+    'cwv2', // ekrem
+    'cwv-lcp',
+    'cwv-cls',
+    'cwv-inp',
+    'cwv-ttfb', // these are virtual checkpoints
+    'click',
+    'top',
+    'viewmedia',
+    'viewblock',
+    'enter',
+    'error',
+    'navigate',
+    'utm',
+    'reload',
+    'back_forward',
+    'missingresource',
+    'audience',
+    'experiment',
+    'formsubmit',
+    '404',
+    'convert',
+    'search',
+    'unsupported',
+    'noscript',
+    'consent',
+    'paid',
+    'email',
+    'acquisition',
+    'login',
+    'signup',
+    'language', // record language preference
+    'prerender',
+    'redirect', // there was a redirect as part of the request
+    'acquisition', // virtual checkpoint
+  ];
+
+  const baseFacets = [
+    'userAgent',
+    'url',
+    'type',
+    'conversions',
+    'checkpoint',
     // facets from sankey
-    || key === 'trafficsource'
-    || key === 'traffictype'
-    || key === 'entryevent'
-    || key === 'pagetype'
-    || key === 'loadtype'
-    || key === 'contenttype'
-    || key === 'variant'
-    || key === 'interaction'
-    || key === 'clicktarget'
-    || key === 'exit'
-    || key === 'vitals'
-    || key.endsWith('.source')
-    || key.endsWith('.target')
-    || key.endsWith('.histogram')
-    || key === 'checkpoint';
+    'trafficsource',
+    'traffictype',
+    'entryevent',
+    'pagetype',
+    'loadtype',
+    'contenttype',
+    'interaction',
+    'clicktarget',
+    'exit',
+    'vitals',
+    // facets from checkpoints
+    ...checkpoints,
+    // for experimentation
+    'variant',
+  ];
+
+  const suffixes = [
+    'source',
+    'target',
+    'histogram',
+  ];
+
+  const modifiers = [
+    '!', // indicates a negation, and allows us to select a negative facet
+    '~', // indicates a count, and allows us to control how many items are shown
+  ];
+
+  const facetPattern = /^(?<facet>[a-z]+)(\.(?<suffix>[a-z]+))?(?<qualifier>[!~])?$/i;
+  const match = facetPattern.exec(key);
+  if (match) {
+    const { facet, suffix, qualifier } = match.groups;
+    return baseFacets.includes(facet)
+      && (!suffix || suffixes.includes(suffix))
+      && (!qualifier || modifiers.includes(qualifier));
+  }
+  return false;
 }
 
 export function scoreCWV(value, name) {
   if (value === undefined || value === null) return null;
-  const limits = {
-    lcp: [2500, 4000],
-    cls: [0.1, 0.25],
-    inp: [200, 500],
-    ttfb: [800, 1800],
-  };
-  return scoreValue(value, ...limits[name]);
+  let poor;
+  let ni;
+  // this is unrolled on purpose as this method becomes a bottleneck
+  if (name === 'lcp') {
+    poor = 4000;
+    ni = 2500;
+  }
+  if (name === 'cls') {
+    poor = 0.25;
+    ni = 0.1;
+  }
+  if (name === 'inp') {
+    poor = 500;
+    ni = 200;
+  }
+  if (name === 'ttfb') {
+    poor = 1800;
+    ni = 800;
+  }
+  if (value >= poor) {
+    return 'poor';
+  }
+  if (value >= ni) {
+    return 'ni';
+  }
+  return 'good';
 }
+
 export const UA_KEY = 'userAgent';
 
 /**
@@ -330,7 +407,7 @@ export function reclassifyEnter(acc, event, i, allEvents) {
     // we need to reclassify when we have seen both enter and acquisition
     (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')
     // but if there is no acquisition, we reclassify the enter event
-    && ((!has('acquisition')) || (acc.acquisition && acc.referrer))) {
+    && ((acc.acquisition && acc.referrer) || (!has('acquisition')))) {
     const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
     const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
     const group = aGroup || 'earned';

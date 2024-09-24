@@ -98,9 +98,11 @@ main .title {
 main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-right: 8px;
   font-size: var(--type-heading-m-size);
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 main .title url-selector img {
@@ -183,6 +185,12 @@ main .key-metrics ul > #inp p number-format::after,
 main facet-sidebar ul.cwv > li[title^="LCP"] number-format::after,
 main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
   content: 's';
+}
+
+/* as of 2024, all iOS CWV values are fake, so we hide them a bit */
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv {
+  opacity: 0.5;
+  filter: grayscale(1);
 }
 
 main .key-metrics ul > #lcp number-format.extra::after {
@@ -780,6 +788,11 @@ vitals-facet fieldset label {
 
 #facets div[aria-selected=true] {
   background-color: var(--light-blue)
+}
+
+#facets div[aria-checked=mixed] {
+  opacity: 0.7;
+  filter: brightness(0.7);
 }
 
 #facets div[aria-selected]:hover {

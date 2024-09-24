@@ -50,6 +50,15 @@
   line-height: var(--type-body-s-lh);
 }
 
+.feed.recent .desc {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media screen and (min-width: 768px) {
   .feed.recent > div > div {
     grid-template-columns: 1fr 1fr 1fr;

@@ -1,14 +1,9 @@
 /* helpers */
-export function scoreValue(value, ni, poor) {
-  if (value >= poor) return 'poor';
-  if (value >= ni) return 'ni';
-  return 'good';
-}
-
 export function isKnownFacet(key) {
   return false // TODO: find a better way to filter out non-facet keys
     || key === 'userAgent'
     || key === 'url'
+    || key === 'type'
     || key === 'conversions'
     // facets from sankey
     || key === 'trafficsource'
@@ -29,13 +24,32 @@ export function isKnownFacet(key) {
 
 export function scoreCWV(value, name) {
   if (value === undefined || value === null) return null;
-  const limits = {
-    lcp: [2500, 4000],
-    cls: [0.1, 0.25],
-    inp: [200, 500],
-    ttfb: [800, 1800],
-  };
-  return scoreValue(value, ...limits[name]);
+  let poor;
+  let ni;
+  // this is unrolled on purpose as this method becomes a bottleneck
+  if (name === 'lcp') {
+    poor = 4000;
+    ni = 2500;
+  }
+  if (name === 'cls') {
+    poor = 0.25;
+    ni = 0.1;
+  }
+  if (name === 'inp') {
+    poor = 500;
+    ni = 200;
+  }
+  if (name === 'ttfb') {
+    poor = 1800;
+    ni = 800;
+  }
+  if (value >= poor) {
+    return 'poor';
+  }
+  if (value >= ni) {
+    return 'ni';
+  }
+  return 'good';
 }
 export const UA_KEY = 'userAgent';
 export function toHumanReadable(num) {

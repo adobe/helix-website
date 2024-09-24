@@ -19,6 +19,7 @@ const displayNames = {
   'helix-cli': 'Command Line Interface',
   'helix-sidekick-extension': 'Sidekick Extension',
   'franklin-sidekick-library': 'Sidekick Library',
+  'aem-lib': 'AEM Library',
 };
 
 function createRelease(release) {
@@ -69,7 +70,7 @@ function createRelease(release) {
     ul.append(li);
   });
 
-  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo]} <a href="${release.url}">${release.tag}</a></h2>`;
+  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo] || release.repo} <a href="${release.url}">${release.tag}</a></h2>`;
   addAnchorLink(div.querySelector('h2'));
 
   div.append(releaseBody);

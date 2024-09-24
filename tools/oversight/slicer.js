@@ -14,11 +14,9 @@ import {
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
-// const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
-// const UA_KEY = 'user_agent';
 
 const elems = {};
 
@@ -143,6 +141,9 @@ export function updateKeyMetrics() {
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+
+  dataChunks.addFacet('type', (bundle) => bundle.hostType);
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -154,8 +155,9 @@ function updateDataFacets(filterText, params, checkpoint) {
       acc.push(parts.slice(0, i + 1).join(':'));
       return acc;
     }, []);
-  });
-  dataChunks.addFacet('url', (bundle) => {
+  }, 'some', 'none');
+
+  const urlFn = (bundle) => {
     if (bundle.domain) return bundle.domain;
     const u = new URL(bundle.url);
     u.pathname = u.pathname.split('/')
@@ -177,13 +179,14 @@ function updateDataFacets(filterText, params, checkpoint) {
           return '<uuid>';
         }
         // just too long
-        if (segment.length > 40) {
+        if (segment.length > 60) {
           return '...';
         }
         return segment;
       }).join('/');
     return u.toString();
-  });
+  };
+  dataChunks.addFacet('url', urlFn, 'some', 'never');
 
   dataChunks.addFacet('vitals', (bundle) => {
     const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
@@ -198,7 +201,7 @@ function updateDataFacets(filterText, params, checkpoint) {
     .reduce((acc, evt) => {
       acc.add(evt.checkpoint);
       return acc;
-    }, new Set())), 'every');
+    }, new Set())), 'every', 'none');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
     dataChunks.addFacet('lcp.target', (bundle) => bundle.events
@@ -345,8 +348,6 @@ async function loadData(scope, chart) {
   } else if (scope === 'year') {
     dataChunks.load(await loader.fetchPrevious12Months(endDate));
   }
-
-  draw();
 }
 
 export function updateState() {
@@ -361,7 +362,9 @@ export function updateState() {
   if (drilldown) url.searchParams.set('drilldown', drilldown);
 
   elems.sidebar.querySelectorAll('input').forEach((e) => {
-    if (e.checked) {
+    if (e.indeterminate) {
+      url.searchParams.append(`${e.id.split('=')[0]}!`, e.value);
+    } else if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
   });
@@ -376,6 +379,14 @@ export function updateState() {
     values.forEach((value) => {
       url.searchParams.append(`conversion.${key}`, value);
     });
+  });
+
+  // iterate over all existing URL parameters and keep those that are known facets
+  // and end with ~, so that we can keep the state of the facets
+  searchParams.forEach((value, key) => {
+    if (key.endsWith('~') && isKnownFacet(key)) {
+      url.searchParams.set(key, value);
+    }
   });
 
   window.history.replaceState({}, '', url);
@@ -412,7 +423,7 @@ const io = new IntersectionObserver((entries) => {
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
       await loadData(view, herochart);
-      herochart.draw();
+      draw();
     });
 
     herochart.render();
@@ -426,7 +437,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view, herochart);
+      loadData(view, herochart).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {

@@ -13,11 +13,9 @@ import {
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
-// const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
-// const UA_KEY = 'user_agent';
 
 const elems = {};
 
@@ -104,6 +102,9 @@ export function updateKeyMetrics(keyMetrics) {
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
+
+  dataChunks.addFacet('type', (bundle) => bundle.hostType);
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -180,7 +181,19 @@ function updateDataFacets(filterText, params, checkpoint) {
           bundle.events
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
-            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+            .reduce((acc, { target }) => {
+              if (typeof target === 'string') {
+                const mi = target.indexOf('/media_');
+                if (cp === 'viewmedia' && mi) {
+                  acc.add(target.substring(mi + 1));
+                } else {
+                  acc.add(target);
+                }
+              } else {
+                acc.add(target);
+              }
+              return acc;
+            }, new Set()),
         ));
 
         if (cp === 'loadresource') {
@@ -272,8 +285,6 @@ async function loadData(scope) {
   if (scope === 'year') {
     dataChunks.load(await loader.fetchPrevious12Months(endDate));
   }
-
-  draw();
 }
 
 export function updateState() {
@@ -326,7 +337,7 @@ const io = new IntersectionObserver((entries) => {
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
       await loadData(view);
-      herochart.draw();
+      draw();
     });
 
     herochart.render();
@@ -340,7 +351,7 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view);
+      loadData(view).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {

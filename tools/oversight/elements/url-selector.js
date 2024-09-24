@@ -28,19 +28,53 @@ export default class URLSelector extends HTMLElement {
         }
       </style>
       <label for="url"><img src="https://www.aem.live/favicon.ico"></label>
-      <input id="url" type="url">
+      <input id="url" type="url" list="rum-domain-suggestions">
+      <datalist id="rum-domain-suggestions"></datalist>
     `;
   }
 
   connectedCallback() {
     this.innerHTML = this.template;
+    const datalist = this.querySelector('datalist');
     const input = this.querySelector('input');
     input.value = new URL(window.location.href).searchParams.get('domain');
     const img = this.querySelector('img');
-    img.src = `https://www.google.com/s2/favicons?domain=${input.value}&sz=64`;
+    img.src = `https://www.google.com/s2/favicons?domain=${input.value.split(':')[0]}&sz=64`;
 
-    if (!getPersistentToken()) {
+    const token = getPersistentToken();
+    if (!token) {
       input.disabled = true;
+      datalist.remove();
+
+      // detect a click with shift key pressed
+      img.addEventListener('click', (event) => {
+        if (event.shiftKey) {
+          const targetlocation = new URL('https://www.aem.live/tools/oversight/explorer.html');
+          targetlocation.searchParams.set('domain', input.value);
+          targetlocation.searchParams.set('returnTo', window.location.href);
+          window.location.href = targetlocation.href;
+        }
+      });
+    } else {
+      fetch('https://rum.fastly-aem.page/domains?suggested=true', {
+        headers: {
+          accept: 'application/json',
+          authorization: `Bearer ${token}`,
+        },
+      }).then(async (resp) => {
+        if (!resp.ok) {
+          datalist.remove();
+        } else {
+          const { domains } = await resp.json();
+          domains.forEach((domain) => {
+            const option = document.createElement('option');
+            option.value = domain;
+            datalist.appendChild(option);
+          });
+        }
+      }).catch(() => {
+        datalist.remove();
+      });
     }
 
     input.addEventListener('focus', () => {
@@ -62,16 +96,17 @@ export default class URLSelector extends HTMLElement {
     });
 
     this.addEventListener('submit', (event) => {
+      let domain = event.detail;
       try {
-        const entered = new URL(`https://${event.detail}`);
-        const goto = new URL(window.location.pathname, window.location.origin);
-        goto.searchParams.set('domain', entered.hostname);
-        goto.searchParams.set('view', 'month');
-        window.location.href = goto.href;
+        const entered = new URL(`https://${domain}`);
+        domain = entered.hostname;
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Invalid URL', e, event.detail);
+        // ignore, some domains are not valid URLs
       }
+      const goto = new URL(window.location.pathname, window.location.origin);
+      goto.searchParams.set('domain', domain);
+      goto.searchParams.set('view', 'month');
+      window.location.href = goto.href;
     });
   }
 

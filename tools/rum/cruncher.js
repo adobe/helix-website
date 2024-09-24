@@ -21,6 +21,7 @@
  * @property {string} timeSlot - the hourly timesot that this bundle belongs to
  * @property {string} url - the URL of the request, without URL parameters
  * @property {string} userAgent - the user agent class, for instance desktop:windows or mobile:ios
+ * @property {string} hostType - the type of host, for instance 'helix' or 'aemcs'
  * @property {number} weight - the weight, or sampling ratio 1:n of the bundle
  * @property {RawEvent} events - the list of events that make up the bundle
  */
@@ -106,12 +107,16 @@ function groupFn(groupByFn) {
  * @typedef {Object} Aggregate - an object that contains aggregate metrics
  */
 class Aggregate {
-  constructor(parent = null) {
+  constructor(parentProvider = () => null) {
     this.count = 0;
     this.sum = 0;
     this.weight = 0;
     this.values = [];
-    this.parent = parent;
+    this.parentProvider = parentProvider;
+  }
+
+  get parent() {
+    return this.parentProvider();
   }
 
   get min() {
@@ -653,14 +658,11 @@ export class DataChunks {
       .filter(skipFilterFn)
       .filter(([, desiredValues]) => desiredValues.length)
       .filter(existenceFilterFn);
-    return bundles.filter((bundle) => {
-      const matches = filterBy.map(([attributeName, desiredValues]) => {
-        const actualValues = valuesExtractorFn(attributeName, bundle, this);
-        const combiner = combinerExtractorFn(attributeName, this);
-        return desiredValues[combiner]((value) => actualValues.includes(value));
-      });
-      return matches.every((match) => match);
-    });
+    return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
+      const actualValues = valuesExtractorFn(attributeName, bundle, this);
+      const combiner = combinerExtractorFn(attributeName, this);
+      return desiredValues[combiner]((value) => actualValues.includes(value));
+    }));
   }
 
   /**
@@ -763,7 +765,7 @@ export class DataChunks {
               aggregateFn(valueFn),
               // we reference the totals object here, so that we can
               // calculate the share and percentage metrics
-              new Aggregate(this.totals[seriesName]),
+              new Aggregate(() => this.totals[seriesName]),
             );
             return accInner;
           }, {});
@@ -809,20 +811,17 @@ export class DataChunks {
     // go over each function in this.series and each value in filteredIn
     // and appy the function to the value
     if (Object.keys(this.totalsIn).length) return this.totalsIn;
-    const parentTotals = Object.entries(this.series)
+    this.totalsIn = Object.entries(this.series)
       .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filtered.reduce(
+        const parent = this.filtered.reduce(
           aggregateFn(valueFn),
           new Aggregate(),
         );
-        return acc;
-      }, {});
-    this.totalsIn = Object.entries(this.series)
-      .reduce((acc, [seriesName, valueFn]) => {
-        acc[seriesName] = this.filtered.reduce(
-          aggregateFn(valueFn),
-          new Aggregate(parentTotals[seriesName]),
-        );
+        // we need to clone the aggregate object, so that we can use it as its own parent
+        // this is necessary for calculating the share and percentage metrics
+        // the alternative would be to calculate the totals for each group twice (which is slower)
+        acc[seriesName] = Object.assign(Object.create(Object.getPrototypeOf(parent)), parent);
+        acc[seriesName].parentProvider = () => parent;
         return acc;
       }, {});
     return this.totalsIn;
