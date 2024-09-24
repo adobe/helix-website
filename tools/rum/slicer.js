@@ -34,7 +34,7 @@ const isDefaultConversion = Object.keys(conversionSpec).length === 1
   && conversionSpec.checkpoint
   && conversionSpec.checkpoint[0] === 'click';
 
-window.addEventListener('pageshow', () => elems.canvas && herochart.render());
+window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
@@ -273,8 +273,6 @@ export async function draw() {
 }
 
 async function loadData(config) {
-  console.log('loadData', config);
-
   const scope = config.value;
   const params = new URL(window.location.href).searchParams;
   const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
@@ -362,7 +360,6 @@ const io = new IntersectionObserver((entries) => {
     });
 
     herochart.render();
-    // sidebar.updateFacets();
 
     elems.filterInput.value = params.get('filter');
     elems.viewSelect.value = {

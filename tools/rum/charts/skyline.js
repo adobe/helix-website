@@ -475,17 +475,12 @@ export default class SkylineChart extends AbstractChart {
   }
 
   async draw() {
-    console.log('draw');
-
     const params = new URL(window.location).searchParams;
     const view = params.get('view');
 
     // eslint-disable-next-line no-unused-vars
     const startDate = params.get('startDate');
     const endDate = params.get('endDate');
-
-    console.log('startDate', startDate);
-    console.log('endDate', endDate);
 
     let customView = 'year';
     let unit = 'month';
@@ -494,25 +489,21 @@ export default class SkylineChart extends AbstractChart {
       const diff = endDate ? new Date(endDate).getTime() - new Date(startDate).getTime() : 0;
       if (diff < (1000 * 60 * 60 * 24)) {
         // less than a day
-        console.log('chart draw - less than a day');
         customView = 'hour';
         unit = 'hour';
         units = 24;
       } else if (diff <= (1000 * 60 * 60 * 24 * 7)) {
         // less than a week
-        console.log('chart draw - week view', (diff / (1000 * 60 * 60)));
         customView = 'week';
         unit = 'hour';
         units = Math.round(diff / (1000 * 60 * 60));
       } else if (diff <= (1000 * 60 * 60 * 24 * 31)) {
         // less than a month
-        console.log('chart draw - less than a month');
         customView = 'month';
         unit = 'day';
         units = 30;
       } else if (diff < (1000 * 60 * 60 * 24 * 365)) {
         // less than a year
-        console.log('chart draw - less than a year');
         customView = 'week';
         unit = 'week';
         units = Math.round(diff / (1000 * 60 * 60 * 24 * 7));
@@ -563,8 +554,6 @@ export default class SkylineChart extends AbstractChart {
     };
 
     const config = configs[view];
-
-    console.log('config', config);
 
     this.config = config;
     this.defineSeries();
@@ -637,8 +626,6 @@ export default class SkylineChart extends AbstractChart {
     this.stepSize = undefined;
     this.clsAlreadyLabeled = false;
     this.lcpAlreadyLabeled = false;
-
-    console.log('this.chart.data', this.chart.data);
 
     this.chart.update();
   }

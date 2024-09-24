@@ -150,14 +150,11 @@ export default class DataLoader {
 
     const promises = [];
 
-    console.log('fetchPeriod', start.toString(), end.toString());
-
     if (diff <= (1000 * 60 * 60 * 24 * 7)) {
       // less than a week
       const days = Math.round((diff / (1000 * 60 * 60 * 24))) + 1;
 
       for (let i = 0; i < days; i += 1) {
-        console.log('fetching day', start.toString());
         promises.push(this.fetchUTCDay(start.toISOString(), originalStart, end));
         start.setDate(start.getDate() + 1);
       }
@@ -166,7 +163,6 @@ export default class DataLoader {
       const days = Math.round((diff / (1000 * 60 * 60 * 24))) + 1;
 
       for (let i = 0; i < days; i += 1) {
-        console.log('fetching day', start.toString());
         promises.push(this.fetchUTCDay(start.toISOString(), originalStart, end));
         start.setDate(start.getDate() + 1);
       }
@@ -174,13 +170,11 @@ export default class DataLoader {
       const months = Math.round(diff / (1000 * 60 * 60 * 24 * 31)) + 1;
 
       for (let i = 0; i < months; i += 1) {
-        console.log('fetching month', start.toString());
         promises.push(this.fetchUTCMonth(start.toISOString(), originalStart, end));
         start.setMonth(start.getMonth() + 1);
       }
     }
 
-    const chunks = Promise.all(promises);
-    return chunks;
+    return Promise.all(promises);
   }
 }
