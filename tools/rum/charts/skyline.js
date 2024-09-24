@@ -502,8 +502,8 @@ export default class SkylineChart extends AbstractChart {
         customView = 'month';
         unit = 'day';
         units = 30;
-      } else if (diff < (1000 * 60 * 60 * 24 * 365)) {
-        // less than a year
+      } else if (diff <= (1000 * 60 * 60 * 24 * 365 * 3)) {
+        // less than 3 years
         customView = 'week';
         unit = 'week';
         units = Math.round(diff / (1000 * 60 * 60 * 24 * 7));
