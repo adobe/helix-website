@@ -40,7 +40,7 @@ const STYLES = `
     font: inherit;
     border-color: var(--gray-100);
     border: 2px solid var(--gray-300);
-    padding: 0.4em 0.85em;
+    padding: 0.4em 0.85em 0.1em;
     background-color: var(--gray-100);
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s;
@@ -78,7 +78,6 @@ const STYLES = `
     grid-template-columns: minmax(0, 1fr);
     gap: 16px 12px;
     right: 0;
-    top: calc(100% + 8px);
     margin-top: 4px;
     border-radius: 4px;
     padding: calc(0.4em + 2px);
@@ -89,11 +88,10 @@ const STYLES = `
   }
 
   ul {
+    position: relative;
     list-style: none;
-    position: absolute;
     left: 0;
     right: 0;
-    top: calc(100% + 8px);
     margin: 0;
     border-radius: 8px;
     padding: calc(0.4em + 2px);
@@ -131,20 +129,30 @@ const STYLES = `
       font-size: var(--type-body-l-size);
     }
 
+    ul {
+      position: absolute;
+    }
+
     input {
       min-width: 200px;
     }
 
     .input-wrapper {
-      min-width: 500px;
+      min-width: 600px;
     }
 
     input[data-custom='true'] ~ .input-wrapper {
       grid-template-columns: minmax(0, 1fr);
     }
 
+    .date-field {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
     .date-field label {
-      margin-bottom: 0.5em;
+      margin-top: 4px;
     }
   }
 
