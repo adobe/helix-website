@@ -4,6 +4,45 @@ import { classifyAcquisition } from './acquisition.js';
 /* helpers */
 
 export function isKnownFacet(key) {
+  const checkpoints = [
+    'loadresource',
+    'cwv',
+    'cwv2', // ekrem
+    'cwv-lcp',
+    'cwv-cls',
+    'cwv-inp',
+    'cwv-ttfb', // these are virtual checkpoints
+    'click',
+    'top',
+    'viewmedia',
+    'viewblock',
+    'enter',
+    'error',
+    'navigate',
+    'utm',
+    'reload',
+    'back_forward',
+    'missingresource',
+    'audience',
+    'experiment',
+    'formsubmit',
+    '404',
+    'convert',
+    'search',
+    'unsupported',
+    'noscript',
+    'consent',
+    'paid',
+    'email',
+    'acquisition',
+    'login',
+    'signup',
+    'language', // record language preference
+    'prerender',
+    'redirect', // there was a redirect as part of the request
+    'acquisition', // virtual checkpoint
+  ];
+
   const baseFacets = [
     'userAgent',
     'url',
@@ -21,6 +60,8 @@ export function isKnownFacet(key) {
     'clicktarget',
     'exit',
     'vitals',
+    // facets from checkpoints
+    ...checkpoints,
   ];
 
   const suffixes = [
