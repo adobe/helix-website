@@ -27,6 +27,7 @@ const STYLES = `
     display: grid;
     align-items: end;
     gap: var(--spacing-l);
+    font-size: var(--type-body-s-size);
   }
 
   .input-wrapper, .daterange-wrapper {
@@ -44,7 +45,6 @@ const STYLES = `
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s;
     border-radius: 4px;
-    min-width: 200px;
   }
 
   input ~ ul li {
@@ -70,7 +70,6 @@ const STYLES = `
 
   .input-wrapper {
     display: none;
-    min-width: 500px;
     background-color: white;
   }
 
@@ -108,6 +107,15 @@ const STYLES = `
     display: none;
   }
 
+  .date-field {
+    display: block;
+    margin-top: 0;
+  }
+
+  .date-field label {
+    display: block;
+  }
+
   @media (width >= 740px) {
     .input-wrapper {
       grid-template-columns: repeat(2, 1fr);
@@ -119,8 +127,24 @@ const STYLES = `
   }
 
   @media (width >= 900px) {
+    .daterange-wrapper {
+      font-size: var(--type-body-l-size);
+    }
+
+    input {
+      min-width: 200px;
+    }
+
+    .input-wrapper {
+      min-width: 500px;
+    }
+
     input[data-custom='true'] ~ .input-wrapper {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .date-field label {
+      margin-bottom: 0.5em;
     }
   }
 
@@ -129,16 +153,6 @@ const STYLES = `
       grid-template-columns: repeat(2, minmax(0, 1fr));
       position: absolute;
     }
-  }
-
- .date-field {
-    display: block;
-    margin-top: 0;
-  }
-
-  .date-field label {
-    display: block;
-    margin-bottom: 0.5em;
   }
 `;
 
@@ -189,6 +203,7 @@ export default class TimeRangePicker extends HTMLElement {
     const section = document.createRange().createContextualFragment(TEMPLATE);
 
     const sul = section.querySelector('ul');
+    const ul = this.querySelector('ul');
     const options = this.querySelectorAll('ul li');
 
     options.forEach((option) => {
@@ -198,6 +213,8 @@ export default class TimeRangePicker extends HTMLElement {
       option.dataset.role = 'option';
       sul.appendChild(option);
     });
+
+    ul.remove();
 
     this.shadowRoot.innerHTML = '';
 

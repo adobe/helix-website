@@ -67,9 +67,12 @@ main li.score-poor, vitals-facet div[data-value^="poor"] label {
   background-color: var(--light-red);
 }
 
-/* heading */
-main .title div {
+main .title {
+  padding-top: 8px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-flow: row wrap;
   gap: 1ch;
 }
 
@@ -83,6 +86,15 @@ main .title select {
   font: inherit;
 }
 
+main .title > * {
+  flex: 2 0px;
+}
+
+main .title daterange-picker {
+  flex: 1 100%;
+  order: 3;
+}
+
 main .title incognito-checkbox {
   display: none;
   margin-bottom: 10px;
@@ -93,13 +105,6 @@ main .title incognito-checkbox[mode="incognito"] {
   display: inline-block;
 }
 
-main .title {
-  padding-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
@@ -108,6 +113,7 @@ main .title url-selector {
   display: flex;
   align-items: center;
   width: 100%;
+  flex-grow: 50;
 }
 
 main .title url-selector img {
@@ -822,6 +828,19 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 }
 
 @media (min-width: 900px) {
+  main .title {
+    flex-wrap: nowrap;
+  }
+
+  main .title > * {
+    flex: 3 0;
+  }
+
+  main .title daterange-picker {
+    flex: unset;
+    order: unset;
+  }
+
   main .title url-selector input {
     font-size: var(--type-heading-xl-size);
   }
