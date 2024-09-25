@@ -384,7 +384,7 @@ const io = new IntersectionObserver((entries) => {
 
     elems.viewSelect.addEventListener('change', () => {
       updateState();
-      window.location.reload();
+      draw();
     });
 
     if (params.get('metrics') === 'all') {
