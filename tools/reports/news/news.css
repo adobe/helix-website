@@ -1,0 +1,27 @@
+@import url('colors.css');
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable selector-class-pattern */
+
+body {
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 32px;
+}
+
+main {
+  margin: 16px;
+  margin-top: var(--nav-height);
+}
+
+body main > .section {
+  padding-top: 0;
+}
+
+
+@media (min-width: 1600px) {
+  body.appear {
+    max-width: 2400px;
+    display: block;
+    padding-top: 0;
+  }
+}

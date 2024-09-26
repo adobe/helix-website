@@ -1,0 +1,41 @@
+<html></html>
+
+<head>
+  <title>News dashboard | AEM Live</title>
+  <!-- <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.2",
+    "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.2"
+  }}</script> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/scripts/lib-franklin.js" type="module"></script>
+  <script src="/scripts/scripts.js" type="module"></script>
+  <link rel="stylesheet" href="/styles/styles.css" />
+
+  <script src="./news.js" type="module"></script>
+  <link rel="stylesheet" href="./news.css">
+  </head>
+
+<body>
+  <header></header>
+  <main>
+    <h1>News reporting</h1>
+    <section>
+      <div id="period"></div>
+    </section>
+    <section>
+      <h2>Article details</h2>
+      <div id="details"></div>
+    </section>
+    <section>
+      <h2>Overall top 10 for the period</h2>
+      <div id="top10"></div>
+    </section>
+    <section>
+      <h2>Top 10 for released during the period</h2>
+      <div id="top10released"></div>
+    </section>
+  </main>
+  <footer></footer>
+</body>
+
+</html>
