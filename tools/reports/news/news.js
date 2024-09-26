@@ -53,6 +53,7 @@ class URLReports {
     this.start = config.start;
     this.end = config.end;
     this.data = null;
+    this.root = config.articlesRootURL;
 
     const loader = new DataLoader();
     loader.apiEndpoint = API_ENDPOINT;
@@ -64,33 +65,52 @@ class URLReports {
 
   async init() {
     this.data = await this.loader.fetchPeriod(this.start, this.end);
+
+    this.dataChunks = new DataChunks();
+
+    this.dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
+    this.dataChunks.addFacet('url', (bundle) => bundle.url);
+
+    const prefix = this.root;
+
+    this.dataChunks.addFacet('underroot', (bundle) => {
+      if (!bundle.url) return false;
+      return bundle.url.startsWith(prefix);
+    });
+
+    const possiblePrefixes = [];
+    const s = new Date(this.start);
+    const e = new Date(this.end);
+
+    // iterate each day between start and end
+    for (let d = s; d <= e; d.setDate(d.getDate() + 1)) {
+      const day = new Date(d);
+      const datePattern = day.toISOString().split('T')[0].replace(/-/g, '/');
+      const pattern = `${prefix}/${datePattern}`;
+      possiblePrefixes.push(pattern);
+    }
+    this.dataChunks.addFacet('inrange', (bundle) => {
+      if (!bundle.url || !bundle.url.startsWith(prefix)) return false;
+      for (let i = 0; i < possiblePrefixes.length; i += 1) {
+        if (bundle.url.startsWith(possiblePrefixes[i])) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    this.dataChunks.load(this.data);
   }
 
-  getReport(filter) {
-    const dataChunks = new DataChunks();
+  getURLs() {
+    console.log('this.dataChunks.facets', this.dataChunks.facets);
+    return this.dataChunks.facets.url;
+  }
 
-    dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
-    dataChunks.addFacet('url', (bundle) => bundle.url);
-
-    dataChunks.load(filter(this.data));
-
-    return {
-      dataChunks,
-      getURLs: () => dataChunks.facets.url,
-    };
+  set filter(filter) {
+    this.dataChunks.filter = filter;
   }
 }
-
-const filterByURL = (data, start) => {
-  if (start) {
-    data.forEach((chunk) => {
-      // eslint-disable-next-line max-len
-      const filtered = chunk.rumBundles.filter((bundle) => (bundle.url ? bundle.url.startsWith(start) : false));
-      chunk.rumBundles = filtered;
-    });
-  }
-  return data;
-};
 
 const getConfig = () => {
   const config = {
@@ -104,36 +124,6 @@ const getConfig = () => {
   };
 
   return config;
-};
-
-const filterByRange = (data, prefix, start, end) => {
-  if (start && end) {
-    const possiblePrefixes = [];
-    const s = new Date(start);
-    const e = new Date(end);
-    // iterate each day between start and end
-    for (let d = s; d <= e; d.setDate(d.getDate() + 1)) {
-      const day = new Date(d);
-      const datePattern = day.toISOString().split('T')[0].replace(/-/g, '/');
-      const pattern = `${prefix}/${datePattern}`;
-      possiblePrefixes.push(pattern);
-    }
-
-    data.forEach((chunk) => {
-      const filtered = chunk.rumBundles.filter((bundle) => {
-        if (!bundle.url || !bundle.url.startsWith(prefix)) return false;
-
-        for (let i = 0; i < possiblePrefixes.length; i += 1) {
-          if (bundle.url.startsWith(possiblePrefixes[i])) {
-            return true;
-          }
-        }
-        return false;
-      });
-      chunk.rumBundles = filtered;
-    });
-  }
-  return data;
 };
 
 const getDetails = async (url, articlesRootURL) => {
@@ -180,8 +170,11 @@ const main = async () => {
 
   const report = new URLReports(config);
   report.init().then(() => {
-    const top10 = report.getReport((data) => filterByURL(data, config.articlesRootURL));
-    let urls = top10.getURLs();
+    report.filter = {
+      underroot: [true],
+    };
+
+    let urls = report.getURLs();
 
     const top10Element = document.getElementById('top10');
     let ul = document.createElement('ul');
@@ -194,10 +187,11 @@ const main = async () => {
       ul.appendChild(li);
     }
 
-    // eslint-disable-next-line max-len
-    const weekTop10 = report.getReport((data) => filterByRange(data, config.articlesRootURL, config.start, config.end));
+    report.filter = {
+      inrange: [true],
+    };
 
-    urls = weekTop10.getURLs();
+    urls = report.getURLs();
 
     const top10ReleasedElement = document.getElementById('top10released');
     ul = document.createElement('ul');
