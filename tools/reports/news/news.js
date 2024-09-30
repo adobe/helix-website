@@ -68,11 +68,10 @@ class URLReports {
     dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
       ? bundle.weight
       : 0));
-    dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
-      checkpoint: ['click'],
-    })
+    dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, { checkpoint: ['click'] })
       ? bundle.weight
       : 0));
+
     dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
       ? bundle.weight
       : 0));
@@ -144,7 +143,6 @@ class URLReports {
   }
 
   getURLs() {
-    console.log('this.dataChunks.facets', this.dataChunks.facets);
     return this.dataChunks.facets.url;
   }
 
