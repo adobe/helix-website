@@ -3,16 +3,10 @@ import { DataChunks } from './cruncher.js';
 import DataLoader from './loader.js';
 
 import {
-//   parseConversionSpec,
-//   parseSearchParams,
-//   isKnownFacet,
-//   scoreCWV,
   toHumanReadable,
-//   computeConversionRate,
+  reclassifyAcquisition,
+  parseConversionSpec,
 } from './utils.js';
-
-// /* globals */
-// let DOMAIN = 'www.thinktanked.org';
 
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
@@ -66,14 +60,60 @@ class URLReports {
   async init() {
     this.data = await this.loader.fetchPeriod(this.start, this.end);
 
-    this.dataChunks = new DataChunks();
+    const dataChunks = new DataChunks();
 
-    this.dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
-    this.dataChunks.addFacet('url', (bundle) => bundle.url);
+    dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
+    dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
+    // a bounce is a visit without a click
+    dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
+      ? bundle.weight
+      : 0));
+    dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
+      checkpoint: ['click'],
+    })
+      ? bundle.weight
+      : 0));
+    dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
+      ? bundle.weight
+      : 0));
+
+    // our series are the different kinds of success metrics that exist
+    // for each of the different breakdowns of the selected drilldown facet
+    // these are the columns of the matrix
+    // - pages per visit (provided by slicer)
+    // - bounce rate (provided by slicer)
+    // - earned percentage
+    // - engagement (provided by slicer)
+    // - conversion rate (if defined)
+    // - we also show the core web vitals as additional series
+
+    dataChunks.addSeries('earned', (bundle) => {
+      const reclassified = bundle.events
+        .map(reclassifyAcquisition);
+      if (!reclassified.find((evt) => evt.checkpoint === 'enter')) {
+        // we only consider enter events
+        return 0;
+      }
+      if (!reclassified.find((evt) => evt.checkpoint === 'acquisition')) {
+        // this is fully organic, as there are no traces of any acquisition
+        return bundle.weight;
+      }
+      if (reclassified.find((evt) => evt.checkpoint === 'acquisition' && evt.source.startsWith('paid'))) {
+        // this is paid, as there is at least one paid acquisition
+        return 0;
+      }
+      if (reclassified.find((evt) => evt.checkpoint === 'acquisition' && evt.source.startsWith('owned'))) {
+        // owned does not count as organic, sorry
+        return 0;
+      }
+      return 0;
+    });
+
+    dataChunks.addFacet('url', (bundle) => bundle.url);
 
     const prefix = this.root;
 
-    this.dataChunks.addFacet('underroot', (bundle) => {
+    dataChunks.addFacet('underroot', (bundle) => {
       if (!bundle.url) return false;
       return bundle.url.startsWith(prefix);
     });
@@ -89,7 +129,7 @@ class URLReports {
       const pattern = `${prefix}/${datePattern}`;
       possiblePrefixes.push(pattern);
     }
-    this.dataChunks.addFacet('inrange', (bundle) => {
+    dataChunks.addFacet('inrange', (bundle) => {
       if (!bundle.url || !bundle.url.startsWith(prefix)) return false;
       for (let i = 0; i < possiblePrefixes.length; i += 1) {
         if (bundle.url.startsWith(possiblePrefixes[i])) {
@@ -99,7 +139,8 @@ class URLReports {
       return false;
     });
 
-    this.dataChunks.load(this.data);
+    dataChunks.load(this.data);
+    this.dataChunks = dataChunks;
   }
 
   getURLs() {
@@ -149,6 +190,42 @@ const getDetails = async (url, articlesRootURL) => {
   };
 };
 
+const SERIES = {
+  bounce: {
+    label: 'Bounce Rate',
+    rateFn: (aggregate) => Math.round(
+      (100 * aggregate.bounces.sum) / aggregate.visits.sum,
+    ),
+    labelFn: (value) => `${value}%`,
+  },
+  engagement: {
+    label: 'Page Engagement',
+    rateFn: (aggregate) => Math.round(
+      (100 * aggregate.engagement.sum) / aggregate.pageViews.sum,
+    ),
+    labelFn: (value) => `${value}%`,
+  },
+  conversions: {
+    label: 'Conversion Rate',
+    rateFn: (aggregate) => Math.min(Math.round(
+      (100 * aggregate.conversions.sum) / aggregate.visits.sum,
+    ), 100),
+    labelFn: (value) => `${value}%`,
+  },
+  pagesPerVisit: {
+    label: 'Visit Depth',
+    rateFn: (aggregate) => Math.round(aggregate.pageViews.sum / aggregate.visits.sum),
+    labelFn: (value) => `${value} pages`,
+  },
+  earned: {
+    label: 'Earned Percentage',
+    rateFn: (aggregate) => Math.round(
+      (100 * aggregate.earned.sum) / aggregate.visits.sum,
+    ),
+    labelFn: (value) => `${value}%`,
+  },
+};
+
 const main = async () => {
   const config = getConfig();
 
@@ -176,12 +253,32 @@ const main = async () => {
 
     let urls = report.getURLs();
 
-    const top10Element = document.getElementById('top10');
+    const currentPageEntry = urls.find((entry) => entry.value === config.url);
+
+    if (!currentPageEntry) {
+      throw new Error('Current page not found in report');
+    }
+
+    const businessMetricsElement = document.getElementById('businessMetrics');
     let ul = document.createElement('ul');
+    businessMetricsElement.appendChild(ul);
+    let metrics = currentPageEntry.getMetrics(['pageViews', 'earned', 'visits', 'bounces', 'engagement', 'conversions']);
+    Object.keys(SERIES).forEach((key) => {
+      const series = SERIES[key];
+      const value = series.rateFn(metrics);
+      const display = series.labelFn(value);
+
+      const li = document.createElement('li');
+      li.innerHTML = `<label>${series.label}: </label><span>${display}</span>`;
+      ul.appendChild(li);
+    });
+
+    const top10Element = document.getElementById('top10');
+    ul = document.createElement('ul');
     top10Element.appendChild(ul);
     for (let i = 0; i < Math.min(10, urls.length); i += 1) {
       const entry = urls[i];
-      const metrics = entry.getMetrics(['pageViews']);
+      metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
       li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} (${toHumanReadable(metrics.pageViews.sum)})</a>`;
       ul.appendChild(li);
@@ -198,7 +295,7 @@ const main = async () => {
     top10ReleasedElement.appendChild(ul);
     for (let i = 0; i < Math.min(10, urls.length); i += 1) {
       const entry = urls[i];
-      const metrics = entry.getMetrics(['pageViews']);
+      metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
       li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} / (${toHumanReadable(metrics.pageViews.sum)})</a>`;
       ul.appendChild(li);
