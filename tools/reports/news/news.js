@@ -191,19 +191,24 @@ const getDetails = async (url, articlesRootURL) => {
 };
 
 const SERIES = {
+  pageViews: {
+    label: 'Page Views',
+    rateFn: (aggregate) => aggregate.pageViews.sum,
+    labelFn: (value) => toHumanReadable(value),
+  },
   bounce: {
     label: 'Bounce Rate',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.bounces.sum) / aggregate.visits.sum,
     ),
-    labelFn: (value) => `${value}%`,
+    labelFn: (value) => `${value || 0}%`,
   },
   engagement: {
     label: 'Page Engagement',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.engagement.sum) / aggregate.pageViews.sum,
     ),
-    labelFn: (value) => `${value}%`,
+    labelFn: (value) => `${value || 0}%`,
   },
   conversions: {
     label: 'Conversion Rate',
@@ -214,16 +219,24 @@ const SERIES = {
   },
   pagesPerVisit: {
     label: 'Visit Depth',
-    rateFn: (aggregate) => Math.round(aggregate.pageViews.sum / aggregate.visits.sum),
-    labelFn: (value) => `${value} pages`,
+    // eslint-disable-next-line max-len
+    rateFn: (aggregate) => (aggregate.visits.sum ? Math.round(aggregate.pageViews.sum / aggregate.visits.sum) : 0),
+    labelFn: (value) => `${value || 0} pages`,
   },
   earned: {
     label: 'Earned Percentage',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.earned.sum) / aggregate.visits.sum,
     ),
-    labelFn: (value) => `${value}%`,
+    labelFn: (value) => `${value || 0}%`,
   },
+};
+
+const toReportURL = (url) => {
+  const u = new URL(window.location.href);
+  u.searchParams.delete('url');
+  u.searchParams.set('url', url);
+  return u.toString();
 };
 
 const main = async () => {
@@ -280,7 +293,7 @@ const main = async () => {
       const entry = urls[i];
       metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
-      li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} (${toHumanReadable(metrics.pageViews.sum)})</a>`;
+      li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} (${toHumanReadable(metrics.pageViews.sum)})</a>`;
       ul.appendChild(li);
     }
 
@@ -297,7 +310,7 @@ const main = async () => {
       const entry = urls[i];
       metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
-      li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} / (${toHumanReadable(metrics.pageViews.sum)})</a>`;
+      li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} / (${toHumanReadable(metrics.pageViews.sum)})</a>`;
       ul.appendChild(li);
     }
   });
