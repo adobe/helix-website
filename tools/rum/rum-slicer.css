@@ -935,3 +935,44 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 footer.footer-wrapper.appear {
   display: none;
 }
+
+#loading {
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  height: 100%;
+  opacity: 0.9;
+  background: var(--gray-100);
+}
+
+#loading[aria-hidden="true"] {
+  display: none;
+}
+
+#loading[aria-hidden="false"] {
+  display: unset;
+}
+
+#loading .spinner {
+  position: relative;
+  top: calc(50% - 24px);
+  left: calc(50% - 24px);
+  width: 48px;
+  height: 48px;
+  border: 5px solid #FFF;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+} 

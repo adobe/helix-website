@@ -290,14 +290,35 @@ async function loadData(config) {
 }
 
 export function updateState() {
+  // reload needed if data must be reloaded. This is the case if the domain or view / date changes
+  let reloadNeeded = false;
+
   const url = new URL(window.location.href.split('?')[0]);
   const { searchParams } = new URL(window.location.href);
+
+  if (searchParams.get('domain') !== DOMAIN) {
+    reloadNeeded = true;
+  }
+
   url.searchParams.set('domain', DOMAIN);
   url.searchParams.set('filter', elems.filterInput.value);
 
   const viewConfig = elems.viewSelect.value;
+
+  if (searchParams.get('view') !== viewConfig.value) {
+    reloadNeeded = true;
+  }
+
   url.searchParams.set('view', viewConfig.value);
   if (viewConfig.value === 'custom') {
+    if (searchParams.get('startDate') !== viewConfig.from) {
+      reloadNeeded = true;
+    }
+
+    if (searchParams.get('endDate') !== viewConfig.to) {
+      reloadNeeded = true;
+    }
+
     url.searchParams.set('startDate', viewConfig.from);
     url.searchParams.set('endDate', viewConfig.to);
   }
@@ -313,6 +334,23 @@ export function updateState() {
 
   window.history.replaceState({}, '', url);
   document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
+
+  return reloadNeeded;
+}
+
+export async function refresh(state = true) {
+  herochart.loading();
+
+  let reload = true;
+  if (state) {
+    reload = updateState();
+  }
+
+  if (reload) {
+    await loadData(elems.viewSelect.value);
+  }
+
+  draw();
 }
 
 const section = document.querySelector('main > div');
@@ -327,13 +365,12 @@ const io = new IntersectionObserver((entries) => {
     elems.sidebar = sidebar;
 
     sidebar.addEventListener('facetchange', () => {
-      // console.log('sidebar change');
-      updateState();
-      draw();
+      refresh();
     });
 
     elems.viewSelect = document.getElementById('view');
     elems.canvas = document.getElementById('time-series');
+    elems.loading = document.getElementById('loading');
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
     elems.incognito = document.querySelector('incognito-checkbox');
@@ -355,8 +392,7 @@ const io = new IntersectionObserver((entries) => {
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
 
-      await loadData(elems.viewSelect.value);
-      draw();
+      refresh(false);
     });
 
     herochart.render();
@@ -374,17 +410,15 @@ const io = new IntersectionObserver((entries) => {
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(elems.viewSelect.value).then(draw);
+      refresh(false);
     }
 
     elems.filterInput.addEventListener('input', () => {
-      updateState();
-      draw();
+      refresh();
     });
 
     elems.viewSelect.addEventListener('change', () => {
-      updateState();
-      draw();
+      refresh();
     });
 
     if (params.get('metrics') === 'all') {
