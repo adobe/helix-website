@@ -340,6 +340,7 @@ export function updateState() {
 
 export async function refresh(state = true) {
   herochart.loading();
+  elems.sidebar.disableFacets();
 
   let reload = true;
   if (state) {
@@ -351,6 +352,7 @@ export async function refresh(state = true) {
   }
 
   draw();
+  elems.sidebar.enableFacets();
 }
 
 const section = document.querySelector('main > div');
