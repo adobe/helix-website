@@ -22,6 +22,7 @@
     import VitalsFacet from './elements/vitals-facet.js';
     import URLSelector from './elements/url-selector.js';
     import NumberFormat from './elements/number-format.js';
+    import DateRangePicker from './elements/daterange-picker.js';
     window.slicer = {
       Chart: SkylineChart,
     };
@@ -35,6 +36,7 @@
     customElements.define('url-selector', URLSelector);
     customElements.define('conversion-tracker', ConversionTracker);
     customElements.define('number-format', NumberFormat);
+    customElements.define('daterange-picker', DateRangePicker);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -48,14 +50,15 @@
           <div class="output">
             <div class="title">
               <url-selector>www.aem.live</url-selector>
-              <div>
-                <select id="view">
-                  <option value="week">Week</option>
-                  <option value="month">Month</option>
-                  <option value="year">Year</option>
-                </select>
-                <incognito-checkbox></incognito-checkbox>
-              </div>
+              <daterange-picker id="view">
+                <ul hidden>
+                  <li data-value="week">Last week</li>
+                  <li data-value="month" aria-selected="true">Last month</li>
+                  <li data-value="year">Last year</li>
+                  <li data-value="custom">Custom</li>
+                </ul>
+              </daterange-picker>
+              <incognito-checkbox></incognito-checkbox>
             </div>
             <div class="key-metrics">
               <ul>
@@ -327,6 +330,7 @@
   <div id="shared-toast" class="toast" aria-hidden="true">
     Link copied to clipboard, ready to share
   </div>
+  <!-- <script src="./elements/timerange-picker.js"></script> -->
 </body>
 
 </html>
