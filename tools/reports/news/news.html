@@ -13,28 +13,67 @@
 
   <script src="./news.js" type="module"></script>
   <link rel="stylesheet" href="./news.css">
-  </head>
+</head>
+
+<!-- domainkey=5BC2E85E-A0F7-4474-B28B-79690FE1349A
+&url=https://blog.adobe.com/en/publish/2024/09/11/bringing-gen-ai-to-video-adobe-firefly-video-model-coming-soon
+&start=2024-09-11
+&end=2024-09-26 -->
 
 <body>
   <header></header>
+
   <main>
-    <h1>News reporting</h1>
+    <div>
+      <h1>Blog Post Insights</h1>
+    </div>
+
     <section>
-      <div id="period"></div>
+      <div class="post" id="post">
+        <div class="post-image-wrapper">
+          <img class="post-image">
+        </div>
+        <div class="post-body">
+          <p><a class="post-title"></a></p>
+          <p class="post-description"></p>
+          <p class="post-info">
+            <span class="post-publicationDate"></span>
+            <span class="post-author"></span>
+          </p>
+        </div>
+      </div>
     </section>
+
     <section>
+      <div class="top" id="top">
+        <h2>Top 10 Posts</h2>
+        <p class="subtitle">by views from <span class="start"></span> to <span class="end"></span></p>
+        <div class="top-chart"></div>
+      </div>
+    </section>
+
+  
+
+    <!-- <div>
+      <div id="period"></div>
+    </div>
+
+    <div>
       <h2>Article details</h2>
       <div id="details"></div>
-    </section>
-    <section>
+    </div>
+
+    <div>
       <h2>Overall top 10 for the period</h2>
       <div id="top10"></div>
-    </section>
-    <section>
+    </div>
+
+    <div>
       <h2>Top 10 for released during the period</h2>
       <div id="top10released"></div>
-    </section>
+    </div> -->
   </main>
+
   <footer></footer>
 </body>
 

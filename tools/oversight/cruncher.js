@@ -238,6 +238,7 @@ function erf(x1) {
 
   return sign * y;
 }
+
 /**
  * @typedef {Object} MeanVariance
  * @property {number} mean - the mean of a dataset
@@ -268,6 +269,7 @@ function calcMeanVariance(data) {
 
   return { mean, variance };
 }
+
 /**
  * Performs a significance test on the data. The test assumes
  * that the data is normally distributed and will calculate

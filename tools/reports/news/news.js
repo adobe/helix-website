@@ -7,7 +7,7 @@ import {
 //   parseSearchParams,
 //   isKnownFacet,
 //   scoreCWV,
-  toHumanReadable,
+//   toHumanReadable,
 //   computeConversionRate,
 } from './utils.js';
 
@@ -46,6 +46,20 @@ const getarticlesRootURL = () => {
     throw new Error('No year found in pathname');
   }
   return `${origin}${pathname.substring(0, year.index)}`;
+};
+
+const getConfig = () => {
+  const config = {
+    domain: getDomain(),
+    domainKey: searchParams.get('domainkey') || '',
+    apiEndpoint: API_ENDPOINT,
+    start: searchParams.get('start'),
+    end: searchParams.get('end'),
+    url: getURL(),
+    articlesRootURL: getarticlesRootURL(),
+  };
+
+  return config;
 };
 
 class URLReports {
@@ -103,7 +117,7 @@ class URLReports {
   }
 
   getURLs() {
-    console.log('this.dataChunks.facets', this.dataChunks.facets);
+    // console.log('this.dataChunks.facets', this.dataChunks.facets);
     return this.dataChunks.facets.url;
   }
 
@@ -112,27 +126,13 @@ class URLReports {
   }
 }
 
-const getConfig = () => {
-  const config = {
-    domain: getDomain(),
-    domainKey: searchParams.get('domainkey') || '',
-    apiEndpoint: API_ENDPOINT,
-    start: searchParams.get('start'),
-    end: searchParams.get('end'),
-    url: getURL(),
-    articlesRootURL: getarticlesRootURL(),
-  };
-
-  return config;
-};
-
 const getDetails = async (url, articlesRootURL) => {
   const resp = await fetch(url);
   const html = await resp.text();
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  const title = doc.querySelector('title')?.textContent || '';
+  const title = doc.querySelector('h1')?.textContent || '';
   const description = doc.querySelector('meta[name="description"]')?.content || '';
   const author = doc.querySelector('meta[name="author"]')?.content || '';
 
@@ -144,28 +144,45 @@ const getDetails = async (url, articlesRootURL) => {
     publicationDate = date ? date[0] : '';
   }
 
+  let img = doc.querySelector('img[src]');
+  if (img) {
+    img = {
+      src: new URL(new URL(img.src).pathname, articlesRootURL).href,
+      alt: img.alt || '',
+      width: img.width || '',
+      height: img.height || '',
+    };
+  } else img = '';
+
   return {
-    title, description, url, author, publicationDate,
+    title, description, url, author, publicationDate, img,
   };
 };
 
 const main = async () => {
   const config = getConfig();
 
-  const period = document.getElementById('period');
-  period.innerHTML = `from ${config.start} to ${config.end}`;
+  // const period = document.getElementById('period');
+  // period.innerHTML = `from ${config.start} to ${config.end}`;
 
   getDetails(config.url, config.articlesRootURL).then((details) => {
-    const detailsElement = document.getElementById('details');
-    detailsElement.innerHTML = `
-      <ul>
-        <li><label>URL: </label><a href="${details.url}" target="_blank">${details.url}</a></li>
-        <li><label>Title: </label><span>${details.title}</span></li>
-        <li><label>Auhor: </label><span>${details.author}</span></li>
-        <li><label>Publication Date: </label><span>${details.publicationDate}</span></li>
-        <li><label>Description: </label><span>${details.title}</p></span>
-      </ul>
-    `;
+    const post = document.getElementById('post');
+    Object.keys(details).forEach((key) => {
+      const el = post.querySelector(`.post-${key}`);
+      if (el) {
+        el.textContent = details[key];
+      } else if (key === 'url') {
+        const title = post.querySelector('.post-title');
+        title.setAttribute('href', details[key]);
+      } else if (key === 'img') {
+        const data = details[key];
+        const img = post.querySelector('.post-image');
+        img.src = data.src;
+        img.alt = data.alt;
+        if (data.width) img.width = data.width;
+        if (data.height) img.height = data.height;
+      }
+    });
   });
 
   const report = new URLReports(config);
@@ -174,35 +191,48 @@ const main = async () => {
       underroot: [true],
     };
 
-    let urls = report.getURLs();
+    const urls = report.getURLs();
+    // eslint-disable-next-line no-console
+    console.log('urls:', urls);
 
-    const top10Element = document.getElementById('top10');
-    let ul = document.createElement('ul');
-    top10Element.appendChild(ul);
     for (let i = 0; i < Math.min(10, urls.length); i += 1) {
       const entry = urls[i];
       const metrics = entry.getMetrics(['pageViews']);
-      const li = document.createElement('li');
-      li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} (${toHumanReadable(metrics.pageViews.sum)})</a>`;
-      ul.appendChild(li);
+      const views = metrics.pageViews.sum;
+      // eslint-disable-next-line no-console
+      console.log(metrics, views);
     }
 
-    report.filter = {
-      inrange: [true],
-    };
+    // const top10Element = document.getElementById('top10');
+    // let ul = document.createElement('ul');
+    // top10Element.appendChild(ul);
+    // for (let i = 0; i < Math.min(10, urls.length); i += 1) {
+    //   const entry = urls[i];
+    //   const metrics = entry.getMetrics(['pageViews']);
+    //   const li = document.createElement('li');
+    // eslint-disable-next-line max-len
+    //   li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} (${toHumanReadable(metrics.pageViews.sum)})</a>`;
+    //   ul.appendChild(li);
+    // }
 
-    urls = report.getURLs();
+    // report.filter = {
+    //   inrange: [true],
+    // };
 
-    const top10ReleasedElement = document.getElementById('top10released');
-    ul = document.createElement('ul');
-    top10ReleasedElement.appendChild(ul);
-    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
-      const entry = urls[i];
-      const metrics = entry.getMetrics(['pageViews']);
-      const li = document.createElement('li');
-      li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} / (${toHumanReadable(metrics.pageViews.sum)})</a>`;
-      ul.appendChild(li);
-    }
+    // urls = report.getURLs();
+    // console.log('urls:', urls);
+
+    // const top10ReleasedElement = document.getElementById('top10released');
+    // ul = document.createElement('ul');
+    // top10ReleasedElement.appendChild(ul);
+    // for (let i = 0; i < Math.min(10, urls.length); i += 1) {
+    //   const entry = urls[i];
+    //   const metrics = entry.getMetrics(['pageViews']);
+    //   const li = document.createElement('li');
+    // eslint-disable-next-line max-len
+    //   li.innerHTML = `<a href="${entry.value}" target="_blank">${entry.value} / (${toHumanReadable(metrics.pageViews.sum)})</a>`;
+    //   ul.appendChild(li);
+    // }
   });
 };
 

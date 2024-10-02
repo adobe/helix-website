@@ -47,6 +47,7 @@ function colorFor(value, allValues, ringIndex) {
   const valueShade = (100 * sameBaseIndex) % 500;
 
   const shade = baseShade + ringShade + valueShade;
+  // eslint-disable-next-line no-console
   console.log('colorFor', value, basecolor, baseShade, ringShade, valueShade, shade);
   return cssVariable(`--spectrum-${basecolor}-${shade}`);
 }
