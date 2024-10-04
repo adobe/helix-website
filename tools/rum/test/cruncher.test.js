@@ -671,6 +671,24 @@ describe('DataChunks', () => {
                 target: 'some_image.png',
               },
             ],
+          }, {
+            id: 'four',
+            host: 'www.anotherhost.com',
+            time: '2024-05-06T00:00:04.444Z',
+            timeSlot: '2024-05-06T00:00:00.000Z',
+            url: 'https://www.anotherhost.com/home',
+            userAgent: 'desktop',
+            weight: 100,
+            events: [
+              {
+                checkpoint: 'top',
+                target: 'hidden',
+                timeDelta: 200,
+              },
+              {
+                checkpoint: 'click',
+              },
+            ],
           },
         ],
       },
