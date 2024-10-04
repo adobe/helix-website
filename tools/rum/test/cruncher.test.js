@@ -317,6 +317,12 @@ describe('DataChunks', () => {
       id: ['one'],
     };
     assert.equal(d.filtered.length, 1);
+
+    d.filter = {
+      // trying to filter with an undefined facet
+      unknown: ['unknown'],
+    };
+    assert.equal(d.filtered.length, 0);
   });
 
   it('DataChunk.group()', () => {
@@ -673,6 +679,7 @@ describe('DataChunks', () => {
     d.load(chunks1);
 
     // define facet functions
+    d.addFacet('host', (bundle) => bundle.host);
     d.addFacet('userAgent', (bundle) => {
       const parts = bundle.userAgent.split(':');
       return parts.reduce((acc, _, i) => {
@@ -703,69 +710,70 @@ describe('DataChunks', () => {
   });
 });
 describe('DataChunks.hasConversion', () => {
+  const chunks = [
+    {
+      date: '2024-05-06',
+      rumBundles: [
+        {
+          id: 'one',
+          host: 'www.aem.live',
+          time: '2024-05-06T00:00:04.444Z',
+          timeSlot: '2024-05-06T00:00:00.000Z',
+          url: 'https://www.aem.live/developer/tutorial',
+          userAgent: 'desktop:windows',
+          weight: 100,
+          events: [
+            {
+              checkpoint: 'top',
+              target: 'visible',
+              timeDelta: 100,
+            },
+          ],
+        },
+        {
+          id: 'two',
+          host: 'www.aem.live',
+          time: '2024-05-06T00:00:04.444Z',
+          timeSlot: '2024-05-06T00:00:00.000Z',
+          url: 'https://www.aem.live/home',
+          userAgent: 'desktop',
+          weight: 100,
+          events: [
+            {
+              checkpoint: 'top',
+              target: 'hidden',
+              timeDelta: 200,
+            },
+            {
+              checkpoint: 'click',
+            },
+          ],
+        },
+        {
+          id: 'three',
+          host: 'www.aem.live',
+          time: '2024-05-06T00:00:04.444Z',
+          timeSlot: '2024-05-06T00:00:00.000Z',
+          url: 'https://www.aem.live/home',
+          userAgent: 'mobile:ios',
+          weight: 100,
+          events: [
+            {
+              checkpoint: 'top',
+              target: 'visible',
+              timeDelta: 200,
+            },
+            {
+              checkpoint: 'viewmedia',
+              target: 'some_image.png',
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
   it('will tag bundles with convert and not-convert based on a filter spec', () => {
-    const chunks = [
-      {
-        date: '2024-05-06',
-        rumBundles: [
-          {
-            id: 'one',
-            host: 'www.aem.live',
-            time: '2024-05-06T00:00:04.444Z',
-            timeSlot: '2024-05-06T00:00:00.000Z',
-            url: 'https://www.aem.live/developer/tutorial',
-            userAgent: 'desktop:windows',
-            weight: 100,
-            events: [
-              {
-                checkpoint: 'top',
-                target: 'visible',
-                timeDelta: 100,
-              },
-            ],
-          },
-          {
-            id: 'two',
-            host: 'www.aem.live',
-            time: '2024-05-06T00:00:04.444Z',
-            timeSlot: '2024-05-06T00:00:00.000Z',
-            url: 'https://www.aem.live/home',
-            userAgent: 'desktop',
-            weight: 100,
-            events: [
-              {
-                checkpoint: 'top',
-                target: 'hidden',
-                timeDelta: 200,
-              },
-              {
-                checkpoint: 'click',
-              },
-            ],
-          },
-          {
-            id: 'three',
-            host: 'www.aem.live',
-            time: '2024-05-06T00:00:04.444Z',
-            timeSlot: '2024-05-06T00:00:00.000Z',
-            url: 'https://www.aem.live/home',
-            userAgent: 'mobile:ios',
-            weight: 100,
-            events: [
-              {
-                checkpoint: 'top',
-                target: 'visible',
-                timeDelta: 200,
-              },
-              {
-                checkpoint: 'viewmedia',
-                target: 'some_image.png',
-              },
-            ],
-          },
-        ],
-      },
-    ];
     const d = new DataChunks();
     d.load(chunks);
 
@@ -782,5 +790,27 @@ describe('DataChunks.hasConversion', () => {
     assert.equal(converted?.count, 1);
     const notConverted = facets.find((f) => f.value === 'not-converted');
     assert.equal(notConverted?.count, 2);
+  });
+
+  it('unknown facet in filter spec', () => {
+    const d = new DataChunks();
+    d.load(chunks);
+
+    const spec = {
+      facetOne: ['top'],
+      facetTwo: ['hidden'],
+      // trying to filter with an undefined facet
+      unknowFacet: ['unknown'],
+    };
+    d.addFacet('facetOne', (bundle) => bundle.events.map((e) => e.checkpoint));
+    d.addFacet('facetTwo', (bundle) => bundle.events.map((e) => e.target));
+    const facetValueFn = (bundle) => (d.hasConversion(bundle, spec) ? 'converted' : 'not-converted');
+    d.addFacet('conversion', facetValueFn);
+
+    const facets = d.facets.conversion;
+    const converted = facets.find((f) => f.value === 'converted');
+    assert.equal(converted, undefined);
+    const notConverted = facets.find((f) => f.value === 'not-converted');
+    assert.equal(notConverted?.count, 3);
   });
 });
