@@ -5,7 +5,6 @@ import DataLoader from './loader.js';
 import {
   toHumanReadable,
   reclassifyAcquisition,
-  parseConversionSpec,
 } from './utils.js';
 
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
@@ -68,13 +67,8 @@ class URLReports {
     dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
       ? bundle.weight
       : 0));
-    dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, { checkpoint: ['click'] })
-      ? bundle.weight
-      : 0));
-
-    dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
-      ? bundle.weight
-      : 0));
+    dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, { hasclick: [true] }) ? bundle.weight : 0));
+    dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, { 'hasclick&source': [true] }) ? bundle.weight : 0));
 
     // our series are the different kinds of success metrics that exist
     // for each of the different breakdowns of the selected drilldown facet
@@ -108,7 +102,18 @@ class URLReports {
       return 0;
     });
 
+    dataChunks.addFacet('checkpoint', (bundle) => bundle.checkpoint);
     dataChunks.addFacet('url', (bundle) => bundle.url);
+    dataChunks.addFacet('hasclick', (bundle) => {
+      const a = bundle.events
+        .filter((event) => event.checkpoint === 'click');
+      return a.length > 0;
+    });
+    dataChunks.addFacet('hasclick&source', (bundle) => {
+      const a = bundle.events
+        .filter((event) => event.checkpoint === 'click' && event.source === '.button');
+      return a.length > 0;
+    });
 
     const prefix = this.root;
 
@@ -195,32 +200,32 @@ const SERIES = {
     labelFn: (value) => toHumanReadable(value),
   },
   bounce: {
-    label: 'Bounce Rate',
+    label: 'Bounce Rate (enters page without clicks)',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.bounces.sum) / aggregate.visits.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
   },
   engagement: {
-    label: 'Page Engagement',
+    label: 'Page Engagement (clicks "something" on page)',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.engagement.sum) / aggregate.pageViews.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
   },
   conversions: {
-    label: 'Conversion Rate',
+    label: 'Conversion Rate (clicks on CTA button)',
     rateFn: (aggregate) => Math.min(Math.round(
       (100 * aggregate.conversions.sum) / aggregate.visits.sum,
     ), 100),
     labelFn: (value) => `${value}%`,
   },
-  pagesPerVisit: {
-    label: 'Visit Depth',
-    // eslint-disable-next-line max-len
-    rateFn: (aggregate) => (aggregate.visits.sum ? Math.round(aggregate.pageViews.sum / aggregate.visits.sum) : 0),
-    labelFn: (value) => `${value || 0} pages`,
-  },
+  // pagesPerVisit: {
+  //   label: 'Visit Depth',
+  // eslint-disable-next-line max-len
+  //   rateFn: (aggregate) => (aggregate.visits.sum ? Math.round(aggregate.pageViews.sum / aggregate.visits.sum) : 0),
+  //   labelFn: (value) => `${value || 0} pages`,
+  // },
   earned: {
     label: 'Earned Percentage',
     rateFn: (aggregate) => Math.round(
