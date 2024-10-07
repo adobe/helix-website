@@ -62,6 +62,8 @@ export function isKnownFacet(key) {
     'vitals',
     // facets from checkpoints
     ...checkpoints,
+    // for experimentation
+    'variant',
   ];
 
   const suffixes = [
