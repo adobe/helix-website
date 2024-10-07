@@ -1,0 +1,22 @@
+<html>
+<head>
+  <script type="module" src="/tests/fixtures/scripts.js"></script>
+  <script>
+    window.AUDIENCES = {
+      foo: () => false,
+      bar: () => true,
+    }
+  </script>
+</head>
+<body>
+  <main>
+    <div>
+      <div>Hello World!</div>
+      <div class="section-metadata">
+        <div><div>Audience Foo</div><div><a href="/tests/fixtures/audiences/variant-1">/tests/fixtures/audiences/variant-1</a></div></div>
+        <div><div>Audience: Bar</div><div><p>/tests/fixtures/audiences/variant-2</p></div></div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

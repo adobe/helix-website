@@ -1,0 +1,17 @@
+{
+  "data": [
+      {
+          "Pages": "/tests/fixtures/audiences/fragment-level--alt",
+          "Audiences": "Foo",
+          "Selectors": ".fragment",
+          "Urls": "/tests/fixtures/audiences/variant-1"
+      },
+      {
+          "Pages": "/tests/fixtures/audiences/fragment-level--alt",
+          "Audiences": "Bar",
+          "Selectors": ".fragment",
+          "Urls": "/tests/fixtures/audiences/variant-2"
+      }
+  ],
+  ":type": "sheet"
+}
