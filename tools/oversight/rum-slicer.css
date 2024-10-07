@@ -199,7 +199,7 @@ main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
 }
 
 main .key-metrics ul > #lcp number-format.extra::after {
-  content: 's caused by TTFB)'
+  content: 's TTFB)'
 }
 
 main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
@@ -878,6 +878,7 @@ facet-sidebar form {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   padding: 4px;
+  accent-color: var(--dark-fuchsia);
 }
 
 /* external referrer only care about the hostname anyway */
