@@ -452,7 +452,7 @@ export default class ListFacet extends HTMLElement {
       const rateVal = li.classList.contains('fixed')
         ? value / total
         : computeConversionRate(value, total);
-      meter.value = rateVal;
+      meter.value = Number.isFinite(rateVal) ? rateVal : 0;
       nf.textContent = rateVal;
 
       // todo: add significance flag, but this needs to be based on a z-test
