@@ -15,63 +15,67 @@
   <link rel="stylesheet" href="./news.css">
 </head>
 
-<!-- domainkey=5BC2E85E-A0F7-4474-B28B-79690FE1349A
-&url=https://blog.adobe.com/en/publish/2024/09/11/bringing-gen-ai-to-video-adobe-firefly-video-model-coming-soon
-&start=2024-09-11
-&end=2024-09-26 -->
-
 <body>
   <header></header>
 
   <main>
-    <div>
+    <section class="top-nav">
       <h1>Blog Post Insights</h1>
-    </div>
 
-    <section>
-      <div class="post" id="post">
-        <div class="post-image-wrapper">
-          <img class="post-image">
-        </div>
-        <div class="post-body">
-          <p><a class="post-title"></a></p>
-          <p class="post-description"></p>
-          <p class="post-info">
-            <span class="post-publicationDate"></span>
-            <span class="post-author"></span>
-          </p>
-        </div>
+      <div class="button-container">
+        <button type="button" class="button" id="share-insights">Share</button>
       </div>
     </section>
 
-    <section>
-      <div class="top" id="top">
-        <h2>Top 10 Posts</h2>
-        <p class="subtitle">by views from <span class="start"></span> to <span class="end"></span></p>
-        <div class="top-chart"></div>
-      </div>
+    <section class="params" id="params">
+      <form>
+        <div class="input-wrapper url-wrapper">
+          <label for="post-url">Post URL</label>
+          <input type="url" id="post-url" name="post-url" required>
+        </div>
+
+        <div class="input-wrapper date-wrapper">
+          <label for="from-date">From</label>
+          <input type="date" id="from-date" name="from-date">
+        </div>
+
+        <div class="input-wrapper date-wrapper">
+          <label for="to-date">To</label>
+          <input type="date" id="to-date" name="to-date">
+        </div>
+
+        <button type="submit" class="button" id="submit-params">Submit</button>
+      </form>
     </section>
 
+    <section class="dashboard">
+      <div class="post-container">
+        <div class="post" id="post">
+          <div class="post-image-wrapper">
+            <img class="post-image">
+          </div>
+          <div class="post-body">
+            <p><a class="post-title" target="_blank"></a></p>
+            <p class="post-description"></p>
+            <p class="post-info">
+              <span class="post-publicationDate"></span>
+              <span class="post-author"></span>
+            </p>
+          </div>
+        </div>
+      </div>
   
+      <div class="summary-container"></div>
+  
+      <div class="table-container">
+        <div class="table" id="top-overall-period"></div>
+      </div>
+  
+      <div class="table-container">
+        <div class="table" id="top-publish-period"></div>
+      </div>
+    </section>
 
-    <!-- <div>
-      <div id="period"></div>
-    </div>
-
-    <div>
-      <h2>Article details</h2>
-      <div id="details"></div>
-    </div>
-
-    <div>
-      <h2>Overall top 10 for the period</h2>
-      <div id="top10"></div>
-    </div>
-
-    <div>
-      <h2>Top 10 for released during the period</h2>
-      <div id="top10released"></div>
-    </div> -->
   </main>
 
   <footer></footer>
