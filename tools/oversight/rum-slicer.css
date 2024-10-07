@@ -188,9 +188,14 @@ main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
 }
 
 /* as of 2024, all iOS CWV values are fake, so we hide them a bit */
-main facet-sidebar input[value="mobile:ios"] ~ ul.cwv {
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li {
   opacity: 0.5;
   filter: grayscale(1);
+}
+
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
+  opacity: inherit;
+  filter: inherit;
 }
 
 main .key-metrics ul > #lcp number-format.extra::after {
@@ -519,6 +524,44 @@ fieldset li.significant {
   padding: 2px 4px;
 }
 
+/* business metrics are shown when the focus is on acquisition */
+facet-sidebar:has(input[name="focus"][value="acquisition"]) aside ul.cwv li.acquisition {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="acquisition"]:checked) aside ul.cwv li.acquisition {
+  display: flex;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]) aside ul.cwv li.performance {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]:checked) aside ul.cwv li.performance {
+  display: block;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.conversion {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion {
+  display: flex;
+  grid-column: span 3;
+}
+
+ul.cwv meter {
+  width: 100%;
+}
+
+main:has(conversion-tracker[mode="custom"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion.engagement {
+  display: none;
+}
+
+main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion:last-of-type {
+  display: none;
+}
+
 fieldset li::after,
 vitals-facet label::before {
   content: ' ';
@@ -528,6 +571,46 @@ vitals-facet label::before {
   margin-left: 8px;
   display: inline-block;
   border-radius: 14px;
+}
+
+/* business metrics have a meter instead of a dot */
+fieldset li:has(meter)::after {
+  display: none;
+}
+
+fieldset li:has(meter) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.6;
+}
+
+fieldset li:has(meter):hover {
+  opacity: 1;
+}
+
+fieldset li.interesting:has(meter) {
+  opacity: 0.8;
+}
+
+fieldset li.significant:has(meter) {
+  opacity: 1;
+}
+
+fieldset li:has(meter) meter {
+  width: 100%;
+}
+
+fieldset li:has(meter) number-format {
+  width: 4em;
+}
+
+fieldset li:has(meter) number-format::after {
+  content: '%';
+}
+
+fieldset li.fixed:has(meter) number-format::after {
+  content: '';
 }
 
 #facets ul.cwv {
@@ -779,6 +862,22 @@ vitals-facet fieldset label {
 #facets facet-sidebar {
   container-type: inline-size;
   container-name: facets;
+}
+
+facet-sidebar form {
+  display: flex;
+  position: absolute;
+  right: 32px;
+  margin-top: 16px;
+  height: 32px;
+  background-color: var(--light-fuchsia);
+  border-radius: 16px;
+  border-top: 2px solid var(--dark-fuchsia);
+  border-left: 2px solid var(--dark-fuchsia);
+  border-right: 2px solid var(--dark-fuchsia);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 4px;
 }
 
 /* external referrer only care about the hostname anyway */

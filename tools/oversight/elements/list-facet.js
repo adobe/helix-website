@@ -251,35 +251,7 @@ export default class ListFacet extends HTMLElement {
           countspan.setAttribute('fuzzy', 'false');
           const valuespan = this.createValueSpan(entry, prefix);
 
-          const conversionspan = document.createElement('number-format');
-          conversionspan.className = 'extra';
-
-          const $this = this;
-          const drawConversion = () => {
-            // we need to divide the totals by average weight
-            // so that we don't overestimate the significance
-            const m = entry.getMetrics(['conversions']);
-            const avgWeight = $this.dataChunks.totals.pageViews.weight
-              / $this.dataChunks.totals.pageViews.count;
-
-            addSignificanceFlag(conversionspan, {
-              total: metrics.visits.sum / avgWeight,
-              conversions: m.conversions.sum / avgWeight,
-            }, {
-              total: $this.dataChunks.totals.visits.sum / avgWeight,
-              conversions: $this.dataChunks.totals.conversions.sum / avgWeight,
-            });
-
-            const conversions = m.conversions.sum;
-            const visits = metrics.visits.sum;
-            const conversionRate = computeConversionRate(conversions, visits);
-            conversionspan.textContent = conversionRate;
-            conversionspan.setAttribute('precision', 2);
-          };
-
-          window.setTimeout(drawConversion, 0);
-
-          label.append(valuespan, countspan, conversionspan);
+          label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
@@ -287,15 +259,48 @@ export default class ListFacet extends HTMLElement {
           // display core web vital to facets
           // add lcp
           const lcpLI = this.createCWVChiclet(entry, 'lcp');
+          lcpLI.classList.add('performance');
           ul.append(lcpLI);
 
           // add cls
           const clsLI = this.createCWVChiclet(entry, 'cls');
+          clsLI.classList.add('performance');
           ul.append(clsLI);
 
           // add inp
           const inpLI = this.createCWVChiclet(entry, 'inp');
+          inpLI.classList.add('performance');
           ul.append(inpLI);
+
+          // add bounce rate
+          const bounceRateLI = this.createBusinessMetricChiclet(entry, 'bounces', 'visits', 60, 40, 20);
+          bounceRateLI.title = 'Bounce Rate';
+          bounceRateLI.classList.add('acquisition');
+          ul.append(bounceRateLI);
+
+          // add visit depth (i.e. pages per visit)
+          const pagesPerVisitLI = this.createBusinessMetricChiclet(entry, 'pageViews', 'visits', 1, 2, 5);
+          pagesPerVisitLI.title = 'Visit Depth';
+          pagesPerVisitLI.classList.add('fixed');
+          pagesPerVisitLI.classList.add('acquisition');
+          ul.append(pagesPerVisitLI);
+
+          // add earned percentage
+          const earnedLI = this.createBusinessMetricChiclet(entry, 'earned', 'visits', 25, 50, 75);
+          earnedLI.title = 'Earned Percentage';
+          earnedLI.classList.add('acquisition');
+          ul.append(earnedLI);
+
+          // add engagement and conversion rate
+          const engagementLI = this.createBusinessMetricChiclet(entry, 'engagement', 'pageViews', 25, 75, 90);
+          engagementLI.title = 'Engagement';
+          engagementLI.classList.add('conversion');
+          ul.append(engagementLI);
+
+          const conversionRateLI = this.createBusinessMetricChiclet(entry, 'conversions', 'visits', 5, 10, 20);
+          conversionRateLI.title = 'Conversion Rate';
+          conversionRateLI.classList.add('conversion');
+          ul.append(conversionRateLI);
 
           div.append(input, label, ul);
 
@@ -418,6 +423,49 @@ export default class ListFacet extends HTMLElement {
       }
       li.classList.add(`score-${score}`);
       li.append(nf);
+    };
+    // fill the element, but don't wait for it
+    window.setTimeout(fillEl, 0);
+    return li;
+  }
+
+  createBusinessMetricChiclet(entry, rate, baseline, low, high, optimum) {
+    const li = document.createElement('li');
+    li.classList.add('business-metric');
+    li.classList.add(rate);
+    const meter = document.createElement('meter');
+    meter.min = 0;
+    if (Math.max(low, high, optimum) < 10) {
+      meter.max = 10;
+    } else {
+      meter.max = 100;
+    }
+    if (low) meter.low = low;
+    if (high) meter.high = high;
+    if (optimum && !Number.isNaN(optimum)) meter.optimum = optimum;
+    const nf = document.createElement('number-format');
+    nf.setAttribute('precision', 2);
+    nf.setAttribute('fuzzy', 'false');
+    const fillEl = async () => {
+      const value = entry.metrics[rate].sum;
+      const total = entry.metrics[baseline].sum;
+      const rateVal = li.classList.contains('fixed')
+        ? value / total
+        : computeConversionRate(value, total);
+      meter.value = rateVal;
+      nf.textContent = rateVal;
+
+      // todo: add significance flag, but this needs to be based on a z-test
+      // between the current entry and the total
+      addSignificanceFlag(li, {
+        total: entry.metrics[baseline].count,
+        conversions: entry.metrics[rate].count,
+      }, {
+        total: this.dataChunks.totals[baseline].count,
+        conversions: this.dataChunks.totals[rate].count,
+      });
+
+      li.append(nf, meter);
     };
     // fill the element, but don't wait for it
     window.setTimeout(fillEl, 0);

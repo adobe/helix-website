@@ -48,6 +48,29 @@ dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle,
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
   ? bundle.weight
   : 0));
+
+dataChunks.addSeries('earned', (bundle) => {
+  const reclassified = bundle.events
+    .map(reclassifyAcquisition);
+  if (!reclassified.find((evt) => evt.checkpoint === 'enter')) {
+    // we only consider enter events
+    return 0;
+  }
+  if (!reclassified.find((evt) => evt.checkpoint === 'acquisition')) {
+    // this is fully organic, as there are no traces of any acquisition
+    return bundle.weight;
+  }
+  if (reclassified.find((evt) => evt.checkpoint === 'acquisition' && evt.source.startsWith('paid'))) {
+    // this is paid, as there is at least one paid acquisition
+    return 0;
+  }
+  if (reclassified.find((evt) => evt.checkpoint === 'acquisition' && evt.source.startsWith('owned'))) {
+    // owned does not count as organic, sorry
+    return 0;
+  }
+  return 0;
+});
+
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
