@@ -866,10 +866,10 @@ vitals-facet fieldset label {
 
 facet-sidebar form {
   display: flex;
-  position: absolute;
-  right: 32px;
-  margin-top: 16px;
+  margin-left: calc(100% - 112px);
+  margin-bottom: -46px;
   height: 32px;
+  width: 96px;
   background-color: var(--light-fuchsia);
   border-radius: 16px;
   border-top: 2px solid var(--dark-fuchsia);
@@ -879,6 +879,7 @@ facet-sidebar form {
   border-bottom-right-radius: 0;
   padding: 4px;
   accent-color: var(--dark-fuchsia);
+  z-index: 4;
 }
 
 /* external referrer only care about the hostname anyway */
