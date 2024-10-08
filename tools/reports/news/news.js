@@ -143,12 +143,36 @@ class URLReports {
       return false;
     });
 
+    dataChunks.addFacet('media', (bundle) => Array.from(
+      bundle.events
+        .filter((evt) => evt.checkpoint === 'viewmedia')
+        .filter(({ target }) => target) // filter out empty targets
+        .reduce((acc, { target }) => {
+          if (typeof target === 'string') {
+            const mi = target.indexOf('/media_');
+            if (mi) {
+              const u = new URL(target);
+              acc.add(u.pathname.substring(u.pathname.lastIndexOf('/') + 1));
+            }
+          }
+          return acc;
+        }, new Set()),
+    ));
+
     dataChunks.load(this.data);
     this.dataChunks = dataChunks;
   }
 
+  getFacets() {
+    return this.dataChunks.facets;
+  }
+
   getURLs() {
     return this.dataChunks.facets.url;
+  }
+
+  getMedia() {
+    return this.dataChunks.facets.media;
   }
 
   set filter(filter) {
@@ -264,21 +288,23 @@ const main = async () => {
   const report = new URLReports(config);
   report.init().then(() => {
     report.filter = {
-      underroot: [true],
+      url: [config.url],
     };
 
-    let urls = report.getURLs();
+    let facets = report.getFacets();
 
-    const currentPageEntry = urls.find((entry) => entry.value === config.url);
+    const currentPageEntry = facets.url.find((entry) => entry.value === config.url);
+    const { media } = facets;
 
     if (!currentPageEntry) {
       throw new Error('Current page not found in report');
     }
 
+    let metrics = currentPageEntry.getMetrics(['pageViews', 'earned', 'visits', 'bounces', 'engagement', 'conversions']);
+
     const businessMetricsElement = document.getElementById('businessMetrics');
     let ul = document.createElement('ul');
     businessMetricsElement.appendChild(ul);
-    let metrics = currentPageEntry.getMetrics(['pageViews', 'earned', 'visits', 'bounces', 'engagement', 'conversions']);
     Object.keys(SERIES).forEach((key) => {
       const series = SERIES[key];
       const value = series.rateFn(metrics);
@@ -289,11 +315,28 @@ const main = async () => {
       ul.appendChild(li);
     });
 
+    const mediaElement = document.getElementById('media');
+    ul = document.createElement('ul');
+    mediaElement.appendChild(ul);
+
+    media.forEach((mi) => {
+      const li = document.createElement('li');
+      li.classList.add('media');
+      li.innerHTML = `<img src="${config.url}/${mi.value}"> / ${mi.value} / ${toHumanReadable(mi.weight)}`;
+      ul.appendChild(li);
+    });
+
+    report.filter = {
+      underroot: [true],
+    };
+
+    facets = report.getFacets();
+
     const top10Element = document.getElementById('top10');
     ul = document.createElement('ul');
     top10Element.appendChild(ul);
-    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
-      const entry = urls[i];
+    for (let i = 0; i < Math.min(10, facets.url.length); i += 1) {
+      const entry = facets.url[i];
       metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
       li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} (${toHumanReadable(metrics.pageViews.sum)})</a>`;
@@ -304,13 +347,13 @@ const main = async () => {
       inrange: [true],
     };
 
-    urls = report.getURLs();
+    facets = report.getFacets();
 
     const top10ReleasedElement = document.getElementById('top10released');
     ul = document.createElement('ul');
     top10ReleasedElement.appendChild(ul);
-    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
-      const entry = urls[i];
+    for (let i = 0; i < Math.min(10, facets.url.length); i += 1) {
+      const entry = facets.url[i];
       metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
       li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} / (${toHumanReadable(metrics.pageViews.sum)})</a>`;

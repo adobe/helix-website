@@ -25,3 +25,7 @@ body main > .section {
     padding-top: 0;
   }
 }
+
+li.media img {
+  max-height: 50px;
+}
