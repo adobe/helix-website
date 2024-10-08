@@ -628,7 +628,12 @@ export class DataChunks {
    * @param {string[]} skipped facets to skip
    */
   filterBundles(bundles, filterSpec, skipped = []) {
-    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const existenceFilterFn = ([facetName]) => {
+      if (!this.facetFns[facetName]) {
+        throw new Error(`Unknown "${facetName}" facet in filter`);
+      }
+      return this.facetFns[facetName];
+    };
     const skipFilterFn = ([facetName]) => !skipped.includes(facetName);
     const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
@@ -654,15 +659,21 @@ export class DataChunks {
    */
   // eslint-disable-next-line max-len
   applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn) {
-    const filterBy = Object.entries(filterSpec)
-      .filter(skipFilterFn)
-      .filter(([, desiredValues]) => desiredValues.length)
-      .filter(existenceFilterFn);
-    return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
-      const actualValues = valuesExtractorFn(attributeName, bundle, this);
-      const combiner = combinerExtractorFn(attributeName, this);
-      return desiredValues[combiner]((value) => actualValues.includes(value));
-    }));
+    try {
+      const filterBy = Object.entries(filterSpec)
+        .filter(skipFilterFn)
+        .filter(([, desiredValues]) => desiredValues.length)
+        .filter(existenceFilterFn);
+      return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
+        const actualValues = valuesExtractorFn(attributeName, bundle, this);
+        const combiner = combinerExtractorFn(attributeName, this);
+        return desiredValues[combiner]((value) => actualValues.includes(value));
+      }));
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`Error while applying filter: ${error.message}`);
+      return [];
+    }
   }
 
   /**
@@ -677,7 +688,12 @@ export class DataChunks {
    * @returns {boolean} the result of the check.
    */
   hasConversion(aBundle, filterSpec, combiner) {
-    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const existenceFilterFn = ([facetName]) => {
+      if (!this.facetFns[facetName]) {
+        throw new Error(`Unknown "${facetName}" facet in filter`);
+      }
+      return this.facetFns[facetName];
+    };
     const skipFilterFn = () => true;
     const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
