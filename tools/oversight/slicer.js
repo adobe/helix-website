@@ -40,11 +40,19 @@ dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
 dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
 dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
 dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
-  checkpoint: ['click'],
-})
-  ? bundle.weight
-  : 0));
+dataChunks.addSeries('engagement', (bundle) => {
+  const clickEngagement = dataChunks.hasConversion(bundle, {
+    checkpoint: ['click'],
+  })
+    ? bundle.weight
+    : 0;
+  const contentEngagement = bundle.events
+    .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock')
+    .length > 3
+    ? bundle.weight
+    : 0;
+  return clickEngagement || contentEngagement;
+});
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
   ? bundle.weight
   : 0));
@@ -76,6 +84,12 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
     .map((evt) => evt.timeDelta)
     .filter((delta) => delta > 0);
   return Math.max(...deltas) / 1000;
+});
+
+dataChunks.addSeries('contentEngagement', (bundle) => {
+  const viewEvents = bundle.events
+    .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock');
+  return viewEvents.length;
 });
 
 function setDomain(domain, key) {
