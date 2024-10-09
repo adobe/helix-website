@@ -189,12 +189,10 @@ main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
 
 /* as of 2024, all iOS CWV values are fake, so we hide them a bit */
 main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li {
-  opacity: 0.5;
   filter: grayscale(1);
 }
 
 main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
-  opacity: inherit;
   filter: inherit;
 }
 
@@ -620,6 +618,8 @@ fieldset li.time:has(meter) number-format::after {
 fieldset div:first-of-type li::before {
   display: block;
   font-size: 50%;
+  margin-left: 10px;
+  text-align: center;
   margin-top: -25px;
   position: absolute;
   text-transform: uppercase;
