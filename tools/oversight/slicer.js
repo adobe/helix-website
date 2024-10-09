@@ -83,6 +83,9 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
   const deltas = bundle.events
     .map((evt) => evt.timeDelta)
     .filter((delta) => delta > 0);
+  if (deltas.length === 0) {
+    return undefined;
+  }
   return Math.max(...deltas) / 1000;
 });
 
