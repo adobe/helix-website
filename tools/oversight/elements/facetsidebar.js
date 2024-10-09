@@ -52,7 +52,7 @@ export default class FacetSidebar extends HTMLElement {
     acquisition.type = 'radio';
     acquisition.name = 'focus';
     acquisition.value = 'acquisition';
-    acquisition.title = 'Toggle acquisition metrics (bounce rate, visit depth, earned)';
+    acquisition.title = 'Toggle acquisition metrics (bounce rate, time on page, organic)';
     const conversion = document.createElement('input');
     conversion.type = 'radio';
     conversion.name = 'focus';

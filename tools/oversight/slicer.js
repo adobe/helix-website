@@ -49,7 +49,7 @@ dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle
   ? bundle.weight
   : 0));
 
-dataChunks.addSeries('earned', (bundle) => {
+dataChunks.addSeries('organic', (bundle) => {
   const reclassified = bundle.events
     .map(reclassifyAcquisition);
   if (!reclassified.find((evt) => evt.checkpoint === 'enter')) {
@@ -64,11 +64,18 @@ dataChunks.addSeries('earned', (bundle) => {
     // this is paid, as there is at least one paid acquisition
     return 0;
   }
-  if (reclassified.find((evt) => evt.checkpoint === 'acquisition' && evt.source.startsWith('owned'))) {
-    // owned does not count as organic, sorry
-    return 0;
-  }
-  return 0;
+  return bundle.weight;
+});
+/*
+ * timeOnPage is the time it took to load the page,
+ * i.e. the difference between the first and last event
+ * in seconds
+ */
+dataChunks.addSeries('timeOnPage', (bundle) => {
+  const deltas = bundle.events
+    .map((evt) => evt.timeDelta)
+    .filter((delta) => delta > 0);
+  return Math.max(...deltas) / 1000;
 });
 
 function setDomain(domain, key) {

@@ -613,6 +613,10 @@ fieldset li.fixed:has(meter) number-format::after {
   content: '';
 }
 
+fieldset li.time:has(meter) number-format::after {
+  content: 's';
+}
+
 #facets ul.cwv {
   list-style: none;
   display: grid;

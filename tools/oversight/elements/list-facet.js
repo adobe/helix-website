@@ -278,16 +278,16 @@ export default class ListFacet extends HTMLElement {
           bounceRateLI.classList.add('acquisition');
           ul.append(bounceRateLI);
 
-          // add visit depth (i.e. pages per visit)
-          const pagesPerVisitLI = this.createBusinessMetricChiclet(entry, 'pageViews', 'visits', 1, 2, 5);
-          pagesPerVisitLI.title = 'Visit Depth';
-          pagesPerVisitLI.classList.add('fixed');
+          // add time on page
+          const pagesPerVisitLI = this.createBusinessMetricChiclet(entry, 'timeOnPage', null, 1, 2, 5);
+          pagesPerVisitLI.title = 'Time on page';
+          pagesPerVisitLI.classList.add('time');
           pagesPerVisitLI.classList.add('acquisition');
           ul.append(pagesPerVisitLI);
 
           // add earned percentage
-          const earnedLI = this.createBusinessMetricChiclet(entry, 'earned', 'visits', 25, 50, 75);
-          earnedLI.title = 'Earned Percentage';
+          const earnedLI = this.createBusinessMetricChiclet(entry, 'organic', 'visits', 25, 50, 75);
+          earnedLI.title = 'Organic Percentage';
           earnedLI.classList.add('acquisition');
           ul.append(earnedLI);
 
@@ -447,23 +447,30 @@ export default class ListFacet extends HTMLElement {
     nf.setAttribute('precision', 2);
     nf.setAttribute('fuzzy', 'false');
     const fillEl = async () => {
-      const value = entry.metrics[rate].sum;
-      const total = entry.metrics[baseline].sum;
-      const rateVal = li.classList.contains('fixed')
-        ? value / total
-        : computeConversionRate(value, total);
-      meter.value = Number.isFinite(rateVal) ? rateVal : 0;
-      nf.textContent = rateVal;
+      if (typeof baseline === 'string') {
+        const value = entry.metrics[rate].sum;
+        const total = entry.metrics[baseline].sum;
+        const rateVal = li.classList.contains('fixed')
+          ? value / total
+          : computeConversionRate(value, total);
+        meter.value = Number.isFinite(rateVal) ? rateVal : 0;
+        nf.textContent = rateVal;
 
-      // todo: add significance flag, but this needs to be based on a z-test
-      // between the current entry and the total
-      addSignificanceFlag(li, {
-        total: entry.metrics[baseline].count,
-        conversions: entry.metrics[rate].count,
-      }, {
-        total: this.dataChunks.totals[baseline].count,
-        conversions: this.dataChunks.totals[rate].count,
-      });
+        // todo: add significance flag, but this needs to be based on a z-test
+        // between the current entry and the total
+        addSignificanceFlag(li, {
+          total: entry.metrics[baseline].count,
+          conversions: entry.metrics[rate].count,
+        }, {
+          total: this.dataChunks.totals[baseline].count,
+          conversions: this.dataChunks.totals[rate].count,
+        });
+      } else {
+        // we show the median and use a t-test between all values
+        const value = entry.metrics[rate].percentile(50);
+        nf.textContent = value;
+        meter.value = Number.isFinite(value) ? value : 0;
+      }
 
       li.append(nf, meter);
     };
