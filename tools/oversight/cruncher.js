@@ -675,7 +675,12 @@ export class DataChunks {
    * @param {string[]} skipped facets to skip
    */
   filterBundles(bundles, filterSpec, skipped = []) {
-    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const existenceFilterFn = ([facetName]) => {
+      if (!this.facetFns[facetName]) {
+        throw new Error(`Unknown "${facetName}" facet in filter`);
+      }
+      return this.facetFns[facetName];
+    };
     const skipFilterFn = ([facetName]) => !skipped.includes(facetName);
     const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
@@ -701,38 +706,44 @@ export class DataChunks {
    */
   // eslint-disable-next-line max-len
   applyFilter(bundles, filterSpec, skipFilterFn, existenceFilterFn, valuesExtractorFn, combinerExtractorFn) {
-    const filterBy = Object.entries(filterSpec)
-      .filter(skipFilterFn)
-      .filter(([, desiredValues]) => desiredValues.length)
-      .filter(existenceFilterFn);
-    return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
-      const actualValues = valuesExtractorFn(attributeName, bundle, this);
+    try {
+      const filterBy = Object.entries(filterSpec)
+        .filter(skipFilterFn)
+        .filter(([, desiredValues]) => desiredValues.length)
+        .filter(existenceFilterFn);
+      return bundles.filter((bundle) => filterBy.every(([attributeName, desiredValues]) => {
+        const actualValues = valuesExtractorFn(attributeName, bundle, this);
 
-      const combiners = {
-        // if some elements match, then return true (partial inclusion)
-        some: 'some',
-        // if some elements do not match, then return true (partial exclusion)
-        none: 'some',
-        // if every element matches, then return true (full inclusion)
-        every: 'every',
-        // if every element does not match, then return true (full exclusion)
-        never: 'every',
-      };
+        const combiners = {
+          // if some elements match, then return true (partial inclusion)
+          some: 'some',
+          // if some elements do not match, then return true (partial exclusion)
+          none: 'some',
+          // if every element matches, then return true (full inclusion)
+          every: 'every',
+          // if every element does not match, then return true (full exclusion)
+          never: 'every',
+        };
 
-      const negators = {
-        some: (value) => value,
-        every: (value) => value,
-        none: (value) => !value,
-        never: (value) => !value,
-      };
-      // this can be some, every, or none
-      const combinerprefence = combinerExtractorFn(attributeName, this);
+        const negators = {
+          some: (value) => value,
+          every: (value) => value,
+          none: (value) => !value,
+          never: (value) => !value,
+        };
+        // this can be some, every, or none
+        const combinerprefence = combinerExtractorFn(attributeName, this);
 
-      const combiner = combiners[combinerprefence];
-      const negator = negators[combinerprefence];
+        const combiner = combiners[combinerprefence];
+        const negator = negators[combinerprefence];
 
-      return desiredValues[combiner]((value) => negator(actualValues.includes(value)));
-    }));
+        return desiredValues[combiner]((value) => negator(actualValues.includes(value)));
+      }));
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.warn(`Error while applying filter: ${error.message}`);
+      return [];
+    }
   }
 
   /**
@@ -747,7 +758,12 @@ export class DataChunks {
    * @returns {boolean} the result of the check.
    */
   hasConversion(aBundle, filterSpec, combiner) {
-    const existenceFilterFn = ([facetName]) => this.facetFns[facetName];
+    const existenceFilterFn = ([facetName]) => {
+      if (!this.facetFns[facetName]) {
+        throw new Error(`Unknown "${facetName}" facet in filter`);
+      }
+      return this.facetFns[facetName];
+    };
     const skipFilterFn = () => true;
     const valuesExtractorFn = (attributeName, bundle, parent) => {
       const facetValue = parent.facetFns[attributeName](bundle);
