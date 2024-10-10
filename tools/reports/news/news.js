@@ -67,20 +67,24 @@ class URLReports {
     dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
       ? bundle.weight
       : 0));
-    dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, { hasclick: [true] }) ? bundle.weight : 0));
+
+    dataChunks.addSeries('engagement', (bundle) => {
+      const clickEngagement = dataChunks.hasConversion(bundle, {
+        checkpoint: ['click'],
+      })
+        ? bundle.weight
+        : 0;
+      const contentEngagement = bundle.events
+        .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock')
+        .length > 3
+        ? bundle.weight
+        : 0;
+      return clickEngagement || contentEngagement;
+    });
+
     dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, { 'hasclick&source': [true] }) ? bundle.weight : 0));
 
-    // our series are the different kinds of success metrics that exist
-    // for each of the different breakdowns of the selected drilldown facet
-    // these are the columns of the matrix
-    // - pages per visit (provided by slicer)
-    // - bounce rate (provided by slicer)
-    // - earned percentage
-    // - engagement (provided by slicer)
-    // - conversion rate (if defined)
-    // - we also show the core web vitals as additional series
-
-    dataChunks.addSeries('earned', (bundle) => {
+    dataChunks.addSeries('organic', (bundle) => {
       const reclassified = bundle.events
         .map(reclassifyAcquisition);
       if (!reclassified.find((evt) => evt.checkpoint === 'enter')) {
@@ -95,11 +99,23 @@ class URLReports {
         // this is paid, as there is at least one paid acquisition
         return 0;
       }
-      if (reclassified.find((evt) => evt.checkpoint === 'acquisition' && evt.source.startsWith('owned'))) {
-        // owned does not count as organic, sorry
-        return 0;
+      return bundle.weight;
+    });
+
+    dataChunks.addSeries('timeOnPage', (bundle) => {
+      const deltas = bundle.events
+        .map((evt) => evt.timeDelta)
+        .filter((delta) => delta > 0);
+      if (deltas.length === 0) {
+        return undefined;
       }
-      return 0;
+      return Math.max(...deltas, 0) / 1000;
+    });
+
+    dataChunks.addSeries('contentEngagement', (bundle) => {
+      const viewEvents = bundle.events
+        .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock');
+      return viewEvents.length;
     });
 
     dataChunks.addFacet('checkpoint', (bundle) => bundle.checkpoint);
@@ -224,38 +240,37 @@ const SERIES = {
     labelFn: (value) => toHumanReadable(value),
   },
   bounce: {
-    label: 'Bounce Rate (enters page without clicks)',
+    label: 'Bounce Rate (surfer never clicked)',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.bounces.sum) / aggregate.visits.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
   },
   engagement: {
-    label: 'Page Engagement (clicks "something" on page)',
+    label: 'Page Engagement (surfer clicked "something" on page or viewed more than 3 media or blocks)',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.engagement.sum) / aggregate.pageViews.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
   },
   conversions: {
-    label: 'Conversion Rate (clicks on CTA button)',
+    label: 'Conversion Rate (surfer clicked on CTA button)',
     rateFn: (aggregate) => Math.min(Math.round(
       (100 * aggregate.conversions.sum) / aggregate.visits.sum,
     ), 100),
     labelFn: (value) => `${value}%`,
   },
-  // pagesPerVisit: {
-  //   label: 'Visit Depth',
-  // eslint-disable-next-line max-len
-  //   rateFn: (aggregate) => (aggregate.visits.sum ? Math.round(aggregate.pageViews.sum / aggregate.visits.sum) : 0),
-  //   labelFn: (value) => `${value || 0} pages`,
-  // },
-  earned: {
-    label: 'Earned Percentage',
+  organic: {
+    label: 'Organic Percentage',
     rateFn: (aggregate) => Math.round(
-      (100 * aggregate.earned.sum) / aggregate.visits.sum,
+      (100 * aggregate.organic.sum) / aggregate.visits.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
+  },
+  timeOnPage: {
+    label: 'Time on page',
+    rateFn: (aggregate) => aggregate.timeOnPage.percentile(50),
+    labelFn: (value) => `${Number.isFinite(value) ? value : 0}s`,
   },
 };
 
@@ -300,7 +315,7 @@ const main = async () => {
       throw new Error('Current page not found in report');
     }
 
-    let metrics = currentPageEntry.getMetrics(['pageViews', 'earned', 'visits', 'bounces', 'engagement', 'conversions']);
+    let metrics = currentPageEntry.getMetrics(['pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage']);
 
     const businessMetricsElement = document.getElementById('businessMetrics');
     let ul = document.createElement('ul');
