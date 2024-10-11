@@ -42,5 +42,8 @@
     "*.js": "eslint",
     "*.cjs": "eslint",
     "*.css": "stylelint"
+  },
+  "dependencies": {
+    "@adobe/rum-distiller": "^1.4.0"
   }
 }
