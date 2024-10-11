@@ -1,4 +1,7 @@
-import { findNearestVulgarFraction, roundToConfidenceInterval, samplingError } from '../utils.js';
+import { stats } from '@adobe/rum-distiller';
+import { findNearestVulgarFraction } from '../utils.js';
+
+const { roundToConfidenceInterval, samplingError } = stats;
 
 export default class NumberFormat extends HTMLElement {
   constructor() {
