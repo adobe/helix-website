@@ -28,104 +28,112 @@ If you prefer using `https` links you'd replace `git@github.com:adobe/aem-experi
 
 ## Project instrumentation
 
-:warning: The plugin requires that you have a recent RUM instrumentation from the AEM boilerplate that supports `sampleRUM.always`. If you are getting errors that `.on` cannot be called on an `undefined` object, please apply the changes from https://github.com/adobe/aem-boilerplate/pull/247/files to your `lib-franklin.js`.
-
-### On top of the plugin system
-
-The easiest way to add the plugin is if your project is set up with the plugin system extension in the boilerplate.
-You'll know you have it if `window.hlx.plugins` is defined on your page.
-
-If you don't have it, you can follow the proposal in https://github.com/adobe/aem-lib/pull/23 and https://github.com/adobe/aem-boilerplate/pull/275 and apply the changes to your `aem.js`/`lib-franklin.js` and `scripts.js`.
-
-Once you have confirmed this, you'll need to edit your `scripts.js` in your AEM project and add the following at the start of the file:
-```js
-const AUDIENCES = {
-  mobile: () => window.innerWidth < 600,
-  desktop: () => window.innerWidth >= 600,
-  // define your custom audiences here as needed
-};
-
-window.hlx.plugins.add('experimentation', {
-  condition: () => getMetadata('experiment')
-    || Object.keys(getAllMetadata('campaign')).length
-    || Object.keys(getAllMetadata('audience')).length,
-  options: { audiences: AUDIENCES },
-  url: '/plugins/experimentation/src/index.js',
-});
-```
-
 ### On top of a regular boilerplate project
 
-Typically, you'd know you don't have the plugin system if you don't see a reference to `window.hlx.plugins` in your `scripts.js`. In that case, you can still manually instrument this plugin in your project by falling back to a more manual instrumentation. To properly connect and configure the plugin for your project, you'll need to edit your `scripts.js` in your AEM project and add the following:
+Typically, you'd know you don't have the plugin system if you don't see a reference to `window.aem.plugins` or `window.hlx.plugins` in your `scripts.js`. In that case, you can still manually instrument this plugin in your project by falling back to a more manual instrumentation. To properly connect and configure the plugin for your project, you'll need to edit your `scripts.js` in your AEM project and add the following:
 
 1. at the start of the file:
     ```js
-    const AUDIENCES = {
-      mobile: () => window.innerWidth < 600,
-      desktop: () => window.innerWidth >= 600,
-      // define your custom audiences here as needed
+    const experimentationConfig = {
+      prodHost: 'www.my-site.com',
+      audiences: {
+        mobile: () => window.innerWidth < 600,
+        desktop: () => window.innerWidth >= 600,
+        // define your custom audiences here as needed
+      }
     };
 
-    /**
-     * Gets all the metadata elements that are in the given scope.
-     * @param {String} scope The scope/prefix for the metadata
-     * @returns an array of HTMLElement nodes that match the given scope
-     */
-    export function getAllMetadata(scope) {
-      return [...document.head.querySelectorAll(`meta[property^="${scope}:"],meta[name^="${scope}-"]`)]
-        .reduce((res, meta) => {
-          const id = toClassName(meta.name
-            ? meta.name.substring(scope.length + 1)
-            : meta.getAttribute('property').split(':')[1]);
-          res[id] = meta.getAttribute('content');
-          return res;
-        }, {});
+    let runExperimentation;
+    let showExperimentationOverlay;
+    const isExperimentationEnabled = document.head.querySelector('[name^="experiment"],[name^="campaign-"],[name^="audience-"]')
+        || [...document.querySelectorAll('.section-metadata div')].some((d) => d.textContent.match(/Experiment|Campaign|Audience/i));
+    if (isExperimentationEnabled) {
+       const {
+        loadEager: runExperimentation,
+        loadLazy: showExperimentationOverlay,
+       } = await import('../plugins/experimentation/src/index.js');
     }
     ```
-2. if this is the first plugin you add to your project, you'll also need to add:
-    ```js
-    // Define an execution context
-    const pluginContext = {
-      getAllMetadata,
-      getMetadata,
-      loadCSS,
-      loadScript,
-      sampleRUM,
-      toCamelCase,
-      toClassName,
-    };
-    ```
-3. Early in the `loadEager` method you'll need to add:
+2. Early in the `loadEager` method you'll need to add:
     ```js
     async function loadEager(doc) {
       …
       // Add below snippet early in the eager phase
-      if (getMetadata('experiment')
-        || Object.keys(getAllMetadata('campaign')).length
-        || Object.keys(getAllMetadata('audience')).length) {
-        // eslint-disable-next-line import/no-relative-packages
-        const { loadEager: runEager } = await import('../plugins/experimentation/src/index.js');
-        await runEager(document, { audiences: AUDIENCES }, pluginContext);
+      if (runExperimentation) {
+        await runExperimentation(document, experimentationConfig);
       }
       …
     }
     ```
     This needs to be done as early as possible since this will be blocking the eager phase and impacting your LCP, so we want this to execute as soon as possible.
-4. Finally at the end of the `loadLazy` method you'll have to add:
+3. Finally at the end of the `loadLazy` method you'll have to add:
     ```js
     async function loadLazy(doc) {
       …
       // Add below snippet at the end of the lazy phase
-      if ((getMetadata('experiment')
-        || Object.keys(getAllMetadata('campaign')).length
-        || Object.keys(getAllMetadata('audience')).length)) {
-        // eslint-disable-next-line import/no-relative-packages
-        const { loadLazy: runLazy } = await import('../plugins/experimentation/src/index.js');
-        await runLazy(document, { audiences: AUDIENCES }, pluginContext);
+      if (showExperimentationOverlay) {
+        await showExperimentationOverlay(document, experimentationConfig);
       }
     }
     ```
     This is mostly used for the authoring overlay, and as such isn't essential to the page rendering, so having it at the end of the lazy phase is good enough.
+
+### On top of the plugin system
+
+The easiest way to add the plugin is if your project is set up with the plugin system extension in the boilerplate.
+You'll know you have it if either `window.aem.plugins` or `window.hlx.plugins` is defined on your page.
+
+If you don't have it, you can follow the proposal in https://github.com/adobe/aem-lib/pull/23 and https://github.com/adobe/aem-boilerplate/pull/275 and apply the changes to your `aem.js`/`lib-franklin.js` and `scripts.js`.
+
+Once you have confirmed this, you'll need to edit your `scripts.js` in your AEM project and add the following at the start of the file:
+```js
+const experimentationConfig = {
+  prodHost: 'www.my-site.com',
+  audiences: {
+    mobile: () => window.innerWidth < 600,
+    desktop: () => window.innerWidth >= 600,
+    // define your custom audiences here as needed
+  }
+};
+
+window.aem.plugins.add('experimentation', { // use window.hlx instead of your project has this
+  condition: () =>
+    // page level metadata
+    document.head.querySelector('[name^="experiment"],[name^="campaign-"],[name^="audience-"]')
+    // decorated section metadata
+    || document.querySelector('.section[class*=experiment],.section[class*=audience],.section[class*=campaign]')
+    // undecorated section metadata
+    || [...document.querySelectorAll('.section-metadata div')].some((d) => d.textContent.match(/Experiment|Campaign|Audience/i)),
+  options: experimentationConfig,
+  url: '/plugins/experimentation/src/index.js',
+});
+```
+
+### Increasing sampling rate for low traffic pages
+
+When running experiments during short periods (i.e. a few days or 2 weeks) or on low-traffic pages (<100K page views a month), it is unlikely that you'll reach statistical significance on your tests with the default RUM sampling. For those use cases, we recommend adjusting the sampling rate for the pages in question to 1 out of 10 instead of the default 1 out of 100 visits.
+
+Edit your html `<head>` and set configure the RUM sampling like:
+```html
+<meta name="experiment" content="...">
+...
+<!-- insert this script tag before loading aem.js or lib-franklin.js -->
+<script>
+  window.RUM_SAMPLING_RATE = document.head.querySelector('[name^="experiment"],[name^="campaign-"],[name^="audience-"]')
+    || [...document.querySelectorAll('.section-metadata div')].some((d) => d.textContent.match(/Experiment|Campaign|Audience/i))
+    ? 10
+    : 100;
+</script>
+<script type="module" src="/scripts/aem.js"></script>
+<script type="module" src="/scripts/scripts.js"></script>
+```
+
+Then double-check your `aem.js` file around line 20 and look for:
+```js
+const weight = new URLSearchParams(window.location.search).get('rum') === 'on' ? 1 : defaultSamplingRate;
+```
+
+If this is not present, please apply the following changes to the file: https://github.com/adobe/helix-rum-js/pull/159/files#diff-bfe9874d239014961b1ae4e89875a6155667db834a410aaaa2ebe3cf89820556
 
 ### Custom options
 
@@ -134,22 +142,12 @@ You have already seen the `audiences` option in the examples above, but here is 
 
 ```js
 runEager.call(document, {
-  // Overrides the base path if the plugin was installed in a sub-directory
-  basePath: '',
-
   // Lets you configure the prod environment.
   // (prod environments do not get the pill overlay)
   prodHost: 'www.my-website.com',
   // if you have several, or need more complex logic to toggle pill overlay, you can use
-  isProd: () => window.location.hostname.endsWith('hlx.page')
-    || window.location.hostname === ('localhost'),
-
-  /* Generic properties */
-  // RUM sampling rate on regular AEM pages is 1 out of 100 page views
-  // but we increase this by default for audiences, campaigns and experiments
-  // to 1 out of 10 page views so we can collect metrics faster of the relative
-  // short durations of those campaigns/experiments
-  rumSamplingRate: 10,
+  isProd: () => !window.location.hostname.endsWith('hlx.page')
+    && window.location.hostname !== ('localhost'),
 
   // the storage type used to persist data between page views
   // (for instance to remember what variant in an experiment the user was served)
@@ -168,14 +166,56 @@ runEager.call(document, {
 
   /* Experimentation related properties */
   // See more details on the dedicated Experiments page linked below
-  experimentsRoot: '/experiments',
-  experimentsConfigFile: 'manifest.json',
-  experimentsMetaTag: 'experiment',
+  experimentsMetaTagPrefix: 'experiment',
   experimentsQueryParameter: 'experiment',
-}, pluginContext);
+
+  /* Fragment experiment needs redecoration */
+  // See more details below
+  decorationFunction: (el) => {
+    /* handle custom decoration here, for example: */
+    buildBlock(el);
+    decorateBlock(el);
+  }
+});
 ```
 
 For detailed implementation instructions on the different features, please read the dedicated pages we have on those topics:
-- [Audiences](https://github.com/adobe/aem-experimentation/wiki/Audiences)
-- [Campaigns](https://github.com/adobe/aem-experimentation/wiki/Campaigns)
-- [Experiments](https://github.com/adobe/aem-experimentation/wiki/Experiments)
+- [Audiences](/documentation/audiences.md)
+- [Campaigns](/documentation/campaigns.md)
+- [Experiments](/documentation/experiments.md)
+
+**Cases of passing `decorationFunction`**
+Fragment replacement is handled by async observer, which may execute before or after default decoration complete. So, you need to provide a decoration method to redecorate. There are several common cases:
+1. Have a selector for an element inside a block and the block needs to be redecorated => sample code above
+2. Have a `.block` selector and  need to redecorate => switch block status to `"loading"` and call `loadBlock(el)`
+3. Have a `.section` selector and need to redecorate => call `decorateBlocks(el)`
+4. Have a `main` selector and need to redecorate => call `decorateMain(el)`
+
+## Extensibility & integrations
+
+If you need to further integrate the experimentation plugin with custom analytics reporting or other 3rd-party libraries, you can listen for the `aem:experimentation` event:
+```js
+document.addEventListener('aem:experimentation', (ev) => console.log(ev.detail));
+```
+
+The event details will contain one of 3 possible sets of properties:
+- For experiments:
+  - `type`: `experiment`
+  - `element`: the DOM element that was modified
+  - `experiment`: the experiment name
+  - `variant`: the variant name that was served
+- For audiences:
+  - `type`: `audience`
+  - `element`: the DOM element that was modified
+  - `audience`: the audience that was resolved
+- For campaigns:
+  - `type`: `campaign`
+  - `element`: the DOM element that was modified
+  - `campaign`: the campaign that was resolved
+
+Additionally, you can leverage the following global JS objects `window.hlx.experiments`, `window.hlx.audiences` and `window.hlx.campaigns`.
+Those will each be an array of objects containing:
+  - `type`: one of `page`, `section` or `fragment`
+  - `el`: the DOM element that was modified
+  - `servedExperience`: the URL for the content that was inlined for that experience
+  - `config`: an object containing the config details

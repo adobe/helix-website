@@ -1,0 +1,21 @@
+{
+  "data": [
+      {
+          "Pages": "/tests/fixtures/experiments/fragment-level--alt",
+          "Experiments": "Baz",
+          "Variants": "challenger-1",
+          "Names": "C1",
+          "Selectors": ".fragment",
+          "Urls": "/tests/fixtures/experiments/section-level-v1"
+      },
+      {
+          "Pages": "/tests/fixtures/experiments/fragment-level--alt",
+          "Experiments": "Baz",
+          "Variants": "challenger-2",
+          "Names": "C2",
+          "Selectors": ".fragment",
+          "Urls": "/tests/fixtures/experiments/section-level-v2"
+      }
+  ],
+  ":type": "sheet"
+}
