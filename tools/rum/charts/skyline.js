@@ -628,5 +628,15 @@ export default class SkylineChart extends AbstractChart {
     this.lcpAlreadyLabeled = false;
 
     this.chart.update();
+
+    this.loaded();
+  }
+
+  loading() {
+    this.elems.loading.ariaHidden = 'false';
+  }
+
+  loaded() {
+    this.elems.loading.ariaHidden = 'true';
   }
 }
