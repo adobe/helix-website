@@ -12,7 +12,7 @@ export function activateRedirects(data) {
           replacements.shift();
           const result = v.replace(/(\$\d+|\*)/g, (matched) => {
             if (matched.startsWith('$')) {
-              return replacements[matched.slice(1)];
+              return replacements[matched.slice(1) - 1];
             }
             if (matched === '*') {
               return replacements.shift();
@@ -39,24 +39,31 @@ export async function fetchRedirects(path = '/smart-redirects.json') {
   return [];
 }
 
-export async function applyRedirects(
-  redirects = fetchRedirects(),
-  path = window.location.pathname,
-) {
+export async function getRedirect(redirects, path, currentURL) {
   const redirect = (await redirects)
     .filter((r) => typeof r.start === 'undefined' || r.start.getTime() <= Date.now())
     .find((r) => r.from.test(path));
   if (redirect) {
     const target = redirect.to(path, ...redirect.from.exec(path).slice(1));
-    const currentUrl = new URL(window.location.href);
-    const targetURL = new URL(target, currentUrl.origin);
-    // Copy all URL parameters from currentUrl to targetURL
-    currentUrl.searchParams.forEach((value, key) => {
+    const targetURL = new URL(target, currentURL.origin);
+    // Copy all URL parameters from currentURL to targetURL
+    currentURL.searchParams.forEach((value, key) => {
       targetURL.searchParams.set(key, value);
     });
 
     targetURL.searchParams.set('redirect_from', path);
-    window.location.replace(targetURL.toString());
+    return targetURL.toString();
+  }
+  return null;
+}
+
+export async function applyRedirects(
+  redirects = fetchRedirects(),
+  path = window.location.pathname,
+) {
+  const redirect = await getRedirect(redirects, path, window.location.href);
+  if (redirect) {
+    window.location.replace(redirect);
   }
   return path;
 }
