@@ -28,6 +28,8 @@
   </script>
   <script type="module">
     import { sampleRUM } from '/scripts/lib-franklin.js';
+    import { applyRedirects } from '/scripts/redirects.js';
+    await applyRedirects();
     sampleRUM('404', { source: document.referrer });
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
