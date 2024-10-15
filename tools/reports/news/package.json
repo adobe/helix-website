@@ -1,0 +1,8 @@
+{
+  "name": "@adobe/aem-rum-report-news",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@adobe/rum-distiller": "^1.4.1"
+  }
+}

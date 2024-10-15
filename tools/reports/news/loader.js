@@ -3,7 +3,10 @@
  * offline, so it should be a service worker. We will migrate code from the main
  * file to here.
  */
-import { addCalculatedProps } from './cruncher.js';
+
+import { utils } from '@adobe/rum-distiller';
+
+const { addCalculatedProps } = utils;
 
 export default class DataLoader {
   constructor() {
