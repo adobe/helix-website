@@ -61,7 +61,7 @@ export async function applyRedirects(
   redirects = fetchRedirects(),
   path = window.location.pathname,
 ) {
-  const redirect = await getRedirect(redirects, path, window.location.href);
+  const redirect = await getRedirect(redirects, path, window.location);
   if (redirect) {
     window.location.replace(redirect);
   }
