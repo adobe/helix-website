@@ -240,7 +240,7 @@ function updateDataFacets(filterText, params, checkpoint) {
 
 function updateFilter(params, filterText) {
   const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
-    || isKnownFacet(key)
+    || (isKnownFacet(key) && !key.endsWith('~'))
     || (key === 'filter' && filterText.length > 2);
   const transform = ([key, value]) => [key, value];
   dataChunks.filter = parseSearchParams(params, filter, transform);
