@@ -57,12 +57,22 @@ export async function getRedirect(redirects, path, currentURL) {
   return null;
 }
 
+export async function isValidRedirect(url) {
+  // we try to fetch the URL, if it fails we return false
+  try {
+    const response = await fetch(url);
+    return response.ok && response.status === 200;
+  } catch (error) {
+    return false;
+  }
+}
+
 export async function applyRedirects(
   redirects = fetchRedirects(),
   path = window.location.pathname,
 ) {
   const redirect = await getRedirect(redirects, path, new URL(window.location.href));
-  if (redirect) {
+  if (redirect && await isValidRedirect(redirect)) {
     window.location.replace(redirect);
   }
   return path;
