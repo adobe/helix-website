@@ -85,7 +85,7 @@ class URLReports {
     });
 
     dataChunks.addFacet('checkpoint', facets.checkpoint);
-    dataChunks.addFacet('url', (bundle) => bundle.url);
+    dataChunks.addFacet('url', facets.plainURL);
 
     dataChunks.addFacet('hasclick&source', (bundle) => {
       const a = bundle.events
@@ -139,10 +139,6 @@ class URLReports {
 
     dataChunks.load(this.data);
     this.dataChunks = dataChunks;
-  }
-
-  getFacets() {
-    return this.dataChunks.facets;
   }
 
   getURLs() {
@@ -268,10 +264,9 @@ const main = async () => {
       url: [config.url],
     };
 
-    let reportFacets = report.getFacets();
-
-    const currentPageEntry = reportFacets.url.find((entry) => entry.value === config.url);
-    const { media } = reportFacets;
+    let urls = report.getURLs();
+    const currentPageEntry = urls.find((entry) => entry.value === config.url);
+    const media = report.getMedia();
 
     if (!currentPageEntry) {
       throw new Error('Current page not found in report');
@@ -307,13 +302,13 @@ const main = async () => {
       underroot: [true],
     };
 
-    reportFacets = report.getFacets();
-
     const top10Element = document.getElementById('top10');
     ul = document.createElement('ul');
     top10Element.appendChild(ul);
-    for (let i = 0; i < Math.min(10, reportFacets.url.length); i += 1) {
-      const entry = reportFacets.url[i];
+
+    urls = report.getURLs();
+    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
+      const entry = urls[i];
       metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
       li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} (${utils.toHumanReadable(metrics.pageViews.sum)})</a>`;
@@ -324,13 +319,12 @@ const main = async () => {
       inrange: [true],
     };
 
-    reportFacets = report.getFacets();
-
     const top10ReleasedElement = document.getElementById('top10released');
     ul = document.createElement('ul');
     top10ReleasedElement.appendChild(ul);
-    for (let i = 0; i < Math.min(10, reportFacets.url.length); i += 1) {
-      const entry = reportFacets.url[i];
+    urls = report.getURLs();
+    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
+      const entry = urls[i];
       metrics = entry.getMetrics(['pageViews']);
       const li = document.createElement('li');
       li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} / (${utils.toHumanReadable(metrics.pageViews.sum)})</a>`;
