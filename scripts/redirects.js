@@ -45,7 +45,7 @@ export async function getRedirect(redirects, path, currentURL) {
     .find((r) => r.from.test(path));
   if (redirect) {
     const target = redirect.to(path, ...redirect.from.exec(path).slice(1));
-    const targetURL = new URL(target, currentURL.origin);
+    const targetURL = new URL(target, currentURL);
     // Copy all URL parameters from currentURL to targetURL
     currentURL.searchParams.forEach((value, key) => {
       targetURL.searchParams.set(key, value);
