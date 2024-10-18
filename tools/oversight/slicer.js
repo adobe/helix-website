@@ -236,6 +236,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       ));
 
       if (cp === 'loadresource') {
+        console.log('adding histogram facet');
         // loadresource.target are not discrete values, but the number
         // of milliseconds it took to load the resource, so the best way
         // to present this is to create a histogram
