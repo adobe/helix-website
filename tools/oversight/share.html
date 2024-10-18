@@ -23,6 +23,7 @@
         import VitalsFacet from './elements/vitals-facet.js';
         import URLSelector from './elements/url-selector.js';
         import NumberFormat from './elements/number-format.js';
+        import DateRangePicker from './elements/daterange-picker.js';
         window.slicer = {
           Chart: PieChart,
         };
@@ -36,6 +37,7 @@
         customElements.define('url-selector', URLSelector);
         customElements.define('conversion-tracker', ConversionTracker);
         customElements.define('number-format', NumberFormat);
+        customElements.define('daterange-picker', DateRangePicker);
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
@@ -55,6 +57,7 @@
                 <option value="month">Month</option>
                 <option value="year">Year</option>
               </select>
+              <daterange-picker></daterange-picker>
               <incognito-checkbox></incognito-checkbox>
             </div>
           </div>
