@@ -8,18 +8,8 @@ function debounce(func, wait) {
   };
 }
 
-// date management
-function pad(number) {
-  return number.toString().padStart(2, '0');
-}
-
 function toDateString(date) {
-  // convert date
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-
-  return `${year}-${month}-${day}`;
+  return date.toISOString().split('T')[0];
 }
 
 const STYLES = `
@@ -184,7 +174,7 @@ const TEMPLATE = `
 </section>
 `;
 
-export default class TimeRangePicker extends HTMLElement {
+export default class DateRangePicker extends HTMLElement {
   constructor() {
     super();
 
@@ -304,20 +294,20 @@ export default class TimeRangePicker extends HTMLElement {
 
     dropdownElement.hidden = true;
 
-    let dateFrom = new Date(from);
-    let dateTo = new Date(to);
-    if (dateFrom > dateTo) {
+    let dateFrom = from;
+    let dateTo = to;
+    if (new Date(from) > new Date(to)) {
       // swap the 2 dates
-      dateFrom = new Date(to);
-      dateTo = new Date(from);
+      dateFrom = to;
+      dateTo = from;
     }
 
-    if (from) {
-      fromElement.value = toDateString(dateFrom);
+    if (dateFrom) {
+      fromElement.value = dateFrom;
     }
 
-    if (to) {
-      toElement.value = toDateString(dateTo);
+    if (dateTo) {
+      toElement.value = dateTo;
     }
 
     this.updateTimeframe({
