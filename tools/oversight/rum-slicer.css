@@ -198,13 +198,16 @@ main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
 }
 
 /* as of 2024, all iOS CWV values are fake, so we hide them a bit */
-main facet-sidebar input[value="mobile:ios"] ~ ul.cwv {
-  opacity: 0.5;
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li {
   filter: grayscale(1);
 }
 
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
+  filter: inherit;
+}
+
 main .key-metrics ul > #lcp number-format.extra::after {
-  content: 's caused by TTFB)'
+  content: 's TTFB)'
 }
 
 main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
@@ -514,6 +517,44 @@ fieldset li.significant {
   padding: 2px 4px;
 }
 
+/* business metrics are shown when the focus is on acquisition */
+facet-sidebar:has(input[name="focus"][value="acquisition"]) aside ul.cwv li.acquisition {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="acquisition"]:checked) aside ul.cwv li.acquisition {
+  display: flex;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]) aside ul.cwv li.performance {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]:checked) aside ul.cwv li.performance {
+  display: block;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.conversion {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion {
+  display: flex;
+  grid-column: span 3;
+}
+
+ul.cwv meter {
+  width: 100%;
+}
+
+main:has(conversion-tracker[mode="custom"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion.engagement {
+  display: none;
+}
+
+main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion:last-of-type {
+  display: none;
+}
+
 fieldset li::after,
 vitals-facet label::before {
   content: ' ';
@@ -524,6 +565,104 @@ vitals-facet label::before {
   display: inline-block;
   border-radius: 14px;
 }
+
+/* business metrics have a meter instead of a dot */
+fieldset li:has(meter)::after {
+  display: none;
+}
+
+fieldset li:has(meter) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.6;
+}
+
+fieldset li:has(meter):hover {
+  opacity: 1;
+}
+
+fieldset li.interesting:has(meter) {
+  opacity: 0.8;
+}
+
+fieldset li.significant:has(meter) {
+  opacity: 1;
+}
+
+fieldset li:has(meter) meter {
+  width: 100%;
+}
+
+fieldset li:has(meter) number-format {
+  width: 4em;
+}
+
+fieldset li:has(meter) number-format::after {
+  content: '%';
+}
+
+fieldset li.fixed:has(meter) number-format::after {
+  content: '';
+}
+
+fieldset li.time:has(meter) number-format::after {
+  content: 's';
+}
+
+fieldset div:first-of-type li::before {
+  display: block;
+  font-size: 50%;
+  margin-left: 10px;
+  text-align: center;
+  margin-top: -25px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+fieldset div:first-of-type li:has(meter)::before {
+  display: block;
+  font-size: 50%;
+  margin-top: -50px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+fieldset div:first-of-type li:nth-of-type(1)::before {
+  content: 'LCP';
+}
+
+fieldset div:first-of-type li:nth-of-type(2)::before {
+  content: 'CLS';
+}
+
+fieldset div:first-of-type li:nth-of-type(3)::before {
+  content: 'INP';
+}
+
+fieldset div:first-of-type li:nth-of-type(4)::before {
+  content: 'Bounce';
+}
+
+fieldset div:first-of-type li:nth-of-type(5)::before {
+  content: 'Time';
+}
+
+fieldset div:first-of-type li:nth-of-type(6)::before {
+  content: 'Organic';
+}
+
+fieldset div:first-of-type li:nth-of-type(7)::before {
+  content: 'Engagement';
+}
+
+fieldset div:first-of-type li:nth-of-type(8)::before {
+  content: 'Conversion';
+}
+
+
+
+
 
 #facets ul.cwv {
   list-style: none;
@@ -772,6 +911,24 @@ vitals-facet fieldset label {
 #facets facet-sidebar {
   container-type: inline-size;
   container-name: facets;
+}
+
+facet-sidebar form {
+  display: flex;
+  margin-left: calc(100% - 112px);
+  margin-bottom: -46px;
+  height: 32px;
+  width: 96px;
+  background-color: var(--light-fuchsia);
+  border-radius: 16px;
+  border-top: 2px solid var(--dark-fuchsia);
+  border-left: 2px solid var(--dark-fuchsia);
+  border-right: 2px solid var(--dark-fuchsia);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 4px;
+  accent-color: var(--dark-fuchsia);
+  z-index: 4;
 }
 
 /* external referrer only care about the hostname anyway */

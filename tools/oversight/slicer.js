@@ -1,15 +1,28 @@
 // eslint-disable-next-line import/no-relative-packages
-import { DataChunks } from './cruncher.js';
-import DataLoader from './loader.js';
 import {
-  parseConversionSpec,
-  parseSearchParams,
+  DataChunks, utils, series, facets,
+} from '@adobe/rum-distiller';
+import DataLoader from './loader.js';
+import { parseSearchParams, parseConversionSpec } from './utils.js';
+
+const {
   isKnownFacet,
   scoreCWV,
   computeConversionRate,
   reclassifyConsent,
-  reclassifyAcquisition,
-} from './utils.js';
+} = utils;
+
+const {
+  userAgent,
+  vitals,
+  lcpSource,
+  lcpTarget,
+  acquisitionSource,
+} = facets;
+
+const {
+  pageViews, visits, bounces, lcp, cls, inp, engagement, ttfb, organic,
+} = series;
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -30,24 +43,41 @@ const herochart = new window.slicer.Chart(dataChunks, elems);
 window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
-dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
-dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
+dataChunks.addSeries('pageViews', pageViews);
+dataChunks.addSeries('visits', visits);
 // a bounce is a visit without a click
-dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
-  ? bundle.weight
-  : 0));
-dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
-dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
-dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
-dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
-  checkpoint: ['click'],
-})
-  ? bundle.weight
-  : 0));
+dataChunks.addSeries('bounces', bounces);
+dataChunks.addSeries('lcp', lcp);
+dataChunks.addSeries('cls', cls);
+dataChunks.addSeries('inp', inp);
+dataChunks.addSeries('ttfb', ttfb);
+dataChunks.addSeries('engagement', engagement);
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
   ? bundle.weight
   : 0));
+
+dataChunks.addSeries('organic', organic);
+/*
+ * timeOnPage is the time it took to load the page,
+ * i.e. the difference between the first and last event
+ * in seconds
+ */
+dataChunks.addSeries('timeOnPage', (bundle) => {
+  const deltas = bundle.events
+    .map((evt) => evt.timeDelta)
+    .filter((delta) => delta > 0);
+  if (deltas.length === 0) {
+    return undefined;
+  }
+  return Math.max(...deltas) / 1000;
+});
+
+dataChunks.addSeries('contentEngagement', (bundle) => {
+  const viewEvents = bundle.events
+    .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock');
+  return viewEvents.length;
+});
+
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -149,70 +179,18 @@ function updateDataFacets(filterText, params, checkpoint) {
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
   );
 
-  dataChunks.addFacet('userAgent', (bundle) => {
-    const parts = bundle.userAgent.split(':');
-    return parts.reduce((acc, _, i) => {
-      acc.push(parts.slice(0, i + 1).join(':'));
-      return acc;
-    }, []);
-  }, 'some', 'none');
+  dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
 
-  const urlFn = (bundle) => {
-    if (bundle.domain) return bundle.domain;
-    const u = new URL(bundle.url);
-    u.pathname = u.pathname.split('/')
-      .map((segment) => {
-        // only numbers and longer than 5 characters: probably an id, censor it
-        if (segment.length >= 5 && /^\d+$/.test(segment)) {
-          return '<number>';
-        }
-        // only hex characters and longer than 8 characters: probably a hash, censor it
-        if (segment.length >= 8 && /^[0-9a-f]+$/i.test(segment)) {
-          return '<hex>';
-        }
-        // base64 encoded data, censor it
-        if (segment.length > 32 && /^[a-zA-Z0-9+/]+$/.test(segment)) {
-          return '<base64>';
-        }
-        // probable UUID, censor it
-        if (segment.length > 35 && /^[0-9a-f-]+$/.test(segment)) {
-          return '<uuid>';
-        }
-        // just too long
-        if (segment.length > 60) {
-          return '...';
-        }
-        return segment;
-      }).join('/');
-    return u.toString();
-  };
-  dataChunks.addFacet('url', urlFn, 'some', 'never');
+  dataChunks.addFacet('url', facets.url, 'some', 'never');
 
-  dataChunks.addFacet('vitals', (bundle) => {
-    const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
-    return cwv
-      .filter((metric) => bundle[metric])
-      .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
-  });
+  dataChunks.addFacet('vitals', vitals);
 
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events
-    .map(reclassifyConsent)
-    .map(reclassifyAcquisition)
-    .reduce((acc, evt) => {
-      acc.add(evt.checkpoint);
-      return acc;
-    }, new Set())), 'every', 'none');
+  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
-    dataChunks.addFacet('lcp.target', (bundle) => bundle.events
-      .filter((evt) => evt.checkpoint === 'cwv-lcp')
-      .map((evt) => evt.target)
-      .filter((target) => target));
+    dataChunks.addFacet('lcp.target', lcpTarget);
 
-    dataChunks.addFacet('lcp.source', (bundle) => bundle.events
-      .filter((evt) => evt.checkpoint === 'cwv-lcp')
-      .map((evt) => evt.source)
-      .filter((source) => source));
+    dataChunks.addFacet('lcp.source', lcpSource);
   }
 
   // this is a bad name, fulltext would be better
@@ -274,20 +252,7 @@ function updateDataFacets(filterText, params, checkpoint) {
 
       // a bit of special handling here, so we can split the acquisition source
       if (cp === 'acquisition') {
-        dataChunks.addFacet('acquisition.source', (bundle) => Array.from(
-          bundle.events
-            .map(reclassifyAcquisition)
-            .filter((evt) => evt.checkpoint === cp)
-            .filter(({ source }) => source) // filter out empty sources
-            .map(({ source }) => source.split(':'))
-            .map((source) => source
-              .reduce((acc, _, i) => {
-                acc.push(source.slice(0, i + 1).join(':'));
-                return acc;
-              }, [])
-              .filter((s) => s))
-            .pop() || [],
-        ));
+        dataChunks.addFacet('acquisition.source', acquisitionSource);
       }
     });
 
@@ -298,7 +263,7 @@ function updateDataFacets(filterText, params, checkpoint) {
 
 function updateFilter(params, filterText) {
   const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
-    || isKnownFacet(key)
+    || (isKnownFacet(key) && !key.endsWith('~'))
     || (key === 'filter' && filterText.length > 2);
   const transform = ([key, value]) => [key, value];
   dataChunks.filter = parseSearchParams(params, filter, transform);

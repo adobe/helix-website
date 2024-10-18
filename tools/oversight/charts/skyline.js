@@ -5,18 +5,24 @@ import {
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import 'chartjs-adapter-luxon';
 import {
-  INTERPOLATION_THRESHOLD,
-  scoreBundle,
-  scoreCWV,
-  toHumanReadable,
-  cwvInterpolationFn,
+  utils,
+  stats,
+} from '@adobe/rum-distiller';
+import AbstractChart from './chart.js';
+import {
   truncate,
-  simpleCWVInterpolationFn,
+  toHumanReadable,
   cssVariable,
   getGradient,
+  cwvInterpolationFn,
+  simpleCWVInterpolationFn,
+  INTERPOLATION_THRESHOLD,
 } from '../utils.js';
-import AbstractChart from './chart.js';
-import { linearRegression } from '../cruncher.js';
+
+const {
+  scoreCWV, scoreBundle,
+} = utils;
+const { linearRegression } = stats;
 
 Chart.register(TimeScale, LinearScale, ...registerables);
 
