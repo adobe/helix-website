@@ -250,7 +250,7 @@ export default class ListFacet extends HTMLElement {
           countspan.setAttribute('sample-size', metrics.pageViews.count);
           countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
           countspan.setAttribute('fuzzy', 'false');
-          const valuespan = this.createValueSpan(entry, prefix);
+          const valuespan = this.createValueSpan(entry, prefix, filteredKeys.length === 1);
 
           label.append(valuespan, countspan);
 
@@ -371,9 +371,9 @@ export default class ListFacet extends HTMLElement {
     }
   }
 
-  createValueSpan(entry, prefix) {
+  createValueSpan(entry, prefix, solo = false) {
     const valuespan = document.createElement('span');
-    valuespan.innerHTML = this.createLabelHTML(entry.value, prefix);
+    valuespan.innerHTML = this.createLabelHTML(entry.value, prefix, solo);
     const highlightFromParam = this.getAttribute('highlight');
     if (highlightFromParam) {
       const highlightValue = new URL(window.location).searchParams.get(highlightFromParam) || '';
