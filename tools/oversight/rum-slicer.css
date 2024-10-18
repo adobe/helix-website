@@ -25,6 +25,14 @@
   --light-indigo: #d3d5ff;
   --medium-indigo: #acafff;
   --dark-indigo: #4046ca;
+  --gray-100: #e9e9e9;
+  --gray-200: #e1e1e1;
+  --gray-300: #dadada;
+  --gray-400: #c6c6c6;
+  --gray-500: #8f8f8f;
+  --gray-600: #717171;
+  --gray-700: #505050;
+
 }
 
 body {
@@ -45,26 +53,26 @@ body main > .section {
 /* general performance */
 
 main li.score-good, vitals-facet div[data-value^="good"] label {
-  opacity: 1;
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
 main li.score-ni, vitals-facet div[data-value^="ni"] label {
-  opacity: 1;
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
 main li.score-poor, vitals-facet div[data-value^="poor"] label {
-  opacity: 1;
   color: var(--dark-red);
   background-color: var(--light-red);
 }
 
-/* heading */
-main .title div {
+main .title {
+  padding-top: 8px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-flow: row wrap;
   gap: 1ch;
 }
 
@@ -78,6 +86,15 @@ main .title select {
   font: inherit;
 }
 
+main .title > * {
+  flex: 2 0px;
+}
+
+main .title daterange-picker {
+  flex: 1 100%;
+  order: 3;
+}
+
 main .title incognito-checkbox {
   display: none;
   margin-bottom: 10px;
@@ -88,13 +105,6 @@ main .title incognito-checkbox[mode="incognito"] {
   display: inline-block;
 }
 
-main .title {
-  padding-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
@@ -103,6 +113,7 @@ main .title url-selector {
   display: flex;
   align-items: center;
   width: 100%;
+  flex-grow: 50;
 }
 
 main .title url-selector img {
@@ -161,7 +172,6 @@ main .key-metrics ul > * p {
 main .key-metrics ul > * p .extra {
   font-weight: normal;
   font-size: 80%;
-  opacity: 0.6;
 }
 
 main .key-metrics ul > * p .extra::before {
@@ -406,7 +416,6 @@ figcaption > span {
   background-color: var(--light-indigo);
   padding: 0 1em;
   text-align: end;
-  opacity: 0.6;
   margin-right: 0.5em;
   margin-bottom: 0.5em;
   white-space: nowrap;
@@ -423,15 +432,6 @@ figcaption > span {
   color: var(--dark-purple);
   background-color: var(--light-purple);
 }
-
-.filter-tags > span.filter-tag-lcp,
-.filter-tags > span.filter-tag-cls,
-.filter-tags > span.filter-tag-inp,
-.filter-tags > span.filter-tag-conversions,
-.filter-tags > span.filter-tag-visits {
-  opacity: 1;
-}
-
 
 /* filters */
 
@@ -504,12 +504,7 @@ vitals-facet label {
   background-color: #eee;
   padding: 2px 6px;
   text-align: end;
-  opacity: 0.2;
   font-size: 12px;
-}
-
-fieldset li[class$="-"] {
-  opacity: 0.2;
 }
 
 fieldset li.interesting {
@@ -712,18 +707,17 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
   opacity: 1;
 }
 
-#facets fieldset label .extra {
+#facets fieldset label .extra,
+#facets fieldset label span.extra {
   display: none;
 }
 
 #facets fieldset label .extra.interesting {
   display: inline;
-  opacity: 0.8;
 }
 
 #facets fieldset label .extra.significant {
   display: inline;
-  opacity: 0.9;
 }
 
 #facets fieldset label .count::before,
@@ -805,7 +799,6 @@ vitals-facet fieldset label {
 }
 
 #facets vitals-facet fieldset input[type=checkbox] {
-  opacity: 0.1;
   width: 0;
   height: 0;
 }
@@ -1031,6 +1024,7 @@ facet-sidebar form {
   border: 2px solid;
   top: 4px;
   left: 4px;
+  z-index: 1;
 }
 
 .clipboard::after {
@@ -1116,7 +1110,6 @@ a.drillup::after {
   max-width: 80%;
   background-color: #444;
   color: white;
-  opacity: 1;
   top: 32px;
   left: 0;
   right: 0;
@@ -1154,6 +1147,19 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 }
 
 @media (min-width: 900px) {
+  main .title {
+    flex-wrap: nowrap;
+  }
+
+  main .title > * {
+    flex: 3 0;
+  }
+
+  main .title daterange-picker {
+    flex: unset;
+    order: unset;
+  }
+
   main .title url-selector input {
     font-size: var(--type-heading-xl-size);
   }

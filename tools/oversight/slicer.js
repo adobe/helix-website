@@ -40,7 +40,7 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
-window.addEventListener('pageshow', () => elems.canvas && herochart.render());
+window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', pageViews);
@@ -296,15 +296,14 @@ export async function draw() {
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
-async function loadData(scope, chart) {
+async function loadData(config) {
+  const scope = config.value;
   const params = new URL(window.location.href).searchParams;
-  const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
-  const startDate = params.get('startDate') ? `${params.get('startDate')}T00:00:00` : null;
+  const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+  const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
   if (startDate && endDate) {
-    dataChunks.load(await loader.fetchDateRange(startDate, endDate));
-    chart.config.startDate = startDate;
-    chart.config.endDate = endDate;
+    dataChunks.load(await loader.fetchPeriod(startDate, endDate));
   } else if (scope === 'week') {
     dataChunks.load(await loader.fetchLastWeek(endDate));
   } else if (scope === 'month') {
@@ -319,8 +318,14 @@ export function updateState() {
   const { searchParams } = new URL(window.location.href);
   url.searchParams.set('domain', DOMAIN);
   url.searchParams.set('filter', elems.filterInput.value);
-  url.searchParams.set('view', elems.viewSelect.value);
-  if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
+
+  const viewConfig = elems.viewSelect.value;
+  url.searchParams.set('view', viewConfig.value);
+  if (viewConfig.value === 'custom') {
+    url.searchParams.set('startDate', viewConfig.from);
+    url.searchParams.set('endDate', viewConfig.to);
+  }
+  // if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
@@ -382,26 +387,41 @@ const io = new IntersectionObserver((entries) => {
     elems.filterInput = sidebar.elems.filterInput;
 
     const params = new URL(window.location).searchParams;
-    const view = params.get('view') || 'week';
+    let view = params.get('view');
+    if (!view) {
+      view = 'week';
+      params.set('view', view);
+      const url = new URL(window.location.href);
+      url.search = params.toString();
+      window.history.replaceState({}, '', url);
+    }
+
+    const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+    const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
-      await loadData(view, herochart);
+
+      await loadData(elems.viewSelect.value);
       draw();
     });
 
     herochart.render();
-    // sidebar.updateFacets();
 
     elems.filterInput.value = params.get('filter');
-    elems.viewSelect.value = view;
+    elems.viewSelect.value = {
+      value: view,
+      from: startDate,
+      to: endDate,
+    };
+
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view, herochart).then(draw);
+      loadData(elems.viewSelect.value).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {
@@ -409,7 +429,7 @@ const io = new IntersectionObserver((entries) => {
       draw();
     });
 
-    elems.viewSelect.addEventListener('input', () => {
+    elems.viewSelect.addEventListener('change', () => {
       updateState();
       window.location.reload();
     });
