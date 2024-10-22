@@ -1,5 +1,4 @@
 const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
-// const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
 
 const { searchParams } = new URL(window.location);
@@ -46,7 +45,7 @@ const getConfig = () => {
   return config;
 };
 
-const getDetails = async (url, articlesRootURL) => {
+const fetchDetails = async (url, articlesRootURL) => {
   const resp = await fetch(url);
   const html = await resp.text();
   const parser = new DOMParser();
@@ -81,7 +80,7 @@ export {
   getDomain,
   getarticlesRootURL,
   getConfig,
-  getDetails,
+  fetchDetails as getDetails,
   toReportURL,
   BUNDLER_ENDPOINT,
   API_ENDPOINT,
