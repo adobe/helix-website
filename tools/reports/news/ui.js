@@ -6,14 +6,7 @@ import {
 } from './utils.js';
 
 import buildTop10TableBlock from './pods/top10.js';
-
-function buildSummary(name, label, value) {
-  const section = document.createElement('div');
-  section.className = `summary ${name}`;
-  section.innerHTML = `<p class="summary-value">${value}</p>
-    <p class="summary-label">${label}</p>`;
-  return section;
-}
+import buildSummary from './pods/summary.js';
 
 function formatDateString(date) {
   try {
