@@ -78,7 +78,6 @@ let report;
 
 const getGlobalFilters = () => {
   const device = document.querySelector('[name="device"]:checked').value;
-  console.log(device);
   const filters = {};
   if (device !== 'all') {
     filters.userAgent = [device];
