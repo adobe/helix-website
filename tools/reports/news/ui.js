@@ -20,7 +20,7 @@ function formatDateString(date) {
   return null;
 }
 
-function init(doc) {
+function initParams(doc) {
   const form = doc.querySelector('.params form');
   // setup form
   const url = searchParams.get('url');
@@ -74,8 +74,107 @@ function init(doc) {
   });
 }
 
+let report;
+
+const getGlobalFilters = () => {
+  const device = document.querySelector('[name="device"]:checked').value;
+  console.log(device);
+  const filters = {};
+  if (device !== 'all') {
+    filters.userAgent = [device];
+  }
+  return filters;
+};
+
+const draw = async () => {
+  const config = getConfig();
+
+  report.filter = {
+    url: [config.url],
+    ...getGlobalFilters(),
+  };
+
+  let urls = report.getURLs();
+  const currentPageEntry = urls.find((entry) => entry.value === config.url);
+
+  if (!currentPageEntry) {
+    throw new Error('Current page not found in report');
+  }
+
+  const metrics = currentPageEntry.getMetrics(['pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage']);
+
+  const summaries = document.querySelector('.summary-container');
+  Object.keys(SERIES).forEach((key) => {
+    const s = SERIES[key];
+    const value = s.rateFn(metrics);
+    const display = s.labelFn(value);
+
+    const summary = buildSummary(key, s.label, key !== 'pageViews' ? display : value.toLocaleString());
+    summaries.append(summary);
+  });
+
+  const media = report.getMedia();
+  let max = 0;
+  const depth = [];
+  media.forEach((mi, i) => {
+    if (i === 0) {
+      max = mi.weight;
+      depth.push({
+        preview: `${config.url}/${mi.value}`,
+        value: 100,
+      });
+    } else {
+      depth.push({
+        preview: `${config.url}/${mi.value}`,
+        value: Math.floor((mi.weight / max) * 100),
+      });
+    }
+  });
+
+  buildDepthBlock(depth, 'page-read-depth');
+
+  report.filter = {
+    underroot: [true],
+    ...getGlobalFilters(),
+  };
+
+  urls = report.getURLs();
+
+  buildTop10TableBlock(
+    urls,
+    currentPageEntry,
+    config,
+    'top-overall-period',
+  );
+
+  report.filter = {
+    inrange: [true],
+    ...getGlobalFilters(),
+  };
+
+  urls = report.getURLs();
+
+  buildTop10TableBlock(
+    urls,
+    currentPageEntry,
+    config,
+    'top-publish-period',
+  );
+};
+
+const initFilters = (doc) => {
+  const filters = doc.querySelectorAll('.filters input');
+  filters.forEach((f) => {
+    f.addEventListener('change', () => {
+      draw();
+    });
+  });
+};
+
 const main = async () => {
-  init(document);
+  initParams(document);
+  initFilters(document);
+
   const config = getConfig();
 
   getDetails(config.url, config.articlesRootURL).then((details) => {
@@ -102,76 +201,9 @@ const main = async () => {
     });
   });
 
-  const report = new URLReports(config);
+  report = new URLReports(config);
   report.init().then(() => {
-    report.filter = {
-      url: [config.url],
-    };
-
-    let urls = report.getURLs();
-    const currentPageEntry = urls.find((entry) => entry.value === config.url);
-
-    if (!currentPageEntry) {
-      throw new Error('Current page not found in report');
-    }
-
-    const metrics = currentPageEntry.getMetrics(['pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage']);
-
-    const summaries = document.querySelector('.summary-container');
-    Object.keys(SERIES).forEach((key) => {
-      const s = SERIES[key];
-      const value = s.rateFn(metrics);
-      const display = s.labelFn(value);
-
-      const summary = buildSummary(key, s.label, key !== 'pageViews' ? display : value.toLocaleString());
-      summaries.append(summary);
-    });
-
-    const media = report.getMedia();
-    let max = 0;
-    const depth = [];
-    media.forEach((mi, i) => {
-      if (i === 0) {
-        max = mi.weight;
-        depth.push({
-          preview: `${config.url}/${mi.value}`,
-          value: 100,
-        });
-      } else {
-        depth.push({
-          preview: `${config.url}/${mi.value}`,
-          value: Math.floor((mi.weight / max) * 100),
-        });
-      }
-    });
-
-    buildDepthBlock(depth, 'page-read-depth');
-
-    report.filter = {
-      underroot: [true],
-    };
-
-    urls = report.getURLs();
-
-    buildTop10TableBlock(
-      urls,
-      currentPageEntry,
-      config,
-      'top-overall-period',
-    );
-
-    report.filter = {
-      inrange: [true],
-    };
-
-    urls = report.getURLs();
-
-    buildTop10TableBlock(
-      urls,
-      currentPageEntry,
-      config,
-      'top-publish-period',
-    );
+    draw();
   });
 };
 

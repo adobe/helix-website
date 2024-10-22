@@ -22,6 +22,9 @@ function buildTableEl(label) {
 export default function buildTop10TableBlock(urls, currentEntry, config, id) {
   const container = document.getElementById(id);
   if (container) {
+    if (container.querySelector('table')) {
+      container.querySelector('table').remove();
+    }
     const table = buildTableEl('Page Views');
     container.append(table);
     const body = table.querySelector('tbody');

@@ -14,6 +14,9 @@ function buildTableEl() {
 export default function buildDepthBlock(depths, id) {
   const container = document.getElementById(id);
   if (container) {
+    if (container.querySelector('table')) {
+      container.querySelector('table').remove();
+    }
     const table = buildTableEl();
     container.append(table);
     const body = table.querySelector('tbody');

@@ -54,6 +54,7 @@ class URLReports {
 
     dataChunks.addFacet('checkpoint', facets.checkpoint);
     dataChunks.addFacet('url', facets.plainURL);
+    dataChunks.addFacet('userAgent', facets.userAgent);
 
     dataChunks.addFacet('hasclick&source', (bundle) => {
       const a = bundle.events
