@@ -150,9 +150,9 @@ const SERIES = {
     ), 100),
     labelFn: (value) => `${value}%`,
   },
-  organic: {
-    label: 'Organic Percentage',
-    rateFn: (aggregate) => Math.round(
+  paid: {
+    label: 'Paid traffic',
+    rateFn: (aggregate) => 100 - Math.round(
       (100 * aggregate.organic.sum) / aggregate.visits.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
