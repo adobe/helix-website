@@ -238,6 +238,15 @@ section.dashboard {
   gap: 1rem;
 }
 
+.depth-container img {
+  max-height: 50px;
+}
+
+.depth-container .table tr td:first-of-type {
+  margin: 0;
+  width: 30%;
+}
+
 .summary {
   box-sizing: border-box;
   display: inline-block;

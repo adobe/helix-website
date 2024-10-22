@@ -5,6 +5,7 @@ function buildTableEl() {
   const body = document.createElement('tbody');
   const foot = document.createElement('tfoot');
   foot.innerHTML = `<tr>
+      <td></td>
       <td class="metric-sum"><span>End of page</span></td>
     </tr>`;
   table.append(caption, body, foot);
@@ -24,6 +25,9 @@ export default function buildDepthBlock(depths, id) {
       const rate = depth.value;
       const row = document.createElement('tr');
       row.innerHTML = `
+        <td>
+          <img src="${depth.preview}" alt="media">
+        </td>
         <td>
           <span class="bar" data-value="${rate}" style="width: ${rate}%"></span>
           <span>${rate.toLocaleString()}%</span>
