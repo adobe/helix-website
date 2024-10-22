@@ -12,31 +12,73 @@
 
   <script src="./ui.js" type="module"></script>
   <link rel="stylesheet" href="./news.css">
-  </head>
+</head>
 
 <body>
   <header></header>
+
   <main>
-    <h1>News reporting</h1>
-    <section>
-      <div id="period"></div>
+    <section class="top-nav">
+      <h1>Blog Post Insights</h1>
+
+      <!-- <div class="button-container">
+        <button type="button" class="button" id="share-insights">Share</button>
+      </div> -->
     </section>
-    <section>
-      <h2>Article details</h2>
-      <div id="details"></div>
-      <div id="businessMetrics"></div>
-      <h3>Media</h3>
-      <div id="media"></div>
+
+    <section class="params" id="params">
+      <form>
+        <div class="input-wrapper url-wrapper">
+          <label for="post-url">Post URL</label>
+          <input type="url" id="post-url" name="post-url" required>
+        </div>
+
+        <div class="input-wrapper date-wrapper">
+          <label for="from-date">From</label>
+          <input type="date" id="from-date" name="from-date">
+        </div>
+
+        <div class="input-wrapper date-wrapper">
+          <label for="to-date">To</label>
+          <input type="date" id="to-date" name="to-date">
+        </div>
+
+        <button type="button" class="button" id="submit-params">Submit</button>
+      </form>
     </section>
-    <section>
-      <h2>Overall top 10 for the period</h2>
-      <div id="top10"></div>
+
+    <section class="dashboard">
+      <div class="post-container">
+        <div class="post" id="post">
+          <div class="post-image-wrapper">
+            <img class="post-image">
+          </div>
+          <div class="post-body">
+            <p><a class="post-title" target="_blank"></a></p>
+            <p class="post-description"></p>
+            <p class="post-info">
+              <span class="post-publicationDate"></span>
+              <span class="post-author"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="summary-container"></div>
+  
+      <div class="table-container">
+        <h3>Global articles ranking during the period</h3>
+        <div class="table" id="top-overall-period"></div>
+      </div>
+  
+      <div class="table-container">
+        <h3>Articles released during the period ranking</h3>
+        <div class="table" id="top-publish-period"></div>
+      </div>
     </section>
-    <section>
-      <h2>Top 10 for released during the period</h2>
-      <div id="top10released"></div>
-    </section>
+
   </main>
+
   <footer></footer>
 </body>
 

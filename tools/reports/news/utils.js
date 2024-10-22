@@ -51,7 +51,7 @@ const fetchDetails = async (url, articlesRootURL) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  const title = doc.querySelector('title')?.textContent || '';
+  const title = doc.querySelector('h1')?.textContent || doc.querySelector('title')?.textContent || '';
   const description = doc.querySelector('meta[name="description"]')?.content || '';
   const author = doc.querySelector('meta[name="author"]')?.content || '';
 
@@ -63,8 +63,18 @@ const fetchDetails = async (url, articlesRootURL) => {
     publicationDate = date ? date[0] : '';
   }
 
+  let img = doc.querySelector('img[src]');
+  if (img) {
+    img = {
+      src: new URL(new URL(img.src).pathname, articlesRootURL).href,
+      alt: img.alt || '',
+      width: img.width || '',
+      height: img.height || '',
+    };
+  } else img = '';
+
   return {
-    title, description, url, author, publicationDate,
+    title, description, url, author, publicationDate, img,
   };
 };
 
@@ -84,4 +94,5 @@ export {
   toReportURL,
   BUNDLER_ENDPOINT,
   API_ENDPOINT,
+  searchParams,
 };
