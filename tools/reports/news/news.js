@@ -2,41 +2,9 @@
 import {
   DataChunks, series, facets, utils,
 } from '@adobe/rum-distiller';
+
 import DataLoader from './loader.js';
-
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
-// const BUNDLER_ENDPOINT = 'http://localhost:3000';
-const API_ENDPOINT = BUNDLER_ENDPOINT;
-
-const { searchParams } = new URL(window.location);
-
-const getURL = () => {
-  const url = searchParams.get('url');
-
-  if (!url) {
-    throw new Error('No url provided');
-  }
-
-  return url;
-};
-
-const getDomain = () => {
-  const url = getURL();
-
-  const { hostname } = new URL(url);
-  return hostname;
-};
-
-const getarticlesRootURL = () => {
-  const url = getURL();
-  const { pathname, origin } = new URL(url);
-  // find year in pathname
-  const year = pathname.match(/\/\d{4}\//);
-  if (!year) {
-    throw new Error('No year found in pathname');
-  }
-  return `${origin}${pathname.substring(0, year.index)}`;
-};
+import { API_ENDPOINT } from './utils.js';
 
 class URLReports {
   constructor(config) {
@@ -154,43 +122,6 @@ class URLReports {
   }
 }
 
-const getConfig = () => {
-  const config = {
-    domain: getDomain(),
-    domainKey: searchParams.get('domainkey') || '',
-    apiEndpoint: API_ENDPOINT,
-    start: searchParams.get('start'),
-    end: searchParams.get('end'),
-    url: getURL(),
-    articlesRootURL: getarticlesRootURL(),
-  };
-
-  return config;
-};
-
-const getDetails = async (url, articlesRootURL) => {
-  const resp = await fetch(url);
-  const html = await resp.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-
-  const title = doc.querySelector('title')?.textContent || '';
-  const description = doc.querySelector('meta[name="description"]')?.content || '';
-  const author = doc.querySelector('meta[name="author"]')?.content || '';
-
-  let publicationDate = doc.querySelector('meta[name="publication-date"]')?.content;
-  if (!publicationDate) {
-    // extract date from url
-    const pathname = url.substring(articlesRootURL.length + 1);
-    const date = pathname.match(/\d{4}\/\d{2}\/\d{2}/);
-    publicationDate = date ? date[0] : '';
-  }
-
-  return {
-    title, description, url, author, publicationDate,
-  };
-};
-
 const SERIES = {
   pageViews: {
     label: 'Page Views',
@@ -232,105 +163,10 @@ const SERIES = {
   },
 };
 
-const toReportURL = (url) => {
-  const u = new URL(window.location.href);
-  u.searchParams.delete('url');
-  u.searchParams.set('url', url);
-  return u.toString();
+const { toHumanReadable } = utils;
+
+export {
+  URLReports,
+  SERIES,
+  toHumanReadable,
 };
-
-const main = async () => {
-  const config = getConfig();
-
-  const period = document.getElementById('period');
-  period.innerHTML = `from ${config.start} to ${config.end}`;
-
-  getDetails(config.url, config.articlesRootURL).then((details) => {
-    const detailsElement = document.getElementById('details');
-    detailsElement.innerHTML = `
-      <ul>
-        <li><label>URL: </label><a href="${details.url}" target="_blank">${details.url}</a></li>
-        <li><label>Title: </label><span>${details.title}</span></li>
-        <li><label>Auhor: </label><span>${details.author}</span></li>
-        <li><label>Publication Date: </label><span>${details.publicationDate}</span></li>
-        <li><label>Description: </label><span>${details.title}</p></span>
-      </ul>
-    `;
-  });
-
-  const report = new URLReports(config);
-  report.init().then(() => {
-    report.filter = {
-      url: [config.url],
-    };
-
-    let urls = report.getURLs();
-    const currentPageEntry = urls.find((entry) => entry.value === config.url);
-    const media = report.getMedia();
-
-    if (!currentPageEntry) {
-      throw new Error('Current page not found in report');
-    }
-
-    let metrics = currentPageEntry.getMetrics(['pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage']);
-
-    const businessMetricsElement = document.getElementById('businessMetrics');
-    let ul = document.createElement('ul');
-    businessMetricsElement.appendChild(ul);
-    Object.keys(SERIES).forEach((key) => {
-      const s = SERIES[key];
-      const value = s.rateFn(metrics);
-      const display = s.labelFn(value);
-
-      const li = document.createElement('li');
-      li.innerHTML = `<label>${s.label}: </label><span>${display}</span>`;
-      ul.appendChild(li);
-    });
-
-    const mediaElement = document.getElementById('media');
-    ul = document.createElement('ul');
-    mediaElement.appendChild(ul);
-
-    media.forEach((mi) => {
-      const li = document.createElement('li');
-      li.classList.add('media');
-      li.innerHTML = `<img src="${config.url}/${mi.value}"> / ${mi.value} / ${utils.toHumanReadable(mi.weight)}`;
-      ul.appendChild(li);
-    });
-
-    report.filter = {
-      underroot: [true],
-    };
-
-    const top10Element = document.getElementById('top10');
-    ul = document.createElement('ul');
-    top10Element.appendChild(ul);
-
-    urls = report.getURLs();
-    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
-      const entry = urls[i];
-      metrics = entry.getMetrics(['pageViews']);
-      const li = document.createElement('li');
-      li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} (${utils.toHumanReadable(metrics.pageViews.sum)})</a>`;
-      ul.appendChild(li);
-    }
-
-    report.filter = {
-      inrange: [true],
-    };
-
-    const top10ReleasedElement = document.getElementById('top10released');
-    ul = document.createElement('ul');
-    top10ReleasedElement.appendChild(ul);
-    urls = report.getURLs();
-    for (let i = 0; i < Math.min(10, urls.length); i += 1) {
-      const entry = urls[i];
-      metrics = entry.getMetrics(['pageViews']);
-      const li = document.createElement('li');
-      li.innerHTML = `<a href="${toReportURL(entry.value)}" target="_blank">${entry.value} / (${utils.toHumanReadable(metrics.pageViews.sum)})</a>`;
-      ul.appendChild(li);
-    }
-  });
-};
-
-main();
