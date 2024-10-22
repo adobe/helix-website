@@ -233,6 +233,11 @@ section.dashboard {
   gap: 1rem;
 }
 
+.depth-container {
+  flex: 1 0 20%;
+  gap: 1rem;
+}
+
 .summary {
   box-sizing: border-box;
   display: inline-block;

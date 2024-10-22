@@ -7,6 +7,7 @@ import {
 
 import buildTop10TableBlock from './pods/top10.js';
 import buildSummary from './pods/summary.js';
+import buildDepthBlock from './pods/depth.js';
 
 function formatDateString(date) {
   try {
@@ -77,9 +78,6 @@ const main = async () => {
   init(document);
   const config = getConfig();
 
-  // const period = document.getElementById('period');
-  // period.innerHTML = `from ${config.start} to ${config.end}`;
-
   getDetails(config.url, config.articlesRootURL).then((details) => {
     const post = document.getElementById('post');
     Object.keys(details).forEach((key) => {
@@ -129,17 +127,25 @@ const main = async () => {
       summaries.append(summary);
     });
 
-    // const mediaElement = document.getElementById('media');
-    // ul = document.createElement('ul');
-    // mediaElement.appendChild(ul);
+    const media = report.getMedia();
+    let max = 0;
+    const depth = [];
+    media.forEach((mi, i) => {
+      if (i === 0) {
+        max = mi.weight;
+        depth.push({
+          preview: `${config.url}/${mi.value}`,
+          value: 100,
+        });
+      } else {
+        depth.push({
+          preview: `${config.url}/${mi.value}`,
+          value: Math.floor((mi.weight / max) * 100),
+        });
+      }
+    });
 
-    // media.forEach((mi) => {
-    //   const li = document.createElement('li');
-    //   li.classList.add('media');
-    // eslint-disable-next-line max-len
-    //   li.innerHTML = `<img src="${config.url}/${mi.value}"> / ${mi.value} / ${toHumanReadable(mi.weight)}`;
-    //   ul.appendChild(li);
-    // });
+    buildDepthBlock(depth, 'page-read-depth');
 
     report.filter = {
       underroot: [true],
