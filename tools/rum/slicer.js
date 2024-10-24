@@ -1,14 +1,27 @@
 // eslint-disable-next-line import/no-relative-packages
-import { DataChunks } from './cruncher.js';
-import DataLoader from './loader.js';
 import {
-  parseConversionSpec,
-  parseSearchParams,
+  DataChunks, utils, series, facets,
+} from '@adobe/rum-distiller';
+import DataLoader from './loader.js';
+import { parseSearchParams, parseConversionSpec } from './utils.js';
+
+const {
   isKnownFacet,
   scoreCWV,
-  toHumanReadable,
   computeConversionRate,
-} from './utils.js';
+  toHumanReadable,
+} = utils;
+
+const {
+  userAgent,
+  vitals,
+  lcpSource,
+  lcpTarget,
+} = facets;
+
+const {
+  pageViews, visits, bounces, lcp, cls, inp, engagement, ttfb,
+} = series;
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -37,16 +50,14 @@ const isDefaultConversion = Object.keys(conversionSpec).length === 1
 window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
-dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
-dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
-// a bounce is a visit without a click
-dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
-  ? bundle.weight
-  : 0));
-dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
-dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
-dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
-dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
+dataChunks.addSeries('pageViews', pageViews);
+dataChunks.addSeries('visits', visits);
+dataChunks.addSeries('bounces', bounces);
+dataChunks.addSeries('lcp', lcp);
+dataChunks.addSeries('cls', cls);
+dataChunks.addSeries('inp', inp);
+dataChunks.addSeries('ttfb', ttfb);
+dataChunks.addSeries('engagement', engagement);
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, conversionSpec)
   ? bundle.weight
   : 0));
@@ -114,37 +125,15 @@ function updateDataFacets(filterText, params, checkpoint) {
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
   );
 
-  dataChunks.addFacet('userAgent', (bundle) => {
-    const parts = bundle.userAgent.split(':');
-    return parts.reduce((acc, _, i) => {
-      acc.push(parts.slice(0, i + 1).join(':'));
-      return acc;
-    }, []);
-  });
-  dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
-
-  dataChunks.addFacet('vitals', (bundle) => {
-    const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
-    return cwv
-      .filter((metric) => bundle[metric])
-      .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
-  });
-
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
-    acc.add(evt.checkpoint);
-    return acc;
-  }, new Set())), 'every');
+  dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
+  dataChunks.addFacet('url', facets.url, 'some', 'never');
+  dataChunks.addFacet('vitals', vitals);
+  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
-    dataChunks.addFacet('lcp.target', (bundle) => bundle.events
-      .filter((evt) => evt.checkpoint === 'cwv-lcp')
-      .map((evt) => evt.target)
-      .filter((target) => target));
+    dataChunks.addFacet('lcp.target', lcpTarget);
 
-    dataChunks.addFacet('lcp.source', (bundle) => bundle.events
-      .filter((evt) => evt.checkpoint === 'cwv-lcp')
-      .map((evt) => evt.source)
-      .filter((source) => source));
+    dataChunks.addFacet('lcp.source', lcpSource);
   }
 
   // this is a bad name, fulltext would be better
