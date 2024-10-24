@@ -4,11 +4,9 @@ import {
 } from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import 'chartjs-adapter-luxon';
+import { utils } from '@adobe/rum-distiller';
 import {
   INTERPOLATION_THRESHOLD,
-  scoreBundle,
-  scoreCWV,
-  // toHumanReadable,
   cwvInterpolationFn,
   truncate,
   simpleCWVInterpolationFn,
@@ -16,6 +14,10 @@ import {
   getGradient,
 } from '../utils.js';
 import AbstractChart from './chart.js';
+
+const {
+  scoreCWV, scoreBundle,
+} = utils;
 
 Chart.register(TimeScale, LinearScale, ...registerables);
 

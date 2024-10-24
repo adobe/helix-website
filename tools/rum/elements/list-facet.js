@@ -1,7 +1,10 @@
+import { utils, stats } from '@adobe/rum-distiller';
 import {
-  escapeHTML, scoreCWV, toHumanReadable,
+  escapeHTML, toHumanReadable,
 } from '../utils.js';
-import { tTest, zTestTwoProportions } from '../cruncher.js';
+
+const { scoreCWV } = utils;
+const { tTest, zTestTwoProportions } = stats;
 
 async function addSignificanceFlag(element, metric, baseline) {
   let p = 1;

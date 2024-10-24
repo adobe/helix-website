@@ -22,35 +22,6 @@ export function isKnownFacet(key) {
     || key === 'checkpoint';
 }
 
-export function scoreCWV(value, name) {
-  if (value === undefined || value === null) return null;
-  let poor;
-  let ni;
-  // this is unrolled on purpose as this method becomes a bottleneck
-  if (name === 'lcp') {
-    poor = 4000;
-    ni = 2500;
-  }
-  if (name === 'cls') {
-    poor = 0.25;
-    ni = 0.1;
-  }
-  if (name === 'inp') {
-    poor = 500;
-    ni = 200;
-  }
-  if (name === 'ttfb') {
-    poor = 1800;
-    ni = 800;
-  }
-  if (value >= poor) {
-    return 'poor';
-  }
-  if (value >= ni) {
-    return 'ni';
-  }
-  return 'good';
-}
 export const UA_KEY = 'userAgent';
 export function toHumanReadable(num) {
   const dp = 3;
@@ -85,20 +56,6 @@ export function toHumanReadable(num) {
   };
 
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
-}
-export function scoreBundle(bundle) {
-  // a bundle is good if all CWV that have a value are good
-  // a bundle is ni if all CWV that have a value are ni or good
-  // a bundle is poor if any CWV that have a value are poor
-  // a bundle has no CWV if no CWV have a value
-  const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
-  const scores = cwv
-    .filter((metric) => bundle[metric])
-    .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)));
-  if (scores.length === 0) return null;
-  if (scores.every((s) => s === 'good')) return 'good';
-  if (scores.every((s) => s !== 'poor')) return 'ni';
-  return 'poor';
 }
 
 export const INTERPOLATION_THRESHOLD = 10;
@@ -214,19 +171,4 @@ export function parseConversionSpec() {
   const filter = ([key]) => (key.startsWith('conversion.'));
   cached.conversionSpec = parseSearchParams(params, filter, transform);
   return cached.conversionSpec;
-}
-
-/**
- * Conversion rates are computed as the ratio of conversions to visits. The conversion rate is
- * capped at 100%.
- * @param conversions the number of conversions
- * @param visits the number of visits
- * @returns {number}  the conversion rate as a percentage
- */
-export function computeConversionRate(conversions, visits) {
-  const conversionRate = (100 * conversions) / visits;
-  if (conversionRate >= 0 && conversionRate <= 100) {
-    return conversionRate;
-  }
-  return 100;
 }
