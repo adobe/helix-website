@@ -104,48 +104,54 @@ export function updateKeyMetrics() {
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
   }
 
-  document.querySelector('#visits p number-format').textContent = dataChunks.totals.visits.sum;
-  document.querySelector('#visits p number-format').setAttribute('sample-size', dataChunks.totals.visits.count);
-  document.querySelector('#visits p number-format').setAttribute('total', dataChunks.totals.pageViews.sum);
   if (dataChunks.totals.visits.sum > 0) {
+    document.querySelector('#visits p number-format').textContent = dataChunks.totals.visits.sum;
+    document.querySelector('#visits p number-format').setAttribute('sample-size', dataChunks.totals.visits.count);
+    document.querySelector('#visits p number-format').setAttribute('total', dataChunks.totals.pageViews.sum);
     const visitsExtra = document.querySelector('#visits p number-format.extra') || document.createElement('number-format');
     visitsExtra.textContent = (100 * dataChunks.totals.bounces.sum) / dataChunks.totals.visits.sum;
     visitsExtra.setAttribute('precision', 1);
     visitsExtra.setAttribute('total', 100);
     visitsExtra.className = 'extra';
     document.querySelector('#visits p').appendChild(visitsExtra);
-  }
-
-  if (isDefaultConversion) {
-    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.engagement.sum;
-    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.engagement.count);
   } else {
-    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
-    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+    document.querySelector('#visits p number-format').textContent = 'N/A';
   }
 
-  document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
-  const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
-  if (dataChunks.totals.pageViews.sum > 0 && isDefaultConversion) {
-    conversionsExtra.textContent = computeConversionRate(
-      dataChunks.totals.engagement.sum,
-      dataChunks.totals.pageViews.sum,
-    );
-    // this is a bit of fake precision, but it's good enough for now
-    conversionsExtra.setAttribute('precision', 2);
-    conversionsExtra.setAttribute('total', 100);
-    conversionsExtra.className = 'extra';
-    document.querySelector('#conversions p').appendChild(conversionsExtra);
-  } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
-    conversionsExtra.textContent = computeConversionRate(
-      dataChunks.totals.conversions.sum,
-      dataChunks.totals.visits.sum,
-    );
-    // this is a bit of fake precision, but it's good enough for now
-    conversionsExtra.setAttribute('precision', 2);
-    conversionsExtra.setAttribute('total', 100);
-    conversionsExtra.className = 'extra';
-    document.querySelector('#conversions p').appendChild(conversionsExtra);
+  if (dataChunks.totals.visits.sum > 0) {
+    if (isDefaultConversion) {
+      document.querySelector('#conversions p number-format').textContent = dataChunks.totals.engagement.sum;
+      document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.engagement.count);
+    } else {
+      document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
+      document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+    }
+
+    document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
+    const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
+    if (dataChunks.totals.pageViews.sum > 0 && isDefaultConversion) {
+      conversionsExtra.textContent = computeConversionRate(
+        dataChunks.totals.engagement.sum,
+        dataChunks.totals.pageViews.sum,
+      );
+      // this is a bit of fake precision, but it's good enough for now
+      conversionsExtra.setAttribute('precision', 2);
+      conversionsExtra.setAttribute('total', 100);
+      conversionsExtra.className = 'extra';
+      document.querySelector('#conversions p').appendChild(conversionsExtra);
+    } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
+      conversionsExtra.textContent = computeConversionRate(
+        dataChunks.totals.conversions.sum,
+        dataChunks.totals.visits.sum,
+      );
+      // this is a bit of fake precision, but it's good enough for now
+      conversionsExtra.setAttribute('precision', 2);
+      conversionsExtra.setAttribute('total', 100);
+      conversionsExtra.className = 'extra';
+      document.querySelector('#conversions p').appendChild(conversionsExtra);
+    }
+  } else {
+    document.querySelector('#conversions p number-format').textContent = 'N/A';
   }
 
   const lcpElem = document.querySelector('#lcp p number-format');
