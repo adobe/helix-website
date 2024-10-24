@@ -66,21 +66,25 @@ export function updateKeyMetrics(keyMetrics) {
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
   }
 
-  document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
   if (keyMetrics.visits > 0) {
+    document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
     const visitsExtra = document.createElement('span');
     visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
     visitsExtra.className = 'extra';
     document.querySelector('#visits p').appendChild(visitsExtra);
+  } else {
+    document.querySelector('#visits p').textContent = 'N/A';
   }
 
-  document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
   if (keyMetrics.visits > 0) {
+    document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
     const conversionsExtra = document.createElement('span');
     const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.pageViews);
     conversionsExtra.textContent = toHumanReadable(conversionRate);
     conversionsExtra.className = 'extra';
     document.querySelector('#conversions p').appendChild(conversionsExtra);
+  } else {
+    document.querySelector('#conversions p').textContent = 'N/A';
   }
 
   const lcpElem = document.querySelector('#lcp p');
