@@ -288,23 +288,8 @@ function loadBlock(context, event, container) {
   // Set block title & description in UI
   updateDetailsContainer(content, authoredBlockName, blockDescription);
 
-  const disableCopyButton = sectionLibraryMetadata.disablecopy
-    ?? defaultLibraryMetadata.disablecopy
-    ?? false;
-
-  const copyButton = container.querySelector('.content .copy-button');
-  copyButton.removeAttribute('disabled');
-  if (disableCopyButton) {
-    copyButton.setAttribute('disabled', 'true');
-  }
-
-  const hideDetailsView = sectionLibraryMetadata.hidedetailsview
-  ?? defaultLibraryMetadata.hidedetailsview
-  ?? context.hidedetailsview
-  ?? false;
-
-  const splitView = container.querySelector('.content sp-split-view');
-  splitView.primarySize = hideDetailsView ? '100%' : '75%';
+  handleCopyButton(container, sectionLibraryMetadata, defaultLibraryMetadata);
+  handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetadata, context);
 
   const blockRenderer = content.querySelector('block-renderer');
 
@@ -358,6 +343,9 @@ function loadTemplate(context, event, container) {
   // Set template title & description in UI
   updateDetailsContainer(content, authoredTemplateName, templateDescription);
 
+  handleCopyButton(container, sectionLibraryMetadata, defaultLibraryMetadata);
+  handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetadata, context);
+
   const blockRenderer = content.querySelector('block-renderer');
 
   // If the block element exists, load the block
@@ -385,6 +373,28 @@ function loadTemplate(context, event, container) {
 
   // Track block view
   sampleRUM('library:blockviewed', { target: blockData.url });
+}
+
+function handleCopyButton(container, sectionLibraryMetadata, defaultLibraryMetadata) {
+  const disableCopyButton = sectionLibraryMetadata?.disablecopy
+    ?? defaultLibraryMetadata?.disablecopy
+    ?? false;
+
+  const copyButton = container.querySelector('.content .copy-button');
+  copyButton.removeAttribute('disabled');
+  if (disableCopyButton) {
+    copyButton.setAttribute('disabled', 'true');
+  }
+}
+
+function handleSplitView(container, sectionLibraryMetadata, defaultLibraryMetadata, context) {
+  const hideDetailsView = sectionLibraryMetadata?.hidedetailsview
+    ?? defaultLibraryMetadata?.hidedetailsview
+    ?? context?.hidedetailsview
+    ?? false;
+
+  const splitView = container.querySelector('.content sp-split-view');
+  splitView.primarySize = hideDetailsView ? '100%' : '75%';
 }
 
 /**
