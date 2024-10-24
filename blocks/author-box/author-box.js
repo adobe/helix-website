@@ -13,30 +13,59 @@ function openPopup(e) {
   );
 }
 
-async function buildSharing(githubId) {
+async function buildSharing(id, type = 'github') {
   const authorName = getMetadata('author');
   const sharing = document.createElement('div');
   sharing.classList.add('sharing-details');
   const scriptUrl = new URL(import.meta.url);
-  const iconsPath = new URL('../../icons/icon-github.svg', scriptUrl).href;
+  let iconsPath;
+  if (type === 'github') {
+    iconsPath = new URL('../../icons/icon-github.svg', scriptUrl).href;
+  } else if (type === 'linkedin') {
+    iconsPath = new URL('../../icons/icon-linkedin.svg', scriptUrl).href;
+  }
   // Fetch SVG content
   const response = await fetch(iconsPath);
   const svgContent = await response.text();
+
+  const profiles = {
+    github: {
+      dataType: 'GitHub',
+      altText: 'share-github',
+      ariaLabel: 'share-github',
+      titleText: `${authorName}'s GitHub Profile`,
+    },
+    linkedin: {
+      dataType: 'LinkedIn',
+      altText: 'share-linkedin',
+      ariaLabel: 'share-linkedin',
+      titleText: `${authorName}'s LinkedIn Profile`,
+    },
+  };
+
+  const {
+    dataType, altText, ariaLabel, titleText,
+  } = profiles[type] || profiles.github;
+
   sharing.innerHTML = `<span>
-      <a data-type="GitHub" data-href="${githubId}" alt="share-github" aria-label="share-github" title="${authorName}'s Profile">
-        ${svgContent}
-      </a>
-    </span>`;
+    <a data-type="${dataType}" data-href="${id}" alt="${altText}" aria-label="${ariaLabel}" title="${titleText}">
+      ${svgContent}
+    </a>
+  </span>`;
   sharing.querySelectorAll('[data-href]').forEach((link) => {
     link.addEventListener('click', openPopup);
   });
   return sharing;
 }
 
-async function addProfileLinkToImage(authorImage, githubId) {
+async function addProfileLinkToImage(authorImage, profileId, type = 'github') {
   const authorLink = document.createElement('a');
   authorLink.classList.add('blog-author-link');
-  authorLink.setAttribute('data-href', githubId);
+  if (type === 'github') {
+    authorLink.setAttribute('data-href', `https://github.com/${profileId}`);
+  } else if (type === 'linkedin') {
+    authorLink.setAttribute('data-href', profileId);
+  }
   authorLink.append(authorImage);
   authorLink.addEventListener('click', openPopup);
   return authorLink;
@@ -61,14 +90,23 @@ function validateDate(dateTag, dateString) {
 
 export default async function decorateAuthorBox(blockEl) {
   const githubId = getMetadata('github');
+  const linkedinLink = getMetadata('linkedin');
   const childrenEls = Array.from(blockEl.children);
   const bylineContainer = childrenEls[0];
   bylineContainer.classList.add('author-box-info');
   // author image
   const authorImage = bylineContainer.firstElementChild;
   authorImage.classList.add('blog-author-image');
-  const addAuthorLink = await addProfileLinkToImage(authorImage, githubId);
-  bylineContainer.prepend(addAuthorLink);
+  // author profile link
+  let addAuthorLink;
+  if (githubId) {
+    addAuthorLink = await addProfileLinkToImage(authorImage, githubId, 'github');
+  } else if (linkedinLink) {
+    addAuthorLink = await addProfileLinkToImage(authorImage, linkedinLink, 'linkedin');
+  }
+  if (addAuthorLink) {
+    bylineContainer.prepend(addAuthorLink);
+  }
   // author name
   bylineContainer.lastElementChild.classList.add('blog-author-details');
   const authorDetails = bylineContainer.lastElementChild;
@@ -82,6 +120,13 @@ export default async function decorateAuthorBox(blockEl) {
   const authorBlurb = await createAuthorBlurb(blurb);
   bylineContainer.append(authorBlurb);
   // sharing
-  const shareBlock = await buildSharing(githubId);
-  bylineContainer.append(shareBlock);
+  let shareBlock;
+  if (githubId) {
+    shareBlock = await buildSharing(githubId, 'github');
+  } else if (linkedinLink) {
+    shareBlock = await buildSharing(linkedinLink, 'linkedin');
+  }
+  if (shareBlock) {
+    bylineContainer.append(shareBlock);
+  }
 }
