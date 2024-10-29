@@ -9,6 +9,11 @@ import buildTop10TableBlock from './pods/top10.js';
 import buildSummary from './pods/summary.js';
 import buildDepthBlock from './pods/depth.js';
 
+/**
+ * Formats a given date string into the `YYYY-MM-DD` format.
+ * @param {string|Date} date - Date to format.
+ * @returns {string|null} Formatted date string (or `null` if date is invalid).
+ */
 function formatDateString(date) {
   try {
     const dateObj = new Date(date);
@@ -20,9 +25,13 @@ function formatDateString(date) {
   return null;
 }
 
+/**
+ * Initializes form parameters and syncs them with URL search parameters.
+ * @param {Document} doc - Document object.
+ */
 function initParams(doc) {
   const form = doc.querySelector('.params form');
-  // setup form
+  // setup url field/parameter
   const url = searchParams.get('url');
   const urlInput = form.querySelector('#post-url');
   urlInput.addEventListener('input', () => {
@@ -33,6 +42,7 @@ function initParams(doc) {
   if (url) {
     urlInput.value = url;
   }
+  // setup start field/parameter
   const start = searchParams.get('start');
   const from = form.querySelector('#from-date');
   from.addEventListener('input', () => {
@@ -47,6 +57,7 @@ function initParams(doc) {
     now.setDate(now.getDate() - 7);
     from.value = formatDateString(now);
   }
+  // setup end field/parameter
   const end = searchParams.get('end');
   const to = form.querySelector('#to-date');
   to.addEventListener('input', () => {
