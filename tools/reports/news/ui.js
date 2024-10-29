@@ -155,6 +155,7 @@ const draw = async () => {
     currentPageEntry,
     config,
     'top-overall-period',
+    'Globally During the Period',
   );
 
   report.filter = {
@@ -169,7 +170,29 @@ const draw = async () => {
     currentPageEntry,
     config,
     'top-publish-period',
+    'Published During the Period',
   );
+};
+
+const initShare = (doc) => {
+  const share = doc.getElementById('share-insights');
+  share.addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => {
+        const tip = doc.createElement('div');
+        tip.className = 'share-tip';
+        tip.textContent = 'Link copied to clipboard!';
+        tip.setAttribute('aria-live', 'polite');
+        share.append(tip);
+        setTimeout(() => {
+          tip.remove();
+        }, 3300);
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(`Could not copy ${window.location.href}:`, error);
+      });
+  });
 };
 
 const initFilters = (doc) => {
@@ -183,6 +206,7 @@ const initFilters = (doc) => {
 
 const main = async () => {
   initParams(document);
+  initShare(document);
   initFilters(document);
 
   const config = getConfig();

@@ -61,6 +61,38 @@ section.top-nav {
   margin: calc(var(--nav-height) + 2rem) 0 2rem;
 }
 
+section.top-nav button {
+  position: relative;
+}
+
+@keyframes fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+section.top-nav button .share-tip {
+  position: absolute;
+  top: calc(100% + 0.5em);
+  right: 0;
+  width: max-content;
+  padding: 5px 1.2em 6px;
+  background-color: #000c;
+  color: white;
+  font-weight: normal;
+  animation: fade 0.3s ease forwards;
+  animation-delay: 3s;
+}
+
+section.top-nav button .share-tip::before {
+  position: absolute;
+  content: '';
+  top: -0.5em;
+  right: 1em;
+  border-left: 0.25em solid transparent;
+  border-right: 0.25em solid transparent;
+  border-bottom: 0.5em solid #000c;
+}
+
 section.top-nav h1 {
   margin: 0;
 }
@@ -240,6 +272,10 @@ section.dashboard {
 
 .depth-container img {
   max-height: 50px;
+}
+
+.depth-container .table tr td {
+  vertical-align: middle;
 }
 
 .depth-container .table tr td:first-of-type {
