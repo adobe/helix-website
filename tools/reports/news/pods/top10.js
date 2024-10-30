@@ -39,9 +39,10 @@ export default function buildTop10TableBlock(urls, currentEntry, config, id) {
       if (entry && entry.value === currentEntry.value) {
         row.className = 'entry-match';
       }
+      const u = new URL(entry.value);
       row.innerHTML = `<td>
           <a href="${toReportURL(entry.value)}" target="_blank">
-            ${entry.value.replace(config.articlesRootURL, '')}
+            ${u.pathname}
           </a>
         </td>
         <td>
