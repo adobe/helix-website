@@ -176,7 +176,7 @@ const main = async () => {
 
   const config = getConfig();
 
-  getDetails(config.url, config.articlesRootURL).then((details) => {
+  getDetails(config.url).then((details) => {
     const post = document.getElementById('post');
     Object.keys(details).forEach((key) => {
       const el = post.querySelector(`.post-${key}`);

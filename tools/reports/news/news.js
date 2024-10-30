@@ -11,7 +11,6 @@ class URLReports {
     this.start = config.start;
     this.end = config.end;
     this.data = null;
-    this.root = config.articlesRootURL;
 
     const loader = new DataLoader();
     loader.apiEndpoint = API_ENDPOINT;
@@ -62,11 +61,10 @@ class URLReports {
       return a.length > 0;
     });
 
-    const prefix = this.root;
-
     dataChunks.addFacet('underroot', (bundle) => {
       if (!bundle.url) return false;
-      return bundle.url.startsWith(prefix);
+      const u = new URL(bundle.url);
+      return !!u.pathname.match(/\/\d{4}\//);
     });
 
     const possiblePrefixes = [];
@@ -76,14 +74,13 @@ class URLReports {
     // iterate each day between start and end
     for (let d = s; d <= e; d.setDate(d.getDate() + 1)) {
       const day = new Date(d);
-      const datePattern = day.toISOString().split('T')[0].replace(/-/g, '/');
-      const pattern = `${prefix}/${datePattern}`;
+      const pattern = day.toISOString().split('T')[0].replace(/-/g, '/');
       possiblePrefixes.push(pattern);
     }
     dataChunks.addFacet('inrange', (bundle) => {
-      if (!bundle.url || !bundle.url.startsWith(prefix)) return false;
+      if (!bundle.url) return false;
       for (let i = 0; i < possiblePrefixes.length; i += 1) {
-        if (bundle.url.startsWith(possiblePrefixes[i])) {
+        if (bundle.url.includes(possiblePrefixes[i])) {
           return true;
         }
       }

@@ -20,17 +20,6 @@ const getDomain = () => {
   return hostname;
 };
 
-const getarticlesRootURL = () => {
-  const url = getURL();
-  const { pathname, origin } = new URL(url);
-  // find year in pathname
-  const year = pathname.match(/\/\d{4}\//);
-  if (!year) {
-    throw new Error('No year found in pathname');
-  }
-  return `${origin}${pathname.substring(0, year.index)}`;
-};
-
 const getConfig = () => {
   const config = {
     domain: getDomain(),
@@ -39,13 +28,12 @@ const getConfig = () => {
     start: searchParams.get('start'),
     end: searchParams.get('end'),
     url: getURL(),
-    articlesRootURL: getarticlesRootURL(),
   };
 
   return config;
 };
 
-const fetchDetails = async (url, articlesRootURL) => {
+const fetchDetails = async (url) => {
   const resp = await fetch(url);
   const html = await resp.text();
   const parser = new DOMParser();
@@ -58,15 +46,15 @@ const fetchDetails = async (url, articlesRootURL) => {
   let publicationDate = doc.querySelector('meta[name="publication-date"]')?.content;
   if (!publicationDate) {
     // extract date from url
-    const pathname = url.substring(articlesRootURL.length + 1);
-    const date = pathname.match(/\d{4}\/\d{2}\/\d{2}/);
+    const u = new URL(url);
+    const date = u.pathname.match(/\d{4}\/\d{2}\/\d{2}/);
     publicationDate = date ? date[0] : '';
   }
 
   let img = doc.querySelector('img[src]');
   if (img) {
     img = {
-      src: new URL(new URL(img.src).pathname, articlesRootURL).href,
+      src: new URL(img.getAttribute('src'), url).href,
       alt: img.alt || '',
       width: img.width || '',
       height: img.height || '',
@@ -88,7 +76,6 @@ const toReportURL = (url) => {
 export {
   getURL,
   getDomain,
-  getarticlesRootURL,
   getConfig,
   fetchDetails as getDetails,
   toReportURL,
