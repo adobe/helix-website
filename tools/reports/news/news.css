@@ -159,6 +159,7 @@ section.dashboard {
   box-sizing: border-box;
   display: inline-block;
   width: 100%;
+  height: 100%;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
   cursor: pointer;
