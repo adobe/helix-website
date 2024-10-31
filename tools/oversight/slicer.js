@@ -432,12 +432,13 @@ const io = new IntersectionObserver((entries) => {
     }
 
     let filterInputDebounce;
+    const debounceTimeout = view === 'week' ? 1000 : 0;
     elems.filterInput.addEventListener('input', () => {
       clearTimeout(filterInputDebounce);
       filterInputDebounce = setTimeout(() => {
         updateState();
         draw();
-      }, 3000);
+      }, debounceTimeout);
     });
 
     elems.viewSelect.addEventListener('change', () => {
