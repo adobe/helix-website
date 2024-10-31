@@ -433,10 +433,14 @@ const io = new IntersectionObserver((entries) => {
 
     elems.filterInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
-        clearTimeout(filterInputDebounce);
         updateState();
         draw();
       }
+    });
+
+    elems.filterInput.addEventListener('blur', (event) => {
+      updateState();
+      draw();
     });
 
     elems.viewSelect.addEventListener('change', () => {
