@@ -353,6 +353,7 @@ section.dashboard {
 
 .table {
   width: 100%;
+  height: 100%;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
   padding: 2rem;
@@ -506,11 +507,16 @@ section.dashboard {
 }
 
 .chart-container {
-  flex: 1 0 600px;
+  flex: 1 1 540px;
+}
+
+.chart-container.bulkMedia {
+  flex: 1 0 100%;
 }
 
 .chart {
   width: 100%;
+  height: 100%;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
   padding: 2rem;

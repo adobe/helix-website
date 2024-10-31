@@ -25,10 +25,13 @@ function buildChart(media) {
 
 export default function buildMediaChart(media, id) {
   const container = document.getElementById(id);
+
   if (container) {
     if (container.querySelector('.chart')) {
       container.querySelector('.chart > div').remove();
     }
+    if (media.length > 8) container.parentElement.classList.add('bulkMedia');
+    else container.parentElement.classList.remove('bulkMedia');
     const title = document.createElement('h2');
     title.textContent = 'Media Engagement By Depth on Blog Post';
     const chart = buildChart(media);
