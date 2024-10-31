@@ -381,9 +381,12 @@ const io = new IntersectionObserver((entries) => {
       loadData(elems.viewSelect.value).then(draw);
     }
 
-    elems.filterInput.addEventListener('input', () => {
-      updateState();
-      draw();
+    elems.filterInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        clearTimeout(filterInputDebounce);
+        updateState();
+        draw();
+      }
     });
 
     elems.viewSelect.addEventListener('change', () => {
