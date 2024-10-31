@@ -195,6 +195,7 @@ section.dashboard {
   height: 100%;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
+  background-color: white;
   cursor: pointer;
 }
 
@@ -263,8 +264,14 @@ section.dashboard {
 .summary-container {
   flex: 1 0 50%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
+}
+
+@media (width >= 1100px) {
+  .summary-container {
+    flex: 1 0 33%;
+  }
 }
 
 .depth-container {
@@ -300,6 +307,30 @@ section.dashboard {
   font-size: 200%;
   line-height: 80%;
   text-align: center;
+}
+
+.summary-container .summary:nth-child(6n + 1) .summary-value {
+  color: var(--spectrum-cyan-900);
+}
+
+.summary-container .summary:nth-child(6n + 2) .summary-value {
+  color: var(--spectrum-indigo-900);
+}
+
+.summary-container .summary:nth-child(6n + 3) .summary-value {
+  color: var(--spectrum-orange-700);
+}
+
+.summary-container .summary:nth-child(6n + 4) .summary-value {
+  color: var(--spectrum-magenta-900);
+}
+
+.summary-container .summary:nth-child(6n + 5) .summary-value {
+  color: var(--spectrum-purple-700);
+}
+
+.summary-container .summary:nth-child(6n) .summary-value {
+  color: var(--spectrum-chartreuse-700);
 }
 
 .summary .summary-label {
@@ -475,7 +506,7 @@ section.dashboard {
 }
 
 .chart-container {
-  flex: 1 0 100%;
+  flex: 1 0 600px;
 }
 
 .chart {
@@ -513,7 +544,15 @@ section.dashboard {
   inset: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--spectrum-cyan-900);
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  background-color: white;
+  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
+    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
+    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 0, 8px -8px, 0 8px;
   transition: height 0.6s, width 0.3s;
 }
 
@@ -558,5 +597,10 @@ section.dashboard {
   outline: 10px solid white;
   box-shadow: 0 0 20px #000c;
   background-color: white;
-  cursor: zoom-out;
+  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
+    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
+    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 0, 8px -8px, 0 8px;  cursor: zoom-out;
 }
