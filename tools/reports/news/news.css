@@ -6,6 +6,7 @@ body {
   max-width: 1200px;
   margin: auto;
   margin-top: 32px;
+  background-color: #eaeaea;
 }
 
 main {
@@ -323,6 +324,7 @@ section.dashboard {
   border: solid 1px #e8e8e8;
   border-radius: 4px;
   padding: 2rem;
+  background-color: white;
 }
 
 .table [data-before]::before {
@@ -469,4 +471,91 @@ section.dashboard {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+.chart-container {
+  flex: 1 0 100%;
+}
+
+.chart {
+  width: 100%;
+  border: solid 1px #e8e8e8;
+  border-radius: 4px;
+  padding: 2rem;
+  background-color: white;
+}
+
+.chart h2 {
+  padding-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.chart > div {
+  border-left: 1px solid #e8e8e8;
+  padding: 8px 0;
+}
+
+.chart > div > div {
+  position: relative;
+  height: 5rem;
+  cursor: zoom-in;
+}
+
+.chart > div > div + div {
+  margin-top: 8px;
+}
+
+.chart .chart-bar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--spectrum-cyan-900);
+  transition: height 0.6s, width 0.3s;
+}
+
+.chart div span {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: var(--spacing-xxs) 8px;
+  border-radius: 8px;
+  background-color: white;
+  color: #2c2c2c;
+  font-size: var(--type-body-s-size);
+  line-height: 1;
+  z-index: 1;
+}
+
+.chart .chart-bar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: height 0.6s, width 0.3s;
+}
+
+.chart > div > div.expand span {
+  z-index: 2;
+}
+
+.chart > div > div.expand .chart-bar {
+  position: relative;
+  width: 100% !important;
+  z-index: 2;
+}
+
+.chart > div > div.expand .chart-bar img {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: auto;
+  max-height: 100vh;
+  outline: 10px solid white;
+  box-shadow: 0 0 20px #000c;
+  background-color: white;
+  cursor: zoom-out;
 }

@@ -7,7 +7,7 @@ import {
 
 import buildTop10TableBlock from './pods/top10.js';
 import buildSummary from './pods/summary.js';
-import buildDepthBlock from './pods/depth.js';
+import buildMediaChart from './pods/media.js';
 
 /**
  * Formats a given date string into the `YYYY-MM-DD` format.
@@ -111,7 +111,9 @@ const draw = async () => {
     throw new Error('Current page not found in report');
   }
 
-  const metrics = currentPageEntry.getMetrics(['pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage']);
+  const metrics = currentPageEntry.getMetrics([
+    'pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage',
+  ]);
 
   const summaries = document.querySelector('.summary-container');
   Object.keys(SERIES).forEach((key) => {
@@ -141,7 +143,7 @@ const draw = async () => {
     }
   });
 
-  buildDepthBlock(depth, 'page-read-depth');
+  buildMediaChart(depth, 'page-read-depth');
 
   report.filter = {
     underroot: [true],
