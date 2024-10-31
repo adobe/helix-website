@@ -438,7 +438,7 @@ const io = new IntersectionObserver((entries) => {
       }
     });
 
-    elems.filterInput.addEventListener('blur', (event) => {
+    elems.filterInput.addEventListener('blur', () => {
       updateState();
       draw();
     });
