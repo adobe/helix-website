@@ -41,7 +41,7 @@ export default function buildTop10TableBlock(urls, currentEntry, config, id, tit
       }
       const u = new URL(entry.value);
       row.innerHTML = `<td>
-          <a href="${toReportURL(entry.value)}" target="_blank">
+          <a href="${toReportURL(entry.value)}">
             ${u.pathname}
           </a>
         </td>
