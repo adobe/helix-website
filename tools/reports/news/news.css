@@ -535,25 +535,29 @@ section.dashboard {
   background-color: white;
 }
 
-.chart h2 {
+.chart figcaption {
   padding-bottom: 16px;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0;
 }
 
-.chart > div {
+.chart figure {
+  margin: 0;
+}
+
+.chart figure > div {
   border-left: 1px solid #e8e8e8;
   padding: 8px 0;
 }
 
-.chart > div > div {
+.chart figure > div > div {
   position: relative;
   height: 5rem;
   cursor: zoom-in;
 }
 
-.chart > div > div + div {
+.chart figure > div > div + div {
   margin-top: 8px;
 }
 
@@ -595,17 +599,17 @@ section.dashboard {
   transition: height 0.6s, width 0.3s;
 }
 
-.chart > div > div.expand span {
+.chart figure > div > div.expand span {
   z-index: 2;
 }
 
-.chart > div > div.expand .chart-bar {
+.chart figure > div > div.expand .chart-bar {
   position: relative;
   width: 100% !important;
   z-index: 2;
 }
 
-.chart > div > div.expand .chart-bar img {
+.chart figure > div > div.expand .chart-bar img {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);

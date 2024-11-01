@@ -1,7 +1,9 @@
 function buildChart(media) {
   const chart = document.createElement('div');
+  chart.role = 'list';
   media.forEach((m, i) => {
     const wrapper = document.createElement('div');
+    wrapper.role = 'listitem';
     wrapper.addEventListener('click', () => {
       const expanded = wrapper.classList.contains('expand');
       chart.querySelectorAll('.expand').forEach((e) => e.removeAttribute('class'));
@@ -9,12 +11,15 @@ function buildChart(media) {
       else wrapper.classList.add('expand');
     });
     const bar = document.createElement('div');
+    bar.setAttribute('aria-label', `Media ${i + 1} engagement: ${m.value}%`);
+    bar.setAttribute('aria-valuenow', m.value);
     bar.className = 'chart-bar';
     bar.style.width = `${m.value}%`;
     const img = document.createElement('img');
     img.src = m.preview;
-    img.alt = `Media ${i + 1}`;
+    img.alt = ''; // image has no contextual value
     const value = document.createElement('span');
+    value.setAttribute('aria-hidden', true); // hide duplicative content
     value.textContent = `${m.value}%`;
     bar.append(img);
     wrapper.append(bar, value);
@@ -27,14 +32,16 @@ export default function buildMediaChart(media, id) {
   const container = document.getElementById(id);
 
   if (container) {
-    if (container.querySelector('.chart')) {
-      container.querySelector('.chart > div').remove();
+    if (container.querySelector('figure')) {
+      container.querySelector('figure').remove();
     }
     if (media.length > 8) container.parentElement.classList.add('bulkMedia');
     else container.parentElement.classList.remove('bulkMedia');
-    const title = document.createElement('h2');
+    const wrapper = document.createElement('figure');
+    const title = document.createElement('figcaption');
     title.textContent = 'Media Engagement By Depth on Blog Post';
     const chart = buildChart(media);
-    container.append(title, chart);
+    wrapper.append(title, chart);
+    container.append(wrapper);
   }
 }
