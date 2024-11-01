@@ -430,9 +430,12 @@ section.dashboard {
 }
 
 .table .media-wrapper.unsupported p {
+  padding: 8px;
   color: var(--spectrum-red-900);
   font-size: 150%;
   font-weight: 700;
+  line-height: 1;
+  text-align: center;
 }
 
 .table table {
@@ -518,7 +521,9 @@ section.dashboard {
 .table table tbody tr td .bar {
   position: absolute;
   inset: 0;
+  width: 0;
   background-color: var(--spectrum-blue-300);
+  transition: width 0.3s;
 }
 
 .table table tr td .bar + span {

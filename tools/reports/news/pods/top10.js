@@ -62,8 +62,22 @@ export default function buildTop10TableBlock(urls, currentEntry, config, id, tit
     bars.forEach((bar) => {
       const value = parseInt(bar.dataset.value, 10);
       const percentage = Math.floor((value / sum) * 100);
-      bar.style.width = `${percentage}%`;
+      bar.dataset.value = percentage;
     });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          table.querySelectorAll('td .bar').forEach((bar, j) => {
+            setTimeout(() => {
+              bar.style.width = `${parseInt(bar.dataset.value, 10)}%`; // expand to target width
+            }, j * 150); // cascade bar expansions
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0 });
+    observer.observe(table);
 
     // populate table caption
     const caption = table.querySelector('caption');

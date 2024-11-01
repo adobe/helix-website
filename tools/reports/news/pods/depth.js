@@ -47,8 +47,22 @@ export default function buildDepthBlock(depths, id) {
     else container.parentElement.classList.remove('bulkMedia');
 
     const table = buildTableEl(depths.length);
-    container.append(table);
     const body = table.querySelector('tbody');
+    container.append(table);
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          table.querySelectorAll('td .bar').forEach((bar, i) => {
+            setTimeout(() => {
+              bar.style.width = `${parseInt(bar.dataset.value, 10)}%`; // expand to target width
+            }, i * 150); // cascade bar expansions
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0 });
+    observer.observe(table);
 
     // supported media types
     const imgs = ['jpeg', 'jpg', 'png', 'gif', 'svg'];
@@ -60,7 +74,7 @@ export default function buildDepthBlock(depths, id) {
           <div class="media-wrapper"></div>
         </td>
         <td>
-          <span class="bar" data-value="${rate}" style="width: ${rate}%"></span>
+          <span class="bar" data-value="${rate}"></span>
           <span>${rate}%</span>
         </td>`;
       body.append(row);
