@@ -1,3 +1,22 @@
+function buildImg(src) {
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = ''; // image has no contextual value
+  return img;
+}
+
+function buildVideo(src, type) {
+  const video = document.createElement('video');
+  ['autoplay', 'loop', 'muted', 'playsinline'].forEach((property) => {
+    video[property] = true;
+  });
+  const source = document.createElement('source');
+  source.src = src;
+  source.type = `video/${type}`;
+  video.append(source);
+  return video;
+}
+
 function buildChart(media) {
   const chart = document.createElement('div');
   chart.role = 'list';
@@ -15,13 +34,25 @@ function buildChart(media) {
     bar.setAttribute('aria-valuenow', m.value);
     bar.className = 'chart-bar';
     bar.style.width = 0;
-    const img = document.createElement('img');
-    img.src = m.preview;
-    img.alt = ''; // image has no contextual value
+    try {
+      const imgs = ['jpeg', 'jpg', 'png', 'gif', 'svg'];
+      const videos = ['mp4'];
+      const type = new URL(m.preview).pathname.split('.').pop();
+      if (![...imgs, ...videos].includes(type)) throw type;
+      if (imgs.includes(type)) {
+        const img = buildImg(m.preview);
+        bar.append(img);
+      } else if (videos.includes(type)) {
+        const video = buildVideo(m.preview, type);
+        bar.append(video);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error, 'is not a supported media type.');
+    }
     const value = document.createElement('span');
     value.setAttribute('aria-hidden', true); // hide duplicative content
     value.textContent = `${m.value}%`;
-    bar.append(img);
     wrapper.append(bar, value);
     chart.append(wrapper);
   });

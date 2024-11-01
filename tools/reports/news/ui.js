@@ -7,7 +7,7 @@ import {
 
 import buildTop10TableBlock from './pods/top10.js';
 import buildSummary from './pods/summary.js';
-import buildMediaChart from './pods/media.js';
+import buildDepthBlock from './pods/depth.js';
 
 /**
  * Formats a given date string into the `YYYY-MM-DD` format.
@@ -143,7 +143,7 @@ const draw = async () => {
     }
   });
 
-  buildMediaChart(depth, 'page-read-depth');
+  buildDepthBlock(depth, 'page-read-depth');
 
   report.filter = {
     underroot: [true],
