@@ -36,12 +36,11 @@ function increment(element, current, i, timeout, target, nonNumeric) {
  * @param {number} target - Target numeric value.
  */
 function startIncrement(element, duration, target) {
-  const numerize = (val) => val.replace(/[^0-9.-]/g, '');
-
   const current = element.textContent; // initial content of the element
   const nonNumeric = target.match(/[^0-9.-]+/g); // extract non-numeric characters
 
   // parse numeric target
+  const numerize = (val) => val.replace(/[^0-9.-]/g, '');
   const numericTarget = parseFloat(numerize(target));
   const initial = parseFloat(numerize(current));
 
@@ -64,6 +63,17 @@ export default function buildSummary(name, label, value) {
   section.className = `summary ${name}`;
   section.innerHTML = `<p class="summary-value">0</p>
     <p class="summary-label">${label}</p>`;
+
+  const parens = label.includes('(') && label.includes(')');
+  if (parens) {
+    const primary = label.split('(')[0].trim();
+    const secondary = label.split('(')[1].split(')')[0].trim();
+    section.innerHTML = `<p class="summary-value">0</p>
+      <p class="summary-label">${primary} <span>(${secondary})</span></p>`;
+  } else {
+    section.innerHTML = `<p class="summary-value">0</p>
+      <p class="summary-label">${label}</p>`;
+  }
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
