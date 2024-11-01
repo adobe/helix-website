@@ -14,7 +14,7 @@ function buildChart(media) {
     bar.setAttribute('aria-label', `Media ${i + 1} engagement: ${m.value}%`);
     bar.setAttribute('aria-valuenow', m.value);
     bar.className = 'chart-bar';
-    bar.style.width = `${m.value}%`;
+    bar.style.width = 0;
     const img = document.createElement('img');
     img.src = m.preview;
     img.alt = ''; // image has no contextual value
@@ -25,6 +25,30 @@ function buildChart(media) {
     wrapper.append(bar, value);
     chart.append(wrapper);
   });
+
+  if (!media.length) {
+    const noMedia = document.createElement('p');
+    noMedia.role = 'listitem';
+    noMedia.textContent = 'This post had no observable media engagement.';
+    chart.append(noMedia);
+    chart.className = 'empty';
+  } else {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          chart.querySelectorAll('.chart-bar').forEach((bar, i) => {
+            setTimeout(() => {
+              bar.style.width = `${media[i].value}%`; // expand to target width
+              bar.querySelector('img').style.objectPosition = 'center';
+            }, i * 150); // cascade bar expansions
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0 });
+    observer.observe(chart);
+  }
+
   return chart;
 }
 
