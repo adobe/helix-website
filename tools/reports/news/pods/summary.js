@@ -52,7 +52,11 @@ function startIncrement(element, duration, target) {
   const steps = Math.ceil(numericTarget / incrementBy);
   const timeout = duration / steps;
 
-  increment(element, initial, incrementBy, timeout, numericTarget, nonNumeric);
+  if (Number.isNaN(numericTarget)) {
+    element.textContent = '--';
+  } else {
+    increment(element, initial, incrementBy, timeout, numericTarget, nonNumeric);
+  }
 }
 
 export default function buildSummary(name, label, value) {
