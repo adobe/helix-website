@@ -1,4 +1,6 @@
-import { isKnownFacet } from '../utils.js';
+import { utils } from '@adobe/rum-distiller';
+
+const { isKnownFacet } = utils;
 
 export default class ConversionTracker extends HTMLElement {
   updateState() {

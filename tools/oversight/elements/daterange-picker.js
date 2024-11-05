@@ -174,7 +174,7 @@ const TEMPLATE = `
 </section>
 `;
 
-export default class TimeRangePicker extends HTMLElement {
+export default class DateRangePicker extends HTMLElement {
   constructor() {
     super();
 

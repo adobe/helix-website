@@ -2,10 +2,13 @@
 import { SankeyController, Flow } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
+import { utils } from '@adobe/rum-distiller';
 import AbstractChart from './chart.js';
 import {
-  cssVariable, parseConversionSpec, reclassifyAcquisition, reclassifyEnter,
+  cssVariable, parseConversionSpec,
 } from '../utils.js';
+
+const { reclassifyAcquisition, reclassifyEnter } = utils;
 
 Chart.register(SankeyController, Flow, ...registerables);
 

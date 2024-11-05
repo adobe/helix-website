@@ -2,10 +2,13 @@ import {
   Chart, LinearScale, registerables,
   // eslint-disable-next-line import/no-unresolved, import/extensions
 } from 'chartjs';
+import { utils } from '@adobe/rum-distiller';
 import AbstractChart from './chart.js';
 import {
-  toHumanReadable, scoreBundle, cwvInterpolationFn, cssVariable,
+  toHumanReadable, cssVariable, cwvInterpolationFn,
 } from '../utils.js';
+
+const { scoreBundle } = utils;
 
 Chart.register(LinearScale, ...registerables);
 
