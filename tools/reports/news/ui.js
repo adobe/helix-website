@@ -129,18 +129,15 @@ const draw = async () => {
   let max = 0;
   const depth = [];
   media.forEach((mi, i) => {
+    const c = {
+      preview: mi.value,
+      value: Math.floor((mi.weight / max) * 100),
+    };
     if (i === 0) {
       max = mi.weight;
-      depth.push({
-        preview: `${config.url}/${mi.value}`,
-        value: 100,
-      });
-    } else {
-      depth.push({
-        preview: `${config.url}/${mi.value}`,
-        value: Math.floor((mi.weight / max) * 100),
-      });
+      c.value = 100;
     }
+    depth.push(c);
   });
 
   buildDepthBlock(depth, 'page-read-depth');

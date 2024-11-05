@@ -93,11 +93,9 @@ class URLReports {
         .filter(({ target }) => target) // filter out empty targets
         .reduce((acc, { target }) => {
           if (typeof target === 'string') {
-            const mi = target.indexOf('/media_');
-            if (mi) {
-              const u = new URL(target);
-              acc.add(u.pathname.substring(u.pathname.lastIndexOf('/') + 1));
-            }
+            const u = new URL(target);
+            u.hash = '';
+            acc.add(u.toString());
           }
           return acc;
         }, new Set()),
