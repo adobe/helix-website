@@ -126,7 +126,7 @@ function updateDataFacets(filterText, params, checkpoint) {
   );
 
   dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
-  dataChunks.addFacet('url', facets.url, 'some', 'never');
+  dataChunks.addFacet('url', facets.plainURL, 'some', 'never');
   dataChunks.addFacet('vitals', vitals);
   dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
