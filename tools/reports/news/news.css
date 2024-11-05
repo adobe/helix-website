@@ -6,6 +6,7 @@ body {
   max-width: 1200px;
   margin: auto;
   margin-top: 32px;
+  background-color: #eaeaea;
 }
 
 main {
@@ -59,6 +60,38 @@ section.top-nav {
   align-items: center;
   justify-content: space-between;
   margin: calc(var(--nav-height) + 2rem) 0 2rem;
+}
+
+section.top-nav button {
+  position: relative;
+}
+
+@keyframes fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+section.top-nav button .share-tip {
+  position: absolute;
+  top: calc(100% + 0.5em);
+  right: 0;
+  width: max-content;
+  padding: 5px 1.2em 6px;
+  background-color: #000c;
+  color: white;
+  font-weight: normal;
+  animation: fade 0.3s ease forwards;
+  animation-delay: 3s;
+}
+
+section.top-nav button .share-tip::before {
+  position: absolute;
+  content: '';
+  top: -0.5em;
+  right: 1em;
+  border-left: 0.25em solid transparent;
+  border-right: 0.25em solid transparent;
+  border-bottom: 0.5em solid #000c;
 }
 
 section.top-nav h1 {
@@ -162,6 +195,7 @@ section.dashboard {
   height: 100%;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
+  background-color: white;
   cursor: pointer;
 }
 
@@ -230,8 +264,14 @@ section.dashboard {
 .summary-container {
   flex: 1 0 50%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
+}
+
+@media (width >= 1100px) {
+  .summary-container {
+    flex: 1 0 33%;
+  }
 }
 
 .depth-container {
@@ -241,6 +281,10 @@ section.dashboard {
 
 .depth-container img {
   max-height: 50px;
+}
+
+.depth-container .table tr td {
+  vertical-align: middle;
 }
 
 .depth-container .table tr td:first-of-type {
@@ -263,6 +307,35 @@ section.dashboard {
   font-size: 200%;
   line-height: 80%;
   text-align: center;
+  transition: transform 0.3s;
+}
+
+.summary:hover .summary-value {
+  transform: scale(1.15);
+}
+
+.summary-container .summary:nth-child(6n + 1) .summary-value {
+  color: var(--spectrum-cyan-900);
+}
+
+.summary-container .summary:nth-child(6n + 2) .summary-value {
+  color: var(--spectrum-indigo-900);
+}
+
+.summary-container .summary:nth-child(6n + 3) .summary-value {
+  color: var(--spectrum-orange-700);
+}
+
+.summary-container .summary:nth-child(6n + 4) .summary-value {
+  color: var(--spectrum-magenta-900);
+}
+
+.summary-container .summary:nth-child(6n + 5) .summary-value {
+  color: var(--spectrum-purple-700);
+}
+
+.summary-container .summary:nth-child(6n) .summary-value {
+  color: var(--spectrum-chartreuse-700);
 }
 
 .summary .summary-label {
@@ -271,6 +344,13 @@ section.dashboard {
   font-size: 18px;
   line-height: 27px;
   text-align: right;
+}
+
+.summary .summary-label span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 80%;
+  line-height: 1.3;
 }
 
 @media (width >= 1100px) {
@@ -285,9 +365,12 @@ section.dashboard {
 
 .table {
   width: 100%;
+  height: 100%;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
   padding: 2rem;
+  background-color: white;
+  overflow-y: hidden;
 }
 
 .table [data-before]::before {
@@ -298,6 +381,61 @@ section.dashboard {
 .table [data-after]::after {
   content: attr(data-after);
   padding-left: 0.5ch;
+}
+
+.table .media-container {
+  position: relative;
+  height: 250px;
+  cursor: zoom-in;
+}
+
+.table .media-wrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
+    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
+    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 0, 8px -8px, 0 8px;
+  transition: height 6s;
+}
+
+.table .media-wrapper.zoom {
+  top: 50%;
+  transform: translateY(-50%);
+  height: max-content;
+  box-shadow: 0 0 20px #000c;
+  outline: 10px solid white;
+  cursor: zoom-out;
+  z-index: 2;
+}
+
+.table .media-wrapper img,
+.table .media-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: height 6s;
+}
+
+.table .media-wrapper.unsupported {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.table .media-wrapper.unsupported p {
+  padding: 8px;
+  color: var(--spectrum-red-900);
+  font-size: 150%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
 }
 
 .table table {
@@ -318,9 +456,13 @@ section.dashboard {
   border: 1px solid #e8e8e8;
 }
 
-.table table tr > * {
-  flex: 1 0 100%;
+.table table tr th {
+  flex: 0 1 max-content;
   min-width: unset;
+}
+
+.table table tr th:not(:last-of-type) {
+  padding-right: 0;
 }
 
 .table table caption,
@@ -332,9 +474,12 @@ section.dashboard {
 .table table tr td {
   border: none;
   padding: 8px;
+  vertical-align: middle;
 }
 
 .table table tr td {
+  flex: 1 0 100%;
+  min-width: unset;
   color: #444 !important;
 }
 
@@ -376,7 +521,9 @@ section.dashboard {
 .table table tbody tr td .bar {
   position: absolute;
   inset: 0;
+  width: 0;
   background-color: var(--spectrum-blue-300);
+  transition: width 0.3s;
 }
 
 .table table tr td .bar + span {
@@ -393,6 +540,10 @@ section.dashboard {
     content: none;
   }
 
+  .table .media-container {
+    height: 5rem;
+  }
+
   .table table tr {
     display: table-row;
   }
@@ -403,6 +554,10 @@ section.dashboard {
 
   .table table tbody tr {
     border: none !important;
+  }
+
+  .table table tr th:not(:last-of-type) {
+    padding-right: 8px;
   }
 
   .table table tbody tr td {
@@ -421,6 +576,14 @@ section.dashboard {
     width: 30%;
   }
 
+  .table#page-read-depth table thead tr th:first-child {
+    width: 50%;
+  }
+
+  .table#page-read-depth table thead tr th:last-child {
+    width: 50%;
+  }
+
   .table table tbody tr td:last-child,
   .table table tfoot tr td:last-child {
     text-align: right;
@@ -434,4 +597,123 @@ section.dashboard {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+.chart-container {
+  flex: 1 1 540px;
+}
+
+.chart-container.bulkMedia,
+.table-container.bulkMedia {
+  flex: 1 0 100%;
+}
+
+.chart {
+  width: 100%;
+  height: 100%;
+  border: solid 1px #e8e8e8;
+  border-radius: 4px;
+  padding: 2rem;
+  background-color: white;
+}
+
+.chart figcaption {
+  padding-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.chart figure {
+  margin: 0;
+}
+
+.chart figure > div {
+  border-left: 1px solid #e8e8e8;
+  padding: 8px 0;
+}
+
+.chart figure > div.empty {
+  border-left: 0;
+  padding: 0;
+  color: #686868;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+.chart figure > div > div {
+  position: relative;
+  height: 5rem;
+  cursor: zoom-in;
+}
+
+.chart figure > div > div + div {
+  margin-top: 8px;
+}
+
+.chart .chart-bar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  background-color: white;
+  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
+    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
+    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 0, 8px -8px, 0 8px;
+  transition: height 0.6s, width 0.6s;
+}
+
+.chart div span {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: var(--spacing-xxs) 8px;
+  border-radius: 8px;
+  background-color: white;
+  color: #2c2c2c;
+  font-size: var(--type-body-s-size);
+  line-height: 1;
+  z-index: 1;
+}
+
+.chart .chart-bar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left;
+  transition: height 0.3s, width 0.3s, object-position 0.7s;
+}
+
+.chart figure > div > div.expand span {
+  z-index: 2;
+}
+
+.chart figure > div > div.expand .chart-bar {
+  position: relative;
+  width: 100% !important;
+  z-index: 2;
+}
+
+.chart figure > div > div.expand .chart-bar img {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: auto;
+  max-height: 100vh;
+  outline: 10px solid white;
+  box-shadow: 0 0 20px #000c;
+  background-color: white;
+  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
+    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
+    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 0, 8px -8px, 0 8px;  cursor: zoom-out;
 }

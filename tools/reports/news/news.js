@@ -127,21 +127,21 @@ const SERIES = {
     labelFn: (value) => utils.toHumanReadable(value),
   },
   bounce: {
-    label: 'Bounce Rate (surfer never clicked)',
+    label: 'Bounce Rate (Visitor left page without any interaction)',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.bounces.sum) / aggregate.visits.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
   },
   engagement: {
-    label: 'Page Engagement (surfer clicked "something" on page or viewed more than 3 media or blocks)',
+    label: 'Active Page Engagement (Visitor clicked or viewed at least three media elements/content blocks)',
     rateFn: (aggregate) => Math.round(
       (100 * aggregate.engagement.sum) / aggregate.pageViews.sum,
     ),
     labelFn: (value) => `${value || 0}%`,
   },
   conversions: {
-    label: 'Conversion Rate (surfer clicked on CTA button)',
+    label: 'Conversion Rate (Visitor clicked the call-to-action button)',
     rateFn: (aggregate) => Math.min(Math.round(
       (100 * aggregate.conversions.sum) / aggregate.visits.sum,
     ), 100),

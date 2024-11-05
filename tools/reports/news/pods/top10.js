@@ -1,9 +1,9 @@
 import { toReportURL } from '../utils.js';
 
-function buildTableEl(label) {
+function buildTableEl(label, title) {
   const table = document.createElement('table');
   const caption = document.createElement('caption');
-  caption.innerHTML = 'Top <span class="top-total"></span> Blog Posts by Page Views';
+  caption.innerHTML = `Top <span class="top-total"></span> Blog Posts ${title || ''} by Page Views`;
   const head = document.createElement('thead');
   head.innerHTML = `<tr>
       <th scope="col">Blog Post</th>
@@ -19,13 +19,13 @@ function buildTableEl(label) {
   return table;
 }
 
-export default function buildTop10TableBlock(urls, currentEntry, config, id) {
+export default function buildTop10TableBlock(urls, currentEntry, config, id, title) {
   const container = document.getElementById(id);
   if (container) {
     if (container.querySelector('table')) {
       container.querySelector('table').remove();
     }
-    const table = buildTableEl('Page Views');
+    const table = buildTableEl('Page Views', title);
     container.append(table);
     const body = table.querySelector('tbody');
     let sum = 0;
@@ -41,7 +41,7 @@ export default function buildTop10TableBlock(urls, currentEntry, config, id) {
       }
       const u = new URL(entry.value);
       row.innerHTML = `<td>
-          <a href="${toReportURL(entry.value)}" target="_blank">
+          <a href="${toReportURL(entry.value)}">
             ${u.pathname}
           </a>
         </td>
@@ -62,8 +62,22 @@ export default function buildTop10TableBlock(urls, currentEntry, config, id) {
     bars.forEach((bar) => {
       const value = parseInt(bar.dataset.value, 10);
       const percentage = Math.floor((value / sum) * 100);
-      bar.style.width = `${percentage}%`;
+      bar.dataset.value = percentage;
     });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          table.querySelectorAll('td .bar').forEach((bar, j) => {
+            setTimeout(() => {
+              bar.style.width = `${parseInt(bar.dataset.value, 10)}%`; // expand to target width
+            }, j * 150); // cascade bar expansions
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0 });
+    observer.observe(table);
 
     // populate table caption
     const caption = table.querySelector('caption');
