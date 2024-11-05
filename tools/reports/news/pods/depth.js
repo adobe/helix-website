@@ -81,13 +81,16 @@ export default function buildDepthBlock(depths, id) {
       const preview = row.querySelector('.media-wrapper');
       try {
         const type = new URL(depth.preview).pathname.split('.').pop();
-        if (![...imgs, ...videos].includes(type)) throw type;
         if (imgs.includes(type)) {
           const img = buildImg(depth.preview, i);
           preview.append(img);
         } else if (videos.includes(type)) {
           const video = buildVideo(depth.preview, type, i);
           preview.append(video);
+        } else {
+          // try as an image
+          const img = buildImg(depth.preview, i);
+          preview.append(img);
         }
         preview.addEventListener('click', () => {
           const zoom = preview.classList.contains('zoom');
