@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@adobe/rum-distiller": "1.5.0"
+    "@adobe/rum-distiller": "1.6.0"
   }
 }
