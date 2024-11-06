@@ -93,9 +93,14 @@ class URLReports {
         .filter(({ target }) => target) // filter out empty targets
         .reduce((acc, { target }) => {
           if (typeof target === 'string') {
-            const u = new URL(target);
-            u.hash = '';
-            acc.add(u.toString());
+            try {
+              const u = new URL(target);
+              u.hash = '';
+              acc.add(u.toString());
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error(error, target);
+            }
           }
           return acc;
         }, new Set()),
