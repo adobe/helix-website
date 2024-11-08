@@ -2,17 +2,21 @@ function getPersistentToken() {
   return localStorage.getItem('rum-bundler-token');
 }
 
+function isIncognitoMode() {
+  return new URL(window.location.href).searchParams.get('domainkey') === 'incognito';
+}
+
 export default class URLSelector extends HTMLElement {
   constructor() {
     super();
     this.template = `
       <style>
-        label {
+        url-selector label {
           display: block;
           margin-right: 8px;
         }
 
-        input {
+        url-selector input {
           width: 100%;
           display: block;
           font: inherit;
@@ -22,18 +26,20 @@ export default class URLSelector extends HTMLElement {
           border: 0;
         }
 
-        input:disabled {
+        url-selector input:disabled {
           background-color: transparent;
           color: black;
         }
       </style>
       <label for="url"><img src="https://www.aem.live/favicon.ico"></label>
-      <input id="url" type="url">
+      <input id="url" type="url" list="rum-domain-suggestions">
+      <datalist id="rum-domain-suggestions"></datalist>
     `;
   }
 
   connectedCallback() {
     this.innerHTML = this.template;
+    const datalist = this.querySelector('datalist');
     const input = this.querySelector('input');
     input.value = new URL(window.location.href).searchParams.get('domain');
     const img = this.querySelector('img');
@@ -41,7 +47,33 @@ export default class URLSelector extends HTMLElement {
 
     if (!getPersistentToken()) {
       input.disabled = true;
+      datalist.remove();
     }
+
+    input.addEventListener('mouseover', () => {
+      const token = getPersistentToken();
+      if (token && !isIncognitoMode()) {
+        fetch('https://rum.fastly-aem.page/domains?suggested=true', {
+          headers: {
+            accept: 'application/json',
+            authorization: `Bearer ${token}`,
+          },
+        }).then(async (resp) => {
+          if (!resp.ok) {
+            datalist.remove();
+          } else {
+            const { domains } = await resp.json();
+            domains.forEach((domain) => {
+              const option = document.createElement('option');
+              option.value = domain;
+              datalist.appendChild(option);
+            });
+          }
+        }).catch(() => {
+          datalist.remove();
+        });
+      }
+    }, { once: true });
 
     input.addEventListener('focus', () => {
       input.select();

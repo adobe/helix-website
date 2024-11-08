@@ -1,15 +1,29 @@
 // eslint-disable-next-line import/no-relative-packages
-import { DataChunks } from './cruncher.js';
-import DataLoader from './loader.js';
 import {
-  parseConversionSpec,
-  parseSearchParams,
+  DataChunks, utils, series, facets,
+  // eslint-disable-next-line import/no-unresolved
+} from '@adobe/rum-distiller';
+import DataLoader from './loader.js';
+import { parseSearchParams, parseConversionSpec } from './utils.js';
+
+const {
   isKnownFacet,
   scoreCWV,
   computeConversionRate,
   reclassifyConsent,
-  reclassifyAcquisition,
-} from './utils.js';
+} = utils;
+
+const {
+  userAgent,
+  vitals,
+  lcpSource,
+  lcpTarget,
+  acquisitionSource,
+} = facets;
+
+const {
+  pageViews, visits, bounces, lcp, cls, inp, engagement, ttfb, organic,
+} = series;
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
@@ -30,27 +44,44 @@ await loader.fetchEnrichedData();
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
-window.addEventListener('pageshow', () => elems.canvas && herochart.render());
+window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
-dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
-dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
+dataChunks.addSeries('pageViews', pageViews);
+dataChunks.addSeries('visits', visits);
 // a bounce is a visit without a click
-dataChunks.addSeries('bounces', (bundle) => (bundle.visit && !bundle.events.find(({ checkpoint }) => checkpoint === 'click')
-  ? bundle.weight
-  : 0));
-dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
-dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
-dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
-dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-dataChunks.addSeries('engagement', (bundle) => (dataChunks.hasConversion(bundle, {
-  checkpoint: ['click'],
-})
-  ? bundle.weight
-  : 0));
+dataChunks.addSeries('bounces', bounces);
+dataChunks.addSeries('lcp', lcp);
+dataChunks.addSeries('cls', cls);
+dataChunks.addSeries('inp', inp);
+dataChunks.addSeries('ttfb', ttfb);
+dataChunks.addSeries('engagement', engagement);
 dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, parseConversionSpec())
   ? bundle.weight
   : 0));
+
+dataChunks.addSeries('organic', organic);
+/*
+ * timeOnPage is the time it took to load the page,
+ * i.e. the difference between the first and last event
+ * in seconds
+ */
+dataChunks.addSeries('timeOnPage', (bundle) => {
+  const deltas = bundle.events
+    .map((evt) => evt.timeDelta)
+    .filter((delta) => delta > 0);
+  if (deltas.length === 0) {
+    return undefined;
+  }
+  return Math.max(...deltas) / 1000;
+});
+
+dataChunks.addSeries('contentEngagement', (bundle) => {
+  const viewEvents = bundle.events
+    .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock');
+  return viewEvents.length;
+});
+
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -77,48 +108,54 @@ export function updateKeyMetrics() {
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
   }
 
-  document.querySelector('#visits p number-format').textContent = dataChunks.totals.visits.sum;
-  document.querySelector('#visits p number-format').setAttribute('sample-size', dataChunks.totals.visits.count);
-  document.querySelector('#visits p number-format').setAttribute('total', dataChunks.totals.pageViews.sum);
   if (dataChunks.totals.visits.sum > 0) {
+    document.querySelector('#visits p number-format').textContent = dataChunks.totals.visits.sum;
+    document.querySelector('#visits p number-format').setAttribute('sample-size', dataChunks.totals.visits.count);
+    document.querySelector('#visits p number-format').setAttribute('total', dataChunks.totals.pageViews.sum);
     const visitsExtra = document.querySelector('#visits p number-format.extra') || document.createElement('number-format');
     visitsExtra.textContent = (100 * dataChunks.totals.bounces.sum) / dataChunks.totals.visits.sum;
     visitsExtra.setAttribute('precision', 1);
     visitsExtra.setAttribute('total', 100);
     visitsExtra.className = 'extra';
     document.querySelector('#visits p').appendChild(visitsExtra);
-  }
-
-  if (isDefaultConversion) {
-    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.engagement.sum;
-    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.engagement.count);
   } else {
-    document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
-    document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+    document.querySelector('#visits p number-format').textContent = 'N/A';
   }
 
-  document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
-  const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
-  if (dataChunks.totals.pageViews.sum > 0 && isDefaultConversion) {
-    conversionsExtra.textContent = computeConversionRate(
-      dataChunks.totals.engagement.sum,
-      dataChunks.totals.pageViews.sum,
-    );
-    // this is a bit of fake precision, but it's good enough for now
-    conversionsExtra.setAttribute('precision', 2);
-    conversionsExtra.setAttribute('total', 100);
-    conversionsExtra.className = 'extra';
-    document.querySelector('#conversions p').appendChild(conversionsExtra);
-  } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
-    conversionsExtra.textContent = computeConversionRate(
-      dataChunks.totals.conversions.sum,
-      dataChunks.totals.visits.sum,
-    );
-    // this is a bit of fake precision, but it's good enough for now
-    conversionsExtra.setAttribute('precision', 2);
-    conversionsExtra.setAttribute('total', 100);
-    conversionsExtra.className = 'extra';
-    document.querySelector('#conversions p').appendChild(conversionsExtra);
+  if (dataChunks.totals.visits.sum > 0) {
+    if (isDefaultConversion) {
+      document.querySelector('#conversions p number-format').textContent = dataChunks.totals.engagement.sum;
+      document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.engagement.count);
+    } else {
+      document.querySelector('#conversions p number-format').textContent = dataChunks.totals.conversions.sum;
+      document.querySelector('#conversions p number-format').setAttribute('sample-size', dataChunks.totals.conversions.count);
+    }
+
+    document.querySelector('#conversions p number-format').setAttribute('total', dataChunks.totals.visits.sum);
+    const conversionsExtra = document.querySelector('#conversions p number-format.extra') || document.createElement('number-format');
+    if (dataChunks.totals.pageViews.sum > 0 && isDefaultConversion) {
+      conversionsExtra.textContent = computeConversionRate(
+        dataChunks.totals.engagement.sum,
+        dataChunks.totals.pageViews.sum,
+      );
+      // this is a bit of fake precision, but it's good enough for now
+      conversionsExtra.setAttribute('precision', 2);
+      conversionsExtra.setAttribute('total', 100);
+      conversionsExtra.className = 'extra';
+      document.querySelector('#conversions p').appendChild(conversionsExtra);
+    } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
+      conversionsExtra.textContent = computeConversionRate(
+        dataChunks.totals.conversions.sum,
+        dataChunks.totals.visits.sum,
+      );
+      // this is a bit of fake precision, but it's good enough for now
+      conversionsExtra.setAttribute('precision', 2);
+      conversionsExtra.setAttribute('total', 100);
+      conversionsExtra.className = 'extra';
+      document.querySelector('#conversions p').appendChild(conversionsExtra);
+    }
+  } else {
+    document.querySelector('#conversions p number-format').textContent = 'N/A';
   }
 
   const lcpElem = document.querySelector('#lcp p number-format');
@@ -152,70 +189,18 @@ function updateDataFacets(filterText, params, checkpoint) {
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
   );
 
-  dataChunks.addFacet('userAgent', (bundle) => {
-    const parts = bundle.userAgent.split(':');
-    return parts.reduce((acc, _, i) => {
-      acc.push(parts.slice(0, i + 1).join(':'));
-      return acc;
-    }, []);
-  }, 'some', 'none');
+  dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
 
-  const urlFn = (bundle) => {
-    if (bundle.domain) return bundle.domain;
-    const u = new URL(bundle.url);
-    u.pathname = u.pathname.split('/')
-      .map((segment) => {
-        // only numbers and longer than 5 characters: probably an id, censor it
-        if (segment.length >= 5 && /^\d+$/.test(segment)) {
-          return '<number>';
-        }
-        // only hex characters and longer than 8 characters: probably a hash, censor it
-        if (segment.length >= 8 && /^[0-9a-f]+$/i.test(segment)) {
-          return '<hex>';
-        }
-        // base64 encoded data, censor it
-        if (segment.length > 32 && /^[a-zA-Z0-9+/]+$/.test(segment)) {
-          return '<base64>';
-        }
-        // probable UUID, censor it
-        if (segment.length > 35 && /^[0-9a-f-]+$/.test(segment)) {
-          return '<uuid>';
-        }
-        // just too long
-        if (segment.length > 60) {
-          return '...';
-        }
-        return segment;
-      }).join('/');
-    return u.toString();
-  };
-  dataChunks.addFacet('url', urlFn, 'some', 'never');
+  dataChunks.addFacet('url', facets.url, 'some', 'never');
 
-  dataChunks.addFacet('vitals', (bundle) => {
-    const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
-    return cwv
-      .filter((metric) => bundle[metric])
-      .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)) + metric.slice(3));
-  });
+  dataChunks.addFacet('vitals', vitals);
 
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events
-    .map(reclassifyConsent)
-    .map(reclassifyAcquisition)
-    .reduce((acc, evt) => {
-      acc.add(evt.checkpoint);
-      return acc;
-    }, new Set())), 'every', 'none');
+  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
-    dataChunks.addFacet('lcp.target', (bundle) => bundle.events
-      .filter((evt) => evt.checkpoint === 'cwv-lcp')
-      .map((evt) => evt.target)
-      .filter((target) => target));
+    dataChunks.addFacet('lcp.target', lcpTarget);
 
-    dataChunks.addFacet('lcp.source', (bundle) => bundle.events
-      .filter((evt) => evt.checkpoint === 'cwv-lcp')
-      .map((evt) => evt.source)
-      .filter((source) => source));
+    dataChunks.addFacet('lcp.source', lcpSource);
   }
 
   // this is a bad name, fulltext would be better
@@ -294,6 +279,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       ));
 
       if (cp === 'loadresource') {
+        console.log('adding histogram facet');
         // loadresource.target are not discrete values, but the number
         // of milliseconds it took to load the resource, so the best way
         // to present this is to create a histogram
@@ -310,20 +296,7 @@ function updateDataFacets(filterText, params, checkpoint) {
 
       // a bit of special handling here, so we can split the acquisition source
       if (cp === 'acquisition') {
-        dataChunks.addFacet('acquisition.source', (bundle) => Array.from(
-          bundle.events
-            .map(reclassifyAcquisition)
-            .filter((evt) => evt.checkpoint === cp)
-            .filter(({ source }) => source) // filter out empty sources
-            .map(({ source }) => source.split(':'))
-            .map((source) => source
-              .reduce((acc, _, i) => {
-                acc.push(source.slice(0, i + 1).join(':'));
-                return acc;
-              }, [])
-              .filter((s) => s))
-            .pop() || [],
-        ));
+        dataChunks.addFacet('acquisition.source', acquisitionSource);
       }
     });
 
@@ -334,7 +307,8 @@ function updateDataFacets(filterText, params, checkpoint) {
 
 function updateFilter(params, filterText) {
   const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
-    || isKnownFacet(key)
+  // TODO: allow `extra` facets
+    || (isKnownFacet(key) && !key.endsWith('~'))
     || (key === 'filter' && filterText.length > 2);
   const transform = ([key, value]) => [key, value];
   dataChunks.filter = parseSearchParams(params, filter, transform);
@@ -367,15 +341,14 @@ export async function draw() {
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
-async function loadData(scope, chart) {
+async function loadData(config) {
+  const scope = config.value;
   const params = new URL(window.location.href).searchParams;
-  const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
-  const startDate = params.get('startDate') ? `${params.get('startDate')}T00:00:00` : null;
+  const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+  const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
   if (startDate && endDate) {
-    dataChunks.load(await loader.fetchDateRange(startDate, endDate));
-    chart.config.startDate = startDate;
-    chart.config.endDate = endDate;
+    dataChunks.load(await loader.fetchPeriod(startDate, endDate));
   } else if (scope === 'week') {
     dataChunks.load(await loader.fetchLastWeek(endDate));
   } else if (scope === 'month') {
@@ -390,8 +363,14 @@ export function updateState() {
   const { searchParams } = new URL(window.location.href);
   url.searchParams.set('domain', DOMAIN);
   url.searchParams.set('filter', elems.filterInput.value);
-  url.searchParams.set('view', elems.viewSelect.value);
-  if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
+
+  const viewConfig = elems.viewSelect.value;
+  url.searchParams.set('view', viewConfig.value);
+  if (viewConfig.value === 'custom') {
+    url.searchParams.set('startDate', viewConfig.from);
+    url.searchParams.set('endDate', viewConfig.to);
+  }
+  // if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
   if (searchParams.get('enrich')) url.searchParams.set('enrich', searchParams.get('enrich'));
   const drilldown = new URL(window.location).searchParams.get('drilldown');
@@ -420,6 +399,7 @@ export function updateState() {
   // iterate over all existing URL parameters and keep those that are known facets
   // and end with ~, so that we can keep the state of the facets
   searchParams.forEach((value, key) => {
+    // TODO: allow `extra` facets
     if (key.endsWith('~') && isKnownFacet(key)) {
       url.searchParams.set(key, value);
     }
@@ -454,26 +434,41 @@ const io = new IntersectionObserver((entries) => {
     elems.filterInput = sidebar.elems.filterInput;
 
     const params = new URL(window.location).searchParams;
-    const view = params.get('view') || 'week';
+    let view = params.get('view');
+    if (!view) {
+      view = 'week';
+      params.set('view', view);
+      const url = new URL(window.location.href);
+      url.search = params.toString();
+      window.history.replaceState({}, '', url);
+    }
+
+    const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+    const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
-      await loadData(view, herochart);
+
+      await loadData(elems.viewSelect.value);
       draw();
     });
 
     herochart.render();
-    // sidebar.updateFacets();
 
     elems.filterInput.value = params.get('filter');
-    elems.viewSelect.value = view;
+    elems.viewSelect.value = {
+      value: view,
+      from: startDate,
+      to: endDate,
+    };
+
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view, herochart).then(draw);
+      loadData(elems.viewSelect.value).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {
@@ -481,7 +476,7 @@ const io = new IntersectionObserver((entries) => {
       draw();
     });
 
-    elems.viewSelect.addEventListener('input', () => {
+    elems.viewSelect.addEventListener('change', () => {
       updateState();
       window.location.reload();
     });

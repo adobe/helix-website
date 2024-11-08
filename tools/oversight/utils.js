@@ -1,83 +1,4 @@
-import classifyConsent from './consent.js';
-import { classifyAcquisition } from './acquisition.js';
-
 /* helpers */
-
-export function isKnownFacet(key) {
-  const baseFacets = [
-    'userAgent',
-    'url',
-    'type',
-    'conversions',
-    'checkpoint',
-    // facets from sankey
-    'trafficsource',
-    'traffictype',
-    'entryevent',
-    'pagetype',
-    'loadtype',
-    'contenttype',
-    'interaction',
-    'clicktarget',
-    'exit',
-    'vitals',
-    // extra facets
-    'extra',
-  ];
-
-  const suffixes = [
-    'source',
-    'target',
-    'histogram',
-  ];
-
-  const modifiers = [
-    '!', // indicates a negation, and allows us to select a negative facet
-    '~', // indicates a count, and allows us to control how many items are shown
-  ];
-
-  const facetPattern = /^(?<facet>[a-z]+)(\.(?<suffix>[a-z]+))?(?<qualifier>[!~])?$/i;
-  const match = facetPattern.exec(key);
-  if (match) {
-    const { facet, suffix, qualifier } = match.groups;
-    return baseFacets.includes(facet)
-      && (!suffix || suffixes.includes(suffix) || facet === 'extra')
-      && (!qualifier || modifiers.includes(qualifier));
-  }
-  return false;
-}
-
-export function scoreCWV(value, name) {
-  if (value === undefined || value === null) return null;
-  let poor;
-  let ni;
-  // this is unrolled on purpose as this method becomes a bottleneck
-  if (name === 'lcp') {
-    poor = 4000;
-    ni = 2500;
-  }
-  if (name === 'cls') {
-    poor = 0.25;
-    ni = 0.1;
-  }
-  if (name === 'inp') {
-    poor = 500;
-    ni = 200;
-  }
-  if (name === 'ttfb') {
-    poor = 1800;
-    ni = 800;
-  }
-  if (value >= poor) {
-    return 'poor';
-  }
-  if (value >= ni) {
-    return 'ni';
-  }
-  return 'good';
-}
-
-export const UA_KEY = 'userAgent';
 
 /**
  * Returns a human readable number
@@ -107,53 +28,32 @@ export function toISOStringWithTimezone(date) {
 
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
 }
-export function scoreBundle(bundle) {
-  // a bundle is good if all CWV that have a value are good
-  // a bundle is ni if all CWV that have a value are ni or good
-  // a bundle is poor if any CWV that have a value are poor
-  // a bundle has no CWV if no CWV have a value
-  const cwv = ['cwvLCP', 'cwvCLS', 'cwvINP'];
-  const scores = cwv
-    .filter((metric) => bundle[metric])
-    .map((metric) => scoreCWV(bundle[metric], metric.toLowerCase().slice(3)));
-  if (scores.length === 0) return null;
-  if (scores.every((s) => s === 'good')) return 'good';
-  if (scores.every((s) => s !== 'poor')) return 'ni';
-  return 'poor';
-}
 
-export const INTERPOLATION_THRESHOLD = 10;
+const vulgarFractions = {
+  0: '0',
+  0.125: '⅛',
+  0.2: '⅕',
+  0.25: '¼',
+  0.333: '⅓',
+  0.375: '⅜',
+  0.5: '½',
+  0.625: '⅝',
+  0.666: '⅔',
+  0.75: '¾',
+  0.8: '⅘',
+  0.875: '⅞',
+  1: '1',
+};
 
-export function simpleCWVInterpolationFn(metric, threshold) {
-  return (cwvs) => {
-    const valuedWeights = Object.values(cwvs)
-      .filter((value) => value.weight !== undefined)
-      .map((value) => value.weight)
-      .reduce((acc, value) => acc + value, 0);
-    return cwvs[threshold + metric].weight / valuedWeights;
-  };
-}
-export function cwvInterpolationFn(targetMetric) {
-  return (cwvs) => {
-    const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
-    const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
-
-    if (valueCount < INTERPOLATION_THRESHOLD) {
-      // not enough data to interpolate
-      return 0;
+export function findNearestVulgarFraction(fraction) {
+  const closest = Object.keys(vulgarFractions).reduce((acc, key) => {
+    if (Math.abs(fraction - key) < Math.abs(fraction - acc)) {
+      return key;
     }
-    // total weight
-    const totalWeight = cwvs.goodCWV.weight
-      + cwvs.niCWV.weight
-      + cwvs.poorCWV.weight
-      + cwvs.noCWV.weight;
-    // share of targetMetric compared to all CWV
-    const share = cwvs[targetMetric].weight / (valuedWeights);
-    // interpolate the share to the total weight
-    return Math.round(share * totalWeight);
-  };
+    return acc;
+  }, 0);
+  return vulgarFractions[closest];
 }
-
 export function truncate(time, unit) {
   const t = new Date(time);
   // truncate to the beginning of the hour
@@ -238,146 +138,34 @@ export function parseConversionSpec() {
   return cached.conversionSpec;
 }
 
-/**
- * Conversion rates are computed as the ratio of conversions to visits. The conversion rate is
- * capped at 100%.
- * @param conversions the number of conversions
- * @param visits the number of visits
- * @returns {number}  the conversion rate as a percentage
- */
-export function computeConversionRate(conversions, visits) {
-  const conversionRate = (100 * conversions) / visits;
-  if (conversionRate >= 0 && conversionRate <= 100) {
-    return conversionRate;
-  }
-  return 100;
+export const INTERPOLATION_THRESHOLD = 10;
+
+export function simpleCWVInterpolationFn(metric, threshold) {
+  return (cwvs) => {
+    const valuedWeights = Object.values(cwvs)
+      .filter((value) => value.weight !== undefined)
+      .map((value) => value.weight)
+      .reduce((acc, value) => acc + value, 0);
+    return cwvs[threshold + metric].weight / valuedWeights;
+  };
 }
+export function cwvInterpolationFn(targetMetric) {
+  return (cwvs) => {
+    const valueCount = cwvs.goodCWV.count + cwvs.niCWV.count + cwvs.poorCWV.count;
+    const valuedWeights = cwvs.goodCWV.weight + cwvs.niCWV.weight + cwvs.poorCWV.weight;
 
-/**
- * Determines the sampling error based on a binomial distribution.
- * Each sample is a Bernoulli trial, where the probability of success is the
- * proportion of the total population that has the attribute of interest.
- * The sampling error is calculated as the standard error of the proportion.
- * @param {number} total the expectation value of the total population
- * @param {number} samples the number of successful trials (i.e. samples)
- */
-export function samplingError(total, samples) {
-  if (samples === 0) {
-    return 0;
-  }
-  const weight = total / samples;
-
-  const variance = weight * weight * samples;
-  const standardError = Math.sqrt(variance);
-  const marginOfError = 1.96 * standardError;
-  // round up to the nearest integer
-  return Math.round(marginOfError);
-}
-
-const vulgarFractions = {
-  0: '0',
-  0.125: '⅛',
-  0.2: '⅕',
-  0.25: '¼',
-  0.333: '⅓',
-  0.375: '⅜',
-  0.5: '½',
-  0.625: '⅝',
-  0.666: '⅔',
-  0.75: '¾',
-  0.8: '⅘',
-  0.875: '⅞',
-  1: '1',
-};
-
-export function findNearestVulgarFraction(fraction) {
-  const closest = Object.keys(vulgarFractions).reduce((acc, key) => {
-    if (Math.abs(fraction - key) < Math.abs(fraction - acc)) {
-      return key;
+    if (valueCount < INTERPOLATION_THRESHOLD) {
+      // not enough data to interpolate
+      return 0;
     }
-    return acc;
-  }, 0);
-  return vulgarFractions[closest];
-}
-
-export function roundToConfidenceInterval(
-  total,
-  samples = total,
-  maxPrecision = Infinity,
-) {
-  const max = total + samplingError(total, samples);
-  const min = total - samplingError(total, samples);
-  // determine the number of significant digits that max and min have in common
-  // e.g. 3.14 and 3.16 have 2 significant digits in common
-  const maxStr = max.toPrecision(`${max}`.length);
-  const minStr = min.toPrecision(`${min}`.length);
-  const common = Math.min(maxStr.split('').reduce((acc, digit, i) => {
-    if (digit === minStr[i]) {
-      return acc + 1;
-    }
-    return acc;
-  }, 0), Number.isNaN(maxPrecision) ? Infinity : maxPrecision);
-  const precision = Math.max(
-    Math.min(2, Number.isNaN(maxPrecision) ? Infinity : maxPrecision),
-    common,
-  );
-
-  const rounded = toHumanReadable(total, precision);
-  return rounded;
-}
-
-export function reclassifyConsent({ source, target, checkpoint }) {
-  if (checkpoint === 'click' && source) {
-    const consent = classifyConsent(source);
-    if (consent) return consent;
-  }
-  return { source, target, checkpoint };
-}
-
-export function reclassifyAcquisition({ source, target, checkpoint }) {
-  if (checkpoint === 'utm' && (source === 'utm_source' || source === 'utm_medium')) {
-    const acquisition = classifyAcquisition(target);
-    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
-  } else if (checkpoint === 'paid') {
-    const acquisition = classifyAcquisition(source, true);
-    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
-  } else if (checkpoint === 'email') {
-    const acquisition = classifyAcquisition(source, false);
-    if (acquisition) return { checkpoint: 'acquisition', source: acquisition };
-  }
-  /* reclassify earned acquisition – I don't like this, because it kills the enter checkpoint
-  else if (checkpoint === 'enter' && !allEvents.find((evt) => evt.checkpoint === 'acquisition'
-    || evt.checkpoint === 'utm'
-    || evt.checkpoint === 'paid'
-    || evt.checkpoint === 'email')) {
-    const acquisition = classifyAcquisition(source, 'earned');
-    if (acquisition) return { checkpoint: 'acquisition', source: `${acquisition}` };
-  }
-  */
-  return { source, target, checkpoint };
-}
-
-export function reclassifyEnter(acc, event, i, allEvents) {
-  const has = (cp) => allEvents.find((evt) => evt.checkpoint === cp);
-
-  if (event.checkpoint === 'enter') acc.referrer = event.source;
-  if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
-  if (
-    // we need to reclassify when we have seen both enter and acquisition
-    (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')
-    // but if there is no acquisition, we reclassify the enter event
-    && ((acc.acquisition && acc.referrer) || (!has('acquisition')))) {
-    const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
-    const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
-    const group = aGroup || 'earned';
-    const category = rCategory || aCategory;
-    const vndr = rVendor || aVendor;
-    const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
-    // console.log('reclassifyEnter', acc.referrer, acc.acquisition, newsrc);
-    acc.push({ checkpoint: 'acquisition', source: newsrc });
-  }
-  if (event.checkpoint !== 'acquisition') {
-    acc.push(event);
-  }
-  return acc;
+    // total weight
+    const totalWeight = cwvs.goodCWV.weight
+      + cwvs.niCWV.weight
+      + cwvs.poorCWV.weight
+      + cwvs.noCWV.weight;
+    // share of targetMetric compared to all CWV
+    const share = cwvs[targetMetric].weight / (valuedWeights);
+    // interpolate the share to the total weight
+    return Math.round(share * totalWeight);
+  };
 }

@@ -1,7 +1,10 @@
+import { utils, stats } from '@adobe/rum-distiller';
 import {
-  escapeHTML, scoreCWV, toHumanReadable,
+  escapeHTML, toHumanReadable,
 } from '../utils.js';
-import { tTest, zTestTwoProportions } from '../cruncher.js';
+
+const { scoreCWV } = utils;
+const { tTest, zTestTwoProportions } = stats;
 
 async function addSignificanceFlag(element, metric, baseline) {
   let p = 1;
@@ -161,7 +164,7 @@ export default class ListFacet extends HTMLElement {
           }
           input.id = `${facetName}=${entry.value}`;
           if (enabled) {
-            div.addEventListener('click', (evt) => {
+            input.addEventListener('click', (evt) => {
               if (evt.target !== input) input.checked = !input.checked;
               evt.stopPropagation();
               this.parentElement.parentElement.dispatchEvent(new Event('facetchange'), this);

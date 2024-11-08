@@ -1,4 +1,8 @@
-import { findNearestVulgarFraction, roundToConfidenceInterval, samplingError } from '../utils.js';
+// eslint-disable-next-line import/no-unresolved
+import { stats } from '@adobe/rum-distiller';
+import { findNearestVulgarFraction } from '../utils.js';
+
+const { roundToConfidenceInterval, samplingError } = stats;
 
 export default class NumberFormat extends HTMLElement {
   constructor() {

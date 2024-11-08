@@ -84,7 +84,7 @@ main .author-box-container > div {
     }
 
     main .author-box-info .blog-author-blurb {
-        max-width: 300px;
+        max-width: 290px;
         margin-left: 10px;
         border-left: 1px solid grey;
         display: block;

@@ -1,4 +1,7 @@
-import { isKnownFacet } from '../utils.js';
+// eslint-disable-next-line import/no-unresolved
+import { utils } from '@adobe/rum-distiller';
+
+const { isKnownFacet } = utils;
 
 export default class ConversionTracker extends HTMLElement {
   updateState() {
