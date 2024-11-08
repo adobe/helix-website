@@ -46,7 +46,11 @@ export default class DataLoader {
   }
 
   set enrich(url) {
-    this.enrichURL = url;
+    if (!this.DOMAIN_KEY) return;
+    const serviceURL = new URL('https://rum-proxy-prod.adobeaem.workers.dev/tools/rum/_cors');
+    serviceURL.searchParams.set('url', url);
+    serviceURL.searchParams.set('domainkey', this.DOMAIN_KEY);
+    this.enrichURL = serviceURL.toString();
   }
 
   /**
@@ -90,6 +94,7 @@ export default class DataLoader {
       })
       .all();
     this.enrichedData = this.organizeClassifications(allentries, ['path', 'url']);
+    console.log('enriched data', this.enrichedData);
     return this.enrichedData;
   }
 

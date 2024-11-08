@@ -39,9 +39,6 @@ const dataChunks = new DataChunks();
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
-loader.enrich = new URLSearchParams(window.location.search).get('enrich');
-await loader.fetchEnrichedData();
-
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
 window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
@@ -86,6 +83,8 @@ function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
   loader.domainKey = key;
+  loader.enrich = new URLSearchParams(window.location.search).get('enrich');
+  loader.fetchEnrichedData();
 }
 
 const conversionSpec = Object.keys(parseConversionSpec()).length

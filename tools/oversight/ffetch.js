@@ -15,13 +15,26 @@
 async function* request(url, context) {
   const { chunkSize, sheetName, fetch } = context;
   for (let offset = 0, total = Infinity; offset < total; offset += chunkSize) {
-    const params = new URLSearchParams(`offset=${offset}&limit=${chunkSize}`);
-    if (sheetName) params.append('sheet', sheetName);
-    const resp = await fetch(`${url}?${params.toString()}`);
+    const serviceURL = new URL(url);
+    let fetchURL = serviceURL;
+    if (serviceURL.searchParams.get('url')) {
+      fetchURL = new URL(serviceURL.searchParams.get('url'));
+    }
+    fetchURL.searchParams.set('offset', offset);
+    fetchURL.searchParams.set('limit', chunkSize);
+    if (sheetName) fetchURL.searchParams.set('sheet', sheetName);
+    if (serviceURL.searchParams.get('url')) {
+      serviceURL.searchParams.set('url', fetchURL);
+      fetchURL = null;
+    }
+    const resp = await fetch((fetchURL || serviceURL).toString());
     if (resp.ok) {
       const json = await resp.json();
       total = json.total;
       context.total = total;
+      if (!fetchURL) {
+        context.serviceURL = serviceURL;
+      }
       for (const entry of json.data) yield entry;
     } else {
       return;
@@ -106,9 +119,15 @@ function slice(upstream, context, from, to) {
 function follow(upstream, context, name, newName, maxInFlight = 5) {
   const { fetch, parseHtml } = context;
   return map(upstream, context, async (entry) => {
-    const value = entry[name];
+    let value = entry[name];
     if (value) {
       try {
+        if (context.serviceURL) {
+          const fetchURL = new URL(context.serviceURL.searchParams.get('url'));
+          fetchURL.pathname = value;
+          context.serviceURL.searchParams.set('url', fetchURL);
+          value = context.serviceURL.toString();
+        }
         const resp = await fetch(value);
         return { ...entry, [newName || name]: resp.ok ? parseHtml(await resp.text()) : null };
       } catch (e) {
