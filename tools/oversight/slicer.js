@@ -83,7 +83,7 @@ function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
   loader.domainKey = key;
-  loader.enrich = new URLSearchParams(window.location.search).get('enrich');
+  loader.enrich = new URLSearchParams(window.location.search).get('enrich') || window.location.hash;
   loader.fetchEnrichedData();
 }
 
@@ -240,6 +240,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       'twitter:image',
       'og:image:alt',
       'hlx:proxyUrl',
+      'lastModified',
       'content'];
     Array.from(loader.classifications)
       .filter((key) => !skip.includes(key))
@@ -320,6 +321,8 @@ export async function draw() {
   const filterText = params.get('filter') || '';
 
   const startTime = new Date();
+
+  console.log('fetching enriched data', await loader.fetchEnrichedData());
 
   updateDataFacets(filterText, params, checkpoint);
 

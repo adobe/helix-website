@@ -47,6 +47,12 @@ export default class DataLoader {
 
   set enrich(url) {
     if (!this.DOMAIN_KEY) return;
+    if (!url) return;
+    if (url.match(/^#.*==$/)) {
+      // not a real URL, but base64-encoded TSV
+      this.enrichURL = url.substring(1);
+      return;
+    }
     const serviceURL = new URL('https://rum-proxy-prod.adobeaem.workers.dev/tools/rum/_cors');
     serviceURL.searchParams.set('url', url);
     serviceURL.searchParams.set('domainkey', this.DOMAIN_KEY);
@@ -76,26 +82,57 @@ export default class DataLoader {
     if (!this.enrichURL || this.enrichedData) {
       return this.enrichedData;
     }
-    const allentries = await ffetch(this.enrichURL)
-      .follow('path', 'document')
-      .map((entry) => {
-        const { document: doc } = entry;
-        if (doc) {
-          doc.querySelectorAll('head meta').forEach((meta) => {
-            const name = meta.getAttribute('name') || meta.getAttribute('property');
-            const content = meta.getAttribute('content');
-            if (name && content) {
-              entry[name] = content.toLowerCase();
-            }
+    if (this.enrichURL.match(/^.*==$/)) {
+      this.enrichedData = new Promise((resolve) => {
+        const tsv = atob(this.enrichURL);
+        const rows = tsv.split('\n');
+        const headers = rows.shift().split('\t');
+        const data = rows.map((row) => {
+          const entry = {};
+          row.split('\t').forEach((value, index) => {
+            entry[headers[index]] = value;
           });
-        }
-        delete entry.document;
-        return entry;
-      })
-      .all();
-    this.enrichedData = this.organizeClassifications(allentries, ['path', 'url']);
-    console.log('enriched data', this.enrichedData);
+          return entry;
+        });
+        const enrichedData = this.organizeClassifications(data, ['path', 'url', 'Domain']);
+        console.log('enriched TSV data', enrichedData);
+        resolve(enrichedData);
+      });
+      return this.enrichedData;
+    }
+    this.enrichedData = new Promise((resolve) => {
+      ffetch(this.enrichURL)
+        .follow('path', 'document')
+        .map((entry) => {
+          const { document: doc } = entry;
+          if (doc) {
+            doc.querySelectorAll('head meta').forEach((meta) => {
+              const name = meta.getAttribute('name') || meta.getAttribute('property');
+              const content = meta.getAttribute('content');
+              if (name && content) {
+                entry[name] = content.toLowerCase();
+              }
+            });
+          }
+          delete entry.document;
+          return entry;
+        })
+        .all()
+        .then((allentries) => resolve(this.organizeClassifications(allentries, ['path', 'url'])));
+    });
+
     return this.enrichedData;
+  }
+
+  async enrichData(bundle) {
+    const { url } = bundle;
+    const { pathname, hostname } = new URL(url);
+    const enrichedData = await this.fetchEnrichedData();
+    if (!enrichedData) return;
+    const data = enrichedData[pathname] || enrichedData[url] || enrichedData[hostname];
+    if (data) {
+      bundle.extra = data;
+    }
   }
 
   apiURL(datePath, hour) {
@@ -137,7 +174,7 @@ export default class DataLoader {
     const json = await resp.json();
     const { rumBundles } = json;
     rumBundles.forEach((bundle) => addCalculatedProps(bundle));
-    // TODO: add enrichment, classification
+    rumBundles.forEach((bundle) => this.enrichData(bundle));
     return { date, rumBundles: this.filterByDateRange(rumBundles, start, end) };
   }
 
@@ -150,7 +187,7 @@ export default class DataLoader {
     const json = await resp.json();
     const { rumBundles } = json;
     rumBundles.forEach((bundle) => addCalculatedProps(bundle));
-    // TODO: add enrichment, classification
+    rumBundles.forEach((bundle) => this.enrichData(bundle));
     return { date, rumBundles: this.filterByDateRange(rumBundles, start, end) };
   }
 
@@ -164,7 +201,7 @@ export default class DataLoader {
     const json = await resp.json();
     const { rumBundles } = json;
     rumBundles.forEach((bundle) => addCalculatedProps(bundle));
-    // TODO: add enrichment, classification
+    rumBundles.forEach(async (bundle) => this.enrichData(bundle));
     return { date, hour, rumBundles: this.filterByDateRange(rumBundles, start, end) };
   }
 
