@@ -6,6 +6,7 @@ import {
 } from './utils.js';
 
 import buildTop10TableBlock from './pods/top10.js';
+import buildMinus10TableBlock from './pods/minus10.js';
 import buildSummary from './pods/summary.js';
 import buildDepthBlock from './pods/depth.js';
 
@@ -169,7 +170,15 @@ const draw = async () => {
     currentPageEntry,
     config,
     'top-publish-period',
-    'Published During the Period',
+    'Published During the Period - Most Viewed',
+  );
+
+  buildMinus10TableBlock(
+    urls,
+    currentPageEntry,
+    config,
+    'minus-publish-period',
+    'Published During the Period - Less Viewed',
   );
 };
 
