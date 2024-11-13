@@ -1,0 +1,104 @@
+#rumadmin {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  max-width: 1440px;
+}
+
+#rumadmin h1.title {
+  margin: 20px 0;
+  font-size: 2em;
+}
+
+#rumadmin .topbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+#rumadmin .topbar #org-selected {
+  width: 250px;
+}
+
+#rumadmin .topbar #org-actions {
+  display: none;
+}
+
+#rumadmin .topbar #org-actions .orgkey {
+  width: 300px;
+}
+
+#rumadmin #org-details {
+  margin: 20px 0;
+}
+
+#rumadmin #org-details .empty-message {
+  text-align: center;
+  font-style: italic;
+}
+
+
+#rumadmin #org-details .domain-row {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+}
+
+#rumadmin #org-details .domain-row:nth-child(even) {
+  background-color: #f9f9f9
+}
+
+#org-details .domain-row .cell-checkbox {
+  align-content: center;
+  margin: 0 12px 0 0;
+}
+
+#org-details .domain-row .cell-domain {
+  flex-grow: 1;
+}
+
+#org-details .domain-row .cell-domain-actions {
+  align-content: center;
+}
+
+#rumadmin .modal {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 9999;
+  background: #00000070;
+}
+
+#rumadmin .modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 500px;
+  width: 30%;
+  margin: clamp(1rem, 12%, min(15vw, 15rem)) auto;
+  background-color: #fff;
+  padding: 0 20px 20px;
+}
+
+#rumadmin .modal .modal-content span.cancel {
+  align-self: flex-end;
+  padding: 0 8px;
+  margin: 8px -8px 0;
+  cursor: pointer;
+}
+
+#rumadmin .modal .modal-content h2.modal-title {
+  font-size: 1.5em;
+  margin: -20px 0 20px;
+  pointer-events: none;
+}
+
+#rumadmin .modal .modal-content .content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#rumadmin .modal .modal-content .modal-actions {
+  margin-top: 20px;
+}

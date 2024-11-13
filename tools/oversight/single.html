@@ -1,0 +1,182 @@
+<html>
+
+<head>
+  <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
+  <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.2",
+    "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.2",
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.4.1"
+  }}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/scripts/lib-franklin.js" type="module"></script>
+  <script src="/scripts/scripts.js" type="module"></script>
+  <link rel="stylesheet" href="/styles/styles.css" />
+  <script type="module" defer="false">
+    import SkylineChart from './charts/skyline.js';
+    import ConversionTracker from './elements/conversion-tracker.js';
+    import IncognitoCheckbox from './elements/incognito-checkbox.js';
+    import FacetSidebar from './elements/facetsidebar.js';
+    import ListFacet from './elements/list-facet.js';
+    import ThumbnailFacet from './elements/thumbnail-facet.js';
+    import LinkFacet from './elements/link-facet.js';
+    import LiteralFacet from './elements/literal-facet.js';
+    import VitalsFacet from './elements/vitals-facet.js';
+    import URLSelector from './elements/url-selector.js';
+    import NumberFormat from './elements/number-format.js';
+    window.slicer = {
+      Chart: SkylineChart,
+      extraFacets: {
+        clicktarget: (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'click')
+            .filter(({ target }) => target) // filter out empty targets
+            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+        ),
+        entersource: (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'enter')
+            .filter(({ source }) => source) // filter out empty sources
+            .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
+        ),
+      },
+    };
+    customElements.define('incognito-checkbox', IncognitoCheckbox);
+    customElements.define('facet-sidebar', FacetSidebar);
+    customElements.define('list-facet', ListFacet);
+    customElements.define('thumbnail-facet', ThumbnailFacet);
+    customElements.define('link-facet', LinkFacet);
+    customElements.define('literal-facet', LiteralFacet);
+    customElements.define('vitals-facet', VitalsFacet);
+    customElements.define('url-selector', URLSelector);
+    customElements.define('conversion-tracker', ConversionTracker);
+    customElements.define('number-format', NumberFormat);
+  </script>
+  <script src="./slicer.js" type="module"></script>
+  <link rel="stylesheet" href="./rum-slicer.css">
+</head>
+
+<body>
+  <header></header>
+  <main>
+    <div>
+      <div id="deepmain">
+        <div class="output">
+          <div class="title">
+            <url-selector>www.aem.live</url-selector>
+            <div>
+              <select id="view">
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+              </select>
+              <incognito-checkbox></incognito-checkbox>
+            </div>
+          </div>
+          <div class="key-metrics">
+            <ul>
+              <li id="pageviews" title="Estimate of page views based on RUM data collected and sampling rate">
+                <h2>Page views</h2>
+                <p><number-format>0</number-format></p>
+              </li>
+              <li id="visits" title="Page views which were not linked from another page on this site">
+                <h2>Visits</h2>
+                <p><number-format>0</number-format></p>
+              </li>
+              <conversion-tracker id="conversions" title="Page views with a user click outside a consent dialog">
+                <h2>Engagement</h2>
+                <p><number-format>0</number-format></p>
+              </conversion-tracker>
+              <li id="lcp" title="Largest Contentful Paint">
+                <h2>LCP</h2>
+                <p><number-format precision="2" fuzzy="false">0</number-format></p>
+              </li>
+              <li id="cls" title="Cumulative Layout Shift">
+                <h2>CLS</h2>
+                <p><number-format precision="2" fuzzy="false">0</number-format></p>
+              </li>
+              <li id="inp" title="Interaction to Next Paint">
+                <h2>INP</h2>
+                <p><number-format precision="2" fuzzy="false">0</number-format></p>
+              </li>
+            </ul>
+            <div class="key-metrics-more" aria-hidden="true">
+              <ul>
+                <li id="cls" title="Time to First Byte">
+                  <h2>TTFB</h2>
+                  <p><number-format>0</number-format></p>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <figure>
+            <div class="chart-container solitary">
+              <canvas id="time-series"></canvas>
+            </div>
+            <div class="filter-tags"></div>
+            <figcaption>
+              <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size,
+                accuracy
+                reduced.</span>
+              <span id="timezone"></span>
+            </figcaption>
+          </figure>
+        </div>
+        <facet-sidebar aria-disabled="true">
+          <list-facet facet="userAgent">
+            <legend>Device Type and Operating System</legend>
+            <dl>
+              <dt>desktop</dt>
+              <dd>All Desktop</dd>
+              <dt>desktop:windows</dt>
+              <dd>Windows Desktop</dd>
+              <dt>desktop:mac</dt>
+              <dd>Mac Desktop</dd>
+              <dt>desktop:linux</dt>
+              <dd>Linux Desktop</dd>
+              <dt>desktop:chromeos</dt>
+              <dd>Chrome OS Desktop</dd>
+              <dt>mobile</dt>
+              <dd>All Mobile</dd>
+              <dt>mobile:android</dt>
+              <dd>Android Mobile</dd>
+              <dt>mobile:ios</dt>
+              <dd>iOS Mobile</dd>
+              <dt>mobile:ipados</dt>
+              <dd>iPad Mobile</dd>
+              <dt>bot</dt>
+              <dd>All Bots</dd>
+              <dt>bot:seo</dt>
+              <dd>SEO Bot</dd>
+              <dt>bot:search</dt>
+              <dd>Search Engine Crawler</dd>
+              <dt>bot:ads</dt>
+              <dd>Ad Bot</dd>
+              <dt>bot:social</dt>
+              <dd>Social Media Bot</dd>
+            </dl>
+          </list-facet>
+          <link-facet facet="clicktarget">
+            <legend>Click Target (URL)</legend>
+          </link-facet>
+          <link-facet facet="entersource" thumbnail="false">
+            <legend>External Referrer</legend>
+            <dl>
+              <dt>(direct)</dt>
+              <dd>Direct Entry (or via App)</dd>
+            </dl>
+          </link-facet>
+        </facet-sidebar>
+      </div>
+    </div>
+  </main>
+  <footer></footer>
+  <div id="copied-toast" class="toast" aria-hidden="true">
+    Rows copied to clipboard, ready to paste into spreadsheet
+  </div>
+  <div id="shared-toast" class="toast" aria-hidden="true">
+    Link copied to clipboard, ready to share
+  </div>
+</body>
+
+</html>

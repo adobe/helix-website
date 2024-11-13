@@ -31,19 +31,24 @@ function run(evt) {
   }
 
   let finalGitUrl = giturl;
+  let owner;
+  let repo;
+  let ref;
   const giturlAsUrl = new URL(giturl);
   if (giturlAsUrl.hostname.endsWith('hlx.page')
     || giturlAsUrl.hostname.endsWith('hlx.live')
     || giturlAsUrl.hostname.endsWith('aem.page')
     || giturlAsUrl.hostname.endsWith('aem.live')) {
     const segs = giturlAsUrl.hostname.split('.')[0].split('--');
-    const owner = segs[2];
-    const repo = segs[1];
-    const ref = segs[0] || 'main';
+    [ref, repo, owner] = segs;
 
     finalGitUrl = `https://github.com/${owner}/${repo}/tree/${ref}`;
+  } else {
+    [, owner, repo,, ref = 'main'] = giturlAsUrl.pathname.split('/');
   }
 
+  // update title
+  document.title = `${project || `${repo}`} for ${document.title}`;
   // update URL
   const url = new URL(window.location.href);
   const usp = url.searchParams;

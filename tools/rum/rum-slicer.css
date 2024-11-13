@@ -25,6 +25,14 @@
   --light-indigo: #d3d5ff;
   --medium-indigo: #acafff;
   --dark-indigo: #4046ca;
+  --gray-100: #e9e9e9;
+  --gray-200: #e1e1e1;
+  --gray-300: #dadada;
+  --gray-400: #c6c6c6;
+  --gray-500: #8f8f8f;
+  --gray-600: #717171;
+  --gray-700: #505050;
+
 }
 
 body {
@@ -38,47 +46,25 @@ main {
   margin-top: var(--nav-height);
 }
 
+body main > .section {
+  padding-top: 0;
+}
+
 /* general performance */
 
-main li.score-good {
-  opacity: 1;
+main li.score-good, vitals-facet div[data-value^="good"] label {
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
-main li.score-ni {
-  opacity: 1;
+main li.score-ni, vitals-facet div[data-value^="ni"] label {
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
-main li.score-poor {
-  opacity: 1;
+main li.score-poor, vitals-facet div[data-value^="poor"] label {
   color: var(--dark-red);
   background-color: var(--light-red);
-}
-
-/* heading */
-main .title select {
-  border: 1px solid currentcolor;
-  border-radius: 16px;
-  background-color: var(--dark-blue);
-  padding: 2px 8px;
-  text-align: end;
-  font-size: 18px;
-  display: inline-block;
-  height: 30px;
-  color: white;
-}
-
-main .title incognito-checkbox {
-  display: none;
-  margin-top: 10px;
-}
-
-main .title incognito-checkbox[mode="open"],
-main .title incognito-checkbox[mode="incognito"] {
-  display: inline-block;
 }
 
 main .title {
@@ -86,19 +72,57 @@ main .title {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-flow: row wrap;
+  gap: 1ch;
 }
 
-main .title h1 {
+main .title select {
+  align-self: center;
+  border: 2px solid var(--dark-blue);
+  border-radius: 32px;
+  padding: 2px 15px;
+  background-color: var(--dark-blue);
+  color: white;
+  font: inherit;
+}
+
+main .title > * {
+  flex: 2 0px;
+}
+
+main .title daterange-picker {
+  flex: 1 100%;
+  order: 3;
+}
+
+main .title incognito-checkbox {
+  display: none;
+  margin-bottom: 10px;
+}
+
+main .title incognito-checkbox[mode="open"],
+main .title incognito-checkbox[mode="incognito"] {
+  display: inline-block;
+}
+
+main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
+  margin-right: 8px;
   font-size: var(--type-heading-m-size);
   display: flex;
   align-items: center;
+  width: 100%;
+  flex-grow: 50;
 }
 
-main .title h1 img {
+main .title url-selector img {
   height: 16px;
   margin-right: 8px;
+}
+
+main .title url-selector input {
+  color: var(--spectrum-gray-700);
 }
 
 .title button {
@@ -110,7 +134,6 @@ main .title h1 img {
   padding: 4px 16px;
 }
 
-
 /* key metrics */
 main .key-metrics ul {
   list-style: none;
@@ -120,13 +143,17 @@ main .key-metrics ul {
   padding-left: 0;
 }
 
-main .key-metrics li h2 {
+main .key-metrics ul > * h2 {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: normal;
 }
 
-main .key-metrics li h2::before {
+main .key-metrics ul > * button {
+  font-size: 10px;
+}
+
+main .key-metrics ul > * h2::before {
   content: ' ';
   background-color: currentcolor;
   width: 8px;
@@ -136,20 +163,41 @@ main .key-metrics li h2::before {
   border-radius: 8px;
 }
 
-main .key-metrics li p {
+main .key-metrics ul > * p {
   font-weight: 600;
   font-size: 20px;
   margin: 8px 0;
 }
 
-.key-metrics li {
+main .key-metrics ul > * p span.extra {
+  font-weight: normal;
+  font-size: 80%;
+}
+
+main .key-metrics ul > * p span.extra::before {
+  content: ' (';
+}
+
+main .key-metrics ul > #pageviews p span.extra::after {
+  content: ' per visit)';
+}
+
+main .key-metrics ul > #conversions p span.extra::after {
+  content: '%)';
+}
+
+main .key-metrics ul > #visits p span.extra::after {
+  content: '% bounces)';
+}
+
+.key-metrics > ul > * {
   border: 1px solid currentcolor;
   border-radius: 8px;
   background-color: #eee;
   padding: 4px 8px;
 }
 
-.key-metrics li[aria-selected="true"] {
+.key-metrics ul > *[aria-selected="true"] {
   background-color: #444;
   color: white;
 }
@@ -173,7 +221,7 @@ figure .chart-container {
   min-height: 100px;
   display: grid;
   justify-content: center;
-  height: calc(100vh - 400px);
+  height: calc(100vh - 450px);
 }
 
 figure .chart-container.sankey {
@@ -232,13 +280,17 @@ figcaption {
   font-style: italic;
   display: flex;
   align-items: center;
-  justify-content: end;
   flex-wrap: wrap;
 }
 
 figcaption > span {
   display: inline-flex;
   align-items: center;
+  margin-left: 2px;
+}
+
+figcaption span.lab {
+  flex-grow: 1;
 }
 
 #low-data-warning[aria-hidden=true] {
@@ -260,7 +312,6 @@ figcaption > span {
   background-color: var(--light-indigo);
   padding: 0 1em;
   text-align: end;
-  opacity: 0.6;
   margin-right: 0.5em;
   margin-bottom: 0.5em;
   white-space: nowrap;
@@ -278,15 +329,6 @@ figcaption > span {
   background-color: var(--light-purple);
 }
 
-.filter-tags > span.filter-tag-lcp, 
-.filter-tags > span.filter-tag-cls, 
-.filter-tags > span.filter-tag-inp,
-.filter-tags > span.filter-tag-conversions,
-.filter-tags > span.filter-tag-visits {
-  opacity: 1;
-}
-
-
 /* filters */
 
 .quick-filter {
@@ -295,13 +337,13 @@ figcaption > span {
 }
 
 .quick-filter input {
-  font-size: 20px;
   width: 100%;
   border: none;
+  border-bottom: 2px solid #ccc;
   border-radius: 0;
   padding: 12px;
   background-color: #eee;
-  border-bottom: 2px solid #ccc;
+  font: inherit;
 }
 
 fieldset {
@@ -319,16 +361,20 @@ fieldset a:any-link {
   color: currentcolor;
 }
 
-fieldset.facet-user_agent {
+list-facet[facet="userAgent" ] fieldset {
   color: var(--dark-fuchsia);
 
   --background-color: var(--light-fuchsia);
 }
 
-fieldset.facet-url {
+list-facet[facet="url"] fieldset {
   color: var(--dark-purple);
 
   --background-color: var(--light-purple);
+}
+
+*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
+  display: none;
 }
 
 legend {
@@ -347,29 +393,28 @@ fieldset > div:hover {
   background-color: #eee;
 }
 
-fieldset li {
+fieldset li,
+vitals-facet label {
   border: 1px solid currentcolor;
   border-radius: 8px;
   background-color: #eee;
   padding: 2px 6px;
   text-align: end;
-  opacity: 0.2;
   font-size: 12px;
-}
-
-fieldset li[class$="-"] {
-  opacity: 0.2;
 }
 
 fieldset li.interesting {
   border-width: 2px;
+  padding: 2px 16px;
 }
 
 fieldset li.significant {
   border-width: 3px;
+  padding: 2px 14px;
 }
 
-fieldset li::after {
+fieldset li::after,
+vitals-facet label::before {
   content: ' ';
   background-color: currentcolor;
   width: 10px;
@@ -396,6 +441,12 @@ fieldset li::after {
   grid-gap: 0 16px;
 }
 
+#facets fieldset div ~ div.more-container:last-of-type,
+#facets .more fieldset div ~ div.more-container:last-of-type,
+#facets .more-more fieldset div ~ div.more-container:last-of-type,
+#facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
+  display: grid;
+}
 
 #facets fieldset input[type=checkbox] {
   grid-area: check;
@@ -406,6 +457,199 @@ fieldset li::after {
 #facets fieldset label {
   grid-area: lab;
   word-break: break-all;
+}
+
+#facets fieldset label span.extra {
+  display: none;
+}
+
+#facets fieldset label span.extra.interesting {
+  display: inline;
+}
+
+#facets fieldset label span.extra.significant {
+  display: inline;
+}
+
+#facets fieldset label span.count::before,
+#facets fieldset label span.value::before {
+  content: ' (';
+}
+
+#facets literal-facet label span.value::before {
+  content: '';
+}
+
+#facets fieldset label span.count::after, #facets fieldset label span.value::after {
+  content: ') ';
+}
+
+#facets fieldset label span.extra::after {
+  content: '% conversion rate';
+}
+
+#facets literal-facet label span.value::after {
+  content: '';
+}
+
+#facets literal-facet label span.value {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+}
+
+thumbnail-facet label {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+thumbnail-facet fieldset div:not(.more-container) {
+  border-bottom: 1px solid currentcolor;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+thumbnail-facet label > span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+thumbnail-facet img {
+  max-width: 100px;
+}
+
+thumbnail-facet label span.filename {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+  line-height: 1.4;
+  margin-left: 4px;
+}
+
+thumbnail-facet label span.count {
+  min-width: 54px;
+}
+
+file-facet label {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+file-facet fieldset div:not(.more-container) {
+  border-bottom: 1px solid currentcolor;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+file-facet label > span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+file-facet label span.filename {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+  line-height: 1.4;
+  margin-left: 4px;
+}
+
+file-facet label span.count {
+  min-width: 54px;
+}
+
+vitals-facet fieldset {
+  display: grid;
+  grid-template-areas:
+  '. lcp-good cls-good inp-good'
+  '. lcp-ni cls-ni inp-ni'
+  '. lcp-poor cls-poor inp-poor';
+  grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 4pt;
+  padding: 4pt;
+  align-items: end;
+}
+
+vitals-facet fieldset label {
+  word-break: normal;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] {
+  width: 0;
+  height: 0;
+}
+
+#facets vitals-facet label::before {
+  margin-right: 8px;
+}
+
+#facets vitals-facet fieldset div {
+  display: grid;
+  grid-template-areas: 'check lab';
+  grid-template-columns: 0 1fr;
+  grid-gap: 0;
+}
+
+#facets vitals-facet fieldset label {
+  text-align: start;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] + label::before {
+  border: 2px solid currentcolor;
+  background-color: transparent;
+  width: 8px;
+  height: 8px;
+}
+
+#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+  border: 2px solid currentcolor;
+  background-color: currentcolor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodLCP"] {
+  grid-area: lcp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niLCP"] {
+  grid-area: lcp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorLCP"] {
+  grid-area: lcp-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodCLS"] {
+  grid-area: cls-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niCLS"] {
+  grid-area: cls-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorCLS"] {
+  grid-area: cls-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodINP"] {
+  grid-area: inp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niINP"] {
+  grid-area: inp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorINP"] {
+  grid-area: inp-poor;
 }
 
 #facets fieldset ul.cwv {
@@ -424,8 +668,52 @@ fieldset li::after {
   height: 60px;
 }
 
+#facets link-facet a .protocol::after {
+  content: '//';
+}
+
+/* don't worry, we'll show this when there is enough space */
+#facets link-facet  a .protocol {
+  display: none;
+}
+
+#facets link-facet  a .hostname {
+  display: none;
+}
+
+#facets facet-sidebar {
+  container-type: inline-size;
+  container-name: facets;
+}
+
+/* external referrer only care about the hostname anyway */
+#facets link-facet[facet="enter.source"] a .hostname {
+  display: inline;
+}
+
+#facets link-facet[facet="enter.source"] a .pathname {
+  display: none;
+}
+
+#facets link-facet img {
+  height: 40px;
+  width: 60px;
+  object-fit: cover;
+  display: block;
+  float: left;
+  margin-right: 8px;
+}
+
+#facets link-facet img.broken {
+  opacity: 0;
+}
+
+#facets link-facet img.favicon {
+  object-fit: contain;
+}
+
 #facets fieldset div.load-more {
-  grid-column: 2 / span 2;  
+  grid-column: 2 / span 2;
   display: block;
   padding: 10px 0;
 }
@@ -435,20 +723,22 @@ fieldset li::after {
   padding-right: 50px;
 }
 
-.clipboard, a.drilldown, a.drillup {
+.clipboard, .icon {
   margin-left: 8px;
   box-sizing: border-box;
   position: relative;
   display: inline-block;
   transform: scale(1);
-  width: 18px;
-  height: 18px;
-  border: 2px solid;
+  width: 22px;
+  height: 22px;
   border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  font-size: 0;
 }
 
-.clipboard::after,
-.clipboard::before {
+.icon::after,
+.icon::before {
   content: "";
   display: block;
   box-sizing: border-box;
@@ -458,75 +748,35 @@ fieldset li::after {
   left: 2px;
 }
 
+/* the copy icon looks like two rectangles, overlaid */
 .clipboard::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 2px;
+  width: 12px;
+  height: 12px;
   border: 2px solid;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  top: -2px;
-  height: 6px;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
 }
 
 .clipboard::after {
-  height: 2px;
-  background: currentcolor;
-  box-shadow: 0 -4px 0 0;
-  bottom: 2px;
-}
-
-/* make a little down arrow from ::before and ::after */
-a.drilldown::before {
   content: "";
   display: block;
   box-sizing: border-box;
   position: absolute;
-  width: 2px;
-  height: 6px;
+  border-radius: 2px;
+  width: 12px;
+  height: 12px;
   border: 2px solid;
-  border-width: 0 2px 0 0;
-  top: 1px;
-  left: 6px;
-}
-
-/* and the downward facing triangle */
-a.drilldown::after {
-  content: "";
-  display: block;
-  box-sizing: border-box;
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-  border-top-color: currentcolor;
-  top: 6px;
-  left: 2px;
-}
-
-/* make a little upward pointing arrow from ::before and ::after for drillup */
-a.drillup::before {
-  content: "";
-  display: block;
-  box-sizing: border-box;
-  position: absolute;
-  width: 2px;
-  height: 6px;
-  border: 2px solid;
-  border-width: 0 2px 0 0;
-  top: 6px;
-  left: 6px;
-}
-
-/* and the upward facing triangle */
-a.drillup::after {
-  content: "";
-  display: block;
-  box-sizing: border-box;
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-  border-bottom-color: currentcolor;
-  top: -4px;
-  left: 1px;
+  border-bottom: 0;
+  border-right: 0;
+  top: 5px;
+  left: 5px;
+  z-index: 1;
 }
 
 /* toasts */
@@ -541,7 +791,6 @@ a.drillup::after {
   max-width: 80%;
   background-color: #444;
   color: white;
-  opacity: 1;
   top: 32px;
   left: 0;
   right: 0;
@@ -556,56 +805,70 @@ a.drillup::after {
   margin-top: -20px;
 }
 
+facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+  display: none;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset legend span {
+  display: none;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset > div:hover {
+  background-color: transparent;
+}
+
+facet-sidebar[aria-disabled="true"] div.quick-filter {
+  display: none;
+}
+
 @media (min-width: 600px) {
-  main .title h1 {
+  main .title url-selector input {
     font-size: var(--type-heading-l-size);
   }
-
-  main .title select {
-    border-radius: 24px;
-    padding: 2px 8px;
-    font-size: 20px;
-    height: 32px;
-  }
-
 }
 
 @media (min-width: 900px) {
-  main .title h1 {
+  main .title {
+    flex-wrap: nowrap;
+  }
+
+  main .title > * {
+    flex: 3 0;
+  }
+
+  main .title daterange-picker {
+    flex: unset;
+    order: unset;
+  }
+
+  main .title url-selector input {
     font-size: var(--type-heading-xl-size);
   }
 
-  main .title select {
-    border-radius: 24px;
-    padding: 4px 16px;
-    font-size: 24px;
-    height: 40px;
-  }
-
-  main .title h1 img {
+  main .title url-selector img {
     height: 32px;
   }
 
-  main .key-metrics li h2 {
+  main .key-metrics ul > * h2, main .key-metrics ul > * button {
     font-size: 14px;
   }
-  
-  main .key-metrics li h2::before {
+
+  main .key-metrics ul > * h2::before {
     width: 14px;
     height: 14px;
     border-radius: 14px;
   }
-  
-  main .key-metrics li p {
+
+  main .key-metrics ul > * p {
     font-size: 30px;
     margin: 16px 0;
   }
-  
+
   main .key-metrics ul {
     grid-gap: 16px;
   }
 
-  main .key-metrics li {
+  main .key-metrics ul > * {
     border-radius: 16px;
     padding: 8px 16px;
   }
@@ -621,19 +884,19 @@ a.drillup::after {
     margin: 8px 4px;
   }
 
-  fieldset li {
+  fieldset li,
+  vitals-facet label {
     border-radius: 16px;
     padding: 4px 16px;
     font-size: 18px;
-  }  
-  
+  }
 }
 
 
 /* split mode */
 
 @media (min-width: 1600px) {
-  main {
+  #deepmain {
     display: flex;
     gap: 16px;
     height: calc(100vh - var(--nav-height) - 32px);
@@ -641,15 +904,19 @@ a.drillup::after {
 
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }  
-
-  main > div {
-    width: 100%;
   }
 
-  main #facets {
-    height: calc(100% - 70px);
-    overflow-y: scroll;
+  #deepmain > div, #deepmain > facet-sidebar {
+    width: 50%;
+  }
+
+  main div.output {
+    position: fixed;
+    width: 50vw;
+  }
+
+  facet-sidebar {
+    margin-left: calc(50vw + 16px);
   }
 
   body.appear {
@@ -662,7 +929,7 @@ a.drillup::after {
 @media (min-width: 2000px) {
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }  
+  }
 }
 
 footer.footer-wrapper.appear {

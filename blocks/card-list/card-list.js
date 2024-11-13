@@ -80,36 +80,40 @@ async function decorateCardListByUrl(block) {
   if (blockPartyJson.data && (blockPartyJson.data.length > 0)) {
     // create a 2D array to pass to the cards block
     const cardsArr = [];
-    let cardsRow = [];
-    const blockPartyList = blockPartyJson.data.filter((row) => row.approved === 'true');
-    await blockPartyList.forEach(async (row, i) => {
-      // limit each row to only 2 columns, otherwise create a new row
-      if ((i !== 0) && (i % 2) === 0) {
-        cardsArr.push(cardsRow);
-        cardsRow = [];
-      }
-      let githubName = '';
-      if (row.githubProfile && (row.permission === 'on')) {
-        const ghProfile = stripTags(row.githubProfile).split('/');
-        const ghUsername = ghProfile[ghProfile.length - 1];
-        if (ghUsername) {
-          githubName = `<code>${ghUsername}</code>`;
-        } else {
-          githubName = `<code>${stripTags(row.githubProfile)}</code>`;
+    const cardsRow = [];
+    const categories = new Set();
+    blockPartyJson.data
+      .filter((row) => row.approved === 'true')
+      .reverse() // sort newest entries first, unless highlighted
+      .sort((a, b) => {
+        if (a.highlight && !b.highlight) return -1;
+        if (!a.highlight && b.highlight) return 1;
+        return 0;
+      }).forEach((row) => {
+        let githubName = '';
+        if (row.githubProfile && (row.permission === 'on')) {
+          const ghProfile = stripTags(row.githubProfile).split('/');
+          const ghUsername = ghProfile[ghProfile.length - 1];
+          if (ghUsername) {
+            githubName = `<code>${ghUsername}</code>`;
+          } else {
+            githubName = `<code>${stripTags(row.githubProfile)}</code>`;
+          }
         }
-      }
-      let cardDetails = `<p class="block-party-card-title"><em>${stripTags(row.category)}</em>${githubName}</p>`;
-      cardDetails += `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
-      if (row.showcaseUrl) {
-        cardDetails += `<p><a href="${stripTags(row.showcaseUrl)}" target="_blank">Preview</a></p>`;
-      }
-      cardDetails += `${truncate(urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br'), 25)}`;
-      cardsRow.push(cardDetails);
-    });
+        categories.add(row.category);
+        let cardDetails = `<p class="block-party-card-title"><em>${stripTags(row.category)}</em>${githubName}</p>`;
+        cardDetails += `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
+        if (row.showcaseUrl) {
+          cardDetails += `<p><a href="${stripTags(row.showcaseUrl)}" target="_blank">Preview</a></p>`;
+        }
+        cardDetails += `${truncate(urlify(stripTags(row.description), 'b', 'i', 'u', 'p', 'br'), 25)}`;
+        cardsRow.push(cardDetails);
+      });
     cardsArr.push(cardsRow);
 
     // build out cards using the existing cards block
     const cardsBlock = buildBlock('cards', cardsArr);
+    cardsBlock.classList.add('two');
     // replace existing block with the new cards block
     const blockWrapper = block.parentElement;
     block.remove();
@@ -117,6 +121,46 @@ async function decorateCardListByUrl(block) {
     // decorate and load the cards block
     decorateBlock(cardsBlock);
     await loadBlock(cardsBlock);
+
+    const categoryFilter = document.createElement('div');
+    categoryFilter.classList.add('category-filter-wrapper');
+    const categoryFilterSelect = document.createElement('select');
+    categoryFilterSelect.id = 'category-filter';
+    categoryFilterSelect.classList.add('category-filter');
+    categoryFilter.append(categoryFilterSelect);
+    [...categories].sort((a, b) => {
+      if (a.toLowerCase() === 'other') return 1;
+      if (b.toLowerCase() === 'other') return -1;
+      return a.localeCompare(b);
+    }).forEach((category) => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.text = category;
+      categoryFilterSelect.append(option);
+    });
+    const optionAll = document.createElement('option');
+    optionAll.value = '';
+    optionAll.text = 'All';
+    categoryFilterSelect.prepend(optionAll);
+
+    categoryFilterSelect.addEventListener('change', () => {
+      const selectedCategory = categoryFilterSelect.value;
+      cardsBlock.querySelectorAll('.cards-card').forEach((card) => {
+        const cardCategory = card.querySelector('.block-party-card-title em').textContent;
+        if (selectedCategory === '' || cardCategory === selectedCategory) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+
+    const categoryFilterLabel = document.createElement('label');
+    categoryFilterLabel.htmlFor = 'category-filter';
+    categoryFilterLabel.textContent = 'Category';
+    categoryFilter.prepend(categoryFilterLabel);
+
+    cardsBlock.before(categoryFilter);
 
     // add listener to hide/show the description overflow dialog
     const extras = blockWrapper.querySelectorAll('.cards-card span.extra');
@@ -137,6 +181,6 @@ export default async function decorate(block) {
   if (block.classList.contains('image-card-listing')) {
     decorateCardListByListElement(block);
   } else {
-    decorateCardListByUrl(block);
+    await decorateCardListByUrl(block);
   }
 }

@@ -1,0 +1,1253 @@
+@import url('colors.css');
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable selector-class-pattern */
+
+:root {
+  /* colors */
+  --light-green: #adf4ce;
+  --medium-green: #49cc93;
+  --dark-green: #00653e;
+  --light-orange: #ffdfad;
+  --medium-orange: #ffa037;
+  --dark-orange: #cb5d00;
+  --light-red: #ffddd6;
+  --medium-red: #ff7c65;
+  --dark-red: #b40000;
+  --light-blue: #cae8ff;
+  --medium-blue: #78bbfa;
+  --dark-blue: #147af3;
+  --light-fuchsia: #ffdafa;
+  --medium-fuchsia: #f592f3;
+  --dark-fuchsia: #9d039e;
+  --light-purple: #edf;
+  --medium-purple: #cca4fd;
+  --dark-purple: #7326d3;
+  --light-indigo: #d3d5ff;
+  --medium-indigo: #acafff;
+  --dark-indigo: #4046ca;
+  --gray-100: #e9e9e9;
+  --gray-200: #e1e1e1;
+  --gray-300: #dadada;
+  --gray-400: #c6c6c6;
+  --gray-500: #8f8f8f;
+  --gray-600: #717171;
+  --gray-700: #505050;
+
+}
+
+body {
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 32px;
+}
+
+main {
+  margin: 16px;
+  margin-top: var(--nav-height);
+}
+
+body main > .section {
+  padding-top: 0;
+}
+
+/* general performance */
+
+main li.score-good, vitals-facet div[data-value^="good"] label {
+  color: var(--dark-green);
+  background-color: var(--light-green);
+}
+
+main li.score-ni, vitals-facet div[data-value^="ni"] label {
+  color: var(--dark-orange);
+  background-color: var(--light-orange);
+}
+
+main li.score-poor, vitals-facet div[data-value^="poor"] label {
+  color: var(--dark-red);
+  background-color: var(--light-red);
+}
+
+main .title {
+  padding-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-flow: row wrap;
+  gap: 1ch;
+}
+
+main .title select {
+  align-self: center;
+  border: 2px solid var(--dark-blue);
+  border-radius: 32px;
+  padding: 2px 15px;
+  background-color: var(--dark-blue);
+  color: white;
+  font: inherit;
+}
+
+main .title > * {
+  flex: 2 0px;
+}
+
+main .title daterange-picker {
+  flex: 1 100%;
+  order: 3;
+}
+
+main .title incognito-checkbox {
+  display: none;
+  margin-bottom: 10px;
+}
+
+main .title incognito-checkbox[mode="open"],
+main .title incognito-checkbox[mode="incognito"] {
+  display: inline-block;
+}
+
+main .title url-selector {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  margin-right: 8px;
+  font-size: var(--type-heading-m-size);
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex-grow: 50;
+}
+
+main .title url-selector img {
+  height: 16px;
+  margin-right: 8px;
+}
+
+main .title url-selector input {
+  color: var(--spectrum-gray-700);
+}
+
+.title button {
+  color: var(--dark-blue);
+  border: 2px solid currentcolor;
+  border-radius: 32px;
+  font-size: 24px;
+  background-color: white;
+  padding: 4px 16px;
+}
+
+/* key metrics */
+main .key-metrics ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-gap: 8px;
+  padding-left: 0;
+}
+
+main .key-metrics ul > * h2 {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+main .key-metrics ul > * button {
+  font-size: 10px;
+}
+
+main .key-metrics ul > * h2::before {
+  content: ' ';
+  background-color: currentcolor;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  display: inline-block;
+  border-radius: 8px;
+}
+
+main .key-metrics ul > * p {
+  font-weight: 600;
+  font-size: 20px;
+  margin: 8px 0;
+}
+
+main .key-metrics ul > * p .extra {
+  font-weight: normal;
+  font-size: 80%;
+}
+
+main .key-metrics ul > * p .extra::before {
+  content: ' (';
+}
+
+main .key-metrics ul > #pageviews p .extra::after {
+  content: ' per visit)';
+}
+
+main .key-metrics ul > #conversions p .extra::after {
+  content: '%)';
+}
+
+main .key-metrics ul > #visits p .extra::after {
+  content: '% bounces)';
+}
+
+main .key-metrics ul > #lcp p number-format::after,
+main .key-metrics ul > #inp p number-format::after,
+main facet-sidebar ul.cwv > li[title^="LCP"] number-format::after,
+main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
+  content: 's';
+}
+
+/* as of 2024, all iOS CWV values are fake, so we hide them a bit */
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li {
+  filter: grayscale(1);
+}
+
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
+  filter: inherit;
+}
+
+main .key-metrics ul > #lcp number-format.extra::after {
+  content: 's TTFB)'
+}
+
+main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
+  content: '';
+}
+
+main .key-metrics number-format[trend="falling"],
+main .key-metrics #lcp number-format[trend="rising"],
+main .key-metrics #cls number-format[trend="rising"],
+main .key-metrics #inp number-format[trend="rising"] {
+  border-bottom: 1px solid;
+  border-color: var(--spectrum-red-600);
+}
+
+main .key-metrics number-format[trend="rising"],
+/* more isn't always better */
+main .key-metrics #lcp number-format[trend="falling"],
+main .key-metrics #cls number-format[trend="falling"],
+main .key-metrics #inp number-format[trend="falling"] {
+  border-bottom: 1px solid;
+  border-color: var(--spectrum-green-600);
+}
+
+.key-metrics > ul > * {
+  border: 1px solid currentcolor;
+  border-radius: 8px;
+  background-color: #eee;
+  padding: 4px 8px;
+}
+
+.key-metrics ul > *[aria-selected="true"] {
+  background-color: #444;
+  color: white;
+}
+
+.key-metrics [aria-hidden="true"] {
+  display: none;
+}
+
+/* conversions custom element */
+
+conversion-tracker {
+  display: grid;
+  grid-template-areas:
+  'heading heading button'
+  'number empty button'
+  'number definition definition'
+  ;
+  grid-template-columns: 4fr 1fr 4em;
+  align-items: start;
+}
+
+conversion-tracker button {
+  border: 2px solid var(--spectrum-gray-700);
+  border-radius: 32px;
+  padding: 2px 8px;
+  background-color: var(--spectrum-gray-300);
+  color: var(--spectrum-gray-700);
+  grid-area: button;
+  font-weight: normal!important;
+}
+
+conversion-tracker button:disabled {
+  opacity: 0.5;
+}
+
+conversion-tracker h2 {
+  grid-area: heading;
+}
+
+conversion-tracker p {
+  grid-area: number;
+}
+
+conversion-tracker ol {
+  grid-area: definition;
+  padding-left: 0;
+  text-align: right;
+  font-size: small;
+  list-style: none;
+  line-height: 1.2;
+  color: var(--spectrum-gray-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+conversion-tracker[mode="pending"] ol li {
+  background-color: var(--spectrum-yellow-200);
+  display: inline-block;
+}
+
+conversion-tracker ol li {
+  margin: 0;
+  padding: 0;
+}
+
+main .key-metrics ul > conversion-tracker[mode="pending"] h2::before {
+  background-color: var(--spectrum-yellow-200);
+  border: 1px solid var(--spectrum-yellow-700);
+}
+
+main .key-metrics ul > conversion-tracker[mode="custom"] h2::before {
+  background-color: var(--spectrum-fuchsia-200);
+  border: 1px solid var(--spectrum-fuchsia-700);
+}
+
+/* figure */
+
+figure {
+  position: relative;
+  margin: 0;
+  margin-bottom: 16px;
+}
+
+
+
+figure .chart-container {
+  position: relative;
+  min-height: 100px;
+  display: grid;
+  justify-content: center;
+  height: calc(100vh - 400px);
+}
+
+figure .chart-container.sankey {
+  height: calc(100vh - 300px);
+}
+
+#low-data-warning {
+  color: red;
+  display: inline-flex;
+  align-items: center;
+  align-self: end;
+}
+
+#timezone::before {
+  content: 'Timezone: ';
+}
+
+.danger-icon {
+  box-sizing: border-box;
+  position: relative;
+  display: inline-block;
+  transform: scale(1);
+  width: 20px;
+  height: 20px;
+  border: 2px solid;
+  border-radius: 40px;
+  margin-right: 5px;
+}
+
+.danger-icon::after,
+.danger-icon::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 3px;
+  width: 2px;
+  background: currentcolor;
+  left: 7px;
+}
+
+.danger-icon::after {
+  top: 2px;
+  height: 8px;
+}
+
+.danger-icon::before {
+  height: 2px;
+  bottom: 2px;
+}
+
+figcaption {
+  font-size: var(--type-body-xs-size);
+  margin-top: 8px;
+  text-align: right;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  flex-wrap: wrap;
+}
+
+figcaption > span {
+  display: inline-flex;
+  align-items: center;
+}
+
+#low-data-warning[aria-hidden=true] {
+  display: none;
+}
+
+.filter-tags {
+  position: absolute;
+  top: 50px;
+  left: 60px;
+  width: 60%;
+  font-size: var(--type-body-xs-size);
+}
+
+.filter-tags > span {
+  color: var(--dark-indigo);
+  border: 1px solid currentcolor;
+  border-radius: 1em;
+  background-color: var(--light-indigo);
+  padding: 0 1em;
+  text-align: end;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+  white-space: nowrap;
+  display: inline-block;
+  word-break: break-all;
+}
+
+.filter-tags > span.filter-tag-user_agent {
+  color: var(--dark-fuchsia);
+  background-color: var(--light-fuchsia);
+}
+
+.filter-tags > span.filter-tag-url {
+  color: var(--dark-purple);
+  background-color: var(--light-purple);
+}
+
+/* filters */
+
+.quick-filter {
+  padding: 12px 0 8px;
+  display: flex;
+}
+
+.quick-filter input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 0;
+  padding: 12px;
+  background-color: #eee;
+  font: inherit;
+}
+
+fieldset {
+  --background-color: var(--light-indigo);
+
+  padding: 8px 0 0;
+  color: var(--dark-indigo);
+  background-color: var(--background-color);
+  border: 2px solid currentcolor;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+fieldset a:any-link {
+  color: currentcolor;
+}
+
+list-facet[facet="userAgent" ] fieldset {
+  color: var(--dark-fuchsia);
+
+  --background-color: var(--light-fuchsia);
+}
+
+list-facet[facet="url"] fieldset {
+  color: var(--dark-purple);
+
+  --background-color: var(--light-purple);
+}
+
+*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
+  display: none;
+}
+
+legend {
+  display: flex;
+  margin-left: 20px;
+  padding: 8px;
+  background-color: var(--background-color);
+}
+
+fieldset > div {
+  padding: 0 4px;
+  font-size: var(--type-body-s-size);
+}
+
+fieldset > div:hover {
+  background-color: #eee;
+}
+
+fieldset li,
+vitals-facet label {
+  border: 1px solid currentcolor;
+  border-radius: 8px;
+  background-color: #eee;
+  padding: 2px 6px;
+  text-align: end;
+  font-size: 12px;
+}
+
+fieldset li.interesting {
+  border-width: 2px;
+  padding: 2px 5px;
+}
+
+fieldset li.significant {
+  border-width: 3px;
+  padding: 2px 4px;
+}
+
+/* business metrics are shown when the focus is on acquisition */
+facet-sidebar:has(input[name="focus"][value="acquisition"]) aside ul.cwv li.acquisition {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="acquisition"]:checked) aside ul.cwv li.acquisition {
+  display: flex;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]) aside ul.cwv li.performance {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]:checked) aside ul.cwv li.performance {
+  display: block;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.conversion {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion {
+  display: flex;
+  grid-column: span 3;
+}
+
+ul.cwv meter {
+  width: 100%;
+}
+
+main:has(conversion-tracker[mode="custom"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion.engagement {
+  display: none;
+}
+
+main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion:last-of-type {
+  display: none;
+}
+
+fieldset li::after,
+vitals-facet label::before {
+  content: ' ';
+  background-color: currentcolor;
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+  display: inline-block;
+  border-radius: 14px;
+}
+
+/* business metrics have a meter instead of a dot */
+fieldset li:has(meter)::after {
+  display: none;
+}
+
+fieldset li:has(meter) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.6;
+}
+
+fieldset li:has(meter):hover {
+  opacity: 1;
+}
+
+fieldset li.interesting:has(meter) {
+  opacity: 0.8;
+}
+
+fieldset li.significant:has(meter) {
+  opacity: 1;
+}
+
+fieldset li:has(meter) meter {
+  width: 100%;
+}
+
+fieldset li:has(meter) number-format {
+  width: 4em;
+}
+
+fieldset li:has(meter) number-format::after {
+  content: '%';
+}
+
+fieldset li.fixed:has(meter) number-format::after {
+  content: '';
+}
+
+fieldset li.time:has(meter) number-format::after {
+  content: 's';
+}
+
+fieldset div:first-of-type li::before {
+  display: block;
+  font-size: 50%;
+  margin-left: 10px;
+  text-align: center;
+  margin-top: -25px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+fieldset div:first-of-type li:has(meter)::before {
+  display: block;
+  font-size: 50%;
+  margin-top: -50px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+fieldset div:first-of-type li:nth-of-type(1)::before {
+  content: 'LCP';
+}
+
+fieldset div:first-of-type li:nth-of-type(2)::before {
+  content: 'CLS';
+}
+
+fieldset div:first-of-type li:nth-of-type(3)::before {
+  content: 'INP';
+}
+
+fieldset div:first-of-type li:nth-of-type(4)::before {
+  content: 'Bounce';
+}
+
+fieldset div:first-of-type li:nth-of-type(5)::before {
+  content: 'Time';
+}
+
+fieldset div:first-of-type li:nth-of-type(6)::before {
+  content: 'Organic';
+}
+
+fieldset div:first-of-type li:nth-of-type(7)::before {
+  content: 'Engagement';
+}
+
+fieldset div:first-of-type li:nth-of-type(8)::before {
+  content: 'Conversion';
+}
+
+
+
+
+
+#facets ul.cwv {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-gap: 4px;
+  padding-left: 0;
+  margin: 4px 2px;
+}
+
+#facets fieldset div {
+  display: grid;
+  grid-template-areas: 'check lab' ' - cwv';
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  grid-gap: 0 16px;
+}
+
+#facets fieldset div ~ div.more-container:last-of-type,
+#facets .more fieldset div ~ div.more-container:last-of-type,
+#facets .more-more fieldset div ~ div.more-container:last-of-type,
+#facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
+  display: grid;
+}
+
+#facets fieldset input[type=checkbox] {
+  grid-area: check;
+  height: 20px;
+  width: 20px;
+}
+
+#facets fieldset label {
+  grid-area: lab;
+  word-break: break-all;
+}
+
+#facets fieldset label .count, #facets fieldset label .extra {
+  opacity: 0.6;
+}
+
+#facets fieldset div:hover .count, #facets fieldset div:hover .extra {
+  opacity: 1;
+}
+
+#facets fieldset label .extra,
+#facets fieldset label span.extra {
+  display: none;
+}
+
+#facets fieldset label .extra.interesting {
+  display: inline;
+}
+
+#facets fieldset label .extra.significant {
+  display: inline;
+}
+
+#facets fieldset label .count::before,
+#facets fieldset label span.value::before {
+  content: ' (';
+}
+
+#facets literal-facet label span.value::before {
+  content: '';
+}
+
+#facets fieldset label .count::after, #facets fieldset label span.value::after {
+  content: ') ';
+}
+
+#facets fieldset label .extra::after {
+  content: '% rate';
+}
+
+#facets fieldset label number-format[title="0"].extra::after {
+  content: ' conversions';
+}
+
+
+#facets literal-facet label span.value::after {
+  content: '';
+}
+
+#facets literal-facet label span.value,
+#facets link-facet label span.withheld {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+}
+
+thumbnail-facet label {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+thumbnail-facet label > span {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+thumbnail-facet label span.filename {
+  font-family: monospace;
+  font-size: 80%;
+  background-color: var(--spectrum-blue-200);
+  border: 1px solid var(--spectrum-blue-400);
+  padding: 2px 4px;
+  line-height: 0.9;
+}
+
+thumbnail-facet fieldset div:not(.more-container) {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+
+vitals-facet fieldset {
+  display: grid;
+  grid-template-areas:
+  '. lcp-good cls-good inp-good'
+  '. lcp-ni cls-ni inp-ni'
+  '. lcp-poor cls-poor inp-poor';
+  grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 4pt;
+  padding: 4pt;
+  align-items: end;
+}
+
+vitals-facet fieldset label {
+  word-break: normal;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] {
+  width: 0;
+  height: 0;
+}
+
+#facets vitals-facet label::before {
+  margin-right: 8px;
+}
+
+#facets vitals-facet fieldset div {
+  display: grid;
+  grid-template-areas: 'check lab';
+  grid-template-columns: 0 1fr;
+  grid-gap: 0;
+}
+
+#facets vitals-facet fieldset label {
+  text-align: start;
+}
+
+#facets vitals-facet fieldset input[type=checkbox] + label::before {
+  border: 2px solid currentcolor;
+  background-color: transparent;
+  width: 8px;
+  height: 8px;
+}
+
+#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+  border: 2px solid currentcolor;
+  background-color: currentcolor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodLCP"] {
+  grid-area: lcp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niLCP"] {
+  grid-area: lcp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorLCP"] {
+  grid-area: lcp-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodCLS"] {
+  grid-area: cls-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niCLS"] {
+  grid-area: cls-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorCLS"] {
+  grid-area: cls-poor;
+}
+
+#facets vitals-facet fieldset div[data-value="goodINP"] {
+  grid-area: inp-good;
+}
+
+#facets vitals-facet fieldset div[data-value="niINP"] {
+  grid-area: inp-ni;
+}
+
+#facets vitals-facet fieldset div[data-value="poorINP"] {
+  grid-area: inp-poor;
+}
+
+#facets fieldset ul.cwv {
+  grid-area: cwv;
+}
+
+#facets div[aria-selected=true] {
+  background-color: var(--light-blue)
+}
+
+#facets div[aria-checked=mixed] {
+  opacity: 0.7;
+  filter: brightness(0.7);
+}
+
+#facets div[aria-selected]:hover {
+  background-color: #eee;
+}
+
+#facets img {
+  height: 60px;
+}
+
+#facets link-facet span.collapse {
+  display: none;
+}
+
+#facets link-facet span.collapse + span.suffix::before {
+  content: '...';
+}
+
+#facets link-facet a .protocol::after {
+  content: '//';
+}
+
+/* don't worry, we'll show this when there is enough space */
+#facets link-facet  a .protocol {
+  display: none;
+}
+
+#facets link-facet  a .hostname {
+  display: none;
+}
+
+#facets facet-sidebar {
+  container-type: inline-size;
+  container-name: facets;
+}
+
+facet-sidebar form {
+  display: flex;
+  margin-left: calc(100% - 112px);
+  margin-bottom: -46px;
+  height: 32px;
+  width: 96px;
+  background-color: var(--light-fuchsia);
+  border-radius: 16px;
+  border-top: 2px solid var(--dark-fuchsia);
+  border-left: 2px solid var(--dark-fuchsia);
+  border-right: 2px solid var(--dark-fuchsia);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 4px;
+  accent-color: var(--dark-fuchsia);
+  z-index: 4;
+}
+
+/* external referrer only care about the hostname anyway */
+#facets link-facet[facet="enter.source"] a .hostname {
+  display: inline;
+}
+
+#facets link-facet[facet="enter.source"] a .pathname {
+  display: none;
+}
+
+#facets link-facet img {
+  height: 40px;
+  width: 60px;
+  object-fit: cover;
+  display: block;
+  float: left;
+  margin-right: 8px;
+}
+
+#facets link-facet img.broken {
+  opacity: 0;
+}
+
+#facets link-facet img.favicon {
+  object-fit: contain;
+}
+
+#facets fieldset div.load-more {
+  grid-column: 2 / span 2;
+  display: flex;
+  justify-content: left;
+  padding: 10px 0;
+}
+
+#facets fieldset div.load-more label {
+  cursor: pointer;
+  padding-right: 50px;
+}
+
+.clipboard, a.drilldown, a.drillup, .clipboard-paste, .icon {
+  margin-left: 8px;
+  box-sizing: border-box;
+  position: relative;
+  display: inline-block;
+  transform: scale(1);
+  width: 18px;
+  height: 18px;
+  border: 2px solid;
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  font-size: 0;
+}
+
+.clipboard-paste::after,
+.clipboard-paste::before,
+.icon::after,
+.icon::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 2px;
+  width: 10px;
+  left: 2px;
+}
+
+.clipboard-paste::before {
+  border: 2px solid;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  top: -2px;
+  height: 6px;
+}
+
+.clipboard-paste::after {
+  height: 2px;
+  background: currentcolor;
+  box-shadow: 0 -4px 0 0;
+  bottom: 2px;
+}
+
+/* the copy icon looks like two rectangles, overlaid */
+.clipboard::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 2px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid;
+  top: 4px;
+  left: 4px;
+  z-index: 1;
+}
+
+.clipboard::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 2px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid;
+  border-bottom: 0;
+  border-right: 0;
+  top: 1px;
+  left: 1px;
+}
+
+/* make a little down arrow from ::before and ::after */
+a.drilldown::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  border: 2px solid;
+  border-width: 0 2px 0 0;
+  top: 1px;
+  left: 6px;
+}
+
+/* and the downward facing triangle */
+a.drilldown::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-top-color: currentcolor;
+  top: 6px;
+  left: 1px;
+}
+
+/* make a little upward pointing arrow from ::before and ::after for drillup */
+a.drillup::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  border: 2px solid;
+  border-width: 0 2px 0 0;
+  top: 6px;
+  left: 6px;
+}
+
+/* and the upward facing triangle */
+a.drillup::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-bottom-color: currentcolor;
+  top: -4px;
+  left: 1px;
+}
+
+/* toasts */
+
+.toast {
+  z-index: var(--nav-z-index);
+  position: fixed;
+  display: block;
+  width: fit-content;
+  padding: 8px 32px;
+  border-radius: 16px;
+  max-width: 80%;
+  background-color: #444;
+  color: white;
+  top: 32px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  transition: all 0.3s linear;
+  margin-top: 0;
+}
+
+.toast[aria-hidden="true"] {
+  visibility: hidden;
+  opacity: 0;
+  margin-top: -20px;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+  display: none;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset legend span {
+  display: none;
+}
+
+facet-sidebar[aria-disabled="true"] fieldset > div:hover {
+  background-color: transparent;
+}
+
+facet-sidebar[aria-disabled="true"] div.quick-filter {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  main .title url-selector input {
+    font-size: var(--type-heading-l-size);
+  }
+}
+
+@media (min-width: 900px) {
+  main .title {
+    flex-wrap: nowrap;
+  }
+
+  main .title > * {
+    flex: 3 0;
+  }
+
+  main .title daterange-picker {
+    flex: unset;
+    order: unset;
+  }
+
+  main .title url-selector input {
+    font-size: var(--type-heading-xl-size);
+  }
+
+  main .title url-selector img {
+    height: 32px;
+  }
+
+  main .key-metrics ul > * h2, main .key-metrics ul > * button {
+    font-size: 14px;
+  }
+
+  main .key-metrics ul > * h2::before {
+    width: 14px;
+    height: 14px;
+    border-radius: 14px;
+  }
+
+  main .key-metrics ul > * p {
+    font-size: 30px;
+    margin: 16px 0;
+  }
+
+  main .key-metrics ul {
+    grid-gap: 16px;
+  }
+
+  main .key-metrics ul > * {
+    border-radius: 16px;
+    padding: 8px 16px;
+  }
+
+  #facets fieldset div {
+    grid-template-areas: 'check lab cwv';
+    grid-template-columns: 20px 1fr 350px;
+  }
+
+  #facets ul.cwv {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-gap: 8px;
+    margin: 8px 4px;
+  }
+
+  fieldset li,
+  vitals-facet label {
+    border-radius: 16px;
+    padding: 4px 16px;
+    font-size: 18px;
+  }
+}
+
+
+/* split mode */
+
+@media (min-width: 1600px) {
+  #deepmain {
+    display: flex;
+    gap: 16px;
+    height: calc(100vh - var(--nav-height) - 32px);
+  }
+
+  #deepmain > div, #deepmain > facet-sidebar {
+    width: 50%;
+  }
+
+  main div.output {
+    position: fixed;
+    width: 50vw;
+  }
+
+  facet-sidebar {
+    margin-left: calc(50vw + 16px);
+  }
+
+  body.appear {
+    max-width: 2400px;
+    display: block;
+    padding-top: 0;
+  }
+
+  #facets link-facet label {
+    /* don't let the line wrap */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+footer.footer-wrapper.appear {
+  display: none;
+}

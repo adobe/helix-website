@@ -1,23 +1,34 @@
 // eslint-disable-next-line import/no-relative-packages
-import { DataChunks } from './cruncher.js';
+import {
+  DataChunks, utils, series, facets,
+} from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
-import { toHumanReadable, scoreCWV } from './utils.js';
+import { parseSearchParams, parseConversionSpec } from './utils.js';
 
-// eslint-disable-next-line import/no-relative-packages
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import FacetSidebar from './facetsidebar.js';
-import IncognitoCheckbox from './incognito-checkbox.js';
+const {
+  isKnownFacet,
+  scoreCWV,
+  computeConversionRate,
+  toHumanReadable,
+} = utils;
 
-customElements.define('incognito-checkbox', IncognitoCheckbox);
+const {
+  userAgent,
+  vitals,
+  lcpSource,
+  lcpTarget,
+} = facets;
+
+const {
+  pageViews, visits, bounces, lcp, cls, inp, engagement, ttfb,
+} = series;
 
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page/bundles';
+const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
-// const API_ENDPOINT = 'https://rum-bundles-2.david8603.workers.dev/rum-bundles';
-// const UA_KEY = 'user_agent';
 
 const elems = {};
 
@@ -27,19 +38,29 @@ const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
-const sidebar = new FacetSidebar(dataChunks, elems);
 
-window.addEventListener('pageshow', () => elems.canvas && herochart.render());
+const conversionSpec = Object.keys(parseConversionSpec()).length
+  ? parseConversionSpec()
+  : { checkpoint: ['click'] };
+
+const isDefaultConversion = Object.keys(conversionSpec).length === 1
+  && conversionSpec.checkpoint
+  && conversionSpec.checkpoint[0] === 'click';
+
+window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
-dataChunks.addSeries('pageViews', (bundle) => bundle.weight);
-dataChunks.addSeries('visits', (bundle) => (bundle.visit ? bundle.weight : 0));
-dataChunks.addSeries('conversions', (bundle) => (bundle.conversion ? bundle.weight : 0));
-dataChunks.addSeries('lcp', (bundle) => bundle.cwvLCP);
-dataChunks.addSeries('cls', (bundle) => bundle.cwvCLS);
-dataChunks.addSeries('inp', (bundle) => bundle.cwvINP);
-dataChunks.addSeries('ttfb', (bundle) => bundle.cwvTTFB);
-
+dataChunks.addSeries('pageViews', pageViews);
+dataChunks.addSeries('visits', visits);
+dataChunks.addSeries('bounces', bounces);
+dataChunks.addSeries('lcp', lcp);
+dataChunks.addSeries('cls', cls);
+dataChunks.addSeries('inp', inp);
+dataChunks.addSeries('ttfb', ttfb);
+dataChunks.addSeries('engagement', engagement);
+dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, conversionSpec)
+  ? bundle.weight
+  : 0));
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -49,8 +70,33 @@ function setDomain(domain, key) {
 /* update UX */
 export function updateKeyMetrics(keyMetrics) {
   document.querySelector('#pageviews p').textContent = toHumanReadable(keyMetrics.pageViews);
-  document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
-  document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
+  if (keyMetrics.visits > 0) {
+    const pageViewsExtra = document.createElement('span');
+    pageViewsExtra.textContent = toHumanReadable(keyMetrics.pageViews / keyMetrics.visits);
+    pageViewsExtra.className = 'extra';
+    document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+  }
+
+  if (keyMetrics.visits > 0) {
+    document.querySelector('#visits p').textContent = toHumanReadable(keyMetrics.visits);
+    const visitsExtra = document.createElement('span');
+    visitsExtra.textContent = toHumanReadable((100 * keyMetrics.bounces) / keyMetrics.visits);
+    visitsExtra.className = 'extra';
+    document.querySelector('#visits p').appendChild(visitsExtra);
+  } else {
+    document.querySelector('#visits p').textContent = 'N/A';
+  }
+
+  if (keyMetrics.visits > 0) {
+    document.querySelector('#conversions p').textContent = toHumanReadable(keyMetrics.conversions);
+    const conversionsExtra = document.createElement('span');
+    const conversionRate = computeConversionRate(keyMetrics.conversions, keyMetrics.pageViews);
+    conversionsExtra.textContent = toHumanReadable(conversionRate);
+    conversionsExtra.className = 'extra';
+    document.querySelector('#conversions p').appendChild(conversionsExtra);
+  } else {
+    document.querySelector('#conversions p').textContent = 'N/A';
+  }
 
   const lcpElem = document.querySelector('#lcp p');
   lcpElem.textContent = `${toHumanReadable(keyMetrics.lcp / 1000)} s`;
@@ -71,39 +117,51 @@ export function updateKeyMetrics(keyMetrics) {
 
 function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.resetFacets();
-  dataChunks.addFacet('userAgent', (bundle) => {
-    const parts = bundle.userAgent.split(':');
-    return parts.reduce((acc, _, i) => {
-      acc.push(parts.slice(0, i + 1).join(':'));
-      return acc;
-    }, []);
-  });
-  dataChunks.addFacet('url', (bundle) => bundle.domain || bundle.url);
-  dataChunks.addFacet('checkpoint', (bundle) => Array.from(bundle.events.reduce((acc, evt) => {
-    acc.add(evt.checkpoint);
-    return acc;
-  }, new Set())), 'every');
+
+  dataChunks.addFacet('type', (bundle) => bundle.hostType);
+
+  dataChunks.addFacet(
+    'conversions',
+    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
+  );
+
+  dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
+  dataChunks.addFacet('url', facets.url, 'some', 'never');
+  dataChunks.addFacet('vitals', vitals);
+  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
+
+  if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
+    dataChunks.addFacet('lcp.target', lcpTarget);
+
+    dataChunks.addFacet('lcp.source', lcpSource);
+  }
 
   // this is a bad name, fulltext would be better
   // but I'm keeping it for compatibility reasons
   dataChunks.addFacet('filter', (bundle) => {
     // this function is also a bit weird, because it takes
     // the filtertext into consideration
-    const fullText = bundle.url + bundle.events.map((e) => e.checkpoint).join(' ');
+    const fullText = `${bundle.url} ${bundle.events.map((e) => e.checkpoint).join(' ')}`;
     const keywords = filterText
       .split(' ')
       .filter((word) => word.length > 2);
     const matching = keywords
-      .filter((word) => fullText.indexOf(word) > -1);
+      .filter((word) => fullText.toLowerCase().indexOf(word.toLowerCase()) > -1);
     if (matching.length === keywords.length && filterText.length > 2) {
       matching.push(params.get('filter'));
     }
     return matching;
   });
 
+  Object.entries(window.slicer.extraFacets || {}).forEach(([key, value]) => {
+    dataChunks.addFacet(key, value);
+  });
+
   // if we have a checkpoint filter, then we also want facets for
-  // source and target
-  checkpoint
+  // source and target, the same applies to defined conversion checkpoints
+  // we need facets for source and target, too
+  Array.from(new Set([...checkpoint, ...(
+    isDefaultConversion ? [] : conversionSpec.checkpoint || [])]))
     .forEach((cp) => {
       dataChunks.addFacet(`${cp}.source`, (bundle) => Array.from(
         bundle.events
@@ -116,8 +174,35 @@ function updateDataFacets(filterText, params, checkpoint) {
           bundle.events
             .filter((evt) => evt.checkpoint === cp)
             .filter(({ target }) => target) // filter out empty targets
-            .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+            .reduce((acc, { target }) => {
+              if (typeof target === 'string') {
+                const mi = target.indexOf('/media_');
+                if (cp === 'viewmedia' && mi) {
+                  acc.add(target.substring(mi + 1));
+                } else {
+                  acc.add(target);
+                }
+              } else {
+                acc.add(target);
+              }
+              return acc;
+            }, new Set()),
         ));
+
+        if (cp === 'loadresource') {
+          // loadresource.target are not discrete values, but the number
+          // of milliseconds it took to load the resource, so the best way
+          // to present this is to create a histogram
+          // we already have the `loadresource.target` facet, so we can
+          // extract the values from there and create a histogram
+          dataChunks.addHistogramFacet(
+            'loadresource.histogram',
+            'loadresource.target',
+            {
+              count: 10, min: 0, max: 10000, steps: 'quantiles',
+            },
+          );
+        }
       } else if (params.has('utm.source')) {
         params.getAll('utm.source').forEach((utmsource) => {
           dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
@@ -137,34 +222,14 @@ function updateDataFacets(filterText, params, checkpoint) {
 }
 
 function updateFilter(params, filterText) {
-  dataChunks.filter = Array.from(params
-    .entries())
-    .filter(([key]) => false // TODO: find a better way to filter out non-facet keys
-      || key === 'userAgent'
-      || (key === 'filter' && filterText.length > 2)
-      || key === 'url'
-      // facets from sankey
-      || key === 'trafficsource'
-      || key === 'traffictype'
-      || key === 'entryevent'
-      || key === 'pagetype'
-      || key === 'loadtype'
-      || key === 'contenttype'
-      || key === 'interaction'
-      || key === 'clicktarget'
-      || key === 'exit'
-      || key.endsWith('.source')
-      || key.endsWith('.target')
-      || key === 'checkpoint')
-    .reduce((acc, [key, value]) => {
-      if (acc[key]) acc[key].push(value);
-      else acc[key] = [value];
-      return acc;
-    }, {});
+  const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
+    || isKnownFacet(key)
+    || (key === 'filter' && filterText.length > 2);
+  const transform = ([key, value]) => [key, value];
+  dataChunks.filter = parseSearchParams(params, filter, transform);
 }
 
 export async function draw() {
-  const ph = await fetchPlaceholders('/tools/rum');
   const params = new URL(window.location).searchParams;
   const checkpoint = params.getAll('checkpoint');
 
@@ -190,31 +255,31 @@ export async function draw() {
     ttfb: dataChunks.totals.ttfb.percentile(75),
     conversions: dataChunks.totals.conversions.sum,
     visits: dataChunks.totals.visits.sum,
+    bounces: dataChunks.totals.bounces.sum,
   });
 
-  const focus = params.get('focus');
   const mode = params.get('metrics');
-  sidebar.updateFacets(focus, mode, ph);
+  elems.sidebar.updateFacets(mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
 }
 
-async function loadData(scope) {
+async function loadData(config) {
+  const scope = config.value;
   const params = new URL(window.location.href).searchParams;
-  const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
+  const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+  const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
-  if (scope === 'week') {
+  if (startDate && endDate) {
+    dataChunks.load(await loader.fetchPeriod(startDate, endDate));
+  } else if (scope === 'week') {
     dataChunks.load(await loader.fetchLastWeek(endDate));
-  }
-  if (scope === 'month') {
+  } else if (scope === 'month') {
     dataChunks.load(await loader.fetchPrevious31Days(endDate));
-  }
-  if (scope === 'year') {
+  } else if (scope === 'year') {
     dataChunks.load(await loader.fetchPrevious12Months(endDate));
   }
-
-  draw();
 }
 
 export function updateState() {
@@ -222,147 +287,87 @@ export function updateState() {
   const { searchParams } = new URL(window.location.href);
   url.searchParams.set('domain', DOMAIN);
   url.searchParams.set('filter', elems.filterInput.value);
-  url.searchParams.set('view', elems.viewSelect.value);
-  if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
-  if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
-  const selectedMetric = document.querySelector('.key-metrics li[aria-selected="true"]');
-  if (selectedMetric) url.searchParams.set('focus', selectedMetric.id);
-  const drilldown = new URL(window.location).searchParams.get('drilldown');
-  if (drilldown) url.searchParams.set('drilldown', drilldown);
 
-  elems.facetsElement.querySelectorAll('input').forEach((e) => {
+  const viewConfig = elems.viewSelect.value;
+  url.searchParams.set('view', viewConfig.value);
+  if (viewConfig.value === 'custom') {
+    url.searchParams.set('startDate', viewConfig.from);
+    url.searchParams.set('endDate', viewConfig.to);
+  }
+  // if (searchParams.get('endDate')) url.searchParams.set('endDate', searchParams.get('endDate'));
+  if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
+
+  elems.sidebar.querySelectorAll('input').forEach((e) => {
     if (e.checked) {
       url.searchParams.append(e.id.split('=')[0], e.value);
     }
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
-  window.history.replaceState({}, '', url);
-}
 
-sidebar.addEventListener('change', () => {
-  updateState();
-  draw();
-});
+  window.history.replaceState({}, '', url);
+  document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
+}
 
 const section = document.querySelector('main > div');
 const io = new IntersectionObserver((entries) => {
   // wait for decoration to have happened
   if (entries[0].isIntersecting) {
-    const mainInnerHTML = `<div class="output">
-<div class="title">
-  <h1><img src="https://www.aem.live/favicon.ico"> www.aem.live</h1>
-  <div>
-    <select id="view">
-      <option value="week">Week</option>
-      <option value="month">Month</option>
-      <option value="year">Year</option>
-    </select>
-    <incognito-checkbox></incognito-checkbox>
-  </div>
-</div>
-<div class="key-metrics">
-  <ul>
-    <li id="pageviews">
-      <h2>Pageviews</h2>
-      <p>0</p>
-    </li>
-    <li id="visits">
-      <h2>Visits</h2>
-      <p>0</p>
-    </li>
-    <li id="conversions">
-      <h2>Conversions</h2>
-      <p>0</p>
-    </li>
-    <li id="lcp">
-      <h2>LCP</h2>
-      <p>0</p>
-    </li>
-    <li id="cls">
-      <h2>CLS</h2>
-      <p>0</p>
-    </li>
-    <li id="inp">
-      <h2>INP</h2>
-      <p>0</p>
-    </li>
-  </ul>
-  <div class="key-metrics-more" aria-hidden="true">
-    <ul>
-      <li id="ttfb">
-        <h2>TTFB</h2>
-        <p>0</p>
-      </li>  
-    </ul>
-  </div>
-</div>
+    // const main = document.querySelector('main');
+    // main.innerHTML = mainInnerHTML;
 
-<figure>
-  <div class="chart-container solitary">
-    <canvas id="time-series"></canvas>
-  </div>
-  <div class="filter-tags"></div>
-  <figcaption>
-    <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy reduced.</span>
-    <span id="timezone"></span>
-  </figcaption>
-</figure>
-</div>
-`;
+    const sidebar = document.querySelector('facet-sidebar');
+    sidebar.data = dataChunks;
+    elems.sidebar = sidebar;
 
-    const main = document.querySelector('main');
-    main.innerHTML = mainInnerHTML;
-
-    main.append(sidebar.rootElement);
+    sidebar.addEventListener('facetchange', () => {
+      // console.log('sidebar change');
+      updateState();
+      draw();
+    });
 
     elems.viewSelect = document.getElementById('view');
     elems.canvas = document.getElementById('time-series');
     elems.timezoneElement = document.getElementById('timezone');
     elems.lowDataWarning = document.getElementById('low-data-warning');
     elems.incognito = document.querySelector('incognito-checkbox');
+    elems.filterInput = sidebar.elems.filterInput;
 
     const params = new URL(window.location).searchParams;
-    const view = params.get('view') || 'week';
+    let view = params.get('view');
+    if (!view) {
+      view = 'week';
+      params.set('view', view);
+      const url = new URL(window.location.href);
+      url.search = params.toString();
+      window.history.replaceState({}, '', url);
+    }
+
+    const startDate = params.get('startDate') ? `${params.get('startDate')}` : null;
+    const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
     elems.incognito.addEventListener('change', async () => {
       loader.domainKey = elems.incognito.getAttribute('domainkey');
-      await loadData(view);
-      herochart.draw();
+
+      await loadData(elems.viewSelect.value);
+      draw();
     });
 
     herochart.render();
 
     elems.filterInput.value = params.get('filter');
-    elems.viewSelect.value = view;
+    elems.viewSelect.value = {
+      value: view,
+      from: startDate,
+      to: endDate,
+    };
+
     setDomain(params.get('domain') || 'www.thinktanked.org', params.get('domainkey') || '');
-    const focus = params.get('focus');
-    const h1 = document.querySelector('h1');
-    h1.textContent = ` ${DOMAIN}`;
-    const img = document.createElement('img');
-    img.src = `https://${DOMAIN}/favicon.ico`;
-    img.addEventListener('error', () => {
-      img.src = './website.svg';
-    });
-    h1.prepend(img);
-    h1.addEventListener('click', async () => {
-      // eslint-disable-next-line no-alert
-      let domain = window.prompt('enter domain or URL');
-      if (domain) {
-        try {
-          const url = new URL(domain);
-          domain = url.host;
-        } catch {
-          // nothing
-        }
-        window.location = `${window.location.pathname}?domain=${domain}&view=month`;
-      }
-    });
 
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     elems.timezoneElement.textContent = timezone;
 
     if (elems.incognito.getAttribute('domainkey')) {
-      loadData(view);
+      loadData(elems.viewSelect.value).then(draw);
     }
 
     elems.filterInput.addEventListener('input', () => {
@@ -370,30 +375,28 @@ const io = new IntersectionObserver((entries) => {
       draw();
     });
 
-    elems.viewSelect.addEventListener('input', () => {
+    elems.viewSelect.addEventListener('change', () => {
       updateState();
       window.location.reload();
     });
 
-    if (focus) {
-      const keyMetric = document.getElementById(focus);
-      if (keyMetric) keyMetric.ariaSelected = 'true';
-    }
-
-    const metrics = [...document.querySelectorAll('.key-metrics li')];
-    metrics.forEach((e) => {
-      e.addEventListener('click', (evt) => {
-        const metric = evt.currentTarget.id;
-        const selected = evt.currentTarget.ariaSelected === 'true';
-        metrics.forEach((m) => { m.ariaSelected = false; });
-        if (metric !== 'pageviews') e.ariaSelected = !selected;
-        updateState();
-        draw();
-      });
-    });
-
     if (params.get('metrics') === 'all') {
       document.querySelector('.key-metrics-more').ariaHidden = false;
+    }
+
+    // update the lab link with the current url search params
+    const labLink = document.querySelector('.lab a');
+    if (labLink) {
+      const updateLabLink = (url) => {
+        const current = new URL(labLink.href);
+        current.search = url.search;
+        labLink.href = current.toString();
+      };
+      updateLabLink(new URL(window.location.href));
+
+      document.addEventListener('urlstatechange', (ev) => {
+        updateLabLink(ev.detail);
+      });
     }
   }
 });

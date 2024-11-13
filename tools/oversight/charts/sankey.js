@@ -2,8 +2,14 @@
 import { SankeyController, Flow } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
+// eslint-disable-next-line import/no-unresolved
+import { utils } from '@adobe/rum-distiller';
 import AbstractChart from './chart.js';
-import { cssVariable } from '../utils.js';
+import {
+  cssVariable, parseConversionSpec,
+} from '../utils.js';
+
+const { reclassifyAcquisition, reclassifyEnter } = utils;
 
 Chart.register(SankeyController, Flow, ...registerables);
 
@@ -22,7 +28,7 @@ Chart.register(SankeyController, Flow, ...registerables);
 // 'pagesviewed',
 'error',
 'navigate',
-'utm',
+'utm', // replace with 'paid'
 'reload',
 'back_forward',
 'lcp',
@@ -32,34 +38,98 @@ Chart.register(SankeyController, Flow, ...registerables);
 const stages = [
   {
     label: 'trafficsource',
+    max_values: 20,
     /*
      *  1.  Where is the traffic coming from:
      *   - referrer (can be domain or page)
      *   - direct
      */
+    social: {
+      label: 'Social',
+      next: ['paid', 'owned', 'earned'],
+      color: cssVariable('--spectrum-red-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/social/))
+        .length > 0,
+    },
+    search: {
+      label: 'Search',
+      next: ['paid', 'owned', 'earned'],
+      color: cssVariable('--spectrum-blue-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/search/))
+        .length > 0,
+    },
+    display: {
+      label: 'Display',
+      next: ['paid'],
+      color: cssVariable('--spectrum-red-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/display/))
+        .length > 0,
+    },
+    video: {
+      label: 'Video',
+      next: ['paid', 'owned', 'earned'],
+      color: cssVariable('--spectrum-orange-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/video/))
+        .length > 0,
+    },
+    email: {
+      label: 'Email',
+      next: ['owned'],
+      color: cssVariable('--spectrum-yellow-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/email/))
+        .length > 0,
+    },
+    local: {
+      label: 'Local',
+      next: ['owned', 'paid'],
+      color: cssVariable('--spectrum-chartreuse-300'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter(({ source }) => source.match(/local/))
+        .length > 0,
+    },
     referrer: {
-      label: (bundle) => {
-        const refhost = bundle.events.filter((e) => e.checkpoint === 'enter')
-          .filter((e) => e.source.startsWith('http'))
-          .map((e) => new URL(e.source).hostname)
-          .pop();
-        return `referrer:${refhost}`;
-      },
+      label: 'Referrer',
       color: cssVariable('--spectrum-purple-300'),
       // detection function
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
         .filter((e) => e.source.startsWith('http'))
-        .length > 0,
-      next: ['organic', 'campaign'],
+        .length > 0
+        && bundle.events
+          .filter((e) => e.checkpoint === 'acquisition')
+          .filter((e) => e.source)
+          .length === 0,
+      next: ['earned', 'owned', 'paid'],
     },
     direct: {
       label: 'Direct',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'enter')
         .filter((e) => !e.source.startsWith('http'))
-        .length > 0,
-      next: ['organic', 'campaign'],
+        .length > 0
+        || bundle.events
+          .filter((e) => e.checkpoint === 'acquisition')
+          .filter((e) => e.source)
+          .filter(({ source }) => source.match(/direct/))
+          .length > 0,
+      next: ['earned', 'owned', 'paid'],
       color: cssVariable('--spectrum-green-300'),
     },
   },
@@ -70,21 +140,38 @@ const stages = [
      *   - organic
      *  - campaign (utm params present)
      */
-    organic: {
-      label: 'Organic',
+    earned: {
+      label: 'Earned',
       color: cssVariable('--spectrum-green-400'),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'utm')
+        .filter((e) => e.checkpoint === 'utm'
+          || e.checkpoint === 'paid'
+          || (e.checkpoint === 'acquisition' && e.source && !e.source.startsWith('earned'))
+          || e.checkpoint === 'email')
         .length === 0,
-      next: ['enter'],
+      next: ['enter', 'consent', 'noconsent'],
     },
-    campaign: {
-      label: 'Campaign',
+    owned: {
+      label: 'Owned',
+      color: cssVariable('--spectrum-orange-400'),
+      detect: (bundle) => bundle.events
+        // .map(reclassifyAcquisition)
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter((e) => e.source.startsWith('owned'))
+        .length > 0,
+      next: ['enter', 'consent', 'noconsent'],
+    },
+    paid: {
+      label: 'Paid',
       color: cssVariable('--spectrum-red-400'),
       detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'utm')
+        // .map(reclassifyAcquisition)
+        .filter((e) => e.checkpoint === 'acquisition')
+        .filter((e) => e.source)
+        .filter((e) => e.source.startsWith('paid'))
         .length > 0,
-      next: ['enter'],
+      next: ['enter', 'consent', 'noconsent'],
     },
   },
   {
@@ -112,6 +199,24 @@ const stages = [
         .length > 0,
       next: ['top', '404'],
     },
+    consent: {
+      label: 'Consent Shown',
+      color: cssVariable('--spectrum-purple-500'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'consent')
+        .filter((e) => e.target === 'show')
+        .length > 0,
+      next: ['top', '404'],
+    },
+    noconsent: {
+      label: 'Consent Hidden',
+      color: cssVariable('--spectrum-seafoam-500'),
+      detect: (bundle) => bundle.events
+        .filter((e) => e.checkpoint === 'consent')
+        .filter((e) => e.target === 'hidden')
+        .length > 0,
+      next: ['top', '404'],
+    },
     enter: {
       label: 'Enter',
       color: cssVariable('--spectrum-green-500'),
@@ -124,6 +229,7 @@ const stages = [
       color: cssVariable('--spectrum-green-500'),
       label: (bundle) => {
         const nav = bundle.events.filter((e) => e.checkpoint === 'navigate')
+          .filter((e) => e.source)
           .map((e) => new URL(e.source).pathname)
           .pop();
         return `navigate:${nav}`;
@@ -147,7 +253,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === '404')
         .length === 0,
-      next: ['load', 'partial', 'aborted'],
+      next: ['nocontent', 'initial', 'engaged', 'experiment'],
     },
     404: {
       label: '404',
@@ -156,39 +262,6 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === '404')
         .length > 0,
-    },
-  },
-  {
-    label: 'loadtype',
-    /*
-     * 4.  How is the page being loaded
-     *   - partial (no lazy or lcp fired)
-     *   - complete
-     *   - aborted (leave before complete, no more events)
-     */
-    load: {
-      color: cssVariable('--spectrum-green-700'),
-      label: 'Complete Load',
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
-        .length > 0,
-      next: ['nocontent', 'initial', 'engaged', 'experiment'],
-    },
-    partial: {
-      color: cssVariable('--spectrum-orange-700'),
-      label: 'Partial Load',
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'lcp' || e.checkpoint === 'lazy')
-        .length === 0,
-      next: ['nocontent', 'initial', 'engaged', 'experiment'],
-    },
-    aborted: {
-      color: cssVariable('--spectrum-gray-700'),
-      label: 'Aborted Load',
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'top')
-        .length === 0,
-      next: [],
     },
   },
   {
@@ -202,8 +275,8 @@ const stages = [
       */
     nocontent: {
       label: 'No Content',
-      color: cssVariable('--spectrum-gray-800'),
-      next: ['click', 'formsubmit', 'nointeraction'],
+      color: cssVariable('--spectrum-gray-200'),
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length === 0,
@@ -214,7 +287,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'experiment')
         .length > 0,
-      next: ['click', 'formsubmit', 'nointeraction'],
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
     initial: {
       label: 'Initial Content',
@@ -222,7 +295,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length <= 3,
-      next: ['click', 'formsubmit', 'nointeraction'],
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
     engaged: {
       color: cssVariable('--spectrum-seafoam-800'), // greenish, but not too green
@@ -230,7 +303,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'viewmedia' || e.checkpoint === 'viewblock')
         .length > 3,
-      next: ['click', 'formsubmit', 'nointeraction'],
+      next: ['click', 'convert', 'formsubmit', 'nointeraction'],
     },
   },
   {
@@ -241,13 +314,24 @@ const stages = [
      * - formsubmit
      * - none
      */
+    convert: {
+      color: cssVariable('--spectrum-fuchsia-300'),
+      label: 'Conversion',
+      detect: (bundle, dataChunks) => {
+        const conversionSpec = parseConversionSpec();
+        if (Object.keys(conversionSpec).length === 0) return false;
+        if (Object.keys(conversionSpec).length === 1 && conversionSpec.checkpoint && conversionSpec.checkpoint[0] === 'click') return false;
+        return dataChunks.hasConversion(bundle, conversionSpec, 'every');
+      },
+      next: [],
+    },
     click: {
       color: cssVariable('--spectrum-green-900'),
       label: 'Click',
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .length > 0,
-      next: ['blind', 'intclick', 'extclick', 'media'],
+      next: ['intclick', 'extclick', 'media'],
     },
     formsubmit: {
       color: cssVariable('--spectrum-seafoam-900'),
@@ -258,7 +342,7 @@ const stages = [
     },
     nointeraction: {
       label: 'No Interaction',
-      color: cssVariable('--spectrum-gray-900'),
+      color: cssVariable('--spectrum-gray-100'),
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click'
           || e.checkpoint === 'formsubmit')
@@ -304,53 +388,6 @@ const stages = [
         .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
         .length > 0,
     },
-    blind: {
-      label: 'Blind Click',
-      color: cssVariable('--spectrum-gray-900'),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => !e.target)
-        .length > 0,
-    },
-  },
-  {
-    label: 'exit',
-    /*
-     * 8. What's the click target, specifically
-     */
-    internal: {
-      color: cssVariable('--spectrum-green-1100'),
-      next: [],
-      label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
-        .filter((e) => !!e.target)
-        .map((e) => new URL(e.target))
-        .map((u) => u.pathname)
-        .map((p) => `internal:${p}`)
-        .pop(),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => !!e.target)
-        .filter((e) => e.target.indexOf('media_') === -1)
-        .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
-        .length > 0,
-    },
-    external: {
-      color: cssVariable('--spectrum-purple-1100'),
-      next: [],
-      label: (bundle) => bundle.events.filter((e) => e.checkpoint === 'click')
-        .filter((e) => !!e.target)
-        .map((e) => new URL(e.target))
-        .map((u) => u.hostname)
-        .map((h) => `external:${h}`)
-        .pop(),
-      detect: (bundle) => bundle.events
-        .filter((e) => e.checkpoint === 'click')
-        .filter((e) => e.target)
-        .filter((e) => e.target.indexOf('media_') === -1)
-        // only external links for now
-        .filter((e) => new URL(e.target).hostname !== new URL(bundle.url).hostname)
-        .length > 0,
-    },
   },
 ];
 const allStages = stages.reduce((acc, stage) => ({ ...acc, ...stage }), {});
@@ -365,8 +402,6 @@ export default class SankeyChart extends AbstractChart {
       window.history.replaceState({}, '', u);
     }
 
-    this.chartConfig.focus = params.get('focus');
-
     if (this.dataChunks.filtered.length < 1000) {
       this.elems.lowDataWarning.ariaHidden = 'false';
     } else {
@@ -374,7 +409,11 @@ export default class SankeyChart extends AbstractChart {
     }
 
     const MAX_FACETS = 7;
-    this.dataChunks.group((bundle) => {
+    this.dataChunks.group((b) => {
+      const bundle = b;
+      bundle.events = b.events
+        .map(reclassifyAcquisition)
+        .reduce(reclassifyEnter, []);
       const detectedFlows = [];
       // go through each stage
       stages.forEach((stage) => {
@@ -382,17 +421,19 @@ export default class SankeyChart extends AbstractChart {
         // go through each flow step in the stage
         Object.entries(stage)
           .filter(([key]) => key !== 'label')
+          .filter(([key]) => key !== 'max_values')
           .forEach(([key, step]) => {
           // if we already detected a flow, skip the rest
             if (cont) return;
-            if (step.detect(bundle)) {
+            if (step.detect(bundle, this.dataChunks)) {
               const flowLabel = typeof step.label === 'function' ? step.label(bundle) : key;
               const flowValue = typeof step.label === 'function' ? step.label(bundle) : step.label;
               if (stage.label
-                && Object.entries(this.dataChunks.facets[stage.label]).length > MAX_FACETS) {
+                && Object.entries(this.dataChunks.facets[stage.label]).length
+                > (stage.max_values || stage.max_values || MAX_FACETS)) {
                 // we have too many facets, so we need to group some
                 if (this.dataChunks.facets[stage.label]
-                  .slice(0, MAX_FACETS)
+                  .slice(0, stage.max_values || stage.max_values || MAX_FACETS)
                   .map(({ value }) => value)
                   .includes(flowValue)) {
                   // the top N values are shown as is
@@ -518,9 +559,10 @@ export default class SankeyChart extends AbstractChart {
     facetcandidates.forEach((facet) => {
       dataChunks.addFacet(facet.label, (bundle) => Object.entries(facet)
         .filter(([key]) => key !== 'label')
+        .filter(([key]) => key !== 'max_values')
         .reduce((acc, [key, step]) => {
           if (acc.length > 0) return acc;
-          if (step.detect(bundle)) {
+          if (step.detect(bundle, dataChunks)) {
             acc.push(typeof step.label === 'function' ? step.label(bundle) : step.label || key);
           }
           return acc;
