@@ -91,8 +91,8 @@ class URLReports {
       bundle.events
         .filter((evt) => evt.checkpoint === 'viewmedia')
         .filter(({ target }) => target) // filter out empty targets
-        .reduce((acc, { target }) => {
-          if (typeof target === 'string') {
+        .reduce((acc, { source, target }) => {
+          if (typeof target === 'string' && typeof source === 'string' && !source.includes('profile')) {
             try {
               const u = new URL(target);
               u.hash = '';
