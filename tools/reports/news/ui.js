@@ -126,10 +126,10 @@ const draw = async () => {
       const summary = buildSummary(key, s.label, key !== 'pageViews' ? display : value.toLocaleString());
       summaries.append(summary);
     });
-
-    const traffic = report.getReferers();
-    buildTrafficBlock(traffic, config, 'page-traffic');
   }
+
+  const traffic = report.getReferers();
+  buildTrafficBlock(traffic, config, 'page-traffic');
 
   const media = report.getMedia();
   let max = 0;
