@@ -19,7 +19,7 @@ function buildTableEl(label, title) {
   return table;
 }
 
-export default function buildMinus10TableBlock(list, currentEntry, config, id, title) {
+export default function buildMinus10TableBlock(list, currentEntryValue, config, id, title) {
   const container = document.getElementById(id);
   if (container) {
     if (container.querySelector('table')) {
@@ -37,7 +37,7 @@ export default function buildMinus10TableBlock(list, currentEntry, config, id, t
       const rate = metrics.pageViews.sum;
       sum += rate;
       const row = document.createElement('tr');
-      if (entry && entry.value === currentEntry.value) {
+      if (entry && entry.value === currentEntryValue) {
         row.className = 'entry-match';
       }
       const u = new URL(entry.value);

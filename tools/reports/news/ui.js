@@ -108,23 +108,24 @@ const draw = async () => {
   let urls = report.getURLs();
   const currentPageEntry = urls.find((entry) => entry.value === config.url);
 
-  if (!currentPageEntry) {
-    throw new Error('Current page not found in report');
-  }
-
-  const metrics = currentPageEntry.getMetrics([
-    'pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage',
-  ]);
-
   const summaries = document.querySelector('.summary-container');
-  Object.keys(SERIES).forEach((key) => {
-    const s = SERIES[key];
-    const value = s.rateFn(metrics);
-    const display = s.labelFn(value);
-
-    const summary = buildSummary(key, s.label, key !== 'pageViews' ? display : value.toLocaleString());
+  summaries.innerHTML = '';
+  if (!currentPageEntry) {
+    const summary = buildSummary('no-data', 'No data found', '');
     summaries.append(summary);
-  });
+  } else {
+    const metrics = currentPageEntry.getMetrics([
+      'pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage',
+    ]);
+    Object.keys(SERIES).forEach((key) => {
+      const s = SERIES[key];
+      const value = s.rateFn(metrics);
+      const display = s.labelFn(value);
+
+      const summary = buildSummary(key, s.label, key !== 'pageViews' ? display : value.toLocaleString());
+      summaries.append(summary);
+    });
+  }
 
   const media = report.getMedia();
   let max = 0;
@@ -152,7 +153,7 @@ const draw = async () => {
 
   buildTop10TableBlock(
     urls,
-    currentPageEntry,
+    currentPageEntry ? currentPageEntry.value : '',
     config,
     'top-overall-period',
     'Globally During the Period',
@@ -167,7 +168,7 @@ const draw = async () => {
 
   buildTop10TableBlock(
     urls,
-    currentPageEntry,
+    currentPageEntry ? currentPageEntry.value : '',
     config,
     'top-publish-period',
     'Published During the Period - Most Viewed',
@@ -175,7 +176,7 @@ const draw = async () => {
 
   buildMinus10TableBlock(
     urls,
-    currentPageEntry,
+    currentPageEntry ? currentPageEntry.value : '',
     config,
     'minus-publish-period',
     'Published During the Period - Less Viewed',
