@@ -99,7 +99,7 @@ const getGlobalFilters = () => {
 };
 
 const draw = async () => {
-  const config = getConfig();
+  const config = await getConfig();
 
   report.filter = {
     url: [config.url],
@@ -222,9 +222,10 @@ const main = async () => {
   initShare(document);
   initFilters(document);
 
-  const config = getConfig();
+  const config = await getConfig();
 
   getDetails(config.url).then((details) => {
+    console.log('LOG: > getDetails > details:', details);
     const post = document.getElementById('post');
     Object.keys(details).forEach((key) => {
       const el = post.querySelector(`.post-${key}`);
