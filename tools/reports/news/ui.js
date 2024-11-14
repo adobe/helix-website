@@ -9,6 +9,7 @@ import buildTop10TableBlock from './pods/top10.js';
 import buildMinus10TableBlock from './pods/minus10.js';
 import buildSummary from './pods/summary.js';
 import buildDepthBlock from './pods/depth.js';
+import buildTrafficBlock from './pods/traffic.js';
 
 /**
  * Formats a given date string into the `YYYY-MM-DD` format.
@@ -125,6 +126,9 @@ const draw = async () => {
       const summary = buildSummary(key, s.label, key !== 'pageViews' ? display : value.toLocaleString());
       summaries.append(summary);
     });
+
+    const traffic = report.getReferers();
+    buildTrafficBlock(traffic, config, 'page-traffic');
   }
 
   const media = report.getMedia();

@@ -67,6 +67,11 @@ class URLReports {
       return !!u.pathname.match(/\/\d{4}\//);
     });
 
+    dataChunks.addFacet('referer', (bundle) => bundle.events
+      .filter((evt) => evt.checkpoint === 'enter')
+      .map((evt) => evt.source)
+      .filter((source) => source));
+
     const possiblePrefixes = [];
     const s = new Date(this.start);
     const e = new Date(this.end);
@@ -116,6 +121,10 @@ class URLReports {
 
   getMedia() {
     return this.dataChunks.facets.media;
+  }
+
+  getReferers() {
+    return this.dataChunks.facets.referer;
   }
 
   set filter(filter) {
