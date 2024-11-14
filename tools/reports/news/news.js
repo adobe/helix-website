@@ -21,7 +21,7 @@ class URLReports {
   }
 
   async init() {
-    this.data = await this.loader.fetchPeriod(this.start, this.end);
+    this.data = await this.loader.fetchPeriod(`${this.start} 00:00:00`, `${this.end} 23:59:59`);
 
     const dataChunks = new DataChunks();
 
