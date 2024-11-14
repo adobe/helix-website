@@ -22,6 +22,16 @@ function buildVideo(src, type, i) {
   return video;
 }
 
+function buildEmbed(src, i) {
+  const embed = document.createElement('iframe');
+  embed.src = src;
+  embed.setAttribute('aria-label', `Media ${i + 1}: YouTube video`);
+  embed.setAttribute('title', `Media ${i + 1}: YouTube video`);
+  embed.setAttribute('frameborder', '0');
+  embed.setAttribute('allowfullscreen', 'true');
+  return embed;
+}
+
 function buildTableEl(count) {
   const table = document.createElement('table');
   const caption = document.createElement('caption');
@@ -91,6 +101,9 @@ export default function buildDepthBlock(depths, id) {
         } else if (videos.includes(type)) {
           const video = buildVideo(depth.preview, type, i);
           preview.append(video);
+        } else if (depth.preview.includes('youtube')) {
+          const embed = buildEmbed(depth.preview, i);
+          preview.append(embed);
         } else {
           // try as an image
           const img = buildImg(depth.preview, i);
