@@ -1,7 +1,9 @@
 function buildImg(src, i) {
   const img = document.createElement('img');
   img.src = src;
-  img.alt = `Media ${i + 1}`;
+  const u = new URL(src);
+  img.setAttribute('aria-label', `Media ${i + 1}: ${u.pathname}`);
+  img.setAttribute('title', `Media ${i + 1}: ${u.pathname}`);
   return img;
 }
 
@@ -10,7 +12,9 @@ function buildVideo(src, type, i) {
   ['autoplay', 'loop', 'muted', 'playsinline'].forEach((property) => {
     video[property] = true;
   });
-  video.setAttribute('aria-label', `Media ${i + 1}`);
+  const u = new URL(src);
+  video.setAttribute('aria-label', `Media ${i + 1}: ${u.pathname}`);
+  video.setAttribute('title', `Media ${i + 1}: ${u.pathname}`);
   const source = document.createElement('source');
   source.src = src;
   source.type = `video/${type}`;
