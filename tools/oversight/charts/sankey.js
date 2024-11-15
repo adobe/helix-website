@@ -2,6 +2,7 @@
 import { SankeyController, Flow } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
+// eslint-disable-next-line import/no-unresolved
 import { utils } from '@adobe/rum-distiller';
 import AbstractChart from './chart.js';
 import {
@@ -228,6 +229,7 @@ const stages = [
       color: cssVariable('--spectrum-green-500'),
       label: (bundle) => {
         const nav = bundle.events.filter((e) => e.checkpoint === 'navigate')
+          .filter((e) => e.source)
           .map((e) => new URL(e.source).pathname)
           .pop();
         return `navigate:${nav}`;
