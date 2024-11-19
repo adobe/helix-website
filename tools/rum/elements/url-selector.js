@@ -64,12 +64,6 @@ export default class URLSelector extends HTMLElement {
           } else {
             const { domains } = await resp.json();
             input.setAttribute('data-all-domains', domains.join(','));
-            // console.log('domains', domains);
-            // domains.forEach((domain) => {
-            //   const option = document.createElement('option');
-            //   option.value = domain;
-            //   datalist.appendChild(option);
-            // });
           }
         }).catch(() => {
           datalist.remove();
