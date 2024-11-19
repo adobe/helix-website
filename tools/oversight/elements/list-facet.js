@@ -1,7 +1,8 @@
-import {
-  computeConversionRate, escapeHTML, scoreCWV,
-} from '../utils.js';
-import { tTest, zTestTwoProportions } from '../cruncher.js';
+import { utils, stats } from '@adobe/rum-distiller';
+import { escapeHTML } from '../utils.js';
+
+const { computeConversionRate, scoreCWV } = utils;
+const { tTest, zTestTwoProportions } = stats;
 
 async function addSignificanceFlag(element, metric, baseline) {
   let p = 1;
@@ -249,37 +250,9 @@ export default class ListFacet extends HTMLElement {
           countspan.setAttribute('sample-size', metrics.pageViews.count);
           countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
           countspan.setAttribute('fuzzy', 'false');
-          const valuespan = this.createValueSpan(entry, prefix);
+          const valuespan = this.createValueSpan(entry, prefix, filteredKeys.length === 1);
 
-          const conversionspan = document.createElement('number-format');
-          conversionspan.className = 'extra';
-
-          const $this = this;
-          const drawConversion = () => {
-            // we need to divide the totals by average weight
-            // so that we don't overestimate the significance
-            const m = entry.getMetrics(['conversions']);
-            const avgWeight = $this.dataChunks.totals.pageViews.weight
-              / $this.dataChunks.totals.pageViews.count;
-
-            addSignificanceFlag(conversionspan, {
-              total: metrics.visits.sum / avgWeight,
-              conversions: m.conversions.sum / avgWeight,
-            }, {
-              total: $this.dataChunks.totals.visits.sum / avgWeight,
-              conversions: $this.dataChunks.totals.conversions.sum / avgWeight,
-            });
-
-            const conversions = m.conversions.sum;
-            const visits = metrics.visits.sum;
-            const conversionRate = computeConversionRate(conversions, visits);
-            conversionspan.textContent = conversionRate;
-            conversionspan.setAttribute('precision', 2);
-          };
-
-          window.setTimeout(drawConversion, 0);
-
-          label.append(valuespan, countspan, conversionspan);
+          label.append(valuespan, countspan);
 
           const ul = document.createElement('ul');
           ul.classList.add('cwv');
@@ -287,15 +260,48 @@ export default class ListFacet extends HTMLElement {
           // display core web vital to facets
           // add lcp
           const lcpLI = this.createCWVChiclet(entry, 'lcp');
+          lcpLI.classList.add('performance');
           ul.append(lcpLI);
 
           // add cls
           const clsLI = this.createCWVChiclet(entry, 'cls');
+          clsLI.classList.add('performance');
           ul.append(clsLI);
 
           // add inp
           const inpLI = this.createCWVChiclet(entry, 'inp');
+          inpLI.classList.add('performance');
           ul.append(inpLI);
+
+          // add bounce rate
+          const bounceRateLI = this.createBusinessMetricChiclet(entry, 'bounces', 'visits', 60, 40, 20);
+          bounceRateLI.title = 'Bounce Rate';
+          bounceRateLI.classList.add('acquisition');
+          ul.append(bounceRateLI);
+
+          // add time on page
+          const pagesPerVisitLI = this.createBusinessMetricChiclet(entry, 'timeOnPage', null, 1, 2, 5);
+          pagesPerVisitLI.title = 'Time on page';
+          pagesPerVisitLI.classList.add('time');
+          pagesPerVisitLI.classList.add('acquisition');
+          ul.append(pagesPerVisitLI);
+
+          // add earned percentage
+          const earnedLI = this.createBusinessMetricChiclet(entry, 'organic', 'visits', 25, 50, 75);
+          earnedLI.title = 'Organic Percentage';
+          earnedLI.classList.add('acquisition');
+          ul.append(earnedLI);
+
+          // add engagement and conversion rate
+          const engagementLI = this.createBusinessMetricChiclet(entry, 'engagement', 'pageViews', 25, 75, 90);
+          engagementLI.title = 'Engagement';
+          engagementLI.classList.add('conversion');
+          ul.append(engagementLI);
+
+          const conversionRateLI = this.createBusinessMetricChiclet(entry, 'conversions', 'visits', 5, 10, 20);
+          conversionRateLI.title = 'Conversion Rate';
+          conversionRateLI.classList.add('conversion');
+          ul.append(conversionRateLI);
 
           div.append(input, label, ul);
 
@@ -365,9 +371,9 @@ export default class ListFacet extends HTMLElement {
     }
   }
 
-  createValueSpan(entry, prefix) {
+  createValueSpan(entry, prefix, solo = false) {
     const valuespan = document.createElement('span');
-    valuespan.innerHTML = this.createLabelHTML(entry.value, prefix);
+    valuespan.innerHTML = this.createLabelHTML(entry.value, prefix, solo);
     const highlightFromParam = this.getAttribute('highlight');
     if (highlightFromParam) {
       const highlightValue = new URL(window.location).searchParams.get(highlightFromParam) || '';
@@ -418,6 +424,56 @@ export default class ListFacet extends HTMLElement {
       }
       li.classList.add(`score-${score}`);
       li.append(nf);
+    };
+    // fill the element, but don't wait for it
+    window.setTimeout(fillEl, 0);
+    return li;
+  }
+
+  createBusinessMetricChiclet(entry, rate, baseline, low, high, optimum) {
+    const li = document.createElement('li');
+    li.classList.add('business-metric');
+    li.classList.add(rate);
+    const meter = document.createElement('meter');
+    meter.min = 0;
+    if (Math.max(low, high, optimum) < 10) {
+      meter.max = 10;
+    } else {
+      meter.max = 100;
+    }
+    if (low) meter.low = low;
+    if (high) meter.high = high;
+    if (optimum && !Number.isNaN(optimum)) meter.optimum = optimum;
+    const nf = document.createElement('number-format');
+    nf.setAttribute('precision', 2);
+    nf.setAttribute('fuzzy', 'false');
+    const fillEl = async () => {
+      if (typeof baseline === 'string') {
+        const value = entry.metrics[rate].sum;
+        const total = entry.metrics[baseline].sum;
+        const rateVal = li.classList.contains('fixed')
+          ? value / total
+          : computeConversionRate(value, total);
+        meter.value = Number.isFinite(rateVal) ? rateVal : 0;
+        nf.textContent = rateVal;
+
+        // todo: add significance flag, but this needs to be based on a z-test
+        // between the current entry and the total
+        addSignificanceFlag(li, {
+          total: entry.metrics[baseline].count,
+          conversions: entry.metrics[rate].count,
+        }, {
+          total: this.dataChunks.totals[baseline].count,
+          conversions: this.dataChunks.totals[rate].count,
+        });
+      } else {
+        // we show the median and use a t-test between all values
+        const value = entry.metrics[rate].percentile(50);
+        nf.textContent = value;
+        meter.value = Number.isFinite(value) ? value : 0;
+      }
+
+      li.append(nf, meter);
     };
     // fill the element, but don't wait for it
     window.setTimeout(fillEl, 0);
