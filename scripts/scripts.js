@@ -12,7 +12,6 @@ import {
   loadBlock,
   loadCSS,
   loadScript,
-  getAllMetadata,
   getMetadata,
   decorateBlock,
 } from './lib-franklin.js';
@@ -38,9 +37,10 @@ window.hlx.plugins.add('performance', {
 });
 
 window.hlx.plugins.add('experimentation', {
-  condition: () => getMetadata('experiment')
-    || Object.keys(getAllMetadata('campaign')).length
-    || Object.keys(getAllMetadata('audience')).length,
+  condition: () => document.head.querySelector('[name^="experiment"],[name^="campaign-"],[name^="audience-"]')
+    || document.head.querySelector('[property^="campaign:"],[property^="audience:"]')
+    || document.querySelector('.section[class*="experiment-"],.section[class*="audience-"],.section[class*="campaign-"]')
+    || [...document.querySelectorAll('.section-metadata div')].some((d) => d.textContent.match(/Experiment|Campaign|Audience/i)),
   options: { audiences: AUDIENCES },
   load: 'eager',
   url: '/plugins/experimentation/src/index.js',
@@ -78,6 +78,17 @@ export function createTag(tag, attributes, html) {
     });
   }
   return el;
+}
+
+function buildHeroBlock(main) {
+  const h1 = main.querySelector('main > div > h1');
+  const picture = main.querySelector('main > div > p > picture');
+  // eslint-disable-next-line no-bitwise
+  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+    const section = document.createElement('div');
+    section.append(buildBlock('hero', { elems: [picture, h1] }));
+    main.prepend(section);
+  }
 }
 
 /**
@@ -566,6 +577,26 @@ function buildAuthorBox(main) {
   ]);
   div.append(authorBoxBlockEl);
   main.append(div);
+}
+
+function redecorateIfHeroBlock(heroElement) {
+  const parent = heroElement.parentElement.parentElement;
+  [...heroElement.children].reverse().forEach((el) => parent.prepend(el));
+  heroElement.parentElement.remove();
+  heroElement.remove();
+  // Rebuild and redecorate the hero block
+  buildHeroBlock(parent);
+  decorateBlocks(parent);
+  loadBlocks(parent);
+}
+
+export function decorateFunction(element) {
+  if (element.classList.contains('hero')) {
+    redecorateIfHeroBlock(element);
+  } else if (element.classList.contains('block')) {
+    decorateBlock(element);
+    loadBlock(element);
+  }
 }
 
 // --------------- Main functions here ---------------- //

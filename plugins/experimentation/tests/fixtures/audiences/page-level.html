@@ -1,0 +1,19 @@
+<html>
+<head>
+  <meta name="audience-foo" content="/tests/fixtures/audiences/variant-1"/>
+  <meta name="audience-bar" content="/tests/fixtures/audiences/variant-2"/>
+  <meta property="audience:-foo" content="/tests/fixtures/audiences/variant-1"/>
+  <script>
+    window.AUDIENCES = {
+      foo: () => true,
+      bar: () => true,
+    }
+  </script>
+  <script type="module" src="/tests/fixtures/scripts.js"></script>
+</head>
+<body>
+  <main>
+    <div>Hello World!</div>
+  </main>
+</body>
+</html>

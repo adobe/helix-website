@@ -4,8 +4,10 @@
   "main": "src/index.js",
   "scripts": {
     "lint:js": "eslint src",
-    "lint:css": "stylelint src/**/*.css",
-    "lint": "npm run lint:js && npm run lint:css"
+    "lint:css": "stylelint src/**/*.css --allow-empty-input",
+    "lint": "npm run lint:js && npm run lint:css",
+    "start": "http-server . -p 3000",
+    "test": "playwright test"
   },
   "repository": {
     "type": "git",
