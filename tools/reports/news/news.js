@@ -70,7 +70,18 @@ class URLReports {
     dataChunks.addFacet('referer', (bundle) => bundle.events
       .filter((evt) => evt.checkpoint === 'enter')
       .map((evt) => evt.source)
-      .filter((source) => source));
+      .filter((source) => (source))
+      .map((source) => {
+        try {
+          const u = new URL(source);
+          u.hash = '';
+          u.search = '';
+          return u.toString();
+        } catch (error) {
+          // ignore
+        }
+        return source;
+      }));
 
     const possiblePrefixes = [];
     const s = new Date(this.start);

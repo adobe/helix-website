@@ -20,10 +20,43 @@ const getDomain = () => {
   return hostname;
 };
 
-const getConfig = () => {
+const getDomainKey = async (domain) => {
+  const urlKey = searchParams.get('domainkey');
+  if (!urlKey || urlKey === 'incognito' || urlKey === 'null') {
+    const rum = 'https://rum.fastly-aem.page';
+    try {
+      const auth = localStorage.getItem('rum-bundler-token');
+      const res = await fetch(`${rum}/domainkey/${domain}`, {
+        headers: {
+          authorization: `Bearer ${auth}`,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        return json.domainkey;
+      }
+      // probe for open access
+      const n = new Date();
+      const y = n.getFullYear();
+      const m = String(n.getMonth() + 1).padStart(2, '0');
+      const d = String(n.getDate()).padStart(2, '0');
+      const probe = await fetch(`${rum}/bundles/${domain}/${y}/${m}/${d}?domainkey=open`);
+      if (probe.ok) {
+        return 'open';
+      }
+      throw probe;
+    } catch (error) {
+      return 'error';
+    }
+  } else {
+    return urlKey;
+  }
+};
+
+const getConfig = async () => {
   const config = {
     domain: getDomain(),
-    domainKey: searchParams.get('domainkey') || '',
+    domainKey: await getDomainKey(getDomain()),
     apiEndpoint: API_ENDPOINT,
     start: searchParams.get('start'),
     end: searchParams.get('end'),
