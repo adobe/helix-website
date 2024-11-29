@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import { utils, stats } from '@adobe/rum-distiller';
 import { escapeHTML } from '../utils.js';
 
@@ -138,6 +139,7 @@ export default class ListFacet extends HTMLElement {
 
       const clipboard = document.createElement('span');
       clipboard.className = 'clipboard';
+      clipboard.title = 'Copy to clipboard';
 
       const clipboardPaste = document.createElement('span');
       clipboardPaste.className = 'clipboard-paste';
