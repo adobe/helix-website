@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
   DataChunks, utils, series, facets,
+// eslint-disable-next-line import/no-unresolved
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
 import { parseSearchParams, parseConversionSpec } from './utils.js';
@@ -18,6 +19,7 @@ const {
   lcpSource,
   lcpTarget,
   acquisitionSource,
+  enterSource,
 } = facets;
 
 const {
@@ -260,6 +262,11 @@ function updateDataFacets(filterText, params, checkpoint) {
       // a bit of special handling here, so we can split the acquisition source
       if (cp === 'acquisition') {
         dataChunks.addFacet('acquisition.source', acquisitionSource);
+      }
+
+      // special handling for enter checkpoint
+      if (cp === 'enter') {
+        dataChunks.addFacet('enterSource', enterSource);
       }
     });
 

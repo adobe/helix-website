@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
   DataChunks, utils, series, facets,
+// eslint-disable-next-line import/no-unresolved
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
 import { parseSearchParams, parseConversionSpec } from './utils.js';
@@ -17,6 +18,7 @@ const {
   vitals,
   lcpSource,
   lcpTarget,
+  enterSource,
 } = facets;
 
 const {
@@ -188,6 +190,11 @@ function updateDataFacets(filterText, params, checkpoint) {
               return acc;
             }, new Set()),
         ));
+
+        // special handling for enter checkpoint
+        if (cp === 'enter') {
+          dataChunks.addFacet('enterSource', enterSource);
+        }
 
         if (cp === 'loadresource') {
           // loadresource.target are not discrete values, but the number
