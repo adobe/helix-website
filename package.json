@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/adobe/helix-website#readme",
   "devDependencies": {
-    "@adobe/rum-distiller": "1.12.0",
+    "@adobe/rum-distiller": "1.13.0",
     "@babel/core": "7.18.0",
     "@babel/eslint-parser": "7.17.0",
     "@esm-bundle/chai": "4.3.4-fix.0",
