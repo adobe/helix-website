@@ -18,7 +18,6 @@ const {
   vitals,
   lcpSource,
   lcpTarget,
-  enterSource,
 } = facets;
 
 const {
@@ -190,11 +189,6 @@ function updateDataFacets(filterText, params, checkpoint) {
               return acc;
             }, new Set()),
         ));
-
-        // special handling for enter checkpoint
-        if (cp === 'enter') {
-          dataChunks.addFacet('enterSource', enterSource);
-        }
 
         if (cp === 'loadresource') {
           // loadresource.target are not discrete values, but the number

@@ -687,11 +687,11 @@ vitals-facet fieldset label {
 }
 
 /* external referrer only care about the hostname anyway */
-#facets link-facet[facet="enterSource"] a .hostname {
+#facets link-facet[facet="enter.source"] a .hostname {
   display: inline;
 }
 
-#facets link-facet[facet="enterSource"] a .pathname {
+#facets link-facet[facet="enter.source"] a .pathname {
   display: none;
 }
 
