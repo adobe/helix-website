@@ -266,7 +266,7 @@ function updateDataFacets(filterText, params, checkpoint) {
 
       // special handling for enter checkpoint
       if (cp === 'enter') {
-        dataChunks.addFacet('enterSource', enterSource);
+        dataChunks.addFacet('enter.source', enterSource);
       }
     });
 
