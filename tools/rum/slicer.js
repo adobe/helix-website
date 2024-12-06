@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
   DataChunks, utils, series, facets,
+// eslint-disable-next-line import/no-unresolved
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
 import { parseSearchParams, parseConversionSpec } from './utils.js';
