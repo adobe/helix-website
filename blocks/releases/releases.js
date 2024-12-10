@@ -17,10 +17,10 @@ const displayNames = {
   'helix-admin': 'Admin API',
   'helix-importer-ui': 'Content Importer',
   'helix-cli': 'Command Line Interface',
-  'helix-sidekick-extension': 'Sidekick Extension (legacy)',
   'aem-sidekick': 'Sidekick Extension',
   'franklin-sidekick-library': 'Sidekick Library',
   'aem-lib': 'AEM Library',
+  'helix-sidekick-extension': 'Sidekick Extension (legacy)',
 };
 
 function createRelease(release) {
