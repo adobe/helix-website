@@ -14,6 +14,7 @@
     background-color: #E8E8E8;
 }
 
+.releases .release-aem-sidekick,
 .releases .release-helix-sidekick-extension {
     background-color: #E4E8BF;
 }
@@ -73,6 +74,7 @@
 .releases .helix-pipeline-service .release-helix-pipeline-service,
 .releases .helix-importer-ui .release-helix-importer-ui,
 .releases .helix-sidekick-extension .release-helix-sidekick-extension,
+.releases .aem-sidekick .release-aem-sidekick,
 .releases .helix-cli .release-helix-cli,
 .releases .helix-config-service .release-helix-config-service,
 .releases .aem-lib .release-aem-lib,
