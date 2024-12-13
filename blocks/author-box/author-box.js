@@ -48,13 +48,10 @@ async function buildSharing(id, type = 'github') {
   } = profiles[type] || profiles.github;
 
   sharing.innerHTML = `<span>
-    <a data-type="${dataType}" data-href="${id}" alt="${altText}" aria-label="${ariaLabel}" title="${titleText}">
+    <a data-type="${dataType}" href="${id}" alt="${altText}" aria-label="${ariaLabel}" title="${titleText}">
       ${svgContent}
     </a>
   </span>`;
-  sharing.querySelectorAll('[data-href]').forEach((link) => {
-    link.addEventListener('click', openPopup);
-  });
   return sharing;
 }
 
