@@ -123,6 +123,24 @@ export default class CWVPerfChart extends AbstractChart {
           customCanvasBackgroundColor: {
             color: 'white',
           },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed.y;
+
+                const { datasets } = context.chart.data;
+                const i = context.dataIndex;
+                const cwvmetric = context.dataset.label.split(' ').pop();
+                const total = datasets
+                  .filter((dataset) => dataset.label.indexOf('Fake') === -1)
+                  .filter(({ label }) => label.indexOf(cwvmetric) > -1)
+                  .reduce((pv, cv) => (pv || 0) + (cv.data[i] || 0), 0);
+
+                if (value === 0 || total === 0) return '';
+                return (`${context.dataset.label}: ${Math.round((value / total) * 1000) / 10}%`);
+              },
+            },
+          },
         },
         interaction: {
           mode: 'x',
@@ -205,6 +223,7 @@ export default class CWVPerfChart extends AbstractChart {
         goodCWV, niCWV, poorCWV, noCWV,
       }) => {
         const valueCount = goodCWV.count + niCWV.count + poorCWV.count;
+        console.log('addInterpolation valueCount', valueCount);
         if (valueCount < INTERPOLATION_THRESHOLD) {
           // not enough data to interpolate the other values, so
           // we report as if there are no CWV at all
