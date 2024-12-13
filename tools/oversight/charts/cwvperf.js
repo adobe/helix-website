@@ -223,7 +223,6 @@ export default class CWVPerfChart extends AbstractChart {
         goodCWV, niCWV, poorCWV, noCWV,
       }) => {
         const valueCount = goodCWV.count + niCWV.count + poorCWV.count;
-        console.log('addInterpolation valueCount', valueCount);
         if (valueCount < INTERPOLATION_THRESHOLD) {
           // not enough data to interpolate the other values, so
           // we report as if there are no CWV at all
