@@ -71,7 +71,8 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
   if (deltas.length === 0) {
     return undefined;
   }
-  return Math.max(...deltas) / 1000;
+  // get max delta and divide by 1000 to get seconds
+  return (deltas.reduce((a, b) => Math.max(a, b), -Infinity)) / 1000;
 });
 
 dataChunks.addSeries('contentEngagement', (bundle) => {
