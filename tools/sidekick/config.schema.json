@@ -59,8 +59,12 @@
         },
         "paletteRect": {
           "type": "string",
-          "description": "he dimensions and position of a palette box",
+          "description": "The dimensions and position of a palette box",
           "dependentRequired": ["isPalette"]
+        },
+        "pinned": {
+          "type": "boolean",
+          "description": "Render the plugin in the bar (true, default) or the menu (false)",
         },
         "title": {
           "type": "string",
