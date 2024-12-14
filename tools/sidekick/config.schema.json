@@ -64,7 +64,7 @@
         },
         "pinned": {
           "type": "boolean",
-          "description": "Render the plugin in the bar (true, default) or the menu (false)",
+          "description": "Render the plugin in the bar (true, default) or the menu (false)"
         },
         "title": {
           "type": "string",
