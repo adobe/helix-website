@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
   DataChunks, utils, series, facets,
+// eslint-disable-next-line import/no-unresolved
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
 import { parseSearchParams, parseConversionSpec } from './utils.js';
@@ -272,7 +273,7 @@ async function loadData(config) {
   const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
   if (startDate && endDate) {
-    dataChunks.load(await loader.fetchPeriod(startDate, endDate));
+    dataChunks.load(await loader.fetchPeriod(`${startDate} 00:00:00`, `${endDate} 23:59:59`));
   } else if (scope === 'week') {
     dataChunks.load(await loader.fetchLastWeek(endDate));
   } else if (scope === 'month') {

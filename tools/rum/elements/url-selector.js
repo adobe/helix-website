@@ -63,11 +63,7 @@ export default class URLSelector extends HTMLElement {
             datalist.remove();
           } else {
             const { domains } = await resp.json();
-            domains.forEach((domain) => {
-              const option = document.createElement('option');
-              option.value = domain;
-              datalist.appendChild(option);
-            });
+            input.setAttribute('data-all-domains', domains.join(','));
           }
         }).catch(() => {
           datalist.remove();
@@ -80,6 +76,23 @@ export default class URLSelector extends HTMLElement {
     });
 
     input.addEventListener('input', () => {
+      // filter the domains and append to the datalist
+      const allDomains = input.getAttribute('data-all-domains').split(',');
+      datalist.innerHTML = '';
+      let limit = 10;
+      for (let i = 0; i < allDomains.length; i += 1) {
+        const domain = allDomains[i];
+        if (domain.startsWith(input.value)) {
+          const option = document.createElement('option');
+          option.value = domain;
+          datalist.appendChild(option);
+          limit -= 1;
+        }
+        if (limit === 0) {
+          break;
+        }
+      }
+
       this.dispatchEvent(new CustomEvent('change', { detail: input.value }));
     });
 

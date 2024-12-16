@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
   DataChunks, utils, series, facets,
+// eslint-disable-next-line import/no-unresolved
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
 import { parseSearchParams, parseConversionSpec } from './utils.js';
@@ -18,6 +19,7 @@ const {
   lcpSource,
   lcpTarget,
   acquisitionSource,
+  enterSource,
 } = facets;
 
 const {
@@ -69,7 +71,8 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
   if (deltas.length === 0) {
     return undefined;
   }
-  return Math.max(...deltas) / 1000;
+  // get max delta and divide by 1000 to get seconds
+  return (deltas.reduce((a, b) => Math.max(a, b), -Infinity)) / 1000;
 });
 
 dataChunks.addSeries('contentEngagement', (bundle) => {
@@ -261,6 +264,11 @@ function updateDataFacets(filterText, params, checkpoint) {
       if (cp === 'acquisition') {
         dataChunks.addFacet('acquisition.source', acquisitionSource);
       }
+
+      // special handling for enter checkpoint
+      if (cp === 'enter') {
+        dataChunks.addFacet('enter.source', enterSource);
+      }
     });
 
   if (typeof herochart.updateDataFacets === 'function') {
@@ -310,7 +318,7 @@ async function loadData(config) {
   const endDate = params.get('endDate') ? `${params.get('endDate')}` : null;
 
   if (startDate && endDate) {
-    dataChunks.load(await loader.fetchPeriod(startDate, endDate));
+    dataChunks.load(await loader.fetchPeriod(`${startDate} 00:00:00`, `${endDate} 23:59:59`));
   } else if (scope === 'week') {
     dataChunks.load(await loader.fetchLastWeek(endDate));
   } else if (scope === 'month') {

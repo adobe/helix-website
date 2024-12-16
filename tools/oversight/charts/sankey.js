@@ -9,7 +9,7 @@ import {
   cssVariable, parseConversionSpec,
 } from '../utils.js';
 
-const { reclassifyAcquisition, reclassifyEnter } = utils;
+const { classifyAcquisition, reclassifyAcquisition } = utils;
 
 Chart.register(SankeyController, Flow, ...registerables);
 
@@ -391,6 +391,31 @@ const stages = [
   },
 ];
 const allStages = stages.reduce((acc, stage) => ({ ...acc, ...stage }), {});
+
+function reclassifyEnter(acc, event, i, allEvents) {
+  const has = (cp) => allEvents.find((evt) => evt.checkpoint === cp);
+
+  if (event.checkpoint === 'enter') acc.referrer = event.source;
+  if (event.checkpoint === 'acquisition') acc.acquisition = event.source;
+  if (
+    // we need to reclassify when we have seen both enter and acquisition
+    (event.checkpoint === 'enter' || event.checkpoint === 'acquisition')
+    // but if there is no acquisition, we reclassify the enter event
+    && ((acc.acquisition && acc.referrer) || (!has('acquisition')))) {
+    const [aGroup, aCategory, aVendor] = (acc.acquisition || '').split(':');
+    const [, rCategory, rVendor] = (classifyAcquisition(acc.referrer) || '').split(':');
+    const group = aGroup || 'earned';
+    const category = rCategory || aCategory;
+    const vndr = rVendor || aVendor;
+    const newsrc = `${group}:${category}:${vndr}`.replace(/:undefined/g, '');
+    // console.log('reclassifyEnter', acc.referrer, acc.acquisition, newsrc);
+    acc.push({ checkpoint: 'acquisition', source: newsrc });
+  }
+  if (event.checkpoint !== 'acquisition') {
+    acc.push(event);
+  }
+  return acc;
+}
 
 export default class SankeyChart extends AbstractChart {
   async draw() {
