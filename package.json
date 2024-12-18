@@ -32,7 +32,7 @@
     "eslint": "8.16.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.26.0",
-    "husky": "8.0.1",
+    "husky": "8.0.3",
     "lint-staged": "12.4.2",
     "sinon": "14.0.0",
     "stylelint": "14.8.3",
