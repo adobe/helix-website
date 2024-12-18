@@ -9,7 +9,6 @@ function openPopup(e) {
   window.open(
     href,
     type,
-    'popup,top=233,left=233,width=700,height=467',
   );
 }
 
@@ -18,10 +17,14 @@ async function buildSharing(id, type = 'github') {
   const sharing = document.createElement('div');
   sharing.classList.add('sharing-details');
   const scriptUrl = new URL(import.meta.url);
+  let href;
   let iconsPath;
   if (type === 'github') {
+    // support github id or url
+    href = id.startsWith('https://github.com/') ? id : `https://github.com/${id}`;
     iconsPath = new URL('../../icons/icon-github.svg', scriptUrl).href;
   } else if (type === 'linkedin') {
+    href = id;
     iconsPath = new URL('../../icons/icon-linkedin.svg', scriptUrl).href;
   }
   // Fetch SVG content
@@ -48,13 +51,10 @@ async function buildSharing(id, type = 'github') {
   } = profiles[type] || profiles.github;
 
   sharing.innerHTML = `<span>
-    <a data-type="${dataType}" data-href="${id}" alt="${altText}" aria-label="${ariaLabel}" title="${titleText}">
+    <a data-type="${dataType}" data-href="${href}" alt="${altText}" aria-label="${ariaLabel}" title="${titleText}">
       ${svgContent}
     </a>
   </span>`;
-  sharing.querySelectorAll('[data-href]').forEach((link) => {
-    link.addEventListener('click', openPopup);
-  });
   return sharing;
 }
 
@@ -62,7 +62,10 @@ async function addProfileLinkToImage(authorImage, profileId, type = 'github') {
   const authorLink = document.createElement('a');
   authorLink.classList.add('blog-author-link');
   if (type === 'github') {
-    authorLink.setAttribute('data-href', `https://github.com/${profileId}`);
+    authorLink.setAttribute(
+      'data-href',
+      profileId.startsWith('https://github.com/') ? profileId : `https://github.com/${profileId}`,
+    );
   } else if (type === 'linkedin') {
     authorLink.setAttribute('data-href', profileId);
   }
@@ -127,6 +130,7 @@ export default async function decorateAuthorBox(blockEl) {
     shareBlock = await buildSharing(linkedinLink, 'linkedin');
   }
   if (shareBlock) {
+    shareBlock.addEventListener('click', openPopup);
     bylineContainer.append(shareBlock);
   }
 }
