@@ -1,22 +1,15 @@
 {
   "enabled": true,
   "baseBranches": ["main"],
+  "branchNameStrict": true,
+  "branchName": "r_{{{packageName}}}_{{version}}",
   "packageRules": [
     {
       "matchDepNames": ["@adobe/rum-distiller"],
       "labels": ["rum-distiller"], 
-      "automerge": true,
+      "automerge": false,
       "automergeType": "pr",
-      "requiredStatusChecks": null,
       "fileMatch": [
-        "tools/oversight/explorer.html",
-        "tools/oversight/flow.html",
-        "tools/oversight/list.html",
-        "tools/oversight/package.json",
-        "tools/oversight/share.html",
-        "tools/oversight/single.html",
-        "tools/rum/explorer.html",
-        "tools/rum/package.json",
         "package.json"
       ]
     },
