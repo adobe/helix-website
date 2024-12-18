@@ -1,0 +1,28 @@
+{
+  "enabled": true,
+  "baseBranches": ["main"],
+  "packageRules": [
+    {
+      "matchDepNames": ["@adobe/rum-distiller"],
+      "labels": ["rum-distiller"], 
+      "automerge": true,
+      "automergeType": "pr",
+      "requiredStatusChecks": null,
+      "fileMatch": [
+        "tools/oversight/explorer.html",
+        "tools/oversight/flow.html",
+        "tools/oversight/list.html",
+        "tools/oversight/package.json",
+        "tools/oversight/share.html",
+        "tools/oversight/single.html",
+        "tools/rum/explorer.html",
+        "tools/rum/package.json",
+        "package.json"
+      ]
+    },
+    {
+      "matchDepNames": ["chartjs", "chartjs-adapter-luxon"],
+      "enabled": false
+    }
+  ]
+}
