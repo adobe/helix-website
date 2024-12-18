@@ -1,6 +1,8 @@
 {
   "enabled": true,
   "baseBranches": ["main"],
+  "branchNameStrict": true,
+  "branchName": "r_{{{packageName}}}_{{version}}",
   "packageRules": [
     {
       "matchDepNames": ["@adobe/rum-distiller"],
