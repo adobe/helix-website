@@ -4,6 +4,9 @@ import {
 } from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import 'chartjs-adapter-luxon';
+// eslint-disable-next-line import/no-unresolved, import/extensions
+import annotationPlugin from 'chartjs-plugin-annotation';
+
 import {
   utils,
 } from '@adobe/rum-distiller';
@@ -19,7 +22,7 @@ const {
   scoreBundle,
 } = utils;
 
-Chart.register(TimeScale, LinearScale, ...registerables);
+Chart.register(TimeScale, LinearScale, ...registerables, annotationPlugin);
 
 /**
  * The CWVPerfChart is a unique type of multi-series bar chart that
@@ -351,6 +354,40 @@ export default class CWVPerfChart extends AbstractChart {
     this.stepSize = undefined;
     this.clsAlreadyLabeled = false;
     this.lcpAlreadyLabeled = false;
+
+    const owner = params.get('owner');
+    const repo = params.get('repo');
+    if (owner && repo) {
+      const u = new URL('https://gh-api.capt.workers.dev');
+      u.searchParams.set('owner', owner);
+      u.searchParams.set('repo', repo);
+      u.searchParams.set('since', startDate);
+      u.searchParams.set('until', endDate);
+      const res = await fetch(u.toString());
+      const json = await res.json();
+      const annotations = {};
+      json.forEach(({ date, message }, i) => {
+        const d = date.split('T')[0];
+        const yAdjust = -100 + i * 30;
+        if (!annotations[d]) {
+          annotations[d] = {
+            type: 'line',
+            xMin: d,
+            xMax: d,
+            label: {
+              content: [message],
+              display: true,
+              yAdjust,
+              z: 100,
+            },
+          };
+        } else {
+          annotations[d].label.content.push(message);
+          annotations[d].label.yAdjust += 7;
+        }
+      });
+      this.chart.options.plugins.annotation = { annotations };
+    }
 
     this.chart.update();
   }
