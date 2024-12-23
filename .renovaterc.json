@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "baseBranches": ["main"],
+  "branchNameStrict": true,
+  "branchName": "r_{{{packageName}}}_{{version}}",
+  "packageRules": [
+    {
+      "matchDepNames": ["@adobe/rum-distiller"],
+      "labels": ["rum-distiller"], 
+      "automerge": false,
+      "automergeType": "pr",
+      "fileMatch": [
+        "package.json"
+      ]
+    },
+    {
+      "matchDepNames": ["chartjs", "chartjs-adapter-luxon"],
+      "enabled": false
+    }
+  ]
+}

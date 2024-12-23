@@ -1,0 +1,35 @@
+name: Update import maps
+on:
+  pull_request:
+    branches:
+      - 'r_*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    - name: Configure Git
+      run: |
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
+    - name: Install dependencies
+      run: npm install
+    - name: Update import maps
+      run: tools/imports.sh
+    - name: Commit changes
+      run: |
+        git add -A
+        git commit -m "chore(oversight): update import maps"
+        git push
+    - name: Update PR comment to include aem.live test URL
+      run: |
+        OLD_BODY=$(gh pr view --json body --jq ".body")
+        BRANCH_NAME=$(echo ${{ github.ref }} | sed 's|refs/heads/||')
+        NEW_BODY="$OLD_BODY\n\nTest at: https://$BRANCH_NAME--helix-website--adobe.aem.live/tools/oversight/explorer.html?domain=www.emigrationbrewing.com"
+        gh pr edit ${{ github.event.number }} --body "$NEW_BODY"
