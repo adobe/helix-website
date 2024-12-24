@@ -42,7 +42,7 @@
     margin-top: 0;
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
     .section.roi-calulator-outer-wrapper {
         padding-top: var(--spacing-ml);
     }

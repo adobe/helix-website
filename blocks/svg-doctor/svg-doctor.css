@@ -7,15 +7,12 @@
   display: block;
   cursor: pointer;
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   opacity: 0;
 }
 
 .svg-doctor form input[name='upload']:disabled,
-.svg-doctor form label[for='upload'][aria-hidden=true] {
+.svg-doctor form label[for='upload'][aria-hidden="true"] {
   display: none;
   visibility: hidden;
 }
@@ -39,8 +36,10 @@
 }
 
 .svg-doctor .form .form-number-wrapper,
-.svg-doctor .form label[for=width], .svg-doctor .form input#width,
-.svg-doctor .form label[for=height], .svg-doctor .form input#height {
+.svg-doctor .form label[for="width"],
+.svg-doctor .form input#width,
+.svg-doctor .form label[for="height"],
+.svg-doctor .form input#height {
   visibility: hidden;
   display: none;
 }
@@ -107,7 +106,7 @@
   max-height: calc(100vw - 3rem);
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .svg-doctor .viewbox {
     height: 860px;
   }
@@ -161,7 +160,7 @@
   transition: background-color .3s;
 }
 
-.svg-doctor .controls-buttons button[aria-checked=true],
+.svg-doctor .controls-buttons button[aria-checked="true"],
 .svg-doctor .controls-buttons button:hover,
 .svg-doctor .controls-buttons button:focus {
   background-color: var(--bg-color-grey-2);

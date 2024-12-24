@@ -115,7 +115,7 @@ main .form button {
   font-family: var(--body-font-family);
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   main .form {
     padding: var(--spacing-ml);
   }
