@@ -54,7 +54,7 @@
     margin-bottom: var(--spacing-xs);
   }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .card-list .cards-card-body h3 {
     font-size: var(--type-heading-l-size);
     line-height: var(--type-heading-l-lh);
@@ -62,7 +62,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .card-list > ul {
     grid-gap: var(--spacing-s);
   }
@@ -73,7 +73,7 @@
   cursor: pointer;
 }
 
-.card-list-wrapper .cards .cards-card-details p.description:not([aria-expanded="true"]):not(.noextra)::after {
+.card-list-wrapper .cards .cards-card-details p.description:not([aria-expanded="true"], .noextra)::after {
   content: '...';
 }
 

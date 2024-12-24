@@ -41,7 +41,7 @@
     padding: 5px 20px;
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
     .copy > div {
         flex-direction: unset;
         justify-content: stretch;

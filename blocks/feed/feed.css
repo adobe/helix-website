@@ -53,13 +53,14 @@
 .feed.recent .desc {
   /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
+  line-clamp: 5;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .feed.recent > div > div {
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: var(--spacing-xs);
@@ -82,7 +83,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .feed.recent > div {
     margin-bottom: 0;
     flex-direction: column;
@@ -120,7 +121,7 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .feed.recent h3 {
     font-size: var(--type-heading-l-size);
     line-height: var(--type-heading-l-lh);

@@ -65,7 +65,7 @@
   margin-top: var(--spacing-l);
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .marquee > div:last-of-type {
     min-height: 360px;
     display: flex;
@@ -88,7 +88,7 @@
   }
 }
 
-@media screen and (min-width: 1440px) {
+@media screen and (width >= 1440px) {
   .marquee > div:last-of-type {
     max-width: var(--grid-desktop-container-width);
   }
@@ -195,7 +195,7 @@
   margin: var(--spacing-m) auto 0;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .marquee.testimonial > div:last-of-type {
     display: flex;
     justify-content: space-between;
@@ -272,13 +272,13 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .marquee.testimonial > div:last-of-type {
     align-items: center;
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .marquee.testimonial {
     padding: var(--spacing-s) 0;
   }

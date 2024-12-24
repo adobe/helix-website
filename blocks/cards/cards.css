@@ -57,10 +57,7 @@
     content: '';
     position: absolute;
     z-index: -1;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     opacity: 0;
     box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
     transition: opacity 0.3s ease-in-out;
@@ -107,13 +104,13 @@
     justify-content: space-between;
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
     .cards.two .cards-card, .cards.three .cards-card, .cards.four .cards-card {
         width: calc(50% - 1rem);
     }
 }
 
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
     .cards.three .cards-card {
         width: calc(33% - 1rem);
     }
