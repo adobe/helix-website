@@ -24,6 +24,10 @@ indices:
         select: head > meta[name="robots"]
         value: |
           attribute(el, 'content')
+      publicationDate:
+        select: head > meta[name="publication-date"]
+        value: |
+          attribute(el, 'content')
   docpages:
     target: /docpages-index
     include:
