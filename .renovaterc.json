@@ -1,4 +1,5 @@
 {
+  "extends": ["config:recommended"],
   "enabled": true,
   "baseBranches": ["main"],
   "branchNameStrict": true,

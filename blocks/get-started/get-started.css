@@ -35,7 +35,7 @@
     max-width: 128px;
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
     .get-started > div:last-of-type {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -46,7 +46,7 @@
     }
 }
 
-@media (min-width: 1440px) {
+@media (width >= 1440px) {
     .get-started > div {
         max-width: 1200px;
     }

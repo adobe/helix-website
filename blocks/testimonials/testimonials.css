@@ -239,7 +239,7 @@
   margin-top: var(--spacing-xxs);
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .testimonials .testimonial {
     display: flex;
     justify-content: space-between;
@@ -316,7 +316,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .testimonials .tab-list.image-based {
     width: 86%;
     margin: 0 auto;
@@ -331,7 +331,7 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .testimonials .testimonial {
     padding: var(--spacing-s) 0;
   }
@@ -355,7 +355,7 @@
   }
 }
 
-@media screen and (min-width: 1440px) {
+@media screen and (width >= 1440px) {
   .testimonials {
     max-width: var(--grid-desktop-container-width);
   }

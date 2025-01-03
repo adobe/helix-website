@@ -49,7 +49,7 @@
     max-width: 100%;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
     .feature-list > div:last-of-type {
         grid-template-columns: 1fr 1fr;
         grid-template-areas: "copy image";
@@ -57,7 +57,7 @@
     }
 }
 
-@media screen and (min-width: 1440px) {
+@media screen and (width >= 1440px) {
     .feature-list.contained > div {
         max-width: var(--grid-desktop-container-width);
     }

@@ -69,7 +69,7 @@ main .author-box-container > div {
     display: none;
   }
 
-  @media (min-width: 600px) {
+  @media (width >= 600px) {
     main .author-box {
         margin-left: auto;
         margin-right: auto;
@@ -96,7 +96,7 @@ main .author-box-container > div {
     }
   }
 
-  @media (min-width: 768px) {
+  @media (width >= 768px) {
     main .author-box-info .blog-author-blurb {
         max-width: 380px;
         margin-left: 20px;
@@ -108,7 +108,7 @@ main .author-box-container > div {
     }
   }
 
-  @media (min-width: 900px) {
+  @media (width >= 900px) {
     main .author-box-info .blog-author-blurb {
         max-width: 450px;
         font-size: 20px;

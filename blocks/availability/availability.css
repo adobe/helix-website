@@ -15,7 +15,7 @@
   max-width: calc(100% - 6vw);
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .availability .tooltip-wrapper {
     max-width: calc(100% - 6rem);
   }
@@ -63,7 +63,7 @@
   transition: opacity .4s;
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .availability .tooltip {
     transform: translate(-50%, calc(-50% - (12px + var(--type-detail-m-lh))));
   }

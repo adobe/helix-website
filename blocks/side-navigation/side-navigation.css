@@ -55,7 +55,7 @@
   display: none;
 }
 
-@media screen and (max-width: 899px) {
+@media screen and (width <= 899px) {
   .guides-template .without-full-width-hero .search-input-wrapper {
     display: none;
   }
@@ -85,10 +85,7 @@
   content: "";
   position: absolute;
   z-index: -1;
-  top: 0;
-  bottom: 0;
-  left: -4px;
-  right: -4px;
+  inset: 0 -4px;
   background-color: rgb(252 0 255 / 30%);
   border-radius: 4px;
 }
@@ -422,7 +419,7 @@
   z-index: 9990;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   .side-navigation-wrapper {
     padding: var(--spacing-xxxs) 0 0;
   }
@@ -436,7 +433,7 @@
   }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .side-navigation-wrapper > div {
     max-width: var(--grid-tablet-container-width);
   }
@@ -456,7 +453,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .side-navigation-wrapper > div {
     max-width: 100%;
     margin-left: 0;
@@ -530,7 +527,7 @@
   }
 }
 
-@media screen and (min-width: 1250px) {
+@media screen and (width >= 1250px) {
   .side-navigation-wrapper > div {
     max-width: var(--grid-desktop-container-width);
   }

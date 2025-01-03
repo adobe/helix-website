@@ -94,7 +94,7 @@ async function replaceInner(path, main) {
     return path;
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(`error loading content: ${plainPath}`, e);
+    console.log(`error loading content: ${path}`, e);
   }
   return null;
 }
@@ -671,7 +671,7 @@ function adjustedRumSamplingRate(checkpoint, options, context) {
 export async function loadEager(document, options, context) {
   document.addEventListener('rum', (event) => {
     const checkpoint = event.detail ? event.detail.checkpoint || '' : '';
-    if(['audiences', 'campaign', 'experiment'].includes(checkpoint)) {
+    if (['audiences', 'campaign', 'experiment'].includes(checkpoint)) {
       adjustedRumSamplingRate(checkpoint, options, context);
     }
   });

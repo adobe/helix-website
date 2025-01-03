@@ -75,7 +75,7 @@
   text-decoration: none;
 }
 
-@media (min-width: 600px) {
+@media (width >= 600px) {
   .block.pagination {
     max-width: none;
   }
@@ -94,7 +94,7 @@
   }
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .pagination {
     margin: var(--spacing-xxxl) auto 0;
   }

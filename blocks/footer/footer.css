@@ -125,7 +125,7 @@ footer .new-footer {
   margin-right: 0;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   footer .new-footer {
     margin: auto;
   }
@@ -135,7 +135,7 @@ footer .new-footer {
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .redesign .footer-wrapper {
     padding-top: var(--spacing-xxl);
   }

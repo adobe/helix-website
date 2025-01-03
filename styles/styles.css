@@ -198,7 +198,7 @@
   --circular-1-clip-path-full: circle(120% at 0 50%);
 }
 
-@media (min-width: 600px) {
+@media (width >= 600px) {
   :root {
     /* breadcrumb */
     --breadcrumb-height: 47px;
@@ -206,7 +206,7 @@
 }
 
 /* desktop variables */
-@media (min-width: 900px) {
+@media (width >= 900px) {
   :root {
     /* Headings (Consonant) */
     --type-heading-all-weight: 700;
@@ -285,7 +285,7 @@ aside {
   padding: var(--spacing-xxs) 0 0;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
@@ -295,7 +295,7 @@ aside {
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .block.contained,
   .default-content-wrapper,
   .franklin .gnav .submenu-content,
@@ -321,7 +321,7 @@ aside {
   }
 }
 
-@media screen and (min-width: 1250px) {
+@media screen and (width >= 1250px) {
   .block.contained,
   .section.content > div,
   .default-content-wrapper,
@@ -475,7 +475,7 @@ code:not(pre > code) {
   border-radius: 4px;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   pre code {
     font-size: 16px;
   }
@@ -788,7 +788,7 @@ main .form .button:hover::before {
   line-height: var(--type-body-s-lh);
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .redesign a.button.large:any-link {
     font-size: var(--type-body-m-size);
     line-height: 1.35;
@@ -797,7 +797,7 @@ main .form .button:hover::before {
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .redesign a.button.large:any-link {
     font-size: 18px;
     line-height: 24px;
@@ -1071,7 +1071,7 @@ body.no-header-template {
   width: var(--type-body-xs-size);
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   .main-headline {
     font-size: var(--type-heading-xl-size);
     width: 50%;
@@ -1086,7 +1086,7 @@ body.no-header-template {
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .icon-eyebrow {
     font-size: var(--type-body-l-size);
     padding-bottom: var(--spacing-s);
@@ -1194,7 +1194,7 @@ body.no-header-template {
   line-height: var(--type-body-xs-lh);
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .colored-tag {
     padding: 4px 16px;
   }
@@ -1390,7 +1390,7 @@ body.no-header-template {
   animation: main-reveal 0.8s forwards var(--cubic-bezier-1);
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .in-view .text-main-reveal {
     animation: main-reveal 1s forwards var(--cubic-bezier-1);
   }
@@ -1507,7 +1507,7 @@ body.skills-template main h3.icon-eyebrow svg {
   width: var(--type-heading-m-size);
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   main {
     min-height: calc(100vh - 216px);
   }
@@ -1692,7 +1692,7 @@ body.skills-template main h2 a.anchor-link:any-link::before {
   left: -1.1rem;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   body.guides-template main a.anchor-link:any-link::before,
   body.skills-template main a.anchor-link:any-link::before {
     left: -1.25rem;
@@ -1792,7 +1792,7 @@ body.guides-template .guides-back-btn span.icon {
   margin-right: var(--spacing-xxs);
 }
 
-@media screen and (max-width: 899px) {
+@media screen and (width <= 899px) {
   body.guides-template .guides-back-btn.desktop {
     display: none;
   }
@@ -1858,7 +1858,7 @@ body.guides-template .guides-back-btn span.icon {
 
 /* guides-template message box ENDS */
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   body.guides-template main.has-full-width-hero .section.heading,
   body.skills-template main.has-full-width-hero .section.heading {
     padding-bottom: var(--spacing-s);
@@ -1874,7 +1874,7 @@ body.guides-template .guides-back-btn span.icon {
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   body.guides-template main,
   body.skills-template main {
     display: flex;
@@ -2050,7 +2050,7 @@ body.contact-template main .default-content-wrapper img {
   height: 102px;
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   body.contact-template main .section,
   body.contact-template main .section:first-of-type p {
     max-width: 800px;
@@ -2123,7 +2123,7 @@ body.contact-template main .default-content-wrapper img {
   text-transform: capitalize;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   .breadcrumb-wrapper {
     display: block;
     position: sticky;
@@ -2145,19 +2145,19 @@ body.contact-template main .default-content-wrapper img {
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .breadcrumb-wrapper:not(.no-shadow) {
     margin-bottom: var(--spacing-ml);
   }
 }
 
-@media (min-width: 1440px) {
+@media (width >= 1440px) {
   .block.breadcrumb {
     max-width: var(--header-container-width);
   }
 }
 
-@media (min-width: 1440px) {
+@media (width >= 1440px) {
   .block.breadcrumb {
     max-width: var(--header-container-width);
     padding: 0 var(--header-container-desktop-x-padding);
