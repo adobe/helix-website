@@ -3,6 +3,21 @@ const API_ENDPOINT = BUNDLER_ENDPOINT;
 
 const { searchParams } = new URL(window.location);
 
+/**
+ * Returns a human readable number
+ * @param {Number} num a number
+ * @param {Number} precision the number of significant digits
+ * @returns {String} a human readable number
+ */
+export function toHumanReadable(num, precision = 2) {
+  if (Number.isNaN(num)) return '-';
+  const formatter = new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumSignificantDigits: precision,
+  });
+  return formatter.format(num).toLocaleLowerCase();
+}
+
 const getURL = () => {
   const url = searchParams.get('url');
 
@@ -32,6 +47,10 @@ const getConfig = () => {
 
   return config;
 };
+
+export function cssVariable(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name);
+}
 
 const fetchDetails = async (url) => {
   const resp = await fetch(url);
@@ -73,12 +92,41 @@ const toReportURL = (url) => {
   return u.toString();
 };
 
+function toISOStringWithTimezone(date) {
+  // Pad a number to 2 digits
+  const pad = (n) => `${Math.floor(Math.abs(n))}`.padStart(2, '0');
+
+  // Get timezone offset in ISO format (+hh:mm or -hh:mm)
+  const getTimezoneOffset = () => {
+    const tzOffset = -date.getTimezoneOffset();
+    const diff = tzOffset >= 0 ? '+' : '-';
+    return `${diff}${pad(tzOffset / 60)}:${pad(tzOffset % 60)}`;
+  };
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${getTimezoneOffset()}`;
+}
+
+function truncate(time, unit) {
+  const t = new Date(time);
+  // truncate to the beginning of the hour
+  t.setMinutes(0);
+  t.setSeconds(0);
+  // truncate to the beginning of the day
+  if (unit !== 'hour') t.setHours(0);
+  // truncate to the beginning of the week, if the unit is week
+  if (unit === 'week') t.setDate(t.getDate() - t.getDay());
+  // truncate to the beginning of the month, if the unit is month
+  if (unit === 'month') t.setDate(1);
+  return toISOStringWithTimezone(t);
+}
+
 export {
   getURL,
   getDomain,
   getConfig,
   fetchDetails as getDetails,
   toReportURL,
+  truncate,
   BUNDLER_ENDPOINT,
   API_ENDPOINT,
   searchParams,
