@@ -115,6 +115,10 @@ class URLReports {
     this.dataChunks = dataChunks;
   }
 
+  getDataChunks() {
+    return this.dataChunks;
+  }
+
   getURLs() {
     return this.dataChunks.facets.url;
   }

@@ -274,6 +274,41 @@ section.dashboard {
   }
 }
 
+.chart-container {
+  width: 100%;
+  /* max-width: 800px; */
+  padding: 2rem;
+  border: solid 1px #e8e8e8;
+  border-radius: 4px;
+  background-color: white;
+  color: #2c2c2c;
+}
+
+@media (width >= 1100px) {
+  .chart-container {
+    flex: 1 0 50%;
+  }
+}
+
+.chart-container figure {
+  margin: 0;
+}
+
+.chart-container figure figcaption {
+  padding: 16px 0;
+  color: #2c2c2c;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 23.4px;
+  text-align: center;
+}
+
+.chart-container .canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 .depth-container {
   flex: 1 0 20%;
   gap: 1rem;
@@ -598,123 +633,4 @@ section.dashboard {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-}
-
-.chart-container {
-  flex: 1 1 540px;
-}
-
-.chart-container.bulkMedia,
-.table-container.bulkMedia {
-  flex: 1 0 100%;
-}
-
-.chart {
-  width: 100%;
-  height: 100%;
-  border: solid 1px #e8e8e8;
-  border-radius: 4px;
-  padding: 2rem;
-  background-color: white;
-}
-
-.chart figcaption {
-  padding-bottom: 16px;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.chart figure {
-  margin: 0;
-}
-
-.chart figure > div {
-  border-left: 1px solid #e8e8e8;
-  padding: 8px 0;
-}
-
-.chart figure > div.empty {
-  border-left: 0;
-  padding: 0;
-  color: #686868;
-  font-size: 18px;
-  line-height: 27px;
-}
-
-.chart figure > div > div {
-  position: relative;
-  height: 5rem;
-  cursor: zoom-in;
-}
-
-.chart figure > div > div + div {
-  margin-top: 8px;
-}
-
-.chart .chart-bar {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border-right: 1px solid #e8e8e8;
-  border-bottom: 1px solid #e8e8e8;
-  background-color: white;
-  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
-    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
-    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 8px 0, 8px -8px, 0 8px;
-  transition: height 0.6s, width 0.6s;
-}
-
-.chart div span {
-  position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  padding: var(--spacing-xxs) 8px;
-  border-radius: 8px;
-  background-color: white;
-  color: #2c2c2c;
-  font-size: var(--type-body-s-size);
-  line-height: 1;
-  z-index: 1;
-}
-
-.chart .chart-bar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: left;
-  transition: height 0.3s, width 0.3s, object-position 0.7s;
-}
-
-.chart figure > div > div.expand span {
-  z-index: 2;
-}
-
-.chart figure > div > div.expand .chart-bar {
-  position: relative;
-  width: 100% !important;
-  z-index: 2;
-}
-
-.chart figure > div > div.expand .chart-bar img {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 100%;
-  height: auto;
-  max-height: 100vh;
-  outline: 10px solid white;
-  box-shadow: 0 0 20px #000c;
-  background-color: white;
-  background-image: linear-gradient(45deg,#e8e8e8 25%, transparent 25%), 
-    linear-gradient(135deg, #e8e8e8 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #e8e8e8 75%), 
-    linear-gradient(135deg, transparent 75%, #e8e8e8 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 8px 0, 8px -8px, 0 8px;  cursor: zoom-out;
 }
