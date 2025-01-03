@@ -276,7 +276,6 @@ section.dashboard {
 
 .chart-container {
   width: 100%;
-  /* max-width: 800px; */
   padding: 2rem;
   border: solid 1px #e8e8e8;
   border-radius: 4px;
