@@ -57,6 +57,12 @@ export async function fetchBlogContent(url) {
     const text = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(text, 'text/html');
+    doc.querySelectorAll('h1, h2, h3, h4, h5').forEach((heading) => {
+      const nextLevel = `h${parseInt(heading.tagName[1], 10) + 1}`;
+      const newHeading = document.createElement(nextLevel);
+      newHeading.innerHTML = heading.innerHTML;
+      heading.replaceWith(newHeading);
+    });
     const content = doc.querySelector('body > main > div');
     return content ? content.innerHTML : '';
   } catch (error) {
