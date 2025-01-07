@@ -63,6 +63,7 @@
 .feed.blog > div {
   margin-bottom: var(--spacing-s);
   padding: var(--spacing-ml) 0;
+  padding-top: 40px;
   gap: var(--spacing-s);
 }
 
@@ -184,6 +185,10 @@
     padding: var(--spacing-xs) 0;
   }
 
+  .feed.blog > div {
+    padding-top: unset;
+  }
+
   .feed.recent h3,
   .feed.blog h3 {
     margin-bottom: var(--spacing-s);
@@ -211,6 +216,10 @@
     flex: 1;
     font-size: var(--type-body-m-size);
     line-height: var(--type-body-s-lh);
+  }
+
+  .feed.blog h1 {
+    margin-top: 0;
   }
 }
 
