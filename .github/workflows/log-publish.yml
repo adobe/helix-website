@@ -30,6 +30,8 @@ jobs:
             {
               "text": "Just published: `${{ github.event.client_payload.path }}`"
             }
+          webhook-type: webhook-trigger
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: Notify Slack (Markdown)
         if: ${{ endsWith(github.event.client_payload.path, '.md') }}
         uses: slackapi/slack-github-action@v2.0.0
@@ -41,3 +43,5 @@ jobs:
             {
               "text": "Just published: https://www.aem.live${{ steps.format.outputs.replaced }}"
             }
+          webhook-type: webhook-trigger
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
