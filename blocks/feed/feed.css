@@ -1,8 +1,57 @@
-.feed.recent {
+.feed {
   text-align: left;
 }
 
-.feed.recent .feed-item img {
+.feed-hidden {
+  display: none;
+}
+
+.feed.blog .blog-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.right-container {
+  padding-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.blog-item:not(.blog-item.latest) {
+  box-shadow: 0 4px 8px rgba(0 0 0 / 20%);
+  transition: box-shadow 0.3s ease;
+  padding: 20px;
+  background-color: white;
+}
+
+.blog-item:not(.blog-item.latest):hover {
+  box-shadow: 0 8px 16px rgba(0 0 0 / 40%);
+}
+
+.read-more {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  width: 150px;
+  background-color: var(--spectrum-blue);
+  color: white;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.read-more:hover {
+  background-color: var(--dark-spectrum-blue);
+}
+
+.feed.recent .feed-item {
+  margin: 10px;
+}
+
+.feed.recent .feed-item img,
+.blog-container .right-container .blog-item img {
   max-width: 100%;
   filter: var(--image-filter-drop-shadow-small);
   width: 100%;
@@ -10,7 +59,8 @@
   object-fit: contain;
 }
 
-.feed.recent > div {
+.feed.recent > div,
+.feed.blog > div {
   margin-bottom: var(--spacing-s);
   padding: var(--spacing-ml) 0;
   gap: var(--spacing-s);
@@ -32,12 +82,28 @@
   flex-direction: column;
 }
 
-.feed.recent .feed-item .image-wrapper-el {
+.feed.recent .feed-item .image-wrapper-el,
+.feed.blog .blog-item .image-wrapper {
   margin-top: auto;
   padding-top: var(--spacing-s);
 }
 
-.feed.recent h3 {
+.feed.blog h1 {
+  font-size: var(--type-heading-xl-size);
+  line-height: var(--type-heading-xl-lh);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.feed.blog h2 {
+  font-size: var(--type-heading-l-size);
+  line-height: var(--type-heading-l-lh);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.feed.recent h3,
+.feed.blog h3 {
   margin-bottom: var(--spacing-xs);
   font-size: var(--type-heading-xl-size);
   line-height: var(--type-heading-xl-lh);
@@ -45,12 +111,14 @@
   letter-spacing: -0.04em;
 }
 
-.feed.recent p {
+.feed.recent p,
+.feed.blog p {
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
 }
 
-.feed.recent .desc {
+.feed.recent .desc,
+.feed.blog .desc {
   /* stylelint-disable-next-line value-no-vendor-prefix */
   display: -webkit-box;
   line-clamp: 5;
@@ -61,6 +129,10 @@
 }
 
 @media screen and (width >= 768px) {
+  .feed.recent .feed-item {
+    margin: unset;
+  }
+
   .feed.recent > div > div {
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: var(--spacing-xs);
@@ -71,15 +143,34 @@
     text-align: left;
   }
 
-  .feed.recent h3 {
+  .feed.recent h3,
+  .feed.blog h3 {
     font-size: var(--type-heading-s-size);
     line-height: var(--type-heading-s-lh);
   }
 
-  .feed.recent p {
+  .feed.recent p,
+  .feed.blog p {
     font-size: var(--type-body-xs-size);
     line-height: var(--type-body-xs-lh);
     margin-bottom: 1em;
+  }
+
+  .blog-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .left-container {
+    flex: 0 0 70%; /* 70% width */
+  }
+
+  .right-container {
+    flex: 0 0 30%; /* 30% width */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 0;
   }
 }
 
@@ -93,13 +184,15 @@
     padding: var(--spacing-xs) 0;
   }
 
-  .feed.recent h3 {
+  .feed.recent h3,
+  .feed.blog h3 {
     margin-bottom: var(--spacing-s);
     font-size: var(--type-heading-m-size);
     line-height: var(--type-heading-m-lh);
   }
 
-  .feed.recent .image-wrapper-el {
+  .feed.recent .image-wrapper-el,
+  .feed.blog .image-wrapper {
     padding-top: var(--spacing-l);
     margin-bottom: 0;
   }
@@ -108,7 +201,7 @@
     grid-gap: 32px;
   }
 
-  .feed.recent > div > div > div{
+  .feed.recent > div > div > div {
     padding: var(--spacing-xl) var(--spacing-m);
     margin-bottom: var(--spacing-s);
   }
@@ -122,7 +215,8 @@
 }
 
 @media screen and (width >= 1200px) {
-  .feed.recent h3 {
+  .feed.recent h3,
+  .feed.blog h3 {
     font-size: var(--type-heading-l-size);
     line-height: var(--type-heading-l-lh);
   }
@@ -131,7 +225,8 @@
     padding: var(--spacing-xxl) var(--spacing-xl);
   }
 
-  .feed.recent p {
+  .feed.recent p,
+  .feed.blog p {
     font-size: var(--type-body-s-size);
     line-height: var(--type-body-s-lh);
     margin-bottom: 1em;

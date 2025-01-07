@@ -604,6 +604,24 @@ export function loadFeedData() {
     });
 }
 
+export function loadBlogData() {
+  window.blogindex = window.blogindex || { data: [], loaded: false };
+  const offset = 0;
+
+  fetch(`/query-index.json?offset=${offset}`)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      window.blogindex.data = responseJson?.data?.filter((entry) => entry.path.startsWith('/blog/')) || [];
+      window.blogindex.loaded = true;
+      const event = new Event('dataset-ready');
+      document.dispatchEvent(event);
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(`Error loading query index: ${error.message}`);
+    });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
