@@ -29,21 +29,21 @@
   box-shadow: 0 8px 16px rgba(0 0 0 / 40%);
 }
 
-.read-more {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  border-radius: 25px;
-  width: 150px;
-  background-color: var(--spectrum-blue);
-  color: white;
-  border: none;
-  cursor: pointer;
-  text-align: center;
+.left-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.read-more:hover {
-  background-color: var(--dark-spectrum-blue);
+.left-container .blog-item.latest:not(.read-more) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.left-container .read-more {
+  align-self: center;
+  display: inline-block;
 }
 
 .feed.recent .feed-item {

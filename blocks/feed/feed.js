@@ -88,7 +88,7 @@ export async function renderBlog(block) {
     latestBlogItem.innerHTML = truncatedContent;
   }
 
-  const readMoreButton = createTag('button', { class: 'read-more' }, 'Read More');
+  const readMoreButton = createTag('a', { href: latestBlog.path, class: 'read-more button primary large' }, 'Read More');
   readMoreButton.addEventListener('click', () => {
     window.location.href = latestBlog.path;
   });

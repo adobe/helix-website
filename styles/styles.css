@@ -685,7 +685,8 @@ a.button > svg > use {
 
 /* primary button: blue bg */
 .redesign a.button:any-link,
-main .form .button {
+main .form .button,
+.feed.blog .read-more {
   cursor: pointer;
   text-decoration: none;
   padding: 5.5px 15px;
@@ -721,7 +722,8 @@ main .form .button {
 }
 
 .redesign a.button:any-link:hover,
-main .form .button:hover {
+main .form .button:hover,
+.feed.blog .read-more:hover {
   color: var(--spectrum-blue);
   border-color: var(--spectrum-blue);
   transform: translateZ(0);
