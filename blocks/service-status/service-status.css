@@ -1,7 +1,7 @@
 .service-status {
-    background: aliceblue;
-    padding: var(--spacing-xl) 0;
-    text-align: center;
+  background: aliceblue;
+  padding: var(--spacing-xl) 0;
+  text-align: center;
 }
 
 .service-status statuspage-widget {

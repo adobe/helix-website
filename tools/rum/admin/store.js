@@ -51,6 +51,7 @@ const store = new (class {
       token = localStorage.getItem('rum-bundler-token');
     }
     if (!token) {
+      // eslint-disable-next-line no-alert
       token = prompt('Please enter your key');
       if (!token) {
         this.denied = true;

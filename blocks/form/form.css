@@ -63,7 +63,7 @@ main .form .form-checkbox-wrapper {
   margin: var(--spacing-xs) 0;
 }
 
-main .form .form-checkbox-wrapper input[type='checkbox'] {
+main .form .form-checkbox-wrapper input[type="checkbox"] {
   appearance: none;
 
   /* stylelint-disable */
@@ -80,22 +80,22 @@ main .form .form-checkbox-wrapper input[type='checkbox'] {
   margin-left: 0;
 }
 
-main .form .form-checkbox-wrapper input[type='checkbox']::after {
+main .form .form-checkbox-wrapper input[type="checkbox"]::after {
   display: block;
   position: absolute;
   top: 0;
   left: 0;
   height: 20px;
   width: 20px;
-  content: ' ';
-  background: url('./checkbox.svg');
+  content: " ";
+  background: url("./checkbox.svg");
   background-size: contain;
 }
 
-main .form .form-checkbox-wrapper input[type='checkbox']:checked::after {
-  background: url('./checkbox-checked.svg');
+main .form .form-checkbox-wrapper input[type="checkbox"]:checked::after {
+  background: url("./checkbox-checked.svg");
   background-size: contain;
-  content: ' ';
+  content: " ";
 }
 
 main .form .form-checkbox-wrapper label {
@@ -119,7 +119,7 @@ main .form button {
   main .form {
     padding: var(--spacing-ml);
   }
-  
+
   main .form .field-wrapper {
     display: flex;
   }

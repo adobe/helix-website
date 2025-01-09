@@ -245,6 +245,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       ));
 
       if (cp === 'loadresource') {
+        // eslint-disable-next-line no-console
         console.log('adding histogram facet');
         // loadresource.target are not discrete values, but the number
         // of milliseconds it took to load the resource, so the best way

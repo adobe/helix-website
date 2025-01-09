@@ -1,121 +1,122 @@
 .cards {
-    padding: 0;
-    margin: 2rem 0;
+  padding: 0;
+  margin: 2rem 0;
 }
 
 .cards > div {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 1200px;
-    justify-content: center;
-    margin: 0 auto;
-    text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  justify-content: center;
+  margin: 0 auto;
+  text-align: left;
 }
 
 .cards.four > div {
-    justify-content: left;
+  justify-content: left;
 }
 
 .cards > div:last-of-type {
-    justify-content: left;
+  justify-content: left;
 }
 
 .cards a:any-link {
-    color: currentcolor;
-    font-size: var(--type-heading-m-size);
-    line-height: var(--type-heading-m-lh);
-    text-decoration: none;
-    display: block;
-    position: relative;
+  color: currentcolor;
+  font-size: var(--type-heading-m-size);
+  line-height: var(--type-heading-m-lh);
+  text-decoration: none;
+  display: block;
+  position: relative;
 }
 
 .cards a:any-link::after {
-    content: '❯';
-    position: absolute;
-    right: 0;
-    transition: all 0.3s ease-in-out;
+  content: "❯";
+  position: absolute;
+  right: 0;
+  transition: all 0.3s ease-in-out;
 }
 
 .cards a:hover:any-link::after {
-    color: var(--spectrum-blue);
-    transform: translateX(3px);
+  color: var(--spectrum-blue);
+  transform: translateX(3px);
 }
 
 .cards .cards-card {
-    width: 100%;
-    box-sizing: border-box;
-    margin: 0.5rem;
-    background: var(--bg-color-lightgrey);
-    min-height: 160px;
-    opacity: 0;
-    transform: translate(0, 50px);
-    transition: transform 0.5s ease-out, opacity 1s;
-    position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.5rem;
+  background: var(--bg-color-lightgrey);
+  min-height: 160px;
+  opacity: 0;
+  transform: translate(0, 50px);
+  transition: transform 0.5s ease-out, opacity 1s;
+  position: relative;
 }
 
 .cards .cards-card::after {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    opacity: 0;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
-    transition: opacity 0.3s ease-in-out;
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+  transition: opacity 0.3s ease-in-out;
 }
 
 .cards .cards-card.enter {
-    opacity: 1;
-    transform: translate(0, 0);
+  opacity: 1;
+  transform: translate(0, 0);
 }
 
 .cards .cards-card.enter:hover {
-    transform: scale(calc(100% + 1rem), calc(100% + 1rem)) translate(0, 0);
+  transform: scale(calc(100% + 1rem), calc(100% + 1rem)) translate(0, 0);
 }
 
 /* Fade in the pseudo-element with the bigger shadow */
 .cards .cards-card:hover::after {
-    opacity: 1;
+  opacity: 1;
 }
 
-
 .section.dark .cards .cards-card {
-    background-color: #555;
+  background-color: #555;
 }
 
 .section.light .cards .cards-card {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 
 .cards .cards-card-highlight {
-    background: var(--highlight-gradient);
+  background: var(--highlight-gradient);
 }
 
 .cards .cards-card-details {
-    padding: 1rem 1rem 1.5rem;
+  padding: 1rem 1rem 1.5rem;
 }
 
 .cards .cards-card-details p:last-of-type {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .cards .block-party-card-title {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 @media (width >= 900px) {
-    .cards.two .cards-card, .cards.three .cards-card, .cards.four .cards-card {
-        width: calc(50% - 1rem);
-    }
+  .cards.two .cards-card,
+  .cards.three .cards-card,
+  .cards.four .cards-card {
+    width: calc(50% - 1rem);
+  }
 }
 
 @media (width >= 1200px) {
-    .cards.three .cards-card {
-        width: calc(33% - 1rem);
-    }
+  .cards.three .cards-card {
+    width: calc(33% - 1rem);
+  }
 
-    .cards.four .cards-card {
-        width: calc(25% - 1rem);
-    }
+  .cards.four .cards-card {
+    width: calc(25% - 1rem);
+  }
 }

@@ -7,10 +7,11 @@
   --tabs-active-text-color: #2c2c2c;
   --tabs-bg-color: rgb(250 250 250);
   --tabs-active-bg-color: #fff;
-  --tabs-list-bg-gradient: linear-gradient(
-    rgba(255 255 255 0%) 60%,
-    rgba(245 245 245 80%)
-  );
+  --tabs-list-bg-gradient:
+    linear-gradient(
+      rgba(255 255 255 0%) 60%,
+      rgba(245 245 245 80%)
+    );
 
   /* redesign */
   --tabs-image-based-border-color: #e8e8e8;
@@ -108,17 +109,11 @@
 
 .tabs-background-transparent .tabs,
 .tabs-background-transparent .tabs div[role="tablist"],
-.tabs-background-transparent
-  .tabs
-  div[role="tablist"]
-  button[aria-selected="true"] {
+.tabs-background-transparent .tabs div[role="tablist"] button[aria-selected="true"] {
   background: transparent;
 }
 
-.tabs-background-transparent
-  .tabs
-  div[role="tablist"]
-  button[aria-selected="true"] {
+.tabs-background-transparent .tabs div[role="tablist"] button[aria-selected="true"] {
   border-bottom-color: var(--tabs-active-bg-color);
 }
 
