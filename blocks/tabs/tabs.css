@@ -97,7 +97,7 @@
   border-color: var(--tabs-border-color) var(--tabs-border-color) transparent;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .tabs div[role="tablist"] button {
     padding: 24px 32px 18px;
     line-height: 18px;
@@ -300,13 +300,13 @@
   margin-right: 6vw;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (width <= 600px) {
   .tabs.image-based div[role="tablist"] button {
     padding: 7px 8px 6px;
   }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .tabs.image-based div[role="tablist"] {
     width: 80%;
     margin: 0 auto;
@@ -322,7 +322,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .tabs.image-based div[role="tablist"] {
     width: 86%;
     margin: 0 auto;
@@ -344,7 +344,7 @@
   margin-right: auto;
 }
 
-@media screen and (min-width: 1440px) {
+@media screen and (width >= 1440px) {
   .tabs.contained {
     max-width: var(--grid-desktop-container-width);
   }

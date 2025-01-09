@@ -81,7 +81,7 @@
   margin-right: auto;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   .z-pattern {
     padding: var(--spacing-xxl) 0;
   }
@@ -145,7 +145,7 @@
   }
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .z-pattern > div[class^="z-row"] {
     flex-direction: row;
   }
@@ -209,13 +209,13 @@
   text-align: center;
 }
 
-@media (min-width: 600px) {
+@media (width >= 600px) {
   .z-pattern .colored-tag-description {
     text-align: left;
   }
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .z-pattern ul {
     grid-template-columns: 1fr 1fr;
     margin-top: var(--spacing-m);
