@@ -1,64 +1,65 @@
 .feature-list {
-    background: #F5F5F5;
-    padding: var(--spacing-xxl) 0;
-    color: rgb(63 63 63);
+  background: #f5f5f5;
+  padding: var(--spacing-xxl) 0;
+  color: rgb(63 63 63);
 }
 
 .feature-list.contained > div {
-    max-width: var(--grid-mobile-container-width);
-    margin: 0 auto;
+  max-width: var(--grid-mobile-container-width);
+  margin: 0 auto;
 }
 
 .feature-list > div:last-of-type {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-areas: "image"
-                         "copy";
-    grid-gap: var(--spacing-s);
-    align-items: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "image"
+    "copy";
+  grid-gap: var(--spacing-s);
+  align-items: center;
 }
 
 .feature-list h2 {
-    text-align: center;
-    margin-bottom: var(--spacing-s);
+  text-align: center;
+  margin-bottom: var(--spacing-s);
 }
 
 .feature-list > div:last-of-type > div:first-of-type {
-    grid-area: copy;
+  grid-area: copy;
 }
 
 .feature-list > div:last-of-type > div:last-of-type {
-    grid-area: image;
+  grid-area: image;
 }
 
 .feature-list ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .feature-list li {
-    padding-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
 }
 
 .feature-list li:last-of-type {
-    padding-bottom: 0;
+  padding-bottom: 0;
 }
 
 .feature-list img {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 @media screen and (width >= 1200px) {
-    .feature-list > div:last-of-type {
-        grid-template-columns: 1fr 1fr;
-        grid-template-areas: "copy image";
-        grid-gap: var(--spacing-xxl);
-    }
+  .feature-list > div:last-of-type {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "copy image";
+    grid-gap: var(--spacing-xxl);
+  }
 }
 
 @media screen and (width >= 1440px) {
-    .feature-list.contained > div {
-        max-width: var(--grid-desktop-container-width);
-    }
+  .feature-list.contained > div {
+    max-width: var(--grid-desktop-container-width);
+  }
 }

@@ -1,20 +1,20 @@
 main .faq dt {
-    margin-top: var(--spacing-m);
-    font-weight: 700;
-    margin-bottom: var(--spacing-xxs);
-    scroll-margin: calc(var(--nav-height) + var(--breadcrumb-height));
+  margin-top: var(--spacing-m);
+  font-weight: 700;
+  margin-bottom: var(--spacing-xxs);
+  scroll-margin: calc(var(--nav-height) + var(--breadcrumb-height));
 }
 
 main .faq dt > a {
-    font-size: var(--type-heading-s-size);
-    line-height: var(--type-heading-s-lh);
+  font-size: var(--type-heading-s-size);
+  line-height: var(--type-heading-s-lh);
 }
 
 main .faq dd {
-    font-size: var(--type-body-s-size);
-    line-height: var(--type-body-s-lh);
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
 }
 
 body.guides-template main .faq dt a.anchor-link:any-link::before {
-    top: 0;
+  top: 0;
 }

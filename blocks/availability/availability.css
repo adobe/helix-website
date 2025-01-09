@@ -37,7 +37,7 @@
   stroke: var(--brand-color-purple);
   stroke-width: 0;
   fill: var(--brand-color-purple);
-  transition: fill .2s, stroke .2s, stroke-width .2s;
+  transition: fill 0.2s, stroke 0.2s, stroke-width 0.2s;
   cursor: context-menu;
 }
 
@@ -60,7 +60,7 @@
   font-size: var(--type-detail-m-size);
   line-height: var(--type-detail-m-lh);
   opacity: 1;
-  transition: opacity .4s;
+  transition: opacity 0.4s;
 }
 
 @media (width >= 900px) {
@@ -86,7 +86,7 @@
 }
 
 .availability .tooltip::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 50%;
   bottom: -6px;
@@ -116,6 +116,6 @@
   border-right: 0;
 }
 
-.availability .tooltip[aria-hidden='true'] {
+.availability .tooltip[aria-hidden="true"] {
   opacity: 0;
 }
