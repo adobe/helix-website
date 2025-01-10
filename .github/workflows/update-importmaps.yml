@@ -2,10 +2,11 @@ name: Update import maps
 on:
   pull_request:
     branches:
-      - 'r-*'
+      - 'main'
 
 jobs:
   build:
+    if: startsWith(github.head_ref, 'r-')
     runs-on: ubuntu-latest
     permissions:
       contents: write
