@@ -40,5 +40,6 @@ jobs:
       run: |
         OLD_BODY=$(gh pr view --json body --jq ".body")
         BRANCH_NAME=$(echo ${{ github.head_ref }})
-        NEW_BODY="$OLD_BODY\n\nTest at: https://$BRANCH_NAME--helix-website--adobe.aem.live/tools/oversight/explorer.html?domain=www.emigrationbrewing.com"
+        TEST_URL="https://$BRANCH_NAME--helix-website--adobe.aem.live/tools/oversight/explorer.html?domain=www.emigrationbrewing.com"
+        printf -v NEW_BODY "%s\n\nTest at: %s" "$OLD_BODY" "$TEST_URL"
         gh pr edit ${{ github.event.number }} --body "$NEW_BODY"
