@@ -304,19 +304,11 @@ export default class SkylineChart extends AbstractChart {
               callback: (value, index) => {
                 if (value === 0) return '';
                 if (value > 0) {
-                  this.clsAlreadyLabeled = false;
-                  this.lcpAlreadyLabeled = false;
                   return toHumanReadable(value);
                 }
                 if (index === 0) return 'INP';
-                if (value / this.min < 0.4 && !this.lcpAlreadyLabeled) {
-                  this.lcpAlreadyLabeled = true;
-                  return 'LCP';
-                }
-                if (value / this.min < 0.7 && !this.clsAlreadyLabeled) {
-                  this.clsAlreadyLabeled = true;
-                  return 'CLS';
-                }
+                if (index === 1) return 'CLS';
+                if (index === 2) return 'LCP';
                 return '';
               },
             },
