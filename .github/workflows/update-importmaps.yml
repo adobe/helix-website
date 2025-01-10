@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
     - uses: actions/checkout@v4
       with:
@@ -30,6 +31,8 @@ jobs:
         git commit -m "chore(oversight): update import maps"
         git push origin HEAD:${{ github.head_ref }}
     - name: Update PR comment to include aem.live test URL
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         OLD_BODY=$(gh pr view --json body --jq ".body")
         BRANCH_NAME=$(echo ${{ github.head_ref }})
