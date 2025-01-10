@@ -27,9 +27,13 @@ jobs:
       run: tools/imports.sh
     - name: Commit changes
       run: |
-        git add -A
-        git commit -m "chore(oversight): update import maps"
-        git push origin HEAD:${{ github.head_ref }}
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add -A
+          git commit -m "chore(oversight): update import maps"
+          git push origin HEAD:${{ github.head_ref }}
+        fi
     - name: Update PR comment to include aem.live test URL
       env:
         GH_TOKEN: ${{ github.token }}
