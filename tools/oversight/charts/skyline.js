@@ -291,14 +291,14 @@ export default class SkylineChart extends AbstractChart {
             ticks: {
               autoSkip: false,
               maxTicksLimit: 16,
-              callback: (value, index) => {
+              callback: (value, index, arr) => {
                 if (value === 0) return '';
                 if (value > 0) {
                   return toHumanReadable(value);
                 }
                 if (index === 0) return 'INP';
                 if (index === 1) return 'CLS';
-                if (index === 2) return 'LCP';
+                if (index === 3 || (index === 2 && arr[index + 1].value === 0)) return 'LCP';
                 return '';
               },
             },
