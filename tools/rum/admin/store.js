@@ -1,4 +1,4 @@
-const API = 'https://rum.fastly-aem.page';
+const API = 'https://bundles.aem.page';
 
 let token;
 const fetchAPI = async (path, opts = {}) => fetch(`${API}${path}`, {
