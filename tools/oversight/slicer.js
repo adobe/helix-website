@@ -36,7 +36,7 @@ const API_ENDPOINT = BUNDLER_ENDPOINT;
 const elems = {};
 
 const dataChunks = new DataChunks();
-
+window.dataChunks = dataChunks;
 const loader = new DataLoader();
 loader.apiEndpoint = API_ENDPOINT;
 
@@ -366,6 +366,13 @@ export function updateState() {
     });
   });
 
+  url.searchParams.entries().filter(([key]) => key.match(/\.(source|target)$/))
+    .forEach(([key]) => {
+      const [cp] = key.split('.');
+      if (!url.searchParams.getAll('checkpoint').includes(cp)) {
+        url.searchParams.delete(key);
+      }
+    });
   // iterate over all existing URL parameters and keep those that are known facets
   // and end with ~, so that we can keep the state of the facets
   searchParams.forEach((value, key) => {
