@@ -145,7 +145,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Needs Improvement CLS',
-            backgroundColor: cssVariable('--spectrum-green-500'),
+            backgroundColor: cssVariable('--spectrum-orange-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: true,
