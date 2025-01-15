@@ -305,6 +305,16 @@ export function updateState() {
   });
   url.searchParams.set('domainkey', searchParams.get('domainkey') || 'incognito');
 
+  // remove all source and target filters if their specific checkpoint
+  // is not in the checkpoint filter
+  url.searchParams.entries().filter(([key]) => key.match(/\.(source|target)$/))
+    .forEach(([key]) => {
+      const [cp] = key.split('.');
+      if (!url.searchParams.getAll('checkpoint').includes(cp)) {
+        url.searchParams.delete(key);
+      }
+    });
+
   window.history.replaceState({}, '', url);
   document.dispatchEvent(new CustomEvent('urlstatechange', { detail: url }));
 }
