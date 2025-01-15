@@ -366,6 +366,15 @@ export function updateState() {
     });
   });
 
+  // remove all source and target filters if their specific checkpoint
+  // is not in the checkpoint filter
+  url.searchParams.entries().filter(([key]) => key.match(/\.(source|target)$/))
+    .forEach(([key]) => {
+      const [cp] = key.split('.');
+      if (!url.searchParams.getAll('checkpoint').includes(cp)) {
+        url.searchParams.delete(key);
+      }
+    });
   // iterate over all existing URL parameters and keep those that are known facets
   // and end with ~, so that we can keep the state of the facets
   searchParams.forEach((value, key) => {
