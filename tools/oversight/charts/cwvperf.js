@@ -124,6 +124,7 @@ export default class CWVPerfChart extends AbstractChart {
             color: 'white',
           },
           tooltip: {
+            intersect: false,
             callbacks: {
               label: (context) => {
                 const value = context.parsed.y;
@@ -143,7 +144,8 @@ export default class CWVPerfChart extends AbstractChart {
           },
         },
         interaction: {
-          mode: 'x',
+          mode: 'nearest',
+          axis: 'x',
         },
         animation: {
           duration: 300,
