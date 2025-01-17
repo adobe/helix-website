@@ -911,6 +911,7 @@ export function setup() {
   window.hlx.templates = new TemplatesRegistry();
 
   sampleRUM.collectBaseURL = `${window.location.origin}/.rum`;
+  sampleRUM.enhancerContext = { enhancerVersion: '2.31.0-beta.5' };
 
   const scriptEl = document.querySelector('script[src$="/scripts/scripts.js"]');
   if (scriptEl) {
