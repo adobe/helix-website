@@ -67,8 +67,8 @@ dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle
 
 dataChunks.addSeries('organic', organic);
 
-dataChunks.addSeries('viewblock', eventCountFn('viewblock'));
-dataChunks.addSeries('viewmedia', eventCountFn('viewmedia'));
+dataChunks.addSeries('blockdepth', eventCountFn('viewblock'));
+dataChunks.addSeries('mediadepth', eventCountFn('viewmedia'));
 
 /*
  * timeOnPage is the time it took to load the page,

@@ -300,13 +300,13 @@ export default class ListFacet extends HTMLElement {
           engagementLI.classList.add('conversion');
           ul.append(engagementLI);
 
-          const viewblockDepthLI = this.createBusinessMetricChiclet(entry, 'viewblock', null, 25, 60, 80);
-          viewblockDepthLI.title = 'Viewblock Depth';
+          const viewblockDepthLI = this.createBusinessMetricChiclet(entry, 'blockdepth', null, 25, 60, 80);
+          viewblockDepthLI.title = 'Block Depth';
           viewblockDepthLI.classList.add('conversion');
           ul.append(viewblockDepthLI);
 
-          const viewMediaDepthLI = this.createBusinessMetricChiclet(entry, 'viewmedia', null, 25, 60, 80);
-          viewMediaDepthLI.title = 'View Media Depth';
+          const viewMediaDepthLI = this.createBusinessMetricChiclet(entry, 'mediadepth', null, 25, 60, 80);
+          viewMediaDepthLI.title = 'Media Depth';
           viewMediaDepthLI.classList.add('conversion');
           ul.append(viewMediaDepthLI);
 
@@ -478,7 +478,7 @@ export default class ListFacet extends HTMLElement {
           total: this.dataChunks.totals[baseline].count,
           conversions: this.dataChunks.totals[rate].count,
         });
-      } else if (rate === 'viewblock' || rate === 'viewmedia') {
+      } else if (rate === 'blockdepth' || rate === 'mediadepth') {
         const value = (entry.metrics[rate].percentile(50) / entry.metrics[rate].max) * 100;
         nf.textContent = value;
         meter.value = Number.isFinite(value) ? value : 0;

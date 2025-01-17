@@ -656,11 +656,11 @@ fieldset div:first-of-type li:nth-of-type(7)::before {
 }
 
 fieldset div:first-of-type li:nth-of-type(8)::before {
-  content: 'Viewblock';
+  content: 'Blockdepth';
 }
 
 fieldset div:first-of-type li:nth-of-type(9)::before {
-  content: 'Viewmedia';
+  content: 'Mediadepth';
 }
 
 fieldset div:first-of-type li:nth-of-type(10)::before {
