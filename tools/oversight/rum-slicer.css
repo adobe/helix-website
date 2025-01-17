@@ -540,7 +540,6 @@ facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.conve
 
 facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion {
   display: flex;
-  grid-column: span 3;
 }
 
 ul.cwv meter {
@@ -657,6 +656,14 @@ fieldset div:first-of-type li:nth-of-type(7)::before {
 }
 
 fieldset div:first-of-type li:nth-of-type(8)::before {
+  content: 'Viewblock';
+}
+
+fieldset div:first-of-type li:nth-of-type(9)::before {
+  content: 'Viewmedia';
+}
+
+fieldset div:first-of-type li:nth-of-type(10)::before {
   content: 'Conversion';
 }
 

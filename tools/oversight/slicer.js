@@ -42,6 +42,13 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
+const eventCountFn = (type) => (bundle) => {
+  const eventCount = bundle.events.filter(
+    (e) => e.checkpoint === type,
+  ).length;
+  return eventCount;
+};
+
 window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
@@ -59,6 +66,10 @@ dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle
   : 0));
 
 dataChunks.addSeries('organic', organic);
+
+dataChunks.addSeries('viewblock', eventCountFn('viewblock'));
+dataChunks.addSeries('viewmedia', eventCountFn('viewmedia'));
+
 /*
  * timeOnPage is the time it took to load the page,
  * i.e. the difference between the first and last event

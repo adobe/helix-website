@@ -300,6 +300,16 @@ export default class ListFacet extends HTMLElement {
           engagementLI.classList.add('conversion');
           ul.append(engagementLI);
 
+          const viewblockDepthLI = this.createBusinessMetricChiclet(entry, 'viewblock', null, 25, 60, 80);
+          viewblockDepthLI.title = 'Viewblock Depth';
+          viewblockDepthLI.classList.add('conversion');
+          ul.append(viewblockDepthLI);
+
+          const viewMediaDepthLI = this.createBusinessMetricChiclet(entry, 'viewmedia', null, 25, 60, 80);
+          viewMediaDepthLI.title = 'View Media Depth';
+          viewMediaDepthLI.classList.add('conversion');
+          ul.append(viewMediaDepthLI);
+
           const conversionRateLI = this.createBusinessMetricChiclet(entry, 'conversions', 'visits', 5, 10, 20);
           conversionRateLI.title = 'Conversion Rate';
           conversionRateLI.classList.add('conversion');
@@ -468,6 +478,10 @@ export default class ListFacet extends HTMLElement {
           total: this.dataChunks.totals[baseline].count,
           conversions: this.dataChunks.totals[rate].count,
         });
+      } else if (rate === 'viewblock' || rate === 'viewmedia') {
+        const value = (entry.metrics[rate].percentile(50) / entry.metrics[rate].max) * 100;
+        nf.textContent = value;
+        meter.value = Number.isFinite(value) ? value : 0;
       } else {
         // we show the median and use a t-test between all values
         const value = entry.metrics[rate].percentile(50);
