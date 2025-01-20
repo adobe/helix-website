@@ -2,6 +2,10 @@
   pointer-events: none;
 }
 
+.releases .release-aem-certificate-rotation {
+  background-color: #d4e8ff;
+}
+
 .releases .release-helix-admin {
   background-color: #ffd4f1;
 }
@@ -77,6 +81,7 @@
 .releases .helix-cli .release-helix-cli,
 .releases .helix-config-service .release-helix-config-service,
 .releases .aem-lib .release-aem-lib,
-.releases .franklin-sidekick-library .release-franklin-sidekick-library {
+.releases .franklin-sidekick-library .release-franklin-sidekick-library,
+.releases .aem-certificate-rotation .release-aem-certificate-rotation {
   display: block;
 }

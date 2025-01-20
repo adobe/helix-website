@@ -1931,9 +1931,7 @@ body.guides-template .guides-back-btn span.icon {
     margin-bottom: var(--spacing-l);
   }
 
-  body.guides-template,
-  main.without-full-width-hero,
-  .default-content-wrapper,
+  body.guides-template main.without-full-width-hero .default-content-wrapper,
   body.skills-template,
   h1 {
     margin-top: var(--spacing-ml);

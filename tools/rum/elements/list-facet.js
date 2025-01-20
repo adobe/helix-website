@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import { utils, stats } from '@adobe/rum-distiller';
 import {
   escapeHTML, toHumanReadable,

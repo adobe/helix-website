@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
     - uses: actions/checkout@v4
       with:
@@ -26,12 +27,19 @@ jobs:
       run: tools/imports.sh
     - name: Commit changes
       run: |
-        git add -A
-        git commit -m "chore(oversight): update import maps"
-        git push origin HEAD:${{ github.head_ref }}
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add -A
+          git commit -m "chore(oversight): update import maps"
+          git push origin HEAD:${{ github.head_ref }}
+        fi
     - name: Update PR comment to include aem.live test URL
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         OLD_BODY=$(gh pr view --json body --jq ".body")
         BRANCH_NAME=$(echo ${{ github.head_ref }})
-        NEW_BODY="$OLD_BODY\n\nTest at: https://$BRANCH_NAME--helix-website--adobe.aem.live/tools/oversight/explorer.html?domain=www.emigrationbrewing.com"
+        TEST_URL="https://$BRANCH_NAME--helix-website--adobe.aem.live/tools/oversight/explorer.html?domain=emigrationbrewing.com&view=month&domainkey=open"
+        printf -v NEW_BODY "%s\n\nTest at: %s" "$OLD_BODY" "$TEST_URL"
         gh pr edit ${{ github.event.number }} --body "$NEW_BODY"
