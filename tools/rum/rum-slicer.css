@@ -49,29 +49,6 @@ body main > .section {
   padding-top: 0;
 }
 
-a.icon.help {
-  overflow: visible;
-  font-size: 16px;
-  display: inline-block;
-  font-weight: 900;
-  text-decoration: none;
-  text-align: center;
-  bottom: auto;
-  line-height: 12px;
-  border: 2px solid;
-  border-radius: 2px;
-  box-sizing: border-box;
-  cursor: pointer;
-  transform: scale(1);
-  width: 18px;
-  height: 18px;
-  margin-top: 3px;
-}
-
-a.icon.help::after {
-  content: "?";
-}
-
 /* general performance */
 
 main li.score-good,
@@ -957,8 +934,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   main .key-metrics ul {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
+}
 
-  footer.footer-wrapper.appear {
-    display: none;
-  }
+footer.footer-wrapper.appear {
+  display: none;
 }

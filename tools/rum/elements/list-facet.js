@@ -132,7 +132,6 @@ export default class ListFacet extends HTMLElement {
       const fieldSet = this.querySelector('fieldset') || document.createElement('fieldset');
       fieldSet.classList.add(`facet-${facetName}`);
       const legendText = this.querySelector('legend')?.textContent || facetName;
-      const extraElements = Array.from(this.querySelectorAll(':scope > a, legend > a.icon') || []);
 
       fieldSet.textContent = '';
 
@@ -144,8 +143,6 @@ export default class ListFacet extends HTMLElement {
       clipboard.title = 'Copy facet rows to clipboard';
 
       legend.append(clipboard);
-      extraElements.forEach((el) => el.classList.add('icon'));
-      legend.append(...extraElements);
 
       fieldSet.append(legend);
       const filterKeys = facetName === 'checkpoint' && mode !== 'all';
