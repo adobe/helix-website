@@ -34,7 +34,7 @@
     "husky": "9.1.7",
     "lint-staged": "15.4.1",
     "sinon": "19.0.2",
-    "stylelint": "16.12.0",
+    "stylelint": "16.13.2",
     "stylelint-config-standard": "36.0.1"
   },
   "lint-staged": {
