@@ -190,7 +190,10 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
 
-  dataChunks.addFacet('url', facets.url, 'some', 'never');
+  dataChunks.addFacet('rawURL', facets.url, 'some', 'never');
+  dataChunks.addClusterFacet('url', 'rawURL', {
+    count: Math.log10(dataChunks.facets.rawURL.length),
+  });
 
   dataChunks.addFacet('vitals', vitals);
 
