@@ -1,13 +1,13 @@
 .get-started {
-    background: linear-gradient(45deg, rgb(0 0 0 / 100%) 0%, rgb(38 18 57 / 100%) 42%, rgb(154 26 10 / 100%) 100%);
-    color: #FFF;
-    padding: var(--spacing-xxl) 0; 
-    text-align: center;
+  background: linear-gradient(45deg, rgb(0 0 0 / 100%) 0%, rgb(38 18 57 / 100%) 42%, rgb(154 26 10 / 100%) 100%);
+  color: white;
+  padding: var(--spacing-xxl) 0;
+  text-align: center;
 }
 
 .get-started > div {
-    max-width: 83.4%;
-    margin: 0 auto;
+  max-width: 83.4%;
+  margin: 0 auto;
 }
 
 .get-started > div + div > div:not(:last-of-type) {
@@ -15,39 +15,39 @@
 }
 
 .get-started h2 {
-    margin-bottom: var(--spacing-l);
+  margin-bottom: var(--spacing-l);
 }
 
 .get-started h3 {
-    margin-bottom: var(--spacing-s);
+  margin-bottom: var(--spacing-s);
 }
 
 .get-started p {
-    margin: 0 0 6px;
+  margin: 0 0 6px;
 }
 
 .get-started a {
-    color: #FFF;
+  color: white;
 }
 
 .get-started img,
 .get-started svg {
-    max-width: 128px;
+  max-width: 128px;
 }
 
 @media (width >= 900px) {
-    .get-started > div:last-of-type {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
+  .get-started > div:last-of-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
 
-    .get-started > div + div > div:not(:last-of-type) {
-      margin: 0;
-    }
+  .get-started > div + div > div:not(:last-of-type) {
+    margin: 0;
+  }
 }
 
 @media (width >= 1440px) {
-    .get-started > div {
-        max-width: 1200px;
-    }
+  .get-started > div {
+    max-width: 1200px;
+  }
 }

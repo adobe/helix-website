@@ -21,12 +21,12 @@
   transition: all 0.3s ease-in-out;
 }
 
-.pagination .column:hover{
+.pagination .column:hover {
   cursor: pointer;
   box-shadow: 0 0 15px var(--bg-color-grey);
 }
 
-.pagination .column svg{
+.pagination .column svg {
   color: var(--spectrum-blue);
 }
 
@@ -53,7 +53,7 @@
 }
 
 .pagination .column p:first-of-type span {
-    display: flex;
+  display: flex;
 }
 
 .pagination .column p:last-of-type span {

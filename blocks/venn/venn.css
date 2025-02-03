@@ -17,7 +17,7 @@
 }
 
 .venn .venn-content .venn-content-left {
-  background-color: #F4FADE;
+  background-color: #f4fade;
   border: 2px solid var(--color-accent-lightgreen-content);
   border-bottom: 0;
   border-radius: 50vw 50vw 0 0;
@@ -72,7 +72,13 @@
 }
 
 .venn .venn-content li.in-range {
-  background: linear-gradient(105deg, var(--color-accent-pink-bg), #f0b2f244 var(--venn-progress), #fff6 var(--venn-progress));
+  background:
+    linear-gradient(
+      105deg,
+      var(--color-accent-pink-bg),
+      #f0b2f244 var(--venn-progress),
+      #fff6 var(--venn-progress)
+    );
 }
 
 .venn .venn-content li.exceeds-range {
@@ -93,7 +99,7 @@
   font-style: normal;
   font-weight: 600;
   text-decoration: none;
-  transition: background-color .2s;
+  transition: background-color 0.2s;
 }
 
 .venn .venn-content a:hover {
@@ -111,7 +117,7 @@
     border-radius: var(--image-border-radius-xxl);
     padding: var(--image-border-radius-xxl);
   }
- 
+
   .venn .venn-content .venn-content-left {
     border: 2px solid var(--color-accent-lightgreen-content);
     border-right-width: 1px;
@@ -119,7 +125,7 @@
     padding-top: var(--image-border-radius-xxl);
     padding-right: calc(33% + var(--image-border-radius-xl));
   }
-  
+
   .venn .venn-content .venn-content-right {
     border: 2px solid var(--color-accent-purple-bg);
     border-left-width: 1px;

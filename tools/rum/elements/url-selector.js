@@ -53,7 +53,7 @@ export default class URLSelector extends HTMLElement {
     input.addEventListener('mouseover', () => {
       const token = getPersistentToken();
       if (token && !isIncognitoMode()) {
-        fetch('https://rum.fastly-aem.page/domains?suggested=true', {
+        fetch('https://bundles.aem.page/domains?suggested=true', {
           headers: {
             accept: 'application/json',
             authorization: `Bearer ${token}`,

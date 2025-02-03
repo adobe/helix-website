@@ -1,4 +1,4 @@
-@import url('colors.css');
+@import url("colors.css");
 /* stylelint-disable no-descending-specificity */
 /* stylelint-disable selector-class-pattern */
 
@@ -32,7 +32,6 @@
   --gray-500: #8f8f8f;
   --gray-600: #717171;
   --gray-700: #505050;
-
 }
 
 body {
@@ -52,17 +51,20 @@ body main > .section {
 
 /* general performance */
 
-main li.score-good, vitals-facet div[data-value^="good"] label {
+main li.score-good,
+vitals-facet div[data-value^="good"] label {
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
-main li.score-ni, vitals-facet div[data-value^="ni"] label {
+main li.score-ni,
+vitals-facet div[data-value^="ni"] label {
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
-main li.score-poor, vitals-facet div[data-value^="poor"] label {
+main li.score-poor,
+vitals-facet div[data-value^="poor"] label {
   color: var(--dark-red);
   background-color: var(--light-red);
 }
@@ -154,7 +156,7 @@ main .key-metrics ul > * button {
 }
 
 main .key-metrics ul > * h2::before {
-  content: ' ';
+  content: " ";
   background-color: currentcolor;
   width: 8px;
   height: 8px;
@@ -175,19 +177,19 @@ main .key-metrics ul > * p span.extra {
 }
 
 main .key-metrics ul > * p span.extra::before {
-  content: ' (';
+  content: " (";
 }
 
 main .key-metrics ul > #pageviews p span.extra::after {
-  content: ' per visit)';
+  content: " per visit)";
 }
 
 main .key-metrics ul > #conversions p span.extra::after {
-  content: '%)';
+  content: "%)";
 }
 
 main .key-metrics ul > #visits p span.extra::after {
-  content: '% bounces)';
+  content: "% bounces)";
 }
 
 .key-metrics > ul > * {
@@ -214,8 +216,6 @@ figure {
   margin-bottom: 16px;
 }
 
-
-
 figure .chart-container {
   position: relative;
   min-height: 100px;
@@ -236,7 +236,7 @@ figure .chart-container.sankey {
 }
 
 #timezone::before {
-  content: 'Timezone: ';
+  content: "Timezone: ";
 }
 
 .danger-icon {
@@ -293,7 +293,7 @@ figcaption span.lab {
   flex-grow: 1;
 }
 
-#low-data-warning[aria-hidden=true] {
+#low-data-warning[aria-hidden="true"] {
   display: none;
 }
 
@@ -361,7 +361,7 @@ fieldset a:any-link {
   color: currentcolor;
 }
 
-list-facet[facet="userAgent" ] fieldset {
+list-facet[facet="userAgent"] fieldset {
   color: var(--dark-fuchsia);
 
   --background-color: var(--light-fuchsia);
@@ -373,7 +373,9 @@ list-facet[facet="url"] fieldset {
   --background-color: var(--light-purple);
 }
 
-*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
+*[facet] > legend,
+*[facet] > dl,
+#facets > [mode="hidden"] {
   display: none;
 }
 
@@ -415,7 +417,7 @@ fieldset li.significant {
 
 fieldset li::after,
 vitals-facet label::before {
-  content: ' ';
+  content: " ";
   background-color: currentcolor;
   width: 10px;
   height: 10px;
@@ -435,7 +437,7 @@ vitals-facet label::before {
 
 #facets fieldset div {
   display: grid;
-  grid-template-areas: 'check lab' ' - cwv';
+  grid-template-areas: "check lab" " - cwv";
   grid-template-columns: 20px 1fr;
   align-items: center;
   grid-gap: 0 16px;
@@ -444,11 +446,11 @@ vitals-facet label::before {
 #facets fieldset div ~ div.more-container:last-of-type,
 #facets .more fieldset div ~ div.more-container:last-of-type,
 #facets .more-more fieldset div ~ div.more-container:last-of-type,
-#facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
+#facets .more-more-more fieldset div ~ div.more-container:last-of-type {
   display: grid;
 }
 
-#facets fieldset input[type=checkbox] {
+#facets fieldset input[type="checkbox"] {
   grid-area: check;
   height: 20px;
   width: 20px;
@@ -473,23 +475,24 @@ vitals-facet label::before {
 
 #facets fieldset label span.count::before,
 #facets fieldset label span.value::before {
-  content: ' (';
+  content: " (";
 }
 
 #facets literal-facet label span.value::before {
-  content: '';
+  content: "";
 }
 
-#facets fieldset label span.count::after, #facets fieldset label span.value::after {
-  content: ') ';
+#facets fieldset label span.count::after,
+#facets fieldset label span.value::after {
+  content: ") ";
 }
 
 #facets fieldset label span.extra::after {
-  content: '% conversion rate';
+  content: "% conversion rate";
 }
 
 #facets literal-facet label span.value::after {
-  content: '';
+  content: "";
 }
 
 #facets literal-facet label span.value {
@@ -571,9 +574,9 @@ file-facet label span.count {
 vitals-facet fieldset {
   display: grid;
   grid-template-areas:
-  '. lcp-good cls-good inp-good'
-  '. lcp-ni cls-ni inp-ni'
-  '. lcp-poor cls-poor inp-poor';
+    ". lcp-good cls-good inp-good"
+    ". lcp-ni cls-ni inp-ni"
+    ". lcp-poor cls-poor inp-poor";
   grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
   gap: 4pt;
   padding: 4pt;
@@ -584,7 +587,7 @@ vitals-facet fieldset label {
   word-break: normal;
 }
 
-#facets vitals-facet fieldset input[type=checkbox] {
+#facets vitals-facet fieldset input[type="checkbox"] {
   width: 0;
   height: 0;
 }
@@ -595,7 +598,7 @@ vitals-facet fieldset label {
 
 #facets vitals-facet fieldset div {
   display: grid;
-  grid-template-areas: 'check lab';
+  grid-template-areas: "check lab";
   grid-template-columns: 0 1fr;
   grid-gap: 0;
 }
@@ -604,14 +607,14 @@ vitals-facet fieldset label {
   text-align: start;
 }
 
-#facets vitals-facet fieldset input[type=checkbox] + label::before {
+#facets vitals-facet fieldset input[type="checkbox"] + label::before {
   border: 2px solid currentcolor;
   background-color: transparent;
   width: 8px;
   height: 8px;
 }
 
-#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+#facets vitals-facet fieldset input[type="checkbox"]:checked + label::before {
   border: 2px solid currentcolor;
   background-color: currentcolor;
 }
@@ -656,8 +659,8 @@ vitals-facet fieldset label {
   grid-area: cwv;
 }
 
-#facets div[aria-selected=true] {
-  background-color: var(--light-blue)
+#facets div[aria-selected="true"] {
+  background-color: var(--light-blue);
 }
 
 #facets div[aria-selected]:hover {
@@ -669,15 +672,15 @@ vitals-facet fieldset label {
 }
 
 #facets link-facet a .protocol::after {
-  content: '//';
+  content: "//";
 }
 
-/* don't worry, we'll show this when there is enough space */
-#facets link-facet  a .protocol {
+/* don't worry, we will show this when there is enough space */
+#facets link-facet a .protocol {
   display: none;
 }
 
-#facets link-facet  a .hostname {
+#facets link-facet a .hostname {
   display: none;
 }
 
@@ -723,7 +726,8 @@ vitals-facet fieldset label {
   padding-right: 50px;
 }
 
-.clipboard, .icon {
+.clipboard,
+.icon {
   margin-left: 8px;
   box-sizing: border-box;
   position: relative;
@@ -805,7 +809,7 @@ vitals-facet fieldset label {
   margin-top: -20px;
 }
 
-facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+facet-sidebar[aria-disabled="true"] fieldset input[type="checkbox"] {
   display: none;
 }
 
@@ -849,7 +853,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: 32px;
   }
 
-  main .key-metrics ul > * h2, main .key-metrics ul > * button {
+  main .key-metrics ul > * h2,
+  main .key-metrics ul > * button {
     font-size: 14px;
   }
 
@@ -874,7 +879,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 
   #facets fieldset div {
-    grid-template-areas: 'check lab cwv';
+    grid-template-areas: "check lab cwv";
     grid-template-columns: 20px 1fr 350px;
   }
 
@@ -892,9 +897,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 }
 
-
 /* split mode */
-
 @media (min-width: 1600px) {
   #deepmain {
     display: flex;
@@ -906,7 +909,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 
-  #deepmain > div, #deepmain > facet-sidebar {
+  #deepmain > div,
+  #deepmain > facet-sidebar {
     width: 50%;
   }
 

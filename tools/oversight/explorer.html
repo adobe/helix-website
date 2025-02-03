@@ -1,11 +1,10 @@
 <html>
-
 <head>
   <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
   <script type="importmap">{"imports": {
     "chartjs": "https://esm.sh/chart.js@4.4.2",
     "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.2",
-    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.14.0"
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.16.1"
   }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
@@ -41,303 +40,326 @@
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
-  </head>
+</head>
 
 <body>
   <header></header>
   <main>
     <div>
-        <div id="deepmain">
-          <div class="output">
-            <div class="title">
-              <url-selector>www.aem.live</url-selector>
-              <daterange-picker id="view">
-                <ul hidden>
-                  <li data-value="week">Last week</li>
-                  <li data-value="month" aria-selected="true">Last month</li>
-                  <li data-value="year">Last year</li>
-                  <li data-value="custom">Custom</li>
-                </ul>
-              </daterange-picker>
-              <incognito-checkbox></incognito-checkbox>
-            </div>
-            <div class="key-metrics">
+      <div id="deepmain">
+        <div class="output">
+          <div class="title">
+            <url-selector>www.aem.live</url-selector>
+            <daterange-picker id="view">
+              <ul hidden>
+                <li data-value="week">Last week</li>
+                <li data-value="month" aria-selected="true">Last month</li>
+                <li data-value="year">Last year</li>
+                <li data-value="custom">Custom</li>
+              </ul>
+            </daterange-picker>
+            <incognito-checkbox></incognito-checkbox>
+          </div>
+          <div class="key-metrics">
+            <ul>
+              <li id="pageviews" title="Estimate of page views based on RUM data collected and sampling rate">
+                <h2>Page views</h2>
+                <p><number-format>0</number-format></p>
+              </li>
+              <li id="visits" title="Page views which were not linked from another page on this site">
+                <h2>Visits</h2>
+                <p><number-format>0</number-format></p>
+              </li>
+              <conversion-tracker id="conversions" title="Page views with a user click outside a consent dialog">
+                <h2>Engagement</h2>
+                <p><number-format>0</number-format></p>
+              </conversion-tracker>
+              <li id="lcp" title="Largest Contentful Paint">
+                <h2>LCP</h2>
+                <p><number-format precision="2" fuzzy="false">0</number-format></p>
+              </li>
+              <li id="cls" title="Cumulative Layout Shift">
+                <h2>CLS</h2>
+                <p><number-format precision="2" fuzzy="false">0</number-format></p>
+              </li>
+              <li id="inp" title="Interaction to Next Paint">
+                <h2>INP</h2>
+                <p><number-format precision="2" fuzzy="false">0</number-format></p>
+              </li>
+            </ul>
+            <div class="key-metrics-more" aria-hidden="true">
               <ul>
-                <li id="pageviews" title="Estimate of page views based on RUM data collected and sampling rate">
-                  <h2>Page views</h2>
+                <li id="cls" title="Time to First Byte">
+                  <h2>TTFB</h2>
                   <p><number-format>0</number-format></p>
-                </li>
-                <li id="visits" title="Page views which were not linked from another page on this site">
-                  <h2>Visits</h2>
-                  <p><number-format>0</number-format></p>
-                </li>
-                <conversion-tracker id="conversions" title="Page views with a user click outside a consent dialog">
-                  <h2>Engagement</h2>
-                  <p><number-format>0</number-format></p>
-                </conversion-tracker>
-                <li id="lcp" title="Largest Contentful Paint">
-                  <h2>LCP</h2>
-                  <p><number-format precision="2" fuzzy="false">0</number-format></p>
-                </li>
-                <li id="cls" title="Cumulative Layout Shift">
-                  <h2>CLS</h2>
-                  <p><number-format precision="2" fuzzy="false">0</number-format></p>
-                </li>
-                <li id="inp" title="Interaction to Next Paint">
-                  <h2>INP</h2>
-                  <p><number-format precision="2" fuzzy="false">0</number-format></p>
                 </li>
               </ul>
-              <div class="key-metrics-more" aria-hidden="true">
-                <ul>
-                  <li id="cls" title="Time to First Byte">
-                    <h2>TTFB</h2>
-                    <p><number-format>0</number-format></p>
-                  </li>
-                </ul>
-              </div>
             </div>
-        
-            <figure>
-              <div class="chart-container solitary">
-                <canvas id="time-series"></canvas>
-              </div>
-              <div class="filter-tags"></div>
-              <figcaption>
-                <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size, accuracy
-                  reduced.</span>
-                <span id="timezone"></span>
-              </figcaption>
-            </figure>
           </div>
-          <facet-sidebar>
-            <list-facet facet="type">
-              <legend>Host Type</legend>
-              <dl>
-                <dt>aemcs</dt>
-                <dd>AEM as a Cloud Service</dd>
-                <dt>helix</dt>
-                <dd>aem.live or Standalone</dd>
-              </dl>
-            </list-facet>
-            <list-facet facet="userAgent" drilldown="share.html">
-              <legend>Device Type and Operating System</legend>
-              <dl>
-                <dt>desktop</dt>
-                <dd>All Desktop</dd>
-                <dt>desktop:windows</dt>
-                <dd>Windows Desktop</dd>
-                <dt>desktop:mac</dt>
-                <dd>Mac Desktop</dd>
-                <dt>desktop:linux</dt>
-                <dd>Linux Desktop</dd>
-                <dt>desktop:chromeos</dt>
-                <dd>Chrome OS Desktop</dd>
-                <dt>mobile</dt>
-                <dd>All Mobile</dd>
-                <dt>mobile:android</dt>
-                <dd>Android Mobile</dd>
-                <dt>mobile:ios</dt>
-                <dd>iOS Mobile</dd>
-                <dt>mobile:ipados</dt>
-                <dd>iPad Mobile</dd>
-                <dt>bot</dt>
-                <dd>All Bots</dd>
-                <dt>bot:seo</dt>
-                <dd>SEO Bot</dd>
-                <dt>bot:search</dt>
-                <dd>Search Engine Crawler</dd>
-                <dt>bot:ads</dt>
-                <dd>Ad Bot</dd>
-                <dt>bot:social</dt>
-                <dd>Social Media Bot</dd>
-              </dl>
-            </list-facet>
-            <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
-              <legend>URL</legend>
-            </link-facet>
-            <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
-              <legend>Checkpoints</legend>
-              <dl>
-                <dt>enter</dt>
-                <dd>Visit Entry</dd>
-                <dt>loadresource</dt>
-                <dd>Fragment Loaded</dd>
-                <dt>404</dt>
-                <dd>Not Found</dd>
-                <dt>viewblock</dt>
-                <dd>Block Viewed</dd>
-                <dt>viewmedia</dt>
-                <dd>Media Viewed</dd>
-                <dt>click</dt>
-                <dd>Clicked</dd>
-                <dt>error</dt>
-                <dd>JavaScript Error</dd>
-                <dt>acquisition</dt>
-                <dd>Traffic Acquisition</dd>
-                <dt>consent</dt>
-                <dd>Consent</dd>
-                <dt>navigate</dt>
-                <dd>Internal Navigation</dd>
-                <dt>cwv-lcp</dt>
-                <dd>Largest Contentful Paint</dd>
-                <dt>redirect</dt>
-                <dd>Redirect</dd>
-              </dl>
-            </list-facet>
-            <literal-facet facet="click.source" drilldown="list.html">
-              <legend>Click Source (CSS Selector)</legend>
-            </literal-facet>
-            <link-facet facet="click.target" drilldown="list.html">
-              <legend>Click Target (URL)</legend>
-            </link-facet>
-            <literal-facet facet="viewmedia.source" drilldown="list.html">
-              <legend>Media Source (CSS Selector)</legend>
-            </literal-facet>
-            <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
-              <legend>Media Target</legend>
-            </thumbnail-facet>
-            <literal-facet facet="viewblock.source" drilldown="list.html">
-              <legend>Block (CSS Selector)</legend>
-            </literal-facet>
-            <link-facet facet="enter.source" drilldown="list.html" thumbnail="true" favicon="true">
-              <legend>External Referrer</legend>
-              <dl>
-                <dt>(direct)</dt>
-                <dd>Direct Entry (or via App)</dd>
-              </dl>
-            </link-facet>
-            <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
-              <legend>Internal Referrer</legend>
-            </link-facet>
 
-            <list-facet facet="consent.source">
-              <legend>Consent Provider</legend>
-              <dl>
-                <dt>onetrust</dt>
-                <dd>OneTrust</dd>
-                <dt>truste</dt>
-                <dd>TrustArc</dd>
-                <dt>usercentrics</dt>
-                <dd>Usercentrics</dd>
-                <dt>cybot</dt>
-                <dd>Cybot</dd>
-              </dl>
-            </list-facet>
-            <list-facet facet="consent.target">
-              <legend>Consent Dialog</legend>
-              <dl>
-                <dt>show</dt>
-                <dd>Dialog Shown</dd>
-                <dt>hidden</dt>
-                <dd>Dialog Hidden</dd>
-                <dt>accept</dt>
-                <dd>Consent provided</dd>
-                <dt>reject</dt>
-                <dd>Consent withheld</dd>
-              </dl>
-            </list-facet>
-
-            <list-facet facet="acquisition.source" drilldown="share.html">
-              <legend>Inorganic Traffic Source</legend>
-              <dl>
-                <dt>paid</dt>
-                <dd>All paid traffic</dd>
-                <dt>owned</dt>
-                <dd>All owned traffic</dd>
-                <dt>earned</dt>
-                <dd>All earned traffic</dd><!-- this is not being classified yet -->
-                <dt>paid:search</dt>
-                <dd>Paid Search</dd>
-                <dt>paid:search:google</dt>
-                <dd>Google Ads</dd>
-                <dt>paid:search:bing</dt>
-                <dd>Bing Ads</dd>
-                <dt>paid:search:yahoo</dt>
-                <dd>Yahoo Ads</dd>
-                
-                <dt>paid:social</dt>
-                <dd>Paid Social Media</dd>
-                <dt>paid:social:facebook</dt>
-                <dd>Facebook Ads</dd>
-                <dt>paid:social:twitter</dt>
-                <dd>X Ads</dd>
-                <dt>paid:social:linkedin</dt>
-                <dd>LinkedIn Ads</dd>
-                <dt>paid:social:instagram</dt>
-                <dd>Instagram Ads</dd>
-                <dt>paid:social:pinterest</dt>
-                <dd>Pinterest Ads</dd>
-                <dt>paid:display</dt>
-                <dd>Paid Display</dd>
-                <dt>paid:display:google</dt>
-                <dd>Google Display Ads</dd>
-                <dt>paid:display:microsoft</dt>
-                <dd>Microsoft Display Ads</dd>
-                
-                <dt>paid:video</dt>
-                <dd>Paid Video</dd>
-                <dt>paid:video:youtube</dt>
-                <dd>YouTube Ads</dd>
-                <dt>paid:video:tiktok</dt>
-                <dd>TikTok Ads</dd>
-                <dt>:social</dt>
-                <dd>Paid or owned Social Media</dd>
-                <dt>:social:facebook</dt>
-                <dd>Facebook</dd>
-                <dt>:social:twitter</dt>
-                <dd>X</dd>
-                <dt>:social:linkedin</dt>
-                <dd>LinkedIn</dd>
-                <dt>:social:instagram</dt>
-                <dd>Instagram</dd>
-                <dt>:social:pinterest</dt>
-                <dd>Pinterest</dd>
-                
-                <dt>owned:email</dt>
-                <dd>Email</dd>
-                <dt>owned:email:organic</dt>
-                <dd>Marketo Email</dd>
-
-              </dl>
-            </list-facet>
-
-            <link-facet facet="error.source">
-              <legend>Error Source</legend>
-            </link-facet>
-            <literal-facet facet="error.target">
-              <legend>Error Line</legend>
-            </literal-facet>
-
-            <list-facet facet="loadresource.histogram" sort="asc">
-              <legend>Resource Load Time (ms)</legend>
-            </list-facet>
-            
-            <list-facet facet="loadresource.source">
-              <legend>Resource Loaded</legend>
-            </list-facet>
-
-            <list-facet facet="missingresource.source">
-              <legend>Missing Resource</legend>
-            </list-facet>
-
-            <literal-facet facet="cwv-lcp.source">
-              <legend>LCP Element (DOM)</legend>
-            </literal-facet>
-            <thumbnail-facet facet="cwv-lcp.target">
-              <legend>LCP Element (Preview)</legend>
-            </thumbnail-facet>
-            <list-facet facet="redirect.source">
-              <legend>Redirect Source</legend>
-            </list-facet>
-            
-            <list-facet facet="redirect.target">
-              <legend>Redirect Hops</legend>
-            </list-facet>
-          </facet-sidebar>
+          <figure>
+            <div class="chart-container solitary">
+              <canvas id="time-series"></canvas>
+            </div>
+            <div class="filter-tags"></div>
+            <figcaption>
+              <span aria-hidden="true" id="low-data-warning"><span class="danger-icon"></span> small sample size,
+                accuracy
+                reduced.</span>
+              <span id="timezone"></span>
+            </figcaption>
+          </figure>
         </div>
+        <facet-sidebar>
+          <list-facet facet="type">
+            <legend>Host Type</legend>
+            <dl>
+              <dt>aemcs</dt>
+              <dd>AEM as a Cloud Service</dd>
+              <dt>helix</dt>
+              <dd>aem.live or Standalone</dd>
+              <dt>ams</dt>
+              <dd>Adobe Managed Services</dd>
+            </dl>
+          </list-facet>
+          <list-facet facet="userAgent" drilldown="share.html">
+            <legend>Device Type and Operating System</legend>
+            <a href="/docs/rum-explorer#device-share" class="help"
+            target="_blank" title="What devices and operating systems have accessed your site?"></a>
+            <dl>
+              <dt>desktop</dt>
+              <dd>All Desktop</dd>
+              <dt>desktop:windows</dt>
+              <dd>Windows Desktop</dd>
+              <dt>desktop:mac</dt>
+              <dd>Mac Desktop</dd>
+              <dt>desktop:linux</dt>
+              <dd>Linux Desktop</dd>
+              <dt>desktop:chromeos</dt>
+              <dd>Chrome OS Desktop</dd>
+              <dt>mobile</dt>
+              <dd>All Mobile</dd>
+              <dt>mobile:android</dt>
+              <dd>Android Mobile</dd>
+              <dt>mobile:ios</dt>
+              <dd>iOS Mobile</dd>
+              <dt>mobile:ipados</dt>
+              <dd>iPad Mobile</dd>
+              <dt>bot</dt>
+              <dd>All Bots</dd>
+              <dt>bot:seo</dt>
+              <dd>SEO Bot</dd>
+              <dt>bot:search</dt>
+              <dd>Search Engine Crawler</dd>
+              <dt>bot:ads</dt>
+              <dd>Ad Bot</dd>
+              <dt>bot:social</dt>
+              <dd>Social Media Bot</dd>
+            </dl>
+          </list-facet>
+          <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
+            <legend>URL</legend>
+            <a href="/docs/rum-explorer#url" class="help"
+            target="_blank" title="What different pages make up your site?"></a>
+          </link-facet>
+          <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
+            <legend>Checkpoints</legend>
+            <a href="/docs/rum-explorer#checkpoints" class="help"
+            target="_blank" title="What type of activity data is collected?"></a>
+            <dl>
+              <dt>enter</dt>
+              <dd>Visit Entry</dd>
+              <dt>loadresource</dt>
+              <dd>Fragment Loaded</dd>
+              <dt>404</dt>
+              <dd>Not Found</dd>
+              <dt>viewblock</dt>
+              <dd>Block Viewed</dd>
+              <dt>viewmedia</dt>
+              <dd>Media Viewed</dd>
+              <dt>click</dt>
+              <dd>Clicked</dd>
+              <dt>error</dt>
+              <dd>JavaScript Error</dd>
+              <dt>acquisition</dt>
+              <dd>Traffic Acquisition</dd>
+              <dt>consent</dt>
+              <dd>Consent</dd>
+              <dt>navigate</dt>
+              <dd>Internal Navigation</dd>
+              <dt>cwv-lcp</dt>
+              <dd>Largest Contentful Paint</dd>
+              <dt>redirect</dt>
+              <dd>Redirect</dd>
+            </dl>
+          </list-facet>
+          <literal-facet facet="click.source" drilldown="list.html">
+            <legend>Click Source (CSS Selector)</legend>
+            <a href="/docs/rum-explorer#facet-click" class="help"
+            target="_blank" title="What page visitors clicked"></a>
+          </literal-facet>
+          <link-facet facet="click.target" drilldown="list.html">
+            <legend>Click Target (URL)</legend>
+            <a href="/docs/rum-explorer#facet-click" class="help"
+            target="_blank" title="What page visitors clicked"></a>
+          </link-facet>
+          <literal-facet facet="viewmedia.source" drilldown="list.html">
+            <legend>Media Source (CSS Selector)</legend>
+            <a href="/docs/rum-explorer#facet-viewmedia" class="help"
+            target="_blank" title="What image/video visitors have seen?"></a>
+          </literal-facet>
+          <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
+            <legend>Media Target</legend>
+            <a href="/docs/rum-explorer#facet-viewmedia" class="help"
+            target="_blank" title="What image/video visitors have seen?"></a>
+          </thumbnail-facet>
+          <literal-facet facet="viewblock.source" drilldown="list.html">
+            <legend>Block (CSS Selector)</legend>
+            <a href="/docs/rum-explorer#facet-viewblock" class="help"
+            target="_blank" title="What blocks visitors have seen?"></a>
+          </literal-facet>
+          <link-facet facet="enter.source" drilldown="list.html" thumbnail="true" favicon="true">
+            <legend>External Referrer</legend>
+            <a href="/docs/rum-explorer#facet-enter" class="help"
+            target="_blank" title="How the users entered into the site?"></a>
+            <dl>
+              <dt>(direct)</dt>
+              <dd>Direct Entry (or via App)</dd>
+            </dl>
+          </link-facet>
+          <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
+            <legend>Internal Referrer</legend>
+            <a href="/docs/rum-explorer#facet-navigate" class="help"
+            target="_blank" title="Internal navigation paths on the site"></a>
+          </link-facet>
+
+          <list-facet facet="consent.source">
+            <legend>Consent Provider</legend>
+            <dl>
+              <dt>onetrust</dt>
+              <dd>OneTrust</dd>
+              <dt>truste</dt>
+              <dd>TrustArc</dd>
+              <dt>usercentrics</dt>
+              <dd>Usercentrics</dd>
+              <dt>cybot</dt>
+              <dd>Cybot</dd>
+            </dl>
+          </list-facet>
+          <list-facet facet="consent.target">
+            <legend>Consent Dialog</legend>
+            <dl>
+              <dt>show</dt>
+              <dd>Dialog Shown</dd>
+              <dt>hidden</dt>
+              <dd>Dialog Hidden</dd>
+              <dt>accept</dt>
+              <dd>Consent provided</dd>
+              <dt>reject</dt>
+              <dd>Consent withheld</dd>
+            </dl>
+          </list-facet>
+
+          <list-facet facet="acquisition.source" drilldown="share.html">
+            <legend>Inorganic Traffic Source</legend>
+            <dl>
+              <dt>paid</dt>
+              <dd>All paid traffic</dd>
+              <dt>owned</dt>
+              <dd>All owned traffic</dd>
+              <dt>earned</dt>
+              <dd>All earned traffic</dd><!-- this is not being classified yet -->
+              <dt>paid:search</dt>
+              <dd>Paid Search</dd>
+              <dt>paid:search:google</dt>
+              <dd>Google Ads</dd>
+              <dt>paid:search:bing</dt>
+              <dd>Bing Ads</dd>
+              <dt>paid:search:yahoo</dt>
+              <dd>Yahoo Ads</dd>
+
+              <dt>paid:social</dt>
+              <dd>Paid Social Media</dd>
+              <dt>paid:social:facebook</dt>
+              <dd>Facebook Ads</dd>
+              <dt>paid:social:twitter</dt>
+              <dd>X Ads</dd>
+              <dt>paid:social:linkedin</dt>
+              <dd>LinkedIn Ads</dd>
+              <dt>paid:social:instagram</dt>
+              <dd>Instagram Ads</dd>
+              <dt>paid:social:pinterest</dt>
+              <dd>Pinterest Ads</dd>
+              <dt>paid:display</dt>
+              <dd>Paid Display</dd>
+              <dt>paid:display:google</dt>
+              <dd>Google Display Ads</dd>
+              <dt>paid:display:microsoft</dt>
+              <dd>Microsoft Display Ads</dd>
+
+              <dt>paid:video</dt>
+              <dd>Paid Video</dd>
+              <dt>paid:video:youtube</dt>
+              <dd>YouTube Ads</dd>
+              <dt>paid:video:tiktok</dt>
+              <dd>TikTok Ads</dd>
+              <dt>:social</dt>
+              <dd>Paid or owned Social Media</dd>
+              <dt>:social:facebook</dt>
+              <dd>Facebook</dd>
+              <dt>:social:twitter</dt>
+              <dd>X</dd>
+              <dt>:social:linkedin</dt>
+              <dd>LinkedIn</dd>
+              <dt>:social:instagram</dt>
+              <dd>Instagram</dd>
+              <dt>:social:pinterest</dt>
+              <dd>Pinterest</dd>
+
+              <dt>owned:email</dt>
+              <dd>Email</dd>
+              <dt>owned:email:organic</dt>
+              <dd>Marketo Email</dd>
+
+            </dl>
+          </list-facet>
+
+          <link-facet facet="error.source">
+            <legend>Error Source</legend>
+          </link-facet>
+          <literal-facet facet="error.target">
+            <legend>Error Line</legend>
+          </literal-facet>
+
+          <list-facet facet="loadresource.histogram" sort="asc">
+            <legend>Resource Load Time (ms)</legend>
+          </list-facet>
+
+          <list-facet facet="loadresource.source">
+            <legend>Resource Loaded</legend>
+          </list-facet>
+
+          <list-facet facet="missingresource.source">
+            <legend>Missing Resource</legend>
+          </list-facet>
+
+          <literal-facet facet="cwv-lcp.source">
+            <legend>LCP Element (DOM)</legend>
+          </literal-facet>
+          <thumbnail-facet facet="cwv-lcp.target">
+            <legend>LCP Element (Preview)</legend>
+          </thumbnail-facet>
+          <list-facet facet="redirect.source">
+            <legend>Redirect Source</legend>
+          </list-facet>
+
+          <list-facet facet="redirect.target">
+            <legend>Redirect Hops</legend>
+          </list-facet>
+        </facet-sidebar>
+      </div>
     </div>
-    </main>
+  </main>
   <footer></footer>
   <div id="copied-toast" class="toast" aria-hidden="true">
     Rows copied to clipboard, ready to paste into spreadsheet
