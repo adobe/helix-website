@@ -144,30 +144,30 @@ const SERIES = {
   },
   bounce: {
     label: 'Bounce Rate (Visitor left page without any interaction)',
-    rateFn: (aggregate) => Math.round(
+    rateFn: (aggregate) => (aggregate.visits.sum > 0 ? Math.round(
       (100 * aggregate.bounces.sum) / aggregate.visits.sum,
-    ),
+    ) : 0),
     labelFn: (value) => `${value || 0}%`,
   },
   engagement: {
     label: 'Active Page Engagement (Visitor clicked or viewed at least three media elements/content blocks)',
-    rateFn: (aggregate) => Math.round(
+    rateFn: (aggregate) => (aggregate.pageViews.sum > 0 ? Math.round(
       (100 * aggregate.engagement.sum) / aggregate.pageViews.sum,
-    ),
+    ) : 0),
     labelFn: (value) => `${value || 0}%`,
   },
   conversions: {
     label: 'Conversion Rate (Visitor clicked the call-to-action button)',
-    rateFn: (aggregate) => Math.min(Math.round(
+    rateFn: (aggregate) => (aggregate.visits.sum > 0 ? Math.min(Math.round(
       (100 * aggregate.conversions.sum) / aggregate.visits.sum,
-    ), 100),
+    ), 100) : 0),
     labelFn: (value) => `${value}%`,
   },
   paid: {
     label: 'Paid traffic',
-    rateFn: (aggregate) => 100 - Math.round(
+    rateFn: (aggregate) => (aggregate.visits.sum > 0 ? 100 - Math.round(
       (100 * aggregate.organic.sum) / aggregate.visits.sum,
-    ),
+    ) : 0),
     labelFn: (value) => `${value || 0}%`,
   },
   timeOnPage: {
