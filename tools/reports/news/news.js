@@ -57,7 +57,7 @@ class URLReports {
 
     dataChunks.addFacet('hasclick&source', (bundle) => {
       const a = bundle.events
-        .filter((event) => event.checkpoint === 'click' && event.source === '.button');
+        .filter((event) => event.checkpoint === 'click' && event.source && event.source.includes('cta'));
       return a.length > 0;
     });
 
