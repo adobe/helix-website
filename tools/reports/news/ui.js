@@ -230,10 +230,7 @@ const main = async () => {
   getDetails(config.url).then((details) => {
     const post = document.getElementById('post');
     Object.keys(details).forEach((key) => {
-      const el = post.querySelector(`.post-${key}`);
-      if (el) {
-        el.textContent = details[key];
-      } else if (key === 'url') {
+      if (key === 'url') {
         const title = post.querySelector('.post-title');
         title.setAttribute('href', details[key]);
       } else if (key === 'img') {
@@ -243,6 +240,20 @@ const main = async () => {
         img.alt = data.alt;
         if (data.width) img.width = data.width;
         if (data.height) img.height = data.height;
+      } else if (key === 'tags') {
+        const tags = details[key];
+        const ul = post.querySelector('.post-tags');
+        ul.innerHTML = '';
+        tags.forEach((tag) => {
+          const li = document.createElement('li');
+          li.textContent = tag;
+          ul.appendChild(li);
+        });
+      } else {
+        const el = post.querySelector(`.post-${key}`);
+        if (el) {
+          el.textContent = details[key];
+        }
       }
     });
 

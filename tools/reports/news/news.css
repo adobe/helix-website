@@ -22,7 +22,7 @@ h2 + .subtitle {
   margin-top: 0;
 }
 
-@media (min-width: 1600px) {
+@media (width >= 1600px) {
   body.appear {
     max-width: 2400px;
     display: block;
@@ -236,7 +236,7 @@ section.dashboard {
   cursor: pointer;
 }
 
-.post .post-info {
+.post .post-info, .post .post-tags {
   margin-bottom: 0.5rem;
   color: #686868;
   font-size: 10px;
@@ -244,6 +244,15 @@ section.dashboard {
   letter-spacing: 0.1em;
   line-height: 27px;
   text-transform: uppercase;
+}
+
+.post .post-tags {
+  padding-left: 0;
+}
+
+.post .post-tags li {
+  display: inline-block;
+  margin-right: 0.5rem;
 }
 
 .post .post-info span + span::before {

@@ -61,6 +61,9 @@ const fetchDetails = async (url) => {
   const title = doc.querySelector('h1')?.textContent || doc.querySelector('title')?.textContent || '';
   const description = doc.querySelector('meta[name="description"]')?.content || '';
   const author = doc.querySelector('meta[name="author"]')?.content || '';
+  const tags = Array.from(doc.querySelectorAll('meta[property="article:tag"]'))
+    .map((tag) => tag.getAttribute('content'))
+    .filter(Boolean);
 
   let publicationDate = doc.querySelector('meta[name="publication-date"]')?.content;
   if (!publicationDate) {
@@ -81,7 +84,7 @@ const fetchDetails = async (url) => {
   } else img = '';
 
   return {
-    title, description, url, author, publicationDate, img,
+    title, description, url, author, publicationDate, img, tags,
   };
 };
 
