@@ -54,6 +54,9 @@ export function cssVariable(name) {
 
 const fetchDetails = async (url) => {
   const resp = await fetch(url);
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch details for ${url}`);
+  }
   const html = await resp.text();
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');

@@ -1,0 +1,18 @@
+@import url('colors.css');
+@import url('shared.css');
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable selector-class-pattern */
+
+.post-list {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.post-list td {
+  padding: 0.5rem;
+}
+
+.post-list td a {
+  text-decoration: none;
+  color: var(--color-text);
+}
