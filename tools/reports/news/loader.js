@@ -12,7 +12,7 @@ export default class DataLoader {
   constructor() {
     this.cache = new Map();
     this.API_ENDPOINT = 'https://rum.fastly-aem.page';
-    this.DOMAIN = 'www.thinktanked.org';
+    this.DOMAIN = 'blog.adobe.com';
     this.DOMAIN_KEY = '';
     this.ORG = undefined;
     this.SCOPE = undefined; // unused

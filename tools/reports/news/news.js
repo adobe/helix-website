@@ -14,7 +14,6 @@ class URLReports {
 
     const loader = new DataLoader();
     loader.apiEndpoint = API_ENDPOINT;
-    loader.domain = config.domain;
     loader.domainKey = config.domainKey;
 
     this.loader = loader;
@@ -58,6 +57,9 @@ class URLReports {
     dataChunks.addFacet('hasclick&source', (bundle) => {
       const a = bundle.events
         .filter((event) => event.checkpoint === 'click' && event.source && event.source.includes('cta'));
+      if (a.length > 0) {
+        console.log('hasclick&source', bundle.id, a);
+      }
       return a.length > 0;
     });
 

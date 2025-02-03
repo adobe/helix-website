@@ -20,24 +20,11 @@ export function toHumanReadable(num, precision = 2) {
 
 const getURL = () => {
   const url = searchParams.get('url');
-
-  if (!url) {
-    throw new Error('No url provided');
-  }
-
   return url;
-};
-
-const getDomain = () => {
-  const url = getURL();
-
-  const { hostname } = new URL(url);
-  return hostname;
 };
 
 const getConfig = () => {
   const config = {
-    domain: getDomain(),
     domainKey: searchParams.get('domainkey') || '',
     apiEndpoint: API_ENDPOINT,
     start: searchParams.get('start'),
@@ -128,7 +115,6 @@ function truncate(time, unit) {
 
 export {
   getURL,
-  getDomain,
   getConfig,
   fetchDetails as getDetails,
   toReportURL,
