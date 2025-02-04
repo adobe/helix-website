@@ -149,10 +149,10 @@ const draw = async () => {
       <td><a href="./news.html?url=${encodeURIComponent(url)}&domainkey=${config.domainKey}&start=${config.start}&end=${config.end}">${publicationDate}</a></td>
       <td>${pageViews}</td>
       <td>${author}</td>
-      <td>${timeOnPage}</td>
-      <td>${conversions}</td>
-      <td>${bounces}</td>
-      <td>${paid}</td>
+      <td>${SERIES.timeOnPage.labelFn(timeOnPage)}</td>
+      <td>${SERIES.conversions.labelFn(conversions)}</td>
+      <td>${SERIES.bounce.labelFn(bounces)}</td>
+      <td>${SERIES.paid.labelFn(paid)}</td>
       <td>${tags.join(', ')}</td>
     `;
   });

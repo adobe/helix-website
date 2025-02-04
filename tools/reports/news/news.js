@@ -174,7 +174,7 @@ const SERIES = {
   },
   timeOnPage: {
     label: 'Time on page',
-    rateFn: (aggregate) => aggregate.timeOnPage.percentile(50),
+    rateFn: (aggregate) => Math.round(aggregate.timeOnPage.percentile(50)),
     labelFn: (value) => `${Number.isFinite(value) ? value : 0}s`,
   },
 };
