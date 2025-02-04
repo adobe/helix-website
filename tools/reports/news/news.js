@@ -101,7 +101,7 @@ class URLReports {
         .reduce((acc, { target }) => {
           if (typeof target === 'string' && !target.includes('profile')) {
             try {
-              const u = new URL(target);
+              const u = new URL(target, bundle.url);
               u.hash = '';
               acc.add(u.toString());
             } catch (error) {
