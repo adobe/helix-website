@@ -56,10 +56,7 @@ class URLReports {
 
     dataChunks.addFacet('hasclick&source', (bundle) => {
       const a = bundle.events
-        .filter((event) => event.checkpoint === 'click' && event.source && event.source.includes('cta'));
-      if (a.length > 0) {
-        console.log('hasclick&source', bundle.id, a);
-      }
+        .filter((event) => event.checkpoint === 'click' && event.source && (event.source.includes('cta') || event.source.includes('con-button')));
       return a.length > 0;
     });
 
@@ -159,7 +156,7 @@ const SERIES = {
     labelFn: (value) => `${value || 0}%`,
   },
   conversions: {
-    label: 'Conversion Rate (Visitor clicked the call-to-action button)',
+    label: 'Conversion Rate (New visitor clicked the call-to-action button)',
     rateFn: (aggregate) => (aggregate.visits.sum > 0 ? Math.min(Math.round(
       (100 * aggregate.conversions.sum) / aggregate.visits.sum,
     ), 100) : 0),
