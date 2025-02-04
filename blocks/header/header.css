@@ -660,7 +660,7 @@ button.gnav-toggle::after {
   }
 
   .gnav {
-    grid-template: unset / auto 1fr auto auto auto;
+    grid-template: none / auto 1fr auto auto auto;
     grid-template-areas: "brand navlist search profile logo";
     padding: 0 12px 0 0;
   }
