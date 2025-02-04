@@ -1,0 +1,164 @@
+<html></html>
+
+<head>
+  <title>News dashboard | AEM Live</title>
+  <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.2",
+    "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.2",
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.8.0"
+  }}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="/scripts/lib-franklin.js" type="module"></script>
+  <script src="/scripts/scripts.js" type="module"></script>
+  <link rel="stylesheet" href="/styles/styles.css" />
+
+  <script src="./year-ui.js" type="module"></script>
+  <link rel="stylesheet" href="./year.css">
+</head>
+
+<body>
+  <header></header>
+
+  <main>
+    <section class="top-nav">
+      <h1>Blog Traffic Details</h1>
+
+      <div class="button-container">
+        <button type="button" class="button" id="share-insights">Share</button>
+      </div>
+    </section>
+
+    <section class="params" id="params">
+      <form>
+        <div class="input-wrapper date-wrapper">
+          <label for="year">Year</label>
+          <input type="text" id="year" name="year">
+        </div>
+
+        <button type="button" class="button" id="submit-params">Submit</button>
+      </form>
+    </section>
+
+    <section class="filters" id="filters">
+      <div class="input-wrapper">
+        <label for="device">Device</label>
+        <input type="radio" id="device-all" name="device" value="all" checked>
+        <label for="device-all">All</label>
+        <input type="radio" id="device-desktop" name="device" value="desktop">
+        <label for="device-desktop">Desktop</label>
+        <input type="radio" id="device-mobile" name="device" value="mobile">
+        <label for="device-mobile">Mobile</label>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <table class="post-list">
+        <thead>
+          <tr>
+            <th colspan="2">General</th>
+            <th colspan="5">Total</th>
+            <th colspan="5">Jan</th>
+            <th colspan="5">Feb</th>
+            <th colspan="5">Mar</th>
+            <th colspan="5">Apr</th>
+            <th colspan="5">May</th>
+            <th colspan="5">Jun</th>
+            <th colspan="5">Jul</th>
+            <th colspan="5">Aug</th>
+            <th colspan="5">Sep</th>
+            <th colspan="5">Oct</th>
+            <th colspan="5">Nov</th>
+            <th colspan="5">Dec</th>
+          </tr>
+          <tr>
+            <th>URL</th>
+            <th>Publication date</th>
+            
+            <th>Page views</th>
+            <th>Time on page</th>
+            <th>Conversion rate</th>
+            <th>Bounce rate</th>
+            <th>Paid traffic</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+            
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+            
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+            
+            <th title="Page views">PV</th>
+            <th title="Clicks">C</th>
+            <th title="Conversion rate">CR</th>
+            <th title="Bounce rate">BR</th>
+            <th title="Paid traffic">PT</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+  </main>
+
+  <footer></footer>
+</body>
+
+</html>

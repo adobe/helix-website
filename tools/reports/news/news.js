@@ -30,6 +30,11 @@ class URLReports {
     dataChunks.addSeries('bounces', series.bounces);
     dataChunks.addSeries('engagement', series.engagement);
     dataChunks.addSeries('organic', series.organic);
+    dataChunks.addSeries('clicks', (bundle) => {
+      const clickEvents = bundle.events
+        .filter((evt) => evt.checkpoint === 'click');
+      return clickEvents.length * bundle.weight;
+    });
 
     // custom series
     dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle, { 'hasclick&source': [true] }) ? bundle.weight : 0));
@@ -173,6 +178,11 @@ const SERIES = {
     label: 'Time on page',
     rateFn: (aggregate) => Math.round(aggregate.timeOnPage.percentile(50)),
     labelFn: (value) => `${Number.isFinite(value) ? value : 0}s`,
+  },
+  clicks: {
+    label: 'Clicks',
+    rateFn: (aggregate) => aggregate.clicks.sum,
+    labelFn: (value) => `${value || 0}`,
   },
 };
 

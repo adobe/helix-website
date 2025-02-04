@@ -1,0 +1,30 @@
+@import url('colors.css');
+@import url('shared.css');
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable selector-class-pattern */
+
+.post-list {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.post-list th {
+  position: sticky;
+  top: 64px;
+  z-index: 9999;
+  background-color: #eaeaea;
+}
+
+.post-list td {
+  padding: 0.5rem;
+}
+
+.post-list th, .post-list td {
+  border: 1px solid var(--spectrum-gray-500);
+  min-width: 60px;
+}
+
+.post-list td a {
+  text-decoration: none;
+  color: var(--color-text);
+}

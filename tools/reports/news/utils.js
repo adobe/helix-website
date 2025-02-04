@@ -29,8 +29,14 @@ const getConfig = () => {
     apiEndpoint: API_ENDPOINT,
     start: searchParams.get('start'),
     end: searchParams.get('end'),
+    year: searchParams.get('year'),
     url: getURL(),
   };
+
+  if (config.year) {
+    config.start = `${config.year}-01-01`;
+    config.end = `${config.year}-12-31`;
+  }
 
   return config;
 };
