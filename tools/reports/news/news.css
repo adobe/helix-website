@@ -457,6 +457,7 @@
   .table table tbody tr td a {
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    line-clamp: 1;
     -webkit-line-clamp: 1;
     overflow: hidden;
     text-overflow: ellipsis;
