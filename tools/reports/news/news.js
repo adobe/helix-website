@@ -182,7 +182,7 @@ const SERIES = {
   clicks: {
     label: 'Clicks',
     rateFn: (aggregate) => aggregate.clicks.sum,
-    labelFn: (value) => `${value || 0}`,
+    labelFn: (value) => utils.toHumanReadable(value),
   },
 };
 

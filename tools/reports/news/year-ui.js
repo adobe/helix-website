@@ -117,9 +117,9 @@ const getDataset = async () => {
         if (aggregates[month]) {
           const pv = SERIES.pageViews.rateFn(aggregates[month]);
           const clicks = SERIES.clicks.rateFn(aggregates[month]);
+          const cr = SERIES.conversions.rateFn(aggregates[month]);
           const br = SERIES.bounce.rateFn(aggregates[month]);
           const pt = SERIES.paid.rateFn(aggregates[month]);
-          const cr = SERIES.conversions.rateFn(aggregates[month]);
 
           monthly.push({
             month,
@@ -132,11 +132,7 @@ const getDataset = async () => {
         } else {
           monthly.push({
             month,
-            clicks: '',
-            pv: '',
-            br: '',
-            pt: '',
-            cr: '',
+            nodata: true,
           });
         }
       }
@@ -192,14 +188,20 @@ const draw = async () => {
     `;
 
     monthly.forEach(({
-      pv, br, pt, cr, clicks,
+      pv, br, pt, cr, clicks, nodata,
     }) => {
+      if (nodata) {
+        row.innerHTML += `
+          <td colspan="5"></td>
+        `;
+        return;
+      }
       row.innerHTML += `
-        <td>${pv}</td>
-        <td>${clicks}</td>
-        <td>${br}</td>
-        <td>${pt}</td>
-        <td>${cr}</td>
+        <td>${SERIES.pageViews.labelFn(pv)}</td>
+        <td>${SERIES.clicks.labelFn(clicks)}</td>
+        <td>${SERIES.conversions.labelFn(cr)}</td>
+        <td>${SERIES.bounce.labelFn(br)}</td>
+        <td>${SERIES.paid.labelFn(pt)}</td>
       `;
     });
   });
