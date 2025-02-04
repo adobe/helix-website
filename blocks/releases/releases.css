@@ -57,7 +57,7 @@
   border-radius: 8px;
   font-size: 14px;
   display: flex;
-  align-items: top;
+  align-items: start;
 }
 
 .releases-date {
