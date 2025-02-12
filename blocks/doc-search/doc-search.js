@@ -49,7 +49,7 @@ function identifySource(a) {
  * @returns {Array} `data` array from JSON response or empty array if undefined.
  */
 async function fetchSourceData(index, faq = '') {
-  if (window.docs.length > 0) return window.docs;
+  if (window.docs && window.docs.length > 0) return window.docs;
   try {
     const resp = await fetch(index);
     const json = await resp.json();
@@ -341,21 +341,18 @@ function searchQuery(search, docs, results, isHomepageVariant) {
     // clear previous results
     results.querySelectorAll('.doc-search-result').forEach((r) => r.remove());
     // search for matching document
-    if (isHomepageVariant) {
-      const { match, terms } = findDoc(search, docs);
-      // display results
-      if (match) {
-        displayResult(match[0], terms, results);
+    const { match, terms } = findDoc(search, docs);
+    if (match) {
+      const uniqueMatches = Array.isArray(match) 
+        ? [...new Map(match.map(item => [item.path, item])).values()]
+        : match;
+        if (isHomepageVariant) {
+          displayResult(uniqueMatches[0], terms, results);
+        } else {
+          displayResults(uniqueMatches, terms, results);
+        }
       } else {
-        displayNoResults(results);
-      }
-    } else {
-      const { match, terms } = findDoc(search, docs, true);
-      if (match) {
-        displayResults(match, terms, results);
-      } else {
-        displayNoResults(results);
-      }
+      displayNoResults(results);
     }
   } else {
     hideResults(results);
@@ -535,7 +532,7 @@ export default async function decorate(block) {
   // extract config
   const index = identifySource(block.querySelector('a[href]'));
   const faq = identifySource(block.querySelectorAll('a[href]')[1]) || '';
-  window.docs = [];
+  // window.docs = [];
   const placeholders = [...block.querySelectorAll('li')].map((li) => li.textContent);
   const isHomepageVariant = block.classList.contains('homepage');
   // clear config
