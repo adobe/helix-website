@@ -117,7 +117,7 @@ main .author-box-info .blog-author-details .blog-author-name {
 }
 
 main .author-box-info .multiple-authors .blog-author-blurb {
-  width: 300px;
+  width: 200px;
 }
 
 @media (width >= 600px) {
