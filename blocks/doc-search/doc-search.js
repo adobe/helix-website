@@ -40,7 +40,7 @@ function identifySource(a) {
   const fallback = '/docpages-index.json';
   if (!a) return fallback;
   const { pathname } = new URL(a.href);
-  return pathname.includes('.json') ? pathname : fallback;
+  return pathname || fallback;
 }
 
 /**
@@ -48,11 +48,40 @@ function identifySource(a) {
  * @param {string} index - The URL of the index file to fetch.
  * @returns {Array} `data` array from JSON response or empty array if undefined.
  */
-async function fetchSourceData(index) {
+async function fetchSourceData(index, faq = '') {
+  if (window.docs.length > 0) return window.docs;
   try {
     const resp = await fetch(index);
     const json = await resp.json();
-    return json.data ? json.data : [];
+    // return json.data ? json.data : [];
+    window.docs = json.data ? json.data : [];
+    if (faq) {
+      const faqResp = await fetchSourceDataHTML(faq);
+      window.docs.push(...faqResp);
+    }
+    return window.docs;
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Fetches and parses a HTML file from a given URL.
+ * @param {string} index - The URL of the index file to fetch.
+ * @returns {Array} `data` array from the HTML response or empty array if undefined.
+ */
+async function fetchSourceDataHTML(index) {
+  try {
+    const resp = await fetch(index);
+    const html = await resp.text();
+    // parse the html and return array of sections
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const sections = Array.from(doc.querySelectorAll('h3')).map(h3 => h3.parentElement) || [];
+    window.docs.push(...sections);
+    const image = doc.querySelector('meta[property="og:image"]')?.content || '';
+    window.faqImage = image;
+    return sections;
   } catch (error) {
     return [];
   }
@@ -111,15 +140,12 @@ function highlightTerms(terms, els) {
 }
 
 /**
- * Displays a matched search result in the container.
+ * Builds a search result element.
  * @param {Object} match - Matching document object.
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-function displayResult(match, terms, container) {
-  // reset display
-  container.setAttribute('aria-hidden', false);
-  container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
+function buildResult(match, terms) {
   // build result
   const result = createTag('a', { href: match.path });
   const image = createOptimizedPicture(match.image, null, false, [{ width: '20' }]);
@@ -129,6 +155,36 @@ function displayResult(match, terms, container) {
   result.append(image, title, desc);
   const li = createTag('li', { class: 'doc-search-result' });
   li.append(result);
+  return li;
+}
+
+/**
+ * Displays a list of matched search results in the container.
+ * @param {Array} matches - Array of matching document objects.
+ * @param {Array} terms - Array of search terms to highlight.
+ * @param {HTMLElement} container - Results container.
+ */
+function displayResults(matches, terms, container) {
+  // reset display
+  container.setAttribute('aria-hidden', false);
+  container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
+  matches.forEach((match) => {
+    const li = buildResult(match, terms);
+    container.append(li);
+  });
+}
+
+/**
+ * Displays a matched search result in the container.
+ * @param {Object} match - Matching document object.
+ * @param {Array} terms - Array of search terms to highlight.
+ * @param {HTMLElement} container - Results container.
+ */
+function displayResult(match, terms, container) {
+  // reset display
+  container.setAttribute('aria-hidden', false);
+  container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
+  const li = buildResult(match, terms);
   container.append(li);
 }
 
@@ -149,29 +205,123 @@ function hideResults(container) {
   container.setAttribute('aria-hidden', true);
 }
 
+function getIdFromSectionMetadata(section) {
+  console.log('section', section);
+  const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)').textContent;
+  return sectionId;
+}
+
+function createSearchResultObject(doc, terms, source) {
+  const id = getIdFromSectionMetadata(doc);
+  return {
+    title: doc.querySelector('h3').textContent,
+    description: doc.querySelector('p').textContent,
+    path: `/docs/faq#${id}`,
+    image: window.faqImage || '/default-meta-image.jpg',
+    content: doc.innerHTML,
+    terms: terms,
+    source: source,
+  };
+}
+
 /**
  * Searches through documents for match based on query.
  * @param {string} query - Search query entered by user.
  * @param {Array} docs - Array of documents to search through.
  * @returns {Object} Object containing search terms and matching document (if found).
  */
-function findDoc(query, docs = []) {
+function findDoc(query, docs = [], findMultiple = false) {
   if (docs.length) {
+    const { indexDocs, faqDocs } = docs.reduce((acc, doc) => {
+      if (doc.title) {
+        acc.indexDocs.push(doc);
+      } else {
+        acc.faqDocs.push(doc);
+      }
+      return acc;
+    }, { indexDocs: [], faqDocs: [] });
     // split the query into individual terms, trimming and filtering out 1-2 letter words
     const terms = query.toLowerCase().split(' ').map((e) => e.trim()).filter((e) => e.length > 2);
-    // check if every search term is included in document title
-    const titleMatch = docs.find((doc) => {
-      const title = doc.title.toLowerCase();
-      return (terms.every((term) => title.toLowerCase().includes(term)));
-    });
-    if (titleMatch) return { terms, match: titleMatch };
-    // check for a match in document content if no title-only match
-    const contentMatch = docs.find((doc) => {
-      const content = [doc.title, doc.content].join(' ').toLowerCase();
-      return terms.every((term) => content.includes(term));
-    });
-    // return the content match (if found) or null
-    return { terms, match: contentMatch };
+
+    // Search through faq and index docs and return both matches
+    const matches = [];
+
+    if (findMultiple) {
+      // check if every search term is included in document title
+      const titleMatches = indexDocs.filter((doc) => {
+        const title = doc.title.toLowerCase();
+        return (terms.every((term) => title.toLowerCase().includes(term)));
+      });
+      if (titleMatches) matches.push(...titleMatches);
+
+      let faqQuestionMatches = faqDocs.filter((doc) => {
+        const h3Elements = doc.querySelectorAll('h3');
+        return Array.from(h3Elements || []).some(h3 =>
+          terms.every((term) => h3.textContent.toLowerCase().includes(term))
+        );
+      });
+      if (faqQuestionMatches) {
+        faqQuestionMatches = faqQuestionMatches.map((doc) => {
+          return createSearchResultObject(doc, terms, 'faq');
+        });
+        matches.push(...faqQuestionMatches);
+      }
+      // check for a match in document content if no title-only match
+      const contentMatches = indexDocs.filter((doc) => {
+        const content = [doc.title, doc.content].join(' ').toLowerCase();
+        return terms.every((term) => content.includes(term));
+      });
+      let faqAnswerMatches = faqDocs.filter((doc) => {
+        const pElements = doc.querySelectorAll('p');
+        return Array.from(pElements || []).some(p =>
+          terms.every((term) => p.textContent.toLowerCase().includes(term))
+        );
+      });
+      if (faqAnswerMatches) {
+        faqAnswerMatches = faqAnswerMatches.map((doc) => {
+          return createSearchResultObject(doc, terms, 'faq');
+        });
+        matches.push(...faqAnswerMatches);
+      }
+      if (contentMatches) matches.push(...contentMatches);
+    } else {
+      // check if every search term is included in document title
+      const titleMatch = indexDocs.find((doc) => {
+        const title = doc.title.toLowerCase();
+        return (terms.every((term) => title.toLowerCase().includes(term)));
+      });
+      if (titleMatch) matches.push(titleMatch);
+
+      let faqQuestionMatch = faqDocs.find((doc) => {
+        const h3Elements = doc.querySelectorAll('h3');
+        return Array.from(h3Elements || []).some(h3 =>
+          terms.every((term) => h3.textContent.toLowerCase().includes(term))
+        );
+      });
+      if (faqQuestionMatch) {
+        faqQuestionMatch = createSearchResultObject(faqQuestionMatch, terms, 'faq');
+        matches.push(faqQuestionMatch);
+      }
+
+      if (titleMatch && matches.length > 0) return { terms, match: matches };
+      // check for a match in document content if no title-only match
+      const contentMatch = indexDocs.find((doc) => {
+        const content = [doc.title, doc.content].join(' ').toLowerCase();
+        return terms.every((term) => content.includes(term));
+      });
+      let faqAnswerMatch = faqDocs.find((doc) => {
+        const pElements = doc.querySelectorAll('p');
+        return Array.from(pElements || []).some(p =>
+          terms.every((term) => p.textContent.toLowerCase().includes(term))
+        );
+      });
+      if (faqAnswerMatch) {
+        faqAnswerMatch = createSearchResultObject(faqAnswerMatch, terms, 'faq');
+        matches.push(faqAnswerMatch);
+      }
+      if (contentMatch) matches.push(contentMatch);
+    }
+    if (matches.length > 0) return { terms, match: matches };
   }
   return { terms: query, match: null };
 }
@@ -182,15 +332,27 @@ function findDoc(query, docs = []) {
  * @param {Array} docs - Array of documents to search.
  * @param {HTMLElement} results - Results container.
  */
-function searchQuery(search, docs, results) {
+function searchQuery(search, docs, results, isHomepageVariant) {
   if (docs.length && search.trim()) {
     // clear previous results
     results.querySelectorAll('.doc-search-result').forEach((r) => r.remove());
     // search for matching document
-    const { match, terms } = findDoc(search, docs);
-    // display results
-    if (match) displayResult(match, terms, results);
-    else displayNoResults(results);
+    if (isHomepageVariant) {
+      const { match, terms } = findDoc(search, docs);
+      // display results
+      if (match) {
+        displayResult(match[0], terms, results);
+      } else {
+        displayNoResults(results);
+      }
+    } else {
+      const { match, terms } = findDoc(search, docs, true);
+      if (match) {
+        displayResults(match, terms, results);
+      } else {
+        displayNoResults(results);
+      }
+    }
   } else {
     hideResults(results);
   }
@@ -276,8 +438,9 @@ function blink(input, cb, maxBlinks = 5) {
  * @param {HTMLInputElement} input - Input element where placeholder will be updated.
  * @param {HTMLElement} results - Results container.
  * @param {Function} cb - Callback function to execute after typing and pause finish.
+ * @param {boolean} isHomepageVariant - Whether the block is a homepage variant.
  */
-function type(placeholder, input, results, cb) {
+function type(placeholder, input, results, cb, isHomepageVariant) {
   let i = 0;
   // calculate midpoint in type animation
   const midpoint = Math.floor(placeholder.length / 2);
@@ -287,7 +450,7 @@ function type(placeholder, input, results, cb) {
     i += 1;
     if (i === midpoint) {
       // run search query against placeholder at midpoint
-      searchQuery(placeholder.slice(0, placeholder.length - 1), window.docs, results);
+      searchQuery(placeholder.slice(0, placeholder.length - 1), window.docs, results, isHomepageVariant);
     }
     if (i >= placeholder.length) { // check if full placeholder is displayed
       forceStop(input); // stop typing
@@ -327,8 +490,9 @@ function backspace(input, results, cb) {
  * @param {HTMLInputElement} input - Input element where placeholder will be updated.
  * @param {HTMLInputElement} results - Results container.
  * @param {Array} placeholders - Array of placeholders to cycle through.
+ * @param {boolean} isHomepageVariant - Whether the block is a homepage variant.
  */
-function rotatePlaceholder(currIndex, input, results, placeholders) {
+function rotatePlaceholder(currIndex, input, results, placeholders, isHomepageVariant) {
   if (!isRotating(input)) {
     forceStop(input);
     return;
@@ -346,9 +510,9 @@ function rotatePlaceholder(currIndex, input, results, placeholders) {
       }
       // generate next placeholder index randomly (without immediate repetition)
       const nextIndex = generateIndex(currIndex, placeholders.length);
-      rotatePlaceholder(nextIndex, input, results, placeholders); // recursive call to loop
+      rotatePlaceholder(nextIndex, input, results, placeholders, isHomepageVariant); // recursive call to loop
     });
-  });
+  }, isHomepageVariant);
 }
 
 /**
@@ -366,9 +530,10 @@ function findResultLink(results) {
 export default async function decorate(block) {
   // extract config
   const index = identifySource(block.querySelector('a[href]'));
+  const faq = identifySource(block.querySelectorAll('a[href]')[1]) || '';
   window.docs = [];
   const placeholders = [...block.querySelectorAll('li')].map((li) => li.textContent);
-
+  const isHomepageVariant = block.classList.contains('homepage');
   // clear config
   const row = block.firstElementChild;
   row.innerHTML = '';
@@ -416,7 +581,7 @@ export default async function decorate(block) {
     if (search.value === '') {
       setTimeout(() => {
         search.dataset.rotate = true;
-        rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders);
+        rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
       }, 1200);
     }
   });
@@ -435,13 +600,12 @@ export default async function decorate(block) {
       // start placeholder rotation
       search.dataset.rotate = true;
       setTimeout(() => {
-        rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders);
+        rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
       }, 600);
-      fetchSourceData(index).then((docs) => {
-        window.docs = docs;
+      fetchSourceData(index, faq).then((docs) => {
         // enable search only after docs are available
         search.addEventListener('input', debounce(() => {
-          searchQuery(search.value, docs, results);
+          searchQuery(search.value, docs, results, isHomepageVariant);
         }, 200));
       });
     }
