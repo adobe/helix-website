@@ -266,6 +266,9 @@ function findDoc(query, docs = [], findMultiple = false) {
         });
         matches.push(...faqQuestionMatches);
       }
+
+      if (matches.length > 0) return { terms, match: matches };
+
       // check for a match in document content if no title-only match
       const contentMatches = indexDocs.filter((doc) => {
         const content = [doc.title, doc.content].join(' ').toLowerCase();
