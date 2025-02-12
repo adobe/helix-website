@@ -309,16 +309,16 @@ function findDoc(query, docs = [], findMultiple = false) {
         const content = [doc.title, doc.content].join(' ').toLowerCase();
         return terms.every((term) => content.includes(term));
       });
-      let faqAnswerMatch = faqDocs.find((doc) => {
-        const pElements = doc.querySelectorAll('p');
-        return Array.from(pElements || []).some(p =>
-          terms.every((term) => p.textContent.toLowerCase().includes(term))
-        );
-      });
-      if (faqAnswerMatch) {
-        faqAnswerMatch = createSearchResultObject(faqAnswerMatch, terms, 'faq');
-        matches.push(faqAnswerMatch);
-      }
+      // let faqAnswerMatch = faqDocs.find((doc) => {
+      //   const pElements = doc.querySelectorAll('p');
+      //   return Array.from(pElements || []).some(p =>
+      //     terms.every((term) => p.textContent.toLowerCase().includes(term))
+      //   );
+      // });
+      // if (faqAnswerMatch) {
+      //   faqAnswerMatch = createSearchResultObject(faqAnswerMatch, terms, 'faq');
+      //   matches.push(faqAnswerMatch);
+      // }
       if (contentMatch) matches.push(contentMatch);
     }
     if (matches.length > 0) return { terms, match: matches };
