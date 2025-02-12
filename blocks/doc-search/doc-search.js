@@ -206,7 +206,6 @@ function hideResults(container) {
 }
 
 function getIdFromSectionMetadata(section) {
-  console.log('section', section);
   const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)').textContent;
   return sectionId;
 }
