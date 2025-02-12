@@ -214,9 +214,9 @@ function getIdFromSectionMetadata(section) {
 function createSearchResultObject(doc, terms, source) {
   const id = getIdFromSectionMetadata(doc);
   return {
-    title: doc.querySelector('h3').textContent,
-    description: doc.querySelector('p').textContent,
-    path: `/docs/faq#${id}`,
+    title: doc.querySelector('h3')?.textContent || '',
+    description: doc.querySelector('p')?.textContent || '',
+    path: `/docs/faq#${id}` || '',
     image: window.faqImage || '/default-meta-image.jpg',
     content: doc.innerHTML,
     terms: terms,
@@ -262,7 +262,8 @@ function findDoc(query, docs = [], findMultiple = false) {
       });
       if (faqQuestionMatches) {
         faqQuestionMatches = faqQuestionMatches.map((doc) => {
-          return createSearchResultObject(doc, terms, 'faq');
+          const searchResult = createSearchResultObject(doc, terms, 'faq');
+          if (searchResult.title !== '') return searchResult;
         });
         matches.push(...faqQuestionMatches);
       }
@@ -279,7 +280,8 @@ function findDoc(query, docs = [], findMultiple = false) {
       });
       if (faqAnswerMatches) {
         faqAnswerMatches = faqAnswerMatches.map((doc) => {
-          return createSearchResultObject(doc, terms, 'faq');
+          const searchResult = createSearchResultObject(doc, terms, 'faq');
+          if (searchResult.title !== '') return searchResult;
         });
         matches.push(...faqAnswerMatches);
       }
@@ -300,7 +302,7 @@ function findDoc(query, docs = [], findMultiple = false) {
       });
       if (faqQuestionMatch) {
         faqQuestionMatch = createSearchResultObject(faqQuestionMatch, terms, 'faq');
-        matches.push(faqQuestionMatch);
+        if (faqQuestionMatch.title !== '') matches.push(faqQuestionMatch);
       }
 
       if (titleMatch && matches.length > 0) return { terms, match: matches };
