@@ -22,6 +22,10 @@
   margin-right: auto;
 }
 
+.side-navigation-wrapper .results-wrapper li[aria-hidden="true"] {
+  display: none;
+}
+
 .side-navigation-wrapper.expand + .section.content {
   display: none;
 }
@@ -328,6 +332,10 @@
   width: 16px;
   height: 12px;
   margin-right: var(--spacing-xxs);
+}
+
+.side-navigation .doc-search {
+  padding: unset;
 }
 
 .results-wrapper {

@@ -1,5 +1,6 @@
 import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
+import { buildBlock, loadBlock, decorateBlock } from '../../scripts/lib-franklin.js';
 
 let searchFunc;
 let searchTerm;
@@ -17,8 +18,8 @@ const debounce = (func, time = 100) => {
 };
 
 const loadSearch = async (inputsArray, resultsContainer) => {
-  const gnavSearch = await import('./side-navigation-search.js');
-  searchFunc = gnavSearch.default;
+  // const gnavSearch = await import('./side-navigation-search.js');
+  // searchFunc = gnavSearch.default;
 
   if (/[?&]q=/.test(window.location.search)) {
     searchTerm = searchParams.get('q');
@@ -27,7 +28,7 @@ const loadSearch = async (inputsArray, resultsContainer) => {
   if (searchTerm) {
     inputsArray.forEach((el) => {
       el.querySelector('input').value = searchTerm;
-      searchFunc(searchTerm, resultsContainer);
+      // searchFunc(searchTerm, resultsContainer);
     });
   }
 };
@@ -84,23 +85,27 @@ export default async function decorate(block) {
 
   const searchInputInner = '<input type="text" name="search" placeholder="Search...">';
   const searchInput = createTag('div', { class: 'search-input-wrapper' }, searchInputInner);
-
   const searchInputOuter = searchInput.cloneNode(true);
   const resultsContainer = createTag('div', { class: 'results-wrapper', id: 'search-results' });
+  aside.append(resultsContainer);
 
   const skipLink = createTag('a', { class: 'skip-link', href: '#search-results' }, 'Skip to results');
-
+  const searchBlock = buildBlock('doc-search', [[
+    '<a href="/docpages-index.json">Search</a>',
+    '<a href="/drafts/fkakatie/faq">FAQ</a>',
+  ]]);
+  searchBlock.dataset.resultsContainerClass = 'results-wrapper';
   aside.prepend(docButton);
   aside.prepend(searchInputOuter);
   block.prepend(skipLink);
 
   block.prepend(backBtn);
-  block.prepend(searchInput);
+  // block.prepend(searchInput);
+  block.prepend(searchBlock);
+  decorateBlock(searchBlock);
+  await loadBlock(searchBlock);
 
-  aside.append(resultsContainer);
-
-  loadSearch([searchInput, searchInputOuter], resultsContainer);
-
+  // loadSearch([searchInput, searchInputOuter], resultsContainer);
   // add backdrop overlay
   const backdropCurtain = createTag('div', { class: 'side-navigation-curtain' }, '');
   aside.append(backdropCurtain);
@@ -114,22 +119,6 @@ export default async function decorate(block) {
 
   backdropCurtain.addEventListener('click', () => {
     backBtn.click();
-  });
-
-  [searchInput, searchInputOuter].forEach((el) => {
-    el.querySelector('input').addEventListener('input', async (event) => {
-      if (event.target.value.length === 0) {
-        resultsContainer.classList.remove('open');
-        block.parentElement.classList.remove('expand');
-        skipLink.classList.remove('show');
-
-        handleSearchString(true);
-      } else {
-        searchParams.set('q', event.target.value);
-        handleSearchString();
-      }
-      await searchFunc(event.target.value, resultsContainer);
-    });
   });
 
   block.querySelectorAll(':scope > div > div > ul > li').forEach((list) => {

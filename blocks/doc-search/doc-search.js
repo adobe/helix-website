@@ -48,7 +48,7 @@ function identifySource(a) {
  * @param {string} index - The URL of the index file to fetch.
  * @returns {Array} `data` array from JSON response or empty array if undefined.
  */
-async function fetchSourceData(index, faq = '') {
+export async function fetchSourceData(index, faq = '') {
   if (window.docs && window.docs.length > 0) return window.docs;
   try {
     const resp = await fetch(index);
@@ -70,7 +70,7 @@ async function fetchSourceData(index, faq = '') {
  * @param {string} index - The URL of the index file to fetch.
  * @returns {Array} `data` array from the HTML response or empty array if undefined.
  */
-async function fetchSourceDataHTML(index) {
+export async function fetchSourceDataHTML(index) {
   try {
     const resp = await fetch(index);
     const html = await resp.text();
@@ -139,23 +139,49 @@ function highlightTerms(terms, els) {
   });
 }
 
+function loadSearch(input, docs, resultsContainer, isHomepageVariant) {
+  let searchTerm;
+  if (/[?&]q=/.test(window.location.search)) {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchTerm = searchParams.get('q');
+  }
+
+  if (searchTerm) {
+    input.value = searchTerm;
+    searchQuery(searchTerm, docs, resultsContainer, isHomepageVariant);
+  }
+}
+
 /**
  * Builds a search result element.
  * @param {Object} match - Matching document object.
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-function buildResult(match, terms) {
+function buildResult(match, terms, isHomepageVariant) {
   // build result
   const result = createTag('a', { href: match.path });
-  const image = createOptimizedPicture(match.image, null, false, [{ width: '20' }]);
-  const title = createTag('p', {}, match.title);
-  const desc = createTag('p', {}, match.description);
+  const title = createTag('p', {}, match.title.length > 150 ? match.title.slice(0, 150) + '...' : match.title);
+  const desc = createTag('p', {}, match.description.length > 150 ? match.description.slice(0, 150) + '...' : match.description);
   highlightTerms(terms, [title, desc]);
-  result.append(image, title, desc);
-  const li = createTag('li', { class: 'doc-search-result' });
-  li.append(result);
-  return li;
+  if (isHomepageVariant) {
+    const image = createOptimizedPicture(match.image, null, false, [{ width: '20' }]);
+    result.append(image, title, desc);
+    const li = createTag('li', { class: 'doc-search-result' });
+    li.append(result);
+    return li;
+  } else {
+    const image = createOptimizedPicture(match.image, null, false, [{ width: '750' }]);
+    result.classList.add('article-card');
+    result.classList.add('link-highlight-colorful-effect-hover-wrapper');
+    const articleCardImage = createTag('div', { class: 'article-card-image' }, image);
+    const articleCardBody = createTag('div', { class: 'article-card-body' });
+    const h3 = createTag('h3', {}, title);
+    const p = createTag('p', {}, desc);
+    articleCardBody.append(h3, p);
+    result.append(articleCardImage, articleCardBody);
+    return result;
+  }
 }
 
 /**
@@ -164,14 +190,16 @@ function buildResult(match, terms) {
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-function displayResults(matches, terms, container) {
+export function displayResults(matches, terms, container, isHomepageVariant) {
   // reset display
   container.setAttribute('aria-hidden', false);
   container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
   matches.forEach((match) => {
-    const li = buildResult(match, terms);
+    const li = buildResult(match, terms, isHomepageVariant);
     container.append(li);
   });
+  container.classList.add('open');
+  if (!isHomepageVariant) container.closest('aside').classList.add('expand');
 }
 
 /**
@@ -180,21 +208,28 @@ function displayResults(matches, terms, container) {
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-function displayResult(match, terms, container) {
+export function displayResult(match, terms, container, isHomepageVariant) {
   // reset display
   container.setAttribute('aria-hidden', false);
   container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
-  const li = buildResult(match, terms);
+  const li = buildResult(match, terms, isHomepageVariant);
   container.append(li);
+  container.classList.add('open');
+  if (!isHomepageVariant) container.closest('aside').classList.add('expand');
 }
 
 /**
  * Displays "no results" message.
  * @param {HTMLElement} container - Results container.
  */
-function displayNoResults(container) {
+function displayNoResults(container, isHomepageVariant) {
   const noResults = container.querySelector('.doc-search-no-result');
   noResults.setAttribute('aria-hidden', false);
+  if (!isHomepageVariant) {
+    // for regular non-homepage search results
+    const aside = container.closest('aside');
+    if (aside && aside.classList.contains('expand')) aside.classList.remove('expand');
+  }
 }
 
 /**
@@ -335,24 +370,29 @@ function findDoc(query, docs = [], findMultiple = false) {
  * @param {HTMLInputElement} search - Search input.
  * @param {Array} docs - Array of documents to search.
  * @param {HTMLElement} results - Results container.
+ * @param {boolean} isHomepageVariant - Whether the block is a homepage variant.
  */
 function searchQuery(search, docs, results, isHomepageVariant) {
   if (docs.length && search.trim()) {
     // clear previous results
-    results.querySelectorAll('.doc-search-result').forEach((r) => r.remove());
+    if (isHomepageVariant) {
+      results.querySelectorAll('.doc-search-result').forEach((r) => r.remove());
+    } else {
+      results.querySelectorAll('.article-card').forEach((r) => r.remove());
+    }
     // search for matching document
     const { match, terms } = findDoc(search, docs);
     if (match) {
-      const uniqueMatches = Array.isArray(match) 
+      const uniqueMatches = Array.isArray(match)
         ? [...new Map(match.map(item => [item.path, item])).values()]
         : match;
-        if (isHomepageVariant) {
-          displayResult(uniqueMatches[0], terms, results);
-        } else {
-          displayResults(uniqueMatches, terms, results);
-        }
+      if (isHomepageVariant) {
+        displayResult(uniqueMatches[0], terms, results, isHomepageVariant);
       } else {
-      displayNoResults(results);
+        displayResults(uniqueMatches, terms, results, isHomepageVariant);
+      }
+    } else {
+      displayNoResults(results, isHomepageVariant);
     }
   } else {
     hideResults(results);
@@ -548,15 +588,20 @@ export default async function decorate(block) {
   row.append(form);
 
   // build results container
-  const results = createTag('ul', { class: 'doc-search-results', 'aria-hidden': true });
+  let results;
+  if (isHomepageVariant) {
+    results = createTag('ul', { class: 'doc-search-results', 'aria-hidden': true });
+    row.append(results);
+  } else {
+    const resultsContainerClass = block.dataset.resultsContainerClass;
+    results = document.querySelector(`.${resultsContainerClass}`);
+  }
   const noResults = createTag(
     'li',
     { class: 'doc-search-no-result', 'aria-hidden': true },
     'We didn\'t find a good match. <a href="/docs/">Visit our documentation page</a> for more.',
   );
   results.append(noResults);
-  row.append(results);
-
   // add functionality to search bar
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -579,7 +624,7 @@ export default async function decorate(block) {
     search.placeholder = 'Search the documentation';
   });
   search.addEventListener('blur', () => {
-    if (search.value === '') {
+    if (search.value === '' && isHomepageVariant) {
       setTimeout(() => {
         search.dataset.rotate = true;
         rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
@@ -598,16 +643,19 @@ export default async function decorate(block) {
   const observer = new IntersectionObserver(async (entries) => {
     if (entries.some((e) => e.isIntersecting)) {
       observer.disconnect();
-      // start placeholder rotation
-      search.dataset.rotate = true;
-      setTimeout(() => {
-        rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
-      }, 600);
+      if (isHomepageVariant) {
+        // start placeholder rotation
+        search.dataset.rotate = true;
+        setTimeout(() => {
+          rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
+        }, 600);
+      }
       fetchSourceData(index, faq).then((docs) => {
         // enable search only after docs are available
         search.addEventListener('input', debounce(() => {
           searchQuery(search.value, docs, results, isHomepageVariant);
         }, 200));
+        if (!isHomepageVariant) loadSearch(search, docs, results, isHomepageVariant);
       });
     }
   });
