@@ -51,7 +51,6 @@ body.guides-template main .faq dt a.anchor-link:any-link::before {
 main .faq .filter-controls {
   display: flex;
   font-size: var(--type-body-xs-size);
-  font-weight: 700;
   background-color: var(--bg-color-lightgrey);
   padding: var(--spacing-xxs) var(--spacing-s);
   border: solid 1px var(--bg-color-grey-2);
