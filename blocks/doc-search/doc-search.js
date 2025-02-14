@@ -56,6 +56,7 @@ export async function fetchSourceData(index, faq = '') {
     // return json.data ? json.data : [];
     window.docs = json.data ? json.data : [];
     if (faq) {
+      // eslint-disable-next-line no-use-before-define
       const faqResp = await fetchSourceDataHTML(faq);
       window.docs.push(...faqResp);
     }
@@ -77,7 +78,7 @@ export async function fetchSourceDataHTML(index) {
     // parse the html and return array of sections
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    const sections = Array.from(doc.querySelectorAll('h3')).map(h3 => h3.parentElement) || [];
+    const sections = [...doc.querySelectorAll('h3')].map((h3) => h3.parentElement) || [];
     window.docs.push(...sections);
     const image = doc.querySelector('meta[property="og:image"]')?.content || '';
     window.faqImage = image;
@@ -126,7 +127,7 @@ function highlightTerms(terms, els) {
     else {
       highlighted = text.slice(0, matches[0].offset);
       matches.forEach((match, i) => {
-        highlighted += `<mark>${text.slice(match.offset, match.offset + match.term.length)}</mark>`;
+        highlighted += `<mark class="side-nav-search-highlight">${text.slice(match.offset, match.offset + match.term.length)}</mark>`;
         // add highlighted text between current and next match
         if (matches.length - 1 === i) {
           highlighted += text.slice(match.offset + match.term.length);
@@ -139,7 +140,7 @@ function highlightTerms(terms, els) {
   });
 }
 
-function loadSearch(input, docs, resultsContainer, isHomepageVariant) {
+function loadSearch(input, docs, resultsContainer, isHomepage) {
   let searchTerm;
   if (/[?&]q=/.test(window.location.search)) {
     const searchParams = new URLSearchParams(window.location.search);
@@ -148,7 +149,8 @@ function loadSearch(input, docs, resultsContainer, isHomepageVariant) {
 
   if (searchTerm) {
     input.value = searchTerm;
-    searchQuery(searchTerm, docs, resultsContainer, isHomepageVariant);
+    // eslint-disable-next-line no-use-before-define
+    searchQuery(searchTerm, docs, resultsContainer, isHomepage);
   }
 }
 
@@ -158,29 +160,52 @@ function loadSearch(input, docs, resultsContainer, isHomepageVariant) {
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-function buildResult(match, terms, isHomepageVariant) {
-  // build result
+function buildResult(match, terms, isHomepage) {
+  if (!match) return null; // eject if no match
   const result = createTag('a', { href: match.path });
-  const title = createTag('p', {}, match.title.length > 150 ? match.title.slice(0, 150) + '...' : match.title);
-  const desc = createTag('p', {}, match.description.length > 150 ? match.description.slice(0, 150) + '...' : match.description);
+
+  // write title and description
+  const truncate = (text, maxLength = 150) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
+
+  const title = createTag('p', {}, truncate(match.title));
+  const desc = createTag('p', {}, truncate(match.description));
   highlightTerms(terms, [title, desc]);
-  if (isHomepageVariant) {
+
+  if (isHomepage) {
     const image = createOptimizedPicture(match.image, null, false, [{ width: '20' }]);
     result.append(image, title, desc);
     const li = createTag('li', { class: 'doc-search-result' });
     li.append(result);
     return li;
-  } else {
-    const image = createOptimizedPicture(match.image, null, false, [{ width: '750' }]);
-    result.classList.add('article-card');
-    result.classList.add('link-highlight-colorful-effect-hover-wrapper');
-    const articleCardImage = createTag('div', { class: 'article-card-image' }, image);
-    const articleCardBody = createTag('div', { class: 'article-card-body' });
-    const h3 = createTag('h3', {}, title);
-    const p = createTag('p', {}, desc);
-    articleCardBody.append(h3, p);
-    result.append(articleCardImage, articleCardBody);
-    return result;
+  }
+
+  // default result layout
+  const image = createOptimizedPicture(match.image, null, false, [{ width: '750' }]);
+  result.classList.add('article-card');
+  const cardImage = createTag('div', { class: 'article-card-image' }, image);
+  const cardBody = createTag('div', { class: 'article-card-body' });
+  const span = createTag('span', { class: 'link-highlight-colorful-effect-2' }, title.innerHTML);
+  const h3 = createTag('h3', {}, span);
+  const p = createTag('p', {}, desc);
+  cardBody.append(h3, p);
+  result.append(cardImage, cardBody);
+  return result;
+}
+
+/**
+ * Displays "no results" message.
+ * @param {HTMLElement} container - Results container.
+ */
+function displayNoResults(container, isHomepage) {
+  const noResults = container.querySelector('.doc-search-no-result');
+  noResults.setAttribute('aria-hidden', false);
+  if (!isHomepage) {
+    // for regular non-homepage search results
+    const aside = container.closest('aside');
+    if (aside && aside.classList.contains('expand')) aside.classList.remove('expand');
   }
 }
 
@@ -190,16 +215,21 @@ function buildResult(match, terms, isHomepageVariant) {
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-export function displayResults(matches, terms, container, isHomepageVariant) {
+export function displayResults(matches, terms, container, isHomepage) {
   // reset display
   container.setAttribute('aria-hidden', false);
   container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
+  if (!matches.length) {
+    displayNoResults(container, isHomepage);
+    return;
+  }
+
   matches.forEach((match) => {
-    const li = buildResult(match, terms, isHomepageVariant);
-    container.append(li);
+    const li = buildResult(match, terms, isHomepage);
+    if (li) container.append(li);
   });
   container.classList.add('open');
-  if (!isHomepageVariant) container.closest('aside').classList.add('expand');
+  if (!isHomepage) container.closest('aside').classList.add('expand');
 }
 
 /**
@@ -208,27 +238,17 @@ export function displayResults(matches, terms, container, isHomepageVariant) {
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-export function displayResult(match, terms, container, isHomepageVariant) {
+export function displayResult(match, terms, container, isHomepage) {
   // reset display
   container.setAttribute('aria-hidden', false);
   container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
-  const li = buildResult(match, terms, isHomepageVariant);
-  container.append(li);
-  container.classList.add('open');
-  if (!isHomepageVariant) container.closest('aside').classList.add('expand');
-}
-
-/**
- * Displays "no results" message.
- * @param {HTMLElement} container - Results container.
- */
-function displayNoResults(container, isHomepageVariant) {
-  const noResults = container.querySelector('.doc-search-no-result');
-  noResults.setAttribute('aria-hidden', false);
-  if (!isHomepageVariant) {
-    // for regular non-homepage search results
-    const aside = container.closest('aside');
-    if (aside && aside.classList.contains('expand')) aside.classList.remove('expand');
+  const li = buildResult(match, terms, isHomepage);
+  if (li) {
+    container.append(li);
+    container.classList.add('open');
+    if (!isHomepage) container.closest('aside').classList.add('expand');
+  } else {
+    displayNoResults(container, isHomepage);
   }
 }
 
@@ -253,114 +273,77 @@ function createSearchResultObject(doc, terms, source) {
     path: `/docs/faq#${id}` || '',
     image: window.faqImage || '/default-meta-image.jpg',
     content: doc.innerHTML,
-    terms: terms,
-    source: source,
+    terms,
+    source,
   };
 }
 
 /**
  * Searches through documents for match based on query.
  * @param {string} query - Search query entered by user.
- * @param {Array} docs - Array of documents to search through.
+ * @param {Array} docs - Array of documents to search.
+ * @param {boolean} findMultiple - Whether to return multiple matches.
  * @returns {Object} Object containing search terms and matching document (if found).
  */
 function findDoc(query, docs = [], findMultiple = false) {
   if (docs.length) {
-    const { indexDocs, faqDocs } = docs.reduce((acc, doc) => {
-      if (doc.title) {
-        acc.indexDocs.push(doc);
-      } else {
-        acc.faqDocs.push(doc);
-      }
-      return acc;
-    }, { indexDocs: [], faqDocs: [] });
+    // separate index and faq
+    const indexDocs = [];
+    const faqDocs = [];
+    docs.forEach((doc) => (doc.title ? indexDocs.push(doc) : faqDocs.push(doc)));
+
     // split the query into individual terms, trimming and filtering out 1-2 letter words
     const terms = query.toLowerCase().split(' ').map((e) => e.trim()).filter((e) => e.length > 2);
+    if (!terms.length) return { terms, match: [] }; // eject if no valid search terms
 
     // Search through faq and index docs and return both matches
-    const matches = [];
+    const perfectMatches = new Set();
+    const strongMatches = new Set();
+    const fallbackMatches = new Set();
 
-    if (findMultiple) {
-      // check if every search term is included in document title
-      const titleMatches = indexDocs.filter((doc) => {
-        const title = doc.title.toLowerCase();
-        return (terms.every((term) => title.toLowerCase().includes(term)));
-      });
-      if (titleMatches) matches.push(...titleMatches);
-
-      let faqQuestionMatches = faqDocs.filter((doc) => {
-        const h3Elements = doc.querySelectorAll('h3');
-        return Array.from(h3Elements || []).some(h3 =>
-          terms.every((term) => h3.textContent.toLowerCase().includes(term))
-        );
-      });
-      if (faqQuestionMatches) {
-        faqQuestionMatches = faqQuestionMatches.map((doc) => {
-          const searchResult = createSearchResultObject(doc, terms, 'faq');
-          if (searchResult.title !== '') return searchResult;
-        });
-        matches.push(...faqQuestionMatches);
+    // find "perfect" matches (every term matches title or faq question)
+    indexDocs.forEach((doc) => {
+      if (terms.every((term) => doc.title.toLowerCase().includes(term))) {
+        perfectMatches.add(doc);
       }
-
-      if (matches.length > 0) return { terms, match: matches };
-
-      // check for a match in document content if no title-only match
-      const contentMatches = indexDocs.filter((doc) => {
-        const content = [doc.title, doc.content].join(' ').toLowerCase();
-        return terms.every((term) => content.includes(term));
-      });
-      let faqAnswerMatches = faqDocs.filter((doc) => {
-        const pElements = doc.querySelectorAll('p');
-        return Array.from(pElements || []).some(p =>
-          terms.every((term) => p.textContent.toLowerCase().includes(term))
-        );
-      });
-      if (faqAnswerMatches) {
-        faqAnswerMatches = faqAnswerMatches.map((doc) => {
-          const searchResult = createSearchResultObject(doc, terms, 'faq');
-          if (searchResult.title !== '') return searchResult;
-        });
-        matches.push(...faqAnswerMatches);
+    });
+    faqDocs.forEach((doc) => {
+      if ([...doc.querySelectorAll('h3')].some((q) => terms.every((term) => q.textContent.toLowerCase().includes(term)))) {
+        perfectMatches.add(createSearchResultObject(doc, terms, 'faq'));
       }
-      if (contentMatches) matches.push(...contentMatches);
-    } else {
-      // check if every search term is included in document title
-      const titleMatch = indexDocs.find((doc) => {
-        const title = doc.title.toLowerCase();
-        return (terms.every((term) => title.toLowerCase().includes(term)));
-      });
-      if (titleMatch) matches.push(titleMatch);
+    });
+    // eject if we have and only need one result
+    if (!findMultiple && perfectMatches.size) return { terms, match: [...perfectMatches] };
 
-      let faqQuestionMatch = faqDocs.find((doc) => {
-        const h3Elements = doc.querySelectorAll('h3');
-        return Array.from(h3Elements || []).some(h3 =>
-          terms.every((term) => h3.textContent.toLowerCase().includes(term))
-        );
-      });
-      if (faqQuestionMatch) {
-        faqQuestionMatch = createSearchResultObject(faqQuestionMatch, terms, 'faq');
-        if (faqQuestionMatch.title !== '') matches.push(faqQuestionMatch);
+    // find strong matches (some terms match title or faq question)
+    indexDocs.forEach((doc) => {
+      if (terms.some((term) => doc.title.toLowerCase().includes(term))) {
+        strongMatches.add(doc);
       }
+    });
+    faqDocs.forEach((doc) => {
+      if ([...doc.querySelectorAll('h3')].some((q) => terms.some((term) => q.textContent.toLowerCase().includes(term)))) {
+        strongMatches.add(createSearchResultObject(doc, terms, 'faq'));
+      }
+    });
+    // eject if we have and only need one result
+    if (!findMultiple && strongMatches.size) return { terms, match: [...strongMatches] };
 
-      if (titleMatch && matches.length > 0) return { terms, match: matches };
-      // check for a match in document content if no title-only match
-      const contentMatch = indexDocs.find((doc) => {
-        const content = [doc.title, doc.content].join(' ').toLowerCase();
-        return terms.every((term) => content.includes(term));
-      });
-      // let faqAnswerMatch = faqDocs.find((doc) => {
-      //   const pElements = doc.querySelectorAll('p');
-      //   return Array.from(pElements || []).some(p =>
-      //     terms.every((term) => p.textContent.toLowerCase().includes(term))
-      //   );
-      // });
-      // if (faqAnswerMatch) {
-      //   faqAnswerMatch = createSearchResultObject(faqAnswerMatch, terms, 'faq');
-      //   matches.push(faqAnswerMatch);
-      // }
-      if (contentMatch) matches.push(contentMatch);
-    }
-    if (matches.length > 0) return { terms, match: matches };
+    // find weaker/fallback matches (some terms match content or faq answer}
+    indexDocs.forEach((doc) => {
+      if (terms.some((term) => `${doc.title} ${doc.content}`.toLowerCase().includes(term))) {
+        fallbackMatches.add(doc);
+      }
+    });
+    faqDocs.forEach((doc) => {
+      if ([...doc.querySelectorAll('p')].some((p) => terms.some((term) => p.textContent.toLowerCase().includes(term)))) {
+        fallbackMatches.add(createSearchResultObject(doc, terms, 'faq'));
+      }
+    });
+
+    // aggregate matches
+    const matches = [...perfectMatches, ...strongMatches, ...fallbackMatches];
+    return { terms, match: findMultiple ? matches : matches.slice(0, 1) };
   }
   return { terms: query, match: null };
 }
@@ -370,29 +353,30 @@ function findDoc(query, docs = [], findMultiple = false) {
  * @param {HTMLInputElement} search - Search input.
  * @param {Array} docs - Array of documents to search.
  * @param {HTMLElement} results - Results container.
- * @param {boolean} isHomepageVariant - Whether the block is a homepage variant.
+ * @param {boolean} isHomepage - Whether the block is a homepage variant.
  */
-function searchQuery(search, docs, results, isHomepageVariant) {
+function searchQuery(search, docs, results, isHomepage) {
   if (docs.length && search.trim()) {
     // clear previous results
-    if (isHomepageVariant) {
+    if (isHomepage) {
       results.querySelectorAll('.doc-search-result').forEach((r) => r.remove());
     } else {
       results.querySelectorAll('.article-card').forEach((r) => r.remove());
     }
+
     // search for matching document
-    const { match, terms } = findDoc(search, docs);
+    const { match, terms } = findDoc(search, docs, !isHomepage);
     if (match) {
       const uniqueMatches = Array.isArray(match)
-        ? [...new Map(match.map(item => [item.path, item])).values()]
+        ? [...new Map(match.map((item) => [item.path, item])).values()]
         : match;
-      if (isHomepageVariant) {
-        displayResult(uniqueMatches[0], terms, results, isHomepageVariant);
+      if (isHomepage) {
+        displayResult(uniqueMatches[0], terms, results, isHomepage);
       } else {
-        displayResults(uniqueMatches, terms, results, isHomepageVariant);
+        displayResults(uniqueMatches, terms, results, isHomepage);
       }
     } else {
-      displayNoResults(results, isHomepageVariant);
+      displayNoResults(results, isHomepage);
     }
   } else {
     hideResults(results);
@@ -445,12 +429,12 @@ function manageInterval(input, delay, cb) {
  * @param {HTMLElement} results - Results container.
  */
 function fadeOut(results) {
-  results.classList.add('fadeOut');
-  // wait for .fadeOut animation to complete, then remove
+  results.classList.add('fade-out');
+  // wait for .fade-out animation to complete, then remove
   setTimeout(() => {
-    results.classList.remove('fadeOut');
+    results.classList.remove('fade-out');
     hideResults(results);
-  }, CURSOR_BLINK); // match timing set in .fadeOut
+  }, CURSOR_BLINK); // match timing set in .fade-out
 }
 
 /**
@@ -479,9 +463,9 @@ function blink(input, cb, maxBlinks = 5) {
  * @param {HTMLInputElement} input - Input element where placeholder will be updated.
  * @param {HTMLElement} results - Results container.
  * @param {Function} cb - Callback function to execute after typing and pause finish.
- * @param {boolean} isHomepageVariant - Whether the block is a homepage variant.
+ * @param {boolean} isHomepage - Whether the block is a homepage variant.
  */
-function type(placeholder, input, results, cb, isHomepageVariant) {
+function type(placeholder, input, results, cb, isHomepage) {
   let i = 0;
   // calculate midpoint in type animation
   const midpoint = Math.floor(placeholder.length / 2);
@@ -491,7 +475,7 @@ function type(placeholder, input, results, cb, isHomepageVariant) {
     i += 1;
     if (i === midpoint) {
       // run search query against placeholder at midpoint
-      searchQuery(placeholder.slice(0, placeholder.length - 1), window.docs, results, isHomepageVariant);
+      searchQuery(placeholder.slice(0, placeholder.length - 1), window.docs, results, isHomepage);
     }
     if (i >= placeholder.length) { // check if full placeholder is displayed
       forceStop(input); // stop typing
@@ -531,9 +515,9 @@ function backspace(input, results, cb) {
  * @param {HTMLInputElement} input - Input element where placeholder will be updated.
  * @param {HTMLInputElement} results - Results container.
  * @param {Array} placeholders - Array of placeholders to cycle through.
- * @param {boolean} isHomepageVariant - Whether the block is a homepage variant.
+ * @param {boolean} isHomepage - Whether the block is a homepage variant.
  */
-function rotatePlaceholder(currIndex, input, results, placeholders, isHomepageVariant) {
+function rotatePlaceholder(currIndex, input, results, placeholders, isHomepage) {
   if (!isRotating(input)) {
     forceStop(input);
     return;
@@ -551,9 +535,15 @@ function rotatePlaceholder(currIndex, input, results, placeholders, isHomepageVa
       }
       // generate next placeholder index randomly (without immediate repetition)
       const nextIndex = generateIndex(currIndex, placeholders.length);
-      rotatePlaceholder(nextIndex, input, results, placeholders, isHomepageVariant); // recursive call to loop
+      rotatePlaceholder(
+        nextIndex,
+        input,
+        results,
+        placeholders,
+        isHomepage,
+      ); // recursive call to loop
     });
-  }, isHomepageVariant);
+  }, isHomepage);
 }
 
 /**
@@ -574,7 +564,7 @@ export default async function decorate(block) {
   const faq = identifySource(block.querySelectorAll('a[href]')[1]) || '';
   // window.docs = [];
   const placeholders = [...block.querySelectorAll('li')].map((li) => li.textContent);
-  const isHomepageVariant = block.classList.contains('homepage');
+  const isHomepage = block.classList.contains('homepage');
   // clear config
   const row = block.firstElementChild;
   row.innerHTML = '';
@@ -589,11 +579,11 @@ export default async function decorate(block) {
 
   // build results container
   let results;
-  if (isHomepageVariant) {
+  if (isHomepage) {
     results = createTag('ul', { class: 'doc-search-results', 'aria-hidden': true });
     row.append(results);
   } else {
-    const resultsContainerClass = block.dataset.resultsContainerClass;
+    const { resultsContainerClass } = block.dataset;
     results = document.querySelector(`.${resultsContainerClass}`);
   }
   const noResults = createTag(
@@ -624,10 +614,16 @@ export default async function decorate(block) {
     search.placeholder = 'Search the documentation';
   });
   search.addEventListener('blur', () => {
-    if (search.value === '' && isHomepageVariant) {
+    if (search.value === '' && isHomepage) {
       setTimeout(() => {
         search.dataset.rotate = true;
-        rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
+        rotatePlaceholder(
+          generateIndex(-1, placeholders.length),
+          search,
+          results,
+          placeholders,
+          isHomepage,
+        );
       }, 1200);
     }
   });
@@ -643,19 +639,25 @@ export default async function decorate(block) {
   const observer = new IntersectionObserver(async (entries) => {
     if (entries.some((e) => e.isIntersecting)) {
       observer.disconnect();
-      if (isHomepageVariant) {
+      if (isHomepage) {
         // start placeholder rotation
         search.dataset.rotate = true;
         setTimeout(() => {
-          rotatePlaceholder(generateIndex(-1, placeholders.length), search, results, placeholders, isHomepageVariant);
+          rotatePlaceholder(
+            generateIndex(-1, placeholders.length),
+            search,
+            results,
+            placeholders,
+            isHomepage,
+          );
         }, 600);
       }
       fetchSourceData(index, faq).then((docs) => {
         // enable search only after docs are available
         search.addEventListener('input', debounce(() => {
-          searchQuery(search.value, docs, results, isHomepageVariant);
+          searchQuery(search.value, docs, results, isHomepage);
         }, 200));
-        if (!isHomepageVariant) loadSearch(search, docs, results, isHomepageVariant);
+        if (!isHomepage) loadSearch(search, docs, results, isHomepage);
       });
     }
   });
