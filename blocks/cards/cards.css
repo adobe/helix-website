@@ -66,15 +66,12 @@
   transform: translateX(3px);
 }
 
-.cards.alternate a:hover:any-link::after {
-  transform: none;
-}
-
 .cards.alternate a:hover:any-link::after {  
   color: var(--spectrum-blue);
   border-left-width: 80px; 
   border-right-width: 80px;
   border-bottom-width: 80px;
+  transform: none;
 }
 
 .cards .cards-card {
