@@ -75,7 +75,7 @@ function buildFilterControl(cat, $block) {
   checkbox.id = `filter-${cat}`;
   checkbox.value = cat;
   checkbox.type = 'checkbox';
-  if (!urlFilters.includes('None') && urlFilters.includes(cat)) {
+  if (urlFilters.length === 0 || (!urlFilters.includes('None') && urlFilters.includes(cat))) {
     checkbox.checked = true;
   }
   control.append(checkbox);
