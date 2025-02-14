@@ -23,8 +23,15 @@ function getSelectedFilterValues($block) {
 }
 
 function updateSearchParams($block) {
-  const filters = getSelectedFilterValues($block);
+  let filters = getSelectedFilterValues($block);
   const url = new URL(window.location.href);
+  if (filters.includes('All')) {
+    // omit search parms in case of 'all'
+    filters = [];
+  } else if (filters.length === 0) {
+    // no filters selected, add 'None' filter
+    filters.push('None');
+  }
   const usp = new URLSearchParams(filters.map((v) => ['filter', v]));
   url.search = usp.toString();
   window.history.pushState(null, '', url);
@@ -49,7 +56,6 @@ function buildCategoryLabels(categories) {
     .map((cat) => {
       if (!styles[cat]) {
         const style = (Object.keys(styles).length % 4) + 1;
-        console.log(`Assigning style ${style} to category ${cat}`);
         styles[cat] = style;
       }
       const span = document.createElement('span');
@@ -69,7 +75,9 @@ function buildFilterControl(cat, $block) {
   checkbox.id = `filter-${cat}`;
   checkbox.value = cat;
   checkbox.type = 'checkbox';
-  checkbox.setAttribute('checked', urlFilters.length > 0 ? urlFilters.includes(cat) : true);
+  if (!urlFilters.includes('None') && urlFilters.includes(cat)) {
+    checkbox.checked = true;
+  }
   control.append(checkbox);
 
   control.addEventListener('click', () => {
