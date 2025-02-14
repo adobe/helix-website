@@ -307,7 +307,7 @@ export function updateState() {
 
   // remove all source and target filters if their specific checkpoint
   // is not in the checkpoint filter
-  url.searchParams.entries().filter(([key]) => key.match(/\.(source|target)$/))
+  [...url.searchParams.entries()].filter(([key]) => key.match(/\.(source|target)$/))
     .forEach(([key]) => {
       const [cp] = key.split('.');
       if (!url.searchParams.getAll('checkpoint').includes(cp)) {
