@@ -43,9 +43,9 @@
   right: -1rem;
   width: 0;
   height: 0;
-  border-left: 40px solid transparent; 
-  border-right: 40px solid transparent; 
-  border-bottom: 40px solid transparent;
+  border-left: 20px solid transparent; 
+  border-right: 20px solid transparent; 
+  border-bottom: 20px solid transparent;
   transition: border-width 0.1s ease-in-out;
 }
 
@@ -64,15 +64,6 @@
 .cards a:hover:any-link::after {
   color: var(--spectrum-blue);
   transform: translateX(3px);
-}
-
-.cards.alternate a:hover:any-link::after {  
-  color: var(--spectrum-blue);
-  border-left-width: 80px; 
-  border-right-width: 80px;
-  border-bottom-width: 80px;
-  transform: none;
-}
 
 .cards .cards-card {
   width: 100%;
@@ -104,6 +95,14 @@
 .cards .cards-card.enter:hover {
   transform: scale(calc(100% + 1rem), calc(100% + 1rem)) translate(0, 0);
 }
+
+.cards.alternate .cards-card.enter:hover a:any-link::after{
+  border-left-width: 35px; 
+  border-right-width: 35px;
+  border-bottom-width: 35px;
+  transform: none;
+}
+
 
 /* Fade in the pseudo-element with the bigger shadow */
 .cards .cards-card:hover::after {
