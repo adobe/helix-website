@@ -344,7 +344,7 @@ function findDoc(query, docs = [], findMultiple = false) {
 
     // aggregate matches
     const matches = [...perfectMatches, ...strongMatches, ...fallbackMatches];
-    return { terms, match: findMultiple ? matches : matches.slice(0, 1) };
+    return { terms, match: findMultiple ? matches : matches.slice(0, 3) };
   }
   return { terms: query, match: null };
 }
