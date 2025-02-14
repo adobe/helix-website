@@ -90,32 +90,34 @@
   border-radius: 3px;
   background-color: white;
   opacity: 0;
-  animation: fadeIn 580ms ease forwards;
+  animation: fade-in 580ms ease forwards;
   z-index: 1;
 }
 
-.doc-search .doc-search-results.fadeOut {
+.doc-search .doc-search-results.fade-out {
   /* match delay set in backspace() */
-  animation: fadeOut 580ms ease forwards; 
+  animation: fade-out 580ms ease forwards; 
   z-index: -1;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     top: calc(50% + 15px);
     opacity: 0;
   }
+  
   to {
     top: calc(50% + 20px);
     opacity: 1;
   }
 }
 
-@keyframes fadeOut {
+@keyframes fade-out {
   from {
     top: calc(50% + 20px);
     opacity: 1;
-  }
+  } 
+
   to {
     top: calc(50% - 16px);
     opacity: 0;
