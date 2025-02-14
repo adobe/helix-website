@@ -36,9 +36,45 @@
   transition: all 0.3s ease-in-out;
 }
 
+.cards.alternate a:any-link::after {
+  content: "";
+  position: absolute;
+  top: -2rem;
+  right: -1rem;
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent; 
+  border-right: 40px solid transparent; 
+  border-bottom: 40px solid transparent;
+  transition: border-width 0.1s ease-in-out;
+}
+
+.cards.earlyaccess a:any-link::after {
+  border-right-color: #e6118a; 
+}
+
+.cards.deprecated a:any-link::after {
+  border-right-color: #d31510; 
+}
+
+.cards.removed a:any-link::after {
+  border-right-color: #6a6969; 
+}
+
+.cards.alternate a:hover:any-link::after {
+  transform: none;
+}
+
 .cards a:hover:any-link::after {
   color: var(--spectrum-blue);
   transform: translateX(3px);
+}
+
+.cards a:hover:any-link::after {  
+  color: var(--spectrum-blue);
+  border-left-width: 80px; 
+  border-right-width: 80px;
+  border-bottom-width: 80px;
 }
 
 .cards .cards-card {
