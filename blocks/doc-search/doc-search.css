@@ -38,6 +38,11 @@
   transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
 }
 
+.doc-search.homepage form input {
+  font-size: 150%;
+  line-height: 150%;
+}
+
 .doc-search form input:focus {
   border-color: rgb(42 124 223);
 }
@@ -90,42 +95,42 @@
   border-radius: 3px;
   background-color: white;
   opacity: 0;
-  animation: fadeIn 580ms ease forwards;
+  animation: fade-in 580ms ease forwards;
   z-index: 1;
 }
 
-.doc-search .doc-search-results.fadeOut {
+.doc-search .doc-search-results.fade-out {
   /* match delay set in backspace() */
-  animation: fadeOut 580ms ease forwards; 
+  animation: fade-out 580ms ease forwards; 
   z-index: -1;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     top: calc(50% + 15px);
     opacity: 0;
   }
+  
   to {
-    top: calc(50% + 20px);
+    top: calc(50% + 30px);
     opacity: 1;
   }
 }
 
-@keyframes fadeOut {
+@keyframes fade-out {
   from {
     top: calc(50% + 20px);
     opacity: 1;
-  }
+  } 
+
   to {
-    top: calc(50% - 16px);
+    top: calc(50% - 15px);
     opacity: 0;
   }
 }
 
 .doc-search .doc-search-results > li {
   list-style: none;
-  font-size: var(--type-body-xs-size);
-  line-height: var(--type-body-xs-lh);
 }
 
 .doc-search .doc-search-results > li.doc-search-result + li {
