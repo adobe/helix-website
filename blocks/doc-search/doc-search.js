@@ -314,7 +314,7 @@ function findDoc(query, docs = [], findMultiple = false) {
       }
     });
     // eject if we have and only need one result
-    if (!findMultiple && perfectMatches.size) return { terms, match: [...perfectMatches] };
+    if (!findMultiple && perfectMatches.size > 3) return { terms, match: [...perfectMatches] };
 
     // find strong matches (some terms match title or faq question)
     indexDocs.forEach((doc) => {
@@ -328,7 +328,7 @@ function findDoc(query, docs = [], findMultiple = false) {
       }
     });
     // eject if we have and only need one result
-    if (!findMultiple && strongMatches.size) return { terms, match: [...strongMatches] };
+    if (!findMultiple && strongMatches.size > 3) return { terms, match: [...strongMatches] };
 
     // find weaker/fallback matches (some terms match content or faq answer}
     indexDocs.forEach((doc) => {
