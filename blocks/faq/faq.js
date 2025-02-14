@@ -1,10 +1,6 @@
 import { addAnchorLink } from '../../scripts/scripts.js';
 
-const categoryColors = {
-  build: 1,
-  publish: 2,
-  launch: 3,
-};
+const styles = {};
 
 function autoLink(string) {
   const pattern = /(^|[\s\n]|<[A-Za-z]*\/?>)((?:https?):\/\/[-A-Z0-9+\u0026\u2019@#/%?=()~_|!:,.;]*[-A-Z0-9+\u0026@#/%=~()_|])/gi;
@@ -51,8 +47,13 @@ function filterResults(filters, $block) {
 function buildCategoryLabels(categories) {
   return categories
     .map((cat) => {
+      if (!styles[cat]) {
+        const style = (Object.keys(styles).length % 4) + 1;
+        console.log(`Assigning style ${style} to category ${cat}`);
+        styles[cat] = style;
+      }
       const span = document.createElement('span');
-      span.className = `category style-${categoryColors[cat.toLowerCase()] || 0}`;
+      span.className = `category style-${styles[cat] || 0}`;
       span.textContent = cat;
       return span;
     });
@@ -94,7 +95,7 @@ function buildFilterControl(cat, $block) {
   const label = document.createElement('label');
   label.textContent = cat;
   label.htmlFor = cat;
-  label.className = `category style-${categoryColors[cat.toLowerCase()] || 0}`;
+  label.className = `category style-${styles[cat] || 0}`;
   control.append(label);
 
   return control;
@@ -103,7 +104,7 @@ function buildFilterControl(cat, $block) {
 function buildCategoryFilters(categories, $block) {
   const controls = document.createElement('div');
   controls.classList.add('filter-controls');
-  controls.textContent = 'Category:';
+  controls.textContent = 'Categories:';
 
   // 'all' filter
   controls.append(buildFilterControl('All', $block));

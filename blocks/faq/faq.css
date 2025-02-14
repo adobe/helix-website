@@ -22,16 +22,21 @@ main .faq .category {
 }
 
 main .faq .category.style-1 {
-  background-color: var(--brand-color-purple);
+  background-color: var(--brand-color-dark-purple);
   color: var(--color-white);
 }
 
 main .faq .category.style-2 {
-  background-color: var(--brand-color-pink);
-  color: var(--color-white);}
+  background-color: var(--color-accent-pink-content);
+  color: var(--color-white);
+}
 
 main .faq .category.style-3 {
-  background-color: var(--brand-color-green-yellow);
+  background-color: var(--color-accent-pink-bg);
+}
+
+main .faq .category.style-4 {
+  background-color: var(--color-accent-lightgreen-bg);
 }
 
 main .faq dd {
@@ -46,10 +51,12 @@ body.guides-template main .faq dt a.anchor-link:any-link::before {
 main .faq .filter-controls {
   display: flex;
   font-size: var(--type-body-xs-size);
+  font-weight: 700;
 }
 
 main .faq .filter-control label {
   cursor: pointer;
+  user-select: none;
 }
 
 main .faq .filter-control input[type="checkbox"] {
