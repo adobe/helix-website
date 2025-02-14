@@ -61,16 +61,16 @@
   border-right-color: #6a6969; 
 }
 
-.cards.alternate a:hover:any-link::after {
-  transform: none;
-}
-
 .cards a:hover:any-link::after {
   color: var(--spectrum-blue);
   transform: translateX(3px);
 }
 
-.cards a:hover:any-link::after {  
+.cards.alternate a:hover:any-link::after {
+  transform: none;
+}
+
+.cards.alternate a:hover:any-link::after {  
   color: var(--spectrum-blue);
   border-left-width: 80px; 
   border-right-width: 80px;
