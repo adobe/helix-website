@@ -293,7 +293,7 @@ function findDoc(query, docs = [], findMultiple = false) {
     docs.forEach((doc) => (doc.title ? indexDocs.push(doc) : faqDocs.push(doc)));
 
     // split the query into terms, trimming and filtering out 1-2 letter and unhelpful words
-    const filterOut = ['and', 'but', 'can', 'eds', 'for', 'how', 'the', 'use'];
+    const filterOut = ['and', 'but', 'can', 'eds', 'for', 'how', 'the', 'use', 'what'];
     const terms = query.toLowerCase().split(' ').map((e) => e.trim()).filter((e) => e.length > 2 && !filterOut.includes(e));
     if (!terms.length) return { terms, match: [] }; // eject if no valid search terms
 
