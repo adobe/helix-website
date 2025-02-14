@@ -2,11 +2,6 @@ import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 import { buildBlock, loadBlock, decorateBlock } from '../../scripts/lib-franklin.js';
 
-let searchFunc;
-let searchTerm;
-
-const searchParams = new URLSearchParams(window.location.search);
-
 const MOBILE_BREAKPOINT = 900;
 
 const debounce = (func, time = 100) => {
@@ -15,35 +10,6 @@ const debounce = (func, time = 100) => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(func, time, event);
   };
-};
-
-const loadSearch = async (inputsArray, resultsContainer) => {
-  // const gnavSearch = await import('./side-navigation-search.js');
-  // searchFunc = gnavSearch.default;
-
-  if (/[?&]q=/.test(window.location.search)) {
-    searchTerm = searchParams.get('q');
-  }
-
-  if (searchTerm) {
-    inputsArray.forEach((el) => {
-      el.querySelector('input').value = searchTerm;
-      // searchFunc(searchTerm, resultsContainer);
-    });
-  }
-};
-
-const handleSearchString = (clearQuery) => {
-  const { protocol, host, pathname } = window.location;
-
-  const query = clearQuery ? '' : `?${searchParams.toString()}`;
-  const url = `${protocol}//${host}${pathname}${query}`;
-
-  if (window.history.replaceState) {
-    window.history.replaceState({
-      path: url,
-    }, '', url);
-  }
 };
 
 export default async function decorate(block) {
