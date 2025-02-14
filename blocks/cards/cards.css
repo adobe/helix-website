@@ -64,6 +64,7 @@
 .cards a:hover:any-link::after {
   color: var(--spectrum-blue);
   transform: translateX(3px);
+}
 
 .cards .cards-card {
   width: 100%;
