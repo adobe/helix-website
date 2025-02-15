@@ -52,7 +52,7 @@ main .faq .filter-controls {
   display: flex;
   font-size: var(--type-body-xs-size);
   background-color: var(--bg-color-lightgrey);
-  padding: var(--spacing-xxs) var(--spacing-s);
+  padding: var(--spacing-xs) var(--spacing-s);
   border: solid 1px var(--bg-color-grey-2);
   border-radius: var(--image-border-radius-l);
 }
