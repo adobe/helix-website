@@ -60,7 +60,7 @@ jobs:
           LOGS=$(
             curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
             "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}" \
-            | jq -s '
+            | jq '
               .entries
               | sort_by(.timestamp)
               | map(select(.route == "live"))
