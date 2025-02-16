@@ -65,16 +65,16 @@ jobs:
         run: |
           echo "Debug: Last run ISO: ${{ needs.check-last-run.outputs.last-run-iso }}"
           
-          # URL encode the from parameter
-          FROM_PARAM=$(echo "${{ needs.check-last-run.outputs.last-run-iso }}" | jq -sRr @uri)
+          # URL encode the from parameter (using tr to remove newlines)
+          FROM_PARAM=$(echo -n "${{ needs.check-last-run.outputs.last-run-iso }}" | tr -d '\n' | jq -sRr @uri)
           echo "Debug: URL encoded from parameter: $FROM_PARAM"
           
           # Construct and echo the full URL for debugging
           FULL_URL="https://admin.hlx.page/log/adobe/helix-website/main?from=$FROM_PARAM"
           echo "Debug: Full URL: $FULL_URL"
           
-          # Remove -s flag to see curl errors
-          RESPONSE=$(curl -v -w "\n%{http_code}" -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" "$FULL_URL")
+          # Force HTTP/1.1 and remove -s flag to see curl errors
+          RESPONSE=$(curl --http1.1 -v -w "\n%{http_code}" -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" "$FULL_URL")
           
           # Extract status code from last line
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
