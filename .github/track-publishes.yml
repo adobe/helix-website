@@ -72,32 +72,34 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo '${{ steps.get-logs.outputs.logs }}' | base64 -d | jq -c '.[]' | while read -r log; do
-            path=$(echo "$log" | jq -r '.path')
             user=$(echo "$log" | jq -r '.user // "unknown"')
             status=$(echo "$log" | jq -r '.status')
             timestamp=$(echo "$log" | jq -r '.timestamp')
             
-            # Construct JSON payload properly
-            payload=$(jq -n \
-              --arg type "resource-published-native" \
-              --arg path "$path" \
-              --arg user "$user" \
-              --arg timestamp "$timestamp" \
-              --arg status "$status" \
-              '{
-                event_type: $type,
-                client_payload: {
-                  path: $path,
-                  user: $user,
-                  timestamp: $timestamp,
-                  status: $status
-                }
-              }')
+            # Get all paths (combine path and paths, filter out empty strings)
+            paths=$(echo "$log" | jq -r '[ .path, (.paths[]?) ] | map(select(length > 0))[]')
             
-            # Send repository dispatch
-            gh api \
-              --method POST \
-              --header "Accept: application/vnd.github.v3+json" \
-              "/repos/${{ github.repository }}/dispatches" \
-              --input - <<< "$payload"
+            echo "$paths" | while read -r path; do
+              payload=$(jq -n \
+                --arg type "resource-published-native" \
+                --arg path "$path" \
+                --arg user "$user" \
+                --arg timestamp "$timestamp" \
+                --arg status "$status" \
+                '{
+                  event_type: $type,
+                  client_payload: {
+                    path: $path,
+                    user: $user,
+                    timestamp: $timestamp,
+                    status: $status
+                  }
+                }')
+              
+              gh api \
+                --method POST \
+                --header "Accept: application/vnd.github.v3+json" \
+                "/repos/${{ github.repository }}/dispatches" \
+                --input - <<< "$payload"
+            done
           done
