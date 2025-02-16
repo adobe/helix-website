@@ -54,6 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-last-run
     steps:
+      - name: Check for required secrets
+        run: |
+          if [[ -z "${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" ]]; then
+            echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. Please add this secret to your repository settings."
+            exit 1
+          fi
       - name: Get Logs
         id: get-logs
         run: |
