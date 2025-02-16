@@ -11,6 +11,7 @@ permissions:
 
 env:
   ADD_MD_SUFFIX: "true" # default value for all triggers, this is a compatibility fix for older workflows
+  REPOSITORY_DISPATCH_EVENT: "resource-published-native" # default value for all triggers, this is a compatibility fix for older workflows
 
 jobs:
   check-last-run:
@@ -126,27 +127,32 @@ jobs:
                 path="${path}.md"
               fi
               
-              payload=$(jq -n \
-                --arg type "resource-published-native" \
-                --arg path "$path" \
-                --arg user "$user" \
-                --arg timestamp "$timestamp" \
-                --arg status "$status" \
-                '{
-                  event_type: $type,
-                  client_payload: {
-                    path: $path,
-                    user: $user,
-                    timestamp: $timestamp,
-                    status: $status
-                  }
-                }')
-              
-              echo "Triggering dispatch for $path"
-              gh api \
-                --method POST \
-                --header "Accept: application/vnd.github.v3+json" \
-                "/repos/${{ github.repository }}/dispatches" \
-                --input - <<< "$payload"
+              # Only create and trigger dispatch if REPOSITORY_DISPATCH_EVENT is set
+              if [[ -n "${{ env.REPOSITORY_DISPATCH_EVENT }}" ]]; then
+                payload=$(jq -n \
+                  --arg type "${{ env.REPOSITORY_DISPATCH_EVENT }}" \
+                  --arg path "$path" \
+                  --arg user "$user" \
+                  --arg timestamp "$timestamp" \
+                  --arg status "$status" \
+                  '{
+                    event_type: $type,
+                    client_payload: {
+                      path: $path,
+                      user: $user,
+                      timestamp: $timestamp,
+                      status: $status
+                    }
+                  }')
+                
+                echo "Triggering dispatch for $path with event type: ${{ env.REPOSITORY_DISPATCH_EVENT }}"
+                gh api \
+                  --method POST \
+                  --header "Accept: application/vnd.github.v3+json" \
+                  "/repos/${{ github.repository }}/dispatches" \
+                  --input - <<< "$payload"
+              else
+                echo "Skipping dispatch for $path (REPOSITORY_DISPATCH_EVENT not set)"
+              fi
             done
           done
