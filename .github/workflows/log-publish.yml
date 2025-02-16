@@ -1,7 +1,7 @@
 on: 
   repository_dispatch:
     types:
-      - resource-published
+      - resource-published-native
 jobs:
   print:
     runs-on: ubuntu-latest

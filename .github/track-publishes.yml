@@ -1,0 +1,103 @@
+name: Track Publishes
+on:
+  schedule:
+    - cron: "0/5 * * * *"
+
+permissions:
+  actions: read # required to access workflow runs
+  contents: write # required to access the repository, for the dispatch event
+
+jobs:
+  check-last-run:
+    runs-on: ubuntu-latest
+    outputs:
+      workflow-id: ${{ steps.workflow-id.outputs.WORKFLOW_ID }}
+      last-run-iso: ${{ steps.last-run.outputs.LAST_CREATED_AT_ISO }} # ISO 8601
+      last-run-unix: ${{ steps.last-run.outputs.LAST_CREATED_AT_UNIX }} # Unix timestamp
+      branch-name: ${{ steps.branch-name.outputs.BRANCH_NAME }}
+    steps:
+      - name: Get branch name
+        id: branch-name
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ ${GITHUB_EVENT_NAME} == "pull_request" ]]
+          then
+             echo "BRANCH_NAME=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+          else
+             echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+          fi
+      - name: Get workflow id
+        id: workflow-id
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          WORKFLOW_ID=$(gh api /repos/${{ github.repository }}/actions/runs/${{ github.run_id }} | jq -r .workflow_id)
+          echo "WORKFLOW_ID=$WORKFLOW_ID" >> $GITHUB_OUTPUT
+          echo "Workflow id: ${WORKFLOW_ID}"
+      - name: Get previous build status
+        shell: bash
+        id: last-run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LAST_CREATED_AT_ISO=$(gh api --jq "[.workflow_runs[] | select(.conclusion == \"success\") | .created_at][0]" /repos/${{ github.repository }}/actions/workflows/${{ steps.workflow-id.outputs.WORKFLOW_ID }}/runs?status=completed&branch=${{ steps.branch-name.outputs.BRANCH_NAME }})
+          LAST_CREATED_AT_UNIX=$(date -d "$LAST_CREATED_AT_ISO" +%s)
+          echo "LAST_CREATED_AT_ISO=$LAST_CREATED_AT_ISO" >> $GITHUB_OUTPUT
+          echo "LAST_CREATED_AT_UNIX=$LAST_CREATED_AT_UNIX" >> $GITHUB_OUTPUT
+          echo "Previous build created at: $LAST_CREATED_AT_ISO"
+  poll-log:
+    runs-on: ubuntu-latest
+    needs: check-last-run
+    steps:
+      - name: Get Logs
+        id: get-logs
+        run: |
+          LOGS=$(
+            curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
+            "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}" \
+            | jq -s '
+              .entries
+              | sort_by(.timestamp)
+              | map(select(.route == "live"))
+            ' | base64 -w 0
+          )
+          echo "logs=$LOGS" >> $GITHUB_OUTPUT
+      - name: Check for publishes
+        id: check-publishes
+        if: steps.get-logs.outputs.logs != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo '${{ steps.get-logs.outputs.logs }}' | base64 -d | jq -c '.[]' | while read -r log; do
+            path=$(echo "$log" | jq -r '.path')
+            user=$(echo "$log" | jq -r '.user // "unknown"')
+            status=$(echo "$log" | jq -r '.status')
+            timestamp=$(echo "$log" | jq -r '.timestamp')
+            
+            # Construct JSON payload properly
+            payload=$(jq -n \
+              --arg type "resource-published-native" \
+              --arg path "$path" \
+              --arg user "$user" \
+              --arg timestamp "$timestamp" \
+              --arg status "$status" \
+              '{
+                event_type: $type,
+                client_payload: {
+                  path: $path,
+                  user: $user,
+                  timestamp: $timestamp,
+                  status: $status
+                }
+              }')
+            
+            # Send repository dispatch
+            gh api \
+              --method POST \
+              --header "Accept: application/vnd.github.v3+json" \
+              "/repos/${{ github.repository }}/dispatches" \
+              --input - <<< "$payload"
+          done
