@@ -74,7 +74,12 @@ jobs:
           echo "Debug: Full URL: $FULL_URL"
           
           # Force HTTP/1.1 and remove -s flag to see curl errors
-          RESPONSE=$(curl --http1.1 -v -w "\n%{http_code}" -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" "$FULL_URL")
+          RESPONSE=$(curl --http1.1 -v -w "\n%{http_code}" \
+            -H "Authorization: token ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: GitHub-Actions-Workflow" \
+            "$FULL_URL")
           
           # Extract status code from last line
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
