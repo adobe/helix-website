@@ -2,6 +2,8 @@ name: Track Publishes
 on:
   schedule:
     - cron: "0/5 * * * *"
+  workflow_dispatch:
+
 
 permissions:
   actions: read # required to access workflow runs
