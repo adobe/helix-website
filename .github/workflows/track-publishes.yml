@@ -9,6 +9,9 @@ permissions:
   actions: read # required to access workflow runs
   contents: write # required to access the repository, for the dispatch event
 
+env:
+  ADD_MD_SUFFIX: "true" # default value for all triggers, this is a compatibility fix for older workflows
+
 jobs:
   check-last-run:
     runs-on: ubuntu-latest
@@ -118,6 +121,11 @@ jobs:
             paths=$(echo "$log" | jq -r '[ .path, (.paths[]?) ] | map(select(length > 0))[]')
             
             echo "$paths" | while read -r path; do
+              # Add .md extension if configured and path has no extension
+              if [[ "${{ env.ADD_MD_SUFFIX }}" == "true" ]] && [[ "$path" != *.* ]]; then
+                path="${path}.md"
+              fi
+              
               payload=$(jq -n \
                 --arg type "resource-published-native" \
                 --arg path "$path" \
