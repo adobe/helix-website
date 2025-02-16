@@ -79,6 +79,7 @@ jobs:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -H "User-Agent: GitHub-Actions-Workflow" \
+            --trace-ascii /dev/stdout \
             "$FULL_URL")
           
           # Extract status code from last line
