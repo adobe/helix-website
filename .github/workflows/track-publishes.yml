@@ -103,21 +103,13 @@ jobs:
           echo "logs=$LOGS" >> $GITHUB_OUTPUT
       - name: Check for publishes
         id: check-publishes
-        if: steps.get-logs.outputs.logs != ''
+        if: steps.get-logs.outputs.logs != 'W10K'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Debug: Checking if logs output is empty"
-          echo "Debug: Output value length: ${#LOGS}"
-          echo "Debug: First few characters: ${LOGS:0:100}"
-          echo "Debug: Raw output value: '${{ steps.get-logs.outputs.logs }}'"
+          LOGS="${{ steps.get-logs.outputs.logs }}"
           
-          if [ -z "${{ steps.get-logs.outputs.logs }}" ]; then
-            echo "Debug: logs output is empty"
-            exit 0
-          fi
-          
-          echo '${{ steps.get-logs.outputs.logs }}' | base64 -d | jq -c '.[]' | while read -r log; do
+          echo "$LOGS" | base64 -d | jq -c '.[]' | while read -r log; do
             user=$(echo "$log" | jq -r '.user // "unknown"')
             status=$(echo "$log" | jq -r '.status')
             timestamp=$(echo "$log" | jq -r '.timestamp')
@@ -142,6 +134,7 @@ jobs:
                   }
                 }')
               
+              echo "Triggering dispatch for $path"
               gh api \
                 --method POST \
                 --header "Accept: application/vnd.github.v3+json" \
