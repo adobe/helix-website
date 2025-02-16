@@ -12,6 +12,8 @@ permissions:
 env:
   ADD_MD_SUFFIX: "true" # default value for all triggers, this is a compatibility fix for older workflows
   REPOSITORY_DISPATCH_EVENT: "resource-published-native" # default value for all triggers, this is a compatibility fix for older workflows
+  WORKFLOW_CALL_USE: "example" # if REPOSITORY_DISPATCH_EVENT is unset, this is the workflow file that will be called
+  ROUTE_FILTER: "live" # filter for the route field in the logs, can be 'live' or 'preview'
 
 jobs:
   check-last-run:
@@ -100,7 +102,7 @@ jobs:
           fi
           
           # Process the response if status was ok
-          LOGS=$(echo "$BODY" | jq -R 'fromjson | .entries | sort_by(.timestamp) | map(select(.route == "live"))' | base64 -w 0)
+          LOGS=$(echo "$BODY" | jq -R --arg route "${{ env.ROUTE_FILTER }}" 'fromjson | .entries | sort_by(.timestamp) | map(select(.route == $route))' | base64 -w 0)
           
           echo "Debug: LOGS value length: ${#LOGS}"
           echo "Debug: First few characters: ${LOGS:0:100}"
@@ -127,7 +129,7 @@ jobs:
                 path="${path}.md"
               fi
               
-              # Only create and trigger dispatch if REPOSITORY_DISPATCH_EVENT is set
+              # Handle repository dispatch or workflow call
               if [[ -n "${{ env.REPOSITORY_DISPATCH_EVENT }}" ]]; then
                 payload=$(jq -n \
                   --arg type "${{ env.REPOSITORY_DISPATCH_EVENT }}" \
@@ -151,8 +153,15 @@ jobs:
                   --header "Accept: application/vnd.github.v3+json" \
                   "/repos/${{ github.repository }}/dispatches" \
                   --input - <<< "$payload"
+              elif [[ -n "${{ env.WORKFLOW_CALL_USE }}" ]]; then
+                echo "Triggering workflow ${{ env.WORKFLOW_CALL_USE }} for $path"
+                gh workflow run "${{ env.WORKFLOW_CALL_USE }}" \
+                  -f path="$path" \
+                  -f user="$user" \
+                  -f timestamp="$timestamp" \
+                  -f status="$status"
               else
-                echo "Skipping dispatch for $path (REPOSITORY_DISPATCH_EVENT not set)"
+                echo "Skipping triggers for $path (neither REPOSITORY_DISPATCH_EVENT nor WORKFLOW_CALL_USE is set)"
               fi
             done
           done
