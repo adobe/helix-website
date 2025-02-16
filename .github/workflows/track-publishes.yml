@@ -57,15 +57,20 @@ jobs:
       - name: Get Logs
         id: get-logs
         run: |
-          LOGS=$(
-            curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
+          # Get the logs and store in LOGS variable
+          LOGS=$(curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
             "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}" \
             | jq '
               .entries
               | sort_by(.timestamp)
               | map(select(.route == "live"))
-            ' | base64 -w 0
-          )
+            ' | base64 -w 0)
+          
+          # Debug output
+          echo "Debug: Raw response:"
+          curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
+            "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}" | jq .
+          
           echo "Debug: LOGS value length: ${#LOGS}"
           echo "Debug: First few characters: ${LOGS:0:100}"
           echo "logs=$LOGS" >> $GITHUB_OUTPUT
