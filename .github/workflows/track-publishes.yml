@@ -57,19 +57,34 @@ jobs:
       - name: Get Logs
         id: get-logs
         run: |
-          # Get the logs and store in LOGS variable
-          LOGS=$(curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
-            "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}" \
-            | jq '
-              .entries
-              | sort_by(.timestamp)
-              | map(select(.route == "live"))
-            ' | base64 -w 0)
+          # Get the raw response first and check it
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
+            "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}")
+          
+          # Extract status code from last line
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          # Extract response body (everything except the last line)
+          BODY=$(echo "$RESPONSE" | sed '$ d')
+          
+          echo "Debug: HTTP Status: $HTTP_STATUS"
+          
+          # Check if status code is not 2xx
+          if [[ $HTTP_STATUS -lt 200 ]] || [[ $HTTP_STATUS -gt 299 ]]; then
+            echo "Error: API request failed with status $HTTP_STATUS"
+            echo "Response body: $BODY"
+            exit 1
+          fi
+          
+          # Process the response if status was ok
+          LOGS=$(echo "$BODY" | jq '
+            .entries
+            | sort_by(.timestamp)
+            | map(select(.route == "live"))
+          ' | base64 -w 0)
           
           # Debug output
           echo "Debug: Raw response:"
-          curl -s -X GET -H "Authorization: Bearer ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" \
-            "https://admin.hlx.page/log/adobe/helix-website/main?from=${{ needs.check-last-run.outputs.last-run-iso }}" | jq .
+          echo "$BODY" | jq .
           
           echo "Debug: LOGS value length: ${#LOGS}"
           echo "Debug: First few characters: ${LOGS:0:100}"
