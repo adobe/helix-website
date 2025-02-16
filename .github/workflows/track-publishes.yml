@@ -66,6 +66,8 @@ jobs:
               | map(select(.route == "live"))
             ' | base64 -w 0
           )
+          echo "Debug: LOGS value length: ${#LOGS}"
+          echo "Debug: First few characters: ${LOGS:0:100}"
           echo "logs=$LOGS" >> $GITHUB_OUTPUT
       - name: Check for publishes
         id: check-publishes
@@ -73,6 +75,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "Debug: Checking if logs output is empty"
+          echo "Debug: Output value length: ${#LOGS}"
+          echo "Debug: First few characters: ${LOGS:0:100}"
+          echo "Debug: Raw output value: '${{ steps.get-logs.outputs.logs }}'"
+          
+          if [ -z "${{ steps.get-logs.outputs.logs }}" ]; then
+            echo "Debug: logs output is empty"
+            exit 0
+          fi
+          
           echo '${{ steps.get-logs.outputs.logs }}' | base64 -d | jq -c '.[]' | while read -r log; do
             user=$(echo "$log" | jq -r '.user // "unknown"')
             status=$(echo "$log" | jq -r '.status')
