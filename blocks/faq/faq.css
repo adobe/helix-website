@@ -10,6 +10,35 @@ main .faq dt > a {
   line-height: var(--type-heading-s-lh);
 }
 
+main .faq .category {
+  font-size: var(--type-body-xs-size);
+  font-weight: 700;
+  line-height: var(--type-body-xs-lh);
+  margin: 0 var(--spacing-xxxs);
+  padding: var(--spacing-xxxs) var(--spacing-xxs);
+  border-radius: 12px;
+  background-color: var(--bg-color-grey-2);
+  color: currentcolor;
+}
+
+main .faq .category.style-1 {
+  background-color: var(--brand-color-dark-purple);
+  color: var(--color-white);
+}
+
+main .faq .category.style-2 {
+  background-color: var(--color-accent-pink-content);
+  color: var(--color-white);
+}
+
+main .faq .category.style-3 {
+  background-color: var(--color-accent-pink-bg);
+}
+
+main .faq .category.style-4 {
+  background-color: var(--color-accent-lightgreen-bg);
+}
+
 main .faq dd {
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
@@ -17,4 +46,31 @@ main .faq dd {
 
 body.guides-template main .faq dt a.anchor-link:any-link::before {
   top: 0;
+}
+
+main .faq .filter-controls {
+  display: flex;
+  font-size: var(--type-body-xs-size);
+  background-color: var(--bg-color-lightgrey);
+  padding: var(--spacing-xs) var(--spacing-s);
+  border: solid 1px var(--bg-color-grey-2);
+  border-radius: var(--image-border-radius-l);
+}
+
+main .faq .filter-control label {
+  cursor: pointer;
+  user-select: none;
+}
+
+main .faq .filter-control input[type="checkbox"] {
+  display: none;
+}
+
+main .faq .filter-control input[type="checkbox"]:not(:checked) + label {
+  background-color: var(--color-bg);
+  color: currentcolor;
+}
+
+main .faq .hidden-by-filter {
+  display: none;
 }
