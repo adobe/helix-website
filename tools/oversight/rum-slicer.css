@@ -1,4 +1,4 @@
-@import url('colors.css');
+@import url("colors.css");
 /* stylelint-disable no-descending-specificity */
 /* stylelint-disable selector-class-pattern */
 
@@ -32,7 +32,6 @@
   --gray-500: #8f8f8f;
   --gray-600: #717171;
   --gray-700: #505050;
-
 }
 
 body {
@@ -50,19 +49,44 @@ body main > .section {
   padding-top: 0;
 }
 
+a.icon.help {
+  overflow: visible;
+  font-size: 16px;
+  display: inline-block;
+  font-weight: 900;
+  text-decoration: none;
+  text-align: center;
+  bottom: auto;
+  line-height: 12px;
+  border: 2px solid;
+  border-radius: 2px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transform: scale(1);
+  width: 18px;
+  height: 18px;
+}
+
+a.icon.help::after {
+  content: "?";
+}
+
 /* general performance */
 
-main li.score-good, vitals-facet div[data-value^="good"] label {
+main li.score-good,
+vitals-facet div[data-value^="good"] label {
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
-main li.score-ni, vitals-facet div[data-value^="ni"] label {
+main li.score-ni,
+vitals-facet div[data-value^="ni"] label {
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
-main li.score-poor, vitals-facet div[data-value^="poor"] label {
+main li.score-poor,
+vitals-facet div[data-value^="poor"] label {
   color: var(--dark-red);
   background-color: var(--light-red);
 }
@@ -154,7 +178,7 @@ main .key-metrics ul > * button {
 }
 
 main .key-metrics ul > * h2::before {
-  content: ' ';
+  content: " ";
   background-color: currentcolor;
   width: 8px;
   height: 8px;
@@ -175,26 +199,26 @@ main .key-metrics ul > * p .extra {
 }
 
 main .key-metrics ul > * p .extra::before {
-  content: ' (';
+  content: " (";
 }
 
 main .key-metrics ul > #pageviews p .extra::after {
-  content: ' per visit)';
+  content: " per visit)";
 }
 
 main .key-metrics ul > #conversions p .extra::after {
-  content: '%)';
+  content: "%)";
 }
 
 main .key-metrics ul > #visits p .extra::after {
-  content: '% bounces)';
+  content: "% bounces)";
 }
 
 main .key-metrics ul > #lcp p number-format::after,
 main .key-metrics ul > #inp p number-format::after,
 main facet-sidebar ul.cwv > li[title^="LCP"] number-format::after,
 main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
-  content: 's';
+  content: "s";
 }
 
 /* as of 2024, all iOS CWV values are fake, so we hide them a bit */
@@ -207,11 +231,11 @@ main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
 }
 
 main .key-metrics ul > #lcp number-format.extra::after {
-  content: 's TTFB)'
+  content: "s TTFB)";
 }
 
 main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
-  content: '';
+  content: "";
 }
 
 main .key-metrics number-format[trend="falling"],
@@ -252,10 +276,9 @@ main .key-metrics #inp number-format[trend="falling"] {
 conversion-tracker {
   display: grid;
   grid-template-areas:
-  'heading heading button'
-  'number empty button'
-  'number definition definition'
-  ;
+    "heading heading button"
+    "number empty button"
+    "number definition definition";
   grid-template-columns: 4fr 1fr 4em;
   align-items: start;
 }
@@ -267,7 +290,7 @@ conversion-tracker button {
   background-color: var(--spectrum-gray-300);
   color: var(--spectrum-gray-700);
   grid-area: button;
-  font-weight: normal!important;
+  font-weight: normal !important;
 }
 
 conversion-tracker button:disabled {
@@ -322,8 +345,6 @@ figure {
   margin-bottom: 16px;
 }
 
-
-
 figure .chart-container {
   position: relative;
   min-height: 100px;
@@ -344,7 +365,7 @@ figure .chart-container.sankey {
 }
 
 #timezone::before {
-  content: 'Timezone: ';
+  content: "Timezone: ";
 }
 
 .danger-icon {
@@ -397,7 +418,7 @@ figcaption > span {
   align-items: center;
 }
 
-#low-data-warning[aria-hidden=true] {
+#low-data-warning[aria-hidden="true"] {
   display: none;
 }
 
@@ -465,7 +486,7 @@ fieldset a:any-link {
   color: currentcolor;
 }
 
-list-facet[facet="userAgent" ] fieldset {
+list-facet[facet="userAgent"] fieldset {
   color: var(--dark-fuchsia);
 
   --background-color: var(--light-fuchsia);
@@ -477,7 +498,9 @@ list-facet[facet="url"] fieldset {
   --background-color: var(--light-purple);
 }
 
-*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
+*[facet] > legend,
+*[facet] > dl,
+#facets > [mode="hidden"] {
   display: none;
 }
 
@@ -547,17 +570,19 @@ ul.cwv meter {
   width: 100%;
 }
 
+/* stylelint-disable-next-line max-line-length */
 main:has(conversion-tracker[mode="custom"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion.engagement {
   display: none;
 }
 
+/* stylelint-disable-next-line max-line-length */
 main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion:last-of-type {
   display: none;
 }
 
 fieldset li::after,
 vitals-facet label::before {
-  content: ' ';
+  content: " ";
   background-color: currentcolor;
   width: 10px;
   height: 10px;
@@ -599,15 +624,15 @@ fieldset li:has(meter) number-format {
 }
 
 fieldset li:has(meter) number-format::after {
-  content: '%';
+  content: "%";
 }
 
 fieldset li.fixed:has(meter) number-format::after {
-  content: '';
+  content: "";
 }
 
 fieldset li.time:has(meter) number-format::after {
-  content: 's';
+  content: "s";
 }
 
 fieldset div:first-of-type li::before {
@@ -629,40 +654,36 @@ fieldset div:first-of-type li:has(meter)::before {
 }
 
 fieldset div:first-of-type li:nth-of-type(1)::before {
-  content: 'LCP';
+  content: "LCP";
 }
 
 fieldset div:first-of-type li:nth-of-type(2)::before {
-  content: 'CLS';
+  content: "CLS";
 }
 
 fieldset div:first-of-type li:nth-of-type(3)::before {
-  content: 'INP';
+  content: "INP";
 }
 
 fieldset div:first-of-type li:nth-of-type(4)::before {
-  content: 'Bounce';
+  content: "Bounce";
 }
 
 fieldset div:first-of-type li:nth-of-type(5)::before {
-  content: 'Time';
+  content: "Time";
 }
 
 fieldset div:first-of-type li:nth-of-type(6)::before {
-  content: 'Organic';
+  content: "Organic";
 }
 
 fieldset div:first-of-type li:nth-of-type(7)::before {
-  content: 'Engagement';
+  content: "Engagement";
 }
 
 fieldset div:first-of-type li:nth-of-type(8)::before {
-  content: 'Conversion';
+  content: "Conversion";
 }
-
-
-
-
 
 #facets ul.cwv {
   list-style: none;
@@ -675,7 +696,7 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
 
 #facets fieldset div {
   display: grid;
-  grid-template-areas: 'check lab' ' - cwv';
+  grid-template-areas: "check lab" " - cwv";
   grid-template-columns: 20px 1fr;
   align-items: center;
   grid-gap: 0 16px;
@@ -684,11 +705,11 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
 #facets fieldset div ~ div.more-container:last-of-type,
 #facets .more fieldset div ~ div.more-container:last-of-type,
 #facets .more-more fieldset div ~ div.more-container:last-of-type,
-#facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
+#facets .more-more-more fieldset div ~ div.more-container:last-of-type {
   display: grid;
 }
 
-#facets fieldset input[type=checkbox] {
+#facets fieldset input[type="checkbox"] {
   grid-area: check;
   height: 20px;
   width: 20px;
@@ -699,11 +720,13 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
   word-break: break-all;
 }
 
-#facets fieldset label .count, #facets fieldset label .extra {
+#facets fieldset label .count,
+#facets fieldset label .extra {
   opacity: 0.6;
 }
 
-#facets fieldset div:hover .count, #facets fieldset div:hover .extra {
+#facets fieldset div:hover .count,
+#facets fieldset div:hover .extra {
   opacity: 1;
 }
 
@@ -722,28 +745,28 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
 
 #facets fieldset label .count::before,
 #facets fieldset label span.value::before {
-  content: ' (';
+  content: " (";
 }
 
 #facets literal-facet label span.value::before {
-  content: '';
+  content: "";
 }
 
-#facets fieldset label .count::after, #facets fieldset label span.value::after {
-  content: ') ';
+#facets fieldset label .count::after,
+#facets fieldset label span.value::after {
+  content: ") ";
 }
 
 #facets fieldset label .extra::after {
-  content: '% rate';
+  content: "% rate";
 }
 
 #facets fieldset label number-format[title="0"].extra::after {
-  content: ' conversions';
+  content: " conversions";
 }
 
-
 #facets literal-facet label span.value::after {
-  content: '';
+  content: "";
 }
 
 #facets literal-facet label span.value,
@@ -781,13 +804,12 @@ thumbnail-facet fieldset div:not(.more-container) {
   padding-bottom: 4px;
 }
 
-
 vitals-facet fieldset {
   display: grid;
   grid-template-areas:
-  '. lcp-good cls-good inp-good'
-  '. lcp-ni cls-ni inp-ni'
-  '. lcp-poor cls-poor inp-poor';
+    ". lcp-good cls-good inp-good"
+    ". lcp-ni cls-ni inp-ni"
+    ". lcp-poor cls-poor inp-poor";
   grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
   gap: 4pt;
   padding: 4pt;
@@ -798,7 +820,7 @@ vitals-facet fieldset label {
   word-break: normal;
 }
 
-#facets vitals-facet fieldset input[type=checkbox] {
+#facets vitals-facet fieldset input[type="checkbox"] {
   width: 0;
   height: 0;
 }
@@ -809,7 +831,7 @@ vitals-facet fieldset label {
 
 #facets vitals-facet fieldset div {
   display: grid;
-  grid-template-areas: 'check lab';
+  grid-template-areas: "check lab";
   grid-template-columns: 0 1fr;
   grid-gap: 0;
 }
@@ -818,14 +840,14 @@ vitals-facet fieldset label {
   text-align: start;
 }
 
-#facets vitals-facet fieldset input[type=checkbox] + label::before {
+#facets vitals-facet fieldset input[type="checkbox"] + label::before {
   border: 2px solid currentcolor;
   background-color: transparent;
   width: 8px;
   height: 8px;
 }
 
-#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+#facets vitals-facet fieldset input[type="checkbox"]:checked + label::before {
   border: 2px solid currentcolor;
   background-color: currentcolor;
 }
@@ -870,11 +892,11 @@ vitals-facet fieldset label {
   grid-area: cwv;
 }
 
-#facets div[aria-selected=true] {
-  background-color: var(--light-blue)
+#facets div[aria-selected="true"] {
+  background-color: var(--light-blue);
 }
 
-#facets div[aria-checked=mixed] {
+#facets div[aria-checked="mixed"] {
   opacity: 0.7;
   filter: brightness(0.7);
 }
@@ -892,19 +914,19 @@ vitals-facet fieldset label {
 }
 
 #facets link-facet span.collapse + span.suffix::before {
-  content: '...';
+  content: "...";
 }
 
 #facets link-facet a .protocol::after {
-  content: '//';
+  content: "//";
 }
 
 /* don't worry, we'll show this when there is enough space */
-#facets link-facet  a .protocol {
+#facets link-facet a .protocol {
   display: none;
 }
 
-#facets link-facet  a .hostname {
+#facets link-facet a .hostname {
   display: none;
 }
 
@@ -969,7 +991,11 @@ facet-sidebar form {
   padding-right: 50px;
 }
 
-.clipboard, a.drilldown, a.drillup, .clipboard-paste, .icon {
+.clipboard,
+a.drilldown,
+a.drillup,
+.clipboard-paste,
+.icon {
   margin-left: 8px;
   box-sizing: border-box;
   position: relative;
@@ -1124,7 +1150,7 @@ a.drillup::after {
   margin-top: -20px;
 }
 
-facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+facet-sidebar[aria-disabled="true"] fieldset input[type="checkbox"] {
   display: none;
 }
 
@@ -1168,7 +1194,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: 32px;
   }
 
-  main .key-metrics ul > * h2, main .key-metrics ul > * button {
+  main .key-metrics ul > * h2,
+  main .key-metrics ul > * button {
     font-size: 14px;
   }
 
@@ -1193,7 +1220,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 
   #facets fieldset div {
-    grid-template-areas: 'check lab cwv';
+    grid-template-areas: "check lab cwv";
     grid-template-columns: 20px 1fr 350px;
   }
 
@@ -1211,7 +1238,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 }
 
-
 /* split mode */
 
 @media (min-width: 1600px) {
@@ -1221,7 +1247,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: calc(100vh - var(--nav-height) - 32px);
   }
 
-  #deepmain > div, #deepmain > facet-sidebar {
+  #deepmain > div,
+  #deepmain > facet-sidebar {
     width: 50%;
   }
 

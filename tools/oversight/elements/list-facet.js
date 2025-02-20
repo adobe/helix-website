@@ -131,6 +131,7 @@ export default class ListFacet extends HTMLElement {
       const fieldSet = this.querySelector('fieldset') || document.createElement('fieldset');
       fieldSet.classList.add(`facet-${facetName}`);
       const legendText = this.querySelector('legend')?.textContent || facetName;
+      const extraElements = Array.from(this.querySelectorAll(':scope > a, legend > a.icon') || []);
 
       fieldSet.textContent = '';
 
@@ -165,6 +166,8 @@ export default class ListFacet extends HTMLElement {
       });
 
       legend.append(clipboard, clipboardPaste);
+      extraElements.forEach((el) => el.classList.add('icon'));
+      legend.append(...extraElements);
       if (drilldownAtt && url.searchParams.get('drilldown') !== facetName) {
         const drilldown = document.createElement('a');
         drilldown.className = 'drilldown';

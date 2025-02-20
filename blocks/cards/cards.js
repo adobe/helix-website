@@ -27,7 +27,7 @@ export default function decorate(block) {
       // highlight styling
       const links = details.querySelectorAll('a');
       links.forEach((link) => {
-        link.classList.add('link-highlight-colorful-effect-hover-wrapper');
+        link.className = 'link-highlight-colorful-effect-hover-wrapper';
         link.innerHTML = `<span class="link-highlight-colorful-effect-2">${link.textContent}</span>`;
       });
       cell.append(details);

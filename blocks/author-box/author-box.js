@@ -2,6 +2,10 @@ import {
   getMetadata,
 } from '../../scripts/lib-franklin.js';
 
+import {
+  createTag,
+} from '../../scripts/scripts.js';
+
 function openPopup(e) {
   const target = e.target.closest('a');
   const href = target.getAttribute('data-href');
@@ -12,10 +16,8 @@ function openPopup(e) {
   );
 }
 
-async function buildSharing(id, type = 'github') {
-  const authorName = getMetadata('author');
-  const sharing = document.createElement('div');
-  sharing.classList.add('sharing-details');
+async function buildSharing(id, authorName, type = 'github') {
+  const sharing = createTag('div', { class: 'sharing-details' });
   const scriptUrl = new URL(import.meta.url);
   let href;
   let iconsPath;
@@ -50,17 +52,20 @@ async function buildSharing(id, type = 'github') {
     dataType, altText, ariaLabel, titleText,
   } = profiles[type] || profiles.github;
 
-  sharing.innerHTML = `<span>
-    <a data-type="${dataType}" data-href="${href}" alt="${altText}" aria-label="${ariaLabel}" title="${titleText}">
-      ${svgContent}
-    </a>
-  </span>`;
+  const link = createTag('a', {
+    'data-type': dataType,
+    'data-href': href,
+    alt: altText,
+    'aria-label': ariaLabel,
+    title: titleText,
+  }, svgContent);
+
+  sharing.append(link);
   return sharing;
 }
 
 async function addProfileLinkToImage(authorImage, profileId, type = 'github') {
-  const authorLink = document.createElement('a');
-  authorLink.classList.add('blog-author-link');
+  const authorLink = createTag('a', { class: 'blog-author-link' });
   if (type === 'github') {
     authorLink.setAttribute(
       'data-href',
@@ -75,9 +80,7 @@ async function addProfileLinkToImage(authorImage, profileId, type = 'github') {
 }
 
 async function createAuthorBlurb(blurb) {
-  const authorBlurb = document.createElement('div');
-  authorBlurb.classList.add('blog-author-blurb');
-  authorBlurb.append(blurb);
+  const authorBlurb = createTag('div', { class: 'blog-author-blurb' }, blurb);
   return authorBlurb;
 }
 
@@ -91,16 +94,16 @@ function validateDate(dateTag, dateString) {
   }
 }
 
-export default async function decorateAuthorBox(blockEl) {
-  const githubId = getMetadata('github');
-  const linkedinLink = getMetadata('linkedin');
-  const childrenEls = Array.from(blockEl.children);
-  const bylineContainer = childrenEls[0];
-  bylineContainer.classList.add('author-box-info');
-  // author image
-  const authorImage = bylineContainer.firstElementChild;
+// eslint-disable-next-line max-len
+async function createAuthorContainer(author, githubId, linkedinLink, publicationDate, i, isSingleAuthor) {
+  const authorContainer = createTag('div', { class: 'author-container' });
+
+  const authorDetails = createTag('div', { class: 'blog-author-info' });
+  const authorImage = document.createElement('img');
+  const imageKey = isSingleAuthor ? 'author-image' : `author${i + 1}-image`;
+  authorImage.src = getMetadata(imageKey);
   authorImage.classList.add('blog-author-image');
-  // author profile link
+
   let addAuthorLink;
   if (githubId) {
     addAuthorLink = await addProfileLinkToImage(authorImage, githubId, 'github');
@@ -108,29 +111,97 @@ export default async function decorateAuthorBox(blockEl) {
     addAuthorLink = await addProfileLinkToImage(authorImage, linkedinLink, 'linkedin');
   }
   if (addAuthorLink) {
-    bylineContainer.prepend(addAuthorLink);
+    authorDetails.append(addAuthorLink);
+  } else {
+    authorDetails.append(authorImage);
   }
-  // author name
-  bylineContainer.lastElementChild.classList.add('blog-author-details');
-  const authorDetails = bylineContainer.lastElementChild;
-  authorDetails.firstElementChild.classList.add('blog-author-name');
-  // publication date
-  const date = authorDetails.lastElementChild;
-  date.classList.add('blog-publication-date');
-  validateDate(date, date.textContent.trim());
-  // author blurb
-  const blurb = getMetadata('author-blurb');
-  const authorBlurb = await createAuthorBlurb(blurb);
-  bylineContainer.append(authorBlurb);
+
   // sharing
   let shareBlock;
   if (githubId) {
-    shareBlock = await buildSharing(githubId, 'github');
+    shareBlock = await buildSharing(githubId, author, 'github');
   } else if (linkedinLink) {
-    shareBlock = await buildSharing(linkedinLink, 'linkedin');
+    shareBlock = await buildSharing(linkedinLink, author, 'linkedin');
   }
   if (shareBlock) {
     shareBlock.addEventListener('click', openPopup);
-    bylineContainer.append(shareBlock);
+    authorDetails.append(shareBlock);
   }
+
+  authorContainer.append(authorDetails);
+  return authorContainer;
+}
+
+// eslint-disable-next-line max-len
+async function singleAuthorContainer(author, githubId, linkedinLink, publicationDate, i, isSingleAuthor) {
+  // eslint-disable-next-line max-len
+  const authorContainer = await createAuthorContainer(author, githubId, linkedinLink, publicationDate, i, isSingleAuthor);
+
+  const authorInfo = createTag('div', { class: 'blog-author-details' });
+  const authorName = createTag('div', { class: 'blog-author-name' }, author);
+  const date = createTag('div', { class: 'blog-publication-date' }, publicationDate);
+  validateDate(date, publicationDate);
+  authorInfo.append(authorName);
+  authorInfo.append(date);
+
+  authorContainer.append(authorInfo);
+
+  // author blurb
+  const blurbKey = isSingleAuthor ? 'author-blurb' : `author${i + 1}-blurb`;
+  const blurb = getMetadata(blurbKey);
+  const authorBlurb = await createAuthorBlurb(blurb);
+  authorContainer.append(authorBlurb);
+  return authorContainer;
+}
+
+// eslint-disable-next-line max-len
+async function multipleAuthorsContainer(author, githubId, linkedinLink, publicationDate, i, isSingleAuthor) {
+  // eslint-disable-next-line max-len
+  const authorContainer = await createAuthorContainer(author, githubId, linkedinLink, publicationDate, i, isSingleAuthor);
+
+  const authorInfo = createTag('div', { class: 'blog-author-details' });
+  const authorName = createTag('div', { class: 'blog-author-name' }, author);
+  authorInfo.append(authorName);
+
+  // author blurb
+  const blurbKey = isSingleAuthor ? 'author-blurb' : `author${i + 1}-blurb`;
+  const blurb = getMetadata(blurbKey);
+  const authorBlurb = await createAuthorBlurb(blurb);
+  authorInfo.append(authorBlurb);
+
+  authorContainer.append(authorInfo);
+  return authorContainer;
+}
+
+export default async function decorateAuthorBox(blockEl) {
+  const authors = getMetadata('author').split(',').map((author) => author.trim());
+  const githubIds = getMetadata('github').split(',').map((id) => id.trim());
+  const linkedinLinks = getMetadata('linkedin').split(',').map((link) => link.trim());
+  const publicationDate = getMetadata('publication-date');
+
+  const bylineContainer = createTag('div', { class: 'author-box-info' });
+  blockEl.innerHTML = '';
+  blockEl.append(bylineContainer);
+
+  const authorContainers = createTag('div', { class: 'author-containers' });
+
+  if (authors.length === 1) {
+    // Handle single author case
+    // eslint-disable-next-line max-len
+    const authorContainer = await singleAuthorContainer(authors[0], githubIds[0], linkedinLinks[0], publicationDate, 0, true);
+    authorContainer.classList.add('single-author');
+    authorContainers.append(authorContainer);
+  } else {
+    const date = createTag('div', { class: 'blog-publication-date' }, `Published on ${publicationDate}`);
+    validateDate(date, publicationDate);
+    bylineContainer.append(date);
+    // Handle multiple authors case
+    authors.forEach(async (author, i) => {
+      // eslint-disable-next-line max-len
+      const authorContainer = await multipleAuthorsContainer(author, githubIds[i], linkedinLinks[i], publicationDate, i, false);
+      authorContainer.classList.add('multiple-authors');
+      authorContainers.append(authorContainer);
+    });
+  }
+  bylineContainer.append(authorContainers);
 }

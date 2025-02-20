@@ -5,7 +5,7 @@
   <script type="importmap">{"imports": {
     "chartjs": "https://esm.sh/chart.js@4.4.2",
     "chartjs-chart-sankey": "https://esm.sh/chartjs-chart-sankey@0.12.1?deps=chart.js@4.4.2",
-    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.15.0"
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.16.2"
   }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
@@ -114,6 +114,8 @@
           <facet-sidebar>
             <list-facet facet="userAgent" drilldown="share.html">
               <legend>Device Type and Operating System</legend>
+              <a href="/docs/rum-explorer#device-share" class="help"
+              target="_blank" title="What devices and operating systems have accessed your site?"></a>
               <dl>
                 <dt>desktop</dt>
                 <dd>All Desktop</dd>
@@ -147,9 +149,13 @@
             </list-facet>
             <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
               <legend>URL</legend>
+              <a href="/docs/rum-explorer#url" class="help"
+              target="_blank" title="What different pages make up your site?"></a>
             </link-facet>
             <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
               <legend>Checkpoints</legend>
+              <a href="/docs/rum-explorer#checkpoints" class="help"
+              target="_blank" title="What type of activity data is collected?"></a>
               <dl>
                 <dt>enter</dt>
                 <dd>Visit Entry</dd>
@@ -196,6 +202,8 @@
             </list-facet>
             <list-facet facet="clicktarget">
               <legend>Click Target Type</legend>
+              <a href="/docs/rum-explorer#facet-click" class="help"
+              target="_blank" title="Where on the page (including links) visitors clicked?"></a>
             </list-facet>
             <list-facet facet="exit">
               <legend>Exit Link</legend>
@@ -205,6 +213,8 @@
             </vitals-facet>
             <thumbnail-facet facet="lcp.target">
               <legend>LCP Image</legend>
+              <a href="/docs/rum-explorer#facet-lcp" class="help"
+              target="_blank" title="Identify elements of page that are slowing down page loading"></a>
               </thunbnail-facet>
               <literal-facet facet="lcp.source">
                 <legend>LCP Element</legend>

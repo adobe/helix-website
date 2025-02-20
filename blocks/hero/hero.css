@@ -45,7 +45,7 @@
 .inner-content h3 {
   font-size: var(--type-body-l-size);
   font-weight: 700;
-  letter-spacing: 1;
+  letter-spacing: 1px;
   margin-bottom: var(--spacing-s);
   color: var(--color-accent-blue);
   text-transform: uppercase;
