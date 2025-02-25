@@ -238,19 +238,19 @@ export function displayResults(matches, terms, container, isHomepage) {
  * @param {Array} terms - Array of search terms to highlight.
  * @param {HTMLElement} container - Results container.
  */
-export function displayResult(match, terms, container, isHomepage) {
-  // reset display
-  container.setAttribute('aria-hidden', false);
-  container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
-  const li = buildResult(match, terms, isHomepage);
-  if (li) {
-    container.append(li);
-    container.classList.add('open');
-    if (!isHomepage) container.closest('aside').classList.add('expand');
-  } else {
-    displayNoResults(container, isHomepage);
-  }
-}
+// export function displayResult(match, terms, container, isHomepage) {
+//   // reset display
+//   container.setAttribute('aria-hidden', false);
+//   container.querySelector('.doc-search-no-result').setAttribute('aria-hidden', true);
+//   const li = buildResult(match, terms, isHomepage);
+//   if (li) {
+//     container.append(li);
+//     container.classList.add('open');
+//     if (!isHomepage) container.closest('aside').classList.add('expand');
+//   } else {
+//     displayNoResults(container, isHomepage);
+//   }
+// }
 
 /**
  * Hides the search results container.
@@ -293,7 +293,7 @@ function findDoc(query, docs = [], findMultiple = false) {
     docs.forEach((doc) => (doc.title ? indexDocs.push(doc) : faqDocs.push(doc)));
 
     // split the query into terms, trimming and filtering out 1-2 letter and unhelpful words
-    const filterOut = ['and', 'but', 'can', 'eds', 'for', 'how', 'the', 'use', 'what'];
+    const filterOut = ['and', 'but', 'can', 'eds', 'for', 'how', 'the', 'use', 'what', 'aem'];
     const terms = query.toLowerCase().split(' ').map((e) => e.trim()).filter((e) => e.length > 2 && !filterOut.includes(e));
     if (!terms.length) return { terms, match: [] }; // eject if no valid search terms
 
@@ -313,8 +313,8 @@ function findDoc(query, docs = [], findMultiple = false) {
         perfectMatches.add(createSearchResultObject(doc, terms, 'faq'));
       }
     });
-    // eject if we have and only need one result
-    if (!findMultiple && perfectMatches.size > 3) return { terms, match: [...perfectMatches] };
+    // eject if we have 3 results at least to show
+    if (!findMultiple && perfectMatches.size >= 3) return { terms, match: [...perfectMatches] };
 
     // find strong matches (some terms match title or faq question)
     indexDocs.forEach((doc) => {
@@ -327,8 +327,8 @@ function findDoc(query, docs = [], findMultiple = false) {
         strongMatches.add(createSearchResultObject(doc, terms, 'faq'));
       }
     });
-    // eject if we have and only need one result
-    if (!findMultiple && strongMatches.size > 3) return { terms, match: [...strongMatches] };
+    // eject if we have 3 results at least to show
+    if (!findMultiple && (perfectMatches.size + strongMatches.size) >= 3) return { terms, match: [...strongMatches] };
 
     // find weaker/fallback matches (some terms match content or faq answer}
     indexDocs.forEach((doc) => {
@@ -372,7 +372,7 @@ function searchQuery(search, docs, results, isHomepage) {
         ? [...new Map(match.map((item) => [item.path, item])).values()]
         : match;
       if (isHomepage) {
-        displayResult(uniqueMatches[0], terms, results, isHomepage);
+        displayResults(uniqueMatches.slice(0, 3), terms, results, isHomepage);
       } else {
         displayResults(uniqueMatches, terms, results, isHomepage);
       }
