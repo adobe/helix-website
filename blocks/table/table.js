@@ -11,6 +11,7 @@ function buildCell(rowIndex) {
 }
 
 export default async function decorate(block) {
+  if (block.querySelector('table')) return;
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const tbody = document.createElement('tbody');
