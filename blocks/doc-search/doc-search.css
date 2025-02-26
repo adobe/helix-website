@@ -1,0 +1,211 @@
+.doc-search {
+  padding: var(--spacing-xl) 0;
+}
+
+.doc-search,
+.doc-search form {
+  position: relative;
+}
+
+.doc-search form {
+  margin: 0 auto;
+  padding: 0 12px;
+  font: inherit;
+}
+
+.doc-search form svg {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 18px;
+  width: 20px;
+  height: 20px;
+  fill: rgb(110 110 110);
+  transition: fill 130ms ease-in-out;
+}
+
+.doc-search form input {
+  appearance: none;
+  display: block;
+  width: 100%;
+  outline: none;
+  border: 1px solid;
+  border-color: rgb(202 202 202);
+  border-radius: 4px;
+  padding: 0 0 0 30px;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
+}
+
+.doc-search.homepage form input {
+  font-size: 150%;
+  line-height: 150%;
+}
+
+.doc-search form input:focus {
+  border-color: rgb(42 124 223);
+}
+
+.doc-search form input::placeholder {
+  font-style: italic;
+}
+
+.doc-search form button { 
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 13px;
+  outline: none;
+  border: none;
+  border-radius: 3px;
+  padding: 7px 12px;
+  background: white;
+  transition: color 130ms ease-in-out;
+  cursor: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.doc-search form input:hover + button {
+  display: block;
+  color: white;
+}
+
+.doc-search form input:not(:placeholder-shown) + button {
+  display: block;
+  pointer-events: auto;
+  color: unset;
+  cursor: pointer;
+}
+
+.doc-search [aria-hidden='true'] {
+  display: none;
+}
+
+.doc-search .doc-search-results {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: calc(50% + 15px);
+  margin-top: 0;
+  padding: 0;
+  border: 1px solid rgb(202 202 202);
+  border-radius: 3px;
+  background-color: white;
+  opacity: 0;
+  animation: fade-in 580ms ease forwards;
+  z-index: 1;
+}
+
+.doc-search .doc-search-results.fade-out {
+  /* match delay set in backspace() */
+  animation: fade-out 580ms ease forwards; 
+  z-index: -1;
+}
+
+@keyframes fade-in {
+  from {
+    top: calc(50% + 15px);
+    opacity: 0;
+  }
+  
+  to {
+    top: calc(50% + 30px);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    top: calc(50% + 20px);
+    opacity: 1;
+  } 
+
+  to {
+    top: calc(50% - 15px);
+    opacity: 0;
+  }
+}
+
+.doc-search .doc-search-results > li {
+  list-style: none;
+}
+
+.doc-search .doc-search-results > li.doc-search-result + li {
+  border-top: 1px solid var(--bg-color-grey);
+}
+
+.doc-search .doc-search-results > li.doc-search-no-result {
+  padding: 7px 32px;
+}
+
+.doc-search .doc-search-results > li.doc-search-no-result a {
+  border-bottom: 1px solid;
+  color: var(--spectrum-blue);
+  text-decoration: none;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a {
+  display: grid;
+  grid-template: 
+    'pic title' auto
+    'pic desc' auto / auto 1fr;
+  gap: 0 7px;
+  padding: 7px 6px;
+  padding-right: 32px;
+  color: unset;
+  text-decoration: none;
+  transition: background-color 130ms;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a:hover,
+.doc-search .doc-search-results > li.doc-search-result a:focus {
+  background-color: var(--bg-color-grey);
+}
+
+.doc-search .doc-search-results > li.doc-search-result a picture {
+  grid-area: pic;
+  margin-top: 2px;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a img {
+  width: 17px;
+  height: 17px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a mark {
+  position: relative;
+  background-color: transparent;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a mark::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 -4px;
+  background-color: rgb(255 208 0 / 30%);
+  border-radius: 4px;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a p {
+  margin: 0;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a p:first-of-type {
+  grid-area: title;
+  color: #2e2e2e;
+  font-weight: bold;
+}
+
+.doc-search .doc-search-results > li.doc-search-result a p:last-of-type {
+  grid-area: desc;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
