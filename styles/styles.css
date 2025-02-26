@@ -2212,6 +2212,10 @@ body.contact-template main .default-content-wrapper img {
     max-width: 900px;
   }
 
+  body.faq-theme main aside.side-navigation-wrapper.expand {
+    grid-column: 1 / span 3;
+  }
+
   body.faq-theme main .section.content {
     width: unset;
     padding: unset;
