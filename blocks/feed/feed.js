@@ -50,6 +50,10 @@ export async function renderFeed(block) {
   block.appendChild(parentDiv);
 }
 
+function isImgUrl(url) {
+  return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url)
+}
+
 // logic to render blog list home page
 export async function fetchBlogContent(url) {
   try {
@@ -62,6 +66,17 @@ export async function fetchBlogContent(url) {
       const newHeading = document.createElement(nextLevel);
       newHeading.innerHTML = heading.innerHTML;
       heading.replaceWith(newHeading);
+    });
+    // render images as img tags rather than linka
+    doc.querySelectorAll('a').forEach((link) => {
+      const url = new URL(link.href);
+      const pathname = url.pathname;
+      if (isImgUrl(url)) {
+        const imgName = pathname?.substring(pathname?.lastIndexOf("/")+1, pathname?.lastIndexOf("."));
+        const img = createTag('img', { src: pathname, alt: imgName, width: '100%', loading: 'eager' });
+        link.parentElement.classList.add('image-wrapper');
+        link.replaceWith(img);
+      }
     });
     const content = doc.querySelector('body > main > div');
     return content ? content.innerHTML : '';
@@ -92,6 +107,7 @@ export async function renderBlog(block) {
     // eslint-disable-next-line max-len
     const truncatedContent = latestBlogContent.substring(0, Math.floor(latestBlogContent.length * 0.75));
     latestBlogItem.innerHTML = truncatedContent;
+    
   }
 
   const readMoreButton = createTag('a', { href: latestBlog.path, class: 'read-more button primary large' }, 'Read More');

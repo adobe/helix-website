@@ -37,6 +37,10 @@
   background-color: white;
 }
 
+.blog-item.latest .image-wrapper {
+  width: 100%;
+}
+
 .blog-item:not(.blog-item.latest):hover {
   box-shadow: 0 8px 16px rgba(0 0 0 / 40%);
 }
