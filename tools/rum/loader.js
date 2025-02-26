@@ -10,7 +10,7 @@ const { addCalculatedProps } = utils;
 export default class DataLoader {
   constructor() {
     this.cache = new Map();
-    this.API_ENDPOINT = 'https://rum.fastly-aem.page';
+    this.API_ENDPOINT = 'https://bundles.aem.page';
     this.DOMAIN = 'www.thinktanked.org';
     this.DOMAIN_KEY = '';
     this.ORG = undefined;

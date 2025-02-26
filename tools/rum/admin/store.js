@@ -1,4 +1,4 @@
-const API = 'https://rum.fastly-aem.page';
+const API = 'https://bundles.aem.page';
 
 let token;
 const fetchAPI = async (path, opts = {}) => fetch(`${API}${path}`, {
@@ -51,6 +51,7 @@ const store = new (class {
       token = localStorage.getItem('rum-bundler-token');
     }
     if (!token) {
+      // eslint-disable-next-line no-alert
       token = prompt('Please enter your key');
       if (!token) {
         this.denied = true;

@@ -1,0 +1,264 @@
+name: Track Publishes
+on:
+  schedule:
+    - cron: "0/5 * * * *"
+  workflow_dispatch:
+
+
+permissions:
+  actions: read # required to access workflow runs
+  contents: write # required to access the repository, for the dispatch event
+
+env:
+  ADD_MD_SUFFIX: "true" # default value for all triggers, this is a compatibility fix for older workflows
+  REPOSITORY_DISPATCH_EVENT: "resource-published-native" # default value for all triggers, this is a compatibility fix for older workflows
+  WORKFLOW_CALL_USE: "example" # if REPOSITORY_DISPATCH_EVENT is unset, this is the workflow file that will be called
+  ROUTE_FILTER: "live" # filter for the route field in the logs, can be 'live' or 'preview'
+
+jobs:
+  check-token-expiry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check JWT token expiration
+        run: |
+          # Function to decode JWT token part
+          decode_base64_url() {
+            local len=$((${#1} % 4))
+            local result="$1"
+            if [ $len -eq 2 ]; then result="$1"'=='
+            elif [ $len -eq 3 ]; then result="$1"'='
+            fi
+            echo "$result" | tr '_-' '/+' | base64 -d
+          }
+          
+          # Get the token
+          TOKEN="${{ secrets.AEM_LIVE_ADMIN_TOKEN }}"
+          
+          # Extract the payload (second part of the JWT)
+          PAYLOAD=$(echo -n $TOKEN | cut -d '.' -f 2)
+          
+          # Decode the payload
+          DECODED_PAYLOAD=$(decode_base64_url $PAYLOAD)
+          
+          # Extract expiration timestamp
+          EXPIRY=$(echo $DECODED_PAYLOAD | jq -r .exp)
+          CURRENT_TIME=$(date +%s)
+          ONE_WEEK_FROM_NOW=$((CURRENT_TIME + 7*24*60*60))
+          
+          echo "Token expires at: $(date -d @$EXPIRY)"
+          echo "Current time: $(date -d @$CURRENT_TIME)"
+          echo "One week from now: $(date -d @$ONE_WEEK_FROM_NOW)"
+          
+          if [ $EXPIRY -lt $ONE_WEEK_FROM_NOW ]; then
+            echo "::warning::AEM_LIVE_ADMIN_TOKEN will expire in less than a week (on $(date -d @$EXPIRY)). Please renew the token soon."
+            echo "Token expiration is approaching" >> $GITHUB_STEP_SUMMARY
+            echo "The AEM_LIVE_ADMIN_TOKEN will expire on $(date -d @$EXPIRY)" >> $GITHUB_STEP_SUMMARY
+            echo "Please generate a new token and update the repository secret." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ $EXPIRY -lt $CURRENT_TIME ]; then
+            echo "::error::AEM_LIVE_ADMIN_TOKEN has expired on $(date -d @$EXPIRY)"
+            exit 1
+          fi
+  check-last-run:
+    runs-on: ubuntu-latest
+    outputs:
+      workflow-id: ${{ steps.workflow-id.outputs.WORKFLOW_ID }}
+      last-run-iso: ${{ steps.last-run.outputs.LAST_CREATED_AT_ISO }} # ISO 8601
+      last-run-unix: ${{ steps.last-run.outputs.LAST_CREATED_AT_UNIX }} # Unix timestamp
+      branch-name: ${{ steps.branch-name.outputs.BRANCH_NAME }}
+    steps:
+      - name: Get branch name
+        id: branch-name
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ ${GITHUB_EVENT_NAME} == "pull_request" ]]
+          then
+             echo "BRANCH_NAME=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+          else
+             echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+          fi
+      - name: Get workflow id
+        id: workflow-id
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          WORKFLOW_ID=$(gh api /repos/${{ github.repository }}/actions/runs/${{ github.run_id }} | jq -r .workflow_id)
+          echo "WORKFLOW_ID=$WORKFLOW_ID" >> $GITHUB_OUTPUT
+          echo "Workflow id: ${WORKFLOW_ID}"
+      - name: Get previous build status
+        shell: bash
+        id: last-run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_PAGES: "5" # Maximum number of pages to check before giving up
+        run: |
+          LAST_CREATED_AT_ISO=""
+          page=1
+          
+          while [[ $page -le $MAX_PAGES ]]; do
+            echo "Checking page $page for successful runs..."
+            
+            # Get workflow runs for current page
+            WORKFLOW_RUNS=$(gh api "/repos/${{ github.repository }}/actions/workflows/${{ steps.workflow-id.outputs.WORKFLOW_ID }}/runs?status=completed&branch=${{ steps.branch-name.outputs.BRANCH_NAME }}&page=$page&per_page=100")
+            
+            # Check if we got any runs
+            TOTAL_COUNT=$(echo "$WORKFLOW_RUNS" | jq '.total_count')
+            if [[ $TOTAL_COUNT -eq 0 || $(echo "$WORKFLOW_RUNS" | jq '.workflow_runs | length') -eq 0 ]]; then
+              echo "No more workflow runs found."
+              break
+            fi
+            
+            # Try to find a successful run on this page
+            LAST_CREATED_AT_ISO=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[] | select(.conclusion == \"success\") | .created_at][0]")
+            
+            if [[ "$LAST_CREATED_AT_ISO" != "null" ]]; then
+              echo "Found successful run on page $page"
+              break
+            fi
+            
+            # Store first run's timestamp as fallback if we haven't stored one yet
+            if [[ $page -eq 1 ]]; then
+              FALLBACK_TIMESTAMP=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[].created_at][0]")
+              if [[ "$FALLBACK_TIMESTAMP" != "null" ]]; then
+                echo "Storing fallback timestamp from first page: $FALLBACK_TIMESTAMP"
+                FIRST_RUN_ISO=$FALLBACK_TIMESTAMP
+              fi
+            fi
+            
+            ((page++))
+          done
+          
+          # If we didn't find a successful run, use fallback strategies
+          if [[ "$LAST_CREATED_AT_ISO" == "null" || -z "$LAST_CREATED_AT_ISO" ]]; then
+            echo "::warning::No successful workflow runs found in the last $MAX_PAGES pages."
+            
+            if [[ -n "$FIRST_RUN_ISO" ]]; then
+              echo "Using timestamp from earliest found run as fallback"
+              LAST_CREATED_AT_ISO=$FIRST_RUN_ISO
+              
+              # Add information about recent failures to the job summary
+              echo "Recent workflow run history:" >> $GITHUB_STEP_SUMMARY
+              echo "$WORKFLOW_RUNS" | jq -r '.workflow_runs | map({conclusion, created_at, html_url}) | .[:5]' >> $GITHUB_STEP_SUMMARY
+            else
+              echo "::warning::No previous runs found at all. Using a timestamp from 5 minutes ago as fallback."
+              LAST_CREATED_AT_ISO=$(date -u -d "5 minutes ago" "+%Y-%m-%dT%H:%M:%SZ")
+            fi
+          fi
+          
+          LAST_CREATED_AT_UNIX=$(date -d "$LAST_CREATED_AT_ISO" +%s)
+          echo "LAST_CREATED_AT_ISO=$LAST_CREATED_AT_ISO" >> $GITHUB_OUTPUT
+          echo "LAST_CREATED_AT_UNIX=$LAST_CREATED_AT_UNIX" >> $GITHUB_OUTPUT
+          echo "Previous build created at: $LAST_CREATED_AT_ISO"
+  poll-log:
+    runs-on: ubuntu-latest
+    needs: check-last-run
+    steps:
+      - name: Check for required secrets
+        run: |
+          if [[ -z "${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" ]]; then
+            echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. Please add this secret to your repository settings."
+            exit 1
+          fi
+      - name: Get Logs
+        id: get-logs
+        run: |
+          echo "Debug: Last run ISO: ${{ needs.check-last-run.outputs.last-run-iso }}"
+          
+          # URL encode the from parameter (using tr to remove newlines)
+          FROM_PARAM=$(echo -n "${{ needs.check-last-run.outputs.last-run-iso }}" | tr -d '\n' | jq -sRr @uri)
+          echo "Debug: URL encoded from parameter: $FROM_PARAM"
+          
+          # Construct and echo the full URL for debugging
+          FULL_URL="https://admin.hlx.page/log/adobe/helix-website/main?from=$FROM_PARAM"
+          echo "Debug: Full URL: $FULL_URL"
+          
+          # Make the API request
+          RESPONSE=$(curl --http1.1 -s -w "\n%{http_code}" \
+            -H "Authorization: token $(echo -n "${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" | tr -d '\n')" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: GitHub-Actions-Workflow" \
+            "$FULL_URL")
+          
+          # Extract status code from last line
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          # Extract response body (everything except the last line)
+          BODY=$(echo "$RESPONSE" | sed '$ d')
+          
+          echo "Debug: HTTP Status: $HTTP_STATUS"
+          
+          # Check if status code is not 2xx
+          if [[ $HTTP_STATUS -lt 200 ]] || [[ $HTTP_STATUS -gt 299 ]]; then
+            echo "Error: API request failed with status $HTTP_STATUS"
+            echo "Response body: $BODY"
+            exit 1
+          fi
+          
+          # Process the response if status was ok
+          LOGS=$(echo "$BODY" | jq -R --arg route "${{ env.ROUTE_FILTER }}" 'fromjson | .entries | sort_by(.timestamp) | map(select(.route == $route))' | base64 -w 0)
+          
+          echo "Debug: LOGS value length: ${#LOGS}"
+          echo "Debug: First few characters: ${LOGS:0:100}"
+          echo "logs=$LOGS" >> $GITHUB_OUTPUT
+      - name: Check for publishes
+        id: check-publishes
+        if: steps.get-logs.outputs.logs != 'W10K'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LOGS="${{ steps.get-logs.outputs.logs }}"
+          
+          echo "$LOGS" | base64 -d | jq -c '.[]' | while read -r log; do
+            user=$(echo "$log" | jq -r '.user // "unknown"')
+            status=$(echo "$log" | jq -r '.status')
+            timestamp=$(echo "$log" | jq -r '.timestamp')
+            
+            # Get all paths (combine path and paths, filter out empty strings)
+            paths=$(echo "$log" | jq -r '[ .path, (.paths[]?) ] | map(select(length > 0))[]')
+            
+            echo "$paths" | while read -r path; do
+              # Add .md extension if configured and path has no extension
+              if [[ "${{ env.ADD_MD_SUFFIX }}" == "true" ]] && [[ "$path" != *.* ]]; then
+                path="${path}.md"
+              fi
+              
+              # Handle repository dispatch or workflow call
+              if [[ -n "${{ env.REPOSITORY_DISPATCH_EVENT }}" ]]; then
+                payload=$(jq -n \
+                  --arg type "${{ env.REPOSITORY_DISPATCH_EVENT }}" \
+                  --arg path "$path" \
+                  --arg user "$user" \
+                  --arg timestamp "$timestamp" \
+                  --arg status "$status" \
+                  '{
+                    event_type: $type,
+                    client_payload: {
+                      path: $path,
+                      user: $user,
+                      timestamp: $timestamp,
+                      status: $status
+                    }
+                  }')
+                
+                echo "Triggering dispatch for $path with event type: ${{ env.REPOSITORY_DISPATCH_EVENT }}"
+                gh api \
+                  --method POST \
+                  --header "Accept: application/vnd.github.v3+json" \
+                  "/repos/${{ github.repository }}/dispatches" \
+                  --input - <<< "$payload"
+              elif [[ -n "${{ env.WORKFLOW_CALL_USE }}" ]]; then
+                echo "Triggering workflow ${{ env.WORKFLOW_CALL_USE }} for $path"
+                gh workflow run "${{ env.WORKFLOW_CALL_USE }}" \
+                  -f path="$path" \
+                  -f user="$user" \
+                  -f timestamp="$timestamp" \
+                  -f status="$status"
+              else
+                echo "Skipping triggers for $path (neither REPOSITORY_DISPATCH_EVENT nor WORKFLOW_CALL_USE is set)"
+              fi
+            done
+          done

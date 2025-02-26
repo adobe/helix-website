@@ -1,64 +1,64 @@
 .copy {
-    background: var(--highlight-gradient);
-    border-radius: 25px;
-    padding: 20px 30px;
-    color: white;
-    margin: 64px 0;
+  background: var(--highlight-gradient);
+  border-radius: 25px;
+  padding: 20px 30px;
+  color: white;
+  margin: 64px 0;
 }
 
 .copy:empty {
-    display: none;
+  display: none;
 }
 
 .copy p {
-    margin: 0;
-    line-height: 1em;
-    font-size: var(--type-body-xxs-size);
+  margin: 0;
+  line-height: 1em;
+  font-size: var(--type-body-xxs-size);
 }
 
 .copy > div {
-    display: flex;
-    flex-direction: column;
-    margin: 30px 0;
+  display: flex;
+  flex-direction: column;
+  margin: 30px 0;
 }
 
 .copy > div > span {
-    font-size: var(--type-body-xs-size);
+  font-size: var(--type-body-xs-size);
 }
 
 .copy > div > input {
-    border-radius: 5px;
-    padding: 5px 10px;
-    border: 0;
-    margin: 0 0 10px;
+  border-radius: 5px;
+  padding: 5px 10px;
+  border: 0;
+  margin: 0 0 10px;
 }
 
 .copy > div > button {
-    color: white;
-    border-radius: 20px;
-    background-color: unset;
-    border: 2px solid white;
-    padding: 5px 20px;
+  color: white;
+  border-radius: 20px;
+  background-color: unset;
+  border: 2px solid white;
+  padding: 5px 20px;
 }
 
 @media (width >= 900px) {
-    .copy > div {
-        flex-direction: unset;
-        justify-content: stretch;
-        margin: 30px 0;
-    }
+  .copy > div {
+    flex-direction: unset;
+    justify-content: stretch;
+    margin: 30px 0;
+  }
 
-    .copy > div > span {
-        flex: 1 1 200px;
-    }
-    
-    .copy > div > input {
-        flex: 1 1 100%;
-        margin: unset;
-    }
-    
-    .copy > div > button {
-        margin-left: 40px;
-        flex: 1 1 60px;
-    }
+  .copy > div > span {
+    flex: 1 1 200px;
+  }
+
+  .copy > div > input {
+    flex: 1 1 100%;
+    margin: unset;
+  }
+
+  .copy > div > button {
+    margin-left: 40px;
+    flex: 1 1 60px;
+  }
 }

@@ -3,8 +3,8 @@
 <head>
   <title>Real Use Monitoring (RUM) Explorer | AEM Live</title>
   <script type="importmap">{"imports": {
-    "chartjs": "https://esm.sh/chart.js@4.4.2",
-    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.14.0"
+    "chartjs": "https://esm.sh/chart.js@4.4.8",
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.16.2"
   }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
@@ -109,6 +109,8 @@
           <facet-sidebar>
             <list-facet facet="userAgent" drilldown="share.html">
               <legend>Device Type and Operating System</legend>
+              <a href="/docs/rum-explorer#device-share" class="help"
+              target="_blank" title="What devices and operating systems have accessed your site?"></a>
               <dl>
                 <dt>desktop</dt>
                 <dd>All Desktop</dd>
@@ -142,9 +144,13 @@
             </list-facet>
             <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
               <legend>URL</legend>
+              <a href="/docs/rum-explorer#url" class="help"
+              target="_blank" title="What different pages make up your site?"></a>  
             </link-facet>
             <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
               <legend>Checkpoints</legend>
+              <a href="/docs/rum-explorer#checkpoints" class="help"
+              target="_blank" title="What type of activity data is collected?"></a>
               <dl>
                 <dt>enter</dt>
                 <dd>Visit Entry</dd>
@@ -170,21 +176,33 @@
             </list-facet>
             <literal-facet facet="click.source" drilldown="list.html">
               <legend>Click Source (CSS Selector)</legend>
+              <a href="/docs/rum-explorer#facet-click" class="help"
+              target="_blank" title="What page visitors clicked"></a>
             </literal-facet>
             <link-facet facet="click.target" drilldown="list.html">
               <legend>Click Target (URL)</legend>
+              <a href="/docs/rum-explorer#facet-click" class="help"
+              target="_blank" title="What page visitors clicked"></a>
             </link-facet>
             <literal-facet facet="viewmedia.source" drilldown="list.html">
               <legend>Media Source (CSS Selector)</legend>
+              <a href="/docs/rum-explorer#facet-viewmedia" class="help"
+              target="_blank" title="What image/video visitors have seen?"></a>
             </literal-facet>
             <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
               <legend>Media Target</legend>
+              <a href="/docs/rum-explorer#facet-viewmedia" class="help"
+              target="_blank" title="What image/video visitors have seen?"></a>
             </thumbnail-facet>
             <literal-facet facet="viewblock.source" drilldown="list.html">
               <legend>Block (CSS Selector)</legend>
+              <a href="/docs/rum-explorer#facet-viewblock" class="help"
+              target="_blank" title="What blocks visitors have seen?"></a>
             </literal-facet>
             <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
               <legend>External Referrer</legend>
+              <a href="/docs/rum-explorer#facet-enter" class="help"
+              target="_blank" title="How the users entered into the site?"></a>
               <dl>
                 <dt>(direct)</dt>
                 <dd>Direct Entry (or via App)</dd>
@@ -192,6 +210,8 @@
             </link-facet>
             <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
               <legend>Internal Referrer</legend>
+              <a href="/docs/rum-explorer#facet-navigate" class="help"
+              target="_blank" title="Internal navigation paths on the site"></a>
             </link-facet>
 
             <list-facet facet="consent.source">
@@ -233,7 +253,7 @@
             <list-facet facet="loadresource.source">
               <legend>Resource Loaded</legend>
             </list-facet>
-            <vitals-facet facet="vitals">
+            <vitals-facet drilldown="cwvperf.html" facet="vitals">
               <legend>Experience Quality</legend>
             </vitals-facet>
           </facet-sidebar>

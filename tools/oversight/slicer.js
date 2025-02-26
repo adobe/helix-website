@@ -29,7 +29,7 @@ const {
 /* globals */
 let DOMAIN = 'www.thinktanked.org';
 
-const BUNDLER_ENDPOINT = 'https://rum.fastly-aem.page';
+const BUNDLER_ENDPOINT = 'https://bundles.aem.page';
 // const BUNDLER_ENDPOINT = 'http://localhost:3000';
 const API_ENDPOINT = BUNDLER_ENDPOINT;
 
@@ -245,6 +245,7 @@ function updateDataFacets(filterText, params, checkpoint) {
       ));
 
       if (cp === 'loadresource') {
+        // eslint-disable-next-line no-console
         console.log('adding histogram facet');
         // loadresource.target are not discrete values, but the number
         // of milliseconds it took to load the resource, so the best way
@@ -365,6 +366,15 @@ export function updateState() {
     });
   });
 
+  // remove all source and target filters if their specific checkpoint
+  // is not in the checkpoint filter
+  [...url.searchParams.entries()].filter(([key]) => key.match(/\.(source|target)$/))
+    .forEach(([key]) => {
+      const [cp] = key.split('.');
+      if (!url.searchParams.getAll('checkpoint').includes(cp)) {
+        url.searchParams.delete(key);
+      }
+    });
   // iterate over all existing URL parameters and keep those that are known facets
   // and end with ~, so that we can keep the state of the facets
   searchParams.forEach((value, key) => {

@@ -1,11 +1,11 @@
 .sidekick-generator form {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .sidekick-generator form label {
-    width: 100%;
-    font-weight: 700;
+  width: 100%;
+  font-weight: 700;
 }
 
 .sidekick-generator a.back-link::before {
@@ -16,20 +16,20 @@
 
 .sidekick-generator input[type="text"],
 .sidekick-generator input[type="password"] {
-    display: block;
-    width: 100%;
-    line-height: 30px;
-    border: 1px solid;
-    border-color: rgb(202 202 202);
-    border-radius: 4px;
-    padding: 0 8px;
-    font-size: 14px;
-    font-family: adobe-clean, sans-serif;
-    outline: none !important;
-    appearance: none;
-    box-sizing: border-box;
-    transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
-    flex: 1 1 0%;
+  display: block;
+  width: 100%;
+  line-height: 30px;
+  border: 1px solid;
+  border-color: rgb(202 202 202);
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 14px;
+  font-family: adobe-clean, sans-serif;
+  outline: none !important;
+  appearance: none;
+  box-sizing: border-box;
+  transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
+  flex: 1 1 0%;
 }
 
 .sidekick-generator input[type="checkbox"] {
@@ -40,9 +40,9 @@
 }
 
 .sidekick-generator input[type="text"]::placeholder {
-    font-weight: 400;
-    color: #8e8e8e;
-    transition: color 130ms ease-in-out;
+  font-weight: 400;
+  color: #8e8e8e;
+  transition: color 130ms ease-in-out;
 }
 
 .sidekick-generator input[type="text"]:focus::placeholder,
@@ -52,7 +52,7 @@
 
 .sidekick-generator input[type="text"]:focus,
 .sidekick-generator input[type="password"]:focus {
-    border-color: rgb(42 124 223);
+  border-color: rgb(42 124 223);
 }
 
 .sidekick-generator button {
@@ -64,7 +64,7 @@
   font-weight: 600;
   padding: 0 16px;
   border: none;
-  font-family: adobe-clean, 'Trebuchet MS', sans-serif;
+  font-family: adobe-clean, "Trebuchet MS", sans-serif;
   flex: 0 1 auto;
 }
 

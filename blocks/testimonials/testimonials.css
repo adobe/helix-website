@@ -7,10 +7,11 @@
   --tabs-active-text-color: #2c2c2c;
   --tabs-bg-color: rgb(250 250 250);
   --tabs-active-bg-color: #fff;
-  --tabs-list-bg-gradient: linear-gradient(
-    rgba(255 255 255 0%) 60%,
-    rgba(245 245 245 80%)
-  );
+  --tabs-list-bg-gradient:
+    linear-gradient(
+      rgba(255 255 255 0%) 60%,
+      rgba(245 245 245 80%)
+    );
 
   /* redesign */
   --tabs-image-based-border-color: #e8e8e8;
@@ -69,11 +70,7 @@
 }
 
 .testimonials .tab-list .tablist-container button:hover picture,
-.testimonials
-  .tab-list
-  .tablist-container
-  button[aria-selected="true"]
-  picture {
+.testimonials .tab-list .tablist-container button[aria-selected="true"] picture {
   opacity: 1;
 }
 
@@ -158,12 +155,7 @@
   margin-right: auto;
 }
 
-.testimonials
-  .testimonial
-  .tabcontent-container
-  .tabpanel
-  .customer-info
-  picture {
+.testimonials .testimonial .tabcontent-container .tabpanel .customer-info picture {
   margin-top: var(--spacing-xxs);
 }
 

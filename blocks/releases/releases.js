@@ -6,6 +6,7 @@ function mdToHTML(md) {
     .replace(/^## (.*$)/gim, '<h2>$1</h2>') // h2 tag
     .replace(/^# (.*$)/gim, '<h1>$1</h1>') // h1 tag
     .replace(/^\* (.*$)/gim, '<li>$1</li>') // li tag
+    .replace(/^ {2}- (.*$)/gim, '<li>$1</li>') // li tag - different markdown syntax
     .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>') // bold text
     .replace(/\*(.*)\*/gim, '<i>$1</i>') // italic text
     .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>'); // links
@@ -21,6 +22,7 @@ const displayNames = {
   'franklin-sidekick-library': 'Sidekick Library',
   'aem-lib': 'AEM Library',
   'helix-sidekick-extension': 'Sidekick Extension (legacy)',
+  'aem-certificate-rotation': 'Infrastructure Updates',
 };
 
 function createRelease(release) {
@@ -70,7 +72,6 @@ function createRelease(release) {
     const ul = li.previousElementSibling;
     ul.append(li);
   });
-
   div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo] || release.repo} <a href="${release.url}">${release.tag}</a></h2>`;
   addAnchorLink(div.querySelector('h2'));
 

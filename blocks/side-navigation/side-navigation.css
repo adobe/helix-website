@@ -204,10 +204,7 @@
 }
 
 /* with arrow toggle list layer */
-.side-navigation
-  .list-section:last-of-type
-  .list-section-inner
-  > li.side-navigation-nested-target {
+.side-navigation .list-section:last-of-type .list-section-inner > li.side-navigation-nested-target {
   padding: 2px var(--nav-sidebar-indent-spacing);
   width: 100%;
   cursor: pointer;
@@ -241,17 +238,11 @@
   background: var(--bg-color-grey-2);
 }
 
-.side-navigation
-  .list-section
-  .side-navigation-nested-target
-  .icon.icon-icon-caret-down {
+.side-navigation .list-section .side-navigation-nested-target .icon.icon-icon-caret-down {
   transition: all 0.2s ease-in-out;
 }
 
-.side-navigation
-  .list-section
-  .side-navigation-nested-target:not(.collapse)
-  .icon.icon-icon-caret-down {
+.side-navigation .list-section .side-navigation-nested-target:not(.collapse) .icon.icon-icon-caret-down {
   transform: rotate(180deg);
 }
 

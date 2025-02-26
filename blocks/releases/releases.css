@@ -1,73 +1,76 @@
 .releases .releases-controls input[type="checkbox"] {
-    pointer-events: none;
+  pointer-events: none;
+}
+
+.releases .release-aem-certificate-rotation {
+  background-color: #d4e8ff;
 }
 
 .releases .release-helix-admin {
-    background-color: #FFD4F1;
+  background-color: #ffd4f1;
 }
 
 .releases .release-helix-pipeline-service {
-    background-color: #D1FFED;
+  background-color: #d1ffed;
 }
 
 .releases .release-helix-importer-ui {
-    background-color: #E8E8E8;
+  background-color: #e8e8e8;
 }
 
 .releases .release-aem-sidekick,
 .releases .release-helix-sidekick-extension {
-    background-color: #E4E8BF;
+  background-color: #e4e8bf;
 }
 
 .releases .release-franklin-sidekick-library {
-    background-color: #F4F8CF;
+  background-color: #f4f8cf;
 }
 
 .releases .release-helix-cli {
-    background-color: #FFEBD4;
+  background-color: #ffebd4;
 }
 
 .releases .release-aem-lib {
-    background-color: #CFEBF8;
+  background-color: #cfebf8;
 }
 
 .releases .release-helix-config-service {
-    background-color: #EDD1FF;
+  background-color: #edd1ff;
 }
 
 .releases .release {
-    padding: 16px 32px 32px;
-    margin: 16px 0;
-    border-radius: 16px;
-    display: none;
+  padding: 16px 32px 32px;
+  margin: 16px 0;
+  border-radius: 16px;
+  display: none;
 }
 
 .releases .releases-controls {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .releases .releases-control {
-    padding: 4px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    display: flex;
-    align-items: top;
+  padding: 4px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: start;
 }
 
-
 .releases-date {
-    font-weight: 700;
-    margin-bottom: 0;
+  font-weight: 700;
+  margin-bottom: 0;
 }
 
 .releases .release h2 {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .releases .releases-results[aria-hidden="true"] {
-    display: none;
+  display: none;
 }
 
 .releases .helix-admin .release-helix-admin,
@@ -78,6 +81,7 @@
 .releases .helix-cli .release-helix-cli,
 .releases .helix-config-service .release-helix-config-service,
 .releases .aem-lib .release-aem-lib,
-.releases .franklin-sidekick-library .release-franklin-sidekick-library {
-    display: block;
+.releases .franklin-sidekick-library .release-franklin-sidekick-library,
+.releases .aem-certificate-rotation .release-aem-certificate-rotation {
+  display: block;
 }
