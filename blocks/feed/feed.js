@@ -1,3 +1,4 @@
+import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 import {
   createTag,
   loadFeedData,
@@ -73,9 +74,7 @@ export async function fetchBlogContent(url) {
       const { pathname } = linkSrc;
       if (isImgUrl(pathname)) {
         const imgName = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.lastIndexOf('.'));
-        const img = createTag('img', {
-          src: pathname, alt: imgName, width: '100%', loading: 'eager',
-        });
+        const img = createOptimizedPicture(pathname, imgName);
         link.parentElement.classList.add('image-wrapper');
         link.replaceWith(img);
       }
