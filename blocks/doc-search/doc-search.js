@@ -328,7 +328,9 @@ function findDoc(query, docs = [], findMultiple = false) {
       }
     });
     // eject if we have 3 results at least to show
-    if (!findMultiple && (perfectMatches.size + strongMatches.size) >= 3) return { terms, match: [...strongMatches] };
+    if (!findMultiple && (perfectMatches.size + strongMatches.size) >= 3) {
+      return { terms, match: [...strongMatches] };
+    }
 
     // find weaker/fallback matches (some terms match content or faq answer}
     indexDocs.forEach((doc) => {
