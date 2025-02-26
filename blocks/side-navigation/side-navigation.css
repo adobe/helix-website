@@ -26,7 +26,7 @@
   display: none;
 }
 
-.side-navigation-wrapper.expand + .section.content {
+.side-navigation-wrapper.expand ~ .section {
   display: none;
 }
 
@@ -465,11 +465,11 @@
     min-height: 80vh;
   }
 
-  /* .side-navigation-wrapper + .section.content {
+  /* .side-navigation-wrapper ~ .section {
     display: none;
-  }
+  } */
 
-  .side-navigation-wrapper.ready + .section.content {
+  /* .side-navigation-wrapper.ready + .section {
     display: block;
   } */
 
