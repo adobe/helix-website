@@ -1818,6 +1818,10 @@ body.guides-template .guides-back-btn span.icon {
   margin-right: var(--spacing-xxs);
 }
 
+body.guides-template.no-back-button .guides-back-btn {
+  display: none;
+}
+
 @media screen and (width <= 899px) {
   body.guides-template .guides-back-btn.desktop {
     display: none;

@@ -11,6 +11,8 @@ export default function decorate(block) {
       column.addEventListener('click', () => {
         linkElement.click();
       });
+    } else {
+      column.className = '';
     }
   });
 }
