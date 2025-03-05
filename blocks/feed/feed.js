@@ -1,3 +1,4 @@
+import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 import {
   createTag,
   loadFeedData,
@@ -50,6 +51,10 @@ export async function renderFeed(block) {
   block.appendChild(parentDiv);
 }
 
+function isImgUrl(url) {
+  return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
+}
+
 // logic to render blog list home page
 export async function fetchBlogContent(url) {
   try {
@@ -62,6 +67,17 @@ export async function fetchBlogContent(url) {
       const newHeading = document.createElement(nextLevel);
       newHeading.innerHTML = heading.innerHTML;
       heading.replaceWith(newHeading);
+    });
+    // render images as img tags rather than linka
+    doc.querySelectorAll('a').forEach((link) => {
+      const linkSrc = new URL(link.href);
+      const { pathname } = linkSrc;
+      if (isImgUrl(pathname)) {
+        const imgName = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.lastIndexOf('.'));
+        const img = createOptimizedPicture(pathname, imgName);
+        link.parentElement.classList.add('image-wrapper');
+        link.replaceWith(img);
+      }
     });
     const content = doc.querySelector('body > main > div');
     return content ? content.innerHTML : '';

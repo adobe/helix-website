@@ -459,15 +459,20 @@ function decorateBreadcrumb(main) {
 
   const list = createTag('ul');
   const home = createTag('li', {}, '<a href="/home" class="breadcrumb-link-underline-effect">Home</a>');
-  const docs = createTag('li', {}, '<a href="/docs/" class="breadcrumb-link-underline-effect">Documentation</a>');
-
   list.append(home);
-  list.append(docs);
+
+  const template = getMetadata('template');
+
+  if (template === 'blog') {
+    const blog = createTag('li', {}, '<a href="/blog" class="breadcrumb-link-underline-effect">Blog</a>');
+    list.append(blog);
+  } else {
+    const docs = createTag('li', {}, '<a href="/docs/" class="breadcrumb-link-underline-effect">Documentation</a>');
+    list.append(docs);
+  }
 
   const category = getMetadata('category');
   const title = getMetadata('og:title');
-  const template = getMetadata('template');
-
   if (category) {
     const section = createTag(
       'li',
@@ -477,7 +482,7 @@ function decorateBreadcrumb(main) {
     list.append(section);
   }
 
-  if (template) {
+  if (template && template !== 'blog') {
     const section = createTag(
       'li',
       {},
@@ -555,15 +560,18 @@ function decorateSVGs(main) {
 
 function buildAuthorBox(main) {
   const div = document.createElement('div');
-  const author = getMetadata('author');
+  const authors = getMetadata('author').split(',').map((author) => author.trim());
   const publicationDate = getMetadata('publication-date');
-  const authorImage = getMetadata('author-image');
+  const authorImages = authors.map((_, i) => getMetadata(`author${i + 1}-image`));
+  const authorBlurbs = authors.map((_, i) => getMetadata(`author${i + 1}-blurb`));
 
-  const authorBoxBlockEl = buildBlock('author-box', [
-    [`<img src="${authorImage}" alt="${author}" title="${author}">`,
-      `<p>${author}</p>
-      <p>${publicationDate}</p>`],
-  ]);
+  const authorBoxBlockEl = buildBlock('author-box', authors.map((author, i) => [
+    `<img src="${authorImages[i]}" alt="${author}" title="${author}">`,
+    `<p>${author}</p>
+    <p>${publicationDate}</p>
+    <p>${authorBlurbs[i]}</p>`,
+  ]));
+
   div.append(authorBoxBlockEl);
   main.append(div);
 }
