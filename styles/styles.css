@@ -2204,7 +2204,7 @@ body.contact-template main .default-content-wrapper img {
   body.faq-theme main aside.side-navigation-wrapper {
     grid-column-start: 2;
     grid-row: 2 / span 10;
-    max-width: 300px;
+    width: 300px;
   }
 
   body.faq-theme main div {
@@ -2213,7 +2213,8 @@ body.contact-template main .default-content-wrapper img {
   }
 
   body.faq-theme main aside.side-navigation-wrapper.expand {
-    grid-column: 1 / span 3;
+    grid-column: 1 / span 4;
+    width: unset;
   }
 
   body.faq-theme main .section.content {
