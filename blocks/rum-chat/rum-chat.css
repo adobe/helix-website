@@ -1,0 +1,59 @@
+ .chat-interface {
+  width: 80%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+  
+#messages {
+  height: 500px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #eee;
+}
+  
+.message {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+  
+.user-message {
+  background-color: #e3f2fd;
+  margin-left: 20%;
+}
+
+.claude-message {
+  background-color: #f5f5f5;
+  margin-right: 20%;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+}
+
+#user-input {
+  flex-grow: 1;
+  padding: 10px;
+}
+
+#send-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+#send-button:hover {
+  background-color: #0056b3;
+}
+
+#send-button:active {
+  background-color: #004085;
+}
