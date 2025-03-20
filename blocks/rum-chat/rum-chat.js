@@ -9,11 +9,18 @@ async function callAnthropicAPI(message, onChunk = null) {
       max_tokens: 1000,
       messages: messageHistory,
     };
+
+    const apiKey = localStorage.getItem('anthropicApiKey') || '';
+
+    if (!apiKey) {
+      throw new Error('API key not found');
+    }
     
     const response = await fetch('https://chat-bot-test.asthabhargava001.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': apiKey,
       },
       body: JSON.stringify(requestBody),
     });
@@ -25,7 +32,6 @@ async function callAnthropicAPI(message, onChunk = null) {
 
     // Process the response as standard JSON
     const data = await response.json();
-    console.log("API Response:", data); // For debugging
     
     if (!data?.content?.[0]?.text) {
       throw new Error('Unexpected API response format');
@@ -109,6 +115,7 @@ export default async function decorate(block) {
 
   const chatInterface = document.createElement('div');
   chatInterface.className = 'chat-interface';
+
   chatInterface.innerHTML = `
     <div id="messages" class="messages"></div>
     <div class="input-area">
