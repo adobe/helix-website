@@ -75,4 +75,30 @@ export default class FacetSidebar extends HTMLElement {
       if (facetEl) this.elems.facetsElement.append(facetEl);
     });
   }
+
+  enableFacets() {
+    const existingFacetElements = Array.from(this.elems.facetsElement.children);
+    existingFacetElements.forEach((facet) => {
+      if (facet.enable) {
+        facet.enable();
+      } else {
+        facet.querySelectorAll('input').forEach((input) => {
+          input.disabled = false;
+        });
+      }
+    });
+  }
+
+  disableFacets() {
+    const existingFacetElements = Array.from(this.elems.facetsElement.children);
+    existingFacetElements.forEach((facet) => {
+      if (facet.disable) {
+        facet.disable();
+      } else {
+        facet.querySelectorAll('input').forEach((input) => {
+          input.disabled = true;
+        });
+      }
+    });
+  }
 }
