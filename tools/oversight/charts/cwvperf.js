@@ -57,7 +57,16 @@ export default class CWVPerfChart extends AbstractChart {
         startDate = new Date(this.chartConfig.startDate);
       }
 
+      existing.sort((a, b) => new Date(a) - new Date(b));
       const slots = new Set(existing);
+      // because of timezones (visitor timezone vs slot utc), some slots might be out of range
+      // this causes the last slot on the x index to be get no data, so we need to remove them.
+      slots.forEach((slot) => {
+        const slotDate = new Date(slot);
+        if (slotDate < startDate || slotDate > endDate) {
+          slots.delete(slot);
+        }
+      });
       const slotTime = new Date(startDate);
       // return Array.from(slots);
       let maxSlots = 1000;
