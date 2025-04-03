@@ -32,8 +32,8 @@ function labelURLParts(url, prefix, solo = false) {
 export default class LinkFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText, prefix, solo = false) {
-    const thumbnailAtt = this.getAttribute('thumbnail');
-    const faviconAtt = this.getAttribute('favicon');
+    const thumbnailAtt = this.getAttribute('thumbnail') === 'true';
+    const faviconAtt = this.getAttribute('favicon') === 'true';
     const isCensored = labelText.includes('...')
       || labelText.includes('<number>') || labelText.includes('%3Cnumber%3E')
       || labelText.includes('<hex>') || labelText.includes('%3Chex%3E')
