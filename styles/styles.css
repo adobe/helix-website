@@ -1617,7 +1617,6 @@ body.guides-template main a,
 body.skills-template main p,
 body.skills-template main li,
 body.skills-template main a {
-  color: var(--color-black);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
 }
