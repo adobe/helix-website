@@ -19,6 +19,7 @@
 
 .card-list .cards-card-body {
   font-size: var(--body-font-size-s);
+  color: var(--color-gray-100);
 }
 
 .card-list .cards-card-image {
