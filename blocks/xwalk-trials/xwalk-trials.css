@@ -262,6 +262,21 @@
   text-decoration: none;
 }
 
+.xwalk-trials .terms-footer a:hover {
+  text-decoration: underline;
+}
+
+.xwalk-trials .success-message {
+  padding: 40px;
+  background-color: #f8f8f8;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #333;
+}
+
 @media (max-width: 768px) {
   .xwalk-trials {
     padding: 20px 15px;

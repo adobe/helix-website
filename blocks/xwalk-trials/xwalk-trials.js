@@ -143,7 +143,7 @@ function buildForm() {
   const roleLabel = createTag('label', { for: 'user-role' }, 'User role');
   const roleSelect = createTag('select', { 
     id: 'user-role', 
-    name: 'userRole',
+    name: 'persona',
     required: 'true'
   });
   
@@ -183,6 +183,16 @@ function buildForm() {
   });
   
   templateField.append(templateLabel, templateSelect);
+  
+  // GitHub ID (moved after template)
+  const githubField = createTag('div', { class: 'form-field', id: 'github-field', style: 'display: none;' });
+  const githubLabel = createTag('label', { for: 'github-id' }, 'GitHub ID');
+  const githubInput = createTag('input', { 
+    type: 'text', 
+    id: 'github-id', 
+    name: 'githubId',
+  });
+  githubField.append(githubLabel, githubInput);
   
   // Country/Region and State/Province in a row
   const locationRow = createTag('div', { class: 'form-row' });
@@ -351,8 +361,9 @@ function buildForm() {
   const contactCheckbox = createTag('input', {
     type: 'checkbox',
     id: 'contact-permission',
-    name: 'contactPermission',
-    value: 'true'
+    name: 'optIn',
+    value: 'true',
+    checked: true
   });
   const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
   contactPermission.append(contactCheckbox, contactLabel);
@@ -366,7 +377,7 @@ function buildForm() {
   buttonContainer.append(submitButton);
   
   // Append all elements to form
-  form.append(emailField, nameRow, companyField, roleField, templateField, locationRow, agreement, contactPermission, buttonContainer);
+  form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, buttonContainer);
   
   // Add form submission handler
   form.addEventListener('submit', (e) => {
@@ -376,8 +387,11 @@ function buildForm() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     
+    // Convert optIn to boolean
+    data.optIn = data.optIn === 'true';
+    
     // Submit form data to server using fetch
-    fetch(form.action, {
+    fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -386,15 +400,19 @@ function buildForm() {
     })
     .then(response => {
       if (response.ok) {
-        // Redirect to success page or show success message
-        window.location.href = '/trial-success';
+        // Show success message
+        const successMessage = createTag('div', { class: 'success-message' });
+        successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
+        form.replaceWith(successMessage);
       } else {
         // Handle errors
         console.error('Form submission failed');
+        alert('There was an error submitting your request. Please try again.');
       }
     })
     .catch(error => {
       console.error('Error:', error);
+      alert('There was an error submitting your request. Please try again.');
     });
   });
   
@@ -412,6 +430,19 @@ function buildForm() {
       stateSelect.removeAttribute('required');
       // Clear state selection when country is not US
       stateSelect.innerHTML = '';
+    }
+  });
+  
+  // Add GitHub field visibility based on role selection
+  roleSelect.addEventListener('change', () => {
+    const selectedRole = roleSelect.value;
+    if (selectedRole === 'developer') {
+      githubField.style.display = 'flex';
+      githubInput.setAttribute('required', 'true');
+    } else {
+      githubField.style.display = 'none';
+      githubInput.removeAttribute('required');
+      githubInput.value = '';
     }
   });
   
