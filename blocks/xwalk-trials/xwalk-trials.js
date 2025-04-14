@@ -172,13 +172,13 @@ function buildForm() {
   
   // Add template options
   const templates = [
-    { value: 'boilerplate', text: 'Boilerplate' },
-    { value: 'boilerplate-commerce', text: 'Boilerplate for Commerce' }
+    { value: 'boilerplate-xwalk', text: 'Boilerplate' },
+    { value: 'boilerplate-xcom', text: 'Boilerplate for Commerce' }
   ];
   
   templates.forEach(template => {
     const option = createTag('option', { value: template.value }, template.text);
-    if (template.value === 'boilerplate') option.selected = true;
+    if (template.value === 'boilerplate-xwalk') option.selected = true;
     templateSelect.append(option);
   });
   
