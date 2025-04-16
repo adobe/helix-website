@@ -154,10 +154,11 @@ export async function renderBlog(block) {
     leftContainer.appendChild(latestBlogItem);
   }
 
+  // Get next 5 blogs in newest to oldest order
   const startIndex = 1;
-  const endIndex = Math.min(startIndex + 5, blogIndex.length); // Get up to 5 more blogs
-  for (let i = startIndex; i < endIndex; i += 1) {
-    const page = blogIndex[i];
+  const endIndex = Math.min(startIndex + 5, blogIndex.length);
+  const recentBlogs = blogIndex.slice(startIndex, endIndex).reverse();
+  recentBlogs.forEach((page) => {
     const blogItem = createTag('div', { class: 'blog-item' });
 
     const h3 = createTag('h3', { class: 'title' }, page.title);
@@ -180,7 +181,7 @@ export async function renderBlog(block) {
     blogLink.appendChild(blogItem);
 
     rightContainer.appendChild(blogLink);
-  }
+  });
 }
 
 export default async function decorate(block) {
