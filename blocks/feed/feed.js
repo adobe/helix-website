@@ -93,7 +93,7 @@ export async function renderBlog(block) {
     return;
   }
   const blogIndex = window.blogindex.data;
-  blogIndex.reverse();
+
   // Skip if block has favorite class
   if (block.classList.contains('favorite')) {
     return;
@@ -135,7 +135,7 @@ export async function renderBlog(block) {
   }
 
   // Get the latest blog
-  const latestBlog = blogIndex[0];
+  const latestBlog = blogIndex[blogIndex.length - 1];
   if (!leftContainer.querySelector('.blog-item.latest')) {
     const latestBlogItem = createTag('div', { class: 'blog-item latest' });
     const latestBlogContent = await fetchBlogContent(latestBlog.path);
@@ -154,9 +154,9 @@ export async function renderBlog(block) {
     leftContainer.appendChild(latestBlogItem);
   }
 
-  const startIndex = 1;
-  const endIndex = Math.min(startIndex + 5, blogIndex.length); // Get up to 5 more blogs
-  for (let i = startIndex; i < endIndex; i += 1) {
+  const startIndex = blogIndex.length - 2; // Start from second-to-last blog
+  const endIndex = Math.max(startIndex - 5, -1); // Get up to 5 previous blogs
+  for (let i = startIndex; i > endIndex; i -= 1) {
     const page = blogIndex[i];
     const blogItem = createTag('div', { class: 'blog-item' });
 
