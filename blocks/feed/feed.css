@@ -101,9 +101,9 @@
   object-fit: contain;
 }
 
-/* .blog-container .right-container .blog-item img {
+.blog-container .right-container .blog-item img {
   display: none;
-} */
+}
 
 .feed.recent > div,
 .feed.blog > div {
