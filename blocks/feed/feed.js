@@ -155,7 +155,7 @@ export async function renderBlog(block) {
   }
 
   // Get next 5 blogs in newest to oldest order
-  const startIndex = 1;
+  const startIndex = 0;
   const endIndex = Math.min(startIndex + 5, blogIndex.length);
   const recentBlogs = blogIndex.slice(startIndex, endIndex).reverse();
   recentBlogs.forEach((page) => {
