@@ -187,21 +187,38 @@ export default async function decorateAuthorBox(blockEl) {
 
   if (authors.length === 1) {
     // Handle single author case
-    // eslint-disable-next-line max-len
-    const authorContainer = await singleAuthorContainer(authors[0], githubIds[0], linkedinLinks[0], publicationDate, 0, true);
+    const authorContainer = await singleAuthorContainer(
+      authors[0],
+      githubIds[0],
+      linkedinLinks[0],
+      publicationDate,
+      0,
+      true,
+    );
     authorContainer.classList.add('single-author');
     authorContainers.append(authorContainer);
   } else {
     const date = createTag('div', { class: 'blog-publication-date' }, `Published on ${publicationDate}`);
     validateDate(date, publicationDate);
     bylineContainer.append(date);
+
     // Handle multiple authors case
-    authors.forEach(async (author, i) => {
-      // eslint-disable-next-line max-len
-      const authorContainer = await multipleAuthorsContainer(author, githubIds[i], linkedinLinks[i], publicationDate, i, false);
+    const authorPromises = authors.map(async (author, i) => {
+      const authorContainer = await multipleAuthorsContainer(
+        author,
+        githubIds[i],
+        linkedinLinks[i],
+        publicationDate,
+        i,
+        false,
+      );
       authorContainer.classList.add('multiple-authors');
-      authorContainers.append(authorContainer);
+      return authorContainer;
     });
+
+    // Wait for all author containers to be created and add them in order
+    const authorElements = await Promise.all(authorPromises);
+    authorElements.forEach((container) => authorContainers.append(container));
   }
   bylineContainer.append(authorContainers);
 }
