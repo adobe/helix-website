@@ -1,6 +1,8 @@
 # Adobe Experience Manager
 
-Frictionless experience management with Edge Delivery Services for Adobe Experience Manager Sites: Build blazing fast websites using tools content creators and developers already know.
+> Edge Delivery Services for Adobe Experience Manager Sites
+
+Build blazingly fast websites using tools content creators and developers already know.
 
 ## Docs
 
@@ -32,20 +34,17 @@ Frictionless experience management with Edge Delivery Services for Adobe Experie
 - [Sidekick Security](https://www.aem.live/docs/sidekick-security.md)
 - [Sidekick for Developers](https://www.aem.live/developer/sidekick-development.md)
 - [Sidekick Library](https://www.aem.live/docs/sidekick-library.md)
-- [AEM Status](https://status.adobe.com/products/503489)
-
-## FAQ
-
 - [FAQ](https://www.aem.live/docs/faq.md)
 
 ## API
 
-- [Admin API](https://www.hlx.live/docs/admin.html)
+- [Admin API](https://www.aem.live/docs/admin.html)
 - [aem CLI Reference](https://www.aem.live/developer/cli-reference.md)
 
-## Tools
+## Optional
 
 - [Sidekick Chrome Extension](https://chromewebstore.google.com/detail/aem-sidekick/igkmdomcgoebiipaifhmpfjhbjccggml)
 - [Github Bot](https://github.com/apps/aem-code-sync)
 - [AEM Tools](https://tools.aem.live/)
 - [AEM Labs](https://labs.aem.live/)
+- [AEM Status](https://status.adobe.com/products/503489)
