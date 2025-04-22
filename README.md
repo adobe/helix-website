@@ -8,7 +8,7 @@ This repo is what powers the helix website.
 ## Developing
 Install the Helix CLI:
 
-    sudo npm install -g @adobe/helix-cli
+    sudo npm install -g @adobe/aem-cli
     
 Run it in this repo:
 
