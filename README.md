@@ -1,5 +1,5 @@
 # Project Helix Website
-[www.hlx.live](https://www.hlx.live)
+[www.aem.live](https://www.aem.live)
 
 [![codecov](https://codecov.io/gh/adobe/helix-website/branch/main/graph/badge.svg?token=If90y6KMqx)](https://codecov.io/gh/adobe/helix-website)
 ## Introduction
@@ -12,7 +12,7 @@ Install the Helix CLI:
     
 Run it in this repo:
 
-    hlx up
+    aem up
     
 ## Testing
 ### Install dependencies:
