@@ -149,7 +149,7 @@ main .title url-selector input {
   color: var(--spectrum-gray-700);
 }
 
-.title button {
+.title button:not(.insights-icon) {
   color: var(--dark-blue);
   border: 2px solid currentcolor;
   border-radius: 32px;
@@ -163,7 +163,7 @@ main .key-metrics ul {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-gap: 8px;
+  gap: 8px;
   padding-left: 0;
 }
 
@@ -689,7 +689,7 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-gap: 4px;
+  gap: 4px;
   padding-left: 0;
   margin: 4px 2px;
 }
@@ -699,7 +699,7 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
   grid-template-areas: "check lab" " - cwv";
   grid-template-columns: 20px 1fr;
   align-items: center;
-  grid-gap: 0 16px;
+  gap: 0 16px;
 }
 
 #facets fieldset div ~ div.more-container:last-of-type,
@@ -833,7 +833,7 @@ vitals-facet fieldset label {
   display: grid;
   grid-template-areas: "check lab";
   grid-template-columns: 0 1fr;
-  grid-gap: 0;
+  gap: 0;
 }
 
 #facets vitals-facet fieldset label {
@@ -1211,7 +1211,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 
   main .key-metrics ul {
-    grid-gap: 16px;
+    gap: 16px;
   }
 
   main .key-metrics ul > * {
@@ -1226,7 +1226,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 
   #facets ul.cwv {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    grid-gap: 8px;
+    gap: 8px;
     margin: 8px 4px;
   }
 
