@@ -33,7 +33,7 @@
     "eslint-plugin-import": "2.31.0",
     "husky": "9.1.7",
     "lint-staged": "15.4.3",
-    "sinon": "19.0.2",
+    "sinon": "19.0.5",
     "stylelint": "16.14.1",
     "stylelint-config-standard": "37.0.0"
   },
