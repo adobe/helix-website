@@ -4,8 +4,11 @@
   "baseBranches": ["main"],
   "branchNameStrict": true,
   "branchName": "r_{{{packageName}}}_{{version}}",
-  "packageRules": [
-    {
+  "packageRules": [{
+      "matchDepTypes": ["devDependencies"],
+      "labels": ["ignore-psi-check"], 
+      "automerge": true
+    },{
       "matchDepNames": ["@adobe/rum-distiller"],
       "labels": ["rum-distiller"], 
       "automerge": false,
