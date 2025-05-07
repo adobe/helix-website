@@ -83,6 +83,15 @@ function loadStates(stateSelect, country) {
 }
 
 /**
+ * Loads the reCAPTCHA script dynamically
+ */
+function loadRecaptchaScript() {
+  const script = document.createElement('script');
+  script.src = 'https://www.google.com/recaptcha/api.js?render=6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
+  document.head.appendChild(script);
+}
+
+/**
  * Builds the trial form
  * @returns {HTMLElement} The form element
  */
@@ -368,6 +377,13 @@ function buildForm() {
   const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
   contactPermission.append(contactCheckbox, contactLabel);
   
+  // Hidden field for reCAPTCHA token
+  const recaptchaField = createTag('input', {
+    type: 'hidden',
+    id: 'g-recaptcha-response',
+    name: 'g-recaptcha-response'
+  });
+  
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
   const submitButton = createTag('button', { 
@@ -377,42 +393,50 @@ function buildForm() {
   buttonContainer.append(submitButton);
   
   // Append all elements to form
-  form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, buttonContainer);
+  form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, recaptchaField, buttonContainer);
   
   // Add form submission handler
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     
-    // Collect form data
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    
-    // Convert optIn to boolean
-    data.optIn = data.optIn === 'true';
-    
-    // Submit form data to server using fetch
-    fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => {
-      if (response.ok) {
-        // Show success message
-        const successMessage = createTag('div', { class: 'success-message' });
-        successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
-        form.replaceWith(successMessage);
-      } else {
-        // Handle errors
-        console.error('Form submission failed');
-        alert('There was an error submitting your request. Please try again.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('There was an error submitting your request. Please try again.');
+    // Execute reCAPTCHA verification
+    grecaptcha.ready(function() {
+      grecaptcha.execute('6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx', { action: 'submit' }).then(function(token) {
+        // Set the reCAPTCHA token
+        document.getElementById('g-recaptcha-response').value = token;
+        
+        // Collect form data
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Convert optIn to boolean
+        data.optIn = data.optIn === 'true';
+        
+        // Submit form data to server using fetch
+        fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+        .then(response => {
+          if (response.ok) {
+            // Show success message
+            const successMessage = createTag('div', { class: 'success-message' });
+            successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
+            form.replaceWith(successMessage);
+          } else {
+            // Handle errors
+            console.error('Form submission failed');
+            alert('There was an error submitting your request. Please try again.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('There was an error submitting your request. Please try again.');
+        });
+      });
     });
   });
   
@@ -533,6 +557,9 @@ function buildTrialInfo(block) {
 }
 
 export default function decorate(block) {
+  // Load reCAPTCHA script
+  loadRecaptchaScript();
+  
   // Get the original content from the block
   const originalContent = block.querySelector(':scope > div');
   
