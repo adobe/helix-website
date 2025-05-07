@@ -381,7 +381,7 @@ function buildForm() {
   const recaptchaField = createTag('input', {
     type: 'hidden',
     id: 'g-recaptcha-response',
-    name: 'g-recaptcha-response'
+    name: 'recaptchaToken'
   });
   
   // Submit button
