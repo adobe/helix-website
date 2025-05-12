@@ -31,7 +31,7 @@
 }
 
 .blog-item:not(.blog-item.latest) {
-  box-shadow: 0 4px 8px rgba(0 0 0 / 20%);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
   transition: box-shadow 0.3s ease;
   padding: 20px;
   background-color: white;
@@ -45,7 +45,7 @@
 }
 
 .feed.blog .favorite-blogs {
-  box-shadow: 0 4px 8px rgba(0 0 0 / 20%);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
   transition: box-shadow 0.3s ease;
   padding: 20px;
   background-color: var(--color-accent-purple-content);
@@ -68,7 +68,7 @@
 }
 
 .blog-item:not(.blog-item.latest):hover {
-  box-shadow: 0 8px 16px rgba(0 0 0 / 40%);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 40%);
 }
 
 .left-container {
