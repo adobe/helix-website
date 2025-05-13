@@ -9,6 +9,10 @@
       "labels": ["ignore-psi-check"], 
       "automerge": true
     },{
+      "matchManagers": ["github-actions"],
+      "labels": ["ignore-psi-check"], 
+      "automerge": true
+    },{
       "matchDepNames": ["@adobe/rum-distiller"],
       "labels": ["rum-distiller"], 
       "automerge": false,
