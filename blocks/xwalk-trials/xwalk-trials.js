@@ -418,7 +418,7 @@ function buildForm() {
         data.optIn = data.optIn === 'true';
         
         // Submit form data to server using fetch
-        fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
+        fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
