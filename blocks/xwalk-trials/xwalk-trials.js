@@ -392,10 +392,6 @@ function buildForm() {
   }, 'Continue');
   buttonContainer.append(submitButton);
   
-  // Disable button on click to prevent double submission
-  submitButton.addEventListener('click', () => {
-    submitButton.disabled = true;
-  });
   
   // Append all elements to form
   form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, recaptchaField, buttonContainer);
@@ -417,10 +413,6 @@ function buildForm() {
         // Convert optIn to boolean
         data.optIn = data.optIn === 'true';
         
-        // Disable button on form submit to prevent double submission
-        // This is a fallback in case the click listener doesn't fire or is bypassed.
-        submitButton.disabled = true;
-        
         // Submit form data to server using fetch
         fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
           method: 'POST',
@@ -439,15 +431,11 @@ function buildForm() {
             // Handle errors
             console.error('Form submission failed');
             alert('There was an error submitting your request. Please try again.');
-            // Re-enable the button if the submission fails
-            submitButton.disabled = false;
           }
         })
         .catch(error => {
           console.error('Error:', error);
           alert('There was an error submitting your request. Please try again.');
-          // Re-enable the button if an error occurs
-          submitButton.disabled = false;
         });
       });
     });
