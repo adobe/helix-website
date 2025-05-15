@@ -158,7 +158,7 @@ function buildForm() {
   
   // Add role options
   const roles = [
-    { value: 'business', text: 'Business' },
+    { value: 'business', text: 'Practitioner' },
     { value: 'developer', text: 'Developer' }
   ];
   
