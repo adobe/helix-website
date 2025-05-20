@@ -400,6 +400,11 @@ function buildForm() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     
+    // Disable submit button to prevent multiple submissions
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
+    
     // Execute reCAPTCHA verification
     grecaptcha.ready(function() {
       grecaptcha.execute('6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx', { action: 'submit' }).then(function(token) {
@@ -431,11 +436,17 @@ function buildForm() {
             // Handle errors
             console.error('Form submission failed');
             alert('There was an error submitting your request. Please try again.');
+            // Re-enable submit button on error
+            submitButton.disabled = false;
+            submitButton.textContent = 'Continue';
           }
         })
         .catch(error => {
           console.error('Error:', error);
           alert('There was an error submitting your request. Please try again.');
+          // Re-enable submit button on error
+          submitButton.disabled = false;
+          submitButton.textContent = 'Continue';
         });
       });
     });
