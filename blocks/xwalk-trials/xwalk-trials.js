@@ -419,7 +419,7 @@ function buildForm() {
         data.optIn = data.optIn === 'true';
         
         // Submit form data to server using fetch
-        fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
+        fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -435,8 +435,16 @@ function buildForm() {
           } else {
             // Handle errors
             console.error('Form submission failed');
-            alert('There was an error submitting your request. Please try again.');
-            // Re-enable submit button on error
+            let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
+            response.json().then(errorData => {
+              if (errorData && errorData.error && errorData.error.body && errorData.error.body.error) {
+                console.log('Error data:', errorData);
+                errorMessage = errorData.error.body.error;
+              }
+              alert(errorMessage);
+            }).catch(() => {
+              alert(errorMessage);
+            });
             submitButton.disabled = false;
             submitButton.textContent = 'Continue';
           }
