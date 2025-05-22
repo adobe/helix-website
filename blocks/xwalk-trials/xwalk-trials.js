@@ -437,9 +437,9 @@ function buildForm() {
             console.error('Form submission failed');
             let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
             response.json().then(errorData => {
-              console.log('Error data:', errorData);
-              if (errorData && errorData.error && errorData.error.body && errorData.error.body.error) {
-                errorMessage = errorData.error.body.error;
+              console.error('Error data:', errorData);
+              if (errorData && errorData.error) {
+                errorMessage = errorData.error;
               }
               alert(errorMessage);
             }).catch(() => {
