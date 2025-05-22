@@ -391,8 +391,7 @@ function buildForm() {
     class: 'continue'
   }, 'Continue');
   buttonContainer.append(submitButton);
-  
-  
+
   // Append all elements to form
   form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, recaptchaField, buttonContainer);
   
@@ -437,9 +436,9 @@ function buildForm() {
             console.error('Form submission failed');
             let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
             response.json().then(errorData => {
-              if (errorData && errorData.error && errorData.error.body && errorData.error.body.error) {
-                console.log('Error data:', errorData);
-                errorMessage = errorData.error.body.error;
+              console.error('Error data:', errorData);
+              if (errorData && errorData.error) {
+                errorMessage += '\nCause: ' + errorData.error;
               }
               alert(errorMessage);
             }).catch(() => {
