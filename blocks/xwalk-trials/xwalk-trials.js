@@ -158,7 +158,7 @@ function buildForm() {
   
   // Add role options
   const roles = [
-    { value: 'business', text: 'Business' },
+    { value: 'business', text: 'Practitioner' },
     { value: 'developer', text: 'Developer' }
   ];
   
@@ -392,12 +392,18 @@ function buildForm() {
   }, 'Continue');
   buttonContainer.append(submitButton);
   
+  
   // Append all elements to form
   form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, recaptchaField, buttonContainer);
   
   // Add form submission handler
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    
+    // Disable submit button to prevent multiple submissions
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
     
     // Execute reCAPTCHA verification
     grecaptcha.ready(function() {
@@ -429,12 +435,26 @@ function buildForm() {
           } else {
             // Handle errors
             console.error('Form submission failed');
-            alert('There was an error submitting your request. Please try again.');
+            let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
+            response.json().then(errorData => {
+              if (errorData && errorData.error && errorData.error.body && errorData.error.body.error) {
+                console.log('Error data:', errorData);
+                errorMessage = errorData.error.body.error;
+              }
+              alert(errorMessage);
+            }).catch(() => {
+              alert(errorMessage);
+            });
+            submitButton.disabled = false;
+            submitButton.textContent = 'Continue';
           }
         })
         .catch(error => {
           console.error('Error:', error);
           alert('There was an error submitting your request. Please try again.');
+          // Re-enable submit button on error
+          submitButton.disabled = false;
+          submitButton.textContent = 'Continue';
         });
       });
     });
