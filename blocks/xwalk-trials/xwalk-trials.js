@@ -439,7 +439,7 @@ function buildForm() {
             response.json().then(errorData => {
               console.error('Error data:', errorData);
               if (errorData && errorData.error) {
-                errorMessage = errorData.error;
+                errorMessage += 'Cause:' + errorData.error;
               }
               alert(errorMessage);
             }).catch(() => {
