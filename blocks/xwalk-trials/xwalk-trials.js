@@ -1,6 +1,9 @@
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 import createTag from '../../utils/tag.js';
 
+const V3_SITE_KEY = '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
+const V2_SITE_KEY = '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf';
+
 /**
  * Loads states based on selected country
  * @param {HTMLSelectElement} stateSelect - The state select element
@@ -86,9 +89,20 @@ function loadStates(stateSelect, country) {
  * Loads the reCAPTCHA script dynamically
  */
 function loadRecaptchaScript() {
+  // reCAPTCHA v3
   const script = document.createElement('script');
-  script.src = 'https://www.google.com/recaptcha/api.js?render=6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
+  script.src = `https://www.google.com/recaptcha/api.js?render=${V3_SITE_KEY}`;
   document.head.appendChild(script);
+  // reCAPTCHA v2
+  const scriptV2 = document.createElement('script');
+  scriptV2.src = 'https://www.google.com/recaptcha/api.js';
+  document.head.append(scriptV2);
+}
+
+function showSuccessMessage() {
+  const successMessage = createTag('div', { class: 'success-message' });
+  successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
+  form.replaceWith(successMessage);
 }
 
 /**
@@ -377,12 +391,24 @@ function buildForm() {
   const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
   contactPermission.append(contactCheckbox, contactLabel);
   
+  const verInput = createTag('input', {
+    type: 'hidden',
+    id: 'recaptcha-version',
+    name: 'recaptchaVersion',
+    value: 'v3'
+  });
   // Hidden field for reCAPTCHA token
   const recaptchaField = createTag('input', {
     type: 'hidden',
     id: 'g-recaptcha-response',
     name: 'recaptchaToken'
   });
+  const v2container = createTag('div', {
+    id: 'recaptcha-v2-container',
+    style: 'display: none; margin: 1em 0;'
+  });
+  v2container.append(createTag('div', { id: 'recaptcha-v2' }));
+
   
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
@@ -394,7 +420,23 @@ function buildForm() {
   
   
   // Append all elements to form
-  form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, recaptchaField, buttonContainer);
+  form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, verInput, recaptchaField, v2container, buttonContainer);
+
+  let v2Rendered = false;
+  function showV2Captcha() {
+    verInput.value = 'v2';
+    v2container.style.display = 'block';
+    if (!v2Rendered) {
+      grecaptcha.render('recaptcha-v2', {
+        sitekey: V2_SITE_KEY,
+        callback: (token) => {
+          tokenInput.value = token;
+          form.submit();    // now re-submit, bypassing v3
+        }
+      });
+      v2Rendered = true;
+    }
+  }
   
   // Add form submission handler
   form.addEventListener('submit', (e) => {
@@ -405,11 +447,12 @@ function buildForm() {
     submitButton.disabled = true;
     submitButton.textContent = 'Submitting...';
     
-    // Execute reCAPTCHA verification
+    if (verInput.value === 'v3') {
+    // Execute v3 reCAPTCHA verification
     grecaptcha.ready(function() {
-      grecaptcha.execute('6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx', { action: 'submit' }).then(function(token) {
+      grecaptcha.execute(V3_SITE_KEY, { action: 'submit' }).then(function(v3token) {
         // Set the reCAPTCHA token
-        document.getElementById('g-recaptcha-response').value = token;
+        document.getElementById('g-recaptcha-response').value = v3token;
         
         // Collect form data
         const formData = new FormData(form);
@@ -426,39 +469,66 @@ function buildForm() {
           },
           body: JSON.stringify(data),
         })
-        .then(response => {
+        .then(async response => {
           if (response.ok) {
-            // Show success message
-            const successMessage = createTag('div', { class: 'success-message' });
-            successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
-            form.replaceWith(successMessage);
+            showSuccessMessage();
           } else {
-            // Handle errors
-            console.error('Form submission failed');
-            let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
-            response.json().then(errorData => {
-              console.error('Error data:', errorData);
-              if (errorData && errorData.error) {
-                errorMessage += '\nCause: ' + errorData.error;
+            const err = await response.json();
+              if (err.error === 'v2captcha_required') {
+                // low score → fallback to v2
+                showV2Captcha();
+              } else {
+                throw new Error(err.error || 'There was an error submitting your request. Please try again.')
               }
-              alert(errorMessage);
-            }).catch(() => {
-              alert(errorMessage);
+            }
+            }).catch(error => {
+              alert(error.message);
+              submitButton.disabled = false;
+              submitButton.textContent = 'Continue';
             });
+          })});
+        } else {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+          .then(async response => {
+            if (response.ok) {
+              showSuccessMessage();
+            } else {
+              const err = await response.json();
+              throw new Error(err.error || 'There was an error submitting your request. Please try again.')
+            }
+          })  
+          .catch(error => {
+            alert(error.message);
             submitButton.disabled = false;
             submitButton.textContent = 'Continue';
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('There was an error submitting your request. Please try again.');
-          // Re-enable submit button on error
-          submitButton.disabled = false;
-          submitButton.textContent = 'Continue';
-        });
+          });
+        }
       });
-    });
-  });
+        // .catch(error => {
+        //   console.error('Error:', error);
+        //   alert('There was an error submitting your request. Please try again.');
+        //   // Re-enable submit button on error
+        //   submitButton
+        // .disabled = false;
+        //   submitButton.textContent = 'Continue';
+        // });
+
+        // console.error('Form submission failed');
+        // let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
+        // response.json().then(errorData => {
+        //   console.error('Error data:', errorData);
+        //   if (errorData && errorData.error) {
+        //     errorMessage += '\nCause: ' + errorData.error;
+        //   }
+        //   alert(errorMessage);
   
   // Add dynamic state selection based on country and hide/show logic
   countrySelect.addEventListener('change', () => {
