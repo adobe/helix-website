@@ -426,15 +426,46 @@ function buildForm() {
     verInput.value = 'v2';
     v2container.style.display = 'block';
     if (!v2Rendered) {
-      grecaptcha.render('recaptcha-v2', {
+      grecaptcha.render('recaptcha-v2', { 
         sitekey: V2_SITE_KEY,
         callback: (token) => {
-          tokenInput.value = token;
-          form.submit();    // now re-submit, bypassing v3
+          recaptchaField.value = token;
+          submitFormData();
         }
       });
       v2Rendered = true;
     }
+  }
+  
+  // Extract form submission logic into a separate function
+  function submitFormData() {
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Convert optIn to boolean
+    data.optIn = data.optIn === 'true';
+    
+    fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(async response => {
+      if (response.ok) {
+        showSuccessMessage(form);
+      } else {
+        const err = await response.json();
+        throw new Error(err.error ? `${err.error}\nThere was an error submitting your request. Please try again.` : 'There was an error submitting your request. Please try again.')
+      }
+    })
+    .catch(error => {
+      alert(error.message);
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = false;
+      submitButton.textContent = 'Continue';
+    });
   }
   
   // Add form submission handler
@@ -474,10 +505,9 @@ function buildForm() {
           } else {
             const err = await response.json();
               if (err.error === 'v2captcha_required') {
-                // low score → fallback to v2
                 showV2Captcha();
               } else {
-                throw new Error(err.error || 'There was an error submitting your request. Please try again.')
+                throw new Error(err.error ? `${err.error}\nThere was an error submitting your request. Please try again.` : 'There was an error submitting your request. Please try again.')
               }
             }
             }).catch(error => {
@@ -487,48 +517,10 @@ function buildForm() {
             });
           })});
         } else {
-          const formData = new FormData(form);
-          const data = Object.fromEntries(formData.entries());
-          fetch('https://3531103-xwalktrial-stage.adobeioruntime.net/api/v1/web/web-api/registration', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          })
-          .then(async response => {
-            if (response.ok) {
-              showSuccessMessage(form);
-            } else {
-              const err = await response.json();
-              throw new Error(err.error || 'There was an error submitting your request. Please try again.')
-            }
-          })  
-          .catch(error => {
-            alert(error.message);
-            submitButton.disabled = false;
-            submitButton.textContent = 'Continue';
-          });
+          submitFormData();
         }
       });
-        // .catch(error => {
-        //   console.error('Error:', error);
-        //   alert('There was an error submitting your request. Please try again.');
-        //   // Re-enable submit button on error
-        //   submitButton
-        // .disabled = false;
-        //   submitButton.textContent = 'Continue';
-        // });
 
-        // console.error('Form submission failed');
-        // let errorMessage = 'There was an error submitting your request. Please try again.'; // Default message
-        // response.json().then(errorData => {
-        //   console.error('Error data:', errorData);
-        //   if (errorData && errorData.error) {
-        //     errorMessage += '\nCause: ' + errorData.error;
-        //   }
-        //   alert(errorMessage);
-  
   // Add dynamic state selection based on country and hide/show logic
   countrySelect.addEventListener('change', () => {
     const selectedCountry = countrySelect.value;
