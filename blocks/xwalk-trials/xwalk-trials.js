@@ -99,7 +99,7 @@ function loadRecaptchaScript() {
   document.head.append(scriptV2);
 }
 
-function showSuccessMessage() {
+function showSuccessMessage(form) {
   const successMessage = createTag('div', { class: 'success-message' });
   successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
   form.replaceWith(successMessage);
@@ -471,7 +471,7 @@ function buildForm() {
         })
         .then(async response => {
           if (response.ok) {
-            showSuccessMessage();
+            showSuccessMessage(form);
           } else {
             const err = await response.json();
               if (err.error === 'v2captcha_required') {
@@ -499,7 +499,7 @@ function buildForm() {
           })
           .then(async response => {
             if (response.ok) {
-              showSuccessMessage();
+              showSuccessMessage(form);
             } else {
               const err = await response.json();
               throw new Error(err.error || 'There was an error submitting your request. Please try again.')
