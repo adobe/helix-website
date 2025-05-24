@@ -3,6 +3,7 @@ import {
   createTag,
   loadFeedData,
   loadBlogData,
+  decorateGuideTemplateCodeBlock,
 } from '../../scripts/scripts.js';
 
 // logic for rendering the community feed
@@ -217,12 +218,13 @@ export default async function decorate(block) {
       await renderFunction(block);
       block.dataset.rendered = 'true';
     } else {
-      const div = createTag('div', { class: 'feed-hidden' }, '');
-      block.append(div);
       document.addEventListener('dataset-ready', () => {
         if (checkDataLoaded() && !block.dataset.rendered) {
-          renderFunction(block);
-          block.dataset.rendered = 'true';
+          block.dataset.rendered = false;
+          renderFunction(block).then(() => {
+            decorateGuideTemplateCodeBlock();
+            block.dataset.rendered = 'true';
+          });
         }
       });
     }
