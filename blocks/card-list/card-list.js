@@ -141,6 +141,7 @@ async function decorateCardListByUrl(block) {
     const optionAll = document.createElement('option');
     optionAll.value = '';
     optionAll.text = 'All';
+    optionAll.selected = true;
     categoryFilterSelect.prepend(optionAll);
 
     categoryFilterSelect.addEventListener('change', () => {
