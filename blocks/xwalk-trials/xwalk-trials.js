@@ -195,8 +195,9 @@ function buildForm() {
   
   // Add template options
   const templates = [
+    { value: 'boilerplate-frescopa', text: 'Frescopa' },
     { value: 'boilerplate-xwalk', text: 'Boilerplate' },
-    { value: 'boilerplate-xcom', text: 'Boilerplate for Commerce' }
+    { value: 'boilerplate-xcom', text: 'Boilerplate for Commerce' },
   ];
   
   templates.forEach(template => {
