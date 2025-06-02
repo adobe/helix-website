@@ -202,7 +202,7 @@ function buildForm() {
   
   templates.forEach(template => {
     const option = createTag('option', { value: template.value }, template.text);
-    if (template.value === 'boilerplate-xwalk') option.selected = true;
+    if (template.value === 'boilerplate-frescopa') option.selected = true;
     templateSelect.append(option);
   });
   
