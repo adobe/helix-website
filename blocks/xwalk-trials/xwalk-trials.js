@@ -195,13 +195,14 @@ function buildForm() {
 
   // Add template options
   const templates = [
+    { value: 'boilerplate-frescopa', text: 'Frescopa' },
     { value: 'boilerplate-xwalk', text: 'Boilerplate' },
-    { value: 'boilerplate-xcom', text: 'Boilerplate for Commerce' }
+    { value: 'boilerplate-xcom', text: 'Boilerplate for Commerce' },
   ];
 
   templates.forEach(template => {
     const option = createTag('option', { value: template.value }, template.text);
-    if (template.value === 'boilerplate-xwalk') option.selected = true;
+    if (template.value === 'boilerplate-frescopa') option.selected = true;
     templateSelect.append(option);
   });
 
@@ -390,7 +391,7 @@ function buildForm() {
   });
   const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
   contactPermission.append(contactCheckbox, contactLabel);
-
+  
   const verInput = createTag('input', {
     type: 'hidden',
     id: 'recaptcha-version',
@@ -409,7 +410,7 @@ function buildForm() {
   });
   v2container.append(createTag('div', { id: 'recaptcha-v2' }));
 
-
+  
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
   const submitButton = createTag('button', {
@@ -427,7 +428,7 @@ function buildForm() {
     verInput.value = 'v2';
     v2container.style.display = 'block';
     if (!v2Rendered) {
-      grecaptcha.render('recaptcha-v2', {
+      grecaptcha.render('recaptcha-v2', { 
         sitekey: V2_SITE_KEY,
         callback: (token) => {
           recaptchaField.value = token;
@@ -437,15 +438,15 @@ function buildForm() {
       v2Rendered = true;
     }
   }
-
+  
   // Extract form submission logic into a separate function
   function submitFormData() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-
+    
     // Convert optIn to boolean
     data.optIn = data.optIn === 'true';
-
+    
     fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
       method: 'POST',
       headers: {
@@ -468,7 +469,7 @@ function buildForm() {
       submitButton.textContent = 'Continue';
     });
   }
-
+  
   // Add form submission handler
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -477,14 +478,14 @@ function buildForm() {
     const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;
     submitButton.textContent = 'Submitting...';
-
+    
     if (verInput.value === 'v3') {
     // Execute v3 reCAPTCHA verification
     grecaptcha.ready(function() {
       grecaptcha.execute(V3_SITE_KEY, { action: 'submit' }).then(function(v3token) {
         // Set the reCAPTCHA token
         document.getElementById('g-recaptcha-response').value = v3token;
-
+        
         // Collect form data
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
