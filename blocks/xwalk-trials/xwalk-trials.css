@@ -14,12 +14,57 @@
   margin-bottom: 30px;
 }
 
+/* Less specific selectors - must come before more specific ones */
+.xwalk-trials .template-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.xwalk-trials .template-info h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.xwalk-trials .template-info p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #666;
+}
+
+.xwalk-trials .trial-details p {
+  font-size: 22px;
+  margin: 0;
+}
+
+.xwalk-trials .feature-item p {
+  font-size: 18px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.xwalk-trials .trial-features > p {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 15px;
+}
+
+.xwalk-trials .agreement ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
 .xwalk-trials .trial-info {
   flex: 1;
   padding: 40px;
   background-color: #f8f8f8;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
 }
 
 /* Style the original block content structure */
@@ -73,7 +118,7 @@
 .xwalk-trials .trial-info > div > div:nth-child(2) h3 {
   font-size: 32px;
   font-weight: 800;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   line-height: 1.2;
   color: #000;
 }
@@ -81,7 +126,7 @@
 .xwalk-trials .trial-info > div > div:nth-child(2) h4 {
   font-size: 18px;
   font-weight: 400;
-  margin: 0 0 30px 0;
+  margin: 0 0 30px;
   line-height: 1.4;
   color: #000;
 }
@@ -89,7 +134,7 @@
 .xwalk-trials .trial-info > div > div:nth-child(2) p {
   font-size: 18px;
   font-weight: 600;
-  margin: 0 0 15px 0;
+  margin: 0 0 15px;
   color: #000;
 }
 
@@ -172,13 +217,12 @@
   margin-top: 15px;
 }
 
-.xwalk-trials .agreement ul {
-  list-style-type: disc;
-  padding-left: 20px;
-  margin: 10px 0;
+.xwalk-trials .agreement a {
+  color: #1473e6;
+  text-decoration: none;
 }
 
-.xwalk-trials .agreement a {
+.xwalk-trials .terms-footer a {
   color: #1473e6;
   text-decoration: none;
 }
@@ -217,13 +261,13 @@
 
 .xwalk-trials .template-card:hover {
   border-color: #1473e6;
-  box-shadow: 0 2px 8px rgba(20, 115, 230, 0.1);
+  box-shadow: 0 2px 8px rgb(20 115 230 / 10%);
 }
 
 .xwalk-trials .template-card.selected {
   border-color: #1473e6;
   background-color: #f8fbff;
-  box-shadow: 0 2px 8px rgba(20, 115, 230, 0.15);
+  box-shadow: 0 2px 8px rgb(20 115 230 / 15%);
 }
 
 .xwalk-trials .template-thumbnail {
@@ -235,32 +279,11 @@
   border: 1px solid #ddd;
 }
 
-.xwalk-trials .template-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
 .xwalk-trials .template-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.xwalk-trials .template-info h4 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.xwalk-trials .template-info p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #666;
 }
 
 .xwalk-trials .template-card.selected .template-info h4 {
@@ -291,19 +314,8 @@
   margin: 20px 0;
 }
 
-.xwalk-trials .trial-details p {
-  font-size: 22px;
-  margin: 0;
-}
-
 .xwalk-trials .trial-features {
   margin-top: 30px;
-}
-
-.xwalk-trials .trial-features > p {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 15px 0;
 }
 
 .xwalk-trials .feature-item {
@@ -320,21 +332,10 @@
   line-height: 1;
 }
 
-.xwalk-trials .feature-item p {
-  font-size: 18px;
-  margin: 0;
-  line-height: 1.4;
-}
-
 .xwalk-trials .terms-footer {
   font-size: 14px;
   color: #666;
   margin-top: 30px;
-}
-
-.xwalk-trials .terms-footer a {
-  color: #1473e6;
-  text-decoration: none;
 }
 
 .xwalk-trials .terms-footer a:hover {
@@ -345,56 +346,56 @@
   padding: 40px;
   background-color: #f8f8f8;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
   text-align: center;
   font-size: 18px;
   line-height: 1.5;
   color: #333;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .xwalk-trials {
     padding: 20px 15px;
     flex-direction: column;
   }
-  
+
   .xwalk-trials .form-row {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .xwalk-trials .trial-info > div > div:first-child {
     flex-direction: row;
     align-items: center;
   }
-  
+
   .xwalk-trials .trial-info > div > div:nth-child(2) {
     text-align: left;
   }
-  
+
   .xwalk-trials .trial-info > div > div:nth-child(2) li {
     justify-content: flex-start;
     text-align: left;
   }
-  
+
   /* Template selector mobile styles */
   .xwalk-trials .template-card {
     flex-direction: column;
     gap: 12px;
     padding: 12px;
   }
-  
+
   .xwalk-trials .template-thumbnail {
     width: 100%;
     max-width: 200px;
     height: 100px;
     align-self: center;
   }
-  
+
   .xwalk-trials .template-info h4 {
     font-size: 16px;
   }
-  
+
   .xwalk-trials .template-info p {
     font-size: 13px;
   }
