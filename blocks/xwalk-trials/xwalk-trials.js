@@ -109,7 +109,58 @@ function showSuccessMessage(form) {
  * Builds the trial form
  * @returns {HTMLElement} The form element
  */
-function buildForm() {
+/**
+ * Extracts template data from the merged template-selection-data within the block
+ * @param {HTMLElement} block - The xwalk-trials block containing merged template data
+ * @returns {Array} Array of template objects with value, text, description, and image
+ */
+function extractTemplatesFromBlock(block) {
+  const templates = [];
+  
+  // Look for the merged template-selection-data within this block
+  const templateData = block.querySelector('.template-selection-data');
+  
+  if (!templateData) return templates;
+  
+  // Get all template rows from the template-selection-data
+  const templateRows = templateData.querySelectorAll(':scope > div');
+  
+  templateRows.forEach(row => {
+    const cells = row.querySelectorAll(':scope > div');
+    if (cells.length >= 3) {
+      // Extract image
+      const imageCell = cells[0];
+      const img = imageCell.querySelector('img');
+      
+      // Extract title and description
+      const contentCell = cells[1];
+      const title = contentCell.querySelector('h4')?.textContent?.trim() || '';
+      const description = contentCell.querySelector('p')?.textContent?.trim() || '';
+      
+      // Extract value
+      const valueCell = cells[2];
+      const value = valueCell.textContent?.trim() || '';
+      
+      if (value && title) {
+        templates.push({
+          value: value,
+          text: title,
+          description: description,
+          image: {
+            src: img?.src || '',
+            alt: img?.alt || title,
+            width: img?.width || '150',
+            height: img?.height || '120'
+          }
+        });
+      }
+    }
+  });
+  
+  return templates;
+}
+
+function buildForm(block) {
   const form = createTag('form', { action: '/createTrials', method: 'POST' });
 
   // Business email
@@ -184,29 +235,90 @@ function buildForm() {
 
   roleField.append(roleLabel, roleSelect);
 
-  // Template select dropdown
-  const templateField = createTag('div', { class: 'form-field' });
-  const templateLabel = createTag('label', { for: 'template-select' }, 'Select Template');
-  const templateSelect = createTag('select', {
+  // Template visual selector
+  const templateField = createTag('div', { class: 'form-field template-selector-field' });
+  const templateLabel = createTag('label', {}, 'Select Template');
+  
+  // Extract templates from the merged template-selection-data within this block
+  const templates = extractTemplatesFromBlock(block);
+  
+  // Hidden input to store selected template value
+  const templateInput = createTag('input', {
+    type: 'hidden',
     id: 'template-select',
     name: 'template',
+    value: templates.length > 0 ? templates[0].value : '', // Default to first template
     required: 'true'
   });
 
-  // Add template options
-  const templates = [
-    { value: 'boilerplate-frescopa', text: 'Frescopa' },
-    { value: 'boilerplate-xwalk', text: 'Boilerplate' },
-    { value: 'boilerplate-xcom', text: 'Boilerplate for Commerce' },
-  ];
+  const templateGrid = createTag('div', { class: 'template-grid' });
 
-  templates.forEach(template => {
-    const option = createTag('option', { value: template.value }, template.text);
-    if (template.value === 'boilerplate-frescopa') option.selected = true;
-    templateSelect.append(option);
+  templates.forEach((template, index) => {
+    const templateCard = createTag('div', { 
+      class: `template-card ${index === 0 ? 'selected' : ''}`,
+      'data-value': template.value
+    });
+
+    // Use actual image from template data or create placeholder
+    const thumbnail = createTag('div', { class: 'template-thumbnail' });
+    let thumbnailImg;
+    
+    if (template.image && template.image.src) {
+      // Use the actual image from the template-selection block
+      thumbnailImg = createTag('img', { 
+        src: template.image.src,
+        alt: template.image.alt,
+        width: template.image.width,
+        height: template.image.height
+      });
+    } else {
+      // Create placeholder if no image available
+      thumbnailImg = createTag('img', { 
+        src: `data:image/svg+xml;base64,${btoa(`
+          <svg width="150" height="120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="150" height="120" fill="${['#e8f4fd', '#f0f9ff', '#fef3e2'][index]}" stroke="#ddd"/>
+            <text x="75" y="60" text-anchor="middle" font-family="Arial" font-size="14" fill="#666">
+              ${template.text}
+            </text>
+            <text x="75" y="80" text-anchor="middle" font-family="Arial" font-size="10" fill="#999">
+              Preview
+            </text>
+          </svg>
+        `)}`,
+        alt: template.text,
+        width: '150',
+        height: '120'
+      });
+    }
+    
+    thumbnail.append(thumbnailImg);
+
+    // Template info
+    const templateInfo = createTag('div', { class: 'template-info' });
+    const templateTitle = createTag('h4', {}, template.text);
+    const templateDesc = createTag('p', {}, template.description);
+    templateInfo.append(templateTitle, templateDesc);
+
+    templateCard.append(thumbnail, templateInfo);
+
+    // Click handler for template selection
+    templateCard.addEventListener('click', () => {
+      // Remove selected class from all cards
+      templateGrid.querySelectorAll('.template-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selected class to clicked card
+      templateCard.classList.add('selected');
+      
+      // Update hidden input value
+      templateInput.value = template.value;
+    });
+
+    templateGrid.append(templateCard);
   });
 
-  templateField.append(templateLabel, templateSelect);
+  templateField.append(templateLabel, templateGrid, templateInput);
 
   // GitHub ID (moved after template)
   const githubField = createTag('div', { class: 'form-field', id: 'github-field', style: 'display: none;' });
@@ -643,12 +755,12 @@ export default function decorate(block) {
   // Load reCAPTCHA script
   loadRecaptchaScript();
 
-  // Get the original content from the block
-  const originalContent = block.querySelector(':scope > div');
+  // Get the original content from the block (excluding template-selection-data)
+  const originalContent = block.querySelector(':scope > div:not(.template-selection-data)');
 
   // Create a new layout with two columns
   const formSection = createTag('div', { class: 'form-section' });
-  formSection.append(buildForm());
+  formSection.append(buildForm(block));
 
   // Move the original content to the trial info section
   const trialInfo = createTag('div', { class: 'trial-info' });
