@@ -579,6 +579,35 @@ function buildAuthorBox(main) {
 // --------------- Main functions here ---------------- //
 
 /**
+ * Merges template-selection blocks into xwalk-trials blocks
+ * @param {Element} main The container element
+ */
+function mergeTemplateSelectionWithXwalkTrials(main) {
+  const xwalkTrialsBlocks = main.querySelectorAll('.xwalk-trials');
+  const templateSelectionBlocks = main.querySelectorAll('.template-selection');
+  
+  if (xwalkTrialsBlocks.length > 0 && templateSelectionBlocks.length > 0) {
+    xwalkTrialsBlocks.forEach((xwalkBlock) => {
+      // Find the closest template-selection block or use the first one
+      const templateBlock = templateSelectionBlocks[0];
+      
+      if (templateBlock) {
+        // Clone the template-selection content
+        const templateContent = templateBlock.cloneNode(true);
+        templateContent.classList.remove('template-selection');
+        templateContent.classList.add('template-selection-data');
+        
+        // Append template content to xwalk-trials block
+        xwalkBlock.appendChild(templateContent);
+        
+        // Remove the original template-selection block
+        templateBlock.remove();
+      }
+    });
+  }
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -587,6 +616,7 @@ export function buildAutoBlocks(main) {
     if (getMetadata('author') && !main.querySelector('.author-box')) {
       buildAuthorBox(main);
     }
+    mergeTemplateSelectionWithXwalkTrials(main);
     buildEmbeds(main);
   } catch (error) {
     // eslint-disable-next-line no-console

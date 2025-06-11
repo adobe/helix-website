@@ -191,6 +191,82 @@
   margin-top: 20px;
 }
 
+/* Template Selector Styles */
+.xwalk-trials .template-selector-field {
+  margin: 20px 0;
+}
+
+.xwalk-trials .template-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.xwalk-trials .template-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.xwalk-trials .template-card:hover {
+  border-color: #1473e6;
+  box-shadow: 0 2px 8px rgba(20, 115, 230, 0.1);
+}
+
+.xwalk-trials .template-card.selected {
+  border-color: #1473e6;
+  background-color: #f8fbff;
+  box-shadow: 0 2px 8px rgba(20, 115, 230, 0.15);
+}
+
+.xwalk-trials .template-thumbnail {
+  flex-shrink: 0;
+  width: 150px;
+  height: 120px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.xwalk-trials .template-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.xwalk-trials .template-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.xwalk-trials .template-info h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.xwalk-trials .template-info p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #666;
+}
+
+.xwalk-trials .template-card.selected .template-info h4 {
+  color: #1473e6;
+}
+
 .xwalk-trials button.continue {
   background-color: #1473e6;
   color: white;
@@ -299,5 +375,27 @@
   .xwalk-trials .trial-info > div > div:nth-child(2) li {
     justify-content: flex-start;
     text-align: left;
+  }
+  
+  /* Template selector mobile styles */
+  .xwalk-trials .template-card {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .xwalk-trials .template-thumbnail {
+    width: 100%;
+    max-width: 200px;
+    height: 100px;
+    align-self: center;
+  }
+  
+  .xwalk-trials .template-info h4 {
+    font-size: 16px;
+  }
+  
+  .xwalk-trials .template-info p {
+    font-size: 13px;
   }
 }
