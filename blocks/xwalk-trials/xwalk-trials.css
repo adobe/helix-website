@@ -358,21 +358,21 @@
     padding: 20px 15px;
     flex-direction: column;
   }
-  
+
   .xwalk-trials .form-row {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .xwalk-trials .trial-info > div > div:first-child {
     flex-direction: row;
     align-items: center;
   }
-  
+
   .xwalk-trials .trial-info > div > div:nth-child(2) {
     text-align: left;
   }
-  
+
   .xwalk-trials .trial-info > div > div:nth-child(2) li {
     justify-content: flex-start;
     text-align: left;
