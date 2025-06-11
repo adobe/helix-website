@@ -533,7 +533,7 @@ function buildForm(block) {
   
   
   // Append all elements to form
-  form.append(emailField, nameRow, companyField, roleField, templateField, githubField, agreement, contactPermission, verInput, recaptchaField, v2container, buttonContainer);
+  form.append(emailField, nameRow, companyField, roleField, githubField, templateField, agreement, contactPermission, verInput, recaptchaField, v2container, buttonContainer);
 
   let v2Rendered = false;
   function showV2Captcha() {
