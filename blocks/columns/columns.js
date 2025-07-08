@@ -71,7 +71,16 @@ export default function decorate(block) {
       cell.classList.add('columns-content');
       const wrapper = document.createElement('div');
       wrapper.className = 'columns-content-wrapper';
-      while (cell.firstChild) wrapper.append(cell.firstChild);
+      while (cell.firstChild) {
+        const firstChild = cell.firstChild;
+        if (firstChild.nodeType === Node.TEXT_NODE) {
+          const par = document.createElement('p');
+          par.append(firstChild);
+          wrapper.append(par);
+        } else {
+          wrapper.append(firstChild);
+        }
+      }
       cell.append(wrapper);
 
       // colored icons
