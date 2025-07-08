@@ -109,8 +109,15 @@ export default class URLSelector extends HTMLElement {
     this.addEventListener('submit', (event) => {
       let domain = event.detail;
       try {
-        const entered = new URL(`https://${domain}`);
-        domain = entered.hostname;
+        // First, try to parse as a full URL
+        if (domain.startsWith('http://') || domain.startsWith('https://')) {
+          const url = new URL(domain);
+          domain = url.hostname;
+        } else {
+          // If not a full URL, treat as hostname/domain
+          const entered = new URL(`https://${domain}`);
+          domain = entered.hostname;
+        }
       } catch (e) {
         // ignore, some domains are not valid URLs
       }
