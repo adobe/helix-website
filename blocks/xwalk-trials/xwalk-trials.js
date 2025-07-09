@@ -4,6 +4,7 @@ import createTag from '../../utils/tag.js';
 
 const V3_SITE_KEY = '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
 const V2_SITE_KEY = '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf';
+const base = 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api';
 
 /**
  * Loads states based on selected country
@@ -100,16 +101,172 @@ function loadRecaptchaScript() {
   document.head.append(scriptV2);
 }
 
-function showSuccessMessage(form) {
+function showSuccessMessage(form, completionMessage) {
   const successMessage = createTag('div', { class: 'success-message' });
-  successMessage.innerHTML = 'Your trial request has been submitted successfully. You will receive an email in the next 10 minutes with all details about your trial access';
+  successMessage.innerHTML = completionMessage.innerHTML;
   form.replaceWith(successMessage);
 }
 
-/**
- * Builds the trial form
- * @returns {HTMLElement} The form element
- */
+async function checkStatus(form, processId) {
+    const resp = await fetch(base + '/check-status?processId=' + processId)
+    const check = await resp.json()
+
+    let modal = document.querySelector('#status-modal');
+    if (!modal) {
+      modal = createStatusModal();
+      document.body.appendChild(modal);
+    }
+    
+    const hasError = updateStatusModal(modal, check);
+    
+    if (hasError) {
+      return;
+    }
+    
+    if (!check.status.finished) {
+      setTimeout(() => checkStatus(form, processId), 2000)
+    } else {
+      // Show completion message
+      const completionMessage = modal.querySelector('.completion-message');
+      if (completionMessage) {
+        modal.remove();
+        showSuccessMessage(form, completionMessage);
+        
+      }
+    }
+}
+
+function createStatusModal() {
+  const modal = createTag('div', { 
+    id: 'status-modal', 
+    class: 'status-modal' 
+  });
+  
+  const modalContent = createTag('div', { class: 'modal-content' });
+  
+  const header = createTag('div', { class: 'modal-header' });
+  const title = createTag('h2', {}, 'Setting up your environment...');
+  // Add close button
+  const closeButton = createTag('button', { class: 'modal-close', 'aria-label': 'Close dialog', type: 'button' }, '\u00D7');
+  closeButton.addEventListener('click', () => {
+    modal.remove();
+    // Re-enable form submission when modal is closed
+    const form = document.querySelector('form[action="/createTrials"]');
+    if (form) {
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Continue';
+      }
+    }
+  });
+  header.appendChild(title);
+  header.appendChild(closeButton);
+  
+  const stepsContainer = createTag('div', { class: 'steps-container' });
+  
+  // Create step elements for each major step
+  const steps = [
+    { key: 'createUser', label: 'Creating user account' },
+    { key: 'permissions', label: 'Setting up permissions' },
+    { key: 'quicksite', label: 'Creating site' },
+    { key: 'codeBus', label: 'Configuring site / repo' },
+    { key: 'publishContent', label: 'Publishing content' },
+    { key: 'sendNotification', label: 'Sending notification' }
+  ];
+  
+  steps.forEach(step => {
+    const stepElement = createTag('div', { 
+      class: 'step-item',
+      'data-step': step.key
+    });
+    
+    const spinner = createTag('div', { class: 'spinner' });
+    const stepLabel = createTag('span', { class: 'step-label' }, step.label);
+    
+    stepElement.appendChild(spinner);
+    stepElement.appendChild(stepLabel);
+    stepsContainer.appendChild(stepElement);
+  });
+  
+  const completionMessage = createTag('div', { 
+    class: 'completion-message',
+    style: 'display: none;'
+  });
+  const completionText = createTag('p', {}, 'Your environment is ready! You will receive an email with access details shortly.');
+  completionMessage.appendChild(completionText);
+  
+  modalContent.appendChild(header);
+  modalContent.appendChild(stepsContainer);
+  modalContent.appendChild(completionMessage);
+  modal.appendChild(modalContent);
+  
+  return modal;
+}
+
+function updateStatusModal(modal, status) {
+  const steps = ['createUser', 'permissions', 'quicksite', 'codeBus', 'publishContent', 'sendNotification'];
+  let errorMessage = null;
+  let errorStep = null;
+  let hasError = false;
+
+  // First pass: check for errors and mark completed steps
+  steps.forEach(stepKey => {
+    const stepElement = modal.querySelector(`[data-step="${stepKey}"]`);
+    if (!stepElement) return;
+    
+    const stepData = status[stepKey];
+    const spinner = stepElement.querySelector('.spinner');
+    if (!spinner) return;
+    
+    if (stepData && stepData.result === 'success') {
+      spinner.innerHTML = '✓';
+      spinner.className = 'checkmark';
+      stepElement.classList.add('completed');
+    } else if (stepData && stepData.result === 'error') {
+      spinner.innerHTML = '✗';
+      spinner.className = 'error';
+      if (stepData.message) {
+        errorMessage = stepData.message;
+        errorStep = stepKey;
+      }
+      hasError = true;
+    }
+  });
+
+  // Second pass: handle remaining steps based on error state
+  steps.forEach(stepKey => {
+    const stepElement = modal.querySelector(`[data-step="${stepKey}"]`);
+    if (!stepElement) return;
+    
+    const stepData = status[stepKey];
+    const spinner = stepElement.querySelector('.spinner');
+    if (!spinner) return;
+    
+    // If no step data and there's an error, stop the spinner
+    if (!stepData && hasError) {
+      spinner.innerHTML = '';
+      spinner.className = 'spinner stopped';
+    } else if (!stepData && !hasError) {
+      // Keep spinning for steps that haven't completed yet (no error)
+      spinner.innerHTML = '';
+      spinner.className = 'spinner';
+    }
+  });
+
+  // If there was an error, show it in the completion message and return true
+  if (errorMessage) {
+    const completionMessage = modal.querySelector('.completion-message');
+    if (completionMessage) {
+      completionMessage.style.display = 'block';
+      completionMessage.className = 'completion-message error-message';
+      completionMessage.innerHTML = `<p><strong>There was an error during the "${errorStep.replace(/([A-Z])/g, ' $1').toLowerCase()}" step:</strong><br>${errorMessage}<br><br>If you need help, please <a href="mailto:aemsitestrial@adobe.com">contact us at aemsitestrial@adobe.com</a>.</p>`;
+    }
+    return true;
+  }
+  return false;
+}
+
 /**
  * Extracts template data from the merged template-selection-data within the block
  * @param {HTMLElement} block - The xwalk-trials block containing merged template data
@@ -166,7 +323,7 @@ function submitFormData(form) {
   // Convert optIn to boolean
   data.optIn = data.optIn === 'true';
 
-  fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
+  fetch(base + '/registration', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -175,7 +332,8 @@ function submitFormData(form) {
   })
     .then(async (response) => {
       if (response.ok) {
-        showSuccessMessage(form);
+        const { processId } = await response.json();
+        checkStatus(form, processId);
       } else {
         const err = await response.json();
         throw new Error(err.error ? `${err.error}\nThere was an error submitting your request. Please try again.` : 'There was an error submitting your request. Please try again.');
@@ -617,7 +775,7 @@ function buildForm(block) {
           data.optIn = data.optIn === 'true';
 
           // Submit form data to server using fetch
-          fetch('https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api/registration', {
+          fetch(base + '/registration', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -626,7 +784,8 @@ function buildForm(block) {
           })
             .then(async (response) => {
               if (response.ok) {
-                showSuccessMessage(form);
+                const { processId } = await response.json();
+                checkStatus(form, processId);
               } else {
                 const err = await response.json();
                 if (err.error === 'v2captcha_required') {
