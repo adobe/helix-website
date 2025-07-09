@@ -72,7 +72,7 @@ export default function decorate(block) {
       const wrapper = document.createElement('div');
       wrapper.className = 'columns-content-wrapper';
       while (cell.firstChild) {
-        const firstChild = cell.firstChild;
+        const { firstChild } = cell;
         if (firstChild.nodeType === Node.TEXT_NODE) {
           const par = document.createElement('p');
           par.append(firstChild);
