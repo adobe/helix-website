@@ -21,7 +21,7 @@ jobs:
           replace-with: ''
       - name: Notify Slack (JSON)
         if: ${{ endsWith(github.event.client_payload.path, '.json') }}
-        uses: slackapi/slack-github-action@v2.1.0
+        uses: slackapi/slack-github-action@v2.1.1
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
@@ -34,7 +34,7 @@ jobs:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: Notify Slack (Markdown)
         if: ${{ endsWith(github.event.client_payload.path, '.md') }}
-        uses: slackapi/slack-github-action@v2.1.0
+        uses: slackapi/slack-github-action@v2.1.1
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
