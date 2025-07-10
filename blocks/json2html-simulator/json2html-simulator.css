@@ -1,0 +1,250 @@
+.json2html-simulator {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-l);
+  font-family: var(--body-font-family);
+}
+
+.json2html-simulator .input-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-l);
+  margin-bottom: var(--spacing-xl);
+}
+
+.json2html-simulator .json-section,
+.json2html-simulator .template-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.json2html-simulator label {
+  font-weight: 600;
+  margin-bottom: var(--spacing-s);
+  color: var(--text-color);
+  font-size: var(--type-body-s-size);
+}
+
+.json2html-simulator textarea {
+  min-height: 200px;
+  padding: var(--spacing-s);
+  border: 2px solid var(--overlay-background-color);
+  border-radius: 8px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--background-color);
+  color: var(--text-color);
+  transition: border-color 0.2s ease;
+  margin-bottom: var(--spacing-s);
+}
+
+.json2html-simulator textarea:focus {
+  outline: none;
+  border-color: var(--link-color);
+  box-shadow: 0 0 0 3px rgba(var(--link-color-rgb), 0.1);
+}
+
+.json2html-simulator .preset-btn {
+  text-decoration: none;
+  border-radius: 100px;
+  padding: 5.5px 15px;
+  text-align: center;
+  font-size: var(--type-body-xs-size);
+  font-style: normal;
+  font-weight: 600;
+  line-height: var(--body-line-height);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid var(--spectrum-blue);
+  margin: 10px 10px 10px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  height: fit-content;
+  color: var(--color-white);
+  background: transparent;
+  align-self: flex-start;
+  position: relative;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+.json2html-simulator .preset-btn::before {
+  content: "";
+  position: absolute;
+  left: -102%;
+  top: 0;
+  transition: all 0.3s ease-in-out;
+  width: 202%;
+  height: 104%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      circle at left,
+      var(--color-white) 50%,
+      var(--spectrum-blue) 50%
+    );
+}
+
+.json2html-simulator .preset-btn:hover {
+  color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
+  transform: translateZ(0);
+}
+
+.json2html-simulator .preset-btn:hover::before {
+  left: 0%;
+}
+
+.json2html-simulator .preset-btn:focus {
+  color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
+  box-shadow:
+    0 0 0 2px var(--color-white),
+    0 0 0 4px var(--spectrum-blue);
+}
+
+.json2html-simulator .preset-btn:active {
+  color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
+}
+
+.json2html-simulator .process-btn {
+  grid-column: 1 / -1;
+  padding: var(--spacing-s) var(--spacing-l);
+  background: var(--link-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: var(--type-body-m-size);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: var(--spacing-m);
+}
+
+.json2html-simulator .process-btn:hover {
+  background: var(--link-hover-color);
+}
+
+.json2html-simulator .output-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.json2html-simulator .output-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-l);
+  margin-top: var(--spacing-s);
+}
+
+.json2html-simulator .output-preview {
+  min-height: 200px;
+  padding: var(--spacing-s);
+  border: 2px solid var(--overlay-background-color);
+  border-radius: 8px;
+  background: var(--background-color);
+  overflow: auto;
+}
+
+.json2html-simulator .output-code {
+  min-height: 200px;
+  padding: var(--spacing-s);
+  border: 2px solid var(--overlay-background-color);
+  border-radius: 8px;
+  background: var(--overlay-background-color);
+  font-family: 'Source Code Pro', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.json2html-simulator .error {
+  color: #d32f2f;
+  background: #ffebee;
+  padding: var(--spacing-s);
+  border-radius: 4px;
+  border-left: 4px solid #d32f2f;
+}
+
+/* JSON table styles */
+.json2html-simulator .json-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+.json2html-simulator .json-table td {
+  padding: 4px 8px;
+  border: 1px solid var(--overlay-background-color);
+  vertical-align: top;
+}
+
+.json2html-simulator .json-table .key {
+  font-weight: 600;
+  background: var(--overlay-background-color);
+  color: var(--text-color);
+  width: 30%;
+}
+
+.json2html-simulator .json-table .index {
+  font-weight: 600;
+  background: var(--overlay-background-color);
+  color: var(--text-color);
+  width: 10%;
+  text-align: center;
+}
+
+.json2html-simulator .json-table .string {
+  color: #2e7d32;
+}
+
+.json2html-simulator .json-table .number {
+  color: #1976d2;
+}
+
+.json2html-simulator .json-table .boolean {
+  color: #f57c00;
+}
+
+.json2html-simulator .json-table .null,
+.json2html-simulator .json-table .undefined {
+  color: #757575;
+  font-style: italic;
+}
+
+.json2html-simulator .json-table .empty {
+  color: #757575;
+  font-style: italic;
+}
+
+.json2html-simulator .json-table .unknown {
+  color: #d32f2f;
+}
+
+.json2html-simulator .json-table .max-depth {
+  color: #f57c00;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media screen and (width < 768px) {
+  .json2html-simulator .input-section {
+    grid-template-columns: 1fr;
+  }
+
+  .json2html-simulator .output-container {
+    grid-template-columns: 1fr;
+  }
+
+  .json2html-simulator {
+    padding: var(--spacing-m);
+  }
+}
