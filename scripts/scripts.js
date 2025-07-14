@@ -724,7 +724,7 @@ async function loadLazy(doc) {
 
           if (precedingImages.length === 0) {
             // No lazy-loaded images above target, scroll immediately
-            element.scrollIntoView();
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
             return;
           }
 
