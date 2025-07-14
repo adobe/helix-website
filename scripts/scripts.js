@@ -717,29 +717,10 @@ async function loadLazy(doc) {
         // Handle lazy-loaded images that might cause content shift
         const handleLazyLoadedImages = () => {
           // Find all images above the target element that are lazy-loaded
-          const allElements = Array.from(main.querySelectorAll('*'));
-          const targetIndex = allElements.indexOf(element);
-
-          if (targetIndex === -1) {
-            element.scrollIntoView();
-            return;
-          }
-
-          // Get all lazy-loaded images before the target element
-          const precedingImages = allElements
-            .slice(0, targetIndex)
-            .filter((el) => {
-              if (el.tagName === 'IMG' && el.getAttribute('loading') === 'lazy') {
-                return true;
-              }
-              // Also check for images inside picture elements
-              if (el.tagName === 'PICTURE') {
-                const img = el.querySelector('img[loading="lazy"]');
-                return img !== null;
-              }
-              return false;
-            })
-            .map((el) => (el.tagName === 'PICTURE' ? el.querySelector('img') : el));
+          const allImages = Array.from(document.querySelectorAll('img'));
+          const precedingImages = allImages
+            .filter(img => img.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING;
+        });
 
           if (precedingImages.length === 0) {
             // No lazy-loaded images above target, scroll immediately
