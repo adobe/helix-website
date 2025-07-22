@@ -101,124 +101,104 @@ function loadRecaptchaScript() {
   document.head.append(scriptV2);
 }
 
-function showSuccessMessage(form, completionMessage) {
+function showSuccessMessage(element, status) {
   const successMessage = createTag('div', { class: 'success-message' });
-  successMessage.innerHTML = completionMessage.innerHTML;
-  form.replaceWith(successMessage);
+  const completionText = createTag('p', {}, 'Your environment is ready! You will receive an email with access details shortly.');
+  successMessage.appendChild(completionText);
+  element.replaceWith(successMessage);
 }
 
 async function checkStatus(form, processId) {
     const resp = await fetch(base + '/check-status?processId=' + processId)
     const check = await resp.json()
 
-    let modal = document.querySelector('#status-modal');
-    if (!modal) {
-      modal = createStatusModal();
-      document.body.appendChild(modal);
-    }
-    
-    const hasError = updateStatusModal(modal, check);
-    
+    const hasError = updateStatusInline(form, check);
+
     if (hasError) {
       return;
     }
-    
+
     if (!check.status.finished) {
       setTimeout(() => checkStatus(form, processId), 2000)
     } else {
-      // Show completion message
-      const completionMessage = modal.querySelector('.completion-message');
-      if (completionMessage) {
-        modal.remove();
-        showSuccessMessage(form, completionMessage);
-        
-      }
+      const elementToReplace = form.querySelector('.status-container');
+      showSuccessMessage(elementToReplace, check);
     }
 }
 
-function createStatusModal() {
-  const modal = createTag('div', { 
-    id: 'status-modal', 
-    class: 'status-modal' 
-  });
-  
-  const modalContent = createTag('div', { class: 'modal-content' });
-  
-  const header = createTag('div', { class: 'modal-header' });
+function createStatusInline(form) {
+  const statusContainer = createTag('div', { class: 'status-container' });
+  form.innerHTML = '';
+  form.appendChild(statusContainer);
+
+  const header = createTag('div', { class: 'status-header' });
   const title = createTag('h2', {}, 'Setting up your environment...');
-  // Add close button
-  const closeButton = createTag('button', { class: 'modal-close', 'aria-label': 'Close dialog', type: 'button' }, '\u00D7');
-  closeButton.addEventListener('click', () => {
-    modal.remove();
-    // Re-enable form submission when modal is closed
-    const form = document.querySelector('form[action="/createTrials"]');
-    if (form) {
-      const submitButton = form.querySelector('button[type="submit"]');
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Continue';
-      }
-    }
-  });
   header.appendChild(title);
-  header.appendChild(closeButton);
-  
+
   const stepsContainer = createTag('div', { class: 'steps-container' });
-  
+
   // Create step elements for each major step
   const steps = [
     { key: 'createUser', label: 'Creating user account' },
-    { key: 'permissions', label: 'Setting up permissions' },
     { key: 'quicksite', label: 'Creating site' },
+    { key: 'permissions', label: 'Setting up permissions' },
     { key: 'codeBus', label: 'Configuring site / repo' },
     { key: 'publishContent', label: 'Publishing content' },
     { key: 'sendNotification', label: 'Sending notification' }
   ];
-  
+
   steps.forEach(step => {
-    const stepElement = createTag('div', { 
+    const stepElement = createTag('div', {
       class: 'step-item',
       'data-step': step.key
     });
-    
+
     const spinner = createTag('div', { class: 'spinner' });
     const stepLabel = createTag('span', { class: 'step-label' }, step.label);
-    
+
     stepElement.appendChild(spinner);
     stepElement.appendChild(stepLabel);
     stepsContainer.appendChild(stepElement);
   });
-  
-  const completionMessage = createTag('div', { 
-    class: 'completion-message',
+
+  const errorContainer = createTag('div', {
+    class: 'error-container',
     style: 'display: none;'
   });
-  const completionText = createTag('p', {}, 'Your environment is ready! You will receive an email with access details shortly.');
-  completionMessage.appendChild(completionText);
-  
-  modalContent.appendChild(header);
-  modalContent.appendChild(stepsContainer);
-  modalContent.appendChild(completionMessage);
-  modal.appendChild(modalContent);
-  
-  return modal;
+
+  const retryButton = createTag('button', {
+    class: 'retry-button',
+    type: 'button'
+  }, 'Try Again');
+
+  errorContainer.appendChild(retryButton);
+
+  statusContainer.appendChild(header);
+  statusContainer.appendChild(stepsContainer);
+  statusContainer.appendChild(errorContainer);
+
+  return statusContainer;
 }
 
-function updateStatusModal(modal, status) {
+function updateStatusInline(form, status) {
   const steps = ['createUser', 'permissions', 'quicksite', 'codeBus', 'publishContent', 'sendNotification'];
   let errorMessage = null;
   let errorStep = null;
   let hasError = false;
 
-  // First pass: check for errors and mark completed steps
+  let statusContainer = form.querySelector('.status-container');
+  if (!statusContainer) {
+    statusContainer = createStatusInline(form);
+  }
+
   steps.forEach(stepKey => {
-    const stepElement = modal.querySelector(`[data-step="${stepKey}"]`);
+    const stepElement = statusContainer.querySelector(`[data-step="${stepKey}"]`);
     if (!stepElement) return;
-    
+
     const stepData = status[stepKey];
     const spinner = stepElement.querySelector('.spinner');
     if (!spinner) return;
-    
+
     if (stepData && stepData.result === 'success') {
       spinner.innerHTML = '✓';
       spinner.className = 'checkmark';
@@ -236,13 +216,13 @@ function updateStatusModal(modal, status) {
 
   // Second pass: handle remaining steps based on error state
   steps.forEach(stepKey => {
-    const stepElement = modal.querySelector(`[data-step="${stepKey}"]`);
+    const stepElement = statusContainer.querySelector(`[data-step="${stepKey}"]`);
     if (!stepElement) return;
-    
+
     const stepData = status[stepKey];
     const spinner = stepElement.querySelector('.spinner');
     if (!spinner) return;
-    
+
     // If no step data and there's an error, stop the spinner
     if (!stepData && hasError) {
       spinner.innerHTML = '';
@@ -254,13 +234,34 @@ function updateStatusModal(modal, status) {
     }
   });
 
-  // If there was an error, show it in the completion message and return true
+  // If there was an error, show it in the error container and return true
   if (errorMessage) {
-    const completionMessage = modal.querySelector('.completion-message');
-    if (completionMessage) {
-      completionMessage.style.display = 'block';
-      completionMessage.className = 'completion-message error-message';
-      completionMessage.innerHTML = `<p><strong>There was an error during the "${errorStep.replace(/([A-Z])/g, ' $1').toLowerCase()}" step:</strong><br>${errorMessage}<br><br>If you need help, please <a href="mailto:aemsitestrial@adobe.com">contact us at aemsitestrial@adobe.com</a>.</p>`;
+    const errorContainer = statusContainer.querySelector('.error-container');
+    if (errorContainer) {
+      errorContainer.style.display = 'block';
+      errorContainer.innerHTML = `
+        <div class="error-message">
+          <p><strong>There was an error during the "${errorStep.replace(/([A-Z])/g, ' $1').toLowerCase()}" step:</strong><br>${errorMessage}</p>
+          <p>If you need help, please <a href="mailto:aemsitestrial@adobe.com">contact us at aemsitestrial@adobe.com</a>.</p>
+        </div>
+        <button class="retry-button" type="button">Try Again</button>
+      `;
+
+      // Add retry functionality
+      const retryButton = errorContainer.querySelector('.retry-button');
+      retryButton.addEventListener('click', () => {
+        // Restore the form
+        const block = statusContainer.closest('.xwalk-trials');
+        if (block) {
+          statusContainer.remove();
+          const newForm = buildForm(block);
+          const formSection = block.querySelector('.form-section');
+          if (formSection) {
+            formSection.innerHTML = '';
+            formSection.appendChild(newForm);
+          }
+        }
+      });
     }
     return true;
   }
