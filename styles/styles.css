@@ -285,6 +285,7 @@ body.appear {
   max-width: var(--grid-mobile-container-width);
   margin-left: auto;
   margin-right: auto;
+  padding-top: 30px;
 }
 
 aside {
