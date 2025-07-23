@@ -13,6 +13,11 @@ Install the Helix CLI:
 Run it in this repo:
 
     aem up
+
+While site preview is authenticated, run below command for local development:
+
+    npx @adobe/aem-cli up --url https://main--helix-website--adobe.aem.live/
+
     
 ## Testing
 ### Install dependencies:

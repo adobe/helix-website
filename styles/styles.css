@@ -1506,6 +1506,11 @@ body.skills-template main h1 {
   margin-bottom: var(--spacing-s);
 }
 
+body.blog-template main h1,
+body .blog.feed-container h1 {
+  padding-top: 30px;
+}
+
 body.docs-template main h2,
 body.guides-template main h2,
 body.skills-template main h2 {

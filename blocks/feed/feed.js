@@ -148,8 +148,18 @@ export async function renderBlog(block) {
     const latestBlogItem = createTag('div', { class: 'blog-item latest' });
     const latestBlogContent = await fetchBlogContent(latestBlog.path);
     if (latestBlogContent) {
-      const contentLength = latestBlogContent.length;
-      const truncatedContent = latestBlogContent.substring(0, Math.floor(contentLength * 0.80));
+      const targetLength = Math.floor(latestBlogContent.length * 0.70);
+
+      // Find last sentence ending (., !, ?) before 70% mark
+      const lastPeriod = latestBlogContent.lastIndexOf('.', targetLength);
+      const lastExclamation = latestBlogContent.lastIndexOf('!', targetLength);
+      const lastQuestion = latestBlogContent.lastIndexOf('?', targetLength);
+      const lastSentenceEnd = Math.max(lastPeriod, lastExclamation, lastQuestion);
+
+      const truncatedContent = lastSentenceEnd > targetLength * 0.5
+        ? latestBlogContent.substring(0, lastSentenceEnd + 1)
+        : latestBlogContent.substring(0, targetLength);
+
       latestBlogItem.innerHTML = truncatedContent;
     }
 
