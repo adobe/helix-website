@@ -287,11 +287,6 @@ body.appear {
   margin-right: auto;
 }
 
-.blog-template main h1,
-.blog.feed-container h1 {
-  padding-top: 30px;
-}
-
 aside {
   min-height: 75px;
   padding: var(--spacing-xxs) 0 0;
@@ -1509,6 +1504,11 @@ body.skills-template main h1 {
   font-size: var(--type-heading-xxl-size);
   line-height: var(--type-heading-xxl-lh);
   margin-bottom: var(--spacing-s);
+}
+
+body.blog-template main h1,
+body .blog.feed-container h1 {
+  padding-top: 30px;
 }
 
 body.docs-template main h2,
