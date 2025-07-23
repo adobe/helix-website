@@ -181,7 +181,10 @@ export default class DataLoader {
   async fetchPeriod(startDate, endDate) {
     const start = new Date(startDate);
     const originalStart = new Date(start);
-    const end = endDate ? new Date(endDate) : new Date();
+    let end = endDate ? new Date(endDate) : new Date();
+    if (end > Date.now()) {
+      end = new Date();
+    }
 
     const diff = end.getTime() - start.getTime();
     if (diff < 0) {
@@ -192,11 +195,16 @@ export default class DataLoader {
 
     if (diff <= (1000 * 60 * 60 * 24 * 7)) {
       // less than a week
-      const days = Math.round((diff / (1000 * 60 * 60 * 24))) + 1;
+      const hours = Math.round((diff / (1000 * 60 * 60))) + 1;
 
-      for (let i = 0; i < days; i += 1) {
-        promises.push(this.fetchUTCDay(start.toISOString(), originalStart, end));
-        start.setDate(start.getDate() + 1);
+      for (let i = 0; i < hours; i += 1) {
+        promises.push(this.fetchUTCHour(start.toISOString(), originalStart, end));
+        if (start.getHours() >= 23) {
+          start.setDate(start.getDate() + 1);
+          start.setHours(0);
+        } else {
+          start.setHours(start.getHours() + 1);
+        }
       }
     } else if (diff <= (1000 * 60 * 60 * 24 * 31)) {
       // less than a month
