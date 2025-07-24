@@ -117,8 +117,9 @@ const draw = async () => {
     summaries.append(summary);
   } else {
     const metrics = currentPageEntry.getMetrics([
-      'pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage',
+      'pageViews', 'organic', 'visits', 'bounces', 'engagement', 'conversions', 'timeOnPage', 'clicks',
     ]);
+
     Object.keys(SERIES).forEach((key) => {
       const s = SERIES[key];
       const value = s.rateFn(metrics);
