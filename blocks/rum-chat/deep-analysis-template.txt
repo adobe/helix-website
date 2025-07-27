@@ -1,0 +1,37 @@
+ORGANIZE THE ABOVE FINDINGS INTO A STRUCTURED REPORT WITH THESE SECTIONS:
+
+<b>🎯 Executive Summary</b>
+Create a crisp 3-minute read (MAXIMUM 250 words) covering:
+- Top 3 critical insights with business impact
+- Overall performance status and key concerns
+- Priority recommendations summary
+
+<b>⚡ Performance Analysis</b>
+- Core Web Vitals insights and bottlenecks
+- Page load performance patterns
+- Resource loading issues and optimizations
+
+<b>👥 User Engagement Insights</b>
+- Click behaviors and interaction patterns
+- Content engagement effectiveness
+- User journey analysis and friction points
+
+<b>📈 Traffic Acquisition Analysis</b>
+- Traffic source quality and performance
+- Channel effectiveness and conversion rates
+- Referrer analysis and acquisition optimization
+
+<b>🚨 Critical Issues & Errors</b>
+- JavaScript errors and technical problems
+- Performance issues affecting user experience
+- System reliability concerns
+
+<b>🎯 Actionable Recommendations</b>
+- Specific technical improvements with ROI potential
+- User experience optimizations
+- Performance enhancement strategies
+- Monitoring and measurement strategies
+
+Format with clear HTML <b> tags for sections and use bullet points for readability. Consolidate duplicate findings and focus on unique insights from each area.
+
+WORD COUNT ENFORCEMENT: The Executive Summary MUST NOT exceed 250 words. If approaching the limit, prioritize the most critical business-impacting information only. 

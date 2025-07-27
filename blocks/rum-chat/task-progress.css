@@ -1,0 +1,84 @@
+.task-list-container {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.task-list-header {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #495057;
+  font-size: 14px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.task-item.task-in-progress {
+  border-color: #007bff;
+  background: #f0f8ff;
+  animation: pulse 2s infinite;
+}
+
+.task-item.task-completed {
+  border-color: #28a745;
+  background: #f0fff4;
+}
+
+.task-item.task-error {
+  border-color: #dc3545;
+  background: #fff5f5;
+}
+
+.task-status {
+  font-size: 14px;
+  min-width: 20px;
+}
+
+.task-text {
+  font-size: 13px;
+  color: #495057;
+  flex: 1;
+}
+
+.task-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e9ecef;
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+.task-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 0 0 6px 6px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+} 

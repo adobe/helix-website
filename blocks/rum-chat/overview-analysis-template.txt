@@ -1,0 +1,36 @@
+CREATE A CLEAN, PROFESSIONAL REPORT WITH THIS STRUCTURE:
+
+<b>🎯 Executive Summary</b>
+Create an ULTRA-CONCISE summary (MAXIMUM 250 words - strictly enforce this limit) that covers:
+- Current performance status in 2-3 sentences
+- Top 3 most critical findings with specific impact metrics
+- Top 3 priority actions with expected ROI
+- Overall recommendation (fix, optimize, or monitor)
+
+<b>📊 Key Metrics & Findings</b>
+- Most important performance metrics discovered
+- Critical user behavior patterns
+- Primary traffic and engagement insights
+- Top technical issues requiring attention
+
+<b>🎯 Priority Action Plan</b>
+- High-impact improvements (implement first)
+- Medium-impact optimizations (implement second)
+- Monitoring and measurement recommendations
+- Quick wins vs long-term strategic improvements
+
+<b>📈 Detailed Analysis</b>
+- Performance bottlenecks and Core Web Vitals insights
+- User engagement patterns and conversion opportunities
+- Traffic acquisition effectiveness and channel analysis
+- Technical issues and system reliability concerns
+
+CRITICAL: Keep the Executive Summary section STRICTLY under 250 words for guaranteed 3-minute readability. Count words carefully and prioritize only the most essential information. Use bullet points and specific metrics where possible. Format with clear HTML <b> tags for sections.
+
+IMPORTANT: After creating the report, systematically use the "collect_insights" and "collect_recommendations" tools to capture the key findings for separate rendering:
+
+1. Use "collect_insights" tool to capture key insights from your analysis with appropriate categories (performance, engagement, traffic, errors, user_behavior) and impact levels (high, medium, low)
+
+2. Use "collect_recommendations" tool to capture actionable recommendations with appropriate categories (performance, technical, user_experience, monitoring, content), priority levels (high, medium, low), and effort estimates (low, medium, high)
+
+WORD COUNT REMINDER: Executive Summary section must remain under 250 words for true 3-minute readability. 
