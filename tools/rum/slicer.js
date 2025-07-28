@@ -204,6 +204,24 @@ function updateDataFacets(filterText, params, checkpoint) {
             },
           );
         }
+
+        // special handling for a11y to provide simplified binary values
+        if (cp === 'a11y') {
+          dataChunks.addFacet('a11y.source', (bundle) => Array.from(
+            bundle.events
+              .filter((evt) => evt.checkpoint === 'a11y')
+              .filter(({ source }) => source) // filter out empty sources
+              .reduce((acc, { source }) => {
+                // Map granular values to binary ones
+                if (source === 'off') {
+                  acc.add('off');
+                } else if (['on', 'low', 'medium', 'high'].includes(source)) {
+                  acc.add('on');
+                }
+                return acc;
+              }, new Set()),
+          ));
+        }
       } else if (params.has('utm.source')) {
         params.getAll('utm.source').forEach((utmsource) => {
           dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
