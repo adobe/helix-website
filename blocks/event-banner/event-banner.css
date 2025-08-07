@@ -1,6 +1,5 @@
 .event-banner {
   position: relative;
-  background-color: #000 !important;
   color: #fff;
   padding: 0;
   text-align: left;
@@ -130,9 +129,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000;
   background-image: var(--event-bg-image, url('./event-banner.png'));
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
