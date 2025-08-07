@@ -13,22 +13,21 @@
 .event-banner-content {
   position: absolute;
   z-index: 10;
-  top: 30%;
+  top: 34%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
   max-width: 800px;
   padding: 0 40px;
+  text-align: center;
 }
 
 /* Adobe Logo */
 .event-banner-content .adobe-logo {
-  position: absolute;
-  left: 50%;
-  top: 60px;
+  display: block;
   width: 120px;
   height: 30px;
-  transform: translateX(-50%);
+  margin: 0 auto 20px;
   /* Logo is already white, no filter needed */
 }
 
@@ -46,15 +45,11 @@
 /* Main Title */
 .event-banner-content h1,
 .event-banner-content .main-title {
-  position: absolute;
-  left: 50%;
-  top: 120px;
-  transform: translateX(-50%);
   font-family: var(--body-font-family);
   font-size: 64px !important;
   font-weight: 900 !important;
   line-height: 1 !important;
-  margin: 0 !important;
+  margin: 0 0 20px 0 !important;
   color: #fff !important;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -64,14 +59,10 @@
 /* Subtitle */
 .event-banner-content .subtitle,
 .event-banner-content p:first-of-type {
-  position: absolute;
-  left: 50%;
-  top: 200px;
-  transform: translateX(-50%);
   font-family: var(--body-font-family);
   font-size: 22px !important;
   font-weight: 500 !important;
-  margin: 0 !important;
+  margin: 0 0 20px 0 !important;
   color: #fff !important;
   opacity: 0.95;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
@@ -81,14 +72,10 @@
 /* Event Details */
 .event-banner-content .event-details,
 .event-banner-content p:nth-of-type(2) {
-  position: absolute;
-  left: 50%;
-  top: 320px;
-  transform: translateX(-50%);
   font-family: var(--body-font-family);
   font-size: 18px !important;
   font-weight: 500 !important;
-  margin: 0 !important;
+  margin: 0 0 30px 0 !important;
   color: #fff !important;
   opacity: 0.9;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
@@ -106,7 +93,7 @@
   text-decoration: none;
   display: inline-block;
   font-weight: 600;
-  margin: 20px auto 0;
+  margin: 0 auto;
   transition: all 0.3s ease;
   border: 2px solid var(--spectrum-blue);
 }
