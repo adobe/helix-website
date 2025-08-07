@@ -46,7 +46,7 @@
 .event-banner-content h1,
 .event-banner-content .main-title {
   font-family: var(--body-font-family);
-  font-size: 60px !important;
+  font-size: 72px !important;
   font-weight: 900 !important;
   line-height: 1 !important;
   margin: 0 0 20px 0 !important;
@@ -60,7 +60,7 @@
 .event-banner-content .subtitle,
 .event-banner-content p:first-of-type {
   font-family: var(--body-font-family);
-  font-size: 24pt !important;
+  font-size: 18px !important;
   font-weight: 500 !important;
   margin: 0 0 25px 0 !important;
   color: #fff !important;
@@ -73,7 +73,7 @@
 .event-banner-content .event-details,
 .event-banner-content p:nth-of-type(2) {
   font-family: var(--body-font-family);
-  font-size: 24pt !important;
+  font-size: 18px !important;
   font-weight: 500 !important;
   margin: 0 0 30px 0 !important;
   color: #fff !important;
