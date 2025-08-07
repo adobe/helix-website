@@ -4,10 +4,11 @@
   padding: 0;
   text-align: left;
   overflow: hidden;
-  height: 450px;
+  height: 600px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 65px; /* Account for header height */
 }
 
 .event-banner-content {
