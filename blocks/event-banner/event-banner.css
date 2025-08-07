@@ -1,0 +1,211 @@
+.event-banner {
+  position: relative;
+  background-color: #000 !important;
+  color: #fff;
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+  height: 450px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.event-banner-content {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+/* Adobe Logo */
+.event-banner-content .adobe-logo {
+  position: absolute;
+  left: 50%;
+  top: 60px;
+  width: 120px;
+  height: 30px;
+  transform: translateX(-50%);
+  /* Logo is already white, no filter needed */
+}
+
+/* Adobe Brand Text */
+.event-banner-content .adobe-brand {
+  font-family: var(--body-font-family);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 8px 0;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+/* Main Title */
+.event-banner-content h1,
+.event-banner-content .main-title {
+  position: absolute;
+  left: 50%;
+  top: 120px;
+  transform: translateX(-50%);
+  font-family: var(--body-font-family);
+  font-size: 64px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  color: #fff !important;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+/* Subtitle */
+.event-banner-content .subtitle,
+.event-banner-content p:first-of-type {
+  position: absolute;
+  left: 50%;
+  top: 200px;
+  transform: translateX(-50%);
+  font-family: var(--body-font-family);
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  color: #fff !important;
+  opacity: 0.95;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+/* Event Details */
+.event-banner-content .event-details,
+.event-banner-content p:nth-of-type(2) {
+  position: absolute;
+  left: 50%;
+  top: 320px;
+  transform: translateX(-50%);
+  font-family: var(--body-font-family);
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  color: #fff !important;
+  opacity: 0.9;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+/* CTA Button */
+.event-banner-content .button {
+  position: absolute;
+  left: 50%;
+  top: 370px;
+  transform: translateX(-50%);
+  background-color: var(--spectrum-blue);
+  border-color: var(--spectrum-blue);
+  color: #fff;
+  font-size: 16px;
+  padding: 12px 32px;
+  border-radius: 25px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 600;
+  margin: 0;
+  transition: all 0.3s ease;
+  border: 2px solid var(--spectrum-blue);
+}
+
+.event-banner-content .button:hover {
+  background-color: var(--dark-spectrum-blue);
+  border-color: var(--dark-spectrum-blue);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(20, 115, 230, 0.3);
+}
+
+/* Combined Background Graphics */
+.event-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  background-image: url('./event-hero.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .event-banner {
+    height: 350px;
+  }
+
+  .event-banner-content .adobe-logo {
+    width: 100px;
+    height: 25px;
+    top: 40px;
+  }
+
+  .event-banner-content h1 {
+    font-size: 48px !important;
+    top: 90px;
+  }
+
+  .event-banner-content .subtitle,
+  .event-banner-content p:first-of-type {
+    font-size: 18px !important;
+    top: 150px;
+  }
+
+  .event-banner-content .event-details,
+  .event-banner-content p:nth-of-type(2) {
+    font-size: 16px !important;
+    top: 240px;
+  }
+
+  .event-banner-content .button {
+    font-size: 14px;
+    padding: 10px 24px;
+    top: 280px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .event-banner {
+    height: 300px;
+  }
+
+  .event-banner-content .adobe-logo {
+    width: 80px;
+    height: 20px;
+    top: 30px;
+  }
+
+  .event-banner-content h1 {
+    font-size: 36px !important;
+    top: 70px;
+  }
+
+  .event-banner-content .subtitle,
+  .event-banner-content p:first-of-type {
+    font-size: 16px !important;
+    top: 120px;
+  }
+
+  .event-banner-content .event-details,
+  .event-banner-content p:nth-of-type(2) {
+    font-size: 14px !important;
+    top: 200px;
+  }
+
+  .event-banner-content .button {
+    font-size: 12px;
+    padding: 8px 20px;
+    top: 230px;
+  }
+}
