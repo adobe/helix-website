@@ -13,7 +13,7 @@
 .event-banner-content {
   position: absolute;
   z-index: 10;
-  top: 40%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -97,10 +97,6 @@
 
 /* CTA Button */
 .event-banner-content .button {
-  position: absolute;
-  left: 50%;
-  top: 370px;
-  transform: translateX(-50%);
   background-color: var(--spectrum-blue);
   border-color: var(--spectrum-blue);
   color: #fff;
@@ -110,7 +106,7 @@
   text-decoration: none;
   display: inline-block;
   font-weight: 600;
-  margin: 0;
+  margin: 20px auto 0;
   transition: all 0.3s ease;
   border: 2px solid var(--spectrum-blue);
 }
@@ -118,7 +114,7 @@
 .event-banner-content .button:hover {
   background-color: var(--dark-spectrum-blue);
   border-color: var(--dark-spectrum-blue);
-  transform: translateX(-50%) translateY(-2px);
+  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(20, 115, 230, 0.3);
 }
 
