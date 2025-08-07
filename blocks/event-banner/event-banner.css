@@ -2,23 +2,23 @@
   position: relative;
   color: #fff;
   padding: 0;
-  text-align: left;
+  text-align: center;
   overflow: hidden;
   height: 600px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 65px; /* Account for header height */
 }
 
 .event-banner-content {
   position: absolute;
   z-index: 10;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 100%;
-  height: 100%;
-  padding: 0;
+  max-width: 800px;
+  padding: 0 40px;
 }
 
 /* Adobe Logo */
