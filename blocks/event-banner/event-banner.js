@@ -16,7 +16,7 @@ function addUTMTracking(button) {
 }
 
 export default function decorate(block) {
-  const content = block.querySelector('div');
+  const content = block.children[0].querySelector('div');
   content.setAttribute('class', 'event-banner-content');
 
   // Check for background image in content
