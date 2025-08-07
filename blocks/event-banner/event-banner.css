@@ -24,10 +24,12 @@
 
 /* Adobe Logo */
 .event-banner-content .adobe-logo {
-  display: block;
+  position: absolute;
+  left: 50%;
+  top: 215px;
   width: 120px;
   height: 30px;
-  margin: 0 auto 20px;
+  transform: translateX(-50%);
   /* Logo is already white, no filter needed */
 }
 
@@ -45,11 +47,15 @@
 /* Main Title */
 .event-banner-content h1,
 .event-banner-content .main-title {
+  position: absolute;
+  left: 50%;
+  top: 295px;
+  transform: translateX(-50%);
   font-family: var(--body-font-family);
-  font-size: 64px !important;
+  font-size: 85pt !important;
   font-weight: 900 !important;
   line-height: 1 !important;
-  margin: 0 0 20px 0 !important;
+  margin: 0 !important;
   color: #fff !important;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -59,10 +65,14 @@
 /* Subtitle */
 .event-banner-content .subtitle,
 .event-banner-content p:first-of-type {
+  position: absolute;
+  left: 50%;
+  top: 367px;
+  transform: translateX(-50%);
   font-family: var(--body-font-family);
-  font-size: 22px !important;
+  font-size: 24pt !important;
   font-weight: 500 !important;
-  margin: 0 0 20px 0 !important;
+  margin: 0 !important;
   color: #fff !important;
   opacity: 0.95;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
@@ -72,10 +82,14 @@
 /* Event Details */
 .event-banner-content .event-details,
 .event-banner-content p:nth-of-type(2) {
+  position: absolute;
+  left: 50%;
+  top: 502px;
+  transform: translateX(-50%);
   font-family: var(--body-font-family);
-  font-size: 18px !important;
+  font-size: 24pt !important;
   font-weight: 500 !important;
-  margin: 0 0 30px 0 !important;
+  margin: 0 !important;
   color: #fff !important;
   opacity: 0.9;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
@@ -84,6 +98,10 @@
 
 /* CTA Button */
 .event-banner-content .button {
+  position: absolute;
+  left: 50%;
+  top: 551px;
+  transform: translateX(-50%);
   background-color: var(--spectrum-blue);
   border-color: var(--spectrum-blue);
   color: #fff;
@@ -93,7 +111,7 @@
   text-decoration: none;
   display: inline-block;
   font-weight: 600;
-  margin: 0 auto;
+  margin: 0;
   transition: all 0.3s ease;
   border: 2px solid var(--spectrum-blue);
 }
@@ -101,7 +119,7 @@
 .event-banner-content .button:hover {
   background-color: var(--dark-spectrum-blue);
   border-color: var(--dark-spectrum-blue);
-  transform: translateY(-2px);
+  transform: translateX(-50%) translateY(-2px);
   box-shadow: 0 8px 25px rgba(20, 115, 230, 0.3);
 }
 
