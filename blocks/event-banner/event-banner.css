@@ -46,7 +46,7 @@
 .event-banner-content h1,
 .event-banner-content .main-title {
   font-family: var(--body-font-family);
-  font-size: 85pt !important;
+  font-size: 60px !important;
   font-weight: 900 !important;
   line-height: 1 !important;
   margin: 0 0 20px 0 !important;
