@@ -131,19 +131,12 @@
   width: 100%;
   height: 100%;
   background-color: #000;
-  background-image: url('./event-hero.webp');
+  background-image: var(--event-bg-image, url('./event-banner.png'));
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
   pointer-events: none;
-}
-
-/* Fallback for browsers that don't support WebP */
-@supports not (background-image: url('./event-hero.webp')) {
-  .event-banner::before {
-    background-image: url('./event-hero.png');
-  }
 }
 
 /* Responsive Design */

@@ -19,6 +19,16 @@ export default function decorate(block) {
   const content = block.querySelector('div');
   content.setAttribute('class', 'event-banner-content');
 
+  // Check for background image in content
+  const backgroundImg = content.querySelector('img');
+  let backgroundImageUrl = '';
+  
+  if (backgroundImg) {
+    backgroundImageUrl = backgroundImg.src;
+    // Remove the image from content since we'll use it as background
+    backgroundImg.remove();
+  }
+
   // Add Adobe logo at the top
   const logoImg = document.createElement('img');
   logoImg.src = '/blocks/event-banner/adobe-logo.svg';
@@ -50,6 +60,11 @@ export default function decorate(block) {
   }
   if (paragraphs.length > 1 && !paragraphs[1].querySelector('a')) {
     paragraphs[1].classList.add('event-details');
+  }
+
+  // Set background image if one was provided
+  if (backgroundImageUrl) {
+    block.style.setProperty('--event-bg-image', `url('${backgroundImageUrl}')`);
   }
 
   // Clear the block and add the content

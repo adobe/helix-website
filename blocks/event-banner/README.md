@@ -27,6 +27,7 @@ Create a simple table in your authoring tool with the following structure:
 | Adobe Experience Manager and Adobe Commerce |
 | Join us in San Jose starting November 10, 2025 |
 | [Register](https://developerevents.adobe.com/events/details/adobe-developer-events-developer-experience-presents-reg-test/) |
+| [Your custom background image] |
 ```
 
 The block expects content in this order:
@@ -34,8 +35,13 @@ The block expects content in this order:
 2. **Subtitle** (p) - Event description like "Adobe Experience Manager and Adobe Commerce"
 3. **Event Details** (p) - Date and location information
 4. **CTA Button** (a) - Registration or information link
+5. **Background Image** (img) - Drag and drop your event background (PNG or JPG)
 
-**Important**: The Adobe logo is automatically added by the JavaScript - no need to include it in your content.
+**Important**: 
+- The Adobe logo is automatically added by the JavaScript - no need to include it in your content
+- If no background image is provided, the default `event-banner.png` will be used
+- The background image will be automatically positioned and sized to fit the banner
+- Edge Delivery Services will automatically optimize images (including WebP conversion)
 
 #### Code:
 
