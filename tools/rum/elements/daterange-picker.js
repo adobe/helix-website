@@ -284,6 +284,7 @@ export default class TimeRangePicker extends HTMLElement {
     if (!option) {
       return;
     }
+    const previousValue = inputElement.dataset.value;
 
     inputElement.value = option.textContent;
     inputElement.dataset.value = option.dataset.value;
@@ -303,6 +304,11 @@ export default class TimeRangePicker extends HTMLElement {
     }
 
     if (dateFrom) {
+      if (previousValue && value === 'custom' && previousValue !== 'custom') {
+        const fromDate = new Date(dateFrom);
+        fromDate.setDate(fromDate.getDate() + 1);
+        dateFrom = toDateString(fromDate);
+      }
       fromElement.value = dateFrom;
     }
 
