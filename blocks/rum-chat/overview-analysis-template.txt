@@ -1,31 +1,44 @@
-CREATE A CLEAN, PROFESSIONAL REPORT WITH THIS STRUCTURE:
+CREATE A CONCISE, EXECUTIVE-LEVEL REPORT (TOTAL TARGET: 600-700 WORDS FOR 3-MINUTE READ):
 
 <b>🎯 Executive Summary</b>
-Create an ULTRA-CONCISE summary (MAXIMUM 250 words - strictly enforce this limit) that covers:
+Create an ULTRA-CONCISE summary (MAXIMUM 200 words) that covers:
 - Current performance status in 2-3 sentences
-- Top 3 most critical findings with specific impact metrics
-- Top 3 priority actions with expected ROI
-- Overall recommendation (fix, optimize, or monitor)
+- <b>Top 3 Critical Findings:</b> with specific impact metrics
+- <b>Top 3 Priority Actions:</b> with expected ROI
+- <b>Overall Recommendation:</b> (fix, optimize, or monitor)
 
 <b>📊 Key Metrics & Findings</b>
-- Most important performance metrics discovered
-- Critical user behavior patterns
-- Primary traffic and engagement insights
-- Top technical issues requiring attention
+Concise bullet points covering:
+- <b>Performance metrics:</b> most important discoveries
+- <b>User behavior patterns:</b> critical insights
+- <b>Traffic insights:</b> primary engagement data
+- <b>Technical issues:</b> top concerns requiring attention
 
 <b>🎯 Priority Action Plan</b>
-- High-impact improvements (implement first)
-- Medium-impact optimizations (implement second)
-- Monitoring and measurement recommendations
-- Quick wins vs long-term strategic improvements
+Brief, actionable recommendations:
+- <b>High-impact improvements:</b> (implement first)
+- <b>Medium-impact optimizations:</b> (implement second)
+- <b>Monitoring recommendations:</b> measurement strategy
+- <b>Quick wins vs strategic:</b> implementation timeline
 
-<b>📈 Detailed Analysis</b>
-- Performance bottlenecks and Core Web Vitals insights
-- User engagement patterns and conversion opportunities
-- Traffic acquisition effectiveness and channel analysis
-- Technical issues and system reliability concerns
+<b>📈 Business Impact</b>
+Brief summary of:
+- <b>Performance bottlenecks:</b> Core Web Vitals impact
+- <b>User engagement:</b> conversion opportunities
+- <b>Traffic acquisition:</b> channel effectiveness
+- <b>Technical concerns:</b> system reliability issues
 
-CRITICAL: Keep the Executive Summary section STRICTLY under 250 words for guaranteed 3-minute readability. Count words carefully and prioritize only the most essential information. Use bullet points and specific metrics where possible. Format with clear HTML <b> tags for sections.
+CRITICAL LENGTH REQUIREMENTS:
+- ENTIRE REPORT: Maximum 600-700 words total (3-minute read)
+- Executive Summary: Maximum 200 words
+- Other sections: Brief bullet points and concise insights only
+- Use specific metrics and actionable language
+
+FORMATTING REQUIREMENTS:
+- Use HTML <b>text</b> tags for ALL headings and important text (NOT **text** markdown)
+- Use HTML <b>tag</b> for any text that should appear bold
+- Do NOT use markdown formatting like **text** or *text*
+- Output must render properly in HTML context
 
 IMPORTANT: After creating the report, systematically use the "collect_insights" and "collect_recommendations" tools to capture the key findings for separate rendering:
 
@@ -33,4 +46,15 @@ IMPORTANT: After creating the report, systematically use the "collect_insights" 
 
 2. Use "collect_recommendations" tool to capture actionable recommendations with appropriate categories (performance, technical, user_experience, monitoring, content), priority levels (high, medium, low), and effort estimates (low, medium, high)
 
-WORD COUNT REMINDER: Executive Summary section must remain under 250 words for true 3-minute readability. 
+WORD COUNT REMINDER: ENTIRE REPORT must be 600-700 words maximum for true 3-minute readability. Executive Summary must be under 200 words. Be concise and focus on business value.
+
+EXAMPLE OUTPUT FORMAT (follow this HTML formatting exactly):
+<b>🎯 Executive Summary</b>
+Site performance shows <b>critical optimization needs</b> affecting 189M monthly visits...
+
+<b>Top 3 Critical Findings:</b>
+- <b>Over-dependence on Google:</b> 184M of 189M entries (97.5%) create single-point vulnerability
+- <b>Performance bottleneck:</b> GIF-based LCP elements slow visual load
+- <b>Attribution blindness:</b> 99.5% of traffic lacks UTM tracking
+
+NEVER use **text** markdown formatting - ALWAYS use <b>text</b> HTML tags for bold text. 

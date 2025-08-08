@@ -149,7 +149,7 @@ main .title url-selector input {
   color: var(--spectrum-gray-700);
 }
 
-.title button:not(.insights-icon) {
+.title button {
   color: var(--dark-blue);
   border: 2px solid currentcolor;
   border-radius: 32px;
@@ -574,7 +574,7 @@ input:checked + .slider::before {
   border-radius: 8px;
   padding: 16px;
   margin-top: 16px;
-  min-height: 400px;
+  min-height: 500px;
   border: 1px solid #ddd;
 }
 
@@ -596,7 +596,7 @@ input:checked + .slider::before {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--gray-700) 0%, var(--gray-600) 100%);
   color: white;
   border-radius: 8px 8px 0 0;
   margin: -16px -16px 16px;
@@ -605,7 +605,8 @@ input:checked + .slider::before {
 .analysis-tile .chat-header h2 {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 400;
+  color: white;
 }
 
 .analysis-tile .header-buttons {
@@ -654,7 +655,7 @@ input:checked + .slider::before {
 
 .analysis-tile .claude-message {
   background: white;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--gray-700);
   box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
@@ -703,8 +704,14 @@ input:checked + .slider::before {
   transition: background-color 0.2s ease;
 }
 
-.analysis-tile .api-key-input button:hover {
+.analysis-tile .api-key-input button:hover:not(:disabled) {
   background: #5a6fd8;
+}
+
+.analysis-tile .api-key-input button:disabled {
+  background: var(--gray-500) !important;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .analysis-tile .analysis-section {

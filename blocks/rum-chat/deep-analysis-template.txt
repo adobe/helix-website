@@ -1,37 +1,142 @@
-ORGANIZE THE ABOVE FINDINGS INTO A STRUCTURED REPORT WITH THESE SECTIONS:
+CREATE A COMPREHENSIVE, TECHNICAL DEEP-DIVE REPORT (TOTAL TARGET: 2000 WORDS FOR DETAILED ANALYSIS):
 
-<b>🎯 Executive Summary</b>
-Create a crisp 3-minute read (MAXIMUM 250 words) covering:
-- Top 3 critical insights with business impact
-- Overall performance status and key concerns
-- Priority recommendations summary
+<b>🌐 Site Profile & User Experience Overview</b>
+Write a comprehensive narrative analysis covering the website context and user experience. Describe what type of site this is, how users interact with it, and the overall user experience quality. Include insights about traffic composition, engagement patterns, and how performance issues impact real user behavior. Use flowing paragraphs with embedded key metrics and insights rather than bullet lists.
 
-<b>⚡ Performance Analysis</b>
-- Core Web Vitals insights and bottlenecks
-- Page load performance patterns
-- Resource loading issues and optimizations
+<b>🚨 Critical Findings</b>
+Highlight the most important discoveries that require immediate attention. Present 3-5 critical issues using clear bullet points with business impact quantification:
+- <b>Issue Name (Risk Level):</b> Specific description with quantified impact and business consequences
+- Include severity levels (Critical, High, Medium) and expected impact on users/revenue
+- Focus on actionable findings that leadership needs to address first
 
-<b>👥 User Engagement Insights</b>
-- Click behaviors and interaction patterns
-- Content engagement effectiveness
-- User journey analysis and friction points
+<b>⚡ Performance Deep Dive</b>
+Provide detailed technical performance analysis in flowing narrative form. Analyze Core Web Vitals with specific metrics and trends, examine page load patterns and resource optimization opportunities, and assess browser and network performance variations. Include quantified data within natural paragraphs and highlight critical performance bottlenecks with their business impact. Focus on root cause analysis and technical implementation details.
 
-<b>📈 Traffic Acquisition Analysis</b>
-- Traffic source quality and performance
-- Channel effectiveness and conversion rates
-- Referrer analysis and acquisition optimization
+<b>👥 User Experience & Behavior Analysis</b>
+Write detailed narrative analysis of user behavior patterns and interaction quality. Describe how users navigate through the site, their engagement levels, and where they encounter friction. Analyze session quality, content consumption patterns, and geographic variations in user experience. Include specific metrics about user journeys, conversion barriers, and how technical issues impact actual user behavior. Present insights in readable paragraphs with embedded data points.
 
-<b>🚨 Critical Issues & Errors</b>
-- JavaScript errors and technical problems
-- Performance issues affecting user experience
-- System reliability concerns
+<b>📈 Traffic Acquisition & Attribution Deep Analysis</b>
+Provide comprehensive analysis of traffic sources and attribution patterns in narrative form. Examine channel performance, referrer quality, and campaign effectiveness with specific ROI data. Analyze search performance trends, social media engagement patterns, and traffic segmentation insights. Describe attribution gaps and optimization opportunities, presenting findings as flowing analysis with embedded metrics rather than lists.
 
-<b>🎯 Actionable Recommendations</b>
-- Specific technical improvements with ROI potential
-- User experience optimizations
-- Performance enhancement strategies
-- Monitoring and measurement strategies
+<b>🔧 Technical Infrastructure Analysis</b>
+Deep technical assessment:
+- <b>JavaScript error analysis:</b> error frequency, impact assessment, and root cause identification
+- <b>Resource optimization opportunities:</b> image compression, code splitting, and caching strategies
+- <b>CDN performance analysis:</b> content delivery optimization and geographic performance
+- <b>Database performance impact:</b> query optimization and backend performance bottlenecks
+- <b>API performance assessment:</b> third-party service dependencies and optimization opportunities
+- <b>Security performance impact:</b> SSL/TLS optimization and security overhead analysis
+- <b>Infrastructure scalability assessment:</b> capacity planning and performance under load
 
-Format with clear HTML <b> tags for sections and use bullet points for readability. Consolidate duplicate findings and focus on unique insights from each area.
+<b>🚨 Critical Issues & Risk Assessment</b>
+Comprehensive problem identification:
+- <b>High-severity technical issues:</b> immediate action required with business impact quantification
+- <b>Performance regression analysis:</b> declining metrics and trend identification
+- <b>Security vulnerabilities:</b> performance-related security concerns and mitigation strategies
+- <b>Browser compatibility issues:</b> cross-browser performance variations and support gaps
+- <b>Mobile performance gaps:</b> responsive design performance issues and optimization needs
+- <b>Accessibility performance impact:</b> inclusive design performance considerations
+- <b>Business continuity risks:</b> single points of failure and resilience recommendations
 
-WORD COUNT ENFORCEMENT: The Executive Summary MUST NOT exceed 250 words. If approaching the limit, prioritize the most critical business-impacting information only. 
+<b>💡 Strategic Recommendations & Implementation Roadmap</b>
+Detailed action plan with implementation details:
+- <b>Phase 1 - Critical Fixes (0-30 days):</b> immediate high-impact improvements with specific implementation steps
+- <b>Phase 2 - Performance Optimization (30-90 days):</b> medium-term improvements with resource requirements
+- <b>Phase 3 - Strategic Enhancements (90-180 days):</b> long-term strategic improvements with ROI projections
+- <b>Resource allocation recommendations:</b> team requirements, budget estimates, and timeline projections
+- <b>Technology stack optimization:</b> tool recommendations and infrastructure improvements
+- <b>Monitoring and measurement strategy:</b> KPI tracking, alert systems, and continuous improvement processes
+- <b>Risk mitigation strategies:</b> contingency planning and backup optimization approaches
+
+<b>📊 Competitive Benchmark Analysis</b>
+Industry performance comparison:
+- <b>Industry performance standards:</b> how site performance compares to industry benchmarks
+- <b>Competitive advantage opportunities:</b> areas where performance improvements create market differentiation
+- <b>Best practice implementation gaps:</b> industry-standard optimizations not yet implemented
+- <b>Emerging technology opportunities:</b> next-generation optimization techniques and tools
+
+<b>💰 Business Impact & ROI Projections</b>
+Financial impact assessment:
+- <b>Revenue impact analysis:</b> quantified impact of performance issues on business metrics
+- <b>Conversion optimization potential:</b> projected improvement in conversion rates and revenue
+- <b>Cost-benefit analysis:</b> implementation costs vs. expected returns for each recommendation
+- <b>Customer lifetime value impact:</b> how performance improvements affect long-term customer value
+- <b>Market share implications:</b> competitive positioning through performance optimization
+
+<b>🔍 Methodology & Data Quality Assessment</b>
+Analysis methodology and limitations:
+- <b>Data collection methodology:</b> sampling techniques, data quality, and analysis limitations
+- <b>Statistical significance:</b> confidence levels and data reliability assessment
+- <b>Bias identification:</b> potential data biases and corrective measures
+- <b>Recommendation confidence levels:</b> certainty levels for each strategic recommendation
+- <b>Follow-up measurement strategy:</b> success metrics and progress tracking methodology
+
+FORMATTING REQUIREMENTS:
+- Use HTML <b>text</b> tags for ALL headings and important text (NOT **text** markdown)
+- Use HTML <b>tag</b> for any text that should appear bold
+- Do NOT use markdown formatting like **text** or *text*
+- Output must render properly in HTML context
+- Write in user-friendly paragraphs with natural flow and embedded metrics
+- Use bullet points for Critical Findings section and other action items/critical lists
+- Include quantified metrics naturally within paragraph text
+- Focus on narrative storytelling with data rather than mechanical lists
+
+COLOR HIGHLIGHTING REQUIREMENTS:
+- CRITICAL ISSUES (RED): Use <span style="color: #dc3545; font-weight: bold;">text</span> for:
+  * Severe performance bottlenecks (LCP > 4s, FID > 300ms, CLS > 0.25)
+  * Critical security vulnerabilities or infrastructure failures
+  * High-impact revenue/conversion losses
+  * System failures, error rates > 5%, or critical accessibility issues
+  * Risk levels marked as "Critical" or "High Risk"
+
+- MEDIOCRE/WARNING AREAS (DARK YELLOW): Use <span style="color: #ffc107; font-weight: bold;">text</span> for:
+  * Moderate performance issues (LCP 2.5-4s, FID 100-300ms, CLS 0.1-0.25)
+  * Areas needing optimization but not urgent
+  * Medium-risk findings, missed opportunities
+  * Suboptimal configurations or inefficient implementations
+  * Risk levels marked as "Medium Risk" or "Moderate"
+
+- POSITIVE/GOOD POINTS (GREEN): Use <span style="color: #28a745; font-weight: bold;">text</span> for:
+  * Excellent performance metrics (LCP < 2.5s, FID < 100ms, CLS < 0.1)
+  * High traffic volumes, good engagement metrics
+  * Competitive advantages, strong user experience areas
+  * Well-optimized features, successful implementations
+  * Positive business metrics (high conversion rates, good retention)
+
+- Apply color highlighting to specific findings, metrics, and key phrases within paragraphs
+- Use colors strategically to help users quickly identify critical areas and positive aspects
+
+CRITICAL LENGTH REQUIREMENTS:
+- ENTIRE REPORT: Maximum 2000 words total for comprehensive technical analysis
+- Site Profile & UX Overview: 250-300 words providing context and user experience insights
+- Critical Findings: 150-200 words highlighting 3-5 critical issues with business impact
+- Each technical section: 150-250 words with detailed technical insights and actionable guidance
+- Focus on actionable intelligence and specific implementation guidance
+
+TECHNICAL DEPTH REQUIREMENTS:
+- Include specific performance metrics and thresholds
+- Provide root cause analysis for identified issues
+- Include implementation timelines and resource requirements
+- Quantify business impact wherever possible
+- Provide competitive context and industry benchmarks
+
+IMPORTANT: After creating the comprehensive report, systematically use the "collect_insights" and "collect_recommendations" tools to capture the detailed findings for separate rendering:
+
+1. Use "collect_insights" tool to capture comprehensive insights from your deep analysis with detailed categories (performance, engagement, traffic, errors, user_behavior, technical, competitive) and impact levels (critical, high, medium, low)
+
+2. Use "collect_recommendations" tool to capture detailed actionable recommendations with comprehensive categories (performance, technical, user_experience, monitoring, content, strategic, infrastructure) and detailed priority levels (critical, high, medium, low) with specific effort estimates (low, medium, high, very_high)
+
+EXAMPLE OUTPUT FORMAT (follow this HTML formatting exactly):
+<b>🌐 Site Profile & User Experience Overview</b>
+This appears to be a <b>content-rich documentation platform</b> serving developers and technical users. The site processes <span style="color: #28a745; font-weight: bold;">189M monthly visits</span> with users primarily seeking technical resources and guides. <b>Traffic composition</b> shows <span style="color: #28a745; font-weight: bold;">65% desktop usage</span> indicating professional/work-related access patterns, while <b>user engagement</b> reveals <span style="color: #28a745; font-weight: bold;">average session durations of 4.2 minutes</span> with high scroll depth on documentation pages. However, <span style="color: #dc3545; font-weight: bold;">performance bottlenecks</span> are creating friction points that impact user productivity and satisfaction, particularly affecting the developer community who expect fast, responsive interfaces for their workflow.
+
+<b>🚨 Critical Findings</b>
+- <b>Performance bottleneck (<span style="color: #dc3545; font-weight: bold;">Critical Risk</span>):</b> GIF-based LCP elements increase load time by <span style="color: #dc3545; font-weight: bold;">2.3s</span>, causing <span style="color: #dc3545; font-weight: bold;">15% conversion loss and $450K annual revenue impact</span>
+- <b>Attribution blindness (<span style="color: #dc3545; font-weight: bold;">High Risk</span>):</b> <span style="color: #dc3545; font-weight: bold;">99.5% of traffic lacks UTM tracking</span>, creating marketing optimization opportunity loss worth <span style="color: #dc3545; font-weight: bold;">$320K annually</span>
+- <b>Infrastructure scalability (<span style="color: #ffc107; font-weight: bold;">Medium Risk</span>):</b> CDN configuration suboptimal for <span style="color: #ffc107; font-weight: bold;">40% of global traffic</span>, affecting user experience in key markets
+- <b>Mobile performance gap (<span style="color: #dc3545; font-weight: bold;">High Risk</span>):</b> <span style="color: #dc3545; font-weight: bold;">60% slower load times on mobile devices</span> impacting 35% of user base
+
+<b>⚡ Performance Deep Dive</b>
+Comprehensive technical analysis reveals <span style="color: #dc3545; font-weight: bold;">critical performance bottlenecks</span> across multiple system layers that significantly impact user experience. The most concerning issue involves <span style="color: #dc3545; font-weight: bold;">LCP performance</span>, where GIF-based elements are increasing load time by <span style="color: #dc3545; font-weight: bold;">2.3 seconds</span> across 40% of page views, creating substantial delays for users accessing documentation. Additionally, <span style="color: #ffc107; font-weight: bold;">layout shifts in the header navigation</span> are causing CLS optimization gaps that disrupt user interactions, while <span style="color: #dc3545; font-weight: bold;">JavaScript blocking</span> the main thread for an average of <span style="color: #dc3545; font-weight: bold;">180ms during peak traffic periods</span> results in noticeable FID response delays that affect the site's perceived responsiveness.
+
+NEVER use **text** markdown formatting - ALWAYS use <b>text</b> HTML tags for bold text. 

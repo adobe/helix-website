@@ -42,22 +42,8 @@
   </script>
   <script src="./slicer.js" type="module"></script>
   <link rel="stylesheet" href="./rum-slicer.css">
-  <link rel="stylesheet" href="../../blocks/rum-chat/rum-chat.css">
   <script type="module">
-    import decorate from '../../blocks/rum-chat/rum-chat.js';
-
-    // Create a container for the chat interface
-    const chatContainer = document.createElement('div');
-    chatContainer.className = 'rum-chat-container';
-    document.body.appendChild(chatContainer);
-
-    // Initialize the chat interface
-    decorate(chatContainer);
-
-    // Add click handler for insights icon
-    document.getElementById('insights-icon').addEventListener('click', () => {
-      chatContainer.classList.toggle('show');
-    });
+    // Insights functionality removed - focusing on switcher implementation only
   </script>
 </head>
 
@@ -69,9 +55,6 @@
         <div class="output">
           <div class="title">
             <url-selector>www.aem.live</url-selector>
-            <button id="insights-icon" class="insights-icon" title="Insights about this site">
-              <img src="/icons/magic.svg" alt="Insights" width="24" height="24">
-            </button>
             <daterange-picker id="view">
               <ul hidden>
                 <li data-value="week">Last week</li>

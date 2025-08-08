@@ -1,13 +1,17 @@
 /* eslint-disable no-console */
 // Import parallel processing functionality
-import processParallelBatches, {
-  resetInsightsAndRecommendations,
+import {
+  processParallelBatches,
   getCollectedInsights,
   getCollectedRecommendations,
 } from './parallel-processing.js';
 
+// Import comprehensive processing functionality
+import processSequentialTools from './comprehensive-processing.js';
+
 // Import task progress functionality
-import initializeTaskProgress, {
+import {
+  initializeTaskProgress,
   completeAllRemainingTasks,
   resetTaskList,
 } from './task-progress.js';
@@ -814,7 +818,7 @@ ${overviewTemplate}`;
 
           const finalRequest = {
             model: 'claude-opus-4-20250514',
-            max_tokens: 3584, // Comprehensive report with good depth
+            max_tokens: 1500, // Executive summary - 3 min read + HTML formatting
             messages: [{ role: 'user', content: finalSynthesisMessage }],
             tools: [createInsightsCollectionTool(), createRecommendationsCollectionTool()],
             system: systemPromptText,
@@ -878,234 +882,28 @@ ${overviewTemplate}`;
         return result;
       }
 
-      // Deep analysis mode - sequential processing
-      console.log('[Anthropic API] Using DEEP analysis (sequential processing)');
-      if (progressCallback) progressCallback(2, 'in-progress', 'Starting sequential batch processing...');
+      // Deep analysis mode - comprehensive sequential processing
+      console.log('[Anthropic API] Using DEEP analysis (comprehensive individual tool processing)');
+      if (progressCallback) progressCallback(2, 'in-progress', `Analyzing ${facetTools.length} metrics comprehensively...`);
 
-      // Reset insights and recommendations storage for fresh analysis
-      resetInsightsAndRecommendations();
+      // Process each tool individually with quality rating
+      const comprehensiveResults = await processSequentialTools(
+        facetTools,
+        dashboardData,
+        systemPromptText,
+        mainApiKey,
+        message,
+        handleDynamicFacetToolCall,
+        progressCallback,
+      );
 
-      const allInsights = [];
-      const usedTools = new Set();
+      // Use the high-quality insights from comprehensive processing
+      const { qualityInsights, toolResults, processedToolsCount } = comprehensiveResults;
 
-      // Enhanced initial message with clear instructions
-      const initialMessage = `${message}
+      console.log(`[Comprehensive Processing] Processed ${processedToolsCount} tools with ${qualityInsights.length} high-quality insights`);
 
-DASHBOARD DATA:
-${Object.entries(dashboardData.metrics)
-    .map(([metric, value]) => `- ${metric}: ${value}`)
-    .join('\n')}
-
-SEGMENTS (top 3 per category):
-${Object.entries(dashboardData.segments)
-    .map(([segment, items]) => `
-${segment}: ${items.slice(0, 3).map((item) => `${item.value} (${item.count.toLocaleString()})`).join(', ')}`)
-    .join('\n')}
-
-ANALYSIS PRIORITIES:
-1. ENGAGEMENT ANALYSIS: Identify user interaction patterns, click behaviors, and content engagement
-2. BOUNCE RATE INVESTIGATION: Find high-exit pages, single-session patterns, and retention issues  
-3. TRAFFIC ACQUISITION DEEP-DIVE: Analyze traffic sources, referrer quality, and channel performance
-4. CONVERSION OPTIMIZATION: Discover friction points and optimization opportunities
-
-CRITICAL WORKFLOW:
-1. FIRST: Analyze "checkpoint" facet to discover available checkpoints
-2. THEN: Use "filter" operations on key checkpoints (error, click, enter, navigate) to activate drilldown facets
-3. FINALLY: Analyze newly revealed drilldown facets (.source, .target) for detailed insights
-
-Use available tools systematically. Focus on checkpoint activation first, then drilldown analysis.`;
-
-      // Variables already defined above for both parallel and sequential processing
-
-      // Systematic batching with dynamic batch count, 3 tools per batch
-      let currentBatch = 0;
-      const remainingTools = [...facetTools];
-      const toolsPerBatch = 3;
-      const estimatedTotalBatches = Math.ceil(facetTools.length / toolsPerBatch);
-
-      while (remainingTools.length > 0 && currentBatch < estimatedTotalBatches) {
-        currentBatch += 1;
-        console.log(`[Systematic Batch] Batch ${currentBatch}: Processing ${remainingTools.length} remaining tools`);
-
-        // Update progress for current batch
-        if (progressCallback) {
-          progressCallback(currentBatch + 1, 'in-progress', `Processing Batch ${currentBatch} of ${estimatedTotalBatches}...`);
-        }
-
-        // Get tools for this batch
-        const batchTools = remainingTools.splice(0, toolsPerBatch);
-
-        // Prepare message for this batch
-        let batchMessage;
-        if (currentBatch === 1) {
-          batchMessage = initialMessage;
-        } else {
-          batchMessage = `Continue systematic analysis using available tools.
-
-PREVIOUS FINDINGS:
-${allInsights.join('\n\n')}
-
-FOCUS: Use remaining tools to discover deeper insights, activate checkpoints, and analyze drilldown facets.
-TOOLS FOR THIS BATCH: ${batchTools.map((t) => t.name).join(', ')}`;
-        }
-
-        // Fresh message history for each batch (avoid tool role issues)
-        const batchMessageHistory = [
-          { role: 'user', content: batchMessage },
-        ];
-
-        const batchRequest = {
-          model: 'claude-opus-4-20250514',
-          max_tokens: 4096,
-          messages: batchMessageHistory,
-          tools: batchTools,
-          system: systemPromptText,
-          temperature: 0.3,
-        };
-
-        console.log(`[Systematic Batch] Sending batch ${currentBatch} with ${batchTools.length} tools`);
-
-        try {
-          const batchResponse = await fetch('https://chat-bot-test.asthabhargava001.workers.dev/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': mainApiKey,
-            },
-            body: JSON.stringify(batchRequest),
-          });
-
-          if (!batchResponse.ok) {
-            const errorData = await batchResponse.json();
-            console.error(`[Systematic Batch] Batch ${currentBatch} failed:`, errorData);
-            break;
-          }
-
-          const batchData = await batchResponse.json();
-          console.log(`[Systematic Batch] Batch ${currentBatch} response received`);
-
-          if (batchData.content && batchData.content.length > 0) {
-            let batchAnalysis = '';
-            const batchToolCalls = [];
-
-            // Process batch response
-            batchData.content.forEach((item) => {
-              if (item.type === 'text') {
-                const text = item.text.trim();
-                if (text) batchAnalysis += `${text}\n`;
-              } else if (item.type === 'tool_use') {
-                batchToolCalls.push(item);
-              }
-            });
-
-            // Execute tool calls with stable event handling
-            if (batchToolCalls.length > 0) {
-              console.log(`[Systematic Batch] Executing ${batchToolCalls.length} tools in batch ${currentBatch}`);
-
-              for (let i = 0; i < batchToolCalls.length; i += 1) {
-                const toolCall = batchToolCalls[i];
-                try {
-                  console.log(`[Systematic Batch] Executing: ${toolCall.name}`);
-                  const result = await handleDynamicFacetToolCall(
-                    toolCall.name,
-                    toolCall.input || {},
-                  );
-
-                  // Track used tools
-                  usedTools.add(toolCall.name);
-                  console.log(`[Systematic Batch] Tool ${toolCall.name} completed:`, result.success);
-                } catch (error) {
-                  console.error(`[Systematic Batch] Error executing ${toolCall.name}:`, error);
-                }
-              }
-
-              // Get analysis of batch results (clean message history)
-              const batchFollowUpMessage = `What insights did you discover from the tool results in this batch? Focus on:
-- Key patterns and performance issues
-- User behavior insights
-- Business impact findings
-- Any new facets that became available for further analysis`;
-
-              const batchFollowUpHistory = [
-                { role: 'user', content: batchFollowUpMessage },
-              ];
-
-              const batchFollowUpRequest = {
-                model: 'claude-opus-4-20250514',
-                max_tokens: 2048,
-                messages: batchFollowUpHistory,
-                system: systemPromptText,
-                temperature: 0.3,
-              };
-
-              const batchFollowUpResponse = await fetch('https://chat-bot-test.asthabhargava001.workers.dev/', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'x-api-key': mainApiKey,
-                },
-                body: JSON.stringify(batchFollowUpRequest),
-              });
-
-              if (batchFollowUpResponse.ok) {
-                const batchFollowUpData = await batchFollowUpResponse.json();
-                if (batchFollowUpData.content && batchFollowUpData.content.length > 0) {
-                  let batchInsights = '';
-                  batchFollowUpData.content.forEach((item) => {
-                    if (item.type === 'text') {
-                      const text = item.text.trim();
-                      if (text) batchInsights += `${text}\n`;
-                    }
-                  });
-                  // Collect insights without batch headers
-                  allInsights.push(batchInsights);
-                }
-              }
-            } else if (batchAnalysis) {
-              // No tool calls, just add text analysis
-              allInsights.push(batchAnalysis);
-            }
-
-            // Log newly discovered tools but don't add them to continue processing
-            const allAvailableTools = extractFacetsFromExplorer();
-            const newlyAvailableTools = allAvailableTools.filter(
-              (tool) => !usedTools.has(tool.name),
-            );
-
-            if (newlyAvailableTools.length > 0) {
-              console.log(`[Systematic Batch] Found ${newlyAvailableTools.length} new tools (not adding to queue): ${newlyAvailableTools.map((t) => t.name).join(', ')}`);
-            }
-
-            console.log(`[Systematic Batch] Batch ${currentBatch} complete. ${remainingTools.length} tools remaining in queue`);
-
-            // Mark current batch as completed in progress tracker
-            if (progressCallback) {
-              progressCallback(currentBatch + 1, 'completed', `Batch ${currentBatch} completed successfully`);
-            }
-
-            // Stop if no more tools in initial queue
-            if (remainingTools.length === 0) {
-              console.log('[Systematic Batch] All initial tools processed');
-              break;
-            }
-          } else {
-            console.log(`[Systematic Batch] Batch ${currentBatch} had no content`);
-            break;
-          }
-        } catch (error) {
-          console.error(`[Systematic Batch] Error in batch ${currentBatch}:`, error);
-          break;
-        }
-      }
-
-      // Log completion reason
-      if (currentBatch >= estimatedTotalBatches) {
-        console.log(`[Systematic Batch] Completed ${estimatedTotalBatches} estimated batches as planned`);
-      }
-
-      // Comprehensive final synthesis - organize by topic, not by batch
-      console.log('[Systematic Batch] Generating comprehensive topical analysis');
-      const finalReportTaskIndex = estimatedTotalBatches + 2; // Dynamic final task index
+      // Use fixed task index for final report (step 4)
+      const finalReportTaskIndex = 3;
       if (progressCallback) {
         progressCallback(finalReportTaskIndex, 'in-progress', 'Generating comprehensive final report...', 10);
       }
@@ -1116,10 +914,14 @@ TOOLS FOR THIS BATCH: ${batchTools.map((t) => t.name).join(', ')}`;
       }
       const deepTemplate = await getDeepAnalysisTemplate();
 
-      const finalMessage = `Based on systematic analysis across ${currentBatch} batches, create a comprehensive, well-organized analysis report:
+      // Create final synthesis message with quality-filtered insights
+      const finalMessage = `Based on comprehensive individual tool analysis with quality rating, create a well-organized analysis report:
 
-RAW FINDINGS FROM ALL BATCHES:
-${allInsights.join('\n\n')}
+HIGH-QUALITY INSIGHTS DISCOVERED:
+${qualityInsights.join('\n\n')}
+
+DETAILED TOOL ANALYSIS RESULTS:
+${toolResults.map((result) => `[${result.impact}] ${result.tool}: ${result.summary}`).join('\n')}
 
 INSIGHTS COLLECTED:
 ${getCollectedInsights().map((insight) => `- ${insight.category}: ${insight.insight} (Impact: ${insight.impact}, Metrics: ${insight.metrics})`).join('\n')}
@@ -1129,14 +931,10 @@ ${getCollectedRecommendations().map((recommendation) => `- ${recommendation.cate
 
 ${deepTemplate}`;
 
-      const finalMessageHistory = [
-        { role: 'user', content: finalMessage },
-      ];
-
       const finalRequest = {
         model: 'claude-opus-4-20250514',
         max_tokens: 4096,
-        messages: finalMessageHistory,
+        messages: [{ role: 'user', content: finalMessage }],
         tools: [createInsightsCollectionTool(), createRecommendationsCollectionTool()],
         system: systemPromptText,
         temperature: 0.3,
@@ -1145,6 +943,7 @@ ${deepTemplate}`;
       if (progressCallback) {
         progressCallback(finalReportTaskIndex, 'in-progress', 'Preparing the comprehensive report...', 40);
       }
+
       const finalResponse = await fetch('https://chat-bot-test.asthabhargava001.workers.dev/', {
         method: 'POST',
         headers: {
@@ -1177,28 +976,29 @@ ${deepTemplate}`;
             if (progressCallback) {
               progressCallback(finalReportTaskIndex, 'in-progress', 'Finalizing recommendations and action items...', 80);
             }
-            console.log(`[Deep Final Analysis] Executing ${finalToolCalls.length} collection tools`);
+            console.log(`[Comprehensive Final Analysis] Executing ${finalToolCalls.length} collection tools`);
             for (let i = 0; i < finalToolCalls.length; i += 1) {
               const toolCall = finalToolCalls[i];
               try {
                 // eslint-disable-next-line no-await-in-loop
                 await handleDynamicFacetToolCall(toolCall.name, toolCall.input || {}, false);
               } catch (error) {
-                console.error(`[Deep Final Analysis] Error executing ${toolCall.name}:`, error);
+                console.error(`[Comprehensive Final Analysis] Error executing ${toolCall.name}:`, error);
               }
             }
           }
 
-          console.log(`[Systematic Batch] Comprehensive topical analysis completed, length: ${finalAnalysis.length} characters`);
+          console.log(`[Comprehensive Processing] Final analysis completed, length: ${finalAnalysis.length} characters`);
           if (progressCallback) {
-            progressCallback(finalReportTaskIndex, 'completed', 'Deep analysis report generated successfully', 100);
+            progressCallback(finalReportTaskIndex, 'completed', 'Comprehensive analysis report completed successfully', 100);
           }
           cacheAnalysisResult(finalAnalysis, currentDashboardHash);
           return finalAnalysis;
         }
       }
 
-      const result = allInsights.join('\n\n') || 'Systematic batched analysis completed.';
+      // Fallback with quality insights
+      const result = qualityInsights.join('\n\n') || 'Comprehensive analysis completed successfully.';
       cacheAnalysisResult(result, currentDashboardHash);
       return result;
     }
@@ -1261,6 +1061,120 @@ Analyze the RUM data and provide comprehensive insights.`;
     console.error('[Anthropic API] Error in API call:', error);
     throw error;
   }
+}
+
+// Reusable analysis function for external modules (e.g., sidebar)
+async function runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection = null) {
+  const createMessageElement = (text, className) => {
+    const div = document.createElement('div');
+    div.className = `message ${className}`;
+    div.innerHTML = text.replace(/\n/g, '<br>');
+    return div;
+  };
+
+  const addProgressMessage = (message) => {
+    if (message.trim()) {
+      messagesDiv.appendChild(createMessageElement(message, 'claude-message'));
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  };
+
+  let analysisResult = '';
+
+  try {
+    // Check if we have cached results first
+    const cacheStatus = getCacheStatus();
+    if (cacheStatus) {
+      addProgressMessage(`${cacheStatus}`);
+      // If we have cached results, we should also enable download if content exists
+      const cachedResult = getAnalysisCache();
+      if (cachedResult && cachedResult.result) {
+        analysisResult = cachedResult.result;
+        if (downloadButton) {
+          downloadButton.disabled = false;
+          downloadButton.title = 'Download insights as PDF';
+        }
+      }
+      return analysisResult; // Exit early if using cached results
+    }
+
+    // Create task list for live progress tracking
+    const isDeepMode = localStorage.getItem('rumChatDeepMode') === 'true';
+
+    // Use the same 4-step structure for both overview and deep analysis modes
+    const taskList = isDeepMode ? [
+      'Initializing analysis environment',
+      'Extracting dashboard data and facets',
+      'Processing comprehensive tool analysis',
+      'Generating comprehensive final report',
+    ] : [
+      'Initializing analysis environment',
+      'Extracting dashboard data and facets',
+      'Processing multiple batches in parallel',
+      'Generating streamlined analysis report',
+    ];
+
+    addProgressMessage('🔍 Analyzing RUM dashboard...');
+    const updateTaskStatus = initializeTaskProgress(taskList, messagesDiv);
+
+    // Start first task
+    updateTaskStatus(0, 'in-progress', 'Setting up analysis tools...');
+
+    // Add a small delay to allow any ongoing operations to complete
+    // This helps prevent performance violations from overlapping operations
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        console.log('[Insights] Initializing facet manipulation for analysis...');
+        initializeDynamicFacets();
+        updateTaskStatus(0, 'completed', 'Analysis environment ready');
+        resolve();
+      }, 200);
+    });
+
+    // Update task 2: Extract dashboard data
+    updateTaskStatus(1, 'in-progress', 'Scanning dashboard for data and available tools...');
+
+    await new Promise((resolve) => {
+      setTimeout(() => resolve(), 300);
+    }); // Brief pause for visual effect
+
+    const facetTools = extractFacetsFromExplorer();
+
+    if (facetTools.length > 0) {
+      updateTaskStatus(1, 'completed', `Found ${facetTools.length} analysis metrics ready`);
+    } else {
+      updateTaskStatus(1, 'completed', 'Basic analysis mode - no advanced tools found');
+      addProgressMessage('⚠️ No facet tools found, proceeding with basic dashboard analysis...');
+    }
+
+    const response = await callAnthropicAPI('Analyze the RUM data from the dashboard.', false, updateTaskStatus);
+    if (response.trim()) {
+      addProgressMessage(response);
+
+      // Store analysis content and enable download button
+      analysisResult = response;
+      if (downloadButton) {
+        downloadButton.disabled = false;
+        downloadButton.title = 'Download insights as PDF';
+      }
+
+      // Mark all remaining tasks as completed
+      completeAllRemainingTasks();
+
+      // Note: updateCacheStatus not called here as it's specific to main chat UI
+    } else {
+      addProgressMessage('Unable to generate insights. Please try again.');
+    }
+  } catch (error) {
+    console.error('[Agent] Error during analysis:', error);
+    addProgressMessage(`❌ Error during analysis: ${error.message}`);
+    if (apiKeySection) {
+      apiKeySection.style.display = 'block';
+    }
+    throw error; // Re-throw for caller to handle
+  }
+
+  return analysisResult;
 }
 
 export default async function decorate(block) {
@@ -1493,13 +1407,6 @@ export default async function decorate(block) {
     }
   });
 
-  const createMessageElement = (text, className) => {
-    const div = document.createElement('div');
-    div.className = `message ${className}`;
-    div.innerHTML = text.replace(/\n/g, '<br>');
-    return div;
-  };
-
   closeButton.addEventListener('click', () => {
     const chatContainer = block.closest('.rum-chat-container');
     if (chatContainer) {
@@ -1566,9 +1473,10 @@ export default async function decorate(block) {
     startAnalysisButton.textContent = baseText + modeText + cacheIndicator;
   });
 
-  // Load saved deep mode preference
-  const savedDeepMode = localStorage.getItem('rumChatDeepMode') === 'true';
-  deepModeCheckbox.checked = savedDeepMode;
+  // Load saved deep mode preference - defaults to unchecked/false
+  const savedDeepMode = localStorage.getItem('rumChatDeepMode');
+  // Only check the box if user explicitly saved 'true', otherwise default to unchecked
+  deepModeCheckbox.checked = savedDeepMode === 'true';
   deepModeCheckbox.dispatchEvent(new Event('change'));
 
   startAnalysisButton.addEventListener('click', async () => {
@@ -1580,112 +1488,28 @@ export default async function decorate(block) {
 
     apiKeySection.style.display = 'none';
 
-    const addProgressMessage = (message) => {
-      if (message.trim()) {
-        messagesDiv.appendChild(createMessageElement(message, 'claude-message'));
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-    };
-
     try {
-      // Check if we have cached results first
-      const cacheStatus = getCacheStatus();
-      if (cacheStatus) {
-        addProgressMessage(`${cacheStatus}`);
-        // If we have cached results, we should also enable download if content exists
-        const cachedResult = getAnalysisCache();
-        if (cachedResult && cachedResult.result) {
-          analysisContent = cachedResult.result;
-          downloadButton.disabled = false;
-          downloadButton.title = 'Download insights as PDF';
-        }
-        return; // Exit early if using cached results
-      }
-
-      // Create task list for live progress tracking
-      const isDeepMode = localStorage.getItem('rumChatDeepMode') === 'true';
-
-      // For deep mode, generate dynamic batch tasks based on expected number of tools
-      const toolsPerBatch = 3;
-      const facetToolsCount = extractFacetsFromExplorer().length;
-      const expectedBatches = Math.ceil(facetToolsCount / toolsPerBatch);
-
-      const taskList = isDeepMode ? [
-        'Initializing analysis environment',
-        'Extracting dashboard data and facets',
-        ...Array.from({ length: expectedBatches }, (_, i) => `Processing Batch ${i + 1} (Sequential)`),
-        'Generating comprehensive final report',
-      ] : [
-        'Initializing analysis environment',
-        'Extracting dashboard data and facets',
-        'Processing multiple batches in parallel',
-        'Generating streamlined analysis report',
-      ];
-
-      addProgressMessage('🔍 Analyzing RUM dashboard...');
-      const updateTaskStatus = initializeTaskProgress(taskList, messagesDiv);
-
-      // Start first task
-      updateTaskStatus(0, 'in-progress', 'Setting up analysis tools...');
-
-      // Add a small delay to allow any ongoing operations to complete
-      // This helps prevent performance violations from overlapping operations
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          console.log('[Insights] Initializing facet manipulation for analysis...');
-          initializeDynamicFacets();
-          updateTaskStatus(0, 'completed', 'Analysis environment ready');
-          resolve();
-        }, 200);
-      });
-
-      // Update task 2: Extract dashboard data
-      updateTaskStatus(1, 'in-progress', 'Scanning dashboard for data and available tools...');
-
-      await new Promise((resolve) => {
-        setTimeout(() => resolve(), 300);
-      }); // Brief pause for visual effect
-
-      const facetTools = extractFacetsFromExplorer();
-
-      if (facetTools.length > 0) {
-        updateTaskStatus(1, 'completed', `Found ${facetTools.length} analysis metrics ready`);
-
-        // Simple start message
-        // const startMessage = isDeepMode
-        //   ? '🔬 Deep analysis started...'
-        //   : '⚡ Overview analysis started...';
-        // addProgressMessage(startMessage);
-      } else {
-        updateTaskStatus(1, 'completed', 'Basic analysis mode - no advanced tools found');
-        addProgressMessage('⚠️ No facet tools found, proceeding with basic dashboard analysis...');
-      }
-
-      const response = await callAnthropicAPI('Analyze the RUM data from the dashboard.', false, updateTaskStatus);
-      if (response.trim()) {
-        // if (cacheStatus) {
-        //   addProgressMessage('✨ Cached analysis loaded! Here are the insights:');
-        // } else {
-        //   // addProgressMessage('✨ Analysis complete! Here are the insights:');
-        // }
-        addProgressMessage(response);
-
-        // Store analysis content and enable download button
-        analysisContent = response;
-        downloadButton.disabled = false;
-        downloadButton.title = 'Download insights as PDF';
-
-        // Mark all remaining tasks as completed
-        completeAllRemainingTasks();
-
-        updateCacheStatus(); // Update cache status after analysis
-      } else {
-        addProgressMessage('Unable to generate insights. Please try again.');
-      }
+      analysisContent = await runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection);
     } catch (error) {
-      console.error('[Agent] Error during analysis:', error);
-      addProgressMessage(`❌ Error during analysis: ${error.message}`);
-      apiKeySection.style.display = 'block';
+      // Error already handled in the function
     }
   });
 }
+
+// Export functions for use in other modules (e.g., facetsidebar)
+export {
+  callAnthropicAPI,
+  extractDashboardData,
+  handleDynamicFacetToolCall,
+  initializeTaskProgress,
+  completeAllRemainingTasks,
+  resetTaskList,
+  extractFacetsFromExplorer,
+  initializeDynamicFacets,
+  getCacheStatus,
+  getAnalysisCache,
+  setAnalysisCache,
+  cacheAnalysisResult,
+  generateDashboardHash,
+  runCompleteRumAnalysis,
+};

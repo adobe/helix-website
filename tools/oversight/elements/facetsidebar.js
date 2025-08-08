@@ -1,3 +1,9 @@
+// Import RUM chat analysis functionality
+import {
+  runCompleteRumAnalysis,
+// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
+} from '../../../blocks/rum-chat/rum-chat.js';
+
 export default class FacetSidebar extends HTMLElement {
   constructor() {
     super();
@@ -181,43 +187,72 @@ export default class FacetSidebar extends HTMLElement {
   }
 
   loadAnalysisInterface() {
+    // Load RUM chat CSS for proper styling
+    if (!document.querySelector('#rum-chat-styles')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/blocks/rum-chat/rum-chat.css';
+      link.id = 'rum-chat-styles';
+      document.head.appendChild(link);
+    }
+
+    // Set analysis tile height to match viewport like the left side graph
+    this.elems.analysisTile.style.height = 'calc(100vh - 200px)'; // Adjust for header space
+    this.elems.analysisTile.style.display = 'flex';
+    this.elems.analysisTile.style.flexDirection = 'column';
+    this.elems.analysisTile.style.overflow = 'hidden'; // No scrolling on the tile itself
+
     // Create the same RUM chat interface that appears in the sidebar
     if (!this.elems.analysisTile.querySelector('.chat-interface')) {
       // Create the interface structure directly
       const chatInterface = document.createElement('div');
       chatInterface.className = 'chat-interface';
+      chatInterface.style.display = 'flex';
+      chatInterface.style.flexDirection = 'column';
+      chatInterface.style.height = '100%';
 
       chatInterface.innerHTML = `
-        <div class="chat-header">
+        <div class="chat-header" style="flex-shrink: 0;">
           <h2>OpTel Detective</h2>
           <div class="header-buttons">
             <button class="download-button" disabled title="Download insights as PDF (available after analysis)">📄 Download as PDF</button>
           </div>
         </div>
-        <div id="messages" class="messages">
+        <div id="messages" class="messages" style="flex: 1; overflow-y: auto; max-height: none;">
           <div class="message claude-message">
-            🤖 Welcome to OpTel Detective! Enter your Anthropic API key below to start analyzing your RUM data.
-          </div>
-        </div>
-        <div id="api-key-section" class="api-key-section">
-          <div class="api-key-input">
-            <label for="api-key">Enter Anthropic API Key:</label>
-            <input type="password" id="api-key" placeholder="sk-ant-...">
-            <button id="save-api-key">Save Key</button>
-          </div>
-          <div class="analysis-section" style="display: none;">
-            <div class="processing-mode-selection" style="margin-bottom: 10px;">
-              <label style="font-size: 14px; color: #666;">
-                <input type="checkbox" id="deep-mode" style="margin-right: 5px;">
-                Deep Analysis (more detailed, takes longer)
-              </label>
-            </div>
-            <button id="start-analysis" class="primary-button" style="padding: 6px 10px;" title="">Show Insights</button>
+            🤖 Welcome to OpTel Detective! Enter your Anthropic API key below to start analyzing the site data.
           </div>
         </div>
       `;
 
+      // Create API key section separately and append it at the end
+      const apiKeySection = document.createElement('div');
+      apiKeySection.id = 'api-key-section';
+      apiKeySection.className = 'api-key-section';
+      apiKeySection.style.marginTop = '15px';
+      apiKeySection.style.borderTop = '1px solid #e0e0e0';
+      apiKeySection.style.paddingTop = '15px';
+      apiKeySection.style.flexShrink = '0'; // Don't shrink the API key section
+      apiKeySection.innerHTML = `
+        <div class="api-key-input">
+          <label for="api-key">Enter Anthropic API Key:</label>
+          <input type="password" id="api-key" placeholder="sk-ant-...">
+          <button id="save-api-key">Save Key</button>
+        </div>
+        <div class="analysis-section" style="display: none;">
+          <div class="analysis-options" style="display: flex; flex-direction: column; gap: 12px;">
+            <label style="display: flex; align-items: center; font-size: 14px; color: var(--gray-700); cursor: pointer;">
+              <input type="checkbox" id="detailed-analysis" style="margin-right: 8px;">
+              Detailed site analysis (more comprehensive)
+            </label>
+            <button id="start-analysis" class="primary-button" style="padding: 10px 16px; background: linear-gradient(135deg, var(--light-green) 0%, var(--medium-green) 100%); color: var(--dark-green); border: none; border-radius: 6px; cursor: pointer; font-size: 14px; width: 100%; text-align: center; font-weight: 600;">📊 Show Insights (executive summary)</button>
+          </div>
+        </div>
+      `;
+
+      // Append the chat interface first, then the API key section at the bottom
       this.elems.analysisTile.appendChild(chatInterface);
+      this.elems.analysisTile.appendChild(apiKeySection);
 
       // Add basic functionality
       this.setupAnalysisInterface(chatInterface);
@@ -225,14 +260,23 @@ export default class FacetSidebar extends HTMLElement {
   }
 
   setupAnalysisInterface(chatInterface) {
-    const apiKeyInput = chatInterface.querySelector('#api-key');
-    const saveApiKeyButton = chatInterface.querySelector('#save-api-key');
-    const analysisSection = chatInterface.querySelector('.analysis-section');
-    const startAnalysisButton = chatInterface.querySelector('#start-analysis');
+    // API key section is now separate from chatInterface, so look in the parent analysisTile
+    const apiKeyInput = this.elems.analysisTile.querySelector('#api-key');
+    const saveApiKeyButton = this.elems.analysisTile.querySelector('#save-api-key');
+    const analysisSection = this.elems.analysisTile.querySelector('.analysis-section');
+    const startAnalysisButton = this.elems.analysisTile.querySelector('#start-analysis');
+    const detailedAnalysisCheckbox = this.elems.analysisTile.querySelector('#detailed-analysis');
     const messagesDiv = chatInterface.querySelector('#messages');
+    const downloadButton = chatInterface.querySelector('.download-button');
 
     // Store reference to the chat interface in the class
     this.elems.chatInterface = chatInterface;
+
+    // Load saved analysis mode preference
+    const savedDeepMode = localStorage.getItem('rumChatDeepMode') === 'true';
+    detailedAnalysisCheckbox.checked = savedDeepMode;
+    // Trigger change event to update button appearance
+    detailedAnalysisCheckbox.dispatchEvent(new Event('change'));
 
     // Check for existing API key
     const existingApiKey = localStorage.getItem('anthropicApiKey');
@@ -265,13 +309,76 @@ export default class FacetSidebar extends HTMLElement {
       }
     });
 
+    // Handle checkbox change to update button text and save state
+    detailedAnalysisCheckbox.addEventListener('change', () => {
+      const isDetailed = detailedAnalysisCheckbox.checked;
+
+      // Save analysis mode to localStorage (same key as main rum-chat)
+      localStorage.setItem('rumChatDeepMode', isDetailed.toString());
+      console.log(`[Sidebar Analysis] Deep mode: ${isDetailed ? 'ENABLED' : 'DISABLED'}`);
+
+      if (isDetailed) {
+        startAnalysisButton.textContent = '🔍 Show Insights (Comprehensive Report)';
+        startAnalysisButton.style.background = 'linear-gradient(135deg, var(--medium-green) 0%, var(--dark-green) 100%)';
+        startAnalysisButton.style.color = 'white';
+      } else {
+        startAnalysisButton.textContent = '📊 Show Insights (Executive Summary)';
+        startAnalysisButton.style.background = 'linear-gradient(135deg, var(--light-green) 0%, var(--medium-green) 100%)';
+        startAnalysisButton.style.color = 'var(--dark-green)';
+      }
+    });
+
     // Start analysis functionality
-    startAnalysisButton.addEventListener('click', () => {
-      const message = document.createElement('div');
-      message.className = 'message claude-message';
-      message.innerHTML = '🔍 Analysis functionality will be available once the RUM chat module is properly loaded. For now, please use the main insights button in the top navigation.';
-      messagesDiv.appendChild(message);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    startAnalysisButton.addEventListener('click', async () => {
+      const apiKey = localStorage.getItem('anthropicApiKey');
+      if (!apiKey) {
+        const message = document.createElement('div');
+        message.className = 'message claude-message';
+        message.innerHTML = '❌ Please save your API key first.';
+        messagesDiv.appendChild(message);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return;
+      }
+
+      const isDetailed = detailedAnalysisCheckbox.checked;
+      const originalText = startAnalysisButton.textContent;
+
+      startAnalysisButton.disabled = true;
+      startAnalysisButton.textContent = 'Analyzing...';
+
+      const apiKeySection = this.elems.analysisTile.querySelector('.api-key-section');
+
+      try {
+        // Call the complete original RUM analysis function directly
+        await runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection);
+
+        // Analysis complete - result is displayed by the function itself
+        console.log(`[Sidebar Analysis] ${isDetailed ? 'Detailed' : 'Executive'} analysis completed successfully`);
+      } catch (error) {
+        console.error('[Sidebar Analysis] Error:', error);
+        // Error messages are already displayed by the function
+      } finally {
+        startAnalysisButton.disabled = false;
+        startAnalysisButton.textContent = originalText;
+      }
+    });
+
+    // Download functionality
+    downloadButton.addEventListener('click', () => {
+      const analysisContent = chatInterface.querySelector('.analysis-content');
+      if (analysisContent) {
+        // Create a simple text file download
+        const analysisText = analysisContent.textContent;
+        const blob = new Blob([analysisText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rum-analysis-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
     });
   }
 }
