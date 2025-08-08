@@ -1,16 +1,27 @@
 // UTM tracking function
 function addUTMTracking(button) {
-  // Parse current page URL for UTM parameters
+  // Parse current page URL for all UTM parameters
   const params = new URLSearchParams(window.location.search);
-  const utmValue = params.get('utm');
+  const utmParams = [];
+  
+  // Collect all UTM parameters
+  for (const [key, value] of params) {
+    if (key.startsWith('utm_') || key === 'utm') {
+      utmParams.push([key, value]);
+    }
+  }
 
-  if (utmValue && button.href) {
+  if (utmParams.length > 0 && button.href) {
     try {
       const buttonUrl = new URL(button.href);
-      buttonUrl.searchParams.set('utm', utmValue);
+      // Add all UTM parameters to the button URL
+      utmParams.forEach(([key, value]) => {
+        buttonUrl.searchParams.set(key, value);
+      });
       button.href = buttonUrl.toString();
+      console.log('UTM tracking applied:', buttonUrl.toString());
     } catch (error) {
-      console.warn('Error adding UTM parameter to button:', error);
+      console.warn('Error adding UTM parameters to button:', error);
     }
   }
 }
