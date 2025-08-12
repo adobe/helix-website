@@ -46,11 +46,11 @@
 .event-banner-content h1,
 .event-banner-content .main-title {
   font-family: var(--body-font-family);
-  font-size: 80px !important;
-  font-weight: 900 !important;
-  line-height: 1 !important;
-  margin: 0 0 25px 0 !important;
-  color: #fff !important;
+  font-size: 80px;
+  font-weight: 900;
+  line-height: 1;
+  margin: 0 0 25px 0;
+  color: #fff;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgba(0,0,0,0.3);
   white-space: nowrap;
@@ -60,10 +60,10 @@
 .event-banner-content .subtitle,
 .event-banner-content p:first-of-type {
   font-family: var(--body-font-family);
-  font-size: 18px !important;
-  font-weight: 500 !important;
-  margin: 0 0 95px 0 !important;
-  color: #fff !important;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 95px 0;
+  color: #fff;
   opacity: 0.95;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
   white-space: nowrap;
@@ -73,10 +73,10 @@
 .event-banner-content .event-details,
 .event-banner-content p:nth-of-type(2) {
   font-family: var(--body-font-family);
-  font-size: 18px !important;
-  font-weight: 500 !important;
-  margin: 0 0 5px 0 !important;
-  color: #fff !important;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 5px 0;
+  color: #fff;
   opacity: 0.9;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
   white-space: nowrap;
@@ -93,7 +93,7 @@
   text-decoration: none;
   display: inline-block;
   font-weight: 600;
-  margin: 0 !important;
+  margin: 0;
   transition: all 0.3s ease;
   border: 2px solid var(--spectrum-blue);
 }
@@ -134,19 +134,19 @@
   }
 
   .event-banner-content h1 {
-    font-size: 48px !important;
+    font-size: 48px;
     top: 90px;
   }
 
   .event-banner-content .subtitle,
   .event-banner-content p:first-of-type {
-    font-size: 18px !important;
+    font-size: 18px;
     top: 150px;
   }
 
   .event-banner-content .event-details,
   .event-banner-content p:nth-of-type(2) {
-    font-size: 16px !important;
+    font-size: 16px;
     top: 240px;
   }
 
@@ -169,19 +169,19 @@
   }
 
   .event-banner-content h1 {
-    font-size: 36px !important;
+    font-size: 36px;
     top: 70px;
   }
 
   .event-banner-content .subtitle,
   .event-banner-content p:first-of-type {
-    font-size: 16px !important;
+    font-size: 16px;
     top: 120px;
   }
 
   .event-banner-content .event-details,
   .event-banner-content p:nth-of-type(2) {
-    font-size: 14px !important;
+    font-size: 14px;
     top: 200px;
   }
 
