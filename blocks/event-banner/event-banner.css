@@ -28,6 +28,7 @@
   width: 150px;
   height: 40px;
   margin: 15px auto 20px;
+
   /* Logo is already white, no filter needed */
 }
 
@@ -37,7 +38,7 @@
   font-size: 48px;
   font-weight: 700;
   line-height: 1;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   color: #fff;
   letter-spacing: -0.02em;
 }
@@ -49,10 +50,10 @@
   font-size: 80px;
   font-weight: 900;
   line-height: 1;
-  margin: 0 0 25px 0;
+  margin: 0 0 25px;
   color: #fff;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
   white-space: nowrap;
 }
 
@@ -62,10 +63,10 @@
   font-family: var(--body-font-family);
   font-size: 18px;
   font-weight: 500;
-  margin: 0 0 95px 0;
+  margin: 0 0 95px;
   color: #fff;
   opacity: 0.95;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
   white-space: nowrap;
 }
 
@@ -75,17 +76,16 @@
   font-family: var(--body-font-family);
   font-size: 18px;
   font-weight: 500;
-  margin: 0 0 5px 0;
+  margin: 0 0 5px;
   color: #fff;
   opacity: 0.9;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
   white-space: nowrap;
 }
 
 /* CTA Button */
 .event-banner-content .button {
   background-color: var(--spectrum-blue);
-  border-color: var(--spectrum-blue);
   color: #fff;
   font-size: 16px;
   padding: 12px 32px;
@@ -102,7 +102,7 @@
   background-color: var(--dark-spectrum-blue);
   border-color: var(--dark-spectrum-blue);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(20, 115, 230, 0.3);
+  box-shadow: 0 8px 25px rgb(20 115 230 / 30%);
 }
 
 /* Combined Background Graphics */
@@ -122,7 +122,7 @@
 }
 
 /* Responsive Design */
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
   .event-banner {
     height: 350px;
   }
@@ -157,7 +157,7 @@
   }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (width <= 480px) {
   .event-banner {
     height: 300px;
   }

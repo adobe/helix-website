@@ -3,13 +3,13 @@ function addUTMTracking(button) {
   // Parse current page URL for all UTM parameters
   const params = new URLSearchParams(window.location.search);
   const utmParams = [];
-  
-  // Collect all UTM parameters
-  for (const [key, value] of params) {
+
+  // Collect all UTM parameters using Array.from instead of for...of
+  Array.from(params.entries()).forEach(([key, value]) => {
     if (key.startsWith('utm_') || key === 'utm') {
       utmParams.push([key, value]);
     }
-  }
+  });
 
   if (utmParams.length > 0 && button.href) {
     try {
@@ -19,9 +19,8 @@ function addUTMTracking(button) {
         buttonUrl.searchParams.set(key, value);
       });
       button.href = buttonUrl.toString();
-      console.log('UTM tracking applied:', buttonUrl.toString());
     } catch (error) {
-      console.warn('Error adding UTM parameters to button:', error);
+      // Silent error handling - don't break the page if UTM tracking fails
     }
   }
 }
@@ -33,7 +32,7 @@ export default function decorate(block) {
   // Check for background image in content
   const backgroundImg = content.querySelector('img');
   let backgroundImageUrl = '';
-  
+
   if (backgroundImg) {
     backgroundImageUrl = backgroundImg.src;
     // Remove the image from content since we'll use it as background
@@ -54,7 +53,7 @@ export default function decorate(block) {
     ctaButton.id = 'DevLiveRegButton'; // Add specific ID for UTM tracking
     // Don't replace the parent paragraph, just style the button
     ctaButton.style.display = 'inline-block';
-    
+
     // Add UTM parameter handling
     addUTMTracking(ctaButton);
   }
