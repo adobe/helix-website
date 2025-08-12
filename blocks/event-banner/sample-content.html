@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Banner Sample</title>
+</head>
+<body>
+    <!-- 
+    Sample content structure for the Event Banner block
+    
+    In your Google Doc, create a table like this:
+    
+    +====================+
+    |    Event Banner    |
+    +====================+
+    | # Developers Live  |
+    +--------------------+
+    | Adobe Experience Manager and Adobe Commerce |
+    +--------------------+
+    | Join us in San Jose starting November 10, 2025 |
+    +--------------------+
+    | Register           |
+    +--------------------+
+    | [Drag your background image here] |
+    +--------------------+
+    
+    Then:
+    1. Select "Register" text and make it a link to your registration URL
+    2. Drag and drop your custom background image (PNG or JPG) into the last cell
+    
+    This will generate the following HTML structure:
+    -->
+    
+    <div class="event-banner">
+        <div>
+            <!-- Adobe logo will be automatically added by JavaScript -->
+            <h1>Developers Live</h1>
+            <p>Adobe Experience Manager and Adobe Commerce</p>
+            <p>Join us in San Jose starting November 10, 2025</p>
+            <p><a href="https://developerevents.adobe.com/events/details/adobe-developer-events-developer-experience-presents-reg-test/">Register</a></p>
+            <p><img src="path/to/your/custom-event-background.png" alt="Event Background"></p>
+        </div>
+    </div>
+
+    <!-- 
+    The JavaScript will automatically:
+    1. Add the Adobe logo at the top
+    2. Style the heading as the main title
+    3. Style the first paragraph as the subtitle
+    4. Style the second paragraph as event details
+    5. Style the link as a button with UTM tracking
+    6. Add ID "DevLiveRegButton" to the button for tracking
+    -->
+</body>
+</html>
