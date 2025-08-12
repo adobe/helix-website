@@ -93,7 +93,7 @@
   text-decoration: none;
   display: inline-block;
   font-weight: 600;
-  margin: 0 auto;
+  margin: 0 !important;
   transition: all 0.3s ease;
   border: 2px solid var(--spectrum-blue);
 }
