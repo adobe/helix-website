@@ -54,7 +54,6 @@
   color: #fff;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
-  white-space: nowrap;
 }
 
 /* Subtitle */
@@ -63,11 +62,10 @@
   font-family: var(--body-font-family);
   font-size: 18px;
   font-weight: 500;
-  margin: 0 0 95px;
+  margin: 0 0 70px;
   color: #fff;
   opacity: 0.95;
   text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
-  white-space: nowrap;
 }
 
 /* Event Details */
@@ -76,11 +74,10 @@
   font-family: var(--body-font-family);
   font-size: 18px;
   font-weight: 500;
-  margin: 0 0 5px;
+  margin: 0 0 8px;
   color: #fff;
   opacity: 0.9;
   text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
-  white-space: nowrap;
 }
 
 /* CTA Button */
@@ -121,73 +118,121 @@
   pointer-events: none;
 }
 
+/* Force button spacing on mobile - override global 24px spacing */
+@media screen and (max-width: 768px) {
+  .event-banner .event-banner-content p {
+    margin-bottom: 0 !important;
+  }
+  
+  .event-banner .event-banner-content .event-details,
+  .event-banner .event-banner-content p:nth-of-type(2) {
+    margin: 35px 0 2px 0 !important;
+  }
+  
+  /* Target button paragraph with strong specificity */
+  .event-banner .event-banner-content p:has(a),
+  .event-banner .event-banner-content p:last-child,
+  .event-banner .event-banner-content p:nth-of-type(3) {
+    margin: 2px 0 0 0 !important;
+    padding: 0 !important;
+  }
+}
+
 /* Responsive Design */
 @media screen and (width <= 768px) {
   .event-banner {
-    height: 350px;
+    height: 400px;
+  }
+
+  .event-banner-content {
+    top: 120px;
+    padding: 0 20px;
   }
 
   .event-banner-content .adobe-logo {
     width: 100px;
     height: 25px;
-    top: 40px;
+    margin: 10px auto 15px;
   }
 
-  .event-banner-content h1 {
+  .event-banner-content .adobe-brand {
+    font-size: 32px;
+    margin: 0 0 5px;
+  }
+
+  .event-banner-content h1,
+  .event-banner-content .main-title {
     font-size: 48px;
-    top: 90px;
+    margin: 0 0 15px;
+    line-height: 1.1;
   }
 
   .event-banner-content .subtitle,
   .event-banner-content p:first-of-type {
-    font-size: 18px;
-    top: 150px;
+    font-size: 16px;
+    margin: 0 0 35px;
   }
 
   .event-banner-content .event-details,
   .event-banner-content p:nth-of-type(2) {
-    font-size: 16px;
-    top: 240px;
+    font-size: 14px;
+    margin: 0 0 5px;
   }
 
-  .event-banner-content .button {
+  .event-banner-content .button,
+  .event-banner-content a.button {
     font-size: 14px;
     padding: 10px 24px;
-    top: 280px;
+    margin-top: 15px !important;
+    margin-bottom: 0 !important;
   }
 }
 
 @media screen and (width <= 480px) {
   .event-banner {
-    height: 300px;
+    height: 380px;
+  }
+
+  .event-banner-content {
+    top: 100px;
+    padding: 0 15px;
   }
 
   .event-banner-content .adobe-logo {
     width: 80px;
     height: 20px;
-    top: 30px;
+    margin: 8px auto 12px;
   }
 
-  .event-banner-content h1 {
+  .event-banner-content .adobe-brand {
+    font-size: 28px;
+    margin: 0 0 4px;
+  }
+
+  .event-banner-content h1,
+  .event-banner-content .main-title {
     font-size: 36px;
-    top: 70px;
+    margin: 0 0 12px;
+    line-height: 1.1;
   }
 
   .event-banner-content .subtitle,
   .event-banner-content p:first-of-type {
-    font-size: 16px;
-    top: 120px;
+    font-size: 14px;
+    margin: 0 0 25px;
   }
 
   .event-banner-content .event-details,
   .event-banner-content p:nth-of-type(2) {
-    font-size: 14px;
-    top: 200px;
+    font-size: 13px;
+    margin: 0 0 5px;
   }
 
-  .event-banner-content .button {
-    font-size: 12px;
+  .event-banner-content .button,
+  .event-banner-content a.button {
+    font-size: 13px;
     padding: 8px 20px;
-    top: 230px;
+    margin-top: 12px !important;
+    margin-bottom: 15px;
   }
 }
