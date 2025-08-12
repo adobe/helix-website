@@ -194,7 +194,7 @@
 .testimonials .testimonial-info > ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: var(--spacing-xs);
+  gap: var(--spacing-xs);
 }
 
 .testimonials .testimonial-info ul,
@@ -299,7 +299,7 @@
   }
 
   .testimonials .testimonial-info > ul {
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
   }
 
   .testimonials .testimonial-info .testimonial-stats-info {

@@ -15,7 +15,7 @@
   grid-template-areas:
     "image"
     "copy";
-  grid-gap: var(--spacing-s);
+  gap: var(--spacing-s);
   align-items: center;
 }
 
@@ -54,7 +54,7 @@
   .feature-list > div:last-of-type {
     grid-template-columns: 1fr 1fr;
     grid-template-areas: "copy image";
-    grid-gap: var(--spacing-xxl);
+    gap: var(--spacing-xxl);
   }
 }
 
