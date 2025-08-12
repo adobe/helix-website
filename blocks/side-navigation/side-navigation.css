@@ -332,7 +332,7 @@
 .results-wrapper {
   list-style: none;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-gap: 16px;
+  gap: 16px;
   margin: 0;
   padding: var(--spacing-xs) 0;
   display: none;
@@ -522,7 +522,7 @@
 
   .results-wrapper {
     width: calc(100% - 300px);
-    grid-gap: var(--spacing-s);
+    gap: var(--spacing-s);
   }
 }
 

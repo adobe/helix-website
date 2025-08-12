@@ -44,7 +44,7 @@
   align-items: flex-start;
   width: 100%;
   min-width: 0;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .right-container {
@@ -61,7 +61,7 @@
   padding: 20px;
   background-color: white;
   min-width: 0;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .feed.blog h2 {
@@ -161,7 +161,7 @@
   line-height: var(--type-heading-xl-lh);
   font-weight: 700;
   letter-spacing: -0.04em;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   min-width: 0;
 }
 
@@ -180,7 +180,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   min-width: 0;
 }
 
@@ -191,7 +191,7 @@
 
   .feed.recent > div > div {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-gap: var(--spacing-xs);
+    gap: var(--spacing-xs);
   }
 
   .feed.recent > div > div > div {
@@ -243,7 +243,7 @@
     flex-direction: column;
     max-width: var(--grid-desktop-container-width);
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
     padding: var(--spacing-xs) 0;
   }
   
@@ -277,7 +277,7 @@
   }
 
   .feed.recent > div > div {
-    grid-gap: 32px;
+    gap: 32px;
   }
 
   .feed.recent > div > div > div {

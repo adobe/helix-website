@@ -4,7 +4,7 @@
   padding: 24px 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-gap: 16px;
+  gap: 16px;
 }
 
 .card-list > ul > li {
@@ -65,7 +65,7 @@
 
 @media screen and (width >= 900px) {
   .card-list > ul {
-    grid-gap: var(--spacing-s);
+    gap: var(--spacing-s);
   }
 }
 
