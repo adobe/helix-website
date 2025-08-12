@@ -1,39 +1,141 @@
+/* Base Event Banner Block */
 .event-banner {
   position: relative;
   color: #fff;
   padding: 0;
   text-align: center;
   overflow: hidden;
-  height: 600px;
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto;
 }
 
 .event-banner-content {
-  position: absolute;
+  position: relative;
   z-index: 10;
-  top: 180px;
-  left: 50%;
-  transform: translateX(-50%);
   width: 100%;
-  max-width: 800px;
-  padding: 0 40px;
+  padding: 40px;
   text-align: center;
 }
 
 /* Adobe Logo */
 .event-banner-content .adobe-logo {
   display: block;
+  width: 120px;
+  height: 32px;
+  margin: 0 auto 20px;
+}
+
+/* Main Title */
+.event-banner-content h1,
+.event-banner-content .main-title {
+  font-family: var(--body-font-family);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  color: #fff;
+}
+
+/* Subtitle */
+.event-banner-content .subtitle,
+.event-banner-content p:first-of-type {
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 20px;
+  color: #fff;
+  opacity: 0.9;
+}
+
+/* Event Details */
+.event-banner-content .event-details {
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0 0 20px;
+  color: #fff;
+  opacity: 0.8;
+}
+
+/* CTA Button */
+.event-banner-content .button {
+  background-color: #06c;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 500;
+  margin: 0;
+  transition: all 0.3s ease;
+  border: 1px solid #06c;
+}
+
+.event-banner-content .button:hover {
+  background-color: #0052a3;
+  border-color: #0052a3;
+}
+
+/* Background Image */
+.event-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--event-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Base Responsive Design */
+@media screen and (width <= 768px) {
+  .event-banner-content {
+    padding: 20px;
+  }
+
+  .event-banner-content h1,
+  .event-banner-content .main-title {
+    font-size: 36px;
+  }
+}
+
+
+/* =============================================== */
+
+/* DEVLIVE VARIANT                                 */
+
+/* =============================================== */
+
+/* DevLive specific styling */
+.event-banner.devlive {
+  height: 600px;
+  max-width: 1200px;
+}
+
+.event-banner.devlive .event-banner-content {
+  position: absolute;
+  top: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  padding: 0 40px;
+}
+
+/* DevLive Adobe Logo */
+.event-banner.devlive .event-banner-content .adobe-logo {
   width: 150px;
   height: 40px;
   margin: 15px auto 20px;
-
-  /* Logo is already white, no filter needed */
 }
 
-/* Adobe Brand Text */
-.event-banner-content .adobe-brand {
+/* DevLive Adobe Brand Text */
+.event-banner.devlive .event-banner-content .adobe-brand {
   font-family: var(--body-font-family);
   font-size: 48px;
   font-weight: 700;
@@ -43,196 +145,172 @@
   letter-spacing: -0.02em;
 }
 
-/* Main Title */
-.event-banner-content h1,
-.event-banner-content .main-title {
-  font-family: var(--body-font-family);
+/* DevLive Main Title */
+.event-banner.devlive .event-banner-content h1,
+.event-banner.devlive .event-banner-content .main-title {
   font-size: 80px;
   font-weight: 900;
   line-height: 1;
   margin: 0 0 25px;
-  color: #fff;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
 }
 
-/* Subtitle */
-.event-banner-content .subtitle,
-.event-banner-content p:first-of-type {
-  font-family: var(--body-font-family);
+/* DevLive Subtitle */
+.event-banner.devlive .event-banner-content .subtitle,
+.event-banner.devlive .event-banner-content p:first-of-type {
   font-size: 18px;
   font-weight: 500;
   margin: 0 0 70px;
-  color: #fff;
   opacity: 0.95;
   text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
 }
 
-/* Event Details */
-.event-banner-content .event-details,
-.event-banner-content p:nth-of-type(2) {
-  font-family: var(--body-font-family);
+/* DevLive Event Details */
+.event-banner.devlive .event-banner-content .event-details,
+.event-banner.devlive .event-banner-content p:nth-of-type(2) {
   font-size: 18px;
   font-weight: 500;
   margin: 0 0 8px;
-  color: #fff;
   opacity: 0.9;
   text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
 }
 
-/* CTA Button */
-.event-banner-content .button {
+/* DevLive CTA Button */
+.event-banner.devlive .event-banner-content .button {
   background-color: var(--spectrum-blue);
-  color: #fff;
   font-size: 16px;
   padding: 12px 32px;
   border-radius: 25px;
-  text-decoration: none;
-  display: inline-block;
   font-weight: 600;
-  margin: 0;
-  transition: all 0.3s ease;
   border: 2px solid var(--spectrum-blue);
 }
 
-.event-banner-content .button:hover {
+.event-banner.devlive .event-banner-content .button:hover {
   background-color: var(--dark-spectrum-blue);
   border-color: var(--dark-spectrum-blue);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgb(20 115 230 / 30%);
 }
 
-/* Combined Background Graphics */
-.event-banner::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+/* DevLive Background */
+.event-banner.devlive::before {
   background-image: var(--event-bg-image, url('./event-banner.png'));
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 1;
-  pointer-events: none;
 }
 
-/* Force button spacing on mobile - override global 24px spacing */
+/* DevLive Mobile Spacing - override global 24px spacing */
 @media screen and (width <= 768px) {
-  .event-banner .event-banner-content p {
-    margin-bottom: 0 !important;
+  .event-banner.devlive .event-banner-content p {
+    margin-bottom: 0;
   }
   
-  /* Target button paragraph with strong specificity */
-  .event-banner .event-banner-content p:has(a),
-  .event-banner .event-banner-content p:last-child,
-  .event-banner .event-banner-content p:nth-of-type(3) {
-    margin: 2px 0 0 !important;
-    padding: 0 !important;
+  /* Target button container with semantic class */
+  .event-banner.devlive .event-banner-content .button-container {
+    margin: 2px 0 0;
+    padding: 0;
   }
   
-  .event-banner .event-banner-content .event-details,
-  .event-banner .event-banner-content p:nth-of-type(2) {
-    margin: 35px 0 2px !important;
+  .event-banner.devlive .event-banner-content .event-details,
+  .event-banner.devlive .event-banner-content p:nth-of-type(2) {
+    margin: 35px 0 2px;
   }
 }
 
-/* Responsive Design */
+/* DevLive Responsive Design */
 @media screen and (width <= 768px) {
-  .event-banner {
+  .event-banner.devlive {
     height: 400px;
   }
 
-  .event-banner-content {
+  .event-banner.devlive .event-banner-content {
     top: 120px;
     padding: 0 20px;
   }
 
-  .event-banner-content .adobe-logo {
+  .event-banner.devlive .event-banner-content .adobe-logo {
     width: 100px;
     height: 25px;
     margin: 10px auto 15px;
   }
 
-  .event-banner-content .adobe-brand {
+  .event-banner.devlive .event-banner-content .adobe-brand {
     font-size: 32px;
     margin: 0 0 5px;
   }
 
-  .event-banner-content h1,
-  .event-banner-content .main-title {
+  .event-banner.devlive .event-banner-content h1,
+  .event-banner.devlive .event-banner-content .main-title {
     font-size: 48px;
     margin: 0 0 15px;
     line-height: 1.1;
   }
 
-  .event-banner-content .subtitle,
-  .event-banner-content p:first-of-type {
+  .event-banner.devlive .event-banner-content .subtitle,
+  .event-banner.devlive .event-banner-content p:first-of-type {
     font-size: 16px;
     margin: 0 0 35px;
   }
 
-  .event-banner-content .event-details,
-  .event-banner-content p:nth-of-type(2) {
+  .event-banner.devlive .event-banner-content .event-details,
+  .event-banner.devlive .event-banner-content p:nth-of-type(2) {
     font-size: 14px;
     margin: 0 0 5px;
   }
 
-  .event-banner-content .button,
-  .event-banner-content a.button {
+  .event-banner.devlive .event-banner-content .button,
+  .event-banner.devlive .event-banner-content a.button {
     font-size: 14px;
     padding: 10px 24px;
-    margin-top: 15px !important;
-    margin-bottom: 0 !important;
+    margin-top: 15px;
+    margin-bottom: 0;
   }
 }
 
 @media screen and (width <= 480px) {
-  .event-banner {
+  .event-banner.devlive {
     height: 380px;
   }
 
-  .event-banner-content {
+  .event-banner.devlive .event-banner-content {
     top: 100px;
     padding: 0 15px;
   }
 
-  .event-banner-content .adobe-logo {
+  .event-banner.devlive .event-banner-content .adobe-logo {
     width: 80px;
     height: 20px;
     margin: 8px auto 12px;
   }
 
-  .event-banner-content .adobe-brand {
+  .event-banner.devlive .event-banner-content .adobe-brand {
     font-size: 28px;
     margin: 0 0 4px;
   }
 
-  .event-banner-content h1,
-  .event-banner-content .main-title {
+  .event-banner.devlive .event-banner-content h1,
+  .event-banner.devlive .event-banner-content .main-title {
     font-size: 36px;
     margin: 0 0 12px;
     line-height: 1.1;
   }
 
-  .event-banner-content .subtitle,
-  .event-banner-content p:first-of-type {
+  .event-banner.devlive .event-banner-content .subtitle,
+  .event-banner.devlive .event-banner-content p:first-of-type {
     font-size: 14px;
     margin: 0 0 25px;
   }
 
-  .event-banner-content .event-details,
-  .event-banner-content p:nth-of-type(2) {
+  .event-banner.devlive .event-banner-content .event-details,
+  .event-banner.devlive .event-banner-content p:nth-of-type(2) {
     font-size: 13px;
     margin: 0 0 5px;
   }
 
-  .event-banner-content .button,
-  .event-banner-content a.button {
+  .event-banner.devlive .event-banner-content .button,
+  .event-banner.devlive .event-banner-content a.button {
     font-size: 13px;
     padding: 8px 20px;
-    margin-top: 12px !important;
+    margin-top: 12px;
     margin-bottom: 15px;
   }
 }

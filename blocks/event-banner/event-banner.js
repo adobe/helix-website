@@ -54,6 +54,12 @@ export default function decorate(block) {
     // Don't replace the parent paragraph, just style the button
     ctaButton.style.display = 'inline-block';
 
+    // Add button-container class to the parent paragraph
+    const buttonParagraph = ctaButton.closest('p');
+    if (buttonParagraph) {
+      buttonParagraph.classList.add('button-container');
+    }
+
     // Add UTM parameter handling
     addUTMTracking(ctaButton);
   }

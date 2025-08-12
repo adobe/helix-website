@@ -1,11 +1,30 @@
 ## Event Banner
 
-Event banner block designed to showcase major events like Adobe Developers Live. Features a dramatic black background with colorful mesh graphics, red geometric elements, and prominent call-to-action.
+Event banner block designed to showcase major events. The block provides a flexible foundation with specific styling variants for different event types.
 
-#### Custom Classes 
-|  Class | Function   |  
-|--------|------------|
-| N/A | Default Event Banner Layout |  
+#### Block Variants
+|  Variant | Usage | Description |  
+|----------|-------|-------------|
+| Default | `Event Banner` | Clean, minimal banner suitable for any event |
+| DevLive | `Event Banner (devlive)` | Styled specifically for Adobe Developer Live events |  
+
+#### How to Use Variants:
+
+To use the **DevLive variant**, create your table like this:
+```
+| Event Banner (devlive) |
+|------------------------|
+| # Developers Live |
+| Adobe Experience Manager and Adobe Commerce |
+| Join us in San Jose starting November 10, 2025 |
+| [Register](https://developerevents.adobe.com/events/details/adobe-developer-events-developer-experience-presents-reg-test/) |
+| [Your custom background image] |
+```
+
+For **other events**, you can create new variants like:
+- `Event Banner (aem-rockstars)` - for AEM Rockstars events
+- `Event Banner (summit)` - for Adobe Summit events
+- `Event Banner (max)` - for Adobe MAX events
 
 #### Example:
 
