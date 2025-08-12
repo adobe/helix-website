@@ -51,14 +51,7 @@ export default function decorate(block) {
   if (ctaButton) {
     ctaButton.classList.add('button', 'large');
     ctaButton.id = 'DevLiveRegButton'; // Add specific ID for UTM tracking
-    // Don't replace the parent paragraph, just style the button
     ctaButton.style.display = 'inline-block';
-
-    // Add button-container class to the parent paragraph
-    const buttonParagraph = ctaButton.closest('p');
-    if (buttonParagraph) {
-      buttonParagraph.classList.add('button-container');
-    }
 
     // Add UTM parameter handling
     addUTMTracking(ctaButton);
