@@ -51,7 +51,6 @@ export default function decorate(block) {
   if (ctaButton) {
     ctaButton.classList.add('button', 'large');
     ctaButton.id = 'DevLiveRegButton'; // Add specific ID for UTM tracking
-    ctaButton.style.display = 'inline-block';
 
     // Add UTM parameter handling
     addUTMTracking(ctaButton);
