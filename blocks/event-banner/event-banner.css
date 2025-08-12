@@ -198,13 +198,13 @@
   background-image: var(--event-bg-image, url('./event-banner.png'));
 }
 
-/* DevLive Mobile Spacing - override global 24px spacing */
+/* DevLive Mobile Spacing - override global spacing */
 @media screen and (width <= 768px) {
   .event-banner.devlive .event-banner-content p {
     margin-bottom: 0;
   }
   
-  /* Target button container with semantic class */
+  /* Target button container directly - override default padding that pushes button down */
   .event-banner.devlive .event-banner-content .button-container {
     margin: 2px 0 0;
     padding: 0;
