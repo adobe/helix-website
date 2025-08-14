@@ -40,42 +40,16 @@
 .event-banner-content .subtitle,
 .event-banner-content p:first-of-type {
   font-family: var(--body-font-family);
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 400;
   margin: 0 0 20px;
   color: #fff;
   opacity: 0.9;
 }
 
-/* Event Details */
-.event-banner-content .event-details {
-  font-family: var(--body-font-family);
-  font-size: 14px;
-  font-weight: 400;
-  margin: 0 0 20px;
-  color: #fff;
-  opacity: 0.8;
-}
 
-/* CTA Button */
-.event-banner-content .button {
-  background-color: #06c;
-  color: #fff;
-  font-size: 14px;
-  padding: 10px 20px;
-  border-radius: 4px;
-  text-decoration: none;
-  display: inline-block;
-  font-weight: 500;
-  margin: 0;
-  transition: all 0.3s ease;
-  border: 1px solid #06c;
-}
 
-.event-banner-content .button:hover {
-  background-color: #0052a3;
-  border-color: #0052a3;
-}
+
 
 /* Background Image */
 .event-banner::before {
@@ -114,7 +88,7 @@
 
 /* DevLive specific styling */
 .event-banner.devlive {
-  height: 600px;
+  height: 472px;
   max-width: 1200px;
 }
 
@@ -159,67 +133,28 @@
 /* DevLive Subtitle */
 .event-banner.devlive .event-banner-content .subtitle,
 .event-banner.devlive .event-banner-content p:first-of-type {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 500;
   margin: 0 0 70px;
   opacity: 0.95;
   text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
 }
 
-/* DevLive Event Details */
-.event-banner.devlive .event-banner-content .event-details,
-.event-banner.devlive .event-banner-content p:nth-of-type(2) {
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0 0 8px;
-  opacity: 0.9;
-  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
-}
 
-/* DevLive CTA Button */
-.event-banner.devlive .event-banner-content .button {
-  background-color: var(--spectrum-blue);
-  font-size: 16px;
-  padding: 12px 32px;
-  border-radius: 25px;
-  font-weight: 600;
-  border: 2px solid var(--spectrum-blue);
-}
 
-.event-banner.devlive .event-banner-content .button:hover {
-  background-color: var(--dark-spectrum-blue);
-  border-color: var(--dark-spectrum-blue);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgb(20 115 230 / 30%);
-}
+
 
 /* DevLive Background */
 .event-banner.devlive::before {
   background-image: var(--event-bg-image, url('./event-banner.png'));
 }
 
-/* DevLive Mobile Spacing - override global spacing */
-@media screen and (width <= 768px) {
-  .event-banner.devlive .event-banner-content p {
-    margin-bottom: 0;
-  }
-  
-  /* Target button container directly - override default padding that pushes button down */
-  .event-banner.devlive .event-banner-content .button-container {
-    margin: 2px 0 0;
-    padding: 0;
-  }
-  
-  .event-banner.devlive .event-banner-content .event-details,
-  .event-banner.devlive .event-banner-content p:nth-of-type(2) {
-    margin: 35px 0 2px;
-  }
-}
+
 
 /* DevLive Responsive Design */
 @media screen and (width <= 768px) {
   .event-banner.devlive {
-    height: 400px;
+    height: 302px;
   }
 
   .event-banner.devlive .event-banner-content {
@@ -240,77 +175,65 @@
 
   .event-banner.devlive .event-banner-content h1,
   .event-banner.devlive .event-banner-content .main-title {
-    font-size: 48px;
-    margin: 0 0 15px;
-    line-height: 1.1;
-  }
-
-  .event-banner.devlive .event-banner-content .subtitle,
-  .event-banner.devlive .event-banner-content p:first-of-type {
-    font-size: 16px;
-    margin: 0 0 35px;
-  }
-
-  .event-banner.devlive .event-banner-content .event-details,
-  .event-banner.devlive .event-banner-content p:nth-of-type(2) {
-    font-size: 14px;
-    margin: 0 0 5px;
-  }
-
-  .event-banner.devlive .event-banner-content .button,
-  .event-banner.devlive .event-banner-content a.button {
-    font-size: 14px;
-    padding: 10px 24px;
-    margin-top: 15px;
-    margin-bottom: 0;
-  }
-}
-
-@media screen and (width <= 480px) {
-  .event-banner.devlive {
-    height: 380px;
-  }
-
-  .event-banner.devlive .event-banner-content {
-    top: 100px;
-    padding: 0 15px;
-  }
-
-  .event-banner.devlive .event-banner-content .adobe-logo {
-    width: 80px;
-    height: 20px;
-    margin: 8px auto 12px;
-  }
-
-  .event-banner.devlive .event-banner-content .adobe-brand {
-    font-size: 28px;
-    margin: 0 0 4px;
-  }
-
-  .event-banner.devlive .event-banner-content h1,
-  .event-banner.devlive .event-banner-content .main-title {
-    font-size: 36px;
+    font-size: 42px;
     margin: 0 0 12px;
     line-height: 1.1;
   }
 
   .event-banner.devlive .event-banner-content .subtitle,
   .event-banner.devlive .event-banner-content p:first-of-type {
-    font-size: 14px;
-    margin: 0 0 25px;
+    font-size: 18px;
+    margin: 0 0 20px;
+    line-height: 1.3;
   }
 
-  .event-banner.devlive .event-banner-content .event-details,
-  .event-banner.devlive .event-banner-content p:nth-of-type(2) {
-    font-size: 13px;
-    margin: 0 0 5px;
+  /* Mobile background sizing */
+  .event-banner.devlive::before {
+    background-size: cover;
+    background-position: center center;
   }
 
-  .event-banner.devlive .event-banner-content .button,
-  .event-banner.devlive .event-banner-content a.button {
-    font-size: 13px;
-    padding: 8px 20px;
-    margin-top: 12px;
-    margin-bottom: 15px;
+}
+
+@media screen and (width <= 480px) {
+  .event-banner.devlive {
+    height: 189px;
   }
+
+  .event-banner.devlive .event-banner-content {
+    top: 60px;
+    padding: 0 15px;
+  }
+
+  .event-banner.devlive .event-banner-content .adobe-logo {
+    width: 90px;
+    height: 22px;
+    margin: 5px auto 8px;
+  }
+
+  .event-banner.devlive .event-banner-content .adobe-brand {
+    font-size: 24px;
+    margin: 0 0 3px;
+  }
+
+  .event-banner.devlive .event-banner-content h1,
+  .event-banner.devlive .event-banner-content .main-title {
+    font-size: 32px;
+    margin: 0 0 8px;
+    line-height: 1.1;
+  }
+
+  .event-banner.devlive .event-banner-content .subtitle,
+  .event-banner.devlive .event-banner-content p:first-of-type {
+    font-size: 16px;
+    margin: 0 0 15px;
+    line-height: 1.3;
+  }
+
+  /* Mobile background sizing */
+  .event-banner.devlive::before {
+    background-size: cover;
+    background-position: center center;
+  }
+
 }
