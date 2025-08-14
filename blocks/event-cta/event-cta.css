@@ -68,7 +68,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media screen and (width <= 768px) {
   .event-cta {
     padding: 32px 16px 16px; /* More compact mobile padding with reduced bottom */
   }
@@ -89,7 +89,7 @@
 
 }
 
-@media (max-width: 480px) {
+@media screen and (width <= 480px) {
   .event-cta {
     padding: 24px 16px 12px; /* Even more compact on small screens with reduced bottom */
   }
