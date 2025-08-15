@@ -58,13 +58,13 @@
 /* Remove spacing between event-cta and following elements */
 .event-cta-wrapper,
 .section:has(.event-cta) {
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
 }
 
 /* Remove spacing from following elements when they come after event-cta */
 .event-cta-wrapper + *,
 .section:has(.event-cta) + * {
-  margin-top: 0 !important;
+  margin-top: 0;
 }
 
 /* Responsive design */

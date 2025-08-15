@@ -1,3 +1,13 @@
+.event-banner-container h1 {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.event-banner-container .default-content-wrapper {
+  margin-top: 40px;
+}
+
 /* Base Event Banner Block */
 .event-banner {
   position: relative;
