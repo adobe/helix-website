@@ -1,0 +1,111 @@
+/* Event CTA Block */
+.event-cta {
+  position: relative;
+  color: #fff;
+  padding: 40px 24px 20px;
+  text-align: center;
+  background: #000;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.event-cta-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.event-cta .tagline-text {
+  font-family: var(--body-font-family);
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+/* CTA Button - matching event-banner style */
+.event-cta .button {
+  background-color: var(--spectrum-blue);
+  color: #fff;
+  font-size: 16px;
+  padding: 12px 32px;
+  border-radius: 25px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 600;
+  margin: 0;
+  transition: all 0.3s ease;
+  border: 2px solid var(--spectrum-blue);
+}
+
+.event-cta .button:hover {
+  background-color: var(--dark-spectrum-blue);
+  border-color: var(--dark-spectrum-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgb(20 115 230 / 30%);
+}
+
+
+
+/* Remove spacing between event-cta and following elements */
+.event-cta-wrapper,
+.section:has(.event-cta) {
+  margin-bottom: 0;
+}
+
+/* Remove spacing from following elements when they come after event-cta */
+.event-cta-wrapper + *,
+.section:has(.event-cta) + * {
+  margin-top: 0;
+}
+
+/* Responsive design */
+@media screen and (width <= 768px) {
+  .event-cta {
+    padding: 32px 16px 16px; /* More compact mobile padding with reduced bottom */
+  }
+  
+  .event-cta-content {
+    gap: 20px; /* Reduce gap on mobile */
+  }
+  
+  .event-cta .tagline-text {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  
+  .event-cta .button {
+    font-size: 14px;
+    padding: 10px 24px;
+  }
+
+}
+
+@media screen and (width <= 480px) {
+  .event-cta {
+    padding: 24px 16px 12px; /* Even more compact on small screens with reduced bottom */
+  }
+  
+  .event-cta-content {
+    gap: 16px; /* Tighter spacing on small screens */
+  }
+  
+  .event-cta .tagline-text {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+  
+  .event-cta .button {
+    font-size: 13px;
+    padding: 8px 20px;
+  }
+
+}

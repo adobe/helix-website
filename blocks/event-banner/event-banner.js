@@ -1,30 +1,3 @@
-// UTM tracking function
-function addUTMTracking(button) {
-  // Parse current page URL for all UTM parameters
-  const params = new URLSearchParams(window.location.search);
-  const utmParams = [];
-
-  // Collect all UTM parameters using Array.from instead of for...of
-  Array.from(params.entries()).forEach(([key, value]) => {
-    if (key.startsWith('utm_') || key === 'utm') {
-      utmParams.push([key, value]);
-    }
-  });
-
-  if (utmParams.length > 0 && button.href) {
-    try {
-      const buttonUrl = new URL(button.href);
-      // Add all UTM parameters to the button URL
-      utmParams.forEach(([key, value]) => {
-        buttonUrl.searchParams.set(key, value);
-      });
-      button.href = buttonUrl.toString();
-    } catch (error) {
-      // Silent error handling - don't break the page if UTM tracking fails
-    }
-  }
-}
-
 export default function decorate(block) {
   const content = block.children[0].querySelector('div');
   content.setAttribute('class', 'event-banner-content');
@@ -46,16 +19,6 @@ export default function decorate(block) {
   logoImg.className = 'adobe-logo';
   content.insertBefore(logoImg, content.firstChild);
 
-  // Find and style the button
-  const ctaButton = content.querySelector('a');
-  if (ctaButton) {
-    ctaButton.classList.add('button', 'large');
-    ctaButton.id = 'DevLiveRegButton'; // Add specific ID for UTM tracking
-
-    // Add UTM parameter handling
-    addUTMTracking(ctaButton);
-  }
-
   // Add structured content classes
   const headings = content.querySelectorAll('h1, h2, h3');
   if (headings.length > 0) {
@@ -63,11 +26,8 @@ export default function decorate(block) {
   }
 
   const paragraphs = content.querySelectorAll('p');
-  if (paragraphs.length > 0 && !paragraphs[0].querySelector('a')) {
+  if (paragraphs.length > 0) {
     paragraphs[0].classList.add('subtitle');
-  }
-  if (paragraphs.length > 1 && !paragraphs[1].querySelector('a')) {
-    paragraphs[1].classList.add('event-details');
   }
 
   // Set background image if one was provided
