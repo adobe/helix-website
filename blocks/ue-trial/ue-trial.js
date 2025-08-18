@@ -658,17 +658,17 @@ function buildForm(block) {
   const terms = createTag('ul');
 
   const term1 = createTag('li', {}, 'The ');
-  const adobeLink = createTag('a', { href: '#', target: '_blank' }, 'Adobe family of companies');
+  const adobeLink = createTag('a', { href: 'https://www.adobe.com/about-adobe.html', target: '_blank' }, 'Adobe family of companies');
   term1.append(adobeLink);
   term1.append(' may keep me informed with ');
-  const personalizedLink = createTag('a', { href: '#', target: '_blank' }, 'personalized');
+  const personalizedLink = createTag('a', { href: 'https://www.adobe.com/privacy.html', target: '_blank' }, 'personalized');
   term1.append(personalizedLink);
   term1.append(' calls about products and services.');
 
   terms.append(term1);
 
   const privacyText = createTag('p', {}, 'See our ');
-  const privacyLink = createTag('a', { href: '#', target: '_blank' }, 'Privacy Policy');
+  const privacyLink = createTag('a', { href: 'https://www.adobe.com/privacy/policy.html', target: '_blank' }, 'Privacy Policy');
   privacyText.append(privacyLink);
   privacyText.append(' for more details or to opt-out at any time.');
 
