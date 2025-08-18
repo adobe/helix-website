@@ -219,9 +219,7 @@ export function addHeadingAnchorLink(elem) {
 }
 
 export function decorateGuideTemplateHeadings(main) {
-  const contentArea = main.querySelector('.section.content');
-  if (!contentArea) return;
-  const contentSections = contentArea.querySelectorAll(
+  const contentSections = main.querySelectorAll(
     '.default-content-wrapper',
   );
   if (!contentSections) return;

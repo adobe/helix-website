@@ -9,8 +9,8 @@
   --tabs-active-bg-color: #fff;
   --tabs-list-bg-gradient:
     linear-gradient(
-      rgba(255 255 255 0%) 60%,
-      rgba(245 245 245 80%)
+      rgb(255 255 255 0%) 60%,
+      rgb(245 245 245 80%)
     );
 
   /* redesign */
@@ -24,7 +24,7 @@
   --tabs-active-text-color: #fff;
   --tabs-bg-color: #1a1a1a;
   --tabs-active-bg-color: #111;
-  --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
+  --tabs-list-bg-gradient: linear-gradient(rgb(0 0 0 0%) 60%, rgb(0 0 0 80%));
 }
 
 .tabs[data-block-status="loaded"] {

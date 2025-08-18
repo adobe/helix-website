@@ -58,7 +58,7 @@ export default async function decorate(block) {
   const skipLink = createTag('a', { class: 'skip-link', href: '#search-results' }, 'Skip to results');
   const searchBlock = buildBlock('doc-search', [[
     '<a href="/docpages-index.json">Search</a>',
-    '<a href="/drafts/fkakatie/faq">FAQ</a>',
+    '<a href="/docs/faq">FAQ</a>',
   ]]);
   searchBlock.dataset.resultsContainerClass = 'results-wrapper';
   aside.prepend(docButton);

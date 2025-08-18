@@ -284,6 +284,7 @@ export default class DateRangePicker extends HTMLElement {
     if (!option) {
       return;
     }
+    const previousValue = inputElement.dataset.value;
 
     inputElement.value = option.textContent;
     inputElement.dataset.value = option.dataset.value;
@@ -303,6 +304,12 @@ export default class DateRangePicker extends HTMLElement {
     }
 
     if (dateFrom) {
+      if (previousValue && value === 'custom' && previousValue !== 'custom') {
+        // when going to custom, push the from date forward 1 day e.g. we want 7 days, not 8
+        const fromDate = new Date(dateFrom);
+        fromDate.setDate(fromDate.getDate() + 1);
+        dateFrom = toDateString(fromDate);
+      }
       fromElement.value = dateFrom;
     }
 

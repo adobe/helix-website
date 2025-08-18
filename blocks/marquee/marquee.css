@@ -128,7 +128,7 @@
 .marquee.testimonial .testimonial-info > ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: var(--spacing-xs);
+  gap: var(--spacing-xs);
 }
 
 .marquee.testimonial .testimonial-info ul,
@@ -218,7 +218,7 @@
   }
 
   .marquee.testimonial .testimonial-info > ul {
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
   }
 
   .marquee.testimonial .testimonial-info h4,

@@ -199,7 +199,7 @@ main.without-full-width-hero .section.content .columns-wrapper {
 
   .columns.three.tall.contained > div {
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: var(--spacing-xs);
+    gap: var(--spacing-xs);
   }
 
   /* Dealing with 2 orphan items */
@@ -248,7 +248,7 @@ main.without-full-width-hero .section.content .columns-wrapper {
   }
 
   .columns.tall.contained > div {
-    grid-gap: 32px;
+    gap: 32px;
   }
 
   /* force image to stick to bottom */
@@ -261,20 +261,20 @@ main.without-full-width-hero .section.content .columns-wrapper {
   /* others */
   .columns.two.contained > div {
     max-width: var(--grid-desktop-container-width);
-    grid-template-columns: 50% 50%;
-    grid-gap: var(--spacing-xxl);
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xxl);
   }
 
   .columns.three.contained > div {
     max-width: var(--grid-desktop-container-width);
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: var(--spacing-xxl);
+    gap: var(--spacing-xxl);
   }
 
   .columns.four.contained > div {
     max-width: var(--grid-desktop-container-width);
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-gap: var(--spacing-xl) var(--spacing-s);
+    gap: var(--spacing-xl) var(--spacing-s);
     padding-top: 0;
   }
 
@@ -283,7 +283,7 @@ main.without-full-width-hero .section.content .columns-wrapper {
   }
 
   .columns.three.tall.contained > div {
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
     padding: var(--spacing-xs) 0;
   }
 

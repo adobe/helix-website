@@ -939,3 +939,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 footer.footer-wrapper.appear {
   display: none;
 }
+
+img.facet-thumbnail {
+  aspect-ratio: 1/1;
+  object-fit: contain;
+}

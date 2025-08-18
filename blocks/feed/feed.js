@@ -3,6 +3,7 @@ import {
   createTag,
   loadFeedData,
   loadBlogData,
+  decorateGuideTemplateCodeBlock,
 } from '../../scripts/scripts.js';
 
 // logic for rendering the community feed
@@ -93,32 +94,92 @@ export async function renderBlog(block) {
     return;
   }
   const blogIndex = window.blogindex.data;
-  blogIndex.reverse();
-  const parentDiv = createTag('div', { class: 'blog-container' });
 
-  const leftContainer = createTag('div', { class: 'left-container' });
-  const rightContainer = createTag('div', { class: 'right-container' });
+  // Sort blogs by publication date in descending order
+  blogIndex.sort((a, b) => {
+    const dateA = new Date(a.publicationDate);
+    const dateB = new Date(b.publicationDate);
+    return dateA - dateB;
+  });
 
-  const latestBlog = blogIndex[0];
-  const latestBlogItem = createTag('div', { class: 'blog-item latest' });
-
-  // Fetch the full content of the latest blog post
-  const latestBlogContent = await fetchBlogContent(latestBlog.path);
-  if (latestBlogContent) {
-    // eslint-disable-next-line max-len
-    const truncatedContent = latestBlogContent.substring(0, Math.floor(latestBlogContent.length * 0.75));
-    latestBlogItem.innerHTML = truncatedContent;
+  // Skip if block has favorite class
+  if (block.classList.contains('favorite')) {
+    return;
   }
 
-  const readMoreButton = createTag('a', { href: latestBlog.path, class: 'read-more button primary large' }, 'Read More');
-  readMoreButton.addEventListener('click', () => {
-    window.location.href = latestBlog.path;
-  });
-  latestBlogItem.appendChild(readMoreButton);
+  let parentDiv = block.querySelector('.blog-container');
+  if (!parentDiv) {
+    parentDiv = createTag('div', { class: 'blog-container' });
+    block.appendChild(parentDiv);
+  }
 
-  leftContainer.appendChild(latestBlogItem);
+  let leftContainer = parentDiv.querySelector('.left-container');
+  let rightContainer = parentDiv.querySelector('.right-container');
 
-  blogIndex.slice(1).forEach((page) => {
+  if (!leftContainer) {
+    leftContainer = createTag('div', { class: 'left-container' });
+    parentDiv.appendChild(leftContainer);
+  }
+  if (!rightContainer) {
+    rightContainer = createTag('div', { class: 'right-container' });
+    parentDiv.appendChild(rightContainer);
+  }
+  rightContainer.innerHTML = '';
+
+  // setting up the favorite blogs
+  const favoriteFeedWrapper = document.querySelector('.feed-wrapper:has(.favorite)');
+  if (favoriteFeedWrapper) {
+    const favoriteDiv = favoriteFeedWrapper.querySelector('.favorite > div');
+    favoriteDiv.classList.add('favorite-blogs');
+    if (favoriteDiv) {
+      favoriteDiv.querySelectorAll('a').forEach((link) => {
+        link.classList.remove('button', 'primary');
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+      rightContainer.appendChild(favoriteDiv);
+      favoriteFeedWrapper.remove();
+    }
+  }
+
+  // Get the latest blog (newest by publication date)
+  const latestBlog = blogIndex[blogIndex.length - 1];
+  if (!leftContainer.querySelector('.blog-item.latest')) {
+    const latestBlogItem = createTag('div', { class: 'blog-item latest' });
+    const latestBlogContent = await fetchBlogContent(latestBlog.path);
+    if (latestBlogContent) {
+      const targetLength = Math.floor(latestBlogContent.length * 0.70);
+
+      // Find last sentence ending (., !, ?) before 70% mark
+      const lastPeriod = latestBlogContent.lastIndexOf('.', targetLength);
+      const lastExclamation = latestBlogContent.lastIndexOf('!', targetLength);
+      const lastQuestion = latestBlogContent.lastIndexOf('?', targetLength);
+      const lastSentenceEnd = Math.max(lastPeriod, lastExclamation, lastQuestion);
+
+      const truncatedContent = lastSentenceEnd > targetLength * 0.5
+        ? latestBlogContent.substring(0, lastSentenceEnd + 1)
+        : latestBlogContent.substring(0, targetLength);
+
+      latestBlogItem.innerHTML = truncatedContent;
+    }
+
+    const readMoreButton = createTag('a', { href: latestBlog.path, class: 'read-more button primary large' }, 'Read More');
+    readMoreButton.addEventListener('click', () => {
+      window.location.href = latestBlog.path;
+    });
+    latestBlogItem.appendChild(readMoreButton);
+
+    leftContainer.appendChild(latestBlogItem);
+  }
+
+  // Get next 5 blogs in newest to oldest order by publication date
+  const startIndex = Math.max(0, blogIndex.length - 6);
+  // Exclude the latest blog which is shown in left container
+  const endIndex = blogIndex.length - 1;
+  // Reverse to get newest to oldest
+  const recentBlogs = blogIndex.slice(startIndex, endIndex).reverse();
+
+  recentBlogs.forEach((page) => {
     const blogItem = createTag('div', { class: 'blog-item' });
 
     const h3 = createTag('h3', { class: 'title' }, page.title);
@@ -135,15 +196,13 @@ export async function renderBlog(block) {
     image.appendChild(img);
     blogItem.appendChild(image);
 
-    const blogLink = createTag('a', { href: page.path, target: '_blank', class: 'blog-link' });
+    const blogLink = createTag('a', {
+      href: page.path, target: '_blank', rel: 'noopener noreferrer', class: 'blog-link',
+    });
     blogLink.appendChild(blogItem);
 
     rightContainer.appendChild(blogLink);
   });
-
-  parentDiv.appendChild(leftContainer);
-  parentDiv.appendChild(rightContainer);
-  block.appendChild(parentDiv);
 }
 
 export default async function decorate(block) {
@@ -164,15 +223,20 @@ export default async function decorate(block) {
 
   const renderFunction = isBlog ? renderBlog : renderFeed;
 
-  if (checkDataLoaded()) {
-    await renderFunction(block);
-  } else {
-    const div = createTag('div', { class: 'feed-hidden' }, '');
-    block.append(div);
-    document.addEventListener('dataset-ready', () => {
-      if (checkDataLoaded()) {
-        renderFunction(block);
-      }
-    });
+  if (!block.dataset.rendered) {
+    if (checkDataLoaded()) {
+      await renderFunction(block);
+      block.dataset.rendered = 'true';
+    } else {
+      document.addEventListener('dataset-ready', () => {
+        if (checkDataLoaded() && !block.dataset.rendered) {
+          block.dataset.rendered = false;
+          renderFunction(block).then(() => {
+            decorateGuideTemplateCodeBlock();
+            block.dataset.rendered = 'true';
+          });
+        }
+      });
+    }
   }
 }

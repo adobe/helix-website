@@ -12,6 +12,9 @@ import ListFacet from './list-facet.js';
 export default class FileFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
-    return `<span class="filename">${escapeHTML(labelText)}</span>`;
+    const removedFragment = labelText.split('#')[0];
+    const isImage = removedFragment.startsWith('http') && (removedFragment.endsWith('.png') || removedFragment.endsWith('.jpg') || removedFragment.endsWith('.jpeg') || removedFragment.endsWith('.gif') || removedFragment.endsWith('.svg') || removedFragment.endsWith('.webp'));
+    const imageString = isImage ? `<img class="facet-thumbnail" src="${labelText}">` : '';
+    return `${imageString}<span class="filename">${escapeHTML(labelText)}</span>`;
   }
 }
