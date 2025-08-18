@@ -275,12 +275,8 @@ function updateStatusInline(form, status) {
  */
 function extractTemplatesFromBlock(block) {
   const templates = [];
-  // Look for the merged template-selection-data within this block
-  const templateData = block.querySelector('.template-selection-data');
 
-  if (!templateData) return templates;
-  // Get all template rows from the template-selection-data
-  const templateRows = templateData.querySelectorAll(':scope > div');
+  const templateRows = block.querySelectorAll(':scope > div:not(:first-child)');
 
   templateRows.forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -660,20 +656,16 @@ function buildForm(block) {
   const agreementText = createTag('p', {}, 'By clicking on "Continue", I agree that:');
 
   const terms = createTag('ul');
-  const term1 = createTag('li', {}, 'I have read and accepted the ');
-  const termsLink = createTag('a', { href: '#', target: '_blank' }, 'Terms of Use');
-  term1.append(termsLink);
-  term1.append('.');
 
-  const term2 = createTag('li', {}, 'The ');
+  const term1 = createTag('li', {}, 'The ');
   const adobeLink = createTag('a', { href: '#', target: '_blank' }, 'Adobe family of companies');
-  term2.append(adobeLink);
-  term2.append(' may keep me informed with ');
+  term1.append(adobeLink);
+  term1.append(' may keep me informed with ');
   const personalizedLink = createTag('a', { href: '#', target: '_blank' }, 'personalized');
-  term2.append(personalizedLink);
-  term2.append(' calls about products and services.');
+  term1.append(personalizedLink);
+  term1.append(' calls about products and services.');
 
-  terms.append(term1, term2);
+  terms.append(term1);
 
   const privacyText = createTag('p', {}, 'See our ');
   const privacyLink = createTag('a', { href: '#', target: '_blank' }, 'Privacy Policy');
@@ -682,14 +674,28 @@ function buildForm(block) {
 
   agreement.append(agreementText, terms, privacyText);
 
+  // Terms and Conditions checkbox
+  const termsAndConditions = createTag('div', { class: 'form-field checkbox-field' });
+  const termsAndConditionsCheckbox = createTag('input', {
+    type: 'checkbox',
+    id: 'terms-and-conditions',
+    name: 'termsAndConditions',
+    value: 'true',
+    required: 'true'
+  });
+  const termsAndConditionsLabel = createTag('label', { for: 'terms-and-conditions' }, 'I have read and accepted the ');
+  const termsLink = createTag('a', { href: './ue-trial-terms.pdf', target: '_blank' }, 'Terms of Use');
+  termsAndConditionsLabel.append(termsLink);
+  termsAndConditionsLabel.append('.');
+  termsAndConditions.append(termsAndConditionsCheckbox, termsAndConditionsLabel);
+
   // Contact permission checkbox
   const contactPermission = createTag('div', { class: 'form-field checkbox-field' });
   const contactCheckbox = createTag('input', {
     type: 'checkbox',
     id: 'contact-permission',
     name: 'optIn',
-    value: 'true',
-    checked: true,
+    value: 'true'
   });
   const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
   contactPermission.append(contactCheckbox, contactLabel);
@@ -729,6 +735,7 @@ function buildForm(block) {
     githubField,
     templateField,
     agreement,
+    termsAndConditions,
     contactPermission,
     verInput,
     recaptchaField,
@@ -846,7 +853,7 @@ export default function decorate(block) {
   loadRecaptchaScript();
 
   // Get the original content from the block (excluding template-selection-data)
-  const originalContent = block.querySelector(':scope > div:not(.template-selection-data)');
+  const infoContent = block.querySelector(':scope > div:first-child');
 
   // Create a new layout with two columns
   const formSection = createTag('div', { class: 'form-section' });
@@ -854,9 +861,9 @@ export default function decorate(block) {
 
   // Move the original content to the trial info section
   const trialInfo = createTag('div', { class: 'trial-info' });
-  if (originalContent) {
+  if (infoContent) {
     // Clone the original content and preserve its structure
-    trialInfo.append(originalContent.cloneNode(true));
+    trialInfo.append(infoContent.cloneNode(true));
   }
 
   // Clear the block and add the new layout

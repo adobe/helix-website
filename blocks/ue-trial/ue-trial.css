@@ -1,4 +1,4 @@
-.xwalk-trials {
+.ue-trial {
   max-width: 1200px;
   margin: 0 auto;
   padding: 30px 20px;
@@ -9,57 +9,57 @@
   align-items: flex-start;
 }
 
-.xwalk-trials .form-section {
+.ue-trial .form-section {
   flex: 1;
   margin-bottom: 30px;
 }
 
 /* Less specific selectors - must come before more specific ones */
-.xwalk-trials .template-thumbnail img {
+.ue-trial .template-thumbnail img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.xwalk-trials .template-info h4 {
+.ue-trial .template-info h4 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: #333;
 }
 
-.xwalk-trials .template-info p {
+.ue-trial .template-info p {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
   color: #666;
 }
 
-.xwalk-trials .trial-details p {
+.ue-trial .trial-details p {
   font-size: 22px;
   margin: 0;
 }
 
-.xwalk-trials .feature-item p {
+.ue-trial .feature-item p {
   font-size: 18px;
   margin: 0;
   line-height: 1.4;
 }
 
-.xwalk-trials .trial-features > p {
+.ue-trial .trial-features > p {
   font-size: 22px;
   font-weight: 600;
   margin: 0 0 15px;
 }
 
-.xwalk-trials .agreement ul {
+.ue-trial .agreement ul {
   list-style-type: disc;
   padding-left: 20px;
   margin: 10px 0;
 }
 
-.xwalk-trials .trial-info {
+.ue-trial .trial-info {
   flex: 1;
   padding: 40px;
   background-color: #f8f8f8;
@@ -68,19 +68,19 @@
 }
 
 /* Style the original block content structure */
-.xwalk-trials .trial-info > div {
+.ue-trial .trial-info > div {
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
 
-.xwalk-trials .trial-info > div > div:first-child {
+.ue-trial .trial-info > div > div:first-child {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.xwalk-trials .trial-info > div > div:first-child picture {
+.ue-trial .trial-info > div > div:first-child picture {
   width: 80px;
   height: 80px;
   flex-shrink: 0;
@@ -91,13 +91,13 @@
   overflow: hidden;
 }
 
-.xwalk-trials .trial-info > div > div:first-child img {
+.ue-trial .trial-info > div > div:first-child img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.xwalk-trials .trial-info > div > div:first-child .step-indicator {
+.ue-trial .trial-info > div > div:first-child .step-indicator {
   width: 80px;
   height: 80px;
   flex-shrink: 0;
@@ -109,13 +109,13 @@
   overflow: hidden;
 }
 
-.xwalk-trials .trial-info > div > div:first-child .step-indicator span {
+.ue-trial .trial-info > div > div:first-child .step-indicator span {
   font-size: 36px;
   font-weight: 700;
   color: #2a2a2a;
 }
 
-.xwalk-trials .trial-info > div > div:nth-child(2) h3 {
+.ue-trial .trial-info > div > div:nth-child(2) h3 {
   font-size: 32px;
   font-weight: 800;
   margin: 0 0 20px;
@@ -123,7 +123,7 @@
   color: #000;
 }
 
-.xwalk-trials .trial-info > div > div:nth-child(2) h4 {
+.ue-trial .trial-info > div > div:nth-child(2) h4 {
   font-size: 18px;
   font-weight: 400;
   margin: 0 0 30px;
@@ -131,20 +131,20 @@
   color: #000;
 }
 
-.xwalk-trials .trial-info > div > div:nth-child(2) p {
+.ue-trial .trial-info > div > div:nth-child(2) p {
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 15px;
   color: #000;
 }
 
-.xwalk-trials .trial-info > div > div:nth-child(2) ul {
+.ue-trial .trial-info > div > div:nth-child(2) ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.xwalk-trials .trial-info > div > div:nth-child(2) li {
+.ue-trial .trial-info > div > div:nth-child(2) li {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -154,7 +154,7 @@
   color: #333;
 }
 
-.xwalk-trials .trial-info > div > div:nth-child(2) li::before {
+.ue-trial .trial-info > div > div:nth-child(2) li::before {
   content: "✓";
   color: #2ecc71;
   font-weight: bold;
@@ -163,32 +163,32 @@
   margin-right: 5px;
 }
 
-.xwalk-trials form {
+.ue-trial form {
   display: flex;
   flex-direction: column;
   gap: 15px;
   max-width: 100%;
 }
 
-.xwalk-trials .form-row {
+.ue-trial .form-row {
   display: flex;
   gap: 20px;
 }
 
-.xwalk-trials .form-field {
+.ue-trial .form-field {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.xwalk-trials label {
+.ue-trial label {
   font-size: 16px;
   color: #444;
 }
 
-.xwalk-trials input,
-.xwalk-trials select {
+.ue-trial input,
+.ue-trial select {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 3px;
@@ -196,7 +196,7 @@
   width: 100%;
 }
 
-.xwalk-trials .checkbox-field {
+.ue-trial .checkbox-field {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -204,50 +204,50 @@
   margin-top: 20px;
 }
 
-.xwalk-trials .checkbox-field input[type="checkbox"] {
+.ue-trial .checkbox-field input[type="checkbox"] {
   width: auto;
   margin: 0;
 }
 
-.xwalk-trials .checkbox-field label {
+.ue-trial .checkbox-field label {
   margin: 0;
 }
 
-.xwalk-trials .agreement {
+.ue-trial .agreement {
   margin-top: 15px;
 }
 
-.xwalk-trials .agreement a {
+.ue-trial .agreement a {
   color: #1473e6;
   text-decoration: none;
 }
 
-.xwalk-trials .terms-footer a {
+.ue-trial .terms-footer a {
   color: #1473e6;
   text-decoration: none;
 }
 
-.xwalk-trials .agreement a:hover {
+.ue-trial .agreement a:hover {
   text-decoration: underline;
 }
 
-.xwalk-trials .button-container {
+.ue-trial .button-container {
   margin-top: 20px;
 }
 
 /* Template Selector Styles */
-.xwalk-trials .template-selector-field {
+.ue-trial .template-selector-field {
   margin: 20px 0;
 }
 
-.xwalk-trials .template-grid {
+.ue-trial .template-grid {
   display: flex;
   flex-direction: column;
   gap: 15px;
   margin-top: 10px;
 }
 
-.xwalk-trials .template-card {
+.ue-trial .template-card {
   display: flex;
   align-items: flex-start;
   gap: 15px;
@@ -259,18 +259,18 @@
   background-color: #fff;
 }
 
-.xwalk-trials .template-card:hover {
+.ue-trial .template-card:hover {
   border-color: #1473e6;
   box-shadow: 0 2px 8px rgb(20 115 230 / 10%);
 }
 
-.xwalk-trials .template-card.selected {
+.ue-trial .template-card.selected {
   border-color: #1473e6;
   background-color: #f8fbff;
   box-shadow: 0 2px 8px rgb(20 115 230 / 15%);
 }
 
-.xwalk-trials .template-thumbnail {
+.ue-trial .template-thumbnail {
   flex-shrink: 0;
   width: 150px;
   height: 120px;
@@ -279,18 +279,18 @@
   border: 1px solid #ddd;
 }
 
-.xwalk-trials .template-info {
+.ue-trial .template-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.xwalk-trials .template-card.selected .template-info h4 {
+.ue-trial .template-card.selected .template-info h4 {
   color: #1473e6;
 }
 
-.xwalk-trials button.continue {
+.ue-trial button.continue {
   background-color: #1473e6;
   color: white;
   border: none;
@@ -302,47 +302,47 @@
   transition: background-color 0.2s;
 }
 
-.xwalk-trials button.continue:hover {
+.ue-trial button.continue:hover {
   background-color: #0d66d0;
 }
 
 /* Separator line */
-.xwalk-trials .separator {
+.ue-trial .separator {
   height: 1px;
   background-color: #e1e1e1;
   border: none;
   margin: 20px 0;
 }
 
-.xwalk-trials .trial-features {
+.ue-trial .trial-features {
   margin-top: 30px;
 }
 
-.xwalk-trials .feature-item {
+.ue-trial .feature-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   margin-bottom: 10px;
 }
 
-.xwalk-trials .feature-item .check {
+.ue-trial .feature-item .check {
   color: #2ecc71;
   font-weight: bold;
   font-size: 24px;
   line-height: 1;
 }
 
-.xwalk-trials .terms-footer {
+.ue-trial .terms-footer {
   font-size: 14px;
   color: #666;
   margin-top: 30px;
 }
 
-.xwalk-trials .terms-footer a:hover {
+.ue-trial .terms-footer a:hover {
   text-decoration: underline;
 }
 
-.xwalk-trials .success-message {
+.ue-trial .success-message {
   padding: 40px;
   background-color: #f8f8f8;
   border-radius: 16px;
@@ -524,49 +524,49 @@
 }
 
 @media (width <= 768px) {
-  .xwalk-trials {
+  .ue-trial {
     padding: 20px 15px;
     flex-direction: column;
   }
 
-  .xwalk-trials .form-row {
+  .ue-trial .form-row {
     flex-direction: column;
     gap: 15px;
   }
 
-  .xwalk-trials .trial-info > div > div:first-child {
+  .ue-trial .trial-info > div > div:first-child {
     flex-direction: row;
     align-items: center;
   }
 
-  .xwalk-trials .trial-info > div > div:nth-child(2) {
+  .ue-trial .trial-info > div > div:nth-child(2) {
     text-align: left;
   }
 
-  .xwalk-trials .trial-info > div > div:nth-child(2) li {
+  .ue-trial .trial-info > div > div:nth-child(2) li {
     justify-content: flex-start;
     text-align: left;
   }
 
   /* Template selector mobile styles */
-  .xwalk-trials .template-card {
+  .ue-trial .template-card {
     flex-direction: column;
     gap: 12px;
     padding: 12px;
   }
 
-  .xwalk-trials .template-thumbnail {
+  .ue-trial .template-thumbnail {
     width: 100%;
     max-width: 200px;
     height: 100px;
     align-self: center;
   }
 
-  .xwalk-trials .template-info h4 {
+  .ue-trial .template-info h4 {
     font-size: 16px;
   }
 
-  .xwalk-trials .template-info p {
+  .ue-trial .template-info p {
     font-size: 13px;
   }
 }
