@@ -29,6 +29,14 @@
   color: #333;
 }
 
+.error-message p {
+  margin: 0 0 10px;
+  color: #dc3545;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 .ue-trial .template-info p {
   margin: 0;
   font-size: 14px;
@@ -131,6 +139,12 @@
   color: #000;
 }
 
+.error-message p:last-child {
+  margin-bottom: 0;
+  font-weight: 400;
+  font-size: 14px;
+}
+
 .ue-trial .trial-info > div > div:nth-child(2) p {
   font-size: 18px;
   font-weight: 600;
@@ -217,6 +231,11 @@
   margin-top: 15px;
 }
 
+.error-message a {
+  color: #1473e6;
+  text-decoration: none;
+}
+
 .ue-trial .agreement a {
   color: #1473e6;
   text-decoration: none;
@@ -225,6 +244,10 @@
 .ue-trial .terms-footer a {
   color: #1473e6;
   text-decoration: none;
+}
+
+.error-message a:hover {
+  text-decoration: underline;
 }
 
 .ue-trial .agreement a:hover {
@@ -357,7 +380,7 @@
 .status-container {
   background: #fff;
   border-radius: 18px;
-  padding: 40px 32px 32px 32px;
+  padding:  40px 32px 32px;
   max-width: 100%;
   box-shadow: 0 2px 16px rgb(0 0 0 / 10%);
   border: 1px solid #ececec;
@@ -482,29 +505,6 @@
 
 .error-message {
   margin-bottom: 20px;
-}
-
-.error-message p {
-  margin: 0 0 10px 0;
-  color: #dc3545;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.error-message p:last-child {
-  margin-bottom: 0;
-  font-weight: 400;
-  font-size: 14px;
-}
-
-.error-message a {
-  color: #1473e6;
-  text-decoration: none;
-}
-
-.error-message a:hover {
-  text-decoration: underline;
 }
 
 .retry-button {

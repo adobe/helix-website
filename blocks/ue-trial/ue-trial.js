@@ -101,29 +101,11 @@ function loadRecaptchaScript() {
   document.head.append(scriptV2);
 }
 
-function showSuccessMessage(element, status) {
+function showSuccessMessage(element) {
   const successMessage = createTag('div', { class: 'success-message' });
   const completionText = createTag('p', {}, 'Your environment is ready! You will receive an email with access details shortly.');
   successMessage.appendChild(completionText);
   element.replaceWith(successMessage);
-}
-
-async function checkStatus(form, processId) {
-    const resp = await fetch(base + '/check-status?processId=' + processId)
-    const check = await resp.json()
-
-    const hasError = updateStatusInline(form, check);
-
-    if (hasError) {
-      return;
-    }
-
-    if (!check.status.finished) {
-      setTimeout(() => checkStatus(form, processId), 2000)
-    } else {
-      const elementToReplace = form.querySelector('.status-container');
-      showSuccessMessage(elementToReplace, check);
-    }
 }
 
 function createStatusInline(form) {
@@ -144,13 +126,13 @@ function createStatusInline(form) {
     { key: 'permissions', label: 'Setting up permissions' },
     { key: 'codeBus', label: 'Configuring site / repo' },
     { key: 'publishContent', label: 'Publishing content' },
-    { key: 'sendNotification', label: 'Sending notification' }
+    { key: 'sendNotification', label: 'Sending notification' },
   ];
 
-  steps.forEach(step => {
+  steps.forEach((step) => {
     const stepElement = createTag('div', {
       class: 'step-item',
-      'data-step': step.key
+      'data-step': step.key,
     });
 
     const spinner = createTag('div', { class: 'spinner' });
@@ -163,12 +145,12 @@ function createStatusInline(form) {
 
   const errorContainer = createTag('div', {
     class: 'error-container',
-    style: 'display: none;'
+    style: 'display: none;',
   });
 
   const retryButton = createTag('button', {
     class: 'retry-button',
-    type: 'button'
+    type: 'button',
   }, 'Try Again');
 
   errorContainer.appendChild(retryButton);
@@ -191,7 +173,7 @@ function updateStatusInline(form, status) {
     statusContainer = createStatusInline(form);
   }
 
-  steps.forEach(stepKey => {
+  steps.forEach((stepKey) => {
     const stepElement = statusContainer.querySelector(`[data-step="${stepKey}"]`);
     if (!stepElement) return;
 
@@ -215,7 +197,7 @@ function updateStatusInline(form, status) {
   });
 
   // Second pass: handle remaining steps based on error state
-  steps.forEach(stepKey => {
+  steps.forEach((stepKey) => {
     const stepElement = statusContainer.querySelector(`[data-step="${stepKey}"]`);
     if (!stepElement) return;
 
@@ -254,6 +236,7 @@ function updateStatusInline(form, status) {
         const block = statusContainer.closest('.xwalk-trials');
         if (block) {
           statusContainer.remove();
+          // eslint-disable-next-line no-use-before-define
           const newForm = buildForm(block);
           const formSection = block.querySelector('.form-section');
           if (formSection) {
@@ -266,6 +249,24 @@ function updateStatusInline(form, status) {
     return true;
   }
   return false;
+}
+
+async function checkStatus(form, processId) {
+  const resp = await fetch(`${base}/check-status?processId=${processId}`);
+  const check = await resp.json();
+
+  const hasError = updateStatusInline(form, check);
+
+  if (hasError) {
+    return;
+  }
+
+  if (!check.status.finished) {
+    setTimeout(() => checkStatus(form, processId), 2000);
+  } else {
+    const elementToReplace = form.querySelector('.status-container');
+    showSuccessMessage(elementToReplace, check);
+  }
 }
 
 /**
@@ -320,7 +321,7 @@ function submitFormData(form) {
   // Convert optIn to boolean
   data.optIn = data.optIn === 'true';
 
-  fetch(base + '/registration', {
+  fetch(`${base}/registration`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -681,7 +682,7 @@ function buildForm(block) {
     id: 'terms-and-conditions',
     name: 'termsAndConditions',
     value: 'true',
-    required: 'true'
+    required: 'true',
   });
   const termsAndConditionsLabel = createTag('label', { for: 'terms-and-conditions' }, 'I have read and accepted the ');
   const termsLink = createTag('a', { href: './ue-trial-terms.pdf', target: '_blank' }, 'Terms of Use');
@@ -695,7 +696,7 @@ function buildForm(block) {
     type: 'checkbox',
     id: 'contact-permission',
     name: 'optIn',
-    value: 'true'
+    value: 'true',
   });
   const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
   contactPermission.append(contactCheckbox, contactLabel);
@@ -783,7 +784,7 @@ function buildForm(block) {
           data.optIn = data.optIn === 'true';
 
           // Submit form data to server using fetch
-          fetch(base + '/registration', {
+          fetch(`${base}/registration`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
