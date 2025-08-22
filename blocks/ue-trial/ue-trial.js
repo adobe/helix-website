@@ -452,7 +452,6 @@ function buildForm(block) {
     type: 'text',
     id: 'github-id',
     name: 'githubId',
-    required: 'true',
   });
   const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
   githubField.append(githubLabel, githubInput, githubHelpText);
