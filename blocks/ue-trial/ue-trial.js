@@ -351,7 +351,7 @@ function buildForm(block) {
 
   // Business email
   const emailField = createTag('div', { class: 'form-field' });
-  const emailLabel = createTag('label', { for: 'business-email' }, 'Business email');
+  const emailLabel = createTag('label', { for: 'business-email' }, 'E-Mail');
   const emailInput = createTag('input', {
     type: 'email',
     id: 'business-email',
@@ -359,67 +359,6 @@ function buildForm(block) {
     required: 'true',
   });
   emailField.append(emailLabel, emailInput);
-
-  // Name fields (first, last) in a row
-  const nameRow = createTag('div', { class: 'form-row' });
-
-  // First name
-  const firstNameField = createTag('div', { class: 'form-field' });
-  const firstNameLabel = createTag('label', { for: 'first-name' }, 'First name');
-  const firstNameInput = createTag('input', {
-    type: 'text',
-    id: 'first-name',
-    name: 'firstName',
-    required: 'true',
-  });
-  firstNameField.append(firstNameLabel, firstNameInput);
-
-  // Last name
-  const lastNameField = createTag('div', { class: 'form-field' });
-  const lastNameLabel = createTag('label', { for: 'last-name' }, 'Last name');
-  const lastNameInput = createTag('input', {
-    type: 'text',
-    id: 'last-name',
-    name: 'lastName',
-    required: 'true',
-  });
-  lastNameField.append(lastNameLabel, lastNameInput);
-
-  nameRow.append(firstNameField, lastNameField);
-
-  // Company name
-  const companyField = createTag('div', { class: 'form-field' });
-  const companyLabel = createTag('label', { for: 'company-name' }, 'Company name');
-  const companyInput = createTag('input', {
-    type: 'text',
-    id: 'company-name',
-    name: 'company',
-    required: 'true',
-  });
-  companyField.append(companyLabel, companyInput);
-
-  // User role dropdown
-  const roleField = createTag('div', { class: 'form-field' });
-  const roleLabel = createTag('label', { for: 'user-role' }, 'User role');
-  const roleSelect = createTag('select', {
-    id: 'user-role',
-    name: 'persona',
-    required: 'true',
-  });
-
-  // Add role options
-  const roles = [
-    { value: 'business', text: 'Practitioner' },
-    { value: 'developer', text: 'Developer' },
-  ];
-
-  roles.forEach((role) => {
-    const option = createTag('option', { value: role.value }, role.text);
-    if (role.value === 'business') option.selected = true;
-    roleSelect.append(option);
-  });
-
-  roleField.append(roleLabel, roleSelect);
 
   // Template visual selector
   const templateField = createTag('div', { class: 'form-field template-selector-field' });
@@ -507,14 +446,16 @@ function buildForm(block) {
   templateField.append(templateLabel, templateGrid, templateInput);
 
   // GitHub ID (moved after template)
-  const githubField = createTag('div', { class: 'form-field', id: 'github-field', style: 'display: none;' });
-  const githubLabel = createTag('label', { for: 'github-id' }, 'GitHub ID');
+  const githubField = createTag('div', { class: 'form-field', id: 'github-field' });
+  const githubLabel = createTag('label', { for: 'github-id' }, 'GitHub ID (optional)');
   const githubInput = createTag('input', {
     type: 'text',
     id: 'github-id',
     name: 'githubId',
+    required: 'true',
   });
-  githubField.append(githubLabel, githubInput);
+  const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
+  githubField.append(githubLabel, githubInput, githubHelpText);
 
   // Country/Region and State/Province in a row
   const locationRow = createTag('div', { class: 'form-row' });
@@ -690,17 +631,6 @@ function buildForm(block) {
   termsAndConditionsLabel.append('.');
   termsAndConditions.append(termsAndConditionsCheckbox, termsAndConditionsLabel);
 
-  // Contact permission checkbox
-  const contactPermission = createTag('div', { class: 'form-field checkbox-field' });
-  const contactCheckbox = createTag('input', {
-    type: 'checkbox',
-    id: 'contact-permission',
-    name: 'optIn',
-    value: 'true',
-  });
-  const contactLabel = createTag('label', { for: 'contact-permission' }, 'Allow Adobe to contact me to provide more information');
-  contactPermission.append(contactCheckbox, contactLabel);
-
   const verInput = createTag('input', {
     type: 'hidden',
     id: 'recaptcha-version',
@@ -730,14 +660,10 @@ function buildForm(block) {
   // Append all elements to form
   form.append(
     emailField,
-    nameRow,
-    companyField,
-    roleField,
     githubField,
     templateField,
     agreement,
     termsAndConditions,
-    contactPermission,
     verInput,
     recaptchaField,
     v2container,
@@ -830,19 +756,6 @@ function buildForm(block) {
       stateSelect.removeAttribute('required');
       // Clear state selection when country is not US
       stateSelect.innerHTML = '';
-    }
-  });
-
-  // Add GitHub field visibility based on role selection
-  roleSelect.addEventListener('change', () => {
-    const selectedRole = roleSelect.value;
-    if (selectedRole === 'developer') {
-      githubField.style.display = 'flex';
-      githubInput.setAttribute('required', 'true');
-    } else {
-      githubField.style.display = 'none';
-      githubInput.removeAttribute('required');
-      githubInput.value = '';
     }
   });
 

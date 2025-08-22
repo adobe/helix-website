@@ -227,6 +227,13 @@
   margin: 0;
 }
 
+.ue-trial .help-text {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0 0;
+  line-height: 1.4;
+}
+
 .ue-trial .agreement {
   margin-top: 15px;
 }
