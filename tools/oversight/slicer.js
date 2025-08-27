@@ -433,7 +433,11 @@ const io = new IntersectionObserver((entries) => {
 
     herochart.render();
 
-    elems.filterInput.value = params.get('filter');
+    // Sanitize filter parameter to prevent XSS
+    const filterValue = params.get('filter') || '';
+    // Remove any HTML tags and dangerous characters that could cause XSS
+    const sanitizedFilter = filterValue.replace(/[<>"']/g, '');
+    elems.filterInput.value = sanitizedFilter;
     elems.viewSelect.value = {
       value: view,
       from: startDate,

@@ -280,7 +280,12 @@ export default class DateRangePicker extends HTMLElement {
       inputElement, dropdownElement, fromElement, toElement,
     } = this;
 
-    const option = dropdownElement.querySelector(`li[data-value="${value}"]`);
+    // Sanitize value to prevent XSS in querySelector
+    // CSS.escape would be ideal but use a safe approach for browser compatibility
+    // Only allow known valid values to prevent injection
+    const validValues = ['week', 'month', 'year', 'custom'];
+    const sanitizedValue = validValues.includes(value) ? value : '';
+    const option = sanitizedValue ? dropdownElement.querySelector(`li[data-value="${sanitizedValue}"]`) : null;
     if (!option) {
       return;
     }
