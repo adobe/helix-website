@@ -87,7 +87,7 @@ function showResults(results, controls) {
 function updateURLParams(controls) {
   const params = new URLSearchParams(window.location.search);
   const checkedRepos = Array.from(controls.querySelectorAll('input[name="repo"]:checked')).map((i) => i.value);
-  
+
   // If all repos are selected, remove the filter param for cleaner URL
   if (checkedRepos.length === Object.keys(displayNames).length) {
     params.delete('filter');
@@ -96,7 +96,7 @@ function updateURLParams(controls) {
   } else {
     params.set('filter', checkedRepos.join(','));
   }
-  
+
   const newURL = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
   window.history.replaceState({}, '', newURL);
 }
@@ -104,17 +104,17 @@ function updateURLParams(controls) {
 function getFilterFromURL() {
   const params = new URLSearchParams(window.location.search);
   const filter = params.get('filter');
-  
+
   if (!filter) {
     // No filter means all selected
     return Object.keys(displayNames);
   }
-  
+
   if (filter === 'none') {
     // Explicitly none selected
     return [];
   }
-  
+
   // Split comma-separated values and validate
   const requestedRepos = filter.split(',').filter((repo) => repo in displayNames);
   return requestedRepos;
