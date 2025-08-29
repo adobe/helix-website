@@ -85,6 +85,42 @@ function showResults(results, controls) {
   results.classList.add('releases-results');
 }
 
+function updateURLParams(controls) {
+  const params = new URLSearchParams(window.location.search);
+  const checkedRepos = Array.from(controls.querySelectorAll('input[name="repo"]:checked')).map((i) => i.value);
+
+  // If all repos are selected, remove the filter param for cleaner URL
+  if (checkedRepos.length === Object.keys(displayNames).length) {
+    params.delete('filter');
+  } else if (checkedRepos.length === 0) {
+    params.set('filter', 'none');
+  } else {
+    params.set('filter', checkedRepos.join(','));
+  }
+
+  const newURL = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, '', newURL);
+}
+
+function getFilterFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const filter = params.get('filter');
+
+  if (!filter) {
+    // No filter means all selected
+    return Object.keys(displayNames);
+  }
+
+  if (filter === 'none') {
+    // Explicitly none selected
+    return [];
+  }
+
+  // Split comma-separated values and validate
+  const requestedRepos = filter.split(',').filter((repo) => repo in displayNames);
+  return requestedRepos;
+}
+
 export default async function decorate(block) {
   const io = new IntersectionObserver((entries) => {
     entries.forEach(async (entry) => {
@@ -96,6 +132,9 @@ export default async function decorate(block) {
         const controls = document.createElement('div');
         controls.classList.add('releases-controls');
 
+        // Get initial filter state from URL
+        const selectedRepos = getFilterFromURL();
+
         // select all
         const all = document.createElement('div');
         all.classList.add('releases-control');
@@ -103,7 +142,7 @@ export default async function decorate(block) {
         allCb.type = 'checkbox';
         // allCb.id = 'all';
         // allCb.value = 'all';
-        allCb.checked = true;
+        allCb.checked = selectedRepos.length === Object.keys(displayNames).length;
         all.append(allCb);
         const allLabel = document.createElement('label');
         allLabel.textContent = 'All';
@@ -115,6 +154,7 @@ export default async function decorate(block) {
             cb.checked = allCb.checked;
           });
           showResults(releases, controls);
+          updateURLParams(controls);
         });
         controls.append(all);
 
@@ -124,7 +164,7 @@ export default async function decorate(block) {
           const cb = document.createElement('input');
           cb.type = 'checkbox';
           cb.name = 'repo';
-          cb.checked = true;
+          cb.checked = selectedRepos.includes(repo);
           cb.value = repo;
           cb.id = repo;
           control.append(cb);
@@ -141,6 +181,7 @@ export default async function decorate(block) {
               allCb.checked = true;
             }
             showResults(releases, controls);
+            updateURLParams(controls);
           });
         });
         block.append(controls);
