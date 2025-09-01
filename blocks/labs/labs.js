@@ -12,7 +12,7 @@ export default function decorate(block) {
   }
   if (parts.length === 1) {
     parts.unshift('Early-access technology');
-    parts[1] = `Ask us about this feature from the ${parts[1]} labs on your Slack channel!`;
+    parts[1] = `Ask us about this feature from the ${parts[1]} labs on your Teams or Slack channel!`;
   }
   [header.textContent, block.innerHTML] = parts;
   block.prepend(header);
