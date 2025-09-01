@@ -183,7 +183,7 @@
   /* drop-shadow */
   --image-filter-drop-shadow-small:
     drop-shadow(
-      10px 25px 50px rgba(0 0 0 / 10%)
+      10px 25px 50px rgb(0 0 0 / 10%)
     );
 
   /* guide-templates */
@@ -1283,9 +1283,9 @@ use .link-underline-effect for normal case */
   /* stylelint-disable-next-line declaration-colon-newline-after */
   background-image: linear-gradient(
     90deg,
-    rgba(137 140 242 / 50%) 0%,
-    rgba(242 231 251 / 50%) 50%,
-    rgba(241 188 231 / 50%) 100%
+    rgb(137 140 242 / 50%) 0%,
+    rgb(242 231 251 / 50%) 50%,
+    rgb(241 188 231 / 50%) 100%
   );
   background-repeat: no-repeat;
   background-position: 4px 82%;
@@ -1300,9 +1300,9 @@ use .link-underline-effect for normal case */
   /* stylelint-disable-next-line declaration-colon-newline-after */
   background-image: linear-gradient(
     90deg,
-    rgba(234 190 248 / 80%) 0%,
-    rgba(255 251 232 / 100%) 50%,
-    rgba(238 246 172 / 100%) 100%
+    rgb(234 190 248 / 80%) 0%,
+    rgb(255 251 232 / 100%) 50%,
+    rgb(238 246 172 / 100%) 100%
   );
 }
 
@@ -1506,6 +1506,11 @@ body.skills-template main h1 {
   margin-bottom: var(--spacing-s);
 }
 
+body.blog-template main h1,
+body .blog.feed-container h1 {
+  padding-top: 30px;
+}
+
 body.docs-template main h2,
 body.guides-template main h2,
 body.skills-template main h2 {
@@ -1617,7 +1622,6 @@ body.guides-template main a,
 body.skills-template main p,
 body.skills-template main li,
 body.skills-template main a {
-  color: var(--color-black);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
 }
@@ -2092,7 +2096,7 @@ body.contact-template main .default-content-wrapper img {
   width: 100%;
   max-height: var(--breadcrumb-height);
   background: var(--color-white);
-  box-shadow: 0 4px 6px rgba(0 0 0 / 15%);
+  box-shadow: 0 4px 6px rgb(0 0 0 / 15%);
   z-index: 100;
 }
 
@@ -2204,7 +2208,7 @@ body.contact-template main .default-content-wrapper img {
   body.faq-theme main aside.side-navigation-wrapper {
     grid-column-start: 2;
     grid-row: 2 / span 10;
-    max-width: 300px;
+    width: 300px;
   }
 
   body.faq-theme main div {
@@ -2213,7 +2217,8 @@ body.contact-template main .default-content-wrapper img {
   }
 
   body.faq-theme main aside.side-navigation-wrapper.expand {
-    grid-column: 1 / span 3;
+    grid-column: 1 / span 4;
+    width: unset;
   }
 
   body.faq-theme main .section.content {

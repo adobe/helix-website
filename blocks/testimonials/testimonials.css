@@ -9,8 +9,8 @@
   --tabs-active-bg-color: #fff;
   --tabs-list-bg-gradient:
     linear-gradient(
-      rgba(255 255 255 0%) 60%,
-      rgba(245 245 245 80%)
+      rgb(255 255 255 0%) 60%,
+      rgb(245 245 245 80%)
     );
 
   /* redesign */
@@ -194,7 +194,7 @@
 .testimonials .testimonial-info > ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: var(--spacing-xs);
+  gap: var(--spacing-xs);
 }
 
 .testimonials .testimonial-info ul,
@@ -299,7 +299,7 @@
   }
 
   .testimonials .testimonial-info > ul {
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
   }
 
   .testimonials .testimonial-info .testimonial-stats-info {

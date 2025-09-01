@@ -280,10 +280,16 @@ export default class DateRangePicker extends HTMLElement {
       inputElement, dropdownElement, fromElement, toElement,
     } = this;
 
-    const option = dropdownElement.querySelector(`li[data-value="${value}"]`);
+    // Sanitize value to prevent XSS in querySelector
+    // CSS.escape would be ideal but use a safe approach for browser compatibility
+    // Only allow known valid values to prevent injection
+    const validValues = ['week', 'month', 'year', 'custom'];
+    const sanitizedValue = validValues.includes(value) ? value : '';
+    const option = sanitizedValue ? dropdownElement.querySelector(`li[data-value="${sanitizedValue}"]`) : null;
     if (!option) {
       return;
     }
+    const previousValue = inputElement.dataset.value;
 
     inputElement.value = option.textContent;
     inputElement.dataset.value = option.dataset.value;
@@ -303,6 +309,12 @@ export default class DateRangePicker extends HTMLElement {
     }
 
     if (dateFrom) {
+      if (previousValue && value === 'custom' && previousValue !== 'custom') {
+        // when going to custom, push the from date forward 1 day e.g. we want 7 days, not 8
+        const fromDate = new Date(dateFrom);
+        fromDate.setDate(fromDate.getDate() + 1);
+        dateFrom = toDateString(fromDate);
+      }
       fromElement.value = dateFrom;
     }
 

@@ -16,8 +16,8 @@ function labelURLParts(url) {
 export default class LinkFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
-    const thumbnailAtt = this.getAttribute('thumbnail');
-    const faviconAtt = this.getAttribute('favicon');
+    const thumbnailAtt = this.getAttribute('thumbnail') === 'true';
+    const faviconAtt = this.getAttribute('favicon') === 'true';
     if (thumbnailAtt && labelText.startsWith('https://')) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);

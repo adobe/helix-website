@@ -91,7 +91,7 @@ async function decorateCardListByUrl(block) {
         return 0;
       }).forEach((row) => {
         let githubName = '';
-        if (row.githubProfile && (row.permission === 'on')) {
+        if (row.githubProfile && (row.permission === 'on' || row.permission === 'Yes')) {
           const ghProfile = stripTags(row.githubProfile).split('/');
           const ghUsername = ghProfile[ghProfile.length - 1];
           if (ghUsername) {
@@ -141,6 +141,7 @@ async function decorateCardListByUrl(block) {
     const optionAll = document.createElement('option');
     optionAll.value = '';
     optionAll.text = 'All';
+    optionAll.selected = true;
     categoryFilterSelect.prepend(optionAll);
 
     categoryFilterSelect.addEventListener('change', () => {

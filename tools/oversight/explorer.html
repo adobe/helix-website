@@ -5,7 +5,7 @@
   <script type="importmap">{"imports": {
     "chartjs": "https://esm.sh/chart.js@4.4.8",
     "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.8",
-    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.16.3"
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.17.0"
   }}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="/scripts/lib-franklin.js" type="module"></script>
@@ -194,6 +194,10 @@
               <dd>Largest Contentful Paint</dd>
               <dt>redirect</dt>
               <dd>Redirect</dd>
+              <dt>experiment</dt>
+              <dd>Experiment</dd>
+              <dt>a11y</dt>
+              <dd>Accessibility</dd>
             </dl>
           </list-facet>
           <literal-facet facet="click.source" drilldown="list.html">
@@ -367,6 +371,37 @@
 
           <list-facet facet="redirect.target">
             <legend>Redirect Hops</legend>
+          </list-facet>
+
+          <list-facet facet="experiment.source">
+            <legend>Experiment ID</legend>
+          </list-facet>
+
+          <list-facet facet="experiment.target">
+            <legend>Selected Variant</legend>
+          </list-facet>
+          <list-facet facet="a11y.source">
+            <legend>Accessibility Preferences</legend>
+            <a href="/docs/rum-explorer#facet-a11y" class="help" target="_blank"
+              title="What accessibility preferences and behaviors were detected?"></a>
+            <dl>
+              <dt>off</dt>
+              <dd>No Accessibility Features Detected</dd>
+              <dt>on</dt>
+              <dd>Accessibility Features Detected</dd>
+              <dt>low</dt>
+              <dd>Basic Accessibility Features Detected</dd>
+              <dt>medium</dt>
+              <dd>Moderate Accessibility Features Detected</dd>
+              <dt>high</dt>
+              <dd>Advanced Accessibility Features Detected</dd>
+            </dl>
+          </list-facet>
+          <list-facet facet="utm.source">
+            <legend>UTM Source</legend>
+          </list-facet>
+          <list-facet facet="utm.target">
+            <legend>UTM Target</legend>
           </list-facet>
         </facet-sidebar>
       </div>

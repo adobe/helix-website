@@ -1,5 +1,5 @@
 # Project Helix Website
-[www.hlx.live](https://www.hlx.live)
+[www.aem.live](https://www.aem.live)
 
 [![codecov](https://codecov.io/gh/adobe/helix-website/branch/main/graph/badge.svg?token=If90y6KMqx)](https://codecov.io/gh/adobe/helix-website)
 ## Introduction
@@ -8,11 +8,16 @@ This repo is what powers the helix website.
 ## Developing
 Install the Helix CLI:
 
-    sudo npm install -g @adobe/helix-cli
+    sudo npm install -g @adobe/aem-cli
     
 Run it in this repo:
 
-    hlx up
+    aem up
+
+While site preview is authenticated, run below command for local development:
+
+    npx @adobe/aem-cli up --url https://main--helix-website--adobe.aem.live/
+
     
 ## Testing
 ### Install dependencies:
