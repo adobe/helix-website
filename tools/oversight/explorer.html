@@ -192,6 +192,8 @@
               <dd>Internal Navigation</dd>
               <dt>cwv-lcp</dt>
               <dd>Largest Contentful Paint</dd>
+              <dt>language</dt>
+              <dd>Language Preference</dd>
               <dt>redirect</dt>
               <dd>Redirect</dd>
               <dt>experiment</dt>
@@ -365,12 +367,17 @@
           <thumbnail-facet facet="cwv-lcp.target">
             <legend>LCP Element (Preview)</legend>
           </thumbnail-facet>
-          <list-facet facet="redirect.source">
-            <legend>Redirect Source</legend>
+          <list-facet facet="language.source">
+            <legend>Content Language</legend>
           </list-facet>
-
+          <list-facet facet="language.target">
+            <legend>Language Preference</legend>
+          </list-facet>
+          <link-facet facet="redirect.source">
+            <legend>Redirect Source</legend>
+          </link-facet>
           <list-facet facet="redirect.target">
-            <legend>Redirect Hops</legend>
+            <legend>Redirect Count</legend>
           </list-facet>
 
           <list-facet facet="experiment.source">
