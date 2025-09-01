@@ -16,8 +16,8 @@ function labelURLParts(url) {
 export default class LinkFacet extends ListFacet {
   // eslint-disable-next-line class-methods-use-this
   createLabelHTML(labelText) {
-    const thumbnailAtt = this.getAttribute('thumbnail');
-    const faviconAtt = this.getAttribute('favicon');
+    const thumbnailAtt = this.getAttribute('thumbnail') === 'true';
+    const faviconAtt = this.getAttribute('favicon') === 'true';
     if (thumbnailAtt && labelText.startsWith('https://')) {
       const u = new URL('https://www.aem.live/tools/rum/_ogimage');
       u.searchParams.set('proxyurl', labelText);
@@ -36,12 +36,18 @@ export default class LinkFacet extends ListFacet {
     if (labelText.startsWith('referrer:')) {
       return `<a href="${labelText.replace('referrer:', 'https://')}" target="_new">${labelText.replace('referrer:', '')}</a>`;
     }
+    const currentURL = new URL(window.location.href);
+    const domain = currentURL.searchParams.get('domain');
     if (labelText.startsWith('navigate:')) {
-      const domain = new URL(window.location.href).searchParams.get('domain');
       return `navigate from <a href="${labelText.replace('navigate:', `https://${domain}`)}" target="_new">${labelText.replace('navigate:', '')}</a>`;
     }
     if (this.placeholders && this.placeholders[labelText]) {
       return (`${this.placeholders[labelText]} [${labelText}]`);
+    }
+    if (domain.endsWith(':all')) {
+      currentURL.searchParams.set('domain', labelText);
+      currentURL.searchParams.delete('domainkey');
+      return `<a href="${currentURL.toString()}" target="_new">${labelText}</a>`;
     }
     return escapeHTML(labelText);
   }

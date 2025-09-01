@@ -1,8 +1,114 @@
-.feed.recent {
+.feed {
   text-align: left;
+  display: none;
 }
 
-.feed.recent .feed-item img {
+.feed[data-rendered='true'] {
+  display: block;
+}
+
+.feed.blog h1 {
+  font-size: var(--type-heading-xl-size);
+  line-height: var(--type-heading-xl-lh);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.feed-container.blog .default-content-wrapper h1 {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.feed.blog .blog-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Base blog container layout - mobile first */
+.blog-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.left-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  order: 1; /* First in mobile */
+}
+
+.left-container .blog-item.latest:not(.read-more) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.right-container {
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  order: 2; /* Second in mobile (after first blog) */
+}
+
+.blog-item:not(.blog-item.latest) {
+  box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
+  transition: box-shadow 0.3s ease;
+  padding: 20px;
+  background-color: white;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.feed.blog h2 {
+  font-size: var(--type-heading-l-size);
+  line-height: var(--type-heading-l-lh);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.feed.blog .favorite-blogs {
+  box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
+  transition: box-shadow 0.3s ease;
+  padding: 20px;
+  background-color: var(--color-accent-purple-content);
+}
+
+.feed.blog .favorite-blogs h2 {
+  font-size: var(--type-heading-m-size);
+}
+
+.feed.blog .favorite-blogs a {
+  text-decoration: none;
+}
+
+.feed.blog .favorite-blogs a:hover {
+  text-decoration: underline;
+}
+
+.blog-item.latest .image-wrapper {
+  width: 100%;
+}
+
+.blog-item:not(.blog-item.latest):hover {
+  box-shadow: 0 8px 16px rgb(0 0 0 / 40%);
+}
+
+.left-container .read-more {
+  align-self: center;
+  display: inline-block;
+}
+
+.feed.recent .feed-item {
+  margin: 10px;
+}
+
+.feed.recent .feed-item img,
+.blog-container .right-container .blog-item img {
   max-width: 100%;
   filter: var(--image-filter-drop-shadow-small);
   width: 100%;
@@ -10,9 +116,15 @@
   object-fit: contain;
 }
 
-.feed.recent > div {
+.blog-container .right-container .blog-item img {
+  display: none;
+}
+
+.feed.recent > div,
+.feed.blog > div {
   margin-bottom: var(--spacing-s);
   padding: var(--spacing-ml) 0;
+  padding-top: 40px;
   gap: var(--spacing-s);
 }
 
@@ -37,23 +149,49 @@
   padding-top: var(--spacing-s);
 }
 
-.feed.recent h3 {
+.feed.blog .blog-item .image-wrapper {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.feed.recent h3,
+.feed.blog h3 {
   margin-bottom: var(--spacing-xs);
   font-size: var(--type-heading-xl-size);
   line-height: var(--type-heading-xl-lh);
   font-weight: 700;
   letter-spacing: -0.04em;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
-.feed.recent p {
+.feed.recent p,
+.feed.blog p {
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
 }
 
-@media screen and (min-width: 768px) {
+.feed.recent .desc,
+.feed.blog .desc {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  line-clamp: 5;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+@media screen and (width >= 768px) {
+  .feed.recent .feed-item {
+    margin: unset;
+  }
+
   .feed.recent > div > div {
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: var(--spacing-xs);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-xs);
   }
 
   .feed.recent > div > div > div {
@@ -61,44 +199,88 @@
     text-align: left;
   }
 
-  .feed.recent h3 {
+  .feed.recent h3,
+  .feed.blog h3 {
     font-size: var(--type-heading-s-size);
     line-height: var(--type-heading-s-lh);
   }
 
-  .feed.recent p {
+  .feed.recent p,
+  .feed.blog p {
     font-size: var(--type-body-xs-size);
     line-height: var(--type-body-xs-lh);
     margin-bottom: 1em;
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
+  .blog-container {
+    flex-direction: row;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  .left-container {
+    flex: 7 1 0%;
+    min-width: 0;
+    order: 1;
+  }
+
+  .right-container {
+    flex: 3 1 0%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 0;
+    order: 2;
+  }
+}
+
+@media screen and (width >= 900px) {
   .feed.recent > div {
     margin-bottom: 0;
     flex-direction: column;
     max-width: var(--grid-desktop-container-width);
     grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
     padding: var(--spacing-xs) 0;
   }
+  
+  .feed.blog > div {
+    padding-top: unset;
+  }
 
-  .feed.recent h3 {
+  .feed-container.blog .default-content-wrapper {
+    margin-top: 0;
+  }
+
+  .feed.blog h1 {
+    margin-top: 0;
+  }
+
+  .feed-container.blog .default-content-wrapper h1 {
+    margin-top: 0;
+  }
+
+  .feed.recent h3,
+  .feed.blog h3 {
     margin-bottom: var(--spacing-s);
     font-size: var(--type-heading-m-size);
     line-height: var(--type-heading-m-lh);
   }
 
-  .feed.recent .image-wrapper-el {
+  .feed.recent .image-wrapper-el,
+  .feed.blog .image-wrapper {
     padding-top: var(--spacing-l);
     margin-bottom: 0;
   }
 
   .feed.recent > div > div {
-    grid-gap: 32px;
+    gap: 32px;
   }
 
-  .feed.recent > div > div > div{
+  .feed.recent > div > div > div {
     padding: var(--spacing-xl) var(--spacing-m);
     margin-bottom: var(--spacing-s);
   }
@@ -111,8 +293,9 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
-  .feed.recent h3 {
+@media screen and (width >= 1200px) {
+  .feed.recent h3,
+  .feed.blog h3 {
     font-size: var(--type-heading-l-size);
     line-height: var(--type-heading-l-lh);
   }
@@ -121,7 +304,8 @@
     padding: var(--spacing-xxl) var(--spacing-xl);
   }
 
-  .feed.recent p {
+  .feed.recent p,
+  .feed.blog p {
     font-size: var(--type-body-s-size);
     line-height: var(--type-body-s-lh);
     margin-bottom: 1em;

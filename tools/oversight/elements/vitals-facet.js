@@ -57,6 +57,39 @@ export default class VitalsFacet extends HTMLElement {
 
     const legend = this.querySelector('legend') || document.createElement('legend');
     legend.textContent = legendText;
+
+    const drilldownAtt = this.getAttribute('drilldown');
+
+    if (drilldownAtt && searchParams.get('drilldown') !== facetName) {
+      const drilldown = document.createElement('a');
+      drilldown.className = 'drilldown';
+      drilldown.href = drilldownAtt;
+      drilldown.title = 'Drill down to more details';
+      drilldown.textContent = '';
+      drilldown.addEventListener('click', () => {
+        const drilldownurl = new URL(drilldown.href, window.location);
+        drilldownurl.search = new URL(window.location).search;
+        drilldownurl.searchParams.delete(facetName);
+        drilldownurl.searchParams.set('drilldown', facetName);
+        drilldown.href = drilldownurl.href;
+      });
+      legend.append(drilldown);
+    } else if (searchParams.get('drilldown') === facetName) {
+      const drillup = document.createElement('a');
+      drillup.className = 'drillup';
+      drillup.href = 'explorer.html';
+      drillup.title = 'Return to previous level';
+      drillup.textContent = '';
+      drillup.addEventListener('click', () => {
+        const drillupurl = new URL(drillup.href, window.location);
+        drillupurl.search = new URL(window.location).search;
+        drillupurl.searchParams.delete(facetName);
+        drillupurl.searchParams.delete('drilldown', facetName);
+        drillup.href = drillupurl.href;
+      });
+      legend.append(drillup);
+    }
+
     fieldSet.append(legend);
     // append fieldset
     this.append(fieldSet);

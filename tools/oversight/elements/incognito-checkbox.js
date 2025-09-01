@@ -9,7 +9,7 @@ async function fetchDomainKey(domain) {
     if (domain.endsWith(':all') && domain !== 'aem.live:all') {
       ([org] = domain.split(':'));
     }
-    const issueResp = await fetch(`https://rum.fastly-aem.page/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
+    const issueResp = await fetch(`https://bundles.aem.page/${org ? `orgs/${org}/key` : `domainkey/${domain}`}`, {
       headers: {
         authorization: `Bearer ${auth}`,
       },
@@ -27,7 +27,7 @@ async function fetchDomainKey(domain) {
       const y = n.getFullYear();
       const m = String(n.getMonth() + 1).padStart(2, '0');
       const d = String(n.getDate()).padStart(2, '0');
-      const probeResp = await fetch(`https://rum.fastly-aem.page/bundles/${domain}/${y}/${m}/${d}?domainkey=open`);
+      const probeResp = await fetch(`https://bundles.aem.page/bundles/${domain}/${y}/${m}/${d}?domainkey=open`);
       if (probeResp.status === 200) {
         return 'open';
       }

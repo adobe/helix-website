@@ -1,5 +1,5 @@
 /* default rule for mobile */
-.videotext>div {
+.videotext > div {
   display: grid;
   padding-top: var(--spacing-xxs);
 }

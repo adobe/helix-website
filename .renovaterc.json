@@ -1,0 +1,29 @@
+{
+  "extends": ["config:recommended"],
+  "enabled": true,
+  "baseBranches": ["main"],
+  "branchNameStrict": true,
+  "branchName": "r_{{{packageName}}}_{{version}}",
+  "packageRules": [{
+      "matchDepTypes": ["devDependencies"],
+      "labels": ["ignore-psi-check"], 
+      "automerge": true
+    },{
+      "matchManagers": ["github-actions"],
+      "labels": ["ignore-psi-check"], 
+      "automerge": true
+    },{
+      "matchDepNames": ["@adobe/rum-distiller"],
+      "labels": ["rum-distiller"], 
+      "automerge": false,
+      "automergeType": "pr",
+      "fileMatch": [
+        "package.json"
+      ]
+    },
+    {
+      "matchDepNames": ["chartjs", "chartjs-adapter-luxon"],
+      "enabled": false
+    }
+  ]
+}

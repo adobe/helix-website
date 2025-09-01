@@ -1,0 +1,45 @@
+name: Update import maps
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    if: startsWith(github.head_ref, 'r-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
+    - name: Configure Git
+      run: |
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
+    - name: Install dependencies
+      run: npm install
+    - name: Update import maps
+      run: tools/imports.sh
+    - name: Commit changes
+      run: |
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add -A
+          git commit -m "chore(oversight): update import maps"
+          git push origin HEAD:${{ github.head_ref }}
+        fi
+    - name: Update PR comment to include aem.live test URL
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        OLD_BODY=$(gh pr view --json body --jq ".body")
+        BRANCH_NAME=$(echo ${{ github.head_ref }})
+        TEST_URL="https://$BRANCH_NAME--helix-website--adobe.aem.live/tools/oversight/explorer.html?domain=emigrationbrewing.com&view=month&domainkey=open"
+        printf -v NEW_BODY "%s\n\nTest at: %s" "$OLD_BODY" "$TEST_URL"
+        gh pr edit ${{ github.event.number }} --body "$NEW_BODY"

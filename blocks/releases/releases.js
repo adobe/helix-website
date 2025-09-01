@@ -6,6 +6,7 @@ function mdToHTML(md) {
     .replace(/^## (.*$)/gim, '<h2>$1</h2>') // h2 tag
     .replace(/^# (.*$)/gim, '<h1>$1</h1>') // h1 tag
     .replace(/^\* (.*$)/gim, '<li>$1</li>') // li tag
+    .replace(/^ {2}- (.*$)/gim, '<li>$1</li>') // li tag - different markdown syntax
     .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>') // bold text
     .replace(/\*(.*)\*/gim, '<i>$1</i>') // italic text
     .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>'); // links
@@ -17,8 +18,12 @@ const displayNames = {
   'helix-admin': 'Admin API',
   'helix-importer-ui': 'Content Importer',
   'helix-cli': 'Command Line Interface',
-  'helix-sidekick-extension': 'Sidekick Extension',
+  'aem-sidekick': 'Sidekick Extension',
   'franklin-sidekick-library': 'Sidekick Library',
+  'aem-lib': 'AEM Library',
+  'helix-sidekick-extension': 'Sidekick Extension (legacy)',
+  'aem-certificate-rotation': 'Infrastructure Updates',
+  'helix-reviews': 'AEM Review System',
 };
 
 function createRelease(release) {
@@ -68,8 +73,7 @@ function createRelease(release) {
     const ul = li.previousElementSibling;
     ul.append(li);
   });
-
-  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo]} <a href="${release.url}">${release.tag}</a></h2>`;
+  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo] || release.repo} <a href="${release.url}">${release.tag}</a></h2>`;
   addAnchorLink(div.querySelector('h2'));
 
   div.append(releaseBody);
@@ -79,6 +83,42 @@ function createRelease(release) {
 function showResults(results, controls) {
   results.className = Array.from(controls.querySelectorAll('input:checked')).map((i) => i.value).join(' ');
   results.classList.add('releases-results');
+}
+
+function updateURLParams(controls) {
+  const params = new URLSearchParams(window.location.search);
+  const checkedRepos = Array.from(controls.querySelectorAll('input[name="repo"]:checked')).map((i) => i.value);
+
+  // If all repos are selected, remove the filter param for cleaner URL
+  if (checkedRepos.length === Object.keys(displayNames).length) {
+    params.delete('filter');
+  } else if (checkedRepos.length === 0) {
+    params.set('filter', 'none');
+  } else {
+    params.set('filter', checkedRepos.join(','));
+  }
+
+  const newURL = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, '', newURL);
+}
+
+function getFilterFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const filter = params.get('filter');
+
+  if (!filter) {
+    // No filter means all selected
+    return Object.keys(displayNames);
+  }
+
+  if (filter === 'none') {
+    // Explicitly none selected
+    return [];
+  }
+
+  // Split comma-separated values and validate
+  const requestedRepos = filter.split(',').filter((repo) => repo in displayNames);
+  return requestedRepos;
 }
 
 export default async function decorate(block) {
@@ -92,6 +132,9 @@ export default async function decorate(block) {
         const controls = document.createElement('div');
         controls.classList.add('releases-controls');
 
+        // Get initial filter state from URL
+        const selectedRepos = getFilterFromURL();
+
         // select all
         const all = document.createElement('div');
         all.classList.add('releases-control');
@@ -99,7 +142,7 @@ export default async function decorate(block) {
         allCb.type = 'checkbox';
         // allCb.id = 'all';
         // allCb.value = 'all';
-        allCb.checked = true;
+        allCb.checked = selectedRepos.length === Object.keys(displayNames).length;
         all.append(allCb);
         const allLabel = document.createElement('label');
         allLabel.textContent = 'All';
@@ -111,6 +154,7 @@ export default async function decorate(block) {
             cb.checked = allCb.checked;
           });
           showResults(releases, controls);
+          updateURLParams(controls);
         });
         controls.append(all);
 
@@ -120,7 +164,7 @@ export default async function decorate(block) {
           const cb = document.createElement('input');
           cb.type = 'checkbox';
           cb.name = 'repo';
-          cb.checked = true;
+          cb.checked = selectedRepos.includes(repo);
           cb.value = repo;
           cb.id = repo;
           control.append(cb);
@@ -137,6 +181,7 @@ export default async function decorate(block) {
               allCb.checked = true;
             }
             showResults(releases, controls);
+            updateURLParams(controls);
           });
         });
         block.append(controls);

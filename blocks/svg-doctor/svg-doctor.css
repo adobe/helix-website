@@ -3,28 +3,25 @@
   position: relative;
 }
 
-.svg-doctor form input[name='upload'] {
+.svg-doctor form input[name="upload"] {
   display: block;
   cursor: pointer;
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   opacity: 0;
 }
 
-.svg-doctor form input[name='upload']:disabled,
-.svg-doctor form label[for='upload'][aria-hidden=true] {
+.svg-doctor form input[name="upload"]:disabled,
+.svg-doctor form label[for="upload"][aria-hidden="true"] {
   display: none;
   visibility: hidden;
 }
 
 .svg-doctor form label {
-  transition: color .3s;
+  transition: color 0.3s;
 }
 
-.svg-doctor form .viewbox[data-mode='dark'] label {
+.svg-doctor form .viewbox[data-mode="dark"] label {
   color: white;
 }
 
@@ -35,12 +32,14 @@
 }
 
 .svg-doctor form label span + p {
-  margin-top: .5em;
+  margin-top: 0.5em;
 }
 
 .svg-doctor .form .form-number-wrapper,
-.svg-doctor .form label[for=width], .svg-doctor .form input#width,
-.svg-doctor .form label[for=height], .svg-doctor .form input#height {
+.svg-doctor .form label[for="width"],
+.svg-doctor .form input#width,
+.svg-doctor .form label[for="height"],
+.svg-doctor .form input#height {
   visibility: hidden;
   display: none;
 }
@@ -61,10 +60,11 @@
 }
 
 .svg-doctor .viewbox,
-.svg-doctor .viewbox [data-mode='light'] {
+.svg-doctor .viewbox [data-mode="light"] {
   --color-checkerboard-bg-fill: #fefefe;
   --color-checkerboard-bg-border: rgb(214 213 213 / 40%);
-  --checkerboard-background: linear-gradient(
+  --checkerboard-background:
+    linear-gradient(
       var(--color-checkerboard-bg-border) 1px,
       transparent 1px
     ),
@@ -80,24 +80,24 @@
     );
 }
 
-.svg-doctor .viewbox[data-mode='dark'] {
+.svg-doctor .viewbox[data-mode="dark"] {
   --color-checkerboard-bg-border: rgb(41 42 42 / 40%);
   --color-checkerboard-bg-fill: #010101;
 }
 
-.svg-doctor .viewbox[data-status='upload'] {
-  transition: background-color .3s, outline .3s;
+.svg-doctor .viewbox[data-status="upload"] {
+  transition: background-color 0.3s, outline 0.3s;
 }
 
-.svg-doctor .viewbox[data-status='upload'].hover,
-.svg-doctor .viewbox[data-status='upload']:hover {
+.svg-doctor .viewbox[data-status="upload"].hover,
+.svg-doctor .viewbox[data-status="upload"]:hover {
   --color-checkerboard-bg-fill: var(--bg-color-lightgrey);
 
   outline: 2px solid var(--spectrum-blue);
 }
 
-.svg-doctor .viewbox[data-status='upload'][data-mode='dark'].hover,
-.svg-doctor .viewbox[data-status='upload'][data-mode='dark']:hover {
+.svg-doctor .viewbox[data-status="upload"][data-mode="dark"].hover,
+.svg-doctor .viewbox[data-status="upload"][data-mode="dark"]:hover {
   --color-checkerboard-bg-fill: #070707;
 }
 
@@ -107,7 +107,7 @@
   max-height: calc(100vw - 3rem);
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .svg-doctor .viewbox {
     height: 860px;
   }
@@ -122,9 +122,9 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: 0.5rem;
   border-radius: 0 0 var(--card-border-radius-l) var(--card-border-radius-l);
-  padding: .5rem var(--card-border-radius-l);
+  padding: 0.5rem var(--card-border-radius-l);
   background-color: var(--bg-color-grey);
 }
 
@@ -139,12 +139,12 @@
   flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: 0.5rem;
   max-width: 100%;
 }
 
 .svg-doctor .controls-buttons > div::after {
-  content: '';
+  content: "";
   width: 1px;
   height: 100%;
   background-color: var(--bg-color-grey-2);
@@ -154,14 +154,14 @@
   position: relative;
   border: 0;
   border-radius: var(--input-border-radius);
-  padding: .2rem .5rem;
+  padding: 0.2rem 0.5rem;
   background-color: transparent;
   font-size: var(--type-detail-m-size);
   cursor: pointer;
-  transition: background-color .3s;
+  transition: background-color 0.3s;
 }
 
-.svg-doctor .controls-buttons button[aria-checked=true],
+.svg-doctor .controls-buttons button[aria-checked="true"],
 .svg-doctor .controls-buttons button:hover,
 .svg-doctor .controls-buttons button:focus {
   background-color: var(--bg-color-grey-2);
@@ -170,11 +170,11 @@
 .svg-doctor .controls-buttons button:hover::after {
   content: attr(aria-label);
   position: absolute;
-  top: calc(100% + .2rem);
+  top: calc(100% + 0.2rem);
   left: 50%;
   transform: translateX(-50%);
   width: max-content;
-  padding: .2rem .5rem;
+  padding: 0.2rem 0.5rem;
   border: 1px solid var(--bg-color-lightgrey);
   border-radius: var(--input-border-radius);
   background-color: #070707;
@@ -186,24 +186,24 @@
 .svg-doctor .controls-palette {
   display: flex;
   flex-wrap: wrap;
-  gap: .2rem;
+  gap: 0.2rem;
 }
 
 .svg-doctor .controls-palette .swatch {
   position: relative;
   margin: 0;
   padding: 0;
-  width: calc(24px + .3em);
-  height: calc(24px + .3em);
+  width: calc(24px + 0.3em);
+  height: calc(24px + 0.3em);
   outline: 1px solid black;
   border: 1px solid white;
   background-color: black;
-  transition: background-color .2s;
+  transition: background-color 0.2s;
   cursor: pointer;
 }
 
 .svg-doctor .controls-palette .swatch.icon::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -212,22 +212,22 @@
   height: 12px;
   border-radius: 50%;
   background-color: white;
-  transition: background-color .2s;
+  transition: background-color 0.2s;
 }
 
-.svg-doctor .viewbox[data-mode='dark'] + .controls .controls-palette .swatch {
+.svg-doctor .viewbox[data-mode="dark"] + .controls .controls-palette .swatch {
   background-color: white;
 }
 
-.svg-doctor .viewbox[data-mode='dark'] + .controls .controls-palette .swatch.icon::after {
+.svg-doctor .viewbox[data-mode="dark"] + .controls .controls-palette .swatch.icon::after {
   background-color: black;
 }
 
-.svg-doctor .viewbox[data-display='button'] + .controls .controls-palette .swatch {
+.svg-doctor .viewbox[data-display="button"] + .controls .controls-palette .swatch {
   background-color: var(--spectrum-blue);
 }
 
-.svg-doctor .viewbox[data-display='button'] + .controls .controls-palette .swatch.icon::after {
+.svg-doctor .viewbox[data-display="button"] + .controls .controls-palette .swatch.icon::after {
   background-color: white;
 }
 
@@ -238,7 +238,7 @@
   width: 100%;
   height: 100%;
   border: 0;
-	padding: 0;
+  padding: 0;
 }
 
 /* specs */
@@ -253,11 +253,11 @@
   color: black;
 }
 
-.svg-doctor .viewbox[data-mode='dark'] .preview {
+.svg-doctor .viewbox[data-mode="dark"] .preview {
   color: white;
 }
 
-.svg-doctor .viewbox[data-display='button'] .preview {
+.svg-doctor .viewbox[data-display="button"] .preview {
   width: max-content;
   border-radius: 32px;
   padding: 13px 1.5em;
@@ -274,18 +274,18 @@
   transition: background-color 0.3s, color 0.3s, border 0.3s;
 }
 
-.svg-doctor .viewbox[data-display='button'] .preview:hover {
+.svg-doctor .viewbox[data-display="button"] .preview:hover {
   border-color: var(--spectrum-blue);
   background-color: var(--color-white);
   color: var(--spectrum-blue);
 }
 
-.svg-doctor .viewbox[data-display='button'] .preview::after {
-  content: 'Call to Action';
+.svg-doctor .viewbox[data-display="button"] .preview::after {
+  content: "Call to Action";
   vertical-align: 5px;
 }
 
-.svg-doctor .viewbox[data-display='button'] .preview svg {
+.svg-doctor .viewbox[data-display="button"] .preview svg {
   width: auto;
   height: var(--type-body-l-lh);
   margin-right: 1ch;
@@ -302,7 +302,7 @@
 
 .svg-doctor .glyph::before,
 .svg-doctor .glyph::after {
-  content: '';
+  content: "";
   position: absolute;
 }
 
@@ -382,11 +382,11 @@
 }
 
 .svg-doctor .glyph-light::before {
-  transform: rotate(-45deg)
+  transform: rotate(-45deg);
 }
 
 .svg-doctor .glyph-light::after {
-  transform: rotate(45deg)
+  transform: rotate(45deg);
 }
 
 .svg-doctor .glyph-button {

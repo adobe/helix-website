@@ -7,10 +7,11 @@
   --tabs-active-text-color: #2c2c2c;
   --tabs-bg-color: rgb(250 250 250);
   --tabs-active-bg-color: #fff;
-  --tabs-list-bg-gradient: linear-gradient(
-    rgba(255 255 255 0%) 60%,
-    rgba(245 245 245 80%)
-  );
+  --tabs-list-bg-gradient:
+    linear-gradient(
+      rgb(255 255 255 0%) 60%,
+      rgb(245 245 245 80%)
+    );
 
   /* redesign */
   --tabs-image-based-border-color: #e8e8e8;
@@ -23,7 +24,7 @@
   --tabs-active-text-color: #fff;
   --tabs-bg-color: #1a1a1a;
   --tabs-active-bg-color: #111;
-  --tabs-list-bg-gradient: linear-gradient(rgba(0 0 0 0%) 60%, rgba(0 0 0 80%));
+  --tabs-list-bg-gradient: linear-gradient(rgb(0 0 0 0%) 60%, rgb(0 0 0 80%));
 }
 
 .tabs[data-block-status="loaded"] {
@@ -97,7 +98,7 @@
   border-color: var(--tabs-border-color) var(--tabs-border-color) transparent;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .tabs div[role="tablist"] button {
     padding: 24px 32px 18px;
     line-height: 18px;
@@ -108,17 +109,11 @@
 
 .tabs-background-transparent .tabs,
 .tabs-background-transparent .tabs div[role="tablist"],
-.tabs-background-transparent
-  .tabs
-  div[role="tablist"]
-  button[aria-selected="true"] {
+.tabs-background-transparent .tabs div[role="tablist"] button[aria-selected="true"] {
   background: transparent;
 }
 
-.tabs-background-transparent
-  .tabs
-  div[role="tablist"]
-  button[aria-selected="true"] {
+.tabs-background-transparent .tabs div[role="tablist"] button[aria-selected="true"] {
   border-bottom-color: var(--tabs-active-bg-color);
 }
 
@@ -300,13 +295,13 @@
   margin-right: 6vw;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (width <= 600px) {
   .tabs.image-based div[role="tablist"] button {
     padding: 7px 8px 6px;
   }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .tabs.image-based div[role="tablist"] {
     width: 80%;
     margin: 0 auto;
@@ -322,7 +317,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .tabs.image-based div[role="tablist"] {
     width: 86%;
     margin: 0 auto;
@@ -344,7 +339,7 @@
   margin-right: auto;
 }
 
-@media screen and (min-width: 1440px) {
+@media screen and (width >= 1440px) {
   .tabs.contained {
     max-width: var(--grid-desktop-container-width);
   }

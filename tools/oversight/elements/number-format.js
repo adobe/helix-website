@@ -1,4 +1,7 @@
-import { findNearestVulgarFraction, roundToConfidenceInterval, samplingError } from '../utils.js';
+import { stats } from '@adobe/rum-distiller';
+import { findNearestVulgarFraction } from '../utils.js';
+
+const { roundToConfidenceInterval, samplingError } = stats;
 
 export default class NumberFormat extends HTMLElement {
   constructor() {
@@ -8,15 +11,14 @@ export default class NumberFormat extends HTMLElement {
 
   connectedCallback() {
     this.mutationObserver = new MutationObserver(() => {
-      this.updateState();
+      const fv = this.querySelector('span.formatted-value');
+      if (!fv) this.updateState();
     });
     this.updateState();
     this.mutationObserver.observe(this, { childList: true });
   }
 
   updateState() {
-    // stop observing while updating
-    this.mutationObserver.disconnect();
     const isPureNumber = !!this.textContent.trim().match(/^\d+(\.\d+)?$/);
     const titleValue = parseFloat((this.getAttribute('title') || '').replace(/ .*/g, ''), 10);
     const contentValue = parseFloat(this.textContent, 10);
@@ -28,16 +30,20 @@ export default class NumberFormat extends HTMLElement {
     const total = parseInt(this.getAttribute('total'), 10);
     const precision = parseInt(this.getAttribute('precision'), 10);
     const fuzzy = this.getAttribute('fuzzy') !== 'false';
+    const fv = document.createElement('span');
+    fv.classList.add('formatted-value');
     if (Number.isNaN(number)) {
-      this.textContent = '-';
+      fv.textContent = '-';
       this.setAttribute('title', 'no data available');
+      this.replaceChildren(fv);
     } else {
-      this.textContent = roundToConfidenceInterval(
+      fv.textContent = roundToConfidenceInterval(
         number,
         Number.isNaN(sampleSize) ? 0 : sampleSize,
         precision,
         fuzzy,
       );
+      this.replaceChildren(fv);
 
       // set the title to the original number
       this.title = number;
@@ -59,7 +65,5 @@ export default class NumberFormat extends HTMLElement {
     if (this.getAttribute('trend')) {
       this.title += ` and ${this.getAttribute('trend')}`;
     }
-    // resume observing
-    this.mutationObserver.observe(this, { childList: true });
   }
 }

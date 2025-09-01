@@ -1,4 +1,6 @@
-import { isKnownFacet } from '../utils.js';
+import { utils } from '@adobe/rum-distiller';
+
+const { isKnownFacet } = utils;
 
 export default class ConversionTracker extends HTMLElement {
   updateState() {
@@ -47,7 +49,7 @@ export default class ConversionTracker extends HTMLElement {
     Array.from(usp.entries())
       .filter(([key]) => isKnownFacet(key))
       .forEach(([key, value]) => {
-        usp.set(`conversion.${key}`, value);
+        usp.append(`conversion.${key}`, value);
       });
     // remove all filter keys
     Array.from(usp.keys())

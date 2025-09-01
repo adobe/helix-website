@@ -5,7 +5,7 @@
   --nav-animation-transition: all 0.2s ease-in-out;
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   :root {
     --curtain-width: calc(100% - var(--grid-tablet-container-width));
   }
@@ -57,7 +57,7 @@ header .gnav {
     "navlist navlist navlist navlist mobileCurtain";
 }
 
-@media (max-width: 1199px) {
+@media (width <= 1199px) {
   .franklin button.gnav-toggle,
   .franklin .brand-wrapper,
   .franklin .gnav-brand-wrapper,
@@ -443,10 +443,7 @@ button.gnav-toggle::after {
 /* curtain */
 .gnav-curtain {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   transition: var(--nav-animation-transition);
   pointer-events: none;
 }
@@ -504,7 +501,7 @@ button.gnav-toggle::after {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr;
-  grid-gap: 20px;
+  gap: 20px;
   padding: 0 12px;
   box-sizing: border-box;
 }
@@ -569,7 +566,7 @@ button.gnav-toggle::after {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   grid-auto-rows: auto;
-  grid-gap: 20px;
+  gap: 20px;
 }
 
 .clear-results-button {
@@ -618,16 +615,13 @@ button.gnav-toggle::after {
   content: "";
   position: absolute;
   z-index: -1;
-  top: 0;
-  bottom: 0;
-  left: -4px;
-  right: -4px;
+  inset: 0 -4px;
   background-color: rgb(255 208 0 / 30%);
   border-radius: 4px;
 }
 
 /* redesign responsive */
-@media screen and (min-width: 600px) {
+@media screen and (width >= 600px) {
   .franklin .gnav .gnav-brand {
     font-size: 16px;
     line-height: 18px;
@@ -638,7 +632,7 @@ button.gnav-toggle::after {
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .gnav .gnav-cta-button-wrapper.mobile {
     display: none;
   }
@@ -666,7 +660,7 @@ button.gnav-toggle::after {
   }
 
   .gnav {
-    grid-template: unset / auto 1fr auto auto auto;
+    grid-template: none / auto 1fr auto auto auto;
     grid-template-areas: "brand navlist search profile logo";
     padding: 0 12px 0 0;
   }
@@ -915,7 +909,7 @@ button.gnav-toggle::after {
   }
 }
 
-@media (min-width: 1440px) {
+@media (width >= 1440px) {
   .gnav,
   .gnav-search-field,
   .gnav-search-results {

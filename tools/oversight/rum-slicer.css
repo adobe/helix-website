@@ -1,4 +1,4 @@
-@import url('colors.css');
+@import url("colors.css");
 /* stylelint-disable no-descending-specificity */
 /* stylelint-disable selector-class-pattern */
 
@@ -25,6 +25,13 @@
   --light-indigo: #d3d5ff;
   --medium-indigo: #acafff;
   --dark-indigo: #4046ca;
+  --gray-100: #e9e9e9;
+  --gray-200: #e1e1e1;
+  --gray-300: #dadada;
+  --gray-400: #c6c6c6;
+  --gray-500: #8f8f8f;
+  --gray-600: #717171;
+  --gray-700: #505050;
 }
 
 body {
@@ -42,29 +49,54 @@ body main > .section {
   padding-top: 0;
 }
 
+a.icon.help {
+  overflow: visible;
+  font-size: 16px;
+  display: inline-block;
+  font-weight: 900;
+  text-decoration: none;
+  text-align: center;
+  bottom: auto;
+  line-height: 12px;
+  border: 2px solid;
+  border-radius: 2px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transform: scale(1);
+  width: 18px;
+  height: 18px;
+}
+
+a.icon.help::after {
+  content: "?";
+}
+
 /* general performance */
 
-main li.score-good, vitals-facet div[data-value^="good"] label {
-  opacity: 1;
+main li.score-good,
+vitals-facet div[data-value^="good"] label {
   color: var(--dark-green);
   background-color: var(--light-green);
 }
 
-main li.score-ni, vitals-facet div[data-value^="ni"] label {
-  opacity: 1;
+main li.score-ni,
+vitals-facet div[data-value^="ni"] label {
   color: var(--dark-orange);
   background-color: var(--light-orange);
 }
 
-main li.score-poor, vitals-facet div[data-value^="poor"] label {
-  opacity: 1;
+main li.score-poor,
+vitals-facet div[data-value^="poor"] label {
   color: var(--dark-red);
   background-color: var(--light-red);
 }
 
-/* heading */
-main .title div {
+main .title {
+  padding-top: 8px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-flow: row wrap;
   gap: 1ch;
 }
 
@@ -78,6 +110,15 @@ main .title select {
   font: inherit;
 }
 
+main .title > * {
+  flex: 2 0px;
+}
+
+main .title daterange-picker {
+  flex: 1 100%;
+  order: 3;
+}
+
 main .title incognito-checkbox {
   display: none;
   margin-bottom: 10px;
@@ -88,13 +129,6 @@ main .title incognito-checkbox[mode="incognito"] {
   display: inline-block;
 }
 
-main .title {
-  padding-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 main .title url-selector {
   margin-top: 8px;
   margin-bottom: 8px;
@@ -103,6 +137,7 @@ main .title url-selector {
   display: flex;
   align-items: center;
   width: 100%;
+  flex-grow: 50;
 }
 
 main .title url-selector img {
@@ -143,7 +178,7 @@ main .key-metrics ul > * button {
 }
 
 main .key-metrics ul > * h2::before {
-  content: ' ';
+  content: " ";
   background-color: currentcolor;
   width: 8px;
   height: 8px;
@@ -161,44 +196,46 @@ main .key-metrics ul > * p {
 main .key-metrics ul > * p .extra {
   font-weight: normal;
   font-size: 80%;
-  opacity: 0.6;
 }
 
 main .key-metrics ul > * p .extra::before {
-  content: ' (';
+  content: " (";
 }
 
 main .key-metrics ul > #pageviews p .extra::after {
-  content: ' per visit)';
+  content: " per visit)";
 }
 
 main .key-metrics ul > #conversions p .extra::after {
-  content: '%)';
+  content: "%)";
 }
 
 main .key-metrics ul > #visits p .extra::after {
-  content: '% bounces)';
+  content: "% bounces)";
 }
 
 main .key-metrics ul > #lcp p number-format::after,
 main .key-metrics ul > #inp p number-format::after,
 main facet-sidebar ul.cwv > li[title^="LCP"] number-format::after,
 main facet-sidebar ul.cwv > li[title^="INP"] number-format::after {
-  content: 's';
+  content: "s";
 }
 
 /* as of 2024, all iOS CWV values are fake, so we hide them a bit */
-main facet-sidebar input[value="mobile:ios"] ~ ul.cwv {
-  opacity: 0.5;
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li {
   filter: grayscale(1);
 }
 
+main facet-sidebar input[value="mobile:ios"] ~ ul.cwv li:has(meter) {
+  filter: inherit;
+}
+
 main .key-metrics ul > #lcp number-format.extra::after {
-  content: 's caused by TTFB)'
+  content: "s TTFB)";
 }
 
 main facet-sidebar ul.cwv > li number-format[title="no data available"]::after {
-  content: '';
+  content: "";
 }
 
 main .key-metrics number-format[trend="falling"],
@@ -239,10 +276,9 @@ main .key-metrics #inp number-format[trend="falling"] {
 conversion-tracker {
   display: grid;
   grid-template-areas:
-  'heading heading button'
-  'number empty button'
-  'number definition definition'
-  ;
+    "heading heading button"
+    "number empty button"
+    "number definition definition";
   grid-template-columns: 4fr 1fr 4em;
   align-items: start;
 }
@@ -254,7 +290,7 @@ conversion-tracker button {
   background-color: var(--spectrum-gray-300);
   color: var(--spectrum-gray-700);
   grid-area: button;
-  font-weight: normal!important;
+  font-weight: normal !important;
 }
 
 conversion-tracker button:disabled {
@@ -309,8 +345,6 @@ figure {
   margin-bottom: 16px;
 }
 
-
-
 figure .chart-container {
   position: relative;
   min-height: 100px;
@@ -331,7 +365,7 @@ figure .chart-container.sankey {
 }
 
 #timezone::before {
-  content: 'Timezone: ';
+  content: "Timezone: ";
 }
 
 .danger-icon {
@@ -384,7 +418,7 @@ figcaption > span {
   align-items: center;
 }
 
-#low-data-warning[aria-hidden=true] {
+#low-data-warning[aria-hidden="true"] {
   display: none;
 }
 
@@ -403,7 +437,6 @@ figcaption > span {
   background-color: var(--light-indigo);
   padding: 0 1em;
   text-align: end;
-  opacity: 0.6;
   margin-right: 0.5em;
   margin-bottom: 0.5em;
   white-space: nowrap;
@@ -420,15 +453,6 @@ figcaption > span {
   color: var(--dark-purple);
   background-color: var(--light-purple);
 }
-
-.filter-tags > span.filter-tag-lcp,
-.filter-tags > span.filter-tag-cls,
-.filter-tags > span.filter-tag-inp,
-.filter-tags > span.filter-tag-conversions,
-.filter-tags > span.filter-tag-visits {
-  opacity: 1;
-}
-
 
 /* filters */
 
@@ -462,7 +486,7 @@ fieldset a:any-link {
   color: currentcolor;
 }
 
-list-facet[facet="userAgent" ] fieldset {
+list-facet[facet="userAgent"] fieldset {
   color: var(--dark-fuchsia);
 
   --background-color: var(--light-fuchsia);
@@ -474,7 +498,9 @@ list-facet[facet="url"] fieldset {
   --background-color: var(--light-purple);
 }
 
-*[facet] > legend, *[facet] > dl, #facets > [mode="hidden"] {
+*[facet] > legend,
+*[facet] > dl,
+#facets > [mode="hidden"] {
   display: none;
 }
 
@@ -501,12 +527,7 @@ vitals-facet label {
   background-color: #eee;
   padding: 2px 6px;
   text-align: end;
-  opacity: 0.2;
   font-size: 12px;
-}
-
-fieldset li[class$="-"] {
-  opacity: 0.2;
 }
 
 fieldset li.interesting {
@@ -519,15 +540,149 @@ fieldset li.significant {
   padding: 2px 4px;
 }
 
+/* business metrics are shown when the focus is on acquisition */
+facet-sidebar:has(input[name="focus"][value="acquisition"]) aside ul.cwv li.acquisition {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="acquisition"]:checked) aside ul.cwv li.acquisition {
+  display: flex;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]) aside ul.cwv li.performance {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="performance"]:checked) aside ul.cwv li.performance {
+  display: block;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.conversion {
+  display: none;
+}
+
+facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion {
+  display: flex;
+  grid-column: span 3;
+}
+
+ul.cwv meter {
+  width: 100%;
+}
+
+/* stylelint-disable-next-line max-line-length */
+main:has(conversion-tracker[mode="custom"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion.engagement {
+  display: none;
+}
+
+/* stylelint-disable-next-line max-line-length */
+main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion:last-of-type {
+  display: none;
+}
+
 fieldset li::after,
 vitals-facet label::before {
-  content: ' ';
+  content: " ";
   background-color: currentcolor;
   width: 10px;
   height: 10px;
   margin-left: 8px;
   display: inline-block;
   border-radius: 14px;
+}
+
+/* business metrics have a meter instead of a dot */
+fieldset li:has(meter)::after {
+  display: none;
+}
+
+fieldset li:has(meter) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.6;
+}
+
+fieldset li:has(meter):hover {
+  opacity: 1;
+}
+
+fieldset li.interesting:has(meter) {
+  opacity: 0.8;
+}
+
+fieldset li.significant:has(meter) {
+  opacity: 1;
+}
+
+fieldset li:has(meter) meter {
+  width: 100%;
+}
+
+fieldset li:has(meter) number-format {
+  width: 4em;
+}
+
+fieldset li:has(meter) number-format::after {
+  content: "%";
+}
+
+fieldset li.fixed:has(meter) number-format::after {
+  content: "";
+}
+
+fieldset li.time:has(meter) number-format::after {
+  content: "s";
+}
+
+fieldset div:first-of-type li::before {
+  display: block;
+  font-size: 50%;
+  margin-left: 10px;
+  text-align: center;
+  margin-top: -25px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+fieldset div:first-of-type li:has(meter)::before {
+  display: block;
+  font-size: 50%;
+  margin-top: -50px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+fieldset div:first-of-type li:nth-of-type(1)::before {
+  content: "LCP";
+}
+
+fieldset div:first-of-type li:nth-of-type(2)::before {
+  content: "CLS";
+}
+
+fieldset div:first-of-type li:nth-of-type(3)::before {
+  content: "INP";
+}
+
+fieldset div:first-of-type li:nth-of-type(4)::before {
+  content: "Bounce";
+}
+
+fieldset div:first-of-type li:nth-of-type(5)::before {
+  content: "Time";
+}
+
+fieldset div:first-of-type li:nth-of-type(6)::before {
+  content: "Organic";
+}
+
+fieldset div:first-of-type li:nth-of-type(7)::before {
+  content: "Engagement";
+}
+
+fieldset div:first-of-type li:nth-of-type(8)::before {
+  content: "Conversion";
 }
 
 #facets ul.cwv {
@@ -541,7 +696,7 @@ vitals-facet label::before {
 
 #facets fieldset div {
   display: grid;
-  grid-template-areas: 'check lab' ' - cwv';
+  grid-template-areas: "check lab" " - cwv";
   grid-template-columns: 20px 1fr;
   align-items: center;
   grid-gap: 0 16px;
@@ -550,11 +705,11 @@ vitals-facet label::before {
 #facets fieldset div ~ div.more-container:last-of-type,
 #facets .more fieldset div ~ div.more-container:last-of-type,
 #facets .more-more fieldset div ~ div.more-container:last-of-type,
-#facets .more-more-more fieldset div ~ div.more-container:last-of-type   {
+#facets .more-more-more fieldset div ~ div.more-container:last-of-type {
   display: grid;
 }
 
-#facets fieldset input[type=checkbox] {
+#facets fieldset input[type="checkbox"] {
   grid-area: check;
   height: 20px;
   width: 20px;
@@ -565,52 +720,53 @@ vitals-facet label::before {
   word-break: break-all;
 }
 
-#facets fieldset label .count, #facets fieldset label .extra {
+#facets fieldset label .count,
+#facets fieldset label .extra {
   opacity: 0.6;
 }
 
-#facets fieldset div:hover .count, #facets fieldset div:hover .extra {
+#facets fieldset div:hover .count,
+#facets fieldset div:hover .extra {
   opacity: 1;
 }
 
-#facets fieldset label .extra {
+#facets fieldset label .extra,
+#facets fieldset label span.extra {
   display: none;
 }
 
 #facets fieldset label .extra.interesting {
   display: inline;
-  opacity: 0.8;
 }
 
 #facets fieldset label .extra.significant {
   display: inline;
-  opacity: 0.9;
 }
 
 #facets fieldset label .count::before,
 #facets fieldset label span.value::before {
-  content: ' (';
+  content: " (";
 }
 
 #facets literal-facet label span.value::before {
-  content: '';
+  content: "";
 }
 
-#facets fieldset label .count::after, #facets fieldset label span.value::after {
-  content: ') ';
+#facets fieldset label .count::after,
+#facets fieldset label span.value::after {
+  content: ") ";
 }
 
 #facets fieldset label .extra::after {
-  content: '% rate';
+  content: "% rate";
 }
 
 #facets fieldset label number-format[title="0"].extra::after {
-  content: ' conversions';
+  content: " conversions";
 }
 
-
 #facets literal-facet label span.value::after {
-  content: '';
+  content: "";
 }
 
 #facets literal-facet label span.value,
@@ -648,13 +804,12 @@ thumbnail-facet fieldset div:not(.more-container) {
   padding-bottom: 4px;
 }
 
-
 vitals-facet fieldset {
   display: grid;
   grid-template-areas:
-  '. lcp-good cls-good inp-good'
-  '. lcp-ni cls-ni inp-ni'
-  '. lcp-poor cls-poor inp-poor';
+    ". lcp-good cls-good inp-good"
+    ". lcp-ni cls-ni inp-ni"
+    ". lcp-poor cls-poor inp-poor";
   grid-template-columns: 0fr minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
   gap: 4pt;
   padding: 4pt;
@@ -665,8 +820,7 @@ vitals-facet fieldset label {
   word-break: normal;
 }
 
-#facets vitals-facet fieldset input[type=checkbox] {
-  opacity: 0.1;
+#facets vitals-facet fieldset input[type="checkbox"] {
   width: 0;
   height: 0;
 }
@@ -677,7 +831,7 @@ vitals-facet fieldset label {
 
 #facets vitals-facet fieldset div {
   display: grid;
-  grid-template-areas: 'check lab';
+  grid-template-areas: "check lab";
   grid-template-columns: 0 1fr;
   grid-gap: 0;
 }
@@ -686,14 +840,14 @@ vitals-facet fieldset label {
   text-align: start;
 }
 
-#facets vitals-facet fieldset input[type=checkbox] + label::before {
+#facets vitals-facet fieldset input[type="checkbox"] + label::before {
   border: 2px solid currentcolor;
   background-color: transparent;
   width: 8px;
   height: 8px;
 }
 
-#facets vitals-facet fieldset input[type=checkbox]:checked + label::before {
+#facets vitals-facet fieldset input[type="checkbox"]:checked + label::before {
   border: 2px solid currentcolor;
   background-color: currentcolor;
 }
@@ -738,11 +892,11 @@ vitals-facet fieldset label {
   grid-area: cwv;
 }
 
-#facets div[aria-selected=true] {
-  background-color: var(--light-blue)
+#facets div[aria-selected="true"] {
+  background-color: var(--light-blue);
 }
 
-#facets div[aria-checked=mixed] {
+#facets div[aria-checked="mixed"] {
   opacity: 0.7;
   filter: brightness(0.7);
 }
@@ -760,25 +914,43 @@ vitals-facet fieldset label {
 }
 
 #facets link-facet span.collapse + span.suffix::before {
-  content: '...';
+  content: "...";
 }
 
 #facets link-facet a .protocol::after {
-  content: '//';
+  content: "//";
 }
 
 /* don't worry, we'll show this when there is enough space */
-#facets link-facet  a .protocol {
+#facets link-facet a .protocol {
   display: none;
 }
 
-#facets link-facet  a .hostname {
+#facets link-facet a .hostname {
   display: none;
 }
 
 #facets facet-sidebar {
   container-type: inline-size;
   container-name: facets;
+}
+
+facet-sidebar form {
+  display: flex;
+  margin-left: calc(100% - 112px);
+  margin-bottom: -46px;
+  height: 32px;
+  width: 96px;
+  background-color: var(--light-fuchsia);
+  border-radius: 16px;
+  border-top: 2px solid var(--dark-fuchsia);
+  border-left: 2px solid var(--dark-fuchsia);
+  border-right: 2px solid var(--dark-fuchsia);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 4px;
+  accent-color: var(--dark-fuchsia);
+  z-index: 4;
 }
 
 /* external referrer only care about the hostname anyway */
@@ -819,7 +991,11 @@ vitals-facet fieldset label {
   padding-right: 50px;
 }
 
-.clipboard, a.drilldown, a.drillup, .clipboard-paste, .icon {
+.clipboard,
+a.drilldown,
+a.drillup,
+.clipboard-paste,
+.icon {
   margin-left: 8px;
   box-sizing: border-box;
   position: relative;
@@ -874,6 +1050,7 @@ vitals-facet fieldset label {
   border: 2px solid;
   top: 4px;
   left: 4px;
+  z-index: 1;
 }
 
 .clipboard::after {
@@ -959,7 +1136,6 @@ a.drillup::after {
   max-width: 80%;
   background-color: #444;
   color: white;
-  opacity: 1;
   top: 32px;
   left: 0;
   right: 0;
@@ -974,7 +1150,7 @@ a.drillup::after {
   margin-top: -20px;
 }
 
-facet-sidebar[aria-disabled="true"] fieldset input[type=checkbox] {
+facet-sidebar[aria-disabled="true"] fieldset input[type="checkbox"] {
   display: none;
 }
 
@@ -997,6 +1173,19 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 }
 
 @media (min-width: 900px) {
+  main .title {
+    flex-wrap: nowrap;
+  }
+
+  main .title > * {
+    flex: 3 0;
+  }
+
+  main .title daterange-picker {
+    flex: unset;
+    order: unset;
+  }
+
   main .title url-selector input {
     font-size: var(--type-heading-xl-size);
   }
@@ -1005,7 +1194,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: 32px;
   }
 
-  main .key-metrics ul > * h2, main .key-metrics ul > * button {
+  main .key-metrics ul > * h2,
+  main .key-metrics ul > * button {
     font-size: 14px;
   }
 
@@ -1030,7 +1220,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 
   #facets fieldset div {
-    grid-template-areas: 'check lab cwv';
+    grid-template-areas: "check lab cwv";
     grid-template-columns: 20px 1fr 350px;
   }
 
@@ -1048,7 +1238,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 }
 
-
 /* split mode */
 
 @media (min-width: 1600px) {
@@ -1058,7 +1247,8 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     height: calc(100vh - var(--nav-height) - 32px);
   }
 
-  #deepmain > div, #deepmain > facet-sidebar {
+  #deepmain > div,
+  #deepmain > facet-sidebar {
     width: 50%;
   }
 

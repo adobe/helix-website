@@ -7,10 +7,11 @@
   --tabs-active-text-color: #2c2c2c;
   --tabs-bg-color: rgb(250 250 250);
   --tabs-active-bg-color: #fff;
-  --tabs-list-bg-gradient: linear-gradient(
-    rgba(255 255 255 0%) 60%,
-    rgba(245 245 245 80%)
-  );
+  --tabs-list-bg-gradient:
+    linear-gradient(
+      rgb(255 255 255 0%) 60%,
+      rgb(245 245 245 80%)
+    );
 
   /* redesign */
   --tabs-image-based-border-color: #e8e8e8;
@@ -69,11 +70,7 @@
 }
 
 .testimonials .tab-list .tablist-container button:hover picture,
-.testimonials
-  .tab-list
-  .tablist-container
-  button[aria-selected="true"]
-  picture {
+.testimonials .tab-list .tablist-container button[aria-selected="true"] picture {
   opacity: 1;
 }
 
@@ -158,12 +155,7 @@
   margin-right: auto;
 }
 
-.testimonials
-  .testimonial
-  .tabcontent-container
-  .tabpanel
-  .customer-info
-  picture {
+.testimonials .testimonial .tabcontent-container .tabpanel .customer-info picture {
   margin-top: var(--spacing-xxs);
 }
 
@@ -202,7 +194,7 @@
 .testimonials .testimonial-info > ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: var(--spacing-xs);
+  gap: var(--spacing-xs);
 }
 
 .testimonials .testimonial-info ul,
@@ -239,7 +231,7 @@
   margin-top: var(--spacing-xxs);
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .testimonials .testimonial {
     display: flex;
     justify-content: space-between;
@@ -307,7 +299,7 @@
   }
 
   .testimonials .testimonial-info > ul {
-    grid-gap: var(--spacing-m);
+    gap: var(--spacing-m);
   }
 
   .testimonials .testimonial-info .testimonial-stats-info {
@@ -316,7 +308,7 @@
   }
 }
 
-@media screen and (min-width: 900px) {
+@media screen and (width >= 900px) {
   .testimonials .tab-list.image-based {
     width: 86%;
     margin: 0 auto;
@@ -331,7 +323,7 @@
   }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (width >= 1200px) {
   .testimonials .testimonial {
     padding: var(--spacing-s) 0;
   }
@@ -355,7 +347,7 @@
   }
 }
 
-@media screen and (min-width: 1440px) {
+@media screen and (width >= 1440px) {
   .testimonials {
     max-width: var(--grid-desktop-container-width);
   }

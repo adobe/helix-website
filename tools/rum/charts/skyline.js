@@ -4,11 +4,9 @@ import {
 } from 'chartjs';
 // eslint-disable-next-line import/no-unresolved, import/extensions
 import 'chartjs-adapter-luxon';
+import { utils } from '@adobe/rum-distiller';
 import {
   INTERPOLATION_THRESHOLD,
-  scoreBundle,
-  scoreCWV,
-  // toHumanReadable,
   cwvInterpolationFn,
   truncate,
   simpleCWVInterpolationFn,
@@ -16,6 +14,10 @@ import {
   getGradient,
 } from '../utils.js';
 import AbstractChart from './chart.js';
+
+const {
+  scoreCWV, scoreBundle,
+} = utils;
 
 Chart.register(TimeScale, LinearScale, ...registerables);
 
@@ -56,12 +58,20 @@ export default class SkylineChart extends AbstractChart {
 
     groupFn.fillerFn = (existing) => {
       const endDate = this.chartConfig.endDate ? new Date(this.chartConfig.endDate) : new Date();
-      // set start date depending on the unit
-      const startDate = new Date(endDate);
-      // roll back to beginning of time
-      if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
-      if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
-      if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+
+      let startDate;
+      if (!this.chartConfig.startDate) {
+        // set start date depending on the unit
+        startDate = new Date(endDate);
+        // roll back to beginning of time
+        if (this.chartConfig.unit === 'day') startDate.setDate(endDate.getDate() - 30);
+        if (this.chartConfig.unit === 'hour') startDate.setDate(endDate.getDate() - 7);
+        if (this.chartConfig.unit === 'week') startDate.setMonth(endDate.getMonth() - 12);
+        if (this.chartConfig.unit === 'month') startDate.setMonth(endDate.getMonth() - 1);
+      } else {
+        startDate = new Date(this.chartConfig.startDate);
+      }
+
       const slots = new Set(existing);
       const slotTime = new Date(startDate);
       // return Array.from(slots);
@@ -72,6 +82,7 @@ export default class SkylineChart extends AbstractChart {
         if (this.chartConfig.unit === 'day') slotTime.setDate(slotTime.getDate() + 1);
         if (this.chartConfig.unit === 'hour') slotTime.setHours(slotTime.getHours() + 1);
         if (this.chartConfig.unit === 'week') slotTime.setDate(slotTime.getDate() + 7);
+        if (this.chartConfig.unit === 'month') slotTime.setMonth(slotTime.getMonth() + 1);
         maxSlots -= 1;
         if (maxSlots < 0) {
           // eslint-disable-next-line no-console
@@ -144,7 +155,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Needs Improvement CLS',
-            backgroundColor: cssVariable('--spectrum-green-500'),
+            backgroundColor: cssVariable('--spectrum-orange-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: true,
@@ -290,22 +301,14 @@ export default class SkylineChart extends AbstractChart {
             ticks: {
               autoSkip: false,
               maxTicksLimit: 16,
-              callback: (value, index) => {
+              callback: (value, index, arr) => {
                 if (value === 0) return '';
                 if (value > 0) {
-                  this.clsAlreadyLabeled = false;
-                  this.lcpAlreadyLabeled = false;
                   return toHumanReadable(value);
                 }
                 if (index === 0) return 'INP';
-                if (value / this.min < 0.4 && !this.lcpAlreadyLabeled) {
-                  this.lcpAlreadyLabeled = true;
-                  return 'LCP';
-                }
-                if (value / this.min < 0.7 && !this.clsAlreadyLabeled) {
-                  this.clsAlreadyLabeled = true;
-                  return 'CLS';
-                }
+                if (index === 1) return 'CLS';
+                if (index === 3 || (index === 2 && arr[index + 1].value === 0)) return 'LCP';
                 return '';
               },
             },
@@ -467,12 +470,40 @@ export default class SkylineChart extends AbstractChart {
 
   async draw() {
     const params = new URL(window.location).searchParams;
-    const view = ['week', 'month', 'year'].indexOf(params.get('view')) !== -1
-      ? params.get('view')
-      : 'week';
-    // TODO re-add. I think this should be a filter
+    const view = params.get('view');
+
     // eslint-disable-next-line no-unused-vars
-    const endDate = params.get('endDate') ? `${params.get('endDate')}T00:00:00` : null;
+    const startDate = params.get('startDate');
+    const endDate = params.get('endDate');
+
+    let customView = 'year';
+    let unit = 'month';
+    let units = 12;
+    if (view === 'custom') {
+      const diff = endDate ? new Date(endDate).getTime() - new Date(startDate).getTime() : 0;
+      if (diff < (1000 * 60 * 60 * 24)) {
+        // less than a day
+        customView = 'hour';
+        unit = 'hour';
+        units = 24;
+      } else if (diff <= (1000 * 60 * 60 * 24 * 7)) {
+        // less than a week
+        customView = 'week';
+        unit = 'hour';
+        units = Math.round(diff / (1000 * 60 * 60));
+      } else if (diff <= (1000 * 60 * 60 * 24 * 31)) {
+        // less than a month
+        customView = 'month';
+        unit = 'day';
+        units = 30;
+      } else if (diff <= (1000 * 60 * 60 * 24 * 365 * 3)) {
+        // less than 3 years
+        customView = 'week';
+        unit = 'week';
+        units = Math.round(diff / (1000 * 60 * 60 * 24 * 7));
+      }
+    }
+
     const focus = params.get('focus');
 
     if (this.dataChunks.filtered.length < 1000) {
@@ -487,6 +518,7 @@ export default class SkylineChart extends AbstractChart {
         unit: 'day',
         units: 30,
         focus,
+        startDate,
         endDate,
       },
       week: {
@@ -494,6 +526,7 @@ export default class SkylineChart extends AbstractChart {
         unit: 'hour',
         units: 24 * 7,
         focus,
+        startDate,
         endDate,
       },
       year: {
@@ -501,6 +534,15 @@ export default class SkylineChart extends AbstractChart {
         unit: 'week',
         units: 52,
         focus,
+        startDate,
+        endDate,
+      },
+      custom: {
+        view: customView,
+        unit,
+        units,
+        focus,
+        startDate,
         endDate,
       },
     };
@@ -514,39 +556,43 @@ export default class SkylineChart extends AbstractChart {
     const group = this.dataChunks.group(this.groupBy);
     const chartLabels = Object.keys(group).sort();
 
-    const iGoodLCPs = Object.entries(this.dataChunks.aggregates)
+    const {
+      iGoodLCPs,
+      iNiLCPs,
+      iPoorLCPs,
+      iGoodCLSs,
+      iNiCLSs,
+      iPoorCLSs,
+      iGoodINPs,
+      iNiINPs,
+      iPoorINPs,
+      allTraffic,
+    } = Object.entries(this.dataChunks.aggregates)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodLCP.weight);
-    const iNiLCPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiLCP.weight);
-    const iPoorLCPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorLCP.weight);
-
-    const iGoodCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodCLS.weight);
-    const iNiCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiCLS.weight);
-    const iPoorCLSs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorCLS.weight);
-
-    const iGoodINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iGoodINP.weight);
-    const iNiINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iNiINP.weight);
-    const iPoorINPs = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => -totals.iPoorINP.weight);
-
-    const allTraffic = Object.entries(this.dataChunks.aggregates)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, totals]) => totals.pageViews.sum);
+      .reduce((acc, [, totals]) => {
+        acc.iGoodLCPs.push(-totals.iGoodLCP.weight);
+        acc.iNiLCPs.push(-totals.iNiLCP.weight);
+        acc.iPoorLCPs.push(-totals.iPoorLCP.weight);
+        acc.iGoodCLSs.push(-totals.iGoodCLS.weight);
+        acc.iNiCLSs.push(-totals.iNiCLS.weight);
+        acc.iPoorCLSs.push(-totals.iPoorCLS.weight);
+        acc.iGoodINPs.push(-totals.iGoodINP.weight);
+        acc.iNiINPs.push(-totals.iNiINP.weight);
+        acc.iPoorINPs.push(-totals.iPoorINP.weight);
+        acc.allTraffic.push(totals.pageViews.sum);
+        return acc;
+      }, {
+        iGoodLCPs: [],
+        iNiLCPs: [],
+        iPoorLCPs: [],
+        iGoodCLSs: [],
+        iNiCLSs: [],
+        iPoorCLSs: [],
+        iGoodINPs: [],
+        iNiINPs: [],
+        iPoorINPs: [],
+        allTraffic: [],
+      });
 
     this.chart.data.datasets[0].data = allTraffic;
 
@@ -574,6 +620,7 @@ export default class SkylineChart extends AbstractChart {
     this.stepSize = undefined;
     this.clsAlreadyLabeled = false;
     this.lcpAlreadyLabeled = false;
+
     this.chart.update();
   }
 }

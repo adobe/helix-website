@@ -1,12 +1,12 @@
 .video-wrapper {
-    width: 100%;
-    overflow: hidden;       
+  width: 100%;
+  overflow: hidden;
 }
 
 .video {
-    margin: 32px 0;
+  margin: 32px 0;
 }
 
 .video video {
-    width: 100%;
+  width: 100%;
 }
