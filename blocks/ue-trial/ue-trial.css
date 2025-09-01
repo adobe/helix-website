@@ -2,7 +2,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 30px 20px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--body-font-family);
   display: flex;
   flex-direction: row;
   gap: 30px;
@@ -199,6 +199,7 @@
 .ue-trial label {
   font-size: 16px;
   color: #444;
+  font-family: var(--body-font-family);
 }
 
 .ue-trial input,
@@ -394,7 +395,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--body-font-family);
 }
 
 .status-header {
