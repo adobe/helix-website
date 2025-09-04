@@ -6,6 +6,68 @@ import {
   decorateGuideTemplateCodeBlock,
 } from '../../scripts/scripts.js';
 
+// Convert timestamp to seconds
+function timeToSeconds(time) {
+  const parts = time.split(':').map(Number);
+  if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+  return parts[0] * 60 + parts[1];
+}
+
+// Parse timestamps from video description
+function parseChapterTimestamps(description, videoUrl) {
+  if (!description) return [];
+
+  // Match timestamps like 00:00, 0:00, 01:23, 1:23:45
+  const timestampRegex = /(?:^|\n)(\d{1,2}:?\d{1,2}:\d{2}|\d{1,2}:\d{2})\s+([^\n]+)/g;
+  const chapters = [];
+  let match = timestampRegex.exec(description);
+
+  while (match !== null) {
+    const [, time, title] = match;
+    const seconds = timeToSeconds(time);
+    chapters.push({
+      timestamp: time,
+      title: title.trim(),
+      seconds,
+      url: `${videoUrl}&t=${seconds}s`,
+    });
+    match = timestampRegex.exec(description);
+  }
+
+  return chapters;
+}
+
+// Create chapter markers UI
+function createChapterMarkers(chapters) {
+  if (!chapters || chapters.length === 0) return null;
+
+  const chaptersContainer = createTag('div', { class: 'chapter-markers' });
+  const chaptersTitle = createTag('h4', { class: 'chapters-title' }, 'Chapters');
+  chaptersContainer.appendChild(chaptersTitle);
+
+  const chaptersList = createTag('ul', { class: 'chapters-list' });
+  chapters.forEach((chapter) => {
+    const listItem = createTag('li', { class: 'chapter-item' });
+    const link = createTag('a', {
+      href: chapter.url,
+      target: '_blank',
+      class: 'chapter-link',
+    });
+    const timestamp = createTag('span', { class: 'chapter-timestamp' }, chapter.timestamp);
+    const title = createTag('span', { class: 'chapter-title' }, chapter.title);
+
+    link.appendChild(timestamp);
+    link.appendChild(title);
+    listItem.appendChild(link);
+    chaptersList.appendChild(listItem);
+  });
+
+  chaptersContainer.appendChild(chaptersList);
+  return chaptersContainer;
+}
+
 // logic for rendering the community feed
 export async function renderFeed(block) {
   if (!block) {
@@ -43,6 +105,13 @@ export async function renderFeed(block) {
     const img = createTag('img', { src: `https://img.youtube.com/vi/${id}/0.jpg` });
     image.appendChild(img);
     div.appendChild(image);
+
+    // Add chapter markers if timestamps are found in description
+    const chapters = parseChapterTimestamps(page.Description, page.URL);
+    const chapterMarkers = createChapterMarkers(chapters);
+    if (chapterMarkers) {
+      div.appendChild(chapterMarkers);
+    }
 
     gridDiv.appendChild(div);
     if (index % 3 === 2 || index === archivePageIndex.length - 1) {
