@@ -89,7 +89,7 @@ TOOLS FOR THIS BATCH: ${batch.tools.map((t) => t.name).join(', ')}`;
       console.log(`[Parallel Batch ${batch.id}] Starting API call`);
 
       const batchRequest = {
-        model: 'claude-opus-4-20250514',
+        model: 'claude-opus-4-1-20250805',
         max_tokens: 3072, // Good depth while maintaining speed advantage
         messages: [{ role: 'user', content: batchMessage }],
         tools: batch.tools,
@@ -113,6 +113,11 @@ TOOLS FOR THIS BATCH: ${batch.tools.map((t) => t.name).join(', ')}`;
 
       const batchData = await batchResponse.json();
       console.log(`[Parallel Batch ${batch.id}] Response received`);
+
+      // Debug: Check if response has content
+      if (!batchData.content || batchData.content.length === 0) {
+        console.log(`[DEBUG] Parallel Batch ${batch.id} - No content in response:`, JSON.stringify(batchData, null, 2));
+      }
 
       let batchAnalysis = '';
       const batchToolCalls = [];
@@ -219,7 +224,7 @@ TOOLS FOR THIS BATCH: ${batch.tools.map((t) => t.name).join(', ')}`;
     }
 
     const followUpRequest = {
-      model: 'claude-opus-4-20250514',
+      model: 'claude-opus-4-1-20250805',
       max_tokens: 3072,
       messages: [{
         role: 'user',

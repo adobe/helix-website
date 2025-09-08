@@ -4,6 +4,10 @@ import {
 // eslint-disable-next-line import/no-unresolved, import/no-relative-packages
 } from '../../../blocks/rum-chat/rum-chat.js';
 
+// Import PDF export functionality
+// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
+import { generatePDFReport, downloadAsText } from '../../../blocks/rum-chat/pdf-export.js';
+
 export default class FacetSidebar extends HTMLElement {
   constructor() {
     super();
@@ -211,6 +215,12 @@ export default class FacetSidebar extends HTMLElement {
       chatInterface.style.flexDirection = 'column';
       chatInterface.style.height = '100%';
 
+      // Check if API key exists to customize welcome message
+      const existingApiKey = localStorage.getItem('anthropicApiKey');
+      const welcomeMessage = existingApiKey
+        ? '👋 Hey there! What would you like to discover about your site today? Start with a quick summary or dive deep with a comprehensive analysis.'
+        : '🤖 Welcome to OpTel Detective! Enter your Anthropic API key below to start analyzing the site data.';
+
       chatInterface.innerHTML = `
         <div class="chat-header" style="flex-shrink: 0;">
           <h2>OpTel Detective</h2>
@@ -219,8 +229,8 @@ export default class FacetSidebar extends HTMLElement {
           </div>
         </div>
         <div id="messages" class="messages" style="flex: 1; overflow-y: auto; max-height: none;">
-          <div class="message claude-message">
-            🤖 Welcome to OpTel Detective! Enter your Anthropic API key below to start analyzing the site data.
+          <div class="message claude-message" id="welcome-message">
+            ${welcomeMessage}
           </div>
         </div>
       `;
@@ -298,10 +308,11 @@ export default class FacetSidebar extends HTMLElement {
         saveApiKeyButton.disabled = true;
         analysisSection.style.display = 'block';
 
-        const message = document.createElement('div');
-        message.className = 'message claude-message';
-        message.innerHTML = '✅ API key saved! You can now start your analysis.';
-        messagesDiv.appendChild(message);
+        // Update the welcome message instead of adding a new one
+        const welcomeMessage = messagesDiv.querySelector('#welcome-message');
+        if (welcomeMessage) {
+          welcomeMessage.innerHTML = '👋 Hey there! What would you like to discover about your site today? Start with a quick summary or dive deep with a comprehensive analysis.';
+        }
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       } else {
         // eslint-disable-next-line no-alert
@@ -363,21 +374,45 @@ export default class FacetSidebar extends HTMLElement {
       }
     });
 
-    // Download functionality
+    // Download functionality using the PDF export module
     downloadButton.addEventListener('click', () => {
-      const analysisContent = chatInterface.querySelector('.analysis-content');
+      // Look for analysis content in various possible containers
+      const analysisContent = chatInterface.querySelector('.analysis-content')
+        || chatInterface.querySelector('.message.claude-message:last-child')
+        || chatInterface.querySelector('#messages .message:last-child');
+
       if (analysisContent) {
-        // Create a simple text file download
-        const analysisText = analysisContent.textContent;
-        const blob = new Blob([analysisText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `rum-analysis-${new Date().toISOString().split('T')[0]}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        // Get the content (HTML or text)
+        const contentHtml = analysisContent.innerHTML || '';
+        const contentText = analysisContent.textContent || '';
+        const finalContent = contentHtml.trim() || contentText.trim();
+
+        if (finalContent) {
+          // Try to get URL from the dashboard or current page
+          const urlInput = document.querySelector('#url');
+          const currentUrl = urlInput ? urlInput.value.trim() : window.location.hostname;
+
+          // Use the modular PDF export function with fallback and HTML preservation
+          const success = generatePDFReport(finalContent, {
+            url: currentUrl,
+            title: `OpTel Detective Analysis - ${currentUrl || 'Dashboard'}`,
+            debug: false,
+            preserveHtml: true, // Keep HTML formatting for better structure
+          });
+
+          if (!success) {
+            console.warn('[Facet Sidebar] PDF generation failed, using text download fallback');
+            // Fallback to simple text download
+            const filename = `rum-analysis-${new Date().toISOString().split('T')[0]}`;
+            downloadAsText(finalContent, filename);
+          }
+        } else {
+          // eslint-disable-next-line no-alert
+          alert('No analysis content available for download.');
+        }
+      } else {
+        // eslint-disable-next-line no-alert
+        alert('No analysis content found. Please run an analysis first.');
       }
     });
   }

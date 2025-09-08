@@ -16,6 +16,9 @@ import {
   resetTaskList,
 } from './task-progress.js';
 
+// Import PDF export functionality
+import { generatePDFReport, downloadAsText } from './pdf-export.js';
+
 let messageHistory = [];
 let cachedFacetTools = null;
 
@@ -425,10 +428,14 @@ async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
   }
 
   // Handle regular facet tools
-  const facetName = toolName.replace(/Facet$/, '').replace(/_/g, '.');
+  // Convert tool name back to original facet name (underscores to dots)
+  const facetName = toolName.replace(/_/g, '.');
+  console.log(`[DEBUG] Tool name: "${toolName}" → Facet name: "${facetName}"`);
   const facetElement = document.querySelector(`[facet="${facetName}"]`);
+  console.log('[DEBUG] Facet element found:', !!facetElement);
 
   if (!facetElement) {
+    console.log('[DEBUG] Available facets:', Array.from(document.querySelectorAll('[facet]')).map((el) => el.getAttribute('facet')));
     return {
       success: false,
       message: `Facet element not found for ${facetName}`,
@@ -817,7 +824,7 @@ ${getCollectedRecommendations().map((recommendation) => `- ${recommendation.cate
 ${overviewTemplate}`;
 
           const finalRequest = {
-            model: 'claude-opus-4-20250514',
+            model: 'claude-opus-4-1-20250805',
             max_tokens: 1500, // Executive summary - 3 min read + HTML formatting
             messages: [{ role: 'user', content: finalSynthesisMessage }],
             tools: [createInsightsCollectionTool(), createRecommendationsCollectionTool()],
@@ -886,6 +893,9 @@ ${overviewTemplate}`;
       console.log('[Anthropic API] Using DEEP analysis (comprehensive individual tool processing)');
       if (progressCallback) progressCallback(2, 'in-progress', `Analyzing ${facetTools.length} metrics comprehensively...`);
 
+      // Load the deep analysis template
+      const deepAnalysisTemplate = await getDeepAnalysisTemplate();
+
       // Process each tool individually with quality rating
       const comprehensiveResults = await processSequentialTools(
         facetTools,
@@ -895,6 +905,7 @@ ${overviewTemplate}`;
         message,
         handleDynamicFacetToolCall,
         progressCallback,
+        deepAnalysisTemplate,
       );
 
       // Use the high-quality insights from comprehensive processing
@@ -1226,7 +1237,7 @@ export default async function decorate(block) {
   // Variable to store analysis content for PDF generation
   let analysisContent = '';
 
-  // Download functionality
+  // Download functionality using the PDF export module
   const generatePDF = () => {
     if (!analysisContent) {
       // eslint-disable-next-line no-alert
@@ -1237,117 +1248,24 @@ export default async function decorate(block) {
     // Get URL from the dashboard input field
     const urlInput = document.querySelector('#url');
     const currentUrl = urlInput ? urlInput.value.trim() : '';
-    const reportTitle = currentUrl
-      ? `OpTel analysis report for ${currentUrl}`
-      : 'OpTel analysis report';
 
-    // Create filename by replacing spaces with dashes (for PDF save suggestion)
-    const filename = reportTitle.replace(/\s+/g, '-');
+    // Use the modular PDF export function
+    const success = generatePDFReport(analysisContent, {
+      url: currentUrl,
+      title: `OpTel Detective Analysis - ${currentUrl || 'Dashboard'}`,
+      debug: true, // Enable debug logging
+      preserveHtml: true, // Keep HTML formatting for better structure
+    });
 
-    // Store original title and change it BEFORE creating the iframe
-    const originalTitle = document.title;
-    console.log('Original title:', originalTitle);
-    console.log('Setting title to:', filename);
-    document.title = filename;
-    console.log('Document title is now:', document.title);
+    if (!success) {
+      console.error('[RUM Chat] PDF generation failed, trying text download fallback');
+      // Fallback to text download if PDF generation fails
+      const filename = currentUrl
+        ? `OpTel-analysis-${currentUrl.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().split('T')[0]}`
+        : `OpTel-analysis-${new Date().toISOString().split('T')[0]}`;
 
-    // Create a clean HTML content for printing
-    const cleanContent = analysisContent
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/&nbsp;/g, ' ') // Replace HTML entities
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .trim();
-
-    // Open a new window directly for printing with custom title
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${filename}</title>
-        <meta charset="utf-8">
-        <style>
-          @media print {
-            body { 
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: none;
-              margin: 0;
-              padding: 20px;
-            }
-            h1 { 
-              color: #2c5aa0;
-              border-bottom: 2px solid #2c5aa0;
-              padding-bottom: 10px;
-              margin-bottom: 20px;
-            }
-            .timestamp { 
-              color: #666;
-              font-size: 14px;
-              margin-bottom: 30px;
-            }
-            .content { 
-              white-space: pre-wrap;
-              font-size: 12px;
-              line-height: 1.5;
-            }
-            @page {
-              margin: 1in;
-              size: A4;
-            }
-          }
-          @media screen {
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 800px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            h1 { 
-              color: #2c5aa0;
-              border-bottom: 2px solid #2c5aa0;
-              padding-bottom: 10px;
-            }
-            .timestamp { 
-              color: #666;
-              font-size: 14px;
-              margin-bottom: 20px;
-            }
-            .content { 
-              white-space: pre-wrap;
-              line-height: 1.6;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <h1>${reportTitle}</h1>
-        <div class="timestamp">Generated on: ${new Date().toLocaleString()}</div>
-        <div class="content">${cleanContent}</div>
-        <script>
-          // Auto-trigger print dialog when page loads
-          window.onload = function() {
-            setTimeout(function() {
-              window.print();
-            }, 500);
-          };
-        </script>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-
-    // Restore original title after a delay
-    setTimeout(() => {
-      document.title = originalTitle;
-    }, 1000);
+      downloadAsText(analysisContent, filename);
+    }
   };
 
   downloadButton.addEventListener('click', generatePDF);
