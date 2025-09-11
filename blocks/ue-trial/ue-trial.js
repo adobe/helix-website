@@ -4,6 +4,16 @@ import createTag from '../../utils/tag.js';
 
 const V3_SITE_KEY = '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
 
+// Define the steps for the trial setup process
+const TRIAL_STEPS = [
+  { key: 'createUser', label: 'Creating user account' },
+  { key: 'quicksite', label: 'Creating site' },
+  { key: 'permissions', label: 'Setting up permissions' },
+  { key: 'codeBus', label: 'Configuring site / repo' },
+  { key: 'publishContent', label: 'Publishing content' },
+  { key: 'sendNotification', label: 'Sending notification' },
+];
+
 /**
  * Creates and shows a custom modal dialog
  * @param {string} message - The error message to display
@@ -181,16 +191,7 @@ function createStatusInline(form) {
   const stepsContainer = createTag('div', { class: 'steps-container' });
 
   // Create step elements for each major step
-  const steps = [
-    { key: 'createUser', label: 'Creating user account' },
-    { key: 'quicksite', label: 'Creating site' },
-    { key: 'permissions', label: 'Setting up permissions' },
-    { key: 'codeBus', label: 'Configuring site / repo' },
-    { key: 'publishContent', label: 'Publishing content' },
-    { key: 'sendNotification', label: 'Sending notification' },
-  ];
-
-  steps.forEach((step) => {
+  TRIAL_STEPS.forEach((step) => {
     const stepElement = createTag('div', {
       class: 'step-item',
       'data-step': step.key,
@@ -224,7 +225,7 @@ function createStatusInline(form) {
 }
 
 function updateStatusInline(form, status) {
-  const steps = ['createUser', 'permissions', 'quicksite', 'codeBus', 'publishContent', 'sendNotification'];
+  const steps = TRIAL_STEPS.map(step => step.key);
   let errorMessage = null;
   let errorStep = null;
   let hasError = false;
