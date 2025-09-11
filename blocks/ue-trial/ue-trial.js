@@ -14,6 +14,34 @@ const TRIAL_STEPS = [
   { key: 'sendNotification', label: 'Sending notification' },
 ];
 
+// Mapping object for step names to readable text for error messages
+const STEP_NAME_MAPPING = {
+  createUser: 'user account creation',
+  quicksite: 'site creation',
+  permissions: 'permissions setup',
+  codeBus: 'site/repo configuration',
+  publishContent: 'content publishing',
+  sendNotification: 'notification sending',
+};
+
+/**
+ * Formats a step key into a readable text for error messages
+ * @param {string} stepKey - The step key (e.g., 'createUser', 'publishContent')
+ * @returns {string} - The formatted readable text
+ */
+function formatStepNameForError(stepKey) {
+  // First check if we have a specific mapping for this step
+  if (STEP_NAME_MAPPING[stepKey]) {
+    return STEP_NAME_MAPPING[stepKey];
+  }
+  
+  // Fallback to a more robust camelCase conversion
+  return stepKey
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/^./, str => str.toLowerCase()) // Make first letter lowercase
+    .trim(); // Remove any leading/trailing spaces
+}
+
 /**
  * Creates and shows a custom modal dialog
  * @param {string} message - The error message to display
@@ -285,7 +313,7 @@ function updateStatusInline(form, status) {
       errorContainer.style.display = 'block';
       errorContainer.innerHTML = `
         <div class="error-message">
-          <p><strong>There was an error during the "${errorStep.replace(/([A-Z])/g, ' $1').toLowerCase()}" step:</strong><br>${errorMessage}</p>
+          <p><strong>There was an error during the "${formatStepNameForError(errorStep)}" step:</strong><br>${errorMessage}</p>
           <p>If you need help, please <a href="mailto:aemsitestrial@adobe.com">contact us at aemsitestrial@adobe.com</a>.</p>
         </div>
         <button class="retry-button" type="button">Try Again</button>
