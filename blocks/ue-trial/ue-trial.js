@@ -440,13 +440,24 @@ function extractTemplatesFromBlock(block) {
   return templates;
 }
 
-// Extract form submission logic into a separate function
-function submitFormData(form) {
+/**
+ * Processes form data by extracting values and converting types
+ * @param {HTMLFormElement} form - The form element to process
+ * @returns {Object} Processed form data object
+ */
+function processFormData(form) {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
   // Convert optIn to boolean
   data.optIn = data.optIn === 'true';
+
+  return data;
+}
+
+// Extract form submission logic into a separate function
+function submitFormData(form) {
+  const data = processFormData(form);
 
   fetch(`${base}/registration`, {
     method: 'POST',
@@ -817,12 +828,8 @@ function buildForm(block) {
           // Set the reCAPTCHA token
           document.getElementById('g-recaptcha-response').value = v3token;
 
-          // Collect form data
-          const formData = new FormData(form);
-          const data = Object.fromEntries(formData.entries());
-
-          // Convert optIn to boolean
-          data.optIn = data.optIn === 'true';
+          // Process form data
+          const data = processFormData(form);
 
           // Submit form data to server using fetch
           fetch(`${base}/registration`, {
