@@ -4,6 +4,43 @@ import createTag from '../../utils/tag.js';
 
 const V3_SITE_KEY = '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
 
+// Constants for template placeholder generation
+const PLACEHOLDER_COLORS = ['#e8f4fd', '#f0f9ff', '#fef3e2'];
+const PLACEHOLDER_DIMENSIONS = {
+  width: 150,
+  height: 120,
+};
+
+/**
+ * Generates a data URL for an SVG placeholder image
+ * @param {string} text - The text to display in the placeholder
+ * @param {number} index - The index to determine background color
+ * @param {Object} options - Optional configuration object
+ * @param {number} options.width - Width of the placeholder (default: 150)
+ * @param {number} options.height - Height of the placeholder (default: 120)
+ * @returns {string} Data URL for the SVG placeholder
+ */
+function generatePlaceholderSVG(text, index, options = {}) {
+  const { width = PLACEHOLDER_DIMENSIONS.width, height = PLACEHOLDER_DIMENSIONS.height } = options;
+  const backgroundColor = PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length];
+  const centerX = width / 2;
+  const centerY = height / 2;
+  
+  const svgContent = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${width}" height="${height}" fill="${backgroundColor}" stroke="#ddd" stroke-width="1"/>
+      <text x="${centerX}" y="${centerY - 10}" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#666">
+        ${text}
+      </text>
+      <text x="${centerX}" y="${centerY + 10}" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">
+        Preview
+      </text>
+    </svg>
+  `;
+  
+  return `data:image/svg+xml;base64,${btoa(svgContent)}`;
+}
+
 // Define the steps for the trial setup process
 const TRIAL_STEPS = [
   { key: 'createUser', label: 'Creating user account' },
@@ -488,20 +525,10 @@ function buildForm(block) {
     } else {
       // Create placeholder if no image available
       thumbnailImg = createTag('img', {
-        src: `data:image/svg+xml;base64,${btoa(`
-          <svg width="150" height="120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="150" height="120" fill="${['#e8f4fd', '#f0f9ff', '#fef3e2'][index]}" stroke="#ddd"/>
-            <text x="75" y="60" text-anchor="middle" font-family="Arial" font-size="14" fill="#666">
-              ${template.text}
-            </text>
-            <text x="75" y="80" text-anchor="middle" font-family="Arial" font-size="10" fill="#999">
-              Preview
-            </text>
-          </svg>
-        `)}`,
+        src: generatePlaceholderSVG(template.text, index),
         alt: template.text,
-        width: '150',
-        height: '120',
+        width: PLACEHOLDER_DIMENSIONS.width.toString(),
+        height: PLACEHOLDER_DIMENSIONS.height.toString(),
       });
     }
 
