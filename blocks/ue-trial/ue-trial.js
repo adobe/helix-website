@@ -3,6 +3,67 @@
 import createTag from '../../utils/tag.js';
 
 const V3_SITE_KEY = '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
+
+/**
+ * Creates and shows a custom modal dialog
+ * @param {string} message - The error message to display
+ * @param {string} title - The modal title (optional, defaults to "Error")
+ */
+function showModal(message, title = 'Error') {
+  // Create modal overlay
+  const overlay = createTag('div', { class: 'modal-overlay' });
+  
+  // Create modal container
+  const modal = createTag('div', { class: 'modal-container' });
+  
+  // Create modal header
+  const header = createTag('div', { class: 'modal-header' });
+  const modalTitle = createTag('h3', {}, title);
+  const closeButton = createTag('button', { class: 'modal-close', type: 'button' }, '×');
+  header.append(modalTitle, closeButton);
+  
+  // Create modal body
+  const body = createTag('div', { class: 'modal-body' });
+  const messageElement = createTag('p', {}, message);
+  body.append(messageElement);
+  
+  // Create modal footer
+  const footer = createTag('div', { class: 'modal-footer' });
+  const okButton = createTag('button', { class: 'modal-ok', type: 'button' }, 'OK');
+  footer.append(okButton);
+  
+  // Assemble modal
+  modal.append(header, body, footer);
+  overlay.append(modal);
+  
+  // Add to document
+  document.body.appendChild(overlay);
+  
+  // Add event listeners
+  const closeModal = () => {
+    document.body.removeChild(overlay);
+  };
+  
+  closeButton.addEventListener('click', closeModal);
+  okButton.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      closeModal();
+    }
+  });
+  
+  // Close on Escape key
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+  
+  // Focus the OK button for accessibility
+  okButton.focus();
+}
 const V2_SITE_KEY = '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf';
 const base = 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api';
 
@@ -338,8 +399,7 @@ function submitFormData(form) {
       }
     })
     .catch((error) => {
-      /* eslint-disable no-alert */
-      alert(error.message);
+      showModal(error.message);
       const submitButtonError = form.querySelector('button[type="submit"]');
       submitButtonError.disabled = false;
       submitButtonError.textContent = 'Continue';
@@ -729,8 +789,7 @@ function buildForm(block) {
                 }
               }
             }).catch((error) => {
-              // eslint-disable-next-line no-alert
-              alert(error.message);
+              showModal(error.message);
               submitButton.disabled = false;
               submitButton.textContent = 'Continue';
             });
