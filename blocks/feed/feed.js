@@ -203,6 +203,15 @@ export async function renderBlog(block) {
 
     rightContainer.appendChild(blogLink);
   });
+
+  // Add link to blog archive
+  const archiveLink = createTag('div', { class: 'archive-link-container' });
+  const link = createTag('a', {
+    href: '/blog/archive',
+    class: 'archive-link button primary',
+  }, 'View All Posts');
+  archiveLink.appendChild(link);
+  rightContainer.appendChild(archiveLink);
 }
 
 export default async function decorate(block) {
