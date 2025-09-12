@@ -13,7 +13,7 @@ async function fetchConfig() {
   if (config) {
     return config;
   }
-  
+
   try {
     const response = await fetch('https://www.aem.live/config.json');
     if (!response.ok) {
@@ -23,16 +23,17 @@ async function fetchConfig() {
     config = configData.public;
     return config;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching configuration:', error);
     // Fallback to hard-coded values if config service is unavailable
     config = {
       recaptcha: {
         v2: { key: '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf' },
-        v3: { key: '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx' }
+        v3: { key: '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx' },
       },
       xwalktrial: {
-        webApi: 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api'
-      }
+        webApi: 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api',
+      },
     };
     return config;
   }
@@ -59,7 +60,7 @@ function generatePlaceholderSVG(text, index, options = {}) {
   const backgroundColor = PLACEHOLDER_COLORS[index % PLACEHOLDER_COLORS.length];
   const centerX = width / 2;
   const centerY = height / 2;
-  
+
   const svgContent = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="${width}" height="${height}" fill="${backgroundColor}" stroke="#ddd" stroke-width="1"/>
@@ -71,7 +72,7 @@ function generatePlaceholderSVG(text, index, options = {}) {
       </text>
     </svg>
   `;
-  
+
   return `data:image/svg+xml;base64,${btoa(svgContent)}`;
 }
 
@@ -105,11 +106,11 @@ function formatStepNameForError(stepKey) {
   if (STEP_NAME_MAPPING[stepKey]) {
     return STEP_NAME_MAPPING[stepKey];
   }
-  
+
   // Fallback to a more robust camelCase conversion
   return stepKey
     .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-    .replace(/^./, str => str.toLowerCase()) // Make first letter lowercase
+    .replace(/^./, (str) => str.toLowerCase()) // Make first letter lowercase
     .trim(); // Remove any leading/trailing spaces
 }
 
@@ -121,38 +122,38 @@ function formatStepNameForError(stepKey) {
 function showModal(message, title = 'Error') {
   // Create modal overlay
   const overlay = createTag('div', { class: 'modal-overlay' });
-  
+
   // Create modal container
   const modal = createTag('div', { class: 'modal-container' });
-  
+
   // Create modal header
   const header = createTag('div', { class: 'modal-header' });
   const modalTitle = createTag('h3', {}, title);
   const closeButton = createTag('button', { class: 'modal-close', type: 'button' }, '×');
   header.append(modalTitle, closeButton);
-  
+
   // Create modal body
   const body = createTag('div', { class: 'modal-body' });
   const messageElement = createTag('p', {}, message);
   body.append(messageElement);
-  
+
   // Create modal footer
   const footer = createTag('div', { class: 'modal-footer' });
   const okButton = createTag('button', { class: 'modal-ok', type: 'button' }, 'OK');
   footer.append(okButton);
-  
+
   // Assemble modal
   modal.append(header, body, footer);
   overlay.append(modal);
-  
+
   // Add to document
   document.body.appendChild(overlay);
-  
+
   // Add event listeners
   const closeModal = () => {
     document.body.removeChild(overlay);
   };
-  
+
   closeButton.addEventListener('click', closeModal);
   okButton.addEventListener('click', closeModal);
   overlay.addEventListener('click', (e) => {
@@ -160,7 +161,7 @@ function showModal(message, title = 'Error') {
       closeModal();
     }
   });
-  
+
   // Close on Escape key
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
@@ -169,21 +170,20 @@ function showModal(message, title = 'Error') {
     }
   };
   document.addEventListener('keydown', handleEscape);
-  
+
   // Focus the OK button for accessibility
   okButton.focus();
 }
-
 
 /**
  * Loads the reCAPTCHA script dynamically
  */
 async function loadRecaptchaScript() {
-  const config = await fetchConfig();
-  
+  const recaptchaConfig = await fetchConfig();
+
   // reCAPTCHA v3
   const script = document.createElement('script');
-  script.src = `https://www.google.com/recaptcha/api.js?render=${config.recaptcha.v3.key}`;
+  script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaConfig.recaptcha.v3.key}`;
   document.head.appendChild(script);
   // reCAPTCHA v2
   const scriptV2 = document.createElement('script');
@@ -244,7 +244,7 @@ function createStatusInline(form) {
 }
 
 function updateStatusInline(form, status) {
-  const steps = TRIAL_STEPS.map(step => step.key);
+  const steps = TRIAL_STEPS.map((step) => step.key);
   let errorMessage = null;
   let errorStep = null;
   let hasError = false;
@@ -333,8 +333,8 @@ function updateStatusInline(form, status) {
 }
 
 async function checkStatus(form, processId) {
-  const config = await fetchConfig();
-  const resp = await fetch(`${config.xwalktrial.webApi}/check-status?processId=${processId}`);
+  const statusConfig = await fetchConfig();
+  const resp = await fetch(`${statusConfig.xwalktrial.webApi}/check-status?processId=${processId}`);
   const check = await resp.json();
 
   const hasError = updateStatusInline(form, check);
@@ -404,16 +404,15 @@ function processFormData(form) {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
-
   return data;
 }
 
 // Extract form submission logic into a separate function
 async function submitFormData(form) {
   const data = processFormData(form);
-  const config = await fetchConfig();
+  const submitConfig = await fetchConfig();
 
-  fetch(`${config.xwalktrial.webApi}/registration`, {
+  fetch(`${submitConfig.xwalktrial.webApi}/registration`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -537,7 +536,6 @@ function buildForm(block) {
   const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
   githubField.append(githubLabel, githubInput, githubHelpText);
 
-
   // Terms and Conditions
   const agreement = createTag('div', { class: 'agreement' });
   const agreementText = createTag('p', {}, 'By clicking on "Continue", I agree that:');
@@ -617,12 +615,12 @@ function buildForm(block) {
 
   let v2Rendered = false;
   async function showV2Captcha() {
-    const config = await fetchConfig();
+    const v2Config = await fetchConfig();
     verInput.value = 'v2';
     v2container.style.display = 'block';
     if (!v2Rendered) {
       grecaptcha.render('recaptcha-v2', {
-        sitekey: config.recaptcha.v2.key,
+        sitekey: v2Config.recaptcha.v2.key,
         callback: (token) => {
           recaptchaField.value = token;
           submitFormData(form);
@@ -643,9 +641,9 @@ function buildForm(block) {
 
     if (verInput.value === 'v3') {
       // Execute v3 reCAPTCHA verification
-      const config = await fetchConfig();
+      const v3Config = await fetchConfig();
       grecaptcha.ready(() => {
-        grecaptcha.execute(config.recaptcha.v3.key, { action: 'submit' }).then((v3token) => {
+        grecaptcha.execute(v3Config.recaptcha.v3.key, { action: 'submit' }).then((v3token) => {
           // Set the reCAPTCHA token
           document.getElementById('g-recaptcha-response').value = v3token;
 
@@ -653,7 +651,7 @@ function buildForm(block) {
           const data = processFormData(form);
 
           // Submit form data to server using fetch
-          fetch(`${config.xwalktrial.webApi}/registration`, {
+          fetch(`${v3Config.xwalktrial.webApi}/registration`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -683,7 +681,6 @@ function buildForm(block) {
       submitFormData(form);
     }
   });
-
 
   return form;
 }
