@@ -171,6 +171,58 @@
   line-height: var(--type-body-s-lh);
 }
 
+/* Archive view */
+.feed.blog.archive .blog-archive {
+  display: block;
+  margin-top: var(--spacing-m);
+}
+
+.feed.blog.archive .archive-year {
+  margin-bottom: var(--spacing-l);
+}
+
+.feed.blog.archive .archive-year-heading {
+  font-size: var(--type-heading-l-size);
+  line-height: var(--type-heading-l-lh);
+  margin: var(--spacing-m) 0 var(--spacing-s);
+}
+
+.feed.blog.archive .archive-month-heading {
+  font-size: var(--type-heading-m-size);
+  line-height: var(--type-heading-m-lh);
+  margin: var(--spacing-s) 0 var(--spacing-xs);
+}
+
+.feed.blog.archive .archive-post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-m);
+}
+
+.feed.blog.archive .archive-post-item {
+  padding: var(--spacing-2xs) 0;
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.feed.blog.archive .archive-post-item:last-child {
+  border-bottom: 0;
+}
+
+.feed.blog.archive .archive-post-title {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.feed.blog.archive .archive-post-title:hover {
+  text-decoration: underline;
+}
+
+.feed.blog.archive .archive-post-meta {
+  color: var(--color-gray-600);
+  margin-left: var(--spacing-2xs);
+  white-space: nowrap;
+}
+
 .feed.recent .desc,
 .feed.blog .desc {
   /* stylelint-disable-next-line value-no-vendor-prefix */

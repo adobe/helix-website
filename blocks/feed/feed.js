@@ -205,23 +205,109 @@ export async function renderBlog(block) {
   });
 }
 
+// logic to render a grouped blog archive (year > month > posts)
+export async function renderBlogArchive(block) {
+  if (!block) return;
+
+  const blogIndex = (window.blogindex && window.blogindex.data) || [];
+
+  // Normalize and filter valid entries
+  const entries = blogIndex
+    .map((e) => ({
+      path: e.path,
+      title: e.title || e.Title || '(Untitled)',
+      author: e.author || e.Author || '',
+      publicationDate: e.publicationDate || e.lastModified || '',
+    }))
+    .filter((e) => e.path && e.title && e.publicationDate);
+
+  // Group by year and month
+  const groups = new Map(); // key: `${year}-${month}` value: array of entries
+
+  entries.forEach((e) => {
+    const d = new Date(e.publicationDate);
+    if (Number.isNaN(d.getTime())) return;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const key = `${y}-${m}`;
+    if (!groups.has(key)) groups.set(key, { year: y, month: m, items: [] });
+    groups.get(key).items.push({ ...e, dateObj: d });
+  });
+
+  // Sort groups by year-month desc and items by date desc
+  const sortedGroups = Array.from(groups.values())
+    .sort((a, b) => (a.year !== b.year ? b.year - a.year : b.month.localeCompare(a.month)));
+  sortedGroups.forEach((g) => g.items.sort((a, b) => b.dateObj - a.dateObj));
+
+  // Build DOM
+  const container = createTag('div', { class: 'blog-archive' });
+
+  // Group by year for headings
+  let currentYear;
+  let yearSection;
+  sortedGroups.forEach((group) => {
+    if (group.year !== currentYear) {
+      currentYear = group.year;
+      yearSection = createTag('section', { class: 'archive-year' });
+      const h2 = createTag('h2', { class: 'archive-year-heading' }, String(currentYear));
+      yearSection.appendChild(h2);
+      container.appendChild(yearSection);
+    }
+
+    const monthDate = new Date(`${group.year}-${group.month}-01T00:00:00Z`);
+    const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'long' });
+    const monthWrapper = createTag('div', { class: 'archive-month' });
+    const h3 = createTag('h3', { class: 'archive-month-heading' }, `${monthLabel}`);
+    monthWrapper.appendChild(h3);
+
+    const ul = createTag('ul', { class: 'archive-post-list' });
+    group.items.forEach((item) => {
+      const li = createTag('li', { class: 'archive-post-item' });
+      const a = createTag('a', { href: item.path, class: 'archive-post-title' }, item.title);
+      const dateStr = item.dateObj.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric',
+      });
+      const authorStr = item.author ? ` by ${item.author}` : '';
+      const meta = createTag('span', { class: 'archive-post-meta' }, ` — ${dateStr}${authorStr}`);
+      li.appendChild(a);
+      li.appendChild(meta);
+      ul.appendChild(li);
+    });
+
+    monthWrapper.appendChild(ul);
+    yearSection.appendChild(monthWrapper);
+  });
+
+  // Clear previous and append
+  block.innerHTML = '';
+  block.appendChild(container);
+}
+
 export default async function decorate(block) {
   const isBlog = block.classList.contains('blog');
+  const isArchive = block.classList.contains('archive');
 
-  if (isBlog) {
+  if (isBlog || isArchive) {
     loadBlogData();
   } else {
     loadFeedData();
   }
 
   const checkDataLoaded = () => {
-    if (isBlog) {
+    if (isBlog || isArchive) {
       return window?.blogindex?.loaded;
     }
     return window?.siteindex?.loaded;
   };
 
-  const renderFunction = isBlog ? renderBlog : renderFeed;
+  let renderFunction;
+  if (isArchive) {
+    renderFunction = renderBlogArchive;
+  } else if (isBlog) {
+    renderFunction = renderBlog;
+  } else {
+    renderFunction = renderFeed;
+  }
 
   if (!block.dataset.rendered) {
     if (checkDataLoaded()) {
