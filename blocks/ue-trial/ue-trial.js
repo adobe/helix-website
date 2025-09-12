@@ -2,7 +2,41 @@
 
 import createTag from '../../utils/tag.js';
 
-const V3_SITE_KEY = '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx';
+// Configuration will be loaded dynamically from config service
+let config = null;
+
+/**
+ * Fetches configuration from the config service
+ * @returns {Promise<Object>} Configuration object with API keys and base URL
+ */
+async function fetchConfig() {
+  if (config) {
+    return config;
+  }
+  
+  try {
+    const response = await fetch('https://www.aem.live/config.json');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch config: ${response.status}`);
+    }
+    const configData = await response.json();
+    config = configData.public;
+    return config;
+  } catch (error) {
+    console.error('Error fetching configuration:', error);
+    // Fallback to hard-coded values if config service is unavailable
+    config = {
+      recaptcha: {
+        v2: { key: '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf' },
+        v3: { key: '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx' }
+      },
+      xwalktrial: {
+        webApi: 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api'
+      }
+    };
+    return config;
+  }
+}
 
 // Constants for template placeholder generation
 const PLACEHOLDER_COLORS = ['#e8f4fd', '#f0f9ff', '#fef3e2'];
@@ -139,8 +173,6 @@ function showModal(message, title = 'Error') {
   // Focus the OK button for accessibility
   okButton.focus();
 }
-const V2_SITE_KEY = '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf';
-const base = 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api';
 
 /**
  * Loads states based on selected country
@@ -226,10 +258,12 @@ function loadStates(stateSelect, country) {
 /**
  * Loads the reCAPTCHA script dynamically
  */
-function loadRecaptchaScript() {
+async function loadRecaptchaScript() {
+  const config = await fetchConfig();
+  
   // reCAPTCHA v3
   const script = document.createElement('script');
-  script.src = `https://www.google.com/recaptcha/api.js?render=${V3_SITE_KEY}`;
+  script.src = `https://www.google.com/recaptcha/api.js?render=${config.recaptcha.v3.key}`;
   document.head.appendChild(script);
   // reCAPTCHA v2
   const scriptV2 = document.createElement('script');
@@ -379,7 +413,8 @@ function updateStatusInline(form, status) {
 }
 
 async function checkStatus(form, processId) {
-  const resp = await fetch(`${base}/check-status?processId=${processId}`);
+  const config = await fetchConfig();
+  const resp = await fetch(`${config.xwalktrial.webApi}/check-status?processId=${processId}`);
   const check = await resp.json();
 
   const hasError = updateStatusInline(form, check);
@@ -456,10 +491,11 @@ function processFormData(form) {
 }
 
 // Extract form submission logic into a separate function
-function submitFormData(form) {
+async function submitFormData(form) {
   const data = processFormData(form);
+  const config = await fetchConfig();
 
-  fetch(`${base}/registration`, {
+  fetch(`${config.xwalktrial.webApi}/registration`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -797,12 +833,13 @@ function buildForm(block) {
   );
 
   let v2Rendered = false;
-  function showV2Captcha() {
+  async function showV2Captcha() {
+    const config = await fetchConfig();
     verInput.value = 'v2';
     v2container.style.display = 'block';
     if (!v2Rendered) {
       grecaptcha.render('recaptcha-v2', {
-        sitekey: V2_SITE_KEY,
+        sitekey: config.recaptcha.v2.key,
         callback: (token) => {
           recaptchaField.value = token;
           submitFormData(form);
@@ -813,7 +850,7 @@ function buildForm(block) {
   }
 
   // Add form submission handler
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     // Disable submit button to prevent multiple submissions
@@ -823,8 +860,9 @@ function buildForm(block) {
 
     if (verInput.value === 'v3') {
       // Execute v3 reCAPTCHA verification
+      const config = await fetchConfig();
       grecaptcha.ready(() => {
-        grecaptcha.execute(V3_SITE_KEY, { action: 'submit' }).then((v3token) => {
+        grecaptcha.execute(config.recaptcha.v3.key, { action: 'submit' }).then((v3token) => {
           // Set the reCAPTCHA token
           document.getElementById('g-recaptcha-response').value = v3token;
 
@@ -832,7 +870,7 @@ function buildForm(block) {
           const data = processFormData(form);
 
           // Submit form data to server using fetch
-          fetch(`${base}/registration`, {
+          fetch(`${config.xwalktrial.webApi}/registration`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -883,9 +921,9 @@ function buildForm(block) {
   return form;
 }
 
-export default function decorate(block) {
+export default async function decorate(block) {
   // Load reCAPTCHA script
-  loadRecaptchaScript();
+  await loadRecaptchaScript();
 
   // Get the original content from the block (excluding template-selection-data)
   const infoContent = block.querySelector(':scope > div:first-child');
