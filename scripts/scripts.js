@@ -719,8 +719,9 @@ async function loadLazy(doc) {
           // Find all images above the target element that are lazy-loaded
           const allImages = Array.from(document.querySelectorAll('img'));
           const precedingImages = allImages
-            .filter(img => img.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING;
-        });
+            // eslint-disable-next-line no-bitwise
+            .filter((img) => (img.compareDocumentPosition(element)
+              & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
 
           if (precedingImages.length === 0) {
             // No lazy-loaded images above target, scroll immediately
