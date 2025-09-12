@@ -49,7 +49,7 @@
 }
 
 .post-link:hover {
-  color: var(--primary-color, #0066cc);
+  color: var(--primary-color, #06c);
 }
 
 .post-date {
@@ -83,7 +83,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 600px) {
+@media (width <= 600px) {
   .blog-archive-container {
     padding: 1rem 0.5rem;
   }

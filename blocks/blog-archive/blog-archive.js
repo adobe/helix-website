@@ -1,5 +1,4 @@
 import { createTag, loadBlogData } from '../../scripts/scripts.js';
-import { getMetadata } from '../../scripts/lib-franklin.js';
 
 function groupPostsByYearAndMonth(posts) {
   const grouped = {};
