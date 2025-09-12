@@ -20,7 +20,7 @@ function parseChapterTimestamps(description, videoUrl) {
   if (!description) return [];
 
   // Match timestamps like 00:00, 0:00, 01:23, 1:23:45
-  const timestampRegex = /(?:^|\n)(\d{1,2}:?\d{1,2}:\d{2}|\d{1,2}:\d{2})\s+([^\n]+)/g;
+  const timestampRegex = /(?:^|\n)(\d{1,2}:\d{1,2}:\d{2}|\d{1,2}:\d{2})\s+([^\n]+)/g;
   const chapters = [];
   let match = timestampRegex.exec(description);
 
