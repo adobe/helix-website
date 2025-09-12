@@ -352,6 +352,21 @@ async function checkStatus(form, processId) {
 }
 
 /**
+ * Extracts terms and conditions content from the block
+ * @param {HTMLElement} block - The xwalk-trials block containing terms and conditions
+ * @returns {HTMLElement|null} The terms and conditions content element or null if not found
+ */
+function extractTermsAndConditionsFromBlock(block) {
+  const rows = block.querySelectorAll(':scope > div');
+  if (rows.length >= 2) {
+    const secondRow = rows[1]; // Second row (0-indexed)
+    const secondDiv = secondRow.querySelector(':scope > div:nth-child(2)');
+    return secondDiv;
+  }
+  return null;
+}
+
+/**
  * Extracts template data from the merged template-selection-data within the block
  * @param {HTMLElement} block - The xwalk-trials block containing merged template data
  * @returns {Array} Array of template objects with value, text, description, and image
@@ -359,7 +374,7 @@ async function checkStatus(form, processId) {
 function extractTemplatesFromBlock(block) {
   const templates = [];
 
-  const templateRows = block.querySelectorAll(':scope > div:not(:first-child)');
+  const templateRows = block.querySelectorAll(':scope > div:not(:nth-child(-n+2))');
 
   templateRows.forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -454,6 +469,7 @@ function buildForm(block) {
   const templateField = createTag('div', { class: 'form-field template-selector-field' });
   const templateLabel = createTag('label', {}, 'Select Template');
 
+  const termsAndConditions = extractTermsAndConditionsFromBlock(block);
   // Extract templates from the merged template-selection-data within this block
   const templates = extractTemplatesFromBlock(block);
 
@@ -536,43 +552,33 @@ function buildForm(block) {
   const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
   githubField.append(githubLabel, githubInput, githubHelpText);
 
-  // Terms and Conditions
+  // Terms and Conditions - extract from block content
   const agreement = createTag('div', { class: 'agreement' });
-  const agreementText = createTag('p', {}, 'By clicking on "Continue", I agree that:');
 
-  const terms = createTag('ul');
+  if (termsAndConditions) {
+    // Clone the extracted content to preserve the original structure
+    const clonedContent = termsAndConditions.cloneNode(true);
 
-  const term1 = createTag('li', {}, 'The ');
-  const adobeLink = createTag('a', { href: 'https://www.adobe.com/about-adobe.html', target: '_blank' }, 'Adobe family of companies');
-  term1.append(adobeLink);
-  term1.append(' may keep me informed with ');
-  const personalizedLink = createTag('a', { href: 'https://www.adobe.com/privacy.html', target: '_blank' }, 'personalized');
-  term1.append(personalizedLink);
-  term1.append(' calls about products and services.');
+    // Find the last paragraph and add checkbox before it
+    const paragraphs = clonedContent.querySelectorAll('p');
+    if (paragraphs.length > 0) {
+      const lastParagraph = paragraphs[paragraphs.length - 1];
 
-  terms.append(term1);
+      // Create checkbox
+      const checkbox = createTag('input', {
+        type: 'checkbox',
+        id: 'terms-and-conditions',
+        name: 'termsAndConditions',
+        value: 'true',
+        required: 'true',
+      });
 
-  const privacyText = createTag('p', {}, 'See our ');
-  const privacyLink = createTag('a', { href: 'https://www.adobe.com/privacy/policy.html', target: '_blank' }, 'Privacy Policy');
-  privacyText.append(privacyLink);
-  privacyText.append(' for more details or to opt-out at any time.');
+      // Insert checkbox before the last paragraph
+      lastParagraph.parentNode.insertBefore(checkbox, lastParagraph);
+    }
 
-  agreement.append(agreementText, terms, privacyText);
-
-  // Terms and Conditions checkbox
-  const termsAndConditions = createTag('div', { class: 'form-field checkbox-field' });
-  const termsAndConditionsCheckbox = createTag('input', {
-    type: 'checkbox',
-    id: 'terms-and-conditions',
-    name: 'termsAndConditions',
-    value: 'true',
-    required: 'true',
-  });
-  const termsAndConditionsLabel = createTag('label', { for: 'terms-and-conditions' }, 'I have read and accepted the ');
-  const termsLink = createTag('a', { href: './ue-trial-terms.pdf', target: '_blank' }, 'Terms of Use');
-  termsAndConditionsLabel.append(termsLink);
-  termsAndConditionsLabel.append('.');
-  termsAndConditions.append(termsAndConditionsCheckbox, termsAndConditionsLabel);
+    agreement.appendChild(clonedContent);
+  }
 
   const verInput = createTag('input', {
     type: 'hidden',
@@ -606,7 +612,6 @@ function buildForm(block) {
     githubField,
     templateField,
     agreement,
-    termsAndConditions,
     verInput,
     recaptchaField,
     v2container,
