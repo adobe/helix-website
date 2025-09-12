@@ -184,10 +184,6 @@
   max-width: 100%;
 }
 
-.ue-trial .form-row {
-  display: flex;
-  gap: 20px;
-}
 
 .ue-trial .form-field {
   flex: 1;
@@ -537,10 +533,6 @@
     flex-direction: column;
   }
 
-  .ue-trial .form-row {
-    flex-direction: column;
-    gap: 15px;
-  }
 
   .ue-trial .trial-info > div > div:first-child {
     flex-direction: row;

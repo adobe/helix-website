@@ -174,86 +174,6 @@ function showModal(message, title = 'Error') {
   okButton.focus();
 }
 
-/**
- * Loads states based on selected country
- * @param {HTMLSelectElement} stateSelect - The state select element
- * @param {string} country - The selected country code
- */
-function loadStates(stateSelect, country) {
-  stateSelect.innerHTML = '';
-
-  if (country === 'US') {
-    const usStates = [
-      { value: '', text: 'Select an option...' },
-      { value: 'AA', text: 'Armed Forces America' },
-      { value: 'AE', text: 'Armed Forces Europe' },
-      { value: 'AK', text: 'Alaska' },
-      { value: 'AL', text: 'Alabama' },
-      { value: 'AP', text: 'Armed Forces Pacific' },
-      { value: 'AR', text: 'Arkansas' },
-      { value: 'AS', text: 'American Samoa' },
-      { value: 'AZ', text: 'Arizona' },
-      { value: 'CA', text: 'California' },
-      { value: 'CO', text: 'Colorado' },
-      { value: 'CT', text: 'Connecticut' },
-      { value: 'DC', text: 'District of Columbia' },
-      { value: 'DE', text: 'Delaware' },
-      { value: 'FL', text: 'Florida' },
-      { value: 'GA', text: 'Georgia' },
-      { value: 'GU', text: 'Guam' },
-      { value: 'HI', text: 'Hawaii' },
-      { value: 'IA', text: 'Iowa' },
-      { value: 'ID', text: 'Idaho' },
-      { value: 'IL', text: 'Illinois' },
-      { value: 'IN', text: 'Indiana' },
-      { value: 'KS', text: 'Kansas' },
-      { value: 'KY', text: 'Kentucky' },
-      { value: 'LA', text: 'Louisiana' },
-      { value: 'MA', text: 'Massachusetts' },
-      { value: 'MD', text: 'Maryland' },
-      { value: 'ME', text: 'Maine' },
-      { value: 'MI', text: 'Michigan' },
-      { value: 'MN', text: 'Minnesota' },
-      { value: 'MO', text: 'Missouri' },
-      { value: 'MP', text: 'Mariana Islands' },
-      { value: 'MS', text: 'Mississippi' },
-      { value: 'MT', text: 'Montana' },
-      { value: 'NC', text: 'North Carolina' },
-      { value: 'ND', text: 'North Dakota' },
-      { value: 'NE', text: 'Nebraska' },
-      { value: 'NH', text: 'New Hampshire' },
-      { value: 'NJ', text: 'New Jersey' },
-      { value: 'NM', text: 'New Mexico' },
-      { value: 'NV', text: 'Nevada' },
-      { value: 'NY', text: 'New York' },
-      { value: 'OH', text: 'Ohio' },
-      { value: 'OK', text: 'Oklahoma' },
-      { value: 'OR', text: 'Oregon' },
-      { value: 'PA', text: 'Pennsylvania' },
-      { value: 'PR', text: 'Puerto Rico' },
-      { value: 'PW', text: 'Palau' },
-      { value: 'RI', text: 'Rhode Island' },
-      { value: 'SC', text: 'South Carolina' },
-      { value: 'SD', text: 'South Dakota' },
-      { value: 'TN', text: 'Tennessee' },
-      { value: 'TX', text: 'Texas' },
-      { value: 'UT', text: 'Utah' },
-      { value: 'VA', text: 'Virginia' },
-      { value: 'VI', text: 'Virgin Islands, US' },
-      { value: 'VT', text: 'Vermont' },
-      { value: 'WA', text: 'Washington' },
-      { value: 'WI', text: 'Wisconsin' },
-      { value: 'WV', text: 'West Virginia' },
-      { value: 'WY', text: 'Wyoming' },
-    ];
-
-    usStates.forEach((state) => {
-      stateSelect.append(createTag('option', { value: state.value }, state.text));
-    });
-  } else {
-    stateSelect.append(createTag('option', { value: '' }, 'Select an option...'));
-  }
-}
 
 /**
  * Loads the reCAPTCHA script dynamically
@@ -484,8 +404,6 @@ function processFormData(form) {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
-  // Convert optIn to boolean
-  data.optIn = data.optIn === 'true';
 
   return data;
 }
@@ -619,141 +537,6 @@ function buildForm(block) {
   const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
   githubField.append(githubLabel, githubInput, githubHelpText);
 
-  // Country/Region and State/Province in a row
-  const locationRow = createTag('div', { class: 'form-row' });
-
-  // Country/Region
-  const countryField = createTag('div', { class: 'form-field' });
-  const countryLabel = createTag('label', { for: 'country' }, 'Country / Region');
-  const countrySelect = createTag('select', {
-    id: 'country',
-    name: 'country',
-    required: 'true',
-  });
-
-  // Define countries with their ISO 3166-1 alpha-2 codes
-  /* eslint-disable quote-props */
-  const countries = {
-    'Algeria': 'DZ',
-    'Argentina': 'AR',
-    'Armenia': 'AM',
-    'Australia': 'AU',
-    'Austria': 'AT',
-    'Azerbaijan': 'AZ',
-    'Bahrain': 'BH',
-    'Belarus': 'BY',
-    'Belgium': 'BE',
-    'Bolivia': 'BO',
-    'Brazil': 'BR',
-    'Bulgaria': 'BG',
-    'Canada': 'CA',
-    'Chile': 'CL',
-    'Colombia': 'CO',
-    'Costa Rica': 'CR',
-    'Croatia': 'HR',
-    'Cyprus': 'CY',
-    'Czech Republic': 'CZ',
-    'Denmark': 'DK',
-    'Dominican Republic': 'DO',
-    'Ecuador': 'EC',
-    'Egypt': 'EG',
-    'El Salvador': 'SV',
-    'Estonia': 'EE',
-    'Finland': 'FI',
-    'France': 'FR',
-    'Georgia': 'GE',
-    'Germany': 'DE',
-    'Greece': 'GR',
-    'Guatemala': 'GT',
-    'Hong Kong SAR of China': 'HK',
-    'Hungary': 'HU',
-    'India': 'IN',
-    'Indonesia': 'ID',
-    'Ireland': 'IE',
-    'Israel': 'IL',
-    'Italy': 'IT',
-    'Japan': 'JP',
-    'Jordan': 'JO',
-    'Kazakhstan': 'KZ',
-    'Kenya': 'KE',
-    'Korea, South': 'KR',
-    'Kuwait': 'KW',
-    'Kyrgyzstan': 'KG',
-    'Latvia': 'LV',
-    'Lebanon': 'LB',
-    'Lithuania': 'LT',
-    'Luxembourg': 'LU',
-    'Macau SAR of China': 'MO',
-    'Malaysia': 'MY',
-    'Malta': 'MT',
-    'Mauritius': 'MU',
-    'Mexico': 'MX',
-    'Moldova': 'MD',
-    'Morocco': 'MA',
-    'Netherlands': 'NL',
-    'New Zealand': 'NZ',
-    'Nigeria': 'NG',
-    'Norway': 'NO',
-    'Oman': 'OM',
-    'Panama': 'PA',
-    'Paraguay': 'PY',
-    'Peru': 'PE',
-    'Philippines': 'PH',
-    'Poland': 'PL',
-    'Portugal': 'PT',
-    'Qatar': 'QA',
-    'Romania': 'RO',
-    'Russia': 'RU',
-    'Saudi Arabia': 'SA',
-    'Singapore': 'SG',
-    'Slovakia': 'SK',
-    'Slovenia': 'SI',
-    'South Africa': 'ZA',
-    'Spain': 'ES',
-    'Sri Lanka': 'LK',
-    'Sweden': 'SE',
-    'Switzerland': 'CH',
-    'Taiwan Region': 'TW',
-    'Tajikistan': 'TJ',
-    'Thailand': 'TH',
-    'Trinidad and Tobago': 'TT',
-    'Tunisia': 'TN',
-    'Turkey': 'TR',
-    'Turkmenistan': 'TM',
-    'Ukraine': 'UA',
-    'United Arab Emirates': 'AE',
-    'United Kingdom': 'GB',
-    'United States': 'US',
-    'Uruguay': 'UY',
-    'Uzbekistan': 'UZ',
-    'Venezuela': 'VE',
-    'Vietnam': 'VN',
-    'Yemen': 'YE',
-  };
-
-  // Add countries to select element
-  Object.entries(countries).forEach(([countryName, countryCode]) => {
-    const option = createTag('option', { value: countryCode }, countryName);
-    if (countryName === 'United States') option.selected = true;
-    countrySelect.append(option);
-  });
-
-  countryField.append(countryLabel, countrySelect);
-
-  // State/Province
-  const stateField = createTag('div', { class: 'form-field', id: 'state-field' });
-  const stateLabel = createTag('label', { for: 'state' }, 'State / Province');
-  const stateSelect = createTag('select', {
-    id: 'state',
-    name: 'state',
-    required: 'true',
-  });
-
-  stateField.append(stateLabel, stateSelect);
-  locationRow.append(countryField, stateField);
-
-  // Load initial states based on default country (US)
-  loadStates(stateSelect, 'US');
 
   // Terms and Conditions
   const agreement = createTag('div', { class: 'agreement' });
@@ -901,22 +684,6 @@ function buildForm(block) {
     }
   });
 
-  // Add dynamic state selection based on country and hide/show logic
-  countrySelect.addEventListener('change', () => {
-    const selectedCountry = countrySelect.value;
-
-    // Show state field only for US
-    if (selectedCountry === 'US') {
-      stateField.style.display = 'flex';
-      stateSelect.setAttribute('required', 'true');
-      loadStates(stateSelect, selectedCountry);
-    } else {
-      stateField.style.display = 'none';
-      stateSelect.removeAttribute('required');
-      // Clear state selection when country is not US
-      stateSelect.innerHTML = '';
-    }
-  });
 
   return form;
 }
