@@ -1,0 +1,41 @@
+
+.blog-archive-container {
+  margin: 2rem 0;
+}
+
+.blog-archive-group {
+  margin-bottom: 2rem;
+}
+
+.blog-archive-group h2 {
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.blog-archive-list {
+  list-style: none;
+  padding: 0;
+}
+
+.blog-archive-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.blog-archive-list a {
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+.blog-archive-list a:hover {
+  text-decoration: underline;
+}
+
+.blog-archive-list .date,
+.blog-archive-list .author {
+  color: #666;
+  margin-left: 1rem;
+}
