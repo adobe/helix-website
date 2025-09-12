@@ -1,0 +1,96 @@
+.blog-archive-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.blog-archive-year {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 2rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  color: #333;
+}
+
+.blog-archive-month {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+  color: #555;
+}
+
+.blog-archive-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+
+.blog-archive-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.blog-archive-item:last-child {
+  border-bottom: none;
+}
+
+.blog-archive-link {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #0066cc;
+  text-decoration: none;
+  flex: 1 1 auto;
+}
+
+.blog-archive-link:hover {
+  text-decoration: underline;
+}
+
+.blog-archive-date {
+  font-size: 0.9rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.blog-archive-author {
+  font-size: 0.9rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .blog-archive-container {
+    padding: 15px;
+  }
+  
+  .blog-archive-year {
+    font-size: 1.75rem;
+    margin: 1.5rem 0 0.75rem 0;
+  }
+  
+  .blog-archive-month {
+    font-size: 1.25rem;
+    margin: 1rem 0 0.75rem 0;
+  }
+  
+  .blog-archive-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .blog-archive-link {
+    font-size: 1rem;
+  }
+  
+  .blog-archive-date,
+  .blog-archive-author {
+    font-size: 0.8rem;
+  }
+}
