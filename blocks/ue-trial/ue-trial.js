@@ -15,7 +15,7 @@ async function fetchConfig() {
   }
 
   try {
-    const response = await fetch('https://www.aem.live/config.json');
+    const response = await fetch('/config.json');
     if (!response.ok) {
       throw new Error(`Failed to fetch config: ${response.status}`);
     }
