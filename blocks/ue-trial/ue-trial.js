@@ -559,7 +559,7 @@ function buildForm(block) {
     // Clone the extracted content to preserve the original structure
     const clonedContent = termsAndConditions.cloneNode(true);
 
-    // Find the last paragraph and make it a label with inline checkbox
+    // Find the last paragraph and restructure it with checkbox and label
     const paragraphs = clonedContent.querySelectorAll('p');
     if (paragraphs.length > 0) {
       const lastParagraph = paragraphs[paragraphs.length - 1];
@@ -573,13 +573,19 @@ function buildForm(block) {
         required: 'true',
       });
 
-      // Convert the paragraph to a label and insert checkbox at the beginning
-      lastParagraph.setAttribute('for', 'terms-and-conditions');
-      lastParagraph.insertBefore(checkbox, lastParagraph.firstChild);
+      // Create label element
+      const label = createTag('label', { for: 'terms-and-conditions' });
 
-      // Add a space after the checkbox for proper spacing
-      const spaceNode = document.createTextNode(' ');
-      lastParagraph.insertBefore(spaceNode, checkbox.nextSibling);
+      // Move all content from the paragraph to the label
+      while (lastParagraph.firstChild) {
+        label.appendChild(lastParagraph.firstChild);
+      }
+
+      // Clear the paragraph and add checkbox and label
+      lastParagraph.innerHTML = '';
+      lastParagraph.appendChild(checkbox);
+      lastParagraph.appendChild(document.createTextNode(' '));
+      lastParagraph.appendChild(label);
     }
 
     agreement.appendChild(clonedContent);

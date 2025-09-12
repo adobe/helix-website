@@ -237,6 +237,11 @@
   margin: 0;
 }
 
+.ue-trial .agreement input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
 .ue-trial .checkbox-field label {
   margin: 0;
 }
