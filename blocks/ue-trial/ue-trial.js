@@ -400,13 +400,47 @@ function processFormData(form) {
   return data;
 }
 
+/**
+ * Waits for the Altcha widget to be ready
+ * @param {HTMLElement} altchaWidget - The Altcha widget element
+ * @returns {Promise<string|null>} The Altcha token or null if not available
+ */
+async function waitForAltchaToken(altchaWidget) {
+  if (!altchaWidget) return null;
+
+  // Wait for the widget to be ready (up to 5 seconds)
+  const maxWait = 5000;
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < maxWait) {
+    if (altchaWidget.getResponse && typeof altchaWidget.getResponse === 'function') {
+      try {
+        const token = altchaWidget.getResponse();
+        if (token) return token;
+      } catch (error) {
+        // Widget exists but not ready yet
+      }
+    }
+    // Wait 100ms before checking again
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    });
+  }
+
+  // eslint-disable-next-line no-console
+  console.warn('Altcha widget not ready after timeout');
+  return null;
+}
+
 // Extract form submission logic into a separate function
 async function submitFormData(form) {
   const data = processFormData(form);
 
   // Get Altcha token
   const altchaWidget = form.querySelector('altcha-widget');
-  const altchaToken = altchaWidget?.getResponse();
+  const altchaToken = await waitForAltchaToken(altchaWidget);
+
   if (altchaToken) {
     data.altcha = altchaToken;
   }
