@@ -1,27 +1,21 @@
 // UTM tracking function - consistent with event-banner
 function addUTMTracking(button) {
-  // Parse current page URL for all UTM parameters
-  const params = new URLSearchParams(window.location.search);
-  const utmParams = [];
+  if (!button.href) return;
 
-  // Collect all UTM parameters using Array.from instead of for...of
-  Array.from(params.entries()).forEach(([key, value]) => {
-    if (key.startsWith('utm_') || key === 'utm') {
-      utmParams.push([key, value]);
-    }
-  });
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const buttonUrl = new URL(button.href);
 
-  if (utmParams.length > 0 && button.href) {
-    try {
-      const buttonUrl = new URL(button.href);
-      // Add all UTM parameters to the button URL
-      utmParams.forEach(([key, value]) => {
+    // Add all UTM parameters to the button URL
+    for (const [key, value] of params) {
+      if (key.startsWith('utm_')) {
         buttonUrl.searchParams.set(key, value);
-      });
-      button.href = buttonUrl.toString();
-    } catch (error) {
-      // Silent error handling - don't break the page if UTM tracking fails
+      }
     }
+
+    button.href = buttonUrl.toString();
+  } catch (error) {
+    // Silent error handling - don't break the page if UTM tracking fails
   }
 }
 
@@ -33,7 +27,7 @@ export default function decorate(block) {
   const paragraphs = content.querySelectorAll('p');
   let tagline = null;
 
-  paragraphs.some((p) => {
+  Array.from(paragraphs).some((p) => {
     if (!p.querySelector('a')) {
       tagline = p;
       return true;
@@ -51,14 +45,14 @@ export default function decorate(block) {
     ctaButton.classList.add('button');
     ctaButton.id = 'EventCTAButton'; // Add specific ID for tracking
 
-    // Add UTM parameter handling
-    addUTMTracking(ctaButton);
-
     // Remove the button from its paragraph wrapper for cleaner layout
     const buttonParagraph = ctaButton.closest('p');
     if (buttonParagraph) {
       buttonParagraph.replaceWith(ctaButton);
     }
+
+    // Add UTM parameter handling AFTER DOM manipulation
+    addUTMTracking(ctaButton);
   }
 
   // Clear the block and add the content
