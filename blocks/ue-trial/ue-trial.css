@@ -338,26 +338,6 @@
   height: 0;
 }
 
-.ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail {
-  outline: 2px solid #1473e6;
-  outline-offset: 2px;
-}
-
-.ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail + .template-info h4 {
-  color: #1473e6;
-}
-
-.ue-trial .template-card:hover {
-  border-color: #1473e6;
-  box-shadow: 0 2px 8px rgb(20 115 230 / 10%);
-}
-
-.ue-trial .template-card.selected {
-  border-color: #1473e6;
-  background-color: #f8fbff;
-  box-shadow: 0 2px 8px rgb(20 115 230 / 15%);
-}
-
 .ue-trial .template-thumbnail {
   flex-shrink: 0;
   width: 150px;
@@ -374,7 +354,27 @@
   gap: 8px;
 }
 
+.ue-trial .template-card:hover {
+  border-color: #1473e6;
+  box-shadow: 0 2px 8px rgb(20 115 230 / 10%);
+}
+
+.ue-trial .template-card.selected {
+  border-color: #1473e6;
+  background-color: #f8fbff;
+  box-shadow: 0 2px 8px rgb(20 115 230 / 15%);
+}
+
 .ue-trial .template-card.selected .template-info h4 {
+  color: #1473e6;
+}
+
+.ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail {
+  outline: 2px solid #1473e6;
+  outline-offset: 2px;
+}
+
+.ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail + .template-info h4 {
   color: #1473e6;
 }
 

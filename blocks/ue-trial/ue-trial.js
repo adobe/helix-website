@@ -1,5 +1,3 @@
-/* global grecaptcha */
-
 import createTag from '../../utils/tag.js';
 
 // Configuration will be loaded dynamically from config service
@@ -15,7 +13,6 @@ async function fetchConfig() {
   }
 
   try {
-
     const response = await fetch('/config.json');
     if (!response.ok) {
       throw new Error(`Failed to fetch config: ${response.status}`);
@@ -171,7 +168,6 @@ function showModal(message, title = 'Error') {
   // Focus the OK button for accessibility
   okButton.focus();
 }
-
 
 function showSuccessMessage(element) {
   const successMessage = createTag('div', { class: 'success-message' });
@@ -407,14 +403,14 @@ function processFormData(form) {
 // Extract form submission logic into a separate function
 async function submitFormData(form) {
   const data = processFormData(form);
-  
+
   // Get Altcha token
   const altchaWidget = form.querySelector('altcha-widget');
   const altchaToken = altchaWidget?.getResponse();
   if (altchaToken) {
     data.altcha = altchaToken;
   }
-  
+
   const submitConfig = await fetchConfig();
 
   fetch(`${submitConfig.xwalktrial.webApi}/registration`, {
@@ -603,7 +599,6 @@ async function buildForm(block) {
     agreement.appendChild(clonedContent);
   }
 
-
   // Altcha script (inline)
   const altchaScript = createTag('script', {
     nonce: 'aem',
@@ -639,7 +634,6 @@ async function buildForm(block) {
     altchaContainer,
     buttonContainer,
   );
-
 
   // Add form submission handler
   form.addEventListener('submit', async (e) => {
