@@ -400,83 +400,9 @@ function processFormData(form) {
   return data;
 }
 
-/**
- * Waits for the Altcha widget to be ready
- * @param {HTMLElement} altchaWidget - The Altcha widget element
- * @returns {Promise<string|null>} The Altcha token or null if not available
- */
-async function waitForAltchaToken(altchaWidget) {
-  if (!altchaWidget) return null;
-
-  // First, wait for the custom element to be defined
-  const maxWait = 10000; // Increased to 10 seconds
-  const startTime = Date.now();
-
-  // Wait for custom element to be defined
-  while (Date.now() - startTime < maxWait) {
-    if (customElements.get('altcha-widget')) {
-      // eslint-disable-next-line no-console
-      console.log('Altcha custom element found');
-      break;
-    }
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100);
-    });
-  }
-
-  if (!customElements.get('altcha-widget')) {
-    // eslint-disable-next-line no-console
-    console.warn('Altcha custom element not defined after timeout');
-    return null;
-  }
-
-  // Now wait for the widget to be ready
-  const widgetStartTime = Date.now();
-  // eslint-disable-next-line no-console
-  console.log('Waiting for Altcha widget to be ready...');
-  while (Date.now() - widgetStartTime < maxWait) {
-    if (altchaWidget.getResponse && typeof altchaWidget.getResponse === 'function') {
-      try {
-        const token = altchaWidget.getResponse();
-        if (token) {
-          // eslint-disable-next-line no-console
-          console.log('Altcha token obtained successfully');
-          return token;
-        }
-      } catch (error) {
-        // Widget exists but not ready yet
-        // eslint-disable-next-line no-console
-        console.log('Altcha widget not ready yet:', error.message);
-      }
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Altcha widget getResponse method not available yet');
-    }
-    // Wait 100ms before checking again
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100);
-    });
-  }
-
-  // eslint-disable-next-line no-console
-  console.warn('Altcha widget not ready after timeout');
-  return null;
-}
-
 // Extract form submission logic into a separate function
 async function submitFormData(form) {
   const data = processFormData(form);
-
-  // Get Altcha token
-  const altchaWidget = form.querySelector('altcha-widget');
-  const altchaToken = await waitForAltchaToken(altchaWidget);
-
-  if (altchaToken) {
-    data.altcha = altchaToken;
-  }
-
   const submitConfig = await fetchConfig();
 
   fetch(`${submitConfig.xwalktrial.webApi}/registration`, {
@@ -672,16 +598,17 @@ async function buildForm(block) {
     challengeurl: `${statusConfig.xwalktrial.webApi}/challenge`,
     name: 'altcha',
   });
-  altchaContainer.append(altchaWidget);
-
   // Try to load Altcha script dynamically
   const altchaScript = createTag('script', {
-    src: './altcha.js',
+    src: 'https://cdn.jsdelivr.net/gh/altcha-org/altcha@main/dist/altcha.min.js',
+    async: 'true',
     defer: 'true',
+    nonce: 'aem',
+    type: 'module',
   });
 
-  // Add script to document head
-  document.head.appendChild(altchaScript);
+  altchaContainer.append(altchaScript);
+  altchaContainer.append(altchaWidget);
 
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
