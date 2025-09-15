@@ -280,6 +280,19 @@
   text-decoration: underline;
 }
 
+.ue-trial .altcha-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ue-trial .altcha-container altcha-widget {
+  --altcha-primary-color: #1473e6;
+  --altcha-border-color: #ccc;
+  --altcha-border-radius: 3px;
+  --altcha-font-family: var(--body-font-family);
+}
+
 .ue-trial .button-container {
   margin-top: 20px;
 }
@@ -306,6 +319,32 @@
   cursor: pointer;
   transition: all 0.2s ease;
   background-color: #fff;
+}
+
+.ue-trial .template-card-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  width: 100%;
+  cursor: pointer;
+  margin: 0;
+}
+
+.ue-trial .template-card-label input[type="radio"] {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail {
+  outline: 2px solid #1473e6;
+  outline-offset: 2px;
+}
+
+.ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail + .template-info h4 {
+  color: #1473e6;
 }
 
 .ue-trial .template-card:hover {
@@ -590,6 +629,11 @@
 
   .ue-trial .template-info p {
     font-size: 13px;
+  }
+
+  /* Altcha widget mobile styles */
+  .ue-trial .altcha-container {
+    margin: 15px 0;
   }
 }
 

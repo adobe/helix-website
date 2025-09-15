@@ -15,6 +15,7 @@ async function fetchConfig() {
   }
 
   try {
+
     const response = await fetch('/config.json');
     if (!response.ok) {
       throw new Error(`Failed to fetch config: ${response.status}`);
@@ -27,10 +28,6 @@ async function fetchConfig() {
     console.error('Error fetching configuration:', error);
     // Fallback to hard-coded values if config service is unavailable
     config = {
-      recaptcha: {
-        v2: { key: '6Le1IkYrAAAAAFKLFRoLHFm2XXBCl5c8iiiWHoxf' },
-        v3: { key: '6LfiKDErAAAAAK_RgBahms-QPJyErQTRElVCprpx' },
-      },
       xwalktrial: {
         webApi: 'https://3531103-xwalktrial.adobeioruntime.net/api/v1/web/web-api',
       },
@@ -175,21 +172,6 @@ function showModal(message, title = 'Error') {
   okButton.focus();
 }
 
-/**
- * Loads the reCAPTCHA script dynamically
- */
-async function loadRecaptchaScript() {
-  const recaptchaConfig = await fetchConfig();
-
-  // reCAPTCHA v3
-  const script = document.createElement('script');
-  script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaConfig.recaptcha.v3.key}`;
-  document.head.appendChild(script);
-  // reCAPTCHA v2
-  const scriptV2 = document.createElement('script');
-  scriptV2.src = 'https://www.google.com/recaptcha/api.js';
-  document.head.append(scriptV2);
-}
 
 function showSuccessMessage(element) {
   const successMessage = createTag('div', { class: 'success-message' });
@@ -425,6 +407,14 @@ function processFormData(form) {
 // Extract form submission logic into a separate function
 async function submitFormData(form) {
   const data = processFormData(form);
+  
+  // Get Altcha token
+  const altchaWidget = form.querySelector('altcha-widget');
+  const altchaToken = altchaWidget?.getResponse();
+  if (altchaToken) {
+    data.altcha = altchaToken;
+  }
+  
   const submitConfig = await fetchConfig();
 
   fetch(`${submitConfig.xwalktrial.webApi}/registration`, {
@@ -451,7 +441,7 @@ async function submitFormData(form) {
     });
 }
 
-function buildForm(block) {
+async function buildForm(block) {
   const form = createTag('form', { action: '/createTrials', method: 'POST' });
 
   // Business email
@@ -473,21 +463,28 @@ function buildForm(block) {
   // Extract templates from the merged template-selection-data within this block
   const templates = extractTemplatesFromBlock(block);
 
-  // Hidden input to store selected template value
-  const templateInput = createTag('input', {
-    type: 'hidden',
-    id: 'template-select',
-    name: 'template',
-    value: templates.length > 0 ? templates[0].value : '', // Default to first template
-    required: 'true',
-  });
-
   const templateGrid = createTag('div', { class: 'template-grid' });
 
   templates.forEach((template, index) => {
     const templateCard = createTag('div', {
       class: `template-card ${index === 0 ? 'selected' : ''}`,
       'data-value': template.value,
+    });
+
+    // Create radio button for accessibility
+    const radioInput = createTag('input', {
+      type: 'radio',
+      id: `template-${template.value}`,
+      name: 'template',
+      value: template.value,
+      required: 'true',
+      checked: index === 0, // Default to first template
+    });
+
+    // Create label for the radio button
+    const radioLabel = createTag('label', {
+      for: `template-${template.value}`,
+      class: 'template-card-label',
     });
 
     // Use actual image from template data or create placeholder
@@ -520,9 +517,11 @@ function buildForm(block) {
     const templateDesc = createTag('p', {}, template.description);
     templateInfo.append(templateTitle, templateDesc);
 
-    templateCard.append(thumbnail, templateInfo);
+    // Add radio button and content to label
+    radioLabel.append(radioInput, thumbnail, templateInfo);
+    templateCard.append(radioLabel);
 
-    // Click handler for template selection
+    // Click handler for template selection (for visual feedback)
     templateCard.addEventListener('click', () => {
       // Remove selected class from all cards
       templateGrid.querySelectorAll('.template-card').forEach((card) => {
@@ -532,14 +531,27 @@ function buildForm(block) {
       // Add selected class to clicked card
       templateCard.classList.add('selected');
 
-      // Update hidden input value
-      templateInput.value = template.value;
+      // Check the radio button
+      radioInput.checked = true;
+    });
+
+    // Radio button change handler for visual feedback
+    radioInput.addEventListener('change', () => {
+      if (radioInput.checked) {
+        // Remove selected class from all cards
+        templateGrid.querySelectorAll('.template-card').forEach((card) => {
+          card.classList.remove('selected');
+        });
+
+        // Add selected class to this card
+        templateCard.classList.add('selected');
+      }
     });
 
     templateGrid.append(templateCard);
   });
 
-  templateField.append(templateLabel, templateGrid, templateInput);
+  templateField.append(templateLabel, templateGrid);
 
   // GitHub ID (moved after template)
   const githubField = createTag('div', { class: 'form-field', id: 'github-field' });
@@ -591,23 +603,23 @@ function buildForm(block) {
     agreement.appendChild(clonedContent);
   }
 
-  const verInput = createTag('input', {
-    type: 'hidden',
-    id: 'recaptcha-version',
-    name: 'recaptchaVersion',
-    value: 'v3',
+
+  // Altcha script (inline)
+  const altchaScript = createTag('script', {
+    nonce: 'aem',
+    src: 'https://cdn.jsdelivr.net/npm/altcha@2.2.3/dist/altcha.min.js',
+    type: 'module',
+    defer: 'true',
   });
-  // Hidden field for reCAPTCHA token
-  const recaptchaField = createTag('input', {
-    type: 'hidden',
-    id: 'g-recaptcha-response',
-    name: 'recaptchaToken',
+
+  // Altcha widget
+  const altchaContainer = createTag('div', { class: 'altcha-container' });
+  const statusConfig = await fetchConfig();
+  const altchaWidget = createTag('altcha-widget', {
+    challengeurl: `${statusConfig.xwalktrial.webApi}/challenge`,
+    name: 'altcha',
   });
-  const v2container = createTag('div', {
-    id: 'recaptcha-v2-container',
-    style: 'display: none; margin: 1em 0;',
-  });
-  v2container.append(createTag('div', { id: 'recaptcha-v2' }));
+  altchaContainer.append(altchaWidget);
 
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
@@ -623,28 +635,11 @@ function buildForm(block) {
     githubField,
     templateField,
     agreement,
-    verInput,
-    recaptchaField,
-    v2container,
+    altchaScript,
+    altchaContainer,
     buttonContainer,
   );
 
-  let v2Rendered = false;
-  async function showV2Captcha() {
-    const v2Config = await fetchConfig();
-    verInput.value = 'v2';
-    v2container.style.display = 'block';
-    if (!v2Rendered) {
-      grecaptcha.render('recaptcha-v2', {
-        sitekey: v2Config.recaptcha.v2.key,
-        callback: (token) => {
-          recaptchaField.value = token;
-          submitFormData(form);
-        },
-      });
-      v2Rendered = true;
-    }
-  }
 
   // Add form submission handler
   form.addEventListener('submit', async (e) => {
@@ -655,62 +650,20 @@ function buildForm(block) {
     submitButtonSubmit.disabled = true;
     submitButtonSubmit.textContent = 'Submitting...';
 
-    if (verInput.value === 'v3') {
-      // Execute v3 reCAPTCHA verification
-      const v3Config = await fetchConfig();
-      grecaptcha.ready(() => {
-        grecaptcha.execute(v3Config.recaptcha.v3.key, { action: 'submit' }).then((v3token) => {
-          // Set the reCAPTCHA token
-          document.getElementById('g-recaptcha-response').value = v3token;
-
-          // Process form data
-          const data = processFormData(form);
-
-          // Submit form data to server using fetch
-          fetch(`${v3Config.xwalktrial.webApi}/registration`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          })
-            .then(async (response) => {
-              if (response.ok) {
-                const { processId } = await response.json();
-                checkStatus(form, processId);
-              } else {
-                const err = await response.json();
-                if (err.error === 'v2captcha_required') {
-                  showV2Captcha();
-                } else {
-                  throw new Error(err.error ? `${err.error}\nThere was an error submitting your request. Please try again.` : 'There was an error submitting your request. Please try again.');
-                }
-              }
-            }).catch((error) => {
-              showModal(error.message);
-              submitButton.disabled = false;
-              submitButton.textContent = 'Continue';
-            });
-        });
-      });
-    } else {
-      submitFormData(form);
-    }
+    // Submit form data
+    submitFormData(form);
   });
 
   return form;
 }
 
 export default async function decorate(block) {
-  // Load reCAPTCHA script
-  await loadRecaptchaScript();
-
   // Get the original content from the block (excluding template-selection-data)
   const infoContent = block.querySelector(':scope > div:first-child');
 
   // Create a new layout with two columns
   const formSection = createTag('div', { class: 'form-section' });
-  formSection.append(buildForm(block));
+  formSection.append(await buildForm(block));
 
   // Move the original content to the trial info section
   const trialInfo = createTag('div', { class: 'trial-info' });
