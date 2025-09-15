@@ -408,18 +408,50 @@ function processFormData(form) {
 async function waitForAltchaToken(altchaWidget) {
   if (!altchaWidget) return null;
 
-  // Wait for the widget to be ready (up to 5 seconds)
-  const maxWait = 5000;
+  // First, wait for the custom element to be defined
+  const maxWait = 10000; // Increased to 10 seconds
   const startTime = Date.now();
 
+  // Wait for custom element to be defined
   while (Date.now() - startTime < maxWait) {
+    if (customElements.get('altcha-widget')) {
+      // eslint-disable-next-line no-console
+      console.log('Altcha custom element found');
+      break;
+    }
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    });
+  }
+
+  if (!customElements.get('altcha-widget')) {
+    // eslint-disable-next-line no-console
+    console.warn('Altcha custom element not defined after timeout');
+    return null;
+  }
+
+  // Now wait for the widget to be ready
+  const widgetStartTime = Date.now();
+  // eslint-disable-next-line no-console
+  console.log('Waiting for Altcha widget to be ready...');
+  while (Date.now() - widgetStartTime < maxWait) {
     if (altchaWidget.getResponse && typeof altchaWidget.getResponse === 'function') {
       try {
         const token = altchaWidget.getResponse();
-        if (token) return token;
+        if (token) {
+          // eslint-disable-next-line no-console
+          console.log('Altcha token obtained successfully');
+          return token;
+        }
       } catch (error) {
         // Widget exists but not ready yet
+        // eslint-disable-next-line no-console
+        console.log('Altcha widget not ready yet:', error.message);
       }
+    } else {
+      // eslint-disable-next-line no-console
+      console.log('Altcha widget getResponse method not available yet');
     }
     // Wait 100ms before checking again
     // eslint-disable-next-line no-await-in-loop
@@ -633,12 +665,10 @@ async function buildForm(block) {
     agreement.appendChild(clonedContent);
   }
 
-  // Altcha script (inline)
+  // Altcha script (inline) - using UMD build for better compatibility
   const altchaScript = createTag('script', {
     nonce: 'aem',
-    src: 'https://cdn.jsdelivr.net/npm/altcha@2.2.3/dist/altcha.min.js',
-    type: 'module',
-    defer: 'true',
+    src: 'https://cdn.jsdelivr.net/npm/altcha@2.2.3/dist/altcha.umd.js',
   });
 
   // Altcha widget
@@ -649,6 +679,25 @@ async function buildForm(block) {
     name: 'altcha',
   });
   altchaContainer.append(altchaWidget);
+
+  // Wait for the script to load and custom element to be defined
+  altchaScript.addEventListener('load', () => {
+    // eslint-disable-next-line no-console
+    console.log('Altcha script loaded');
+    // Ensure the custom element is defined
+    if (!customElements.get('altcha-widget')) {
+      // eslint-disable-next-line no-console
+      console.warn('Altcha widget custom element not defined after script load');
+    } else {
+      // eslint-disable-next-line no-console
+      console.log('Altcha custom element is defined');
+    }
+  });
+
+  altchaScript.addEventListener('error', (error) => {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load Altcha script:', error);
+  });
 
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
