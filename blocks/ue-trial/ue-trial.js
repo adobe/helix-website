@@ -665,12 +665,6 @@ async function buildForm(block) {
     agreement.appendChild(clonedContent);
   }
 
-  // Altcha script (inline) - using UMD build for better compatibility
-  const altchaScript = createTag('script', {
-    nonce: 'aem',
-    src: 'https://cdn.jsdelivr.net/npm/altcha@2.2.3/dist/altcha.umd.js',
-  });
-
   // Altcha widget
   const altchaContainer = createTag('div', { class: 'altcha-container' });
   const statusConfig = await fetchConfig();
@@ -680,24 +674,16 @@ async function buildForm(block) {
   });
   altchaContainer.append(altchaWidget);
 
-  // Wait for the script to load and custom element to be defined
-  altchaScript.addEventListener('load', () => {
-    // eslint-disable-next-line no-console
-    console.log('Altcha script loaded');
-    // Ensure the custom element is defined
-    if (!customElements.get('altcha-widget')) {
-      // eslint-disable-next-line no-console
-      console.warn('Altcha widget custom element not defined after script load');
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Altcha custom element is defined');
-    }
+  // Try to load Altcha script dynamically
+  const altchaScript = createTag('script', {
+    nonce: 'aem',
+    src: 'https://cdn.altcha.org/v2/altcha.min.js',
+    defer: 'true',
+    type: 'module',
   });
 
-  altchaScript.addEventListener('error', (error) => {
-    // eslint-disable-next-line no-console
-    console.error('Failed to load Altcha script:', error);
-  });
+  // Add script to document head
+  document.head.appendChild(altchaScript);
 
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
@@ -713,7 +699,6 @@ async function buildForm(block) {
     githubField,
     templateField,
     agreement,
-    altchaScript,
     altchaContainer,
     buttonContainer,
   );
