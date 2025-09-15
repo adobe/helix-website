@@ -676,10 +676,8 @@ async function buildForm(block) {
 
   // Try to load Altcha script dynamically
   const altchaScript = createTag('script', {
-    nonce: 'aem',
-    src: 'https://cdn.altcha.org/v2/altcha.min.js',
+    src: './altcha.js',
     defer: 'true',
-    type: 'module',
   });
 
   // Add script to document head
