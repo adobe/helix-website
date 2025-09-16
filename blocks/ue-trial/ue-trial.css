@@ -380,18 +380,46 @@
 
 .ue-trial button.continue {
   background-color: #1473e6;
-  color: white;
-  border: none;
+  color: #fff;
+  border: 2px solid #1473e6;
   border-radius: 30px;
   padding: 12px 24px;
-  font-size: 16px;
+  font-family: var(--body-font-family);
+  font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+.ue-trial button.continue::before {
+  content: "";
+  position: absolute;
+  left: -102%;
+  top: 0;
+  transition: all 0.3s ease-in-out;
+  width: 202%;
+  height: 104%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      circle at left,
+      #fff 50%,
+      #1473e6 50%
+    );
 }
 
 .ue-trial button.continue:hover {
-  background-color: #0d66d0;
+  color: #1473e6;
+  border-color: #1473e6;
+  transform: translateZ(0);
+}
+
+.ue-trial button.continue:hover::before {
+  left: 0%;
 }
 
 /* Separator line */
