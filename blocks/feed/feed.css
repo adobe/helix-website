@@ -311,3 +311,16 @@
     margin-bottom: 1em;
   }
 }
+
+/* Archive link styling */
+.archive-link-container {
+  margin-top: 2rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.archive-link {
+  display: inline-block;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
