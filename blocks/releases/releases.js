@@ -23,7 +23,8 @@ const displayNames = {
   'aem-lib': 'AEM Library',
   'helix-sidekick-extension': 'Sidekick Extension (legacy)',
   'aem-certificate-rotation': 'Infrastructure Updates',
-  'helix-reviews': 'AEM Review System',
+  'helix-reviews': 'Reviews',
+  'helix-config-service': 'Config Service',
 };
 
 function createRelease(release) {
