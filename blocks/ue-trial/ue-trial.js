@@ -454,8 +454,9 @@ async function buildForm(block) {
   const templateGrid = createTag('div', { class: 'template-grid' });
 
   templates.forEach((template, index) => {
+    const isDefault = index === 0;
     const templateCard = createTag('div', {
-      class: `template-card ${index === 0 ? 'selected' : ''}`,
+      class: `template-card ${isDefault ? 'selected' : ''}`,
       'data-value': template.value,
     });
 
@@ -466,7 +467,7 @@ async function buildForm(block) {
       name: 'template',
       value: template.value,
       required: 'true',
-      checked: index === 0, // Default to first template
+      ...(isDefault && { checked: true }), // Only add checked attribute when true
     });
 
     // Create label for the radio button
@@ -516,11 +517,18 @@ async function buildForm(block) {
         card.classList.remove('selected');
       });
 
+      // Uncheck all radio buttons and remove checked attribute
+      templateGrid.querySelectorAll('input[type="radio"]').forEach((radio) => {
+        radio.checked = false;
+        radio.removeAttribute('checked');
+      });
+
       // Add selected class to clicked card
       templateCard.classList.add('selected');
 
-      // Check the radio button
+      // Check the radio button and add checked attribute
       radioInput.checked = true;
+      radioInput.setAttribute('checked', 'true');
     });
 
     // Radio button change handler for visual feedback
@@ -531,8 +539,18 @@ async function buildForm(block) {
           card.classList.remove('selected');
         });
 
+        // Uncheck all radio buttons and remove checked attribute
+        templateGrid.querySelectorAll('input[type="radio"]').forEach((radio) => {
+          radio.checked = false;
+          radio.removeAttribute('checked');
+        });
+
         // Add selected class to this card
         templateCard.classList.add('selected');
+
+        // Check this radio button and add checked attribute
+        radioInput.checked = true;
+        radioInput.setAttribute('checked', 'true');
       }
     });
 
