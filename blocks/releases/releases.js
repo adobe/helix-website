@@ -20,10 +20,10 @@ const displayNames = {
   'helix-cli': 'Command Line Interface',
   'aem-sidekick': 'Sidekick Extension',
   'franklin-sidekick-library': 'Sidekick Library',
-  'aem-lib': 'AEM Library',
-  'helix-sidekick-extension': 'Sidekick Extension (legacy)',
+  'aem-lib': 'Boilerplate Library',
   'aem-certificate-rotation': 'Infrastructure Updates',
-  'helix-reviews': 'AEM Review System',
+  'helix-reviews': 'Reviews',
+  'helix-config-service': 'Config Service',
 };
 
 function createRelease(release) {

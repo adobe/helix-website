@@ -18,8 +18,7 @@
   background-color: #e8e8e8;
 }
 
-.releases .release-aem-sidekick,
-.releases .release-helix-sidekick-extension {
+.releases .release-aem-sidekick {
   background-color: #e4e8bf;
 }
 
@@ -61,8 +60,8 @@
   border-radius: 8px;
   font-size: 14px;
   display: flex;
-  align-items: start;
-}
+  align-items: center;
+  }
 
 .releases-date {
   font-weight: 700;
@@ -80,7 +79,6 @@
 .releases .helix-admin .release-helix-admin,
 .releases .helix-pipeline-service .release-helix-pipeline-service,
 .releases .helix-importer-ui .release-helix-importer-ui,
-.releases .helix-sidekick-extension .release-helix-sidekick-extension,
 .releases .aem-sidekick .release-aem-sidekick,
 .releases .helix-cli .release-helix-cli,
 .releases .helix-config-service .release-helix-config-service,
