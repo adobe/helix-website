@@ -46,12 +46,14 @@ The repository provides the basic structure, blocks, and configuration needed to
 ## Code Style Guidelines
 
 ### JavaScript
+- Review the [Development Collaboration and Good Practices – JavaScript](https://www.aem.live/docs/dev-collab-and-good-practices#javascript) guidance
 - Use ES6+ features (arrow functions, destructuring, etc.)
 - Follow Airbnb ESLint rules (already configured)
 - Always include `.js` file extensions in imports
 - Use Unix line endings (LF)
 
 ### CSS
+- Review the [Development Collaboration and Good Practices – CSS](https://www.aem.live/docs/dev-collab-and-good-practices#css) guidance (selector isolation, naming, ARIA-based styling, mobile-first, breakpoints)
 - Follow Stylelint standard configuration
 - Use modern CSS features (CSS Grid, Flexbox, CSS Custom Properties)
 - Maintain responsive design principles
@@ -62,6 +64,7 @@ The repository provides the basic structure, blocks, and configuration needed to
 - Use semantic HTML5 elements
 - Ensure accessibility standards (ARIA labels, proper heading hierarchy)
 - Follow AEM markup conventions for blocks and sections
+ - Keep `<head>` minimal; avoid 3rd-party in `head.html` per [Good Practices – <head>](https://www.aem.live/docs/dev-collab-and-good-practices#head) and load non-critical scripts late (e.g., in blocks or `delayed.js`).
 
 ## Key Concepts
 
@@ -74,9 +77,9 @@ You can inspect the contents of any page with `curl http://localhost:3000/path/t
 
 ### Blocks
 
-Blocks are the re-usable building blocks of AEM. Blocks add styling and functionality to content. Each block has an initial content structure it expects, and transforms the html in the block using DOM APIs to render a final structure. 
+Blocks are the re-usable building blocks of AEM. Blocks add styling and functionality to content. Each block has an initial content structure it expects, and transforms the HTML in the block using DOM APIs to render a final structure. 
 
-The initial content sturcture is important because it impacts how the author will create the content and how you will write your code to decorate it. In some sense, you can think of this structure as the contract for your block between the author and the developer. You should decide on this initial structure before writing any code, and be careful when making changes to code that makes assumptions about that structure as it could break existing pages.
+The initial content structure is important because it impacts how the author will create the content and how you will write your code to decorate it. In some sense, you can think of this structure as the contract for your block between the author and the developer. You should decide on this initial structure before writing any code, and be careful when making changes to code that makes assumptions about that structure as it could break existing pages.
 
 The block javascript should export a default function which is called to perform the block decoration:
 
@@ -121,6 +124,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 - Include CSS and JS files for each block
 - Follow the naming convention: `blockname.css`, `blockname.js`
 - Blocks should be responsive and accessible by default
+- Review the [Development Collaboration and Good Practices](https://www.aem.live/docs/dev-collab-and-good-practices) guide for block creation standards
 
 ### Styling
 - Global styles go in `styles/styles.css`
@@ -141,6 +145,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 - Images uploaded by authors are automatically optimized, all images and assets committed to git must be optimized and checked for size
 - Use lazy loading for non-critical resources (`lazy-styles.css` and `delayed.js`)
 - Minimize JavaScript bundle size by avoiding dependencies, using automatic code splitting provided by `/blocks/`
+ - Load 3rd-party libraries only where needed via `loadScript()`; consider `IntersectionObserver` per [Good Practices – Loading 3rd party libraries](https://www.aem.live/docs/dev-collab-and-good-practices#loading-3rd-party-libraries)
 
 ### Accessibility
 - Ensure proper heading hierarchy
@@ -154,7 +159,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 
 Edge Delivery Services provides you with three environments. Your local development server at `http://localhost:3000` serves code from your local working copy (even uncommitted code) and content that has been previewed by authors. You can access this at any time when the development server is running.
 
-For all other environments, you need to know the GitHub owner and repository name (`gh repo view --json nameWithOwner` or `git remote -v`) and the current branch name `git branch`)
+For all other environments, you need to know the GitHub owner and repository name (`gh repo view --json nameWithOwner` or `git remote -v`) and the current branch name (`git branch`)
 
 With this information, you can construct URLs for the preview environment (same content as `localhost:3000`) and the production environment (same content as the live website, approved by authors)
 
