@@ -8,28 +8,15 @@ function addUTMTracking(button) {
     const buttonUrl = new URL(button.href);
 
     // Add all UTM parameters to the button URL
-    for (const [key, value] of params) {
+    Array.from(params.entries()).forEach(([key, value]) => {
       if (key.startsWith('utm_')) {
         buttonUrl.searchParams.set(key, value);
       }
-    }
+    });
 
     button.href = buttonUrl.toString();
   } catch (error) {
     // Silent error handling - don't break the page if UTM tracking fails
-  }
-}
-
-export default function decorate(block) {
-  const content = block.querySelector('div');
-  
-  // Check if this is the multi-button variant
-  const isMultiVariant = block.classList.contains('multi');
-  
-  if (isMultiVariant) {
-    decorateMultiButtons(block, content);
-  } else {
-    decorateSingleButton(block, content);
   }
 }
 
@@ -75,11 +62,11 @@ function decorateSingleButton(block, content) {
 
 function decorateMultiButtons(block, content) {
   content.setAttribute('class', 'event-cta-content multi-buttons');
-  
+
   // Find the CTA text (first paragraph without a link)
   const paragraphs = content.querySelectorAll('p');
   let ctaText = null;
-  
+
   Array.from(paragraphs).some((p) => {
     if (!p.querySelector('a')) {
       ctaText = p;
@@ -87,15 +74,14 @@ function decorateMultiButtons(block, content) {
     }
     return false;
   });
-  
+
   // Find all the button links
   const buttons = content.querySelectorAll('a');
-  
+
   if (buttons.length === 0) {
-    console.error('Multi-button event-cta requires at least one button link');
     return;
   }
-  
+
   // Create the new structure
   const newContent = document.createElement('div');
   newContent.className = 'event-cta-content multi-buttons';
@@ -117,17 +103,30 @@ function decorateMultiButtons(block, content) {
     // Style the button
     button.classList.add('button');
     button.id = `EventCTAButton-${index + 1}`;
-    
+
     // Add UTM tracking
     addUTMTracking(button);
-    
+
     // Add button to container
     buttonContainer.appendChild(button);
   });
-  
+
   newContent.appendChild(buttonContainer);
-  
+
   // Replace content
   block.innerHTML = '';
   block.appendChild(newContent);
+}
+
+export default function decorate(block) {
+  const content = block.querySelector('div');
+
+  // Check if this is the multi-button variant
+  const isMultiVariant = block.classList.contains('multi');
+
+  if (isMultiVariant) {
+    decorateMultiButtons(block, content);
+  } else {
+    decorateSingleButton(block, content);
+  }
 }
