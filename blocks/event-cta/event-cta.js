@@ -85,7 +85,7 @@ function decorateMultiButtons(block, content) {
   // Create the new structure
   const newContent = document.createElement('div');
   newContent.className = 'event-cta-content multi-buttons';
-  
+
   // Add the centered CTA text
   if (ctaText) {
     const centeredCTA = document.createElement('p');
@@ -93,11 +93,11 @@ function decorateMultiButtons(block, content) {
     centeredCTA.textContent = ctaText.textContent.trim();
     newContent.appendChild(centeredCTA);
   }
-  
+
   // Create button container
   const buttonContainer = document.createElement('div');
   buttonContainer.className = 'multi-button-container';
-  
+
   // Process each button
   Array.from(buttons).forEach((button, index) => {
     // Style the button
