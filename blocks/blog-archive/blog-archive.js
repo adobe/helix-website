@@ -1,4 +1,3 @@
-
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
 
 function groupPosts(posts) {
@@ -47,7 +46,7 @@ function renderArchive(groupedPosts, block) {
 }
 
 export default async function decorate(block) {
-  const config = readBlockConfig(block);
+  readBlockConfig(block);
   block.innerHTML = '';
 
   if (window.blogindex && window.blogindex.loaded) {
