@@ -18,8 +18,10 @@ The repository provides the basic structure, blocks, and configuration needed to
 ## Setup Commands
 
 - Install dependencies: `npm install`
-- Start local development: `npx -y @adobe/aem-cli up --no-open` (run in background, if possible)
-  - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
+- Start local development: `npx -y @adobe/aem-cli up --no-open --url https://main--helix-website--adobe.aem.live/ --html-folder drafts` (run in background, if possible)
+  - If the user installed the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
+  - the `--html-folder drafts` option allows you to serve tests files from the local file system (e.g. drafts/test.html becomes http://localhost/draft/test)
+  - pay attention to the port that the dev server is running. 3000 is the default port, but under AI control other ports are possible
 - Run linting: `npm run lint`
 - Fix linting issues: `npm run lint:fix`
 
@@ -64,7 +66,7 @@ The repository provides the basic structure, blocks, and configuration needed to
 - Use semantic HTML5 elements
 - Ensure accessibility standards (ARIA labels, proper heading hierarchy)
 - Follow AEM markup conventions for blocks and sections
- - Keep `<head>` minimal; avoid 3rd-party in `head.html` per [Good Practices – <head>](https://www.aem.live/docs/dev-collab-and-good-practices#head) and load non-critical scripts late (e.g., in blocks or `delayed.js`).
+ - Keep `<head>` minimal; avoid 3rd-party in `head.html` per [Good Practices – head](https://www.aem.live/docs/dev-collab-and-good-practices#head) and load non-critical scripts late (e.g., in blocks or `delayed.js`).
 
 ## Key Concepts
 
@@ -167,10 +169,12 @@ With this information, you can construct URLs for the preview environment (same 
 - **Production Live**: `https://main--{repo}--{owner}.aem.live/`
 - **Feature Preview**: `https://{branch}--{repo}--{owner}.aem.page/`
 
+For the Helix Website, the `.page` environment requires authentication. Use `.live` instead.
+
 ### Publishing Process
 1. Push changes to a feature branch
 2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
-3. Open a pull request to merge changes to `main` – in the PR description, include a link to https://{branch}--{repo}--{owner}.aem.page/{path}` with a path to a file that illustrates the change you've made. This is the same path you have been testing with locally. WITHOUT THIS YOUR PR WILL BE REJECTED
+3. Open a pull request to merge changes to `main` – in the PR description, include a link to https://{branch}--{repo}--{owner}.aem.live/{path}` with a path to a file that illustrates the change you've made. This is the same path you have been testing with locally. WITHOUT THIS YOUR PR WILL BE REJECTED
 4. use `gh checks` to verify the status of code synchronization, linting, and performance tests
 5. A human reviewer will review the code, inspect the provided URL and merge the PR
 6. AEM Code Sync updates the main branch for production
@@ -211,7 +215,7 @@ With this information, you can construct URLs for the preview environment (same 
 - consider that everything you do is clients-side code served on the public web
 - Follow Adobe security guidelines
 - Regularly update dependencies
-- Use the .hlxignore file to prevent filed from being served
+- Use the `.hlxignore` file to prevent filed from being served
 
 ## Contributing
 
