@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/adobe/helix-website#readme",
   "devDependencies": {
-    "@adobe/rum-distiller": "1.17.0",
+    "@adobe/rum-distiller": "1.19.0",
     "@babel/core": "7.28.4",
     "@babel/eslint-parser": "7.28.4",
     "@esm-bundle/chai": "4.3.4-fix.0",
@@ -32,7 +32,7 @@
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.32.0",
     "husky": "9.1.7",
-    "lint-staged": "16.1.6",
+    "lint-staged": "16.2.3",
     "sinon": "21.0.0",
     "stylelint": "16.24.0",
     "stylelint-config-standard": "39.0.0"

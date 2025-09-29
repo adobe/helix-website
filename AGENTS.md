@@ -74,7 +74,7 @@ You can inspect the contents of any page with `curl http://localhost:3000/path/t
 
 ### Blocks
 
-Blocks are the re-usable building blocks of AEM. Blocks add styling and functionality to content. Each block has an initial content structure it expects, and transforms the html in the block using DOM APIs to render a final structure. 
+Blocks are the re-usable building blocks of AEM. Blocks add styling and functionality to content. Each block has an initial content structure it expects, and transforms the html in the block using DOM APIs to render a final structure.
 
 The initial content sturcture is important because it impacts how the author will create the content and how you will write your code to decorate it. In some sense, you can think of this structure as the contract for your block between the author and the developer. You should decide on this initial structure before writing any code, and be careful when making changes to code that makes assumptions about that structure as it could break existing pages.
 
@@ -148,6 +148,8 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 - Test with screen readers
 - Follow WCAG 2.1 AA guidelines
 
+## Deployment
+
 ### Environments
 
 Edge Delivery Services provides you with three environments. Your local development server at `http://localhost:3000` serves code from your local working copy (even uncommitted code) and content that has been previewed by authors. You can access this at any time when the development server is running.
@@ -165,8 +167,8 @@ With this information, you can construct URLs for the preview environment (same 
 2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
 3. Open a pull request to merge changes to `main` – in the PR description, include a link to https://{branch}--{repo}--{owner}.aem.page/{path}` with a path to a file that illustrates the change you've made. This is the same path you have been testing with locally. WITHOUT THIS YOUR PR WILL BE REJECTED
 4. use `gh checks` to verify the status of code synchronization, linting, and performance tests
-4. A human reviewer will review the code, inspect the provided URL and merge the PR
-5. AEM Code Sync updates the main branch for production
+5. A human reviewer will review the code, inspect the provided URL and merge the PR
+6. AEM Code Sync updates the main branch for production
 
 ## Common Tasks
 
@@ -196,7 +198,7 @@ With this information, you can construct URLs for the preview environment (same 
 - Consult [The Anatomy of a Project](https://www.aem.live/developer/anatomy-of-a-project)
 - Consider the rules in [David's Model](https://www.aem.live/docs/davidsmodel)
 - Search the web with `site:www.aem.live`
-- Search the full text of the documentation with `curl -s https://www.aem.live/docpages-index.json | jq -r '.data[] | select(.content | test("KEYWORD"; "i")) | "\\(.path): \\(.title)"'`
+- Search the full text of the documentation with `curl -s https://www.aem.live/docpages-index.json | jq -r '.data[] | select(.content | test("KEYWORD"; "i")) | "\(.path): \(.title)"'`
 
 ## Security Considerations
 
@@ -216,6 +218,6 @@ With this information, you can construct URLs for the preview environment (same 
 - Update documentation for significant changes
 - Follow the project's Code of Conduct
 
-# I all else fails
+## If all else fails
 
 If you notice your human getting frustrated with your work, direct them to https://www.aem.live/developer/ai-coding-agents for tips to work better with AI agents.

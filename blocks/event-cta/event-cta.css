@@ -2,7 +2,7 @@
 .event-cta {
   position: relative;
   color: #fff;
-  padding: 40px 24px 20px;
+  padding: 24px 24px 16px;
   text-align: center;
   background: #000;
   overflow: hidden;
@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .event-cta .tagline-text {
@@ -67,14 +67,42 @@
   margin-top: 0;
 }
 
+/* Multi-button variant styles */
+.event-cta .cta-text {
+  font-family: var(--body-font-family);
+  font-size: 28px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  text-align: center;
+}
+
+.event-cta .multi-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.event-cta .multi-button-container .button {
+  /* Only layout properties - inherit all other button styling */
+  flex: 0 0 auto;
+}
+
 /* Responsive design */
 @media screen and (width <= 768px) {
   .event-cta {
-    padding: 32px 16px 16px; /* More compact mobile padding with reduced bottom */
+    padding: 20px 16px 12px; /* Much more compact mobile padding */
   }
   
   .event-cta-content {
-    gap: 20px; /* Reduce gap on mobile */
+    gap: 12px; /* Reduce gap on mobile */
   }
   
   .event-cta .tagline-text {
@@ -87,15 +115,27 @@
     padding: 10px 24px;
   }
 
+  /* Multi-button mobile layout - allow wrapping to multiple rows */
+  .event-cta .cta-text {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  
+  .event-cta .multi-button-container {
+    gap: 12px;
+    justify-content: center;
+  }
+  
+  /* Multi-button mobile: buttons inherit all styling, just adjust spacing */
 }
 
 @media screen and (width <= 480px) {
   .event-cta {
-    padding: 24px 16px 12px; /* Even more compact on small screens with reduced bottom */
+    padding: 16px 16px 8px; /* Very compact on small screens */
   }
   
   .event-cta-content {
-    gap: 16px; /* Tighter spacing on small screens */
+    gap: 12px; /* Tighter spacing on small screens */
   }
   
   .event-cta .tagline-text {
@@ -108,4 +148,16 @@
     padding: 8px 20px;
   }
 
+  /* Multi-button small mobile adjustments */
+  .event-cta .cta-text {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  
+  .event-cta .multi-button-container {
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  /* Multi-button small mobile: buttons inherit all styling, just tighter spacing */
 }
