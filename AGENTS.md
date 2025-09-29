@@ -18,10 +18,11 @@ The repository provides the basic structure, blocks, and configuration needed to
 ## Setup Commands
 
 - Install dependencies: `npm install`
-- Start local development: `npx -y @adobe/aem-cli up --no-open --url https://main--helix-website--adobe.aem.live/ --html-folder drafts`
+- Start local development: `npx -y @adobe/aem-cli up --no-open --url https://main--helix-website--adobe.aem.live/ --html-folder drafts --forward-browser-logs`
   - run in background, if possible. If this agent has no built-in background handling, use `nohup`
   - If the user installed the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
   - the `--html-folder drafts` option allows you to serve tests files from the local file system (e.g. drafts/test.html becomes http://localhost/draft/test)
+  - the `--forward-browser-logs` makes it possible to read the `console.log` and `console.error` messages, so use this for debugging, but remove before committing
   - pay attention to the port that the dev server is running. 3000 is the default port, but under AI control other ports are possible
 - Run linting: `npm run lint`
 - Fix linting issues: `npm run lint:fix`
