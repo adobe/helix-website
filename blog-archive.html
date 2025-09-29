@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Blog Archive - AEM.live</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <script>
+    // Mock blog data for demonstration
+    window.blogindex = {
+      data: [
+        {
+          "title": "Getting Started with AEM Sites",
+          "path": "/blog/2023/05/getting-started-aem-sites",
+          "publicationDate": "2023-05-15",
+          "description": "Learn how to get started with AEM Sites for your web projects.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "Jane Doe"
+        },
+        {
+          "title": "Advanced Content Fragments Techniques",
+          "path": "/blog/2023/05/advanced-content-fragments",
+          "publicationDate": "2023-05-10",
+          "description": "Deep dive into advanced content fragment techniques.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "John Smith"
+        },
+        {
+          "title": "AEM as a Cloud Service Best Practices",
+          "path": "/blog/2023/04/aem-cloud-service-best-practices",
+          "publicationDate": "2023-04-22",
+          "description": "Best practices for deploying AEM as a Cloud Service.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "Sam Wilson"
+        },
+        {
+          "title": "Building Responsive Websites with AEM",
+          "path": "/blog/2023/04/responsive-websites-aem",
+          "publicationDate": "2023-04-18",
+          "description": "How to create responsive websites using AEM.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "Alex Johnson"
+        },
+        {
+          "title": "Introduction to HTL in AEM",
+          "path": "/blog/2023/03/introduction-htl-aem",
+          "publicationDate": "2023-03-30",
+          "description": "Getting started with HTML Template Language in AEM.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "Maria Garcia"
+        },
+        {
+          "title": "Workflow Optimization in AEM",
+          "path": "/blog/2023/02/workflow-optimization",
+          "publicationDate": "2023-02-14",
+          "description": "Optimize your AEM workflows for better efficiency.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "David Chen"
+        },
+        {
+          "title": "Component Development Best Practices",
+          "path": "/blog/2023/01/component-development",
+          "publicationDate": "2023-01-25",
+          "description": "Best practices for developing AEM components.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "Sarah Williams"
+        },
+        {
+          "title": "Content Strategy with AEM",
+          "path": "/blog/2022/12/content-strategy",
+          "publicationDate": "2022-12-10",
+          "description": "Develop effective content strategies using AEM.",
+          "image": "/img/default-blog-image.jpg",
+          "author": "Michael Brown"
+        }
+      ],
+      loaded: true
+    };
+    
+    // Simulate window.hlx object
+    window.hlx = {
+      codeBasePath: '.'
+    };
+  </script>
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+    }
+    
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1rem;
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    
+    footer {
+      background-color: #f5f5f5;
+      padding: 1rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AEM.live Blog Archive</h1>
+  </header>
+  
+  <main>
+    <div class="blog-archive">
+      <div class="section">
+        <div class="blog-archive-wrapper">
+          <div class="blog-archive"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <p>© 2023 AEM.live</p>
+  </footer>
+  
+  <script type="module">
+    // Import our functions
+    import './scripts/scripts.js';
+    import { renderBlogArchive } from './blocks/blog-archive/blog-archive.js';
+    
+    // Wait for DOM to be ready and then render the blog archive
+    document.addEventListener('DOMContentLoaded', () => {
+      const blogArchiveBlock = document.querySelector('.blog-archive');
+      if (blogArchiveBlock) {
+        renderBlogArchive(blogArchiveBlock);
+      }
+    });
+  </script>
+</body>
+</html>
