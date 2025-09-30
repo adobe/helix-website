@@ -709,6 +709,10 @@ async function loadLazy(doc) {
   await loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 
+  if (main.querySelector('.blog-archive')) {
+    loadBlogData();
+  }
+
   const { hash } = window.location;
   if (hash) {
     setTimeout(() => {
