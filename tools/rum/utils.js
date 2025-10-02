@@ -33,7 +33,7 @@ export function toHumanReadable(num) {
     return `${number.toFixed(precision)}`;
   }
 
-  const units = ['k', 'm', 'g', 't', 'p'];
+  const units = ['k', 'm', 'b', 't', 'q'];
   let u = -1;
   const r = 10 ** dp;
 
