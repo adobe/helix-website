@@ -1,7 +1,6 @@
 name: Track Publishes
 on:
-  schedule:
-    - cron: "0/5 * * * *"
+  schedule: []  # disable scheduled runs
   workflow_dispatch:
 
 
