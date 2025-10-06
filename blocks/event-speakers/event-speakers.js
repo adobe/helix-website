@@ -109,17 +109,37 @@ function setupCarouselNavigation(carousel, prevButton, nextButton) {
   // Update button states based on scroll position
   function updateNavButtons() {
     const isAtStart = carousel.scrollLeft <= 0;
-    const isAtEnd = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 1;
+    const isAtEnd = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10;
 
     prevButton.disabled = isAtStart;
     nextButton.disabled = isAtEnd;
   }
 
   carousel.addEventListener('scroll', updateNavButtons);
-  // Initial check
-  updateNavButtons();
-  // Also check after a short delay to ensure carousel is fully rendered
-  setTimeout(updateNavButtons, 100);
+  
+  // Wait for images to load before checking button states
+  const images = carousel.querySelectorAll('img');
+  if (images.length > 0) {
+    let loadedCount = 0;
+    const checkAllLoaded = () => {
+      loadedCount += 1;
+      if (loadedCount === images.length) {
+        updateNavButtons();
+      }
+    };
+    
+    images.forEach((img) => {
+      if (img.complete) {
+        checkAllLoaded();
+      } else {
+        img.addEventListener('load', checkAllLoaded);
+        img.addEventListener('error', checkAllLoaded); // Still check even if image fails
+      }
+    });
+  } else {
+    // No images, check immediately
+    setTimeout(updateNavButtons, 100);
+  }
 }
 
 export default async function decorate(block) {
