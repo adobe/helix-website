@@ -92,10 +92,10 @@ function createCarouselNav() {
 
 function setupCarouselNavigation(carousel, prevButton, nextButton) {
   // Calculate scroll amount based on card width + gap
-  // Each scroll should show approximately 3-4 cards
+  // Each scroll should show approximately 4 cards
   const cardWidth = 220;
   const gap = 20;
-  const cardsToScroll = 3;
+  const cardsToScroll = 4;
   const scrollAmount = (cardWidth + gap) * cardsToScroll;
 
   prevButton.addEventListener('click', () => {
