@@ -32,7 +32,7 @@
 }
 
 .event-speakers .speaker-card {
-  flex: 0 0 250px;
+  flex: 0 0 220px;
   position: relative;
   transition: transform 0.3s ease;
   align-self: flex-start;
@@ -40,8 +40,8 @@
 
 /* Odd cards (1, 3, 5...) - Large, portrait aspect ratio */
 .event-speakers .speaker-card:nth-child(odd) img {
-  width: 250px;
-  height: 314px;
+  width: 220px;
+  height: 276px;
   object-fit: cover;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -49,8 +49,8 @@
 
 /* Even cards (2, 4, 6...) - Small, square */
 .event-speakers .speaker-card:nth-child(even) img {
-  width: 250px;
-  height: 250px;
+  width: 220px;
+  height: 220px;
   object-fit: cover;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -138,17 +138,17 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .event-speakers .speaker-card {
-    flex: 0 0 220px;
+    flex: 0 0 200px;
   }
 
   .event-speakers .speaker-card:nth-child(odd) img {
-    width: 220px;
-    height: 276px;
+    width: 200px;
+    height: 251px;
   }
 
   .event-speakers .speaker-card:nth-child(even) img {
-    width: 220px;
-    height: 220px;
+    width: 200px;
+    height: 200px;
   }
 
   .event-speakers .carousel-nav.prev {
@@ -166,17 +166,17 @@
   }
 
   .event-speakers .speaker-card {
-    flex: 0 0 200px;
+    flex: 0 0 180px;
   }
 
   .event-speakers .speaker-card:nth-child(odd) img {
-    width: 200px;
-    height: 251px;
+    width: 180px;
+    height: 226px;
   }
 
   .event-speakers .speaker-card:nth-child(even) img {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
   }
 
   .event-speakers .carousel-nav {
@@ -195,17 +195,17 @@
 
 @media (max-width: 480px) {
   .event-speakers .speaker-card {
-    flex: 0 0 180px;
+    flex: 0 0 160px;
   }
 
   .event-speakers .speaker-card:nth-child(odd) img {
-    width: 180px;
-    height: 226px;
+    width: 160px;
+    height: 201px;
   }
 
   .event-speakers .speaker-card:nth-child(even) img {
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
   }
 }
 
