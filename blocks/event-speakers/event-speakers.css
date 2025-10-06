@@ -45,6 +45,7 @@
   object-fit: cover;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
 }
 
 /* Even cards (2, 4, 6...) - Small, square */
@@ -54,6 +55,7 @@
   object-fit: cover;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
 }
 
 .event-speakers .speaker-info {
@@ -69,6 +71,13 @@
 }
 
 .event-speakers .speaker-title {
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.4;
+  margin: 0 0 4px;
+}
+
+.event-speakers .speaker-company {
   font-size: 1rem;
   color: #000;
   line-height: 1.4;
@@ -144,11 +153,13 @@
   .event-speakers .speaker-card:nth-child(odd) img {
     width: 200px;
     height: 251px;
+    border-radius: 0.5rem;
   }
 
   .event-speakers .speaker-card:nth-child(even) img {
     width: 200px;
     height: 200px;
+    border-radius: 0.5rem;
   }
 
   .event-speakers .carousel-nav.prev {
@@ -172,11 +183,13 @@
   .event-speakers .speaker-card:nth-child(odd) img {
     width: 180px;
     height: 226px;
+    border-radius: 0.5rem;
   }
 
   .event-speakers .speaker-card:nth-child(even) img {
     width: 180px;
     height: 180px;
+    border-radius: 0.5rem;
   }
 
   .event-speakers .carousel-nav {
@@ -201,11 +214,13 @@
   .event-speakers .speaker-card:nth-child(odd) img {
     width: 160px;
     height: 201px;
+    border-radius: 0.5rem;
   }
 
   .event-speakers .speaker-card:nth-child(even) img {
     width: 160px;
     height: 160px;
+    border-radius: 0.5rem;
   }
 }
 

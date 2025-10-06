@@ -52,16 +52,24 @@ function createSpeakerCard(speaker) {
   card.className = 'speaker-card';
 
   const name = `${speaker.first_name} ${speaker.last_name}`;
-  const titleCompany = speaker.company
-    ? `${speaker.title}, ${speaker.company}`
-    : speaker.title;
+  
+  // Parse title - only keep the part before the first comma
+  const fullTitle = speaker.title || '';
+  const title = fullTitle.split(',')[0].trim();
+  
   const imageUrl = speaker.picture?.thumbnail_url || speaker.picture?.url || '';
+
+  // Build the title/company HTML with separate lines
+  let titleHtml = title ? `<p class="speaker-title">${title}</p>` : '';
+  if (speaker.company) {
+    titleHtml += `<p class="speaker-company">${speaker.company}</p>`;
+  }
 
   card.innerHTML = `
     <img src="${imageUrl}" alt="${name}" loading="lazy">
     <div class="speaker-info">
       <h3 class="speaker-name">${name}</h3>
-      <p class="speaker-title">${titleCompany}</p>
+      ${titleHtml}
     </div>
   `;
 
