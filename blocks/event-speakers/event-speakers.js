@@ -115,46 +115,41 @@ function setupCarouselNavigation(carousel, prevButton, nextButton) {
 }
 
 export default async function decorate(block) {
-  // Get the content row (everything after block name)
-  const content = block.children[0]?.querySelector('div');
+  // Get the content div (first div in block, standard pattern)
+  const content = block.querySelector('div');
   if (!content) return;
 
-  // Extract heading (first h1-h6 or first paragraph)
+  // Extract heading - look for first text that's not a link
   let headingText = 'Meet your creative heroes.';
-  const heading = content.querySelector('h1, h2, h3, h4, h5, h6');
-  if (heading) {
-    headingText = heading.textContent.trim();
-    heading.remove();
-  } else {
-    const firstP = content.querySelector('p');
-    if (firstP && !firstP.querySelector('a')) {
-      headingText = firstP.textContent.trim();
-      firstP.remove();
+  const paragraphs = content.querySelectorAll('p');
+  
+  paragraphs.forEach((p) => {
+    if (!p.querySelector('a') && !headingText.includes('creative heroes')) {
+      return; // already found
     }
-  }
+    if (!p.querySelector('a')) {
+      headingText = p.textContent.trim();
+    }
+  });
 
-  // Extract API URL (look for a link or plain text URL)
+  // Extract API URL
   let apiUrl = '';
-  const apiLink = content.querySelector('a[href*="developerevents.adobe.com"]');
-  if (apiLink) {
-    apiUrl = apiLink.href;
-  } else {
-    // Look for URL in text content
-    const textContent = content.textContent;
-    const urlMatch = textContent.match(/https?:\/\/[^\s]+/);
-    if (urlMatch) {
-      apiUrl = urlMatch[0];
+  const links = content.querySelectorAll('a');
+  links.forEach((link) => {
+    if (link.href.includes('developerevents.adobe.com')) {
+      apiUrl = link.href;
     }
-  }
+  });
 
-  // Extract CTA link (any remaining link)
-  const ctaLink = content.querySelector('a:not([href*="developerevents.adobe.com"])');
+  // Extract CTA link (any link that's not the API URL)
   let ctaHtml = '';
-  if (ctaLink) {
-    const ctaText = ctaLink.textContent.trim();
-    const ctaHref = ctaLink.href;
-    ctaHtml = `<a href="${ctaHref}" class="cta-button">${ctaText}</a>`;
-  }
+  links.forEach((link) => {
+    if (!link.href.includes('developerevents.adobe.com')) {
+      const ctaText = link.textContent.trim();
+      const ctaHref = link.href;
+      ctaHtml = `<a href="${ctaHref}" class="cta-button">${ctaText}</a>`;
+    }
+  });
 
   // Clear the block
   block.innerHTML = '';
