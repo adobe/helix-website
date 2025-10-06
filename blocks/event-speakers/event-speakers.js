@@ -221,12 +221,15 @@ export default async function decorate(block) {
     if (!link.href.includes('developerevents.adobe.com')) {
       const ctaText = link.textContent.trim();
       const ctaHref = link.href;
-      ctaHtml = `<a href="${ctaHref}" class="cta-button">${ctaText}</a>`;
+      ctaHtml = `<p class="button-container"><a href="${ctaHref}" class="button black-border">${ctaText}</a></p>`;
     }
   });
 
   // Clear the block
   block.innerHTML = '';
+  
+  // Add redesign class for button styling
+  block.classList.add('redesign');
 
   // Create heading
   const heading = document.createElement('h2');
