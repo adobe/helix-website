@@ -95,31 +95,34 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAX_PAGES: "5" # Maximum number of pages to check before giving up
+          MAX_AGE_MINUTES: "60" # Maximum age for a valid timestamp (workflow runs every 5 min, so 60 min = 12 intervals)
         run: |
           LAST_CREATED_AT_ISO=""
+          FOUND_RUN_ID=""
           page=1
-          
+
           while [[ $page -le $MAX_PAGES ]]; do
             echo "Checking page $page for successful runs..."
-            
+
             # Get workflow runs for current page
             WORKFLOW_RUNS=$(gh api "/repos/${{ github.repository }}/actions/workflows/${{ steps.workflow-id.outputs.WORKFLOW_ID }}/runs?status=completed&branch=${{ steps.branch-name.outputs.BRANCH_NAME }}&page=$page&per_page=100")
-            
+
             # Check if we got any runs
             TOTAL_COUNT=$(echo "$WORKFLOW_RUNS" | jq '.total_count')
             if [[ $TOTAL_COUNT -eq 0 || $(echo "$WORKFLOW_RUNS" | jq '.workflow_runs | length') -eq 0 ]]; then
               echo "No more workflow runs found."
               break
             fi
-            
+
             # Try to find a successful run on this page
             LAST_CREATED_AT_ISO=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[] | select(.conclusion == \"success\") | .created_at][0]")
-            
+            FOUND_RUN_ID=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[] | select(.conclusion == \"success\") | .id][0]")
+
             if [[ "$LAST_CREATED_AT_ISO" != "null" ]]; then
               echo "Found successful run on page $page"
               break
             fi
-            
+
             # Store first run's timestamp as fallback if we haven't stored one yet
             if [[ $page -eq 1 ]]; then
               FALLBACK_TIMESTAMP=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[].created_at][0]")
@@ -128,27 +131,55 @@ jobs:
                 FIRST_RUN_ISO=$FALLBACK_TIMESTAMP
               fi
             fi
-            
+
             ((page++))
           done
-          
-          # If we didn't find a successful run, use fallback strategies
+
+          # Validate timestamp age if we found one
+          CURRENT_TIME=$(date +%s)
+          if [[ "$LAST_CREATED_AT_ISO" != "null" && -n "$LAST_CREATED_AT_ISO" ]]; then
+            FOUND_TIME=$(date -d "$LAST_CREATED_AT_ISO" +%s)
+            AGE_SECONDS=$((CURRENT_TIME - FOUND_TIME))
+            AGE_MINUTES=$((AGE_SECONDS / 60))
+
+            if [[ $AGE_MINUTES -gt $MAX_AGE_MINUTES ]]; then
+              echo "::warning::Found timestamp is too old: $LAST_CREATED_AT_ISO (${AGE_MINUTES} minutes ago, run ID: ${FOUND_RUN_ID})"
+              echo "Timestamp validation failed - found run is ${AGE_MINUTES} minutes old (threshold: ${MAX_AGE_MINUTES} minutes)" >> $GITHUB_STEP_SUMMARY
+              echo "Found run ID: ${FOUND_RUN_ID}" >> $GITHUB_STEP_SUMMARY
+              echo "Found timestamp: ${LAST_CREATED_AT_ISO}" >> $GITHUB_STEP_SUMMARY
+              echo "Using safer fallback instead." >> $GITHUB_STEP_SUMMARY
+              # Reset to trigger fallback logic
+              LAST_CREATED_AT_ISO=""
+            fi
+          fi
+
+          # If we didn't find a successful run or validation failed, use fallback strategies
           if [[ "$LAST_CREATED_AT_ISO" == "null" || -z "$LAST_CREATED_AT_ISO" ]]; then
-            echo "::warning::No successful workflow runs found in the last $MAX_PAGES pages."
-            
+            echo "::warning::No valid workflow runs found in the last $MAX_PAGES pages."
+
             if [[ -n "$FIRST_RUN_ISO" ]]; then
-              echo "Using timestamp from earliest found run as fallback"
-              LAST_CREATED_AT_ISO=$FIRST_RUN_ISO
-              
-              # Add information about recent failures to the job summary
-              echo "Recent workflow run history:" >> $GITHUB_STEP_SUMMARY
-              echo "$WORKFLOW_RUNS" | jq -r '.workflow_runs | map({conclusion, created_at, html_url}) | .[:5]' >> $GITHUB_STEP_SUMMARY
+              FIRST_RUN_TIME=$(date -d "$FIRST_RUN_ISO" +%s)
+              FIRST_RUN_AGE_MINUTES=$(( (CURRENT_TIME - FIRST_RUN_TIME) / 60 ))
+
+              # Only use FIRST_RUN_ISO if it's not too old
+              if [[ $FIRST_RUN_AGE_MINUTES -le $MAX_AGE_MINUTES ]]; then
+                echo "Using timestamp from earliest found run as fallback"
+                LAST_CREATED_AT_ISO=$FIRST_RUN_ISO
+
+                # Add information about recent failures to the job summary
+                echo "Recent workflow run history:" >> $GITHUB_STEP_SUMMARY
+                echo "$WORKFLOW_RUNS" | jq -r '.workflow_runs | map({conclusion, created_at, html_url}) | .[:5]' >> $GITHUB_STEP_SUMMARY
+              else
+                echo "::warning::First run timestamp is also too old (${FIRST_RUN_AGE_MINUTES} minutes). Using 5 minutes ago as fallback."
+                echo "First run was ${FIRST_RUN_AGE_MINUTES} minutes old (threshold: ${MAX_AGE_MINUTES} minutes)" >> $GITHUB_STEP_SUMMARY
+                LAST_CREATED_AT_ISO=$(date -u -d "5 minutes ago" "+%Y-%m-%dT%H:%M:%SZ")
+              fi
             else
               echo "::warning::No previous runs found at all. Using a timestamp from 5 minutes ago as fallback."
               LAST_CREATED_AT_ISO=$(date -u -d "5 minutes ago" "+%Y-%m-%dT%H:%M:%SZ")
             fi
           fi
-          
+
           LAST_CREATED_AT_UNIX=$(date -d "$LAST_CREATED_AT_ISO" +%s)
           echo "LAST_CREATED_AT_ISO=$LAST_CREATED_AT_ISO" >> $GITHUB_OUTPUT
           echo "LAST_CREATED_AT_UNIX=$LAST_CREATED_AT_UNIX" >> $GITHUB_OUTPUT
