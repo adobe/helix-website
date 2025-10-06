@@ -167,12 +167,6 @@ export default async function decorate(block) {
   const carousel = document.createElement('div');
   carousel.className = 'speakers-carousel';
 
-  // Add speaker cards (using mock data for now)
-  MOCK_SPEAKERS.forEach((speaker) => {
-    const card = createSpeakerCard(speaker);
-    carousel.appendChild(card);
-  });
-
   // Add navigation buttons
   const { prevButton, nextButton } = createCarouselNav();
   carouselWrapper.appendChild(prevButton);
@@ -181,9 +175,6 @@ export default async function decorate(block) {
 
   block.appendChild(carouselWrapper);
 
-  // Setup navigation
-  setupCarouselNavigation(carousel, prevButton, nextButton);
-
   // Add CTA if present
   if (ctaHtml) {
     const ctaContainer = document.createElement('div');
@@ -191,9 +182,53 @@ export default async function decorate(block) {
     block.appendChild(ctaContainer);
   }
 
-  // Log API URL for future use
+  // Fetch speakers from API or use mock data
   if (apiUrl) {
-    console.log('API URL for future implementation:', apiUrl);
+    try {
+      // Add loading indicator
+      carousel.innerHTML = '<p style="padding: 40px; text-align: center;">Loading speakers...</p>';
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const speakers = data.speakers || [];
+
+      // Clear loading indicator
+      carousel.innerHTML = '';
+
+      if (speakers.length === 0) {
+        carousel.innerHTML = '<p style="padding: 40px; text-align: center;">No speakers available yet.</p>';
+        return;
+      }
+
+      // Add speaker cards from API data
+      speakers.forEach((speaker) => {
+        const card = createSpeakerCard(speaker);
+        carousel.appendChild(card);
+      });
+
+      // Setup navigation after speakers are loaded
+      setupCarouselNavigation(carousel, prevButton, nextButton);
+    } catch (error) {
+      console.error('Error fetching speakers:', error);
+      // Fall back to mock data on error
+      carousel.innerHTML = '';
+      MOCK_SPEAKERS.forEach((speaker) => {
+        const card = createSpeakerCard(speaker);
+        carousel.appendChild(card);
+      });
+      setupCarouselNavigation(carousel, prevButton, nextButton);
+    }
+  } else {
+    // No API URL provided, use mock data
+    MOCK_SPEAKERS.forEach((speaker) => {
+      const card = createSpeakerCard(speaker);
+      carousel.appendChild(card);
+    });
+    setupCarouselNavigation(carousel, prevButton, nextButton);
   }
 }
 
