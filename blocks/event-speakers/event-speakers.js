@@ -150,6 +150,35 @@ function setupCarouselNavigation(carousel, prevButton, nextButton) {
   }
 }
 
+function reorderSpeakers(speakers, priorityNames) {
+  if (!priorityNames || priorityNames.length === 0) {
+    return speakers;
+  }
+
+  // Normalize priority names for matching (lowercase, trim)
+  const normalizedPriority = priorityNames.map((name) => name.toLowerCase().trim());
+
+  const prioritySpeakers = [];
+  const remainingSpeakers = [];
+
+  // Split speakers into priority and remaining
+  speakers.forEach((speaker) => {
+    const fullName = `${speaker.first_name} ${speaker.last_name}`.toLowerCase();
+    const matchIndex = normalizedPriority.findIndex((priorityName) => 
+      fullName.includes(priorityName) || priorityName.includes(fullName)
+    );
+
+    if (matchIndex !== -1) {
+      prioritySpeakers[matchIndex] = speaker;
+    } else {
+      remainingSpeakers.push(speaker);
+    }
+  });
+
+  // Filter out undefined entries and combine with remaining
+  return [...prioritySpeakers.filter(Boolean), ...remainingSpeakers];
+}
+
 export default async function decorate(block) {
   // Get the content div (first div in block, standard pattern)
   const content = block.querySelector('div');
@@ -157,14 +186,20 @@ export default async function decorate(block) {
 
   // Extract heading - look for first text that's not a link
   let headingText = 'Meet your creative heroes.';
+  let speakerOrder = [];
   const paragraphs = content.querySelectorAll('p');
   
   paragraphs.forEach((p) => {
-    if (!p.querySelector('a') && !headingText.includes('creative heroes')) {
-      return; // already found
-    }
-    if (!p.querySelector('a')) {
-      headingText = p.textContent.trim();
+    const text = p.textContent.trim();
+    // Skip if it's a link paragraph
+    if (p.querySelector('a')) return;
+    
+    // Check if this looks like a speaker order list (contains commas)
+    if (text.includes(',') && text.split(',').length > 1) {
+      speakerOrder = text.split(',').map((name) => name.trim());
+    } else if (!headingText.includes('creative heroes') && !text.includes(',')) {
+      // It's the heading
+      headingText = text;
     }
   });
 
@@ -230,7 +265,7 @@ export default async function decorate(block) {
       }
 
       const data = await response.json();
-      const speakers = data.speakers || [];
+      let speakers = data.speakers || [];
 
       // Clear loading indicator
       carousel.innerHTML = '';
@@ -239,6 +274,9 @@ export default async function decorate(block) {
         carousel.innerHTML = '<p style="padding: 40px; text-align: center;">No speakers available yet.</p>';
         return;
       }
+
+      // Reorder speakers if priority order was specified
+      speakers = reorderSpeakers(speakers, speakerOrder);
 
       // Add speaker cards from API data
       speakers.forEach((speaker) => {
@@ -252,7 +290,8 @@ export default async function decorate(block) {
       console.error('Error fetching speakers:', error);
       // Fall back to mock data on error
       carousel.innerHTML = '';
-      MOCK_SPEAKERS.forEach((speaker) => {
+      const reorderedMock = reorderSpeakers(MOCK_SPEAKERS, speakerOrder);
+      reorderedMock.forEach((speaker) => {
         const card = createSpeakerCard(speaker);
         carousel.appendChild(card);
       });
@@ -260,7 +299,8 @@ export default async function decorate(block) {
     }
   } else {
     // No API URL provided, use mock data
-    MOCK_SPEAKERS.forEach((speaker) => {
+    const reorderedMock = reorderSpeakers(MOCK_SPEAKERS, speakerOrder);
+    reorderedMock.forEach((speaker) => {
       const card = createSpeakerCard(speaker);
       carousel.appendChild(card);
     });
