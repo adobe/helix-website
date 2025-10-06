@@ -184,22 +184,25 @@ export default async function decorate(block) {
   const content = block.querySelector('div');
   if (!content) return;
 
-  // Extract heading - look for first text that's not a link
-  let headingText = 'Meet your creative heroes.';
+  // Extract heading and speaker order
+  let headingText = 'Speakers';
   let speakerOrder = [];
   const paragraphs = content.querySelectorAll('p');
+  
+  let foundHeading = false;
   
   paragraphs.forEach((p) => {
     const text = p.textContent.trim();
     // Skip if it's a link paragraph
     if (p.querySelector('a')) return;
     
-    // Check if this looks like a speaker order list (contains commas)
-    if (text.includes(',') && text.split(',').length > 1) {
+    // Check if this looks like a speaker order list (contains multiple commas)
+    if (text.includes(',') && text.split(',').length > 2) {
       speakerOrder = text.split(',').map((name) => name.trim());
-    } else if (!headingText.includes('creative heroes') && !text.includes(',')) {
-      // It's the heading
+    } else if (!foundHeading && text && !text.includes(',')) {
+      // First non-link text without commas is the heading
       headingText = text;
+      foundHeading = true;
     }
   });
 
