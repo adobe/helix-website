@@ -32,31 +32,32 @@
 }
 
 .event-speakers .speaker-card {
-  flex: 0 0 calc(25% - 15px);
-  min-width: 280px;
+  flex: 0 0 250px;
   position: relative;
   transition: transform 0.3s ease;
 }
 
-/* Alternating size pattern: larger, smaller, smaller, larger */
-.event-speakers .speaker-card:nth-child(4n+1),
-.event-speakers .speaker-card:nth-child(4n+4) {
-  flex: 0 0 calc(28% - 15px);
-  min-width: 320px;
+/* Odd cards (1, 3, 5...) - Large, portrait aspect ratio */
+.event-speakers .speaker-card:nth-child(odd) {
   margin-top: 0;
 }
 
-.event-speakers .speaker-card:nth-child(4n+2),
-.event-speakers .speaker-card:nth-child(4n+3) {
-  flex: 0 0 calc(22% - 15px);
-  min-width: 240px;
-  margin-top: 40px;
+.event-speakers .speaker-card:nth-child(odd) img {
+  width: 250px;
+  height: 314px;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.event-speakers .speaker-card img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4/5;
+/* Even cards (2, 4, 6...) - Small, square, raised up */
+.event-speakers .speaker-card:nth-child(even) {
+  margin-top: -60px;
+}
+
+.event-speakers .speaker-card:nth-child(even) img {
+  width: 250px;
+  height: 250px;
   object-fit: cover;
   display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -144,21 +145,21 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .event-speakers .speaker-card {
-    flex: 0 0 calc(33.333% - 14px);
-    min-width: 240px;
+    flex: 0 0 220px;
   }
 
-  .event-speakers .speaker-card:nth-child(4n+1),
-  .event-speakers .speaker-card:nth-child(4n+4) {
-    flex: 0 0 calc(36% - 14px);
-    min-width: 260px;
+  .event-speakers .speaker-card:nth-child(odd) img {
+    width: 220px;
+    height: 276px;
   }
 
-  .event-speakers .speaker-card:nth-child(4n+2),
-  .event-speakers .speaker-card:nth-child(4n+3) {
-    flex: 0 0 calc(30% - 14px);
-    min-width: 220px;
-    margin-top: 30px;
+  .event-speakers .speaker-card:nth-child(even) {
+    margin-top: -50px;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) img {
+    width: 220px;
+    height: 220px;
   }
 
   .event-speakers .carousel-nav.prev {
@@ -175,19 +176,22 @@
     font-size: 2rem;
   }
 
-  /* Simplify alternating pattern on tablet */
   .event-speakers .speaker-card {
-    flex: 0 0 calc(50% - 10px) !important;
-    min-width: 200px !important;
-    margin-top: 0 !important;
+    flex: 0 0 200px;
   }
 
-  .event-speakers .speaker-card:nth-child(odd) {
-    margin-top: 0 !important;
+  .event-speakers .speaker-card:nth-child(odd) img {
+    width: 200px;
+    height: 251px;
   }
 
   .event-speakers .speaker-card:nth-child(even) {
-    margin-top: 20px !important;
+    margin-top: -40px;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) img {
+    width: 200px;
+    height: 200px;
   }
 
   .event-speakers .carousel-nav {
@@ -205,11 +209,22 @@
 }
 
 @media (max-width: 480px) {
-  /* No alternating on mobile */
   .event-speakers .speaker-card {
-    flex: 0 0 calc(100% - 20px) !important;
-    min-width: 260px !important;
-    margin-top: 0 !important;
+    flex: 0 0 180px;
+  }
+
+  .event-speakers .speaker-card:nth-child(odd) img {
+    width: 180px;
+    height: 226px;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) {
+    margin-top: -30px;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) img {
+    width: 180px;
+    height: 180px;
   }
 }
 
