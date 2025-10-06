@@ -91,7 +91,12 @@ function createCarouselNav() {
 }
 
 function setupCarouselNavigation(carousel, prevButton, nextButton) {
-  const scrollAmount = 300;
+  // Calculate scroll amount based on card width + gap
+  // Each scroll should show approximately 3-4 cards
+  const cardWidth = 250;
+  const gap = 20;
+  const cardsToScroll = 3;
+  const scrollAmount = (cardWidth + gap) * cardsToScroll;
 
   prevButton.addEventListener('click', () => {
     carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -111,7 +116,10 @@ function setupCarouselNavigation(carousel, prevButton, nextButton) {
   }
 
   carousel.addEventListener('scroll', updateNavButtons);
+  // Initial check
   updateNavButtons();
+  // Also check after a short delay to ensure carousel is fully rendered
+  setTimeout(updateNavButtons, 100);
 }
 
 export default async function decorate(block) {
