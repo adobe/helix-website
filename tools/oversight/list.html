@@ -110,7 +110,7 @@
           <facet-sidebar>
             <list-facet facet="userAgent" drilldown="share.html">
               <legend>Device Type and Operating System</legend>
-              <a href="/docs/rum-explorer#device-share" class="help"
+              <a href="/docs/optel-explorer#device-share" class="help"
               target="_blank" title="What devices and operating systems have accessed your site?"></a>
               <dl>
                 <dt>desktop</dt>
@@ -145,12 +145,12 @@
             </list-facet>
             <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
               <legend>URL</legend>
-              <a href="/docs/rum-explorer#url" class="help"
+              <a href="/docs/optel-explorer#url" class="help"
               target="_blank" title="What different pages make up your site?"></a>  
             </link-facet>
             <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
               <legend>Checkpoints</legend>
-              <a href="/docs/rum-explorer#checkpoints" class="help"
+              <a href="/docs/optel-explorer#checkpoints" class="help"
               target="_blank" title="What type of activity data is collected?"></a>
               <dl>
                 <dt>enter</dt>
@@ -177,33 +177,33 @@
             </list-facet>
             <literal-facet facet="click.source" drilldown="list.html">
               <legend>Click Source (CSS Selector)</legend>
-              <a href="/docs/rum-explorer#facet-click" class="help"
+              <a href="/docs/optel-explorer#facet-click" class="help"
               target="_blank" title="What page visitors clicked"></a>
             </literal-facet>
             <link-facet facet="click.target" drilldown="list.html">
               <legend>Click Target (URL)</legend>
-              <a href="/docs/rum-explorer#facet-click" class="help"
+              <a href="/docs/optel-explorer#facet-click" class="help"
               target="_blank" title="What page visitors clicked"></a>
             </link-facet>
             <literal-facet facet="viewmedia.source" drilldown="list.html">
               <legend>Media Source (CSS Selector)</legend>
-              <a href="/docs/rum-explorer#facet-viewmedia" class="help"
+              <a href="/docs/optel-explorer#facet-viewmedia" class="help"
               target="_blank" title="What image/video visitors have seen?"></a>
             </literal-facet>
             <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
               <legend>Media Target</legend>
-              <a href="/docs/rum-explorer#facet-viewmedia" class="help"
+              <a href="/docs/optel-explorer#facet-viewmedia" class="help"
               target="_blank" title="What image/video visitors have seen?"></a>
             </thumbnail-facet>
             <literal-facet facet="viewblock.source" drilldown="list.html">
               <legend>Block (CSS Selector)</legend>
-              <a href="/docs/rum-explorer#facet-viewblock" class="help"
-              target="_blank" title="What blocks visitors have seen?"></a>
+              <a href="/docs/optel-explorer#facet-viewblock" class="help"
+              target="_blank" title="What blocks page visitors have seen? (dialog for elements which are fixed in the viewport and can't be scrolled away)"></a>
             </literal-facet>
             <link-facet facet="enter.source" drilldown="list.html" thumbnail="false">
               <legend>External Referrer</legend>
-              <a href="/docs/rum-explorer#facet-enter" class="help"
-              target="_blank" title="How the users entered into the site?"></a>
+              <a href="/docs/optel-explorer#facet-enter" class="help"
+              target="_blank" title="How the visitors entered into the site?"></a>
               <dl>
                 <dt>(direct)</dt>
                 <dd>Direct Entry (or via App)</dd>
@@ -211,12 +211,14 @@
             </link-facet>
             <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
               <legend>Internal Referrer</legend>
-              <a href="/docs/rum-explorer#facet-navigate" class="help"
+              <a href="/docs/optel-explorer#facet-navigate" class="help"
               target="_blank" title="Internal navigation paths on the site"></a>
             </link-facet>
 
             <list-facet facet="consent.source">
               <legend>Consent Provider</legend>
+              <a href="docs/optel-explorer#facet-consent" class="help" target="_blank" 
+                title="Which consent provider is enabled on the site?"></a>
               <dl>
                 <dt>onetrust</dt>
                 <dd>OneTrust</dd>
@@ -230,6 +232,8 @@
             </list-facet>
             <list-facet facet="consent.target">
               <legend>Consent Dialog</legend>
+              <a href="docs/optel-explorer#facet-consent" class="help" target="_blank" 
+                title="How does the visitors interact with the consent window/modal on the site?"></a>
               <dl>
                 <dt>show</dt>
                 <dd>Dialog Shown</dd>
@@ -243,16 +247,25 @@
             </list-facet>
             <link-facet facet="error.source">
               <legend>Error Source</legend>
+              <a href="/docs/optel-explorer#facet-error" class="help" target="_blank"
+                title="Which files/functions in the code of the site have Javascript errors?"></a>
             </link-facet>
             <literal-facet facet="error.target">
-              <legend>Error Line</legend>
+              <legend>Error Detail</legend>
+              <a href="/docs/optel-explorer#facet-error" class="help" target="_blank"
+                title="Details of the Javascript errors found on the site"></a>
             </literal-facet>
-            
+
             <list-facet facet="loadresource.histogram" sort="asc">
               <legend>Resource Load Time (ms)</legend>
+              <a href="/docs/optel-explorer#facet-loadresource" class="help" target="_blank"
+                title="How long does it take to load the resources (fragments or JSON API endpoints) on the site?"></a>
             </list-facet>
+
             <list-facet facet="loadresource.source">
               <legend>Resource Loaded</legend>
+              <a href="/docs/optel-explorer#facet-loadresource" class="help" target="_blank"
+                title="What fragments and JSON API endpoints are loaded for the site ?"></a>
             </list-facet>
             <vitals-facet drilldown="cwvperf.html" facet="vitals">
               <legend>Experience Quality</legend>

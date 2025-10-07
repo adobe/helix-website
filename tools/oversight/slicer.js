@@ -105,6 +105,10 @@ export function updateKeyMetrics() {
     pageViewsExtra.setAttribute('precision', 2);
     pageViewsExtra.className = 'extra';
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+
+    setTimeout(() => {
+      pageViewsExtra.setAttribute('title', 'Page views per visit');
+    }, 0);
   }
 
   if (dataChunks.totals.visits.sum > 0) {
@@ -117,6 +121,10 @@ export function updateKeyMetrics() {
     visitsExtra.setAttribute('total', 100);
     visitsExtra.className = 'extra';
     document.querySelector('#visits p').appendChild(visitsExtra);
+
+    setTimeout(() => {
+      visitsExtra.setAttribute('title', 'This is the share of traffic that enters your site, and leaves immediately without clicking anywhere on the page.');
+    }, 0);
   } else {
     document.querySelector('#visits p number-format').textContent = 'N/A';
   }
@@ -142,6 +150,10 @@ export function updateKeyMetrics() {
       conversionsExtra.setAttribute('total', 100);
       conversionsExtra.className = 'extra';
       document.querySelector('#conversions p').appendChild(conversionsExtra);
+
+      setTimeout(() => {
+        conversionsExtra.setAttribute('title', 'Percentage of page views where visitors either consumed significant amounts of content or clicked.');
+      }, 0);
     } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
       conversionsExtra.textContent = computeConversionRate(
         dataChunks.totals.conversions.sum,
@@ -152,6 +164,10 @@ export function updateKeyMetrics() {
       conversionsExtra.setAttribute('total', 100);
       conversionsExtra.className = 'extra';
       document.querySelector('#conversions p').appendChild(conversionsExtra);
+
+      setTimeout(() => {
+        conversionsExtra.setAttribute('title', 'Percentage of visits that completed a specific goal or action (based on your custom conversion configuration)');
+      }, 0);
     }
   } else {
     document.querySelector('#conversions p number-format').textContent = 'N/A';
