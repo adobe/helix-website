@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-import { utils, stats } from '@adobe/rum-distiller';
+import { stats, utils } from '@adobe/rum-distiller';
 import { escapeHTML } from '../utils.js';
 
 const { computeConversionRate, scoreCWV } = utils;
@@ -110,7 +110,12 @@ export default class ListFacet extends HTMLElement {
     const optionKeys = facetEntries.map((f) => f.value)
       .sort((a, b) => {
         if (sort === 'count') return 0; // keep the order
-        return a.localeCompare(b);
+        // try to coerce into number (ignore prefixes)
+        const aNum = Number.parseFloat(a.replace(/[^0-9.]/g, ''));
+        const bNum = Number.parseFloat(b.replace(/[^0-9.]/g, ''));
+        // if not a number, just sort alphabetically
+        if (Number.isNaN(aNum) || Number.isNaN(bNum)) return a.localeCompare(b);
+        return aNum - bNum;
       });
 
     const url = new URL(window.location);
@@ -206,7 +211,10 @@ export default class ListFacet extends HTMLElement {
 
       const paint = (start = 0, end = numOptions) => {
         const entries = facetEntries
-          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value));
+          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
+          .sort(
+            ({ value: a }, { value: b }) => filteredKeys.indexOf(a) - filteredKeys.indexOf(b),
+          );
         const prefix = entries.slice(start, end)
           .map((entry) => entry.value)
           .reduce((acc, entry) => {
