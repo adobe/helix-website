@@ -903,6 +903,10 @@ main .section.separator {
   padding: 20px 0;
 }
 
+main .section.red-heading h2 {
+  color: #eb1000;
+}
+
 /* Above the fold */
 
 main .section[data-section-status="loading"],

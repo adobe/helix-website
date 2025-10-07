@@ -129,22 +129,6 @@
 
 /* Use site default button styles - no custom styling needed */
 
-/* Section metadata color utilities for h2 */
-.section.red-heading .event-speakers h2,
-.section.red-text .event-speakers h2 {
-  color: #eb1000;
-}
-
-.section.blue-heading .event-speakers h2,
-.section.blue-text .event-speakers h2 {
-  color: #6870ec;
-}
-
-.section.black-heading .event-speakers h2,
-.section.black-text .event-speakers h2 {
-  color: #000;
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
   .event-speakers .speaker-card {
