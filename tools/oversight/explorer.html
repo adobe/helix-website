@@ -128,7 +128,7 @@
           </list-facet>
           <list-facet facet="userAgent" drilldown="share.html">
             <legend>Device Type and Operating System</legend>
-            <a href="/docs/rum-explorer#device-share" class="help" target="_blank"
+            <a href="/docs/optel-explorer#device-share" class="help" target="_blank"
               title="What devices and operating systems have accessed your site?"></a>
             <dl>
               <dt>desktop</dt>
@@ -163,12 +163,12 @@
           </list-facet>
           <link-facet facet="url" drilldown="list.html" thumbnail="true" highlight="filter">
             <legend>URL</legend>
-            <a href="/docs/rum-explorer#url" class="help" target="_blank"
+            <a href="/docs/optel-explorer#url" class="help" target="_blank"
               title="What different pages make up your site?"></a>
           </link-facet>
           <list-facet facet="checkpoint" drilldown="flow.html" highlight="filter">
             <legend>Checkpoints</legend>
-            <a href="/docs/rum-explorer#checkpoints" class="help" target="_blank"
+            <a href="/docs/optel-explorer#checkpoints" class="help" target="_blank"
               title="What type of activity data is collected?"></a>
             <dl>
               <dt>enter</dt>
@@ -205,33 +205,33 @@
           </list-facet>
           <literal-facet facet="click.source" drilldown="list.html">
             <legend>Click Source (CSS Selector)</legend>
-            <a href="/docs/rum-explorer#facet-click" class="help" target="_blank"
-              title="What page visitors clicked"></a>
+            <a href="/docs/optel-explorer#facet-click" class="help" target="_blank"
+              title="Where the page visitors clicked?"></a>
           </literal-facet>
           <link-facet facet="click.target" drilldown="list.html">
             <legend>Click Target (URL)</legend>
-            <a href="/docs/rum-explorer#facet-click" class="help" target="_blank"
-              title="What page visitors clicked"></a>
+            <a href="/docs/optel-explorer#facet-click" class="help" target="_blank"
+              title="What links the page visitors clicked?"></a>
           </link-facet>
           <literal-facet facet="viewmedia.source" drilldown="list.html">
             <legend>Media Source (CSS Selector)</legend>
-            <a href="/docs/rum-explorer#facet-viewmedia" class="help" target="_blank"
+            <a href="/docs/optel-explorer#facet-viewmedia" class="help" target="_blank"
               title="What image/video visitors have seen?"></a>
           </literal-facet>
           <thumbnail-facet facet="viewmedia.target" drilldown="list.html">
             <legend>Media Target</legend>
-            <a href="/docs/rum-explorer#facet-viewmedia" class="help" target="_blank"
-              title="What image/video visitors have seen?"></a>
+            <a href="/docs/optel-explorer#facet-viewmedia" class="help" target="_blank"
+              title="Preview of the image/video visitors have seen"></a>
           </thumbnail-facet>
           <literal-facet facet="viewblock.source" drilldown="list.html">
             <legend>Block (CSS Selector)</legend>
-            <a href="/docs/rum-explorer#facet-viewblock" class="help" target="_blank"
-              title="What blocks visitors have seen?"></a>
+            <a href="/docs/optel-explorer#facet-viewblock" class="help" target="_blank"
+              title="What blocks page visitors have seen? (dialog for elements which are fixed in the viewport and can't be scrolled away)"></a>
           </literal-facet>
           <link-facet facet="enter.source" drilldown="list.html" thumbnail="true" favicon="true">
             <legend>External Referrer</legend>
-            <a href="/docs/rum-explorer#facet-enter" class="help" target="_blank"
-              title="How the users entered into the site?"></a>
+            <a href="/docs/optel-explorer#facet-enter" class="help" target="_blank"
+              title="How the visitors entered into the site?"></a>
             <dl>
               <dt>(direct)</dt>
               <dd>Direct Entry (or via App)</dd>
@@ -239,6 +239,8 @@
           </link-facet>
           <list-facet facet="enter.target">
             <legend>Enter Target</legend>
+            <a href="/docs/optel-explorer#facet-enter" class="help" target="_blank"
+              title="How did the user open the site page? (directly or probably in a new tab)"></a>
             <dl>
               <dt>visible</dt>
               <dd>Visible</dd>
@@ -248,12 +250,14 @@
           </list-facet>
           <link-facet facet="navigate.source" thumbnail="true" drilldown="list.html">
             <legend>Internal Referrer</legend>
-            <a href="/docs/rum-explorer#facet-navigate" class="help" target="_blank"
+            <a href="/docs/optel-explorer#facet-navigate" class="help" target="_blank"
               title="Internal navigation paths on the site"></a>
           </link-facet>
 
           <list-facet facet="consent.source">
             <legend>Consent Provider</legend>
+            <a href="docs/optel-explorer#facet-consent" class="help" target="_blank" 
+              title="Which consent provider is enabled on the site?"></a>
             <dl>
               <dt>onetrust</dt>
               <dd>OneTrust</dd>
@@ -267,6 +271,8 @@
           </list-facet>
           <list-facet facet="consent.target">
             <legend>Consent Dialog</legend>
+            <a href="docs/optel-explorer#facet-consent" class="help" target="_blank" 
+              title="How does the user interact with the consent window/modal on the site?"></a>
             <dl>
               <dt>show</dt>
               <dd>Dialog Shown</dd>
@@ -281,6 +287,8 @@
 
           <list-facet facet="acquisition.source" drilldown="share.html">
             <legend>Inorganic Traffic Source</legend>
+            <a href="/docs/optel-explorer#facet-acquisition" class="help" target="_blank"
+              title="Which inorganic traffic sources are driving traffic to the site?"></a>
             <dl>
               <dt>paid</dt>
               <dd>All paid traffic</dd>
@@ -345,44 +353,68 @@
 
           <link-facet facet="error.source">
             <legend>Error Source</legend>
+            <a href="/docs/optel-explorer#facet-error" class="help" target="_blank"
+              title="Which files/functions in the code of the site have Javascript errors?"></a>
           </link-facet>
           <literal-facet facet="error.target">
-            <legend>Error Line</legend>
+            <legend>Error Detail</legend>
+            <a href="/docs/optel-explorer#facet-error" class="help" target="_blank"
+              title="Details of the Javascript errors found on the site"></a>
           </literal-facet>
 
           <list-facet facet="loadresource.histogram" sort="asc">
             <legend>Resource Load Time (ms)</legend>
+            <a href="/docs/optel-explorer#facet-loadresource" class="help" target="_blank"
+              title="How long does it take to load the resources (fragments or JSON API endpoints) on the site?"></a>
           </list-facet>
 
           <list-facet facet="loadresource.source">
             <legend>Resource Loaded</legend>
+            <a href="/docs/optel-explorer#facet-loadresource" class="help" target="_blank"
+              title="What fragments and JSON API endpoints are loaded for the site ?"></a>
           </list-facet>
 
           <list-facet facet="missingresource.source">
             <legend>Missing Resource</legend>
+            <a href="/docs/optel-explorer#facet-missingresource" class="help" target="_blank"
+              title="What resources are missing from the site pages ?"></a>
           </list-facet>
 
           <literal-facet facet="cwv-lcp.source">
             <legend>LCP Element (DOM)</legend>
+            <a href="/docs/optel-explorer#facet-lcp" class="help" target="_blank"
+              title="Elements of page that are slowing down page loading"></a>
           </literal-facet>
           <thumbnail-facet facet="cwv-lcp.target">
             <legend>LCP Element (Preview)</legend>
+            <a href="/docs/optel-explorer#facet-lcp" class="help" target="_blank"
+              title="Preview of the elements of page that are slowing down page loading"></a>
           </thumbnail-facet>
           <list-facet facet="language.source">
             <legend>Content Language</legend>
+            <a href="/docs/optel-explorer#facet-language" class="help" target="_blank"
+              title="What content languages are detected on the site?"></a>
           </list-facet>
           <list-facet facet="language.target">
             <legend>Language Preference</legend>
+            <a href="/docs/optel-explorer#facet-language" class="help" target="_blank"
+              title="What language do users select as their preferred language on the site?"></a>
           </list-facet>
           <link-facet facet="redirect.source">
             <legend>Redirect Source</legend>
+            <a href="/docs/optel-explorer#facet-redirect" class="help" target="_blank"
+              title="What links of the site are redirecting?"></a>
           </link-facet>
           <list-facet facet="redirect.target">
             <legend>Redirect Count</legend>
+            <a href="/docs/optel-explorer#facet-redirect" class="help" target="_blank"
+              title="Number of hops it took to reach the final destination page"></a>
           </list-facet>
 
           <list-facet facet="experiment.source">
             <legend>Experiment ID</legend>
+            <a href="/docs/optel-explorer#facet-experiment" class="help" target="_blank"
+              title="What experiments are running on the site?"></a>
           </list-facet>
 
           <list-facet facet="experiment.target">
@@ -390,8 +422,8 @@
           </list-facet>
           <list-facet facet="a11y.source">
             <legend>Accessibility Preferences</legend>
-            <a href="/docs/rum-explorer#facet-a11y" class="help" target="_blank"
-              title="What accessibility preferences and behaviors were detected?"></a>
+            <a href="/docs/optel-explorer#facet-accessibility" class="help" target="_blank"
+              title="What accessibility features are detected on the site?"></a>
             <dl>
               <dt>off</dt>
               <dd>No Accessibility Features Detected</dd>
@@ -407,9 +439,14 @@
           </list-facet>
           <list-facet facet="utm.source">
             <legend>UTM Source</legend>
+            <a href="/docs/optel-explorer#facet-utm" class="help" target="_blank"
+              title="Where the user came from before landing on the site?"></a>
+            
           </list-facet>
           <list-facet facet="utm.target">
             <legend>UTM Target</legend>
+            <a href="/docs/optel-explorer#facet-utm" class="help" target="_blank"
+              title="categorization of the UTM sources driving traffic to the site"></a>
           </list-facet>
         </facet-sidebar>
       </div>
