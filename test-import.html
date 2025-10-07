@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Import</title>
+  <script type="importmap">{"imports": {
+    "chartjs": "https://esm.sh/chart.js@4.4.8",
+    "chartjs-chart-sankey": "https://esm.sh/chartjs-chart-sankey@0.12.1?deps=chart.js@4.4.8",
+    "@adobe/rum-distiller": "https://esm.sh/@adobe/rum-distiller@1.19.0"
+  }}</script>
+</head>
+<body>
+  <h1>Test Import</h1>
+  <canvas id="test"></canvas>
+
+  <script type="module">
+    console.log('Starting import test...');
+
+    try {
+      console.log('Importing Chart from chartjs...');
+      const { Chart, registerables } = await import('chartjs');
+      console.log('Chart imported successfully:', Chart);
+
+      console.log('Importing SankeyController from chartjs-chart-sankey...');
+      const { SankeyController, Flow } = await import('chartjs-chart-sankey');
+      console.log('SankeyController imported successfully:', SankeyController);
+
+      console.log('All imports successful!');
+    } catch (error) {
+      console.error('Import failed:', error);
+      document.body.innerHTML += `<pre style="color: red;">${error.stack}</pre>`;
+    }
+  </script>
+</body>
+</html>
