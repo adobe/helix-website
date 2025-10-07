@@ -1,10 +1,12 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
-  DataChunks, utils, series, facets,
-// eslint-disable-next-line import/no-unresolved
+  DataChunks,
+  facets,
+  series,
+  utils,
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
-import { parseSearchParams, parseConversionSpec } from './utils.js';
+import { parseConversionSpec, parseSearchParams } from './utils.js';
 
 const {
   isKnownFacet,
@@ -193,6 +195,9 @@ function updateDataFacets(filterText, params, checkpoint) {
   dataChunks.addFacet('rawURL', facets.url, 'some', 'never');
   dataChunks.addClusterFacet('url', 'rawURL', {
     count: Math.log10(dataChunks.facets.rawURL.length),
+  });
+  dataChunks.addClusterFacet('url!', 'rawURL!', {
+    count: Math.log10(dataChunks.facets['rawURL!'].length),
   });
 
   dataChunks.addFacet('vitals', vitals);
