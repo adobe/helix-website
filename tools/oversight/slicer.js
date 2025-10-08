@@ -201,6 +201,8 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('type', (bundle) => bundle.hostType);
 
+  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -217,8 +219,6 @@ function updateDataFacets(filterText, params, checkpoint) {
   });
 
   dataChunks.addFacet('vitals', vitals);
-
-  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
     dataChunks.addFacet('lcp.target', lcpTarget);
