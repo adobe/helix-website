@@ -561,18 +561,9 @@ facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.conve
   display: none;
 }
 
-
 facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion {
   display: flex;
-  grid-column: span 2;
-}
-
-facet-sidebar:has(input[name="focus"][value="conversion"]) aside ul.cwv li.timeToSubmit {
-  display: none;
-}
-
-facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.timeToSubmit {
-  display: flex;
+  grid-column: span 3;
 }
 
 ul.cwv meter {
@@ -585,7 +576,7 @@ main:has(conversion-tracker[mode="custom"]) facet-sidebar:has(input[name="focus"
 }
 
 /* stylelint-disable-next-line max-line-length */
-main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion.conversions {
+main:has(conversion-tracker[mode="default"]) facet-sidebar:has(input[name="focus"][value="conversion"]:checked) aside ul.cwv li.conversion:last-of-type {
   display: none;
 }
 
@@ -692,10 +683,6 @@ fieldset div:first-of-type li:nth-of-type(7)::before {
 
 fieldset div:first-of-type li:nth-of-type(8)::before {
   content: "Conversion";
-}
-
-fieldset div:first-of-type li:nth-of-type(9)::before {
-  content: "Time To Submit";
 }
 
 #facets ul.cwv {
@@ -1241,10 +1228,6 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     grid-gap: 8px;
     margin: 8px 4px;
-  }
-
-  facet-sidebar:has(input[name="focus"][value="conversion"]:checked) #facets ul.cwv {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   fieldset li,

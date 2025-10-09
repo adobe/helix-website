@@ -77,7 +77,7 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
   return (deltas.reduce((a, b) => Math.max(a, b), -Infinity)) / 1000;
 });
 
-dataChunks.addSeries('timeToSubmit', (bundle) => {
+function timeToSubmit(bundle) {
   const filteredEvents = bundle.events.filter((evt) => evt.checkpoint === 'formsubmit' || evt.checkpoint === 'viewblock');
   const submitEvent = filteredEvents.find((evt) => evt.checkpoint === 'formsubmit');
   if (!submitEvent) {
@@ -88,8 +88,7 @@ dataChunks.addSeries('timeToSubmit', (bundle) => {
     return undefined;
   }
   return (submitEvent.timeDelta - formViewEvent.timeDelta) / 1000;
-});
-
+}
 dataChunks.addSeries('contentEngagement', (bundle) => {
   const viewEvents = bundle.events
     .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock');
@@ -226,6 +225,8 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
+  dataChunks.addFacet('formsubmit.time', timeToSubmit);
+
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -292,6 +293,16 @@ function updateDataFacets(filterText, params, checkpoint) {
         dataChunks.addHistogramFacet(
           'loadresource.histogram',
           'loadresource.target',
+          {
+            count: 10, min: 0, max: 10000, steps: 'quantiles',
+          },
+        );
+      }
+
+      if (cp === 'formsubmit') {
+        dataChunks.addHistogramFacet(
+          'formsubmit.histogram',
+          'formsubmit.time',
           {
             count: 10, min: 0, max: 10000, steps: 'quantiles',
           },

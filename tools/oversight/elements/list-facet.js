@@ -316,12 +316,6 @@ export default class ListFacet extends HTMLElement {
           conversionRateLI.classList.add('conversion');
           ul.append(conversionRateLI);
 
-          // add time to submit
-          const timeToSubmitLI = this.createBusinessMetricChiclet(entry, 'timeToSubmit', null, 1, 2, 5);
-          timeToSubmitLI.title = 'Time to submit';
-          timeToSubmitLI.classList.add('time', 'timeToSubmit', 'conversion');
-          ul.append(timeToSubmitLI);
-
           div.append(input, label, ul);
 
           const more = fieldSet.querySelector('.more-container');
