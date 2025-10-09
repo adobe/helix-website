@@ -477,7 +477,14 @@ const io = new IntersectionObserver((entries) => {
       loadData(elems.viewSelect.value).then(draw);
     }
 
-    elems.filterInput.addEventListener('input', () => {
+    elems.filterInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        updateState();
+        draw();
+      }
+    });
+
+    elems.filterInput.addEventListener('blur', () => {
       updateState();
       draw();
     });
