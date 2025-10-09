@@ -316,6 +316,12 @@ export default class ListFacet extends HTMLElement {
           conversionRateLI.classList.add('conversion');
           ul.append(conversionRateLI);
 
+          // add time to submit
+          const timeToSubmitLI = this.createBusinessMetricChiclet(entry, 'timeToSubmit', null, 1, 2, 5);
+          timeToSubmitLI.title = 'Time to submit';
+          timeToSubmitLI.classList.add('time', 'timeToSubmit', 'conversion');
+          ul.append(timeToSubmitLI);
+
           div.append(input, label, ul);
 
           const more = fieldSet.querySelector('.more-container');
@@ -443,6 +449,37 @@ export default class ListFacet extends HTMLElement {
     return li;
   }
 
+  /**
+   * Creates a business metric chiclet (visual indicator) for displaying performance metrics
+   * in the facet list. The chiclet includes a meter/gauge with color-coded thresholds and
+   * a formatted number display.
+   *
+   * @param {Object} entry - The data entry containing metrics for this facet value
+   * @param {string} rate - The metric name to display (e.g., 'bounces', 'timeOnPage', 'organic')
+   * @param {string|null} baseline - The baseline metric for rate calculations. If null,
+   *                                 displays absolute values (median). If string, calculates
+   *                                 conversion rate between rate and baseline metrics.
+   * @param {number} low - Low threshold for the meter (red zone)
+   * @param {number} high - High threshold for the meter (yellow zone)
+   * @param {number} optimum - Optimum threshold for the meter (green zone)
+   * @returns {HTMLElement} A list item element containing the metric chiclet
+   *
+   * @example
+   * // Create a bounce rate chiclet (percentage-based)
+   * const bounceRateLI = this.createBusinessMetricChiclet(entry, 'bounces', 'visits', 60, 40, 20);
+   *
+   * @example
+   * // Create a time on page chiclet (absolute values)
+   * const timeOnPageLI = this.createBusinessMetricChiclet(entry, 'timeOnPage', null, 1, 2, 5);
+   *
+   * @description
+   * The method creates a visual meter with the following features:
+   * - Color-coded performance zones (red/yellow/green)
+   * - Formatted number display with precision control
+   * - Automatic meter scale (0-10 for small values, 0-100 for larger values)
+   * - Statistical significance indicators (when baseline is provided)
+   * - Support for both rate calculations and absolute value displays
+   */
   createBusinessMetricChiclet(entry, rate, baseline, low, high, optimum) {
     const li = document.createElement('li');
     li.classList.add('business-metric');

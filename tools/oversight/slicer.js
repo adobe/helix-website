@@ -77,6 +77,19 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
   return (deltas.reduce((a, b) => Math.max(a, b), -Infinity)) / 1000;
 });
 
+dataChunks.addSeries('timeToSubmit', (bundle) => {
+  const filteredEvents = bundle.events.filter((evt) => evt.checkpoint === 'formsubmit' || evt.checkpoint === 'viewblock');
+  const submitEvent = filteredEvents.find((evt) => evt.checkpoint === 'formsubmit');
+  if (!submitEvent) {
+    return undefined;
+  }
+  const formViewEvent = filteredEvents.find((evt) => evt.checkpoint === 'viewblock' && evt.source === submitEvent.source);
+  if (!formViewEvent) {
+    return undefined;
+  }
+  return (submitEvent.timeDelta - formViewEvent.timeDelta) / 1000;
+});
+
 dataChunks.addSeries('contentEngagement', (bundle) => {
   const viewEvents = bundle.events
     .filter((evt) => evt.checkpoint === 'viewmedia' || evt.checkpoint === 'viewblock');
