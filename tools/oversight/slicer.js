@@ -478,7 +478,7 @@ const io = new IntersectionObserver((entries) => {
     }
 
     let filterInputDebounce;
-    const debounceTimeout = view === 'week' ? 1000 : 0;
+    const debounceTimeout = 1000;
     elems.filterInput.addEventListener('input', () => {
       clearTimeout(filterInputDebounce);
       filterInputDebounce = setTimeout(() => {
