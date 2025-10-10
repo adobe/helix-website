@@ -77,6 +77,20 @@ dataChunks.addSeries('timeOnPage', (bundle) => {
   return (deltas.reduce((a, b) => Math.max(a, b), -Infinity)) / 1000;
 });
 
+/**
+ * Formats seconds to mm:ss format
+ * @param {number} seconds - Time in seconds
+ * @returns {string} Formatted time as mm:ss
+ */
+function formatTimeToMMSS(seconds) {
+  if (seconds === undefined || seconds === null || Number.isNaN(seconds)) {
+    return undefined;
+  }
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
 function timeToSubmit(bundle) {
   const filteredEvents = bundle.events.filter((evt) => evt.checkpoint === 'formsubmit' || evt.checkpoint === 'viewblock');
   const submitEvent = filteredEvents.find((evt) => evt.checkpoint === 'formsubmit');
@@ -304,7 +318,10 @@ function updateDataFacets(filterText, params, checkpoint) {
           'formsubmit.histogram',
           'formsubmit.time',
           {
-            count: 10, min: 0, max: 10000, steps: 'quantiles',
+            count: 10, min: 0, max: 600, steps: 'quantiles',
+          },
+          {
+            format: formatTimeToMMSS,
           },
         );
       }
