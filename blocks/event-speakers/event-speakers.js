@@ -1,52 +1,3 @@
-// Mock data for initial styling (will be replaced with API fetch)
-const MOCK_SPEAKERS = [
-  {
-    first_name: 'James',
-    last_name: 'Gunn',
-    title: 'Award-winning Filmmaker and Co-Chair and CEO',
-    company: 'DC Studios',
-    picture: {
-      thumbnail_url: 'https://via.placeholder.com/400x500/333/fff?text=James+Gunn',
-    },
-  },
-  {
-    first_name: 'Yuko',
-    last_name: 'Shimizu',
-    title: 'Illustrator and Educator',
-    company: '',
-    picture: {
-      thumbnail_url: 'https://via.placeholder.com/400x500/666/fff?text=Yuko+Shimizu',
-    },
-  },
-  {
-    first_name: 'Allan',
-    last_name: 'Peters',
-    title: 'Partner and Chief Creative Officer',
-    company: 'Peters Design Company',
-    picture: {
-      thumbnail_url: 'https://via.placeholder.com/400x500/999/fff?text=Allan+Peters',
-    },
-  },
-  {
-    first_name: 'Serwah',
-    last_name: 'Attafuah',
-    title: 'Multidisciplinary Artist and Musician',
-    company: 'Wrath Studios',
-    picture: {
-      thumbnail_url: 'https://via.placeholder.com/400x500/ccc/000?text=Serwah+Attafuah',
-    },
-  },
-  {
-    first_name: 'Johnny',
-    last_name: 'Harris',
-    title: 'Journalist & Co-Founder',
-    company: 'News Company',
-    picture: {
-      thumbnail_url: 'https://via.placeholder.com/400x500/555/fff?text=Johnny+Harris',
-    },
-  },
-];
-
 function createSpeakerCard(speaker) {
   const card = document.createElement('div');
   card.className = 'speaker-card';
@@ -294,23 +245,11 @@ export default async function decorate(block) {
       setupCarouselNavigation(carousel, prevButton, nextButton);
     } catch (error) {
       console.error('Error fetching speakers:', error);
-      // Fall back to mock data on error
-      carousel.innerHTML = '';
-      const reorderedMock = reorderSpeakers(MOCK_SPEAKERS, speakerOrder);
-      reorderedMock.forEach((speaker) => {
-        const card = createSpeakerCard(speaker);
-        carousel.appendChild(card);
-      });
-      setupCarouselNavigation(carousel, prevButton, nextButton);
+      carousel.innerHTML = '<p style="padding: 40px; text-align: center;">Unable to load speakers at this time. Please try again later.</p>';
     }
   } else {
-    // No API URL provided, use mock data
-    const reorderedMock = reorderSpeakers(MOCK_SPEAKERS, speakerOrder);
-    reorderedMock.forEach((speaker) => {
-      const card = createSpeakerCard(speaker);
-      carousel.appendChild(card);
-    });
-    setupCarouselNavigation(carousel, prevButton, nextButton);
+    // No API URL provided
+    carousel.innerHTML = '<p style="padding: 40px; text-align: center;">No speaker information available.</p>';
   }
 }
 
