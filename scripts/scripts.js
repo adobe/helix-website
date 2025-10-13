@@ -585,6 +585,15 @@ export function buildAutoBlocks(main) {
     if (getMetadata('author') && !main.querySelector('.author-box')) {
       buildAuthorBox(main);
     }
+    // Auto-insert blog archive block on /blog/archive
+    const { pathname } = window.location;
+    if ((pathname === '/blog/archive' || pathname === '/blog/archive/')
+      && !main.querySelector('.blog-archive')) {
+      const wrapper = createTag('div');
+      const archiveBlock = buildBlock('blog-archive', '');
+      wrapper.append(archiveBlock);
+      main.append(wrapper);
+    }
     buildEmbeds(main);
   } catch (error) {
     // eslint-disable-next-line no-console
