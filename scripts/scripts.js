@@ -628,6 +628,56 @@ export function loadBlogData() {
     });
 }
 
+// Helper function to format date as "Month Day, Year"
+function formatDate(date) {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+// Function to get blog archive data grouped by year and month
+export function getBlogArchiveData() {
+  if (!window.blogindex?.data || !window.blogindex.loaded) {
+    return {};
+  }
+
+  // Sort blog entries by publication date in descending order (newest first)
+  const sortedBlogs = [...window.blogindex.data].sort((a, b) => {
+    const dateA = new Date(a.publicationDate);
+    const dateB = new Date(b.publicationDate);
+    return dateB - dateA; // Descending order (newest first)
+  });
+
+  // Group by year and month
+  const archive = {};
+
+  sortedBlogs.forEach((post) => {
+    const pubDate = new Date(post.publicationDate);
+    const year = pubDate.getFullYear();
+    const month = String(pubDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, pad to 2 digits
+
+    if (!archive[year]) {
+      archive[year] = {};
+    }
+
+    if (!archive[year][month]) {
+      archive[year][month] = [];
+    }
+
+    // Add the post data with formatted date
+    archive[year][month].push({
+      title: post.title || post.Title,
+      path: post.path,
+      publicationDate: formatDate(pubDate),
+      author: post.author || 'Unknown Author', // Using default if author not available
+    });
+  });
+
+  return archive;
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -825,7 +875,6 @@ if (window.location.hostname === 'www.hlx.live') {
   const url = `https://www.aem.live${window.location.pathname}${window.location.search}${window.location.hash}`;
   // eslint-disable-next-line no-console
   console.log(`redirecting to ${url}`);
-}
-*/
+} */
 
 loadPage(document);
