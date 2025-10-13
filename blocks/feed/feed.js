@@ -89,10 +89,98 @@ export async function fetchBlogContent(url) {
   }
 }
 
+function groupBlogsByYearMonth(blogs) {
+  const grouped = {};
+
+  blogs.forEach((blog) => {
+    const date = new Date(blog.publicationDate);
+    const year = date.getFullYear();
+    const month = date.toLocaleString('default', { month: 'long' });
+    const key = `${year}-${month}`;
+
+    if (!grouped[key]) {
+      grouped[key] = {
+        year,
+        month,
+        blogs: [],
+      };
+    }
+    grouped[key].blogs.push(blog);
+  });
+
+  // Sort years descending, months descending within year
+  return Object.values(grouped).sort((a, b) => {
+    if (a.year !== b.year) return b.year - a.year;
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return months.indexOf(b.month) - months.indexOf(a.month);
+  });
+}
+
+export async function renderBlogArchive(block) {
+  if (!block) {
+    return;
+  }
+  const blogIndex = window.blogindex.data;
+
+  // Sort blogs by publication date in descending order
+  blogIndex.sort((a, b) => {
+    const dateA = new Date(a.publicationDate);
+    const dateB = new Date(b.publicationDate);
+    return dateA - dateB;
+  });
+
+  const groupedBlogs = groupBlogsByYearMonth(blogIndex);
+
+  let archiveContainer = block.querySelector('.blog-archive');
+  if (!archiveContainer) {
+    archiveContainer = createTag('div', { class: 'blog-archive' });
+    block.appendChild(archiveContainer);
+  }
+  archiveContainer.innerHTML = '';
+
+  groupedBlogs.forEach((group) => {
+    const yearMonthHeader = createTag('h2', { class: 'archive-year-month' }, `${group.month} ${group.year}`);
+    archiveContainer.appendChild(yearMonthHeader);
+
+    const postList = createTag('ul', { class: 'archive-post-list' });
+
+    group.blogs.forEach((blog) => {
+      const listItem = createTag('li', { class: 'archive-post-item' });
+
+      const postLink = createTag('a', { href: blog.path, class: 'archive-post-link' });
+
+      const postTitle = createTag('span', { class: 'archive-post-title' }, blog.title);
+      postLink.appendChild(postTitle);
+
+      const postMeta = createTag('span', { class: 'archive-post-meta' });
+      const postDate = createTag('span', { class: 'archive-post-date' }, new Date(blog.publicationDate).toLocaleDateString());
+      postMeta.appendChild(postDate);
+
+      if (blog.author) {
+        const postAuthor = createTag('span', { class: 'archive-post-author' }, ` by ${blog.author}`);
+        postMeta.appendChild(postAuthor);
+      }
+
+      postLink.appendChild(postMeta);
+      listItem.appendChild(postLink);
+      postList.appendChild(listItem);
+    });
+
+    archiveContainer.appendChild(postList);
+  });
+}
+
 export async function renderBlog(block) {
   if (!block) {
     return;
   }
+
+  // Check if this is an archive block
+  if (block.classList.contains('archive')) {
+    await renderBlogArchive(block);
+    return;
+  }
+
   const blogIndex = window.blogindex.data;
 
   // Sort blogs by publication date in descending order
