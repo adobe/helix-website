@@ -30,7 +30,7 @@ export default class FacetSidebar extends HTMLElement {
     const filterInput = document.createElement('input');
     filterInput.type = 'text';
     filterInput.id = 'filter';
-    filterInput.placeholder = 'Type to filter...';
+    filterInput.placeholder = 'Type to filter, press ↵ to apply';
     quickFilter.append(filterInput);
     this.append(quickFilter);
     const facetsElement = document.createElement('aside');
