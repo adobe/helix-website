@@ -141,6 +141,17 @@ export default class FacetSidebar extends HTMLElement {
       this.toggleAnalysisMode(toggleInput.checked);
     });
 
+    // Restore toggle state from localStorage after page reload
+    const savedToggleState = localStorage.getItem('analysisToggleState');
+    if (savedToggleState === 'true') {
+      // Delay restoration to ensure DOM is fully ready
+      setTimeout(() => {
+        toggleInput.checked = true;
+        this.toggleAnalysisMode(true);
+        console.log('[Sidebar] Restored AI Insights view from previous session');
+      }, 100);
+    }
+
     predefinedFacets.forEach((facet) => {
       this.elems.facetsElement.append(facet);
     });
@@ -183,10 +194,14 @@ export default class FacetSidebar extends HTMLElement {
       this.elems.selectFocus.style.display = 'none';
       this.elems.analysisTile.style.display = 'block';
       this.loadAnalysisInterface();
+      // Save toggle state to localStorage for persistence across reloads
+      localStorage.setItem('analysisToggleState', 'true');
     } else {
       this.elems.facetsElement.style.display = 'block';
       this.elems.selectFocus.style.display = 'block';
       this.elems.analysisTile.style.display = 'none';
+      // Save toggle state to localStorage
+      localStorage.setItem('analysisToggleState', 'false');
     }
   }
 
@@ -349,6 +364,20 @@ export default class FacetSidebar extends HTMLElement {
         messagesDiv.appendChild(message);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
         return;
+      }
+
+      // Add metrics=super to URL to ensure all checkpoints are available for analysis
+      const currentUrl = new URL(window.location);
+      
+      if (!currentUrl.searchParams.has('metrics') || currentUrl.searchParams.get('metrics') !== 'super') {
+        currentUrl.searchParams.set('metrics', 'super');
+        window.history.replaceState({}, '', currentUrl);
+        console.log('[Sidebar] Added metrics=super to URL for comprehensive analysis');
+        
+        // Trigger a page reload to apply the new metrics parameter
+        // This ensures all checkpoints are loaded and available for analysis
+        window.location.reload();
+        return; // Exit early since we're reloading
       }
 
       const isDetailed = detailedAnalysisCheckbox.checked;

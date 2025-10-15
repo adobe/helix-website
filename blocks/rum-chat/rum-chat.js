@@ -54,6 +54,7 @@ function setAnalysisCache(cacheData) {
 // Function to generate a simple hash of dashboard data for cache validation
 function generateDashboardHash(dashboardData) {
   const dataString = JSON.stringify({
+    dateRange: dashboardData.dateRange, // Include date range in cache validation
     metricsCount: Object.keys(dashboardData.metrics).length,
     segmentsCount: Object.keys(dashboardData.segments).length,
     segmentSizes: Object.entries(dashboardData.segments).map(([key, items]) => ({
@@ -292,16 +293,34 @@ function extractFacetsFromExplorer() {
     return [];
   }
 
+  // Get dataChunks to check if facets have data
+  const dataChunks = facetSidebar.dataChunks;
+  if (!dataChunks || !dataChunks.facets) {
+    console.warn('[Facet Extraction] No dataChunks available, cannot filter empty facets');
+  }
+
   const facetElements = facetSidebar.querySelectorAll('list-facet, link-facet, literal-facet, file-facet, thumbnail-facet');
   console.log(`[Facet Extraction] Found ${facetElements.length} facet elements`);
 
   const tools = [];
+  const skippedEmptyFacets = [];
 
   facetElements.forEach((facetElement, index) => {
     const facetName = facetElement.getAttribute('facet');
     if (!facetName) {
       console.log(`[Facet Extraction] Skipping facet #${index + 1} - no facet name`);
       return;
+    }
+
+    // Check if facet has data - skip if empty
+    if (dataChunks && dataChunks.facets) {
+      const facetData = dataChunks.facets[facetName];
+      if (!facetData || facetData.length === 0) {
+        console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no data (0 items)`);
+        skippedEmptyFacets.push(facetName);
+        return;
+      }
+      console.log(`[Facet Extraction] Facet ${facetName} has ${facetData.length} items - including in tools`);
     }
 
     // Try to get description from help link title (more detailed)
@@ -326,11 +345,23 @@ function extractFacetsFromExplorer() {
     if (tool) tools.push(tool);
   });
 
-  console.log('[Facet Extraction] Created tools:', tools.map((t, i) => `
-    Tool #${i + 1}:
-    - Name: ${t.name}
-    - Description: ${t.description}
-  `).join('\n'));
+  console.log('[Facet Extraction] ✅ Created tools from facet elements');
+  console.log('  🔧 Total tools created:', tools.length);
+  console.log('  📋 Tool names:', tools.map((t) => t.name).join(', '));
+  
+  if (skippedEmptyFacets.length > 0) {
+    console.log('  ⏭️  Skipped empty facets:', skippedEmptyFacets.join(', '));
+  }
+  
+  // Highlight form-related tools for debugging
+  const formTools = tools.filter((t) => 
+    t.name.includes('fill') || t.name.includes('formsubmit')
+  );
+  if (formTools.length > 0) {
+    console.log('  ✅ Form-related tools found:', formTools.map((t) => t.name).join(', '));
+  } else {
+    console.log('  ⚠️ No form-related tools found (fill.source, formsubmit.source, formsubmit.target)');
+  }
 
   cachedFacetTools = tools;
   return tools;
@@ -430,6 +461,12 @@ async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
   // Handle regular facet tools
   // Convert tool name back to original facet name (underscores to dots)
   const facetName = toolName.replace(/_/g, '.');
+  
+  // Track form tool calls specifically
+  if (facetName.includes('fill') || facetName.includes('formsubmit')) {
+    console.log(`[FORM TOOL CALLED] 📝 AI is using form tool: ${facetName}`, input);
+  }
+  
   console.log(`[DEBUG] Tool name: "${toolName}" → Facet name: "${facetName}"`);
   const facetElement = document.querySelector(`[facet="${facetName}"]`);
   console.log('[DEBUG] Facet element found:', !!facetElement);
@@ -487,9 +524,12 @@ async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
 
           // Process elements directly without batching to avoid complexity
           labelElements.forEach((label) => {
+            // Try different label structures: .label, .value classes, or direct span
             const labelText = label.querySelector('.label')?.textContent?.trim() || '';
             const valueText = label.querySelector('.value')?.textContent?.trim() || '';
-            const countElement = label.querySelector('number-format.count');
+            const spanText = label.querySelector('span')?.textContent?.trim() || '';
+            
+            const countElement = label.querySelector('number-format.count') || label.querySelector('number-format');
             const countText = countElement?.textContent?.trim() || '0';
             const countTitle = countElement?.getAttribute('title') || '0';
 
@@ -512,7 +552,8 @@ async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
               });
             }
 
-            const text = labelText || valueText;
+            // Use whichever text is available: .label, .value, or span
+            const text = labelText || valueText || spanText;
             if (text) {
               items.push({
                 text,
@@ -538,14 +579,19 @@ async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
           const allItems = [];
 
           labelElements.forEach((label) => {
+            // Try different label structures: .label, .value classes, or direct span
             const labelText = label.querySelector('.label')?.textContent?.trim() || '';
             const valueText = label.querySelector('.value')?.textContent?.trim() || '';
-            const countElement = label.querySelector('number-format.count');
+            const spanText = label.querySelector('span')?.textContent?.trim() || '';
+            
+            const countElement = label.querySelector('number-format.count') || label.querySelector('number-format');
             const countTitle = countElement?.getAttribute('title') || '0';
 
             // Extract numeric value from title
             const numericCount = countTitle.split(' ')[0].replace(/[^\d]/g, '');
-            const text = labelText || valueText;
+            
+            // Use whichever text is available: .label, .value, or span
+            const text = labelText || valueText || spanText;
 
             if (text) {
               allItems.push({
@@ -661,21 +707,73 @@ function extractDashboardData() {
       const dashboardData = {
         metrics: {},
         segments: {},
+        dateRange: null, // Will store the date range information
       };
 
       console.log('[Dashboard Data] Starting DOM traversal');
 
-      // Find all metric blocks in the dashboard
-      const metricElements = document.querySelectorAll('.metric-block, [data-metric-type]');
-      console.log('[Dashboard Data] Found metric elements:', metricElements.length);
-
-      metricElements.forEach((metric) => {
-        const metricName = metric.getAttribute('data-metric-name') || metric.querySelector('.metric-name')?.textContent;
-        const metricValue = metric.getAttribute('data-metric-value') || metric.querySelector('.metric-value')?.textContent;
-        if (metricName && metricValue) {
-          dashboardData.metrics[metricName.trim()] = metricValue.trim();
+      // Extract date range from the daterange-wrapper
+      const dateRangeWrapper = document.querySelector('.daterange-wrapper');
+      if (dateRangeWrapper) {
+        const dateRangeInput = dateRangeWrapper.querySelector('input[data-value]');
+        if (dateRangeInput) {
+          const dateValue = dateRangeInput.getAttribute('data-value');
+          const isCustom = dateRangeInput.getAttribute('data-custom') === 'true';
+          
+          // Map date range values to human-readable format
+          const dateRangeMap = {
+            'hour': 'last hour',
+            'day': 'last 24 hours',
+            'week': 'last 7 days',
+            'month': 'last 30 days',
+            'year': 'last year',
+          };
+          
+          dashboardData.dateRange = isCustom ? 'custom date range' : (dateRangeMap[dateValue] || dateValue);
+          console.log(`[Dashboard Data] ✓ Captured date range: ${dashboardData.dateRange} (raw value: ${dateValue})`);
+        } else {
+          console.warn('[Dashboard Data] ⚠️ Date range input not found in daterange-wrapper');
         }
-      });
+      } else {
+        console.warn('[Dashboard Data] ⚠️ Date range wrapper not found in DOM');
+      }
+
+      // Extract key metrics from the dashboard (pageviews, visits, conversions, LCP, CLS, INP)
+      const keyMetricsContainer = document.querySelector('.key-metrics');
+      if (keyMetricsContainer) {
+        console.log('[Dashboard Data] Found key metrics container');
+        
+        // Get all li elements with IDs (pageviews, visits, conversions, lcp, cls, inp, etc.)
+        const metricItems = keyMetricsContainer.querySelectorAll('li[id]');
+        console.log('[Dashboard Data] Found metric items:', metricItems.length);
+        
+        metricItems.forEach((item) => {
+          const metricId = item.id;
+          const metricName = item.querySelector('h2')?.textContent?.trim() || metricId;
+          const numberFormat = item.querySelector('number-format');
+          const metricValue = numberFormat?.textContent?.trim();
+          const metricTitle = numberFormat?.getAttribute('title');
+          
+          if (metricName && metricValue && metricValue !== '0') {
+            // Store both display value and raw value if available in title
+            const finalValue = metricTitle || metricValue;
+            dashboardData.metrics[metricName] = finalValue;
+            console.log(`[Dashboard Data] ✓ Captured metric: ${metricName} = ${finalValue}`);
+          } else if (metricName) {
+            console.warn(`[Dashboard Data] ⚠️ Skipping metric ${metricName}: value is empty or zero (${metricValue})`);
+          }
+        });
+        
+        // Verify we captured some metrics
+        const metricsCount = Object.keys(dashboardData.metrics).length;
+        if (metricsCount === 0) {
+          console.error('[Dashboard Data] ❌ ERROR: No metrics were captured! Dashboard may not be loaded yet.');
+        } else {
+          console.log(`[Dashboard Data] ✓ Successfully captured ${metricsCount} metrics`);
+        }
+      } else {
+        console.error('[Dashboard Data] ❌ ERROR: Key metrics container not found in DOM');
+      }
 
       // Get facet data from the explorer
       const facetSidebar = document.querySelector('facet-sidebar');
@@ -695,6 +793,7 @@ function extractDashboardData() {
           const items = labelElements.map((label) => {
             const labelText = label.querySelector('.label')?.textContent?.trim() || '';
             const valueText = label.querySelector('.value')?.textContent?.trim() || '';
+            const spanText = label.querySelector('span')?.textContent?.trim() || '';
             const countElement = label.querySelector('number-format.count');
             const countText = countElement?.textContent?.trim() || '0';
             const countTitle = countElement?.getAttribute('title') || '0';
@@ -718,8 +817,11 @@ function extractDashboardData() {
               });
             }
 
+            // Use whichever text is available: .label, .value, or span
+            const value = labelText || valueText || spanText;
+
             return {
-              value: labelText || valueText,
+              value,
               displayCount: countText,
               count: parseInt(numericCount, 10) || 0,
               metrics,
@@ -732,7 +834,21 @@ function extractDashboardData() {
         console.log('[Dashboard Data] No facet sidebar found');
       }
 
-      console.log('[Dashboard Data] Extraction complete:', dashboardData);
+      console.log('[Dashboard Data] Extraction complete');
+      console.log('  📊 Total segments extracted:', Object.keys(dashboardData.segments).length);
+      console.log('  📋 Segment names:', Object.keys(dashboardData.segments).join(', '));
+      
+      // Log form-specific facets for debugging
+      if (dashboardData.segments['fill.source']) {
+        console.log('  ✅ fill.source:', dashboardData.segments['fill.source'].length, 'items');
+      }
+      if (dashboardData.segments['formsubmit.source']) {
+        console.log('  ✅ formsubmit.source:', dashboardData.segments['formsubmit.source'].length, 'items');
+      }
+      if (dashboardData.segments['formsubmit.target']) {
+        console.log('  ✅ formsubmit.target:', dashboardData.segments['formsubmit.target'].length, 'items');
+      }
+      
       resolve(dashboardData);
     };
 
@@ -767,7 +883,29 @@ async function callAnthropicAPI(message, isFollowUp = false, progressCallback = 
 
     // Get the current facet tools
     const facetTools = extractFacetsFromExplorer();
-    console.log('[Anthropic API] Available facet tools:', facetTools);
+    console.log('[Anthropic API] 🔧 Total facet tools to pass to AI:', facetTools.length);
+    console.log('[Anthropic API] 📋 Tool names being passed:', facetTools.map((t) => t.name).join(', '));
+    
+    // Cross-check: tools vs segments
+    const segmentNames = Object.keys(dashboardData.segments);
+    const toolNames = facetTools.map((t) => t.name.replace(/_/g, '.'));
+    const missingInTools = segmentNames.filter((s) => !toolNames.includes(s));
+    const missingInSegments = toolNames.filter((t) => !segmentNames.includes(t));
+    
+    if (missingInTools.length > 0) {
+      console.log('[Anthropic API] ⚠️ Segments WITHOUT tools:', missingInTools.join(', '));
+    }
+    if (missingInSegments.length > 0) {
+      console.log('[Anthropic API] ℹ️ Tools WITHOUT segment data:', missingInSegments.join(', '));
+    }
+    
+    // Highlight form tools specifically
+    const formToolNames = toolNames.filter((t) => t.includes('fill') || t.includes('formsubmit'));
+    if (formToolNames.length > 0) {
+      console.log('[Anthropic API] ✅ Form tools ready:', formToolNames.join(', '));
+    } else {
+      console.log('[Anthropic API] ⚠️ No form tools found');
+    }
 
     // Get required variables for processing
     const systemPromptText = await getSystemPrompt();
@@ -807,9 +945,131 @@ async function callAnthropicAPI(message, isFollowUp = false, progressCallback = 
           if (progressCallback) progressCallback(3, 'in-progress', 'Loading overview template...', 25);
           const overviewTemplate = await getOverviewAnalysisTemplate();
 
+          // Log the actual dashboard metrics being sent to the agent
+          console.log('[Final Synthesis] Dashboard metrics being sent to agent:');
+          console.log(JSON.stringify(dashboardData.metrics, null, 2));
+          console.log('[Final Synthesis] Number of segments:', Object.keys(dashboardData.segments).length);
+
+          // Verify we have metrics before proceeding
+          const hasMetrics = Object.keys(dashboardData.metrics).length > 0;
+          if (!hasMetrics) {
+            console.error('[Final Synthesis] ❌ WARNING: No dashboard metrics available! Agent will only have segment data.');
+          }
+
+          // Check if we have form data directly from segments
+          const hasFormData = !!(dashboardData.segments['fill.source'] || 
+                                  dashboardData.segments['formsubmit.source'] || 
+                                  dashboardData.segments['formsubmit.target']);
+          let formDataSection = '';
+          
+          console.log('[Final Synthesis] Checking for form data:', {
+            'fill.source': !!dashboardData.segments['fill.source'],
+            'formsubmit.source': !!dashboardData.segments['formsubmit.source'],
+            'formsubmit.target': !!dashboardData.segments['formsubmit.target'],
+            hasFormData,
+          });
+          
+          if (hasFormData) {
+            console.log('[Final Synthesis] ✅ Forms data detected - increasing word limit to 900-1000 words');
+            console.log('[Final Synthesis] ✅ Forms section will be MANDATORY in the report');
+            
+            formDataSection = '\n\n==== 📝 FORMS DATA - FOR DEDICATED FORMS SECTION ONLY ====\n';
+            formDataSection += '⚠️ This data is ONLY for the "Forms Interaction & Conversion Analysis" section.\n';
+            formDataSection += '⚠️ DO NOT mention forms in Executive Summary, Key Metrics, or other sections.\n';
+            formDataSection += '⚠️ All other sections should focus on the NON-FORM facets.\n\n';
+            
+            if (dashboardData.segments['fill.source']) {
+              formDataSection += '<b>FILL.SOURCE (Form Entry Pages):</b>\n';
+              dashboardData.segments['fill.source'].slice(0, 10).forEach((item, idx) => {
+                formDataSection += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form starts`;
+                if (item.metrics && Object.keys(item.metrics).length > 0) {
+                  formDataSection += ` (Metrics: ${JSON.stringify(item.metrics)})`;
+                }
+                formDataSection += '\n';
+              });
+              formDataSection += '\n';
+            }
+            
+            if (dashboardData.segments['formsubmit.source']) {
+              formDataSection += '<b>FORMSUBMIT.SOURCE (Form Submission Pages):</b>\n';
+              dashboardData.segments['formsubmit.source'].slice(0, 10).forEach((item, idx) => {
+                formDataSection += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form submissions`;
+                if (item.metrics && Object.keys(item.metrics).length > 0) {
+                  formDataSection += ` (Metrics: ${JSON.stringify(item.metrics)})`;
+                }
+                formDataSection += '\n';
+              });
+              formDataSection += '\n';
+            }
+            
+            if (dashboardData.segments['formsubmit.target']) {
+              formDataSection += '<b>FORMSUBMIT.TARGET (Post-Submission Destinations):</b>\n';
+              dashboardData.segments['formsubmit.target'].slice(0, 10).forEach((item, idx) => {
+                formDataSection += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} redirects`;
+                if (item.metrics && Object.keys(item.metrics).length > 0) {
+                  formDataSection += ` (Metrics: ${JSON.stringify(item.metrics)})`;
+                }
+                formDataSection += '\n';
+              });
+              formDataSection += '\n';
+            }
+            
+            formDataSection += '\n<b>INSTRUCTIONS:</b>\n';
+            formDataSection += '1. Create a dedicated "📝 Forms Interaction & Conversion Analysis" section immediately after Executive Summary\n';
+            formDataSection += '2. Use this forms data ONLY in that dedicated section\n';
+            formDataSection += '3. Analyze the complete funnel: fill.source → formsubmit.source → formsubmit.target\n';
+            formDataSection += '4. In ALL OTHER SECTIONS (Executive Summary, Key Metrics, Priority Actions, Business Impact), focus on NON-FORM facets\n';
+            formDataSection += '5. Forms get their own dedicated section - don\'t mix them into other sections\n';
+            formDataSection += '==== END FORMS DATA ====\n\n';
+          } else {
+            console.log('[Final Synthesis] ℹ️ No forms data - standard 600-700 word report');
+          }
+
           const finalSynthesisMessage = `Create a polished, professional analysis report based on the data below. 
 
 DO NOT include any of the raw batch content in your response. Use it only as source material for your analysis.
+
+==== DATA TIME PERIOD ====
+${dashboardData.dateRange ? `📅 Analysis covers data from: ${dashboardData.dateRange.toUpperCase()}` : '⚠️ Date range not available'}
+
+IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
+==== END TIME PERIOD ====
+
+==== ✅ FACET COVERAGE CHECKLIST ====
+⚠️ The following NON-FORM facets MUST ALL be covered in the "Key Metrics & Findings" section.
+Each facet needs 1 positive + 1 improvement observation:
+
+${Object.keys(dashboardData.segments)
+    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
+    .map((facet, idx) => `${idx + 1}. ${facet}`)
+    .join('\n')}
+
+TOTAL: ${Object.keys(dashboardData.segments).filter((key) => !key.includes('fill') && !key.includes('formsubmit')).length} facets to cover
+==== END CHECKLIST ====
+${formDataSection}
+==== ACTUAL DASHBOARD METRICS (USE THESE EXACT VALUES) ====
+${hasMetrics 
+    ? Object.entries(dashboardData.metrics)
+        .map(([metric, value]) => `${metric}: ${value}`)
+        .join('\n')
+    : '⚠️ WARNING: Dashboard metrics not available - focus analysis on segment data from tool results'}
+
+TOTAL SEGMENTS: ${Object.keys(dashboardData.segments).length} facets analyzed
+
+⚠️ COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED (EXCEPT FORMS):
+${Object.keys(dashboardData.segments)
+    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
+    .join(', ')}
+
+Each of these facets MUST get 1 positive + 1 improvement mention in the "Key Metrics & Findings" section.
+
+SEGMENT SUMMARY (showing top items per facet):
+${Object.entries(dashboardData.segments)
+    .slice(0, 10)
+    .map(([segment, items]) => `- ${segment}: ${items.length} items, top item: ${items[0]?.value || 'N/A'} (${items[0]?.count?.toLocaleString() || 0})`)
+    .join('\n')}
+${Object.keys(dashboardData.segments).length > 10 ? `... and ${Object.keys(dashboardData.segments).length - 10} more facets` : ''}
+==== END DASHBOARD METRICS ====
 
 ==== SOURCE MATERIAL (FOR REFERENCE ONLY - DO NOT INCLUDE IN RESPONSE) ====
 ${allInsights.join('\n\n')}
@@ -823,14 +1083,32 @@ ${getCollectedRecommendations().map((recommendation) => `- ${recommendation.cate
 
 ${overviewTemplate}`;
 
+          // Calculate max tokens based on whether we have form data
+          // Need to cover 30+ facets with positive + improvement for each
+          // Standard: 1200-1400 words = ~4500 tokens
+          // With forms: 1400-1600 words = ~5500 tokens
+          const maxTokens = hasFormData ? 5500 : 4500;
+          
+          // Log if form data section was included
+          if (hasFormData) {
+            console.log('[Final Synthesis] 📝 Form data section length:', formDataSection.length, 'characters');
+            console.log('[Final Synthesis] 📝 Form data section preview:', formDataSection.substring(0, 200));
+          }
+          
           const finalRequest = {
             model: 'claude-opus-4-1-20250805',
-            max_tokens: 1500, // Executive summary - 3 min read + HTML formatting
+            max_tokens: maxTokens, // 4500 standard (1200-1400 words, 30+ facets), 5500 with forms (1400-1600 words)
             messages: [{ role: 'user', content: finalSynthesisMessage }],
             tools: [createInsightsCollectionTool(), createRecommendationsCollectionTool()],
             system: systemPromptText,
             temperature: 0.35, // Balanced for structured comprehensive analysis
           };
+          
+          console.log('[Final Synthesis] Request config:', {
+            max_tokens: maxTokens,
+            has_form_data: hasFormData,
+            message_length: finalSynthesisMessage.length,
+          });
 
           if (progressCallback) progressCallback(3, 'in-progress', 'Preparing the overview analysis...', 40);
 
@@ -846,6 +1124,19 @@ ${overviewTemplate}`;
 
           if (finalResponse.ok) {
             const finalData = await finalResponse.json();
+            
+            // Log stop reason to debug truncation
+            console.log('[Final Synthesis] API Response:', {
+              stop_reason: finalData.stop_reason,
+              content_blocks: finalData.content?.length || 0,
+              usage: finalData.usage,
+            });
+            
+            if (finalData.stop_reason === 'max_tokens') {
+              console.error('[Final Synthesis] ⚠️ WARNING: Response was truncated due to max_tokens limit!');
+              console.error('[Final Synthesis] ⚠️ Increase max_tokens or reduce content');
+            }
+            
             if (finalData.content && finalData.content.length > 0) {
               if (progressCallback) progressCallback(3, 'in-progress', 'Finalizing recommendations and action items...', 80);
 
@@ -928,6 +1219,12 @@ ${overviewTemplate}`;
       // Create final synthesis message with quality-filtered insights
       const finalMessage = `Based on comprehensive individual tool analysis with quality rating, create a well-organized analysis report:
 
+==== DATA TIME PERIOD ====
+${dashboardData.dateRange ? `📅 Analysis covers data from: ${dashboardData.dateRange.toUpperCase()}` : '⚠️ Date range not available'}
+
+IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
+==== END TIME PERIOD ====
+
 HIGH-QUALITY INSIGHTS DISCOVERED:
 ${qualityInsights.join('\n\n')}
 
@@ -943,7 +1240,7 @@ ${getCollectedRecommendations().map((recommendation) => `- ${recommendation.cate
 ${deepTemplate}`;
 
       const finalRequest = {
-        model: 'claude-opus-4-20250514',
+        model: 'claude-sonnet-4-5-20250929',
         max_tokens: 4096,
         messages: [{ role: 'user', content: finalMessage }],
         tools: [createInsightsCollectionTool(), createRecommendationsCollectionTool()],
@@ -1023,7 +1320,7 @@ Analyze the RUM data and provide comprehensive insights.`;
 
     const fallbackSystemPrompt = await getSystemPrompt();
     const fallbackRequest = {
-      model: 'claude-opus-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 4096,
       messages: messageHistory,
       tools: facetTools,
@@ -1402,6 +1699,20 @@ export default async function decorate(block) {
     if (isProcessingCacheClear) {
       console.log('[UI] Ignoring click during cache clear process');
       return;
+    }
+
+    // Add metrics=super to URL to ensure all checkpoints are available for analysis
+    const currentUrl = new URL(window.location);
+    
+    if (!currentUrl.searchParams.has('metrics') || currentUrl.searchParams.get('metrics') !== 'super') {
+      currentUrl.searchParams.set('metrics', 'super');
+      window.history.replaceState({}, '', currentUrl);
+      console.log('[UI] Added metrics=super to URL for comprehensive analysis');
+      
+      // Trigger a page reload to apply the new metrics parameter
+      // This ensures all checkpoints are loaded and available for analysis
+      window.location.reload();
+      return; // Exit early since we're reloading
     }
 
     apiKeySection.style.display = 'none';

@@ -1,60 +1,245 @@
-CREATE A CONCISE, EXECUTIVE-LEVEL REPORT (TOTAL TARGET: 600-700 WORDS FOR 3-MINUTE READ):
+CREATE A STRUCTURED, SCANNABLE EXECUTIVE-LEVEL REPORT:
 
-<b>🎯 Executive Summary</b>
-Create an ULTRA-CONCISE summary (MAXIMUM 200 words) that covers:
-- Current performance status in 2-3 sentences
-- <b>Top 3 Critical Findings:</b> with specific impact metrics
-- <b>Top 3 Priority Actions:</b> with expected ROI
-- <b>Overall Recommendation:</b> (fix, optimize, or monitor)
+⚠️ FORMAT REQUIREMENT - USE BULLETS, NOT PARAGRAPHS:
+- DO NOT write dense paragraphs of text
+- Use CLEAR HEADINGS with bold labels (e.g., <b>Performance & Technical</b>)
+- Use BULLET POINTS (•) for all content
+- DO NOT use emojis in the report output
+- DO NOT use progress bars
+- Make the report EASY TO SCAN with clear structure and specific numbers
 
-<b>📊 Key Metrics & Findings</b>
-Concise bullet points covering:
-- <b>Performance metrics:</b> most important discoveries
-- <b>User behavior patterns:</b> critical insights
-- <b>Traffic insights:</b> primary engagement data
-- <b>Technical issues:</b> top concerns requiring attention
+⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:
+- You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)
+- Group related facets into natural categories and cover ALL of them in flowing bullet points
+- Go through the list SYSTEMATICALLY - don't skip any facet
+- Write naturally about multiple related facets together, not mechanically one-by-one
+- Balance positives and improvements in a conversational tone
+- This ensures ALL facets get coverage without mechanical repetition
+- Standard report: 1200-1400 words covering all facets
+- With forms data: 1400-1600 words (forms section + all other facets)
 
-<b>🎯 Priority Action Plan</b>
-Brief, actionable recommendations:
-- <b>High-impact improvements:</b> (implement first)
-- <b>Medium-impact optimizations:</b> (implement second)
-- <b>Monitoring recommendations:</b> measurement strategy
-- <b>Quick wins vs strategic:</b> implementation timeline
+⚠️ FORMS DATA PRIORITY:
+If fill_source, formsubmit_source, or formsubmit_target tools are available:
+- Forms section is MANDATORY and HIGH PRIORITY
+- Create dedicated forms section immediately after Executive Summary
+- Then continue with balanced facet coverage for all other facets
 
-<b>📈 Business Impact</b>
-Brief summary of:
-- <b>Performance bottlenecks:</b> Core Web Vitals impact
-- <b>User engagement:</b> conversion opportunities
-- <b>Traffic acquisition:</b> channel effectiveness
-- <b>Technical concerns:</b> system reliability issues
+<b>📅 Analysis Period</b>
+This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").
 
-CRITICAL LENGTH REQUIREMENTS:
-- ENTIRE REPORT: Maximum 600-700 words total (3-minute read)
-- Executive Summary: Maximum 200 words
-- Other sections: Brief bullet points and concise insights only
+<b>⚠️ Core Web Vitals Interpretation Guidelines</b>
+When analyzing LCP, CLS, and INP metrics:
+- If metric titles contain "and rising" or "and falling", these indicate TRENDS, not absolute performance
+- "Rising" means the metric is getting worse over time, "falling" means it's improving
+- DO NOT conclude the site is bad based solely on "rising" trends - consider the actual metric values
+- Focus on the current metric values and their impact, not just the trend direction
+- A metric can be "rising" but still within acceptable performance thresholds
+
+<b>🔍 Facet Analysis Guidelines</b>
+For ALL facets being analyzed:
+- ALWAYS check the title field of each facet (found in the help link's title attribute) to understand what it represents and its purpose
+- Use these descriptive titles to provide context and meaning to your insights and recommendations
+- DO NOT focus primarily on performance metrics - provide balanced analysis across ALL available facets
+- Include insights from user behavior, traffic acquisition, content engagement, errors, and other non-performance facets
+- Each facet provides unique business value - ensure comprehensive coverage of all data types
+
+<b>EXECUTIVE SUMMARY</b>
+Create a STRUCTURED, SCANNABLE summary (MAXIMUM 200 words) using this format:
+
+<b>Analysis Period:</b> [Date range] - Start with this as the very first line
+
+<b>Site Status:</b> [1-2 sentence overall health assessment with specific metrics]
+
+<b>Top 3 Critical Findings:</b>
+1. [Finding with specific numbers and metrics]
+2. [Finding with specific numbers and metrics]
+3. [Finding with specific numbers and metrics]
+
+<b>Top 3 Priority Actions:</b>
+1. [Action with expected ROI/impact]
+2. [Action with expected ROI/impact]
+3. [Action with expected ROI/impact]
+
+<b>Overall Recommendation:</b> [Fix/Optimize/Monitor decision with brief rationale]
+
+⚠️ EXCLUDE FORMS: If forms data is provided, forms get their own dedicated section. DO NOT mention forms in Executive Summary.
+
+⚠️ FORMAT: Use the exact structure shown above with bold labels and numbered lists for easy scanning. NO EMOJIS in output.
+
+<b>FORMS INTERACTION & CONVERSION ANALYSIS</b>
+⚠️ DEDICATED FORMS SECTION (ONLY IF FORMS DATA IS PROVIDED) ⚠️
+
+If forms data is provided in the "FORMS DATA" section above:
+- CREATE THIS DEDICATED SECTION immediately after Executive Summary
+- Analyze forms conversion funnel using the provided fill.source, formsubmit.source, formsubmit.target data
+- This section should be 200-300 words
+- ⚠️ CRITICAL: Do NOT mention forms anywhere else in the report
+- ⚠️ Forms analysis belongs ONLY in this dedicated section
+- ⚠️ All other sections (Executive Summary, Key Metrics, Priority Actions, Business Impact) should focus on NON-FORM facets
+
+<b>Required Analysis (USE THE TOOLS FIRST):</b>
+1. CALL fill_source tool with operation: "analyze" to get form entry pages
+2. CALL formsubmit_source tool with operation: "analyze" to get form submission pages  
+3. CALL formsubmit_target tool with operation: "analyze" to get post-submission destinations
+
+<b>Then provide structured analysis using this format:</b>
+
+<b>Conversion Funnel Overview:</b>
+• Fill events: [count] | Submissions: [count] | Conversion rate: [X%]
+• Drop-off rate: [percentage] abandon before submission
+
+<b>Top Entry Pages (fill.source):</b>
+• [Page name]: [X] fills, [Y%] conversion rate
+• [Page name]: [X] fills, [Y%] conversion rate
+
+<b>Form Performance (formsubmit.source):</b>
+• [+] Best performer: [Form/page] with [X%] completion rate
+• [-] Needs improvement: [Form/page] with [Y%] completion rate
+
+<b>Post-Submission Flow (formsubmit.target):</b>
+• [Destination]: [X] redirects, [success/error page analysis]
+
+<b>Performance Impact:</b>
+• [Specific finding about load time vs form completion with numbers]
+
+<b>Priority Fixes:</b>
+• [Top recommendation with expected impact]
+• [Second recommendation with expected impact]
+
+Use this structured bullet format with specific metrics. This section should be 200-300 words when forms data is available.
+
+<b>KEY METRICS & FINDINGS</b>
+⚠️ CRITICAL REQUIREMENT - SYSTEMATIC COVERAGE OF ALL NON-FORM FACETS:
+
+⚠️ USE THE FACET LIST: Above in the dashboard data, you received a "COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED" - this is your checklist.
+
+⚠️ EXCLUDE FORMS: If forms data was provided, it's already covered in the dedicated forms section above. DO NOT mention forms here.
+
+Create NATURAL, FLOWING insights organized by category that cover ALL NON-FORM facets from the provided list. Ensure complete coverage but write in a connected, narrative style.
+
+<b>How to ensure complete coverage:</b>
+- Group related facets into clear categories with bold headings (e.g., <b>Performance & Technical</b>, <b>Traffic & Acquisition</b>, <b>User Behavior & Engagement</b>, <b>Content Performance</b>, <b>Errors & Technical Issues</b>)
+- Within each category, write 2-4 bullet points that naturally discuss the facets in that group
+- Each bullet should flow naturally, mentioning multiple related facets together with specific metrics
+- Balance positives and areas for improvement in a natural conversational tone
+- Cross off each facet mentally as you cover it to ensure nothing is missed
+
+<b>Writing Style:</b>
+- Use CLEAR CATEGORY HEADINGS with <b>bold labels</b>
+- Use BULLET POINTS (•) within each category
+- Write in a NATURAL, CONVERSATIONAL flow - NOT mechanical [+]/[-] format
+- Discuss multiple related facets together in each bullet point
+- Use specific numbers and metrics from the actual data
+- Keep bullets concise but natural (2-3 sentences per bullet)
+- NO EMOJIS in the report content
+- NO progress bars
+
+<b>Coverage Checklist (organize these NON-FORM facets into natural categories):</b>
+- Performance metrics (LCP, CLS, INP, TTFB, etc.)
+- Traffic patterns and acquisition sources
+- User behavior and engagement
+- Content performance
+- Error patterns and technical issues
+- Geographic distribution
+- Device and browser usage
+- Navigation patterns
+- Checkpoints and user journey events
+- Resource loading
+- Media interactions
+- Any other NON-FORM facets that were analyzed
+
+⚠️ REMEMBER: Skip fill.source, formsubmit.source, formsubmit.target - these are covered in the dedicated forms section.
+
+Write in this natural, flowing style with category headings and bullet points that cover multiple related facets together. Use actual data and ensure ALL facets from the provided list are covered.
+
+<b>PRIORITY ACTION PLAN</b>
+Use structured format with clear categories:
+
+<b>HIGH PRIORITY (Implement First):</b>
+• [Action 1]: [Expected impact with numbers] - [Timeframe]
+• [Action 2]: [Expected impact with numbers] - [Timeframe]
+• [Action 3]: [Expected impact with numbers] - [Timeframe]
+
+<b>MEDIUM PRIORITY (Implement Second):</b>
+• [Action 1]: [Expected impact with numbers] - [Timeframe]
+• [Action 2]: [Expected impact with numbers] - [Timeframe]
+
+<b>Monitoring & Measurement:</b>
+• [What to track and why]
+• [Key metrics to monitor with thresholds]
+
+<b>Quick Wins:</b>
+• [Easy implementation with immediate impact - 1-2 days]
+• [Low-effort high-impact fix - 1 week]
+
+<b>BUSINESS IMPACT</b>
+Brief summary using structured bullets:
+
+<b>Performance Impact:</b> [Core Web Vitals and UX effects with metrics]
+
+<b>User Engagement:</b> [Conversion opportunities and behavior insights with metrics]
+
+<b>Traffic & Acquisition:</b> [Channel effectiveness and growth opportunities with metrics]
+
+<b>Content Effectiveness:</b> [Engagement patterns and optimization opportunities with metrics]
+
+<b>Technical Issues:</b> [Error impact on UX and operations with severity levels]
+
+<b>Market Opportunities:</b> [Geographic/demographic insights with potential reach]
+
+CRITICAL LENGTH & FORMAT REQUIREMENTS:
+- ENTIRE REPORT: 1200-1400 words (with forms: 1400-1600 words)
+- Executive Summary: Maximum 200 words in STRUCTURED format with bold labels
+- Forms Section (if applicable): 200-300 words in STRUCTURED bullet format
+- Key Metrics: 800-1000 words in STRUCTURED categories with bullet points
+- Priority Action Plan: 150-200 words in STRUCTURED bullet format
+- Business Impact: 150-200 words in STRUCTURED bullet format
+- Use bullet points and clear headings - NO dense paragraphs
 - Use specific metrics and actionable language
+- NO EMOJIS anywhere in the report content
 
 FORMATTING REQUIREMENTS:
 - Use HTML <b>text</b> tags for ALL headings and important text (NOT **text** markdown)
 - Use HTML <b>tag</b> for any text that should appear bold
 - Do NOT use markdown formatting like **text** or *text*
+- NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)
+- NO progress bars (no ████████░░ or similar)
 - Output must render properly in HTML context
 
-IMPORTANT: After creating the report, systematically use the "collect_insights" and "collect_recommendations" tools to capture the key findings for separate rendering:
+WORD COUNT & FORMAT REMINDER: 
+- STANDARD REPORT: 1200-1400 words to cover all 30+ facets with STRUCTURED bullet format
+- WITH FORMS DATA: 1400-1600 words (forms section + all other facets)
+- Executive Summary: Always under 200 words - STRUCTURED with bold labels, NO EMOJIS
+- Forms section (if applicable): 200-300 words - STRUCTURED bullet format
+- Key Metrics section: This is your MAIN content - natural flowing bullets covering all facets
+- With 30+ facets to cover, Key Metrics will be 800-1000 words in STRUCTURED categories
+- Priority Action Plan: 150-200 words - STRUCTURED bullet format
+- Business Impact: 150-200 words - STRUCTURED bullet format
+- Each facet in the provided list MUST get coverage - don't skip any
+- Use BULLET POINTS and CLEAR HEADINGS - NO dense paragraphs
+- NO EMOJIS anywhere in the report
 
-1. Use "collect_insights" tool to capture key insights from your analysis with appropriate categories (performance, engagement, traffic, errors, user_behavior) and impact levels (high, medium, low)
+OUTPUT FORMAT REQUIREMENTS (follow structured format exactly):
+- Use <b>EXECUTIVE SUMMARY</b> as opening section with numbered lists for findings/actions
+- Use <b>KEY METRICS & FINDINGS</b> with category headings like <b>Performance & Technical</b>
+- Use bullet points (•) in a natural, conversational flow
+- Use <b>PRIORITY ACTION PLAN</b> with <b>HIGH PRIORITY</b> and <b>MEDIUM PRIORITY</b> subsections
+- Use <b>BUSINESS IMPACT</b> with <b>labeled categories</b> for each business dimension
+- NO dense paragraphs - use clear structure with bullets and headings throughout
+- NO EMOJIS in section headings or content
 
-2. Use "collect_recommendations" tool to capture actionable recommendations with appropriate categories (performance, technical, user_experience, monitoring, content), priority levels (high, medium, low), and effort estimates (low, medium, high)
+CRITICAL: Use ONLY the actual data from the SOURCE MATERIAL provided above. 
+DO NOT use any example numbers, percentages, or metrics from this template.
+Extract real metrics from the dashboard data and insights provided.
 
-WORD COUNT REMINDER: ENTIRE REPORT must be 600-700 words maximum for true 3-minute readability. Executive Summary must be under 200 words. Be concise and focus on business value.
+FORMATTING REMINDERS:
+- NEVER use **text** markdown formatting - ALWAYS use <b>text</b> HTML tags for bold text
+- NEVER use emojis (🎯, 📊, ⚡, ✅, ⚠️, 📈, 📝, 🚨, etc.) anywhere in the report
+- NEVER use progress bars (████████░░ or similar visual indicators)
+- Write in natural, flowing bullet points that cover multiple facets together
 
-EXAMPLE OUTPUT FORMAT (follow this HTML formatting exactly):
-<b>🎯 Executive Summary</b>
-Site performance shows <b>critical optimization needs</b> affecting 189M monthly visits...
-
-<b>Top 3 Critical Findings:</b>
-- <b>Over-dependence on Google:</b> 184M of 189M entries (97.5%) create single-point vulnerability
-- <b>Performance bottleneck:</b> GIF-based LCP elements slow visual load
-- <b>Attribution blindness:</b> 99.5% of traffic lacks UTM tracking
-
-NEVER use **text** markdown formatting - ALWAYS use <b>text</b> HTML tags for bold text. 
+CRITICAL WORKFLOW:
+1. FIRST: Generate the complete text report with all sections (Executive Summary, Forms if applicable, Key Metrics & Findings, Priority Action Plan, Business Impact)
+2. AFTER the report is complete: Call the "collect_insights" and "collect_recommendations" tools to capture key findings for separate rendering
+3. The report text is the PRIMARY output - tools are supplementary for structured data collection
+4. NEVER call tools without generating the report text first 

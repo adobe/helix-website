@@ -49,6 +49,12 @@ async function processSequentialTools(
   // Enhanced initial message with quality focus
   const qualityFocusedMessage = `${initialMessage}
 
+==== DATA TIME PERIOD ====
+${dashboardData.dateRange ? `📅 This data covers: ${dashboardData.dateRange.toUpperCase()}` : '⚠️ Date range not specified'}
+
+IMPORTANT: All metrics and insights are for the ${dashboardData.dateRange || 'specified'} time period.
+==== END TIME PERIOD ====
+
 QUALITY ANALYSIS INSTRUCTIONS:
 - Focus on discovering SIGNIFICANT patterns and anomalies
 - Look for BUSINESS-IMPACTING insights only
@@ -107,7 +113,7 @@ SUMMARY: [If HIGH/MEDIUM: 2-3 sentence summary of key findings. If LOW: "routine
 
       // API request for individual tool analysis
       const toolRequest = {
-        model: 'claude-opus-4-20250514',
+        model: 'claude-sonnet-4-5-20250929',
         max_tokens: 2048, // Focused analysis per tool
         messages: [{ role: 'user', content: toolSpecificMessage }],
         tools: [tool], // Single tool focus
