@@ -477,9 +477,14 @@ const io = new IntersectionObserver((entries) => {
       loadData(elems.viewSelect.value).then(draw);
     }
 
+    let filterInputDebounce;
+    const debounceTimeout = 1000;
     elems.filterInput.addEventListener('input', () => {
-      updateState();
-      draw();
+      clearTimeout(filterInputDebounce);
+      filterInputDebounce = setTimeout(() => {
+        updateState();
+        draw();
+      }, debounceTimeout);
     });
 
     elems.viewSelect.addEventListener('change', () => {
