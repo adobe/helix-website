@@ -115,7 +115,9 @@ function reorderSpeakers(speakers, priorityNames) {
   // Split speakers into priority and remaining
   speakers.forEach((speaker) => {
     const fullName = `${speaker.first_name} ${speaker.last_name}`.toLowerCase();
-    const matchIndex = normalizedPriority.findIndex((priorityName) => fullName.includes(priorityName) || priorityName.includes(fullName));
+    const matchIndex = normalizedPriority.findIndex(
+      (priorityName) => fullName.includes(priorityName) || priorityName.includes(fullName),
+    );
 
     if (matchIndex !== -1) {
       prioritySpeakers[matchIndex] = speaker;
@@ -144,7 +146,7 @@ export default async function decorate(block) {
     const text = p.textContent.trim();
     // Skip if it's a link paragraph
     if (p.querySelector('a')) return;
-    
+
     // Check if this looks like a speaker order list (contains multiple commas)
     if (text.includes(',') && text.split(',').length > 2) {
       speakerOrder = text.split(',').map((name) => name.trim());
@@ -176,7 +178,7 @@ export default async function decorate(block) {
 
   // Clear the block
   block.innerHTML = '';
-  
+
   // Add redesign class for button styling
   block.classList.add('redesign');
 
@@ -251,4 +253,3 @@ export default async function decorate(block) {
     carousel.innerHTML = '<p style="padding: 40px; text-align: center;">No speaker information available.</p>';
   }
 }
-
