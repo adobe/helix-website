@@ -3,11 +3,11 @@ function createSpeakerCard(speaker) {
   card.className = 'speaker-card';
 
   const name = `${speaker.first_name} ${speaker.last_name}`;
-  
+
   // Parse title - only keep the part before the first comma
   const fullTitle = speaker.title || '';
   const title = fullTitle.split(',')[0].trim();
-  
+
   const imageUrl = speaker.picture?.thumbnail_url || speaker.picture?.url || '';
 
   // Build the title/company HTML with separate lines
@@ -75,7 +75,7 @@ function setupCarouselNavigation(carousel, prevButton, nextButton) {
   }
 
   carousel.addEventListener('scroll', updateNavButtons);
-  
+
   // Wait for images to load before checking button states
   const images = carousel.querySelectorAll('img');
   if (images.length > 0) {
@@ -86,7 +86,7 @@ function setupCarouselNavigation(carousel, prevButton, nextButton) {
         updateNavButtons();
       }
     };
-    
+
     images.forEach((img) => {
       if (img.complete) {
         checkAllLoaded();
@@ -115,9 +115,7 @@ function reorderSpeakers(speakers, priorityNames) {
   // Split speakers into priority and remaining
   speakers.forEach((speaker) => {
     const fullName = `${speaker.first_name} ${speaker.last_name}`.toLowerCase();
-    const matchIndex = normalizedPriority.findIndex((priorityName) => 
-      fullName.includes(priorityName) || priorityName.includes(fullName)
-    );
+    const matchIndex = normalizedPriority.findIndex((priorityName) => fullName.includes(priorityName) || priorityName.includes(fullName));
 
     if (matchIndex !== -1) {
       prioritySpeakers[matchIndex] = speaker;
@@ -139,9 +137,9 @@ export default async function decorate(block) {
   let headingText = 'Speakers';
   let speakerOrder = [];
   const paragraphs = content.querySelectorAll('p');
-  
+
   let foundHeading = false;
-  
+
   paragraphs.forEach((p) => {
     const text = p.textContent.trim();
     // Skip if it's a link paragraph
@@ -244,6 +242,7 @@ export default async function decorate(block) {
       // Setup navigation after speakers are loaded
       setupCarouselNavigation(carousel, prevButton, nextButton);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching speakers:', error);
       carousel.innerHTML = '<p style="padding: 40px; text-align: center;">Unable to load speakers at this time. Please try again later.</p>';
     }
