@@ -44,7 +44,7 @@
   height: 276px;
   object-fit: cover;
   display: block;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   border-radius: 0.5rem;
 }
 
@@ -54,7 +54,7 @@
   height: 220px;
   object-fit: cover;
   display: block;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   border-radius: 0.5rem;
 }
 
@@ -97,13 +97,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
   z-index: 10;
   transition: box-shadow 0.2s;
 }
 
 .event-speakers .carousel-nav:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
 }
 
 .event-speakers .carousel-nav.prev {
@@ -130,7 +130,7 @@
 /* Use site default button styles - no custom styling needed */
 
 /* Responsive */
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
   .event-speakers .speaker-card {
     flex: 0 0 200px;
   }
@@ -156,7 +156,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .event-speakers h2 {
     font-size: 2rem;
   }
@@ -191,7 +191,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .event-speakers .speaker-card {
     flex: 0 0 160px;
   }
