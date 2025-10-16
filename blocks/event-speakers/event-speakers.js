@@ -161,7 +161,7 @@ export default async function decorate(block) {
   let apiUrl = '';
   const links = content.querySelectorAll('a');
   links.forEach((link) => {
-    if (link.href.includes('developerevents.adobe.com')) {
+    if (new URL(link.href).host === 'developerevents.adobe.com') {
       apiUrl = link.href;
     }
   });
