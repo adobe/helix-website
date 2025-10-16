@@ -36,6 +36,12 @@ In your pull request, outline:
 
 Lastly, please follow the [pull request template](.github/pull_request_template.md) when submitting a pull request!
 
+## AI-Generated Contributions
+
+If your pull request contains code that was generated or co-authored by AI tools (such as GitHub Copilot, ChatGPT, Claude, or similar), you must apply the `ai-generated` label to your pull request.
+
+This helps maintainers understand the context of contributions and ensures appropriate review processes.
+
 Each commit message that is not part of a pull request:
 
 * Should contain the issue ID like `#123`
