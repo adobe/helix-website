@@ -81,7 +81,7 @@ async function decorateCardListByUrl(block) {
     // create a 2D array to pass to the cards block
     const cardsArr = [];
     const cardsRow = [];
-    const categories = new Set();
+    const categories = [];
     blockPartyJson.data
       .filter((row) => row.approved === 'true')
       .reverse() // sort newest entries first, unless highlighted
@@ -100,7 +100,9 @@ async function decorateCardListByUrl(block) {
             githubName = `<code>${stripTags(row.githubProfile)}</code>`;
           }
         }
-        categories.add(row.category);
+        if (!categories.find((category) => category.toLowerCase() === row.category.toLowerCase())) {
+          categories.push(row.category);
+        }
         let cardDetails = `<p class="block-party-card-title"><em>${stripTags(row.category)}</em>${githubName}</p>`;
         cardDetails += `<p><a href="${stripTags(row.githubUrl)}" target="_blank">${stripTags(row.title)}</a></p>`;
         if (row.showcaseUrl) {
