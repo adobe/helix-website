@@ -21,7 +21,7 @@ Content Driven Development is a mandatory process for AEM Edge Delivery Services
 
 ## When to Apply This Skill
 
-Apply Content Driven Development principles to almost all AEM development tasks:
+Apply Content Driven Development principles to ALL AEM development tasks:
 
 - ✅ Creating new blocks
 - ✅ Modifying existing blocks (structural or functional changes)

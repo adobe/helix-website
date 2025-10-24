@@ -4,7 +4,7 @@ This project is a website built with Edge Delivery Services in Adobe Experience 
 
 ## Skills
 
-**For almost all development work, start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
+**For ALL development work involving blocks, core scripts, or functionality, you MUST start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
 
 ## Project Overview
 
