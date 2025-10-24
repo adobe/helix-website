@@ -56,6 +56,242 @@ function isImgUrl(url) {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
+const ORDINAL_SUFFIX_REGEX = /\b(\d+)(st|nd|rd|th)\b/g;
+
+function getEntryDate(entry) {
+  if (entry.publicationDate) {
+    const normalized = entry.publicationDate.replace(ORDINAL_SUFFIX_REGEX, '$1');
+    const parsedDate = new Date(normalized);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate;
+    }
+  }
+
+  if (entry.lastModified) {
+    const lastModifiedMs = Number(entry.lastModified) * 1000;
+    if (!Number.isNaN(lastModifiedMs)) {
+      return new Date(lastModifiedMs);
+    }
+  }
+
+  return null;
+}
+
+function formatEntryDisplayDate(entryDate, entry) {
+  if (entryDate) {
+    return entryDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+  return entry.publicationDate || '';
+}
+
+function sortYearsDescending(years) {
+  return years.sort((a, b) => {
+    if (a === 'undated') return 1;
+    if (b === 'undated') return -1;
+    return Number(b) - Number(a);
+  });
+}
+
+function renderArchivePosts(container, posts) {
+  container.innerHTML = '';
+
+  if (!posts.length) {
+    const emptyState = createTag('p', { class: 'archive-empty-message' }, 'No posts match your filters.');
+    container.appendChild(emptyState);
+    return;
+  }
+
+  const postsByYear = posts.reduce((acc, post) => {
+    const yearKey = post.year || 'undated';
+    acc[yearKey] = acc[yearKey] || [];
+    acc[yearKey].push(post);
+    return acc;
+  }, {});
+
+  const sortedYears = sortYearsDescending(Object.keys(postsByYear));
+
+  sortedYears.forEach((year) => {
+    const yearSection = createTag('section', { class: 'archive-group', 'data-year': year });
+    const headingText = year === 'undated' ? 'Undated' : year;
+    const yearHeading = createTag('h2', { class: 'archive-year-heading' }, headingText);
+    yearSection.appendChild(yearHeading);
+
+    const list = createTag('ul', { class: 'archive-list' });
+    postsByYear[year]
+      .sort((a, b) => {
+        if (a.date && b.date) {
+          return b.date.getTime() - a.date.getTime();
+        }
+        if (a.date) return -1;
+        if (b.date) return 1;
+        return a.title.localeCompare(b.title);
+      })
+      .forEach((post) => {
+        const listItem = createTag('li', { class: 'archive-item' });
+        const article = createTag('article', { class: 'archive-article' });
+
+        if (post.displayDate) {
+          const dateEl = createTag('p', { class: 'archive-item-date' }, post.displayDate);
+          article.appendChild(dateEl);
+        }
+
+        const titleHeading = createTag('h3', { class: 'archive-item-title' });
+        const titleLink = createTag('a', {
+          href: post.path,
+          class: 'archive-item-link',
+          rel: 'bookmark',
+        }, post.title);
+        titleHeading.appendChild(titleLink);
+        article.appendChild(titleHeading);
+
+        if (post.description) {
+          const descriptionEl = createTag('p', { class: 'archive-item-desc' });
+          descriptionEl.textContent = post.description;
+          article.appendChild(descriptionEl);
+        }
+
+        listItem.appendChild(article);
+        list.appendChild(listItem);
+      });
+
+    yearSection.appendChild(list);
+    container.appendChild(yearSection);
+  });
+}
+
+export async function renderBlogArchive(block) {
+  if (!block) {
+    return;
+  }
+
+  const blogIndex = window.blogindex?.data || [];
+  if (!blogIndex.length) {
+    const emptyState = createTag('p', { class: 'archive-empty-message' }, 'No blog posts available yet.');
+    block.appendChild(emptyState);
+    return;
+  }
+
+  const enhancedPosts = blogIndex.map((entry) => {
+    const date = getEntryDate(entry);
+    return {
+      ...entry,
+      date,
+      displayDate: formatEntryDisplayDate(date, entry),
+      year: date ? String(date.getFullYear()) : 'undated',
+      titleLower: entry.title ? entry.title.toLowerCase() : '',
+      descriptionLower: entry.description ? entry.description.toLowerCase() : '',
+    };
+  });
+
+  const posts = enhancedPosts.sort((a, b) => {
+    if (a.date && b.date) {
+      return b.date.getTime() - a.date.getTime();
+    }
+    if (a.date) return -1;
+    if (b.date) return 1;
+    return a.title.localeCompare(b.title);
+  });
+
+  const years = sortYearsDescending(Array.from(
+    new Set(posts.map((post) => post.year || 'undated')),
+  ));
+
+  block.innerHTML = '';
+
+  const archiveContainer = createTag('div', { class: 'archive-container' });
+  const controlsWrapper = createTag('div', { class: 'archive-controls' });
+  const countEl = createTag('p', { class: 'archive-count', 'aria-live': 'polite' });
+  const groupsWrapper = createTag('div', { class: 'archive-groups' });
+
+  const searchForm = createTag('form', { class: 'archive-search', role: 'search' });
+  searchForm.addEventListener('submit', (event) => event.preventDefault());
+  const searchLabel = createTag('label', {
+    for: 'archive-search-input',
+    class: 'sr-only',
+  }, 'Search blog posts');
+  const searchInput = createTag('input', {
+    id: 'archive-search-input',
+    type: 'search',
+    placeholder: 'Search posts',
+    'aria-label': 'Search blog posts',
+  });
+  searchForm.append(searchLabel, searchInput);
+  controlsWrapper.appendChild(searchForm);
+
+  let activeYear = 'all';
+  let searchTerm = '';
+
+  function applyFilters() {
+    const filtered = posts.filter((post) => {
+      const matchesYear = activeYear === 'all' || post.year === activeYear;
+      const matchesTerm = !searchTerm
+        || post.titleLower.includes(searchTerm)
+        || post.descriptionLower.includes(searchTerm);
+      return matchesYear && matchesTerm;
+    });
+    countEl.textContent = filtered.length === 1
+      ? 'Showing 1 post'
+      : `Showing ${filtered.length} posts`;
+    renderArchivePosts(groupsWrapper, filtered);
+  }
+
+  if (years.length > 1 || years[0] !== 'undated') {
+    const filtersWrapper = createTag('div', {
+      class: 'archive-filters',
+      role: 'toolbar',
+      'aria-label': 'Filter posts by year',
+    });
+
+    const createFilterButton = (year, label) => {
+      const isActive = year === activeYear;
+      const button = createTag('button', {
+        type: 'button',
+        'data-year': year,
+        class: `archive-filter${isActive ? ' archive-filter-active' : ''}`,
+        'aria-pressed': isActive ? 'true' : 'false',
+      }, label);
+      button.addEventListener('click', () => {
+        if (activeYear === year) {
+          return;
+        }
+        activeYear = year;
+        filtersWrapper.querySelectorAll('button').forEach((btn) => {
+          const btnYear = btn.dataset.year;
+          const isBtnActive = btnYear === activeYear;
+          btn.classList.toggle('archive-filter-active', isBtnActive);
+          btn.setAttribute('aria-pressed', isBtnActive ? 'true' : 'false');
+        });
+        applyFilters();
+      });
+      return button;
+    };
+
+    filtersWrapper.appendChild(createFilterButton('all', 'All years'));
+    years.forEach((year) => {
+      const label = year === 'undated' ? 'Undated' : year;
+      filtersWrapper.appendChild(createFilterButton(year, label));
+    });
+
+    controlsWrapper.appendChild(filtersWrapper);
+  }
+
+  archiveContainer.appendChild(controlsWrapper);
+  archiveContainer.appendChild(countEl);
+  archiveContainer.appendChild(groupsWrapper);
+  block.appendChild(archiveContainer);
+
+  searchInput.addEventListener('input', (event) => {
+    searchTerm = event.target.value.trim().toLowerCase();
+    applyFilters();
+  });
+
+  applyFilters();
+}
+
 // logic to render blog list home page
 export async function fetchBlogContent(url) {
   try {
@@ -207,6 +443,7 @@ export async function renderBlog(block) {
 
 export default async function decorate(block) {
   const isBlog = block.classList.contains('blog');
+  const isBlogArchive = isBlog && block.classList.contains('archive');
 
   if (isBlog) {
     loadBlogData();
@@ -221,7 +458,14 @@ export default async function decorate(block) {
     return window?.siteindex?.loaded;
   };
 
-  const renderFunction = isBlog ? renderBlog : renderFeed;
+  let renderFunction;
+  if (isBlogArchive) {
+    renderFunction = renderBlogArchive;
+  } else if (isBlog) {
+    renderFunction = renderBlog;
+  } else {
+    renderFunction = renderFeed;
+  }
 
   if (!block.dataset.rendered) {
     if (checkDataLoaded()) {
