@@ -89,6 +89,177 @@ export async function fetchBlogContent(url) {
   }
 }
 
+/**
+ * Parse date string that may contain ordinal suffixes (1st, 2nd, 3rd, etc.)
+ * @param {string} dateStr - Date string like "August 29th, 2024"
+ * @returns {Date} Parsed date
+ */
+function parsePublicationDate(dateStr) {
+  if (!dateStr) return new Date(0);
+  // Remove ordinal suffixes (st, nd, rd, th)
+  const cleanedDate = dateStr.replace(/(\d+)(st|nd|rd|th)/g, '$1');
+  return new Date(cleanedDate);
+}
+
+// logic to render blog archive page with all posts
+export async function renderBlogArchive(block) {
+  if (!block) {
+    return;
+  }
+  const blogIndex = window.blogindex.data;
+
+  // Sort blogs by publication date in descending order (newest first)
+  blogIndex.sort((a, b) => {
+    const dateB = parsePublicationDate(b.publicationDate);
+    const dateA = parsePublicationDate(a.publicationDate);
+    return dateB - dateA;
+  });
+
+  // Skip if block has favorite class
+  if (block.classList.contains('favorite')) {
+    return;
+  }
+
+  let parentDiv = block.querySelector('.blog-container');
+  if (!parentDiv) {
+    parentDiv = createTag('div', { class: 'blog-container' });
+    block.appendChild(parentDiv);
+  }
+
+  let leftContainer = parentDiv.querySelector('.left-container');
+  let rightContainer = parentDiv.querySelector('.right-container');
+
+  if (!leftContainer) {
+    leftContainer = createTag('div', { class: 'left-container' });
+    parentDiv.appendChild(leftContainer);
+  }
+  if (!rightContainer) {
+    rightContainer = createTag('div', { class: 'right-container' });
+    parentDiv.appendChild(rightContainer);
+  }
+  rightContainer.innerHTML = '';
+
+  // setting up the favorite blogs
+  const favoriteFeedWrapper = document.querySelector('.feed-wrapper:has(.favorite)');
+  if (favoriteFeedWrapper) {
+    const favoriteDiv = favoriteFeedWrapper.querySelector('.favorite > div');
+    favoriteDiv.classList.add('favorite-blogs');
+    if (favoriteDiv) {
+      favoriteDiv.querySelectorAll('a').forEach((link) => {
+        link.classList.remove('button', 'primary');
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+      rightContainer.appendChild(favoriteDiv);
+      favoriteFeedWrapper.remove();
+    }
+  }
+
+  // Pagination settings
+  const postsPerPage = 10;
+  let currentPage = 1;
+  const totalPages = Math.ceil(blogIndex.length / postsPerPage);
+
+  // Create archive container for all posts
+  const archiveContainer = createTag('div', { class: 'archive-posts-container' });
+  leftContainer.appendChild(archiveContainer);
+
+  // Create pagination controls
+  const paginationDiv = createTag('div', { class: 'pagination-controls' });
+  leftContainer.appendChild(paginationDiv);
+
+  // Function to render posts for current page
+  function renderPage(page) {
+    archiveContainer.innerHTML = '';
+    const startIndex = (page - 1) * postsPerPage;
+    const endIndex = Math.min(startIndex + postsPerPage, blogIndex.length);
+    const pagePosts = blogIndex.slice(startIndex, endIndex);
+
+    pagePosts.forEach((post) => {
+      const blogItem = createTag('div', { class: 'blog-item archive-item' });
+
+      const contentWrapper = createTag('div', { class: 'archive-item-content' });
+
+      const h3 = createTag('h3', { class: 'title' }, post.title);
+      contentWrapper.appendChild(h3);
+
+      const desc = createTag('p', { class: 'desc' }, post.description);
+      contentWrapper.appendChild(desc);
+
+      const date = createTag('p', { class: 'date' }, post.publicationDate);
+      contentWrapper.appendChild(date);
+
+      blogItem.appendChild(contentWrapper);
+
+      if (post.image) {
+        const image = createTag('div', { class: 'image-wrapper' });
+        const img = createTag('img', { src: post.image, alt: post.title });
+        image.appendChild(img);
+        blogItem.appendChild(image);
+      }
+
+      const blogLink = createTag('a', {
+        href: post.path,
+        rel: 'noopener noreferrer',
+        class: 'blog-link',
+      });
+      blogLink.appendChild(blogItem);
+
+      archiveContainer.appendChild(blogLink);
+    });
+
+    // Update pagination controls
+    // eslint-disable-next-line no-use-before-define
+    updatePagination();
+  }
+
+  // Function to update pagination controls
+  function updatePagination() {
+    paginationDiv.innerHTML = '';
+
+    if (totalPages <= 1) return;
+
+    // Previous button
+    const prevButton = createTag('button', {
+      class: `pagination-button ${currentPage === 1 ? 'disabled' : ''}`,
+    }, '← Previous');
+    if (currentPage === 1) {
+      prevButton.disabled = true;
+    }
+    prevButton.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderPage(currentPage);
+        leftContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+    paginationDiv.appendChild(prevButton);
+
+    // Page info
+    const pageInfo = createTag('span', { class: 'page-info' }, `Page ${currentPage} of ${totalPages}`);
+    paginationDiv.appendChild(pageInfo);
+
+    // Next button
+    const nextButton = createTag('button', {
+      class: `pagination-button ${currentPage === totalPages ? 'disabled' : ''}`,
+    }, 'Next →');
+    if (currentPage === totalPages) {
+      nextButton.disabled = true;
+    }
+    nextButton.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        renderPage(currentPage);
+        leftContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+    paginationDiv.appendChild(nextButton);
+  }
+
+  // Initial render
+  renderPage(currentPage);
+}
+
 export async function renderBlog(block) {
   if (!block) {
     return;
@@ -207,21 +378,28 @@ export async function renderBlog(block) {
 
 export default async function decorate(block) {
   const isBlog = block.classList.contains('blog');
+  const isArchive = block.classList.contains('archive');
 
-  if (isBlog) {
+  if (isBlog || isArchive) {
     loadBlogData();
   } else {
     loadFeedData();
   }
 
   const checkDataLoaded = () => {
-    if (isBlog) {
+    if (isBlog || isArchive) {
       return window?.blogindex?.loaded;
     }
     return window?.siteindex?.loaded;
   };
 
-  const renderFunction = isBlog ? renderBlog : renderFeed;
+  // Determine which render function to use
+  let renderFunction = renderFeed;
+  if (isArchive) {
+    renderFunction = renderBlogArchive;
+  } else if (isBlog) {
+    renderFunction = renderBlog;
+  }
 
   if (!block.dataset.rendered) {
     if (checkDataLoaded()) {
