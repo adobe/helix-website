@@ -1,0 +1,50 @@
+#!/bin/bash
+# Discover available skills in .claude/skills/
+# Usage: .agents/discover-skills
+
+SKILLS_DIR=".claude/skills"
+
+if [ ! -d "$SKILLS_DIR" ]; then
+    echo "No skills directory found at $SKILLS_DIR"
+    exit 0
+fi
+
+# Find all SKILL.md files
+SKILL_FILES=$(find "$SKILLS_DIR" -name "SKILL.md" -type f | sort)
+
+if [ -z "$SKILL_FILES" ]; then
+    echo "No skills found in $SKILLS_DIR"
+    exit 0
+fi
+
+echo "Available Skills:"
+echo "=================="
+echo ""
+
+# Process each skill
+while IFS= read -r skill_file; do
+    # Extract skill name from path
+    skill_dir=$(dirname "$skill_file")
+    skill_name=$(basename "$skill_dir")
+
+    # Extract frontmatter if it exists
+    if head -n 1 "$skill_file" | grep -q "^---$"; then
+        # Parse YAML frontmatter
+        name=$(sed -n '/^---$/,/^---$/p' "$skill_file" | grep "^name:" | sed 's/^name: *//')
+        description=$(sed -n '/^---$/,/^---$/p' "$skill_file" | grep "^description:" | sed 's/^description: *//')
+
+        echo "Skill: ${name:-$skill_name}"
+        echo "Path: $skill_file"
+        echo "Description: $description"
+    else
+        # No frontmatter, show skill name and first few lines
+        echo "Skill: $skill_name"
+        echo "Path: $skill_file"
+        echo "Description:"
+        head -n 5 "$skill_file"
+    fi
+
+    echo ""
+    echo "---"
+    echo ""
+done <<< "$SKILL_FILES"
