@@ -89,6 +89,51 @@ export async function fetchBlogContent(url) {
   }
 }
 
+export async function renderBlogArchive(block) {
+  if (!block) {
+    return;
+  }
+  const blogIndex = window.blogindex.data;
+
+  // Sort blogs by publication date in descending order (newest first)
+  blogIndex.sort((a, b) => {
+    const dateA = new Date(a.publicationDate);
+    const dateB = new Date(b.publicationDate);
+    return dateB - dateA;
+  });
+
+  const archiveContainer = createTag('div', { class: 'archive-container' });
+
+  blogIndex.forEach((page) => {
+    const blogItem = createTag('div', { class: 'blog-item archive-item' });
+
+    const h3 = createTag('h3', { class: 'title' }, page.title);
+    blogItem.appendChild(h3);
+
+    const desc = createTag('p', { class: 'desc' }, page.description);
+    blogItem.appendChild(desc);
+
+    const date = createTag('p', { class: 'date' }, page.publicationDate);
+    blogItem.appendChild(date);
+
+    if (page.image) {
+      const image = createTag('p', { class: 'image-wrapper' });
+      const img = createTag('img', { src: page.image, alt: page.title });
+      image.appendChild(img);
+      blogItem.appendChild(image);
+    }
+
+    const blogLink = createTag('a', {
+      href: page.path, class: 'blog-link',
+    });
+    blogLink.appendChild(blogItem);
+
+    archiveContainer.appendChild(blogLink);
+  });
+
+  block.appendChild(archiveContainer);
+}
+
 export async function renderBlog(block) {
   if (!block) {
     return;
@@ -104,6 +149,12 @@ export async function renderBlog(block) {
 
   // Skip if block has favorite class
   if (block.classList.contains('favorite')) {
+    return;
+  }
+
+  // Handle archive view
+  if (block.classList.contains('archive')) {
+    renderBlogArchive(block);
     return;
   }
 
