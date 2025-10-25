@@ -18,6 +18,7 @@ import {
 
 // Import PDF export functionality
 import { generatePDFReport, downloadAsText } from './pdf-export.js';
+import { uploadToDA, getCurrentAnalyzedUrl } from './da-upload.js';
 
 let messageHistory = [];
 let cachedFacetTools = null;
@@ -29,7 +30,7 @@ let deepAnalysisTemplateCache = null;
 
 // Cache for analysis results - now using localStorage for persistence
 const CACHE_KEY = 'rumAnalysisCache';
-const CACHE_DURATION = 40 * 60 * 1000; // 20 minute in milliseconds
+const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
 // Function to get cache from localStorage
 function getAnalysisCache() {
@@ -104,7 +105,7 @@ function cacheAnalysisResult(result, dashboardDataHash) {
     dashboardDataHash,
   };
   setAnalysisCache(cacheData);
-  console.log('[Cache] Analysis result cached for 5 minutes');
+  console.log('[Cache] Analysis result cached for 4 hours');
 }
 
 // Function to clear analysis cache
@@ -1372,7 +1373,7 @@ Analyze the RUM data and provide comprehensive insights.`;
 }
 
 // Reusable analysis function for external modules (e.g., sidebar)
-async function runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection = null) {
+async function runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection = null, saveResultsButton = null) {
   const createMessageElement = (text, className) => {
     const div = document.createElement('div');
     div.className = `message ${className}`;
@@ -1398,9 +1399,17 @@ async function runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection
       const cachedResult = getAnalysisCache();
       if (cachedResult && cachedResult.result) {
         analysisResult = cachedResult.result;
+        
+        // Display the cached analysis result
+        addProgressMessage(analysisResult);
+        
         if (downloadButton) {
           downloadButton.disabled = false;
           downloadButton.title = 'Download insights as PDF';
+        }
+        if (saveResultsButton) {
+          saveResultsButton.disabled = false;
+          saveResultsButton.title = 'Save results to DA';
         }
       }
       return analysisResult; // Exit early if using cached results
@@ -1465,6 +1474,10 @@ async function runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection
         downloadButton.disabled = false;
         downloadButton.title = 'Download insights as PDF';
       }
+      if (saveResultsButton) {
+        saveResultsButton.disabled = false;
+        saveResultsButton.title = 'Save results as JSON';
+      }
 
       // Mark all remaining tasks as completed
       completeAllRemainingTasks();
@@ -1495,6 +1508,7 @@ export default async function decorate(block) {
     <div class="chat-header">
       <h2>OpTel Detective</h2>
       <div class="header-buttons">
+        <button class="save-results-button" disabled title="Save results as JSON (available after analysis)">💾 Save Results</button>
         <button class="download-button" disabled title="Download insights as PDF (available after analysis)">📄 Download as PDF</button>
         <button class="close-button" title="Close chat">×</button>
       </div>
@@ -1522,6 +1536,7 @@ export default async function decorate(block) {
   block.appendChild(chatInterface);
 
   const downloadButton = block.querySelector('.download-button');
+  const saveResultsButton = block.querySelector('.save-results-button');
   const closeButton = block.querySelector('.close-button');
   const messagesDiv = block.querySelector('#messages');
   const apiKeySection = block.querySelector('#api-key-section');
@@ -1566,6 +1581,45 @@ export default async function decorate(block) {
   };
 
   downloadButton.addEventListener('click', generatePDF);
+
+  // Save Results functionality - Upload to DA
+  const saveResults = async () => {
+    if (!analysisContent) {
+      // eslint-disable-next-line no-alert
+      alert('No analysis content available to save.');
+      return;
+    }
+
+    // Disable button and show loading state
+    saveResultsButton.disabled = true;
+    const originalText = saveResultsButton.textContent;
+    saveResultsButton.textContent = '💾 Saving...';
+
+    try {
+      // Get current analyzed URL
+      const currentUrl = getCurrentAnalyzedUrl();
+
+      // Upload to DA using the modular upload function
+      const result = await uploadToDA(analysisContent, {
+        url: currentUrl,
+        debug: true, // Enable debug logging
+      });
+
+      // Show success message
+      // eslint-disable-next-line no-alert
+      alert(`✅ Analysis report saved successfully to DA!\n\nPath: ${result.path}`);
+    } catch (error) {
+      console.error('[Save Results] Error uploading to DA:', error);
+      // eslint-disable-next-line no-alert
+      alert(`❌ Error saving to DA: ${error.message}\n\nPlease check console for details.`);
+    } finally {
+      // Re-enable button and restore text
+      saveResultsButton.disabled = false;
+      saveResultsButton.textContent = originalText;
+    }
+  };
+
+  saveResultsButton.addEventListener('click', saveResults);
 
   // Function to update cache status in UI
   const updateCacheStatus = () => {
@@ -1718,7 +1772,7 @@ export default async function decorate(block) {
     apiKeySection.style.display = 'none';
 
     try {
-      analysisContent = await runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection);
+      analysisContent = await runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection, saveResultsButton);
     } catch (error) {
       // Error already handled in the function
     }

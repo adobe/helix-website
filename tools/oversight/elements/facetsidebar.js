@@ -8,6 +8,10 @@ import {
 // eslint-disable-next-line import/no-unresolved, import/no-relative-packages
 import { generatePDFReport, downloadAsText } from '../../../blocks/rum-chat/pdf-export.js';
 
+// Import DA upload functionality
+// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
+import { uploadToDA, getCurrentAnalyzedUrl } from '../../../blocks/rum-chat/da-upload.js';
+
 export default class FacetSidebar extends HTMLElement {
   constructor() {
     super();
@@ -240,6 +244,7 @@ export default class FacetSidebar extends HTMLElement {
         <div class="chat-header" style="flex-shrink: 0;">
           <h2>OpTel Detective</h2>
           <div class="header-buttons">
+            <button class="save-results-button" disabled title="Save results as JSON (available after analysis)">💾 Save Results</button>
             <button class="download-button" disabled title="Download insights as PDF (available after analysis)">📄 Download as PDF</button>
           </div>
         </div>
@@ -293,6 +298,7 @@ export default class FacetSidebar extends HTMLElement {
     const detailedAnalysisCheckbox = this.elems.analysisTile.querySelector('#detailed-analysis');
     const messagesDiv = chatInterface.querySelector('#messages');
     const downloadButton = chatInterface.querySelector('.download-button');
+    const saveResultsButton = chatInterface.querySelector('.save-results-button');
 
     // Store reference to the chat interface in the class
     this.elems.chatInterface = chatInterface;
@@ -390,7 +396,7 @@ export default class FacetSidebar extends HTMLElement {
 
       try {
         // Call the complete original RUM analysis function directly
-        await runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection);
+        await runCompleteRumAnalysis(messagesDiv, downloadButton, apiKeySection, saveResultsButton);
 
         // Analysis complete - result is displayed by the function itself
         console.log(`[Sidebar Analysis] ${isDetailed ? 'Detailed' : 'Executive'} analysis completed successfully`);
@@ -442,6 +448,58 @@ export default class FacetSidebar extends HTMLElement {
       } else {
         // eslint-disable-next-line no-alert
         alert('No analysis content found. Please run an analysis first.');
+      }
+    });
+
+    // Save Results functionality - Upload to DA
+    saveResultsButton.addEventListener('click', async () => {
+      // Look for analysis content in various possible containers
+      const analysisContent = chatInterface.querySelector('.analysis-content')
+        || chatInterface.querySelector('.message.claude-message:last-child')
+        || chatInterface.querySelector('#messages .message:last-child');
+
+      if (!analysisContent) {
+        // eslint-disable-next-line no-alert
+        alert('No analysis content found. Please run an analysis first.');
+        return;
+      }
+
+      const contentHtml = analysisContent.innerHTML || '';
+      const contentText = analysisContent.textContent || '';
+      const finalContent = contentHtml.trim() || contentText.trim();
+
+      if (!finalContent) {
+        // eslint-disable-next-line no-alert
+        alert('No analysis content available to save.');
+        return;
+      }
+
+      // Disable button and show loading state
+      saveResultsButton.disabled = true;
+      const originalText = saveResultsButton.textContent;
+      saveResultsButton.textContent = '💾 Saving...';
+
+      try {
+        // Get current analyzed URL
+        const currentUrl = getCurrentAnalyzedUrl();
+
+        // Upload to DA using the modular upload function
+        const result = await uploadToDA(finalContent, {
+          url: currentUrl,
+          debug: true, // Enable debug logging
+        });
+
+        // Show success message
+        // eslint-disable-next-line no-alert
+        alert(`✅ Analysis report saved successfully to DA!\n\nPath: ${result.path}`);
+      } catch (error) {
+        console.error('[Facet Sidebar] Error uploading to DA:', error);
+        // eslint-disable-next-line no-alert
+        alert(`❌ Error saving to DA: ${error.message}\n\nPlease check console for details.`);
+      } finally {
+        // Re-enable button and restore text
+        saveResultsButton.disabled = false;
+        saveResultsButton.textContent = originalText;
       }
     });
   }

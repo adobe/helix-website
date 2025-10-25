@@ -369,6 +369,7 @@ body:has(.rum-chat-container.show) #deepmain {
   z-index: 11;
 }
 
+.save-results-button,
 .download-button {
   background: #007cba;
   color: white;
@@ -386,10 +387,19 @@ body:has(.rum-chat-container.show) #deepmain {
   gap: 4px;
 }
 
+.save-results-button {
+  background: #28a745;
+}
+
+.save-results-button:disabled,
 .download-button:disabled {
   background: #ccc;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.save-results-button:hover:not(:disabled) {
+  background: #218838;
 }
 
 .download-button:hover:not(:disabled) {
