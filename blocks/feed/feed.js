@@ -89,6 +89,69 @@ export async function fetchBlogContent(url) {
   }
 }
 
+// logic to render blog archive page showing all blog posts
+export async function renderBlogArchive(block) {
+  if (!block) {
+    return;
+  }
+  const blogIndex = window.blogindex.data;
+
+  // Sort blogs by publication date in descending order (newest first)
+  blogIndex.sort((a, b) => {
+    const dateA = new Date(a.publicationDate);
+    const dateB = new Date(b.publicationDate);
+    return dateB - dateA;
+  });
+
+  let archiveContainer = block.querySelector('.archive-container');
+  if (!archiveContainer) {
+    archiveContainer = createTag('div', { class: 'archive-container' });
+    block.appendChild(archiveContainer);
+  }
+
+  // setting up the favorite blogs
+  const favoriteFeedWrapper = document.querySelector('.feed-wrapper:has(.favorite)');
+  if (favoriteFeedWrapper) {
+    const favoriteDiv = favoriteFeedWrapper.querySelector('.favorite > div');
+    favoriteDiv.classList.add('favorite-blogs');
+    if (favoriteDiv) {
+      favoriteDiv.querySelectorAll('a').forEach((link) => {
+        link.classList.remove('button', 'primary');
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+      archiveContainer.appendChild(favoriteDiv);
+      favoriteFeedWrapper.remove();
+    }
+  }
+
+  // Render all blog posts
+  blogIndex.forEach((page) => {
+    const blogItem = createTag('div', { class: 'blog-item' });
+
+    const h3 = createTag('h3', { class: 'title' }, page.title);
+    blogItem.appendChild(h3);
+
+    const desc = createTag('p', { class: 'desc' }, page.description);
+    blogItem.appendChild(desc);
+
+    const date = createTag('p', { class: 'date' }, page.publicationDate);
+    blogItem.appendChild(date);
+
+    const image = createTag('p', { class: 'image-wrapper' });
+    const img = createTag('img', { src: page.image });
+    image.appendChild(img);
+    blogItem.appendChild(image);
+
+    const blogLink = createTag('a', {
+      href: page.path, class: 'blog-link',
+    });
+    blogLink.appendChild(blogItem);
+
+    archiveContainer.appendChild(blogLink);
+  });
+}
+
 export async function renderBlog(block) {
   if (!block) {
     return;
@@ -207,6 +270,7 @@ export async function renderBlog(block) {
 
 export default async function decorate(block) {
   const isBlog = block.classList.contains('blog');
+  const isArchive = block.classList.contains('archive');
 
   if (isBlog) {
     loadBlogData();
@@ -221,7 +285,13 @@ export default async function decorate(block) {
     return window?.siteindex?.loaded;
   };
 
-  const renderFunction = isBlog ? renderBlog : renderFeed;
+  // Determine which render function to use
+  let renderFunction = renderFeed;
+  if (isBlog && isArchive) {
+    renderFunction = renderBlogArchive;
+  } else if (isBlog) {
+    renderFunction = renderBlog;
+  }
 
   if (!block.dataset.rendered) {
     if (checkDataLoaded()) {
