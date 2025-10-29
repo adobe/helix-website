@@ -1,0 +1,122 @@
+.service-level-objectives {
+  padding: 0;
+  margin: 1.5rem 0;
+  font-family: var(--body-font-family);
+}
+
+.service-level-objectives .loading,
+.service-level-objectives .error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color);
+}
+
+.service-level-objectives .error {
+  color: var(--spectrum-red);
+}
+
+.service-level-objectives .slo-header {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.service-level-objectives .slo-period {
+  font-size: var(--type-body-m-size);
+  color: var(--text-color-secondary);
+}
+
+.service-level-objectives .service-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--bg-color-lightgrey);
+}
+
+.service-level-objectives .service-row:last-of-type {
+  border-bottom: none;
+}
+
+.service-level-objectives .service-name {
+  grid-column: 1;
+  grid-row: 1;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.service-level-objectives .service-value {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: right;
+  font-weight: bold;
+}
+
+.service-level-objectives .service-incidents {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  font-size: var(--type-body-s-size);
+  color: var(--text-color-secondary);
+}
+
+.service-level-objectives .actual-uptime {
+  font-size: var(--type-heading-m-size);
+  font-weight: bold;
+}
+
+.service-level-objectives .actual-uptime.ok {
+  color: var(--spectrum-green);
+}
+
+.service-level-objectives .actual-uptime.warn {
+  color: var(--spectrum-orange);
+}
+
+.service-level-objectives .actual-uptime.err {
+  color: var(--spectrum-red);
+}
+
+.service-level-objectives .target-slo {
+  font-size: var(--type-body-s-size);
+  color: var(--text-color-secondary);
+  font-weight: normal;
+}
+
+.service-level-objectives .slo-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bg-color-lightgrey);
+}
+
+.service-level-objectives .slo-footer p {
+  margin: 0;
+  font-size: var(--type-body-s-size);
+  color: var(--text-color-secondary);
+}
+
+.service-level-objectives .slo-footer a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.service-level-objectives .slo-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design for mobile */
+@media (width <= 600px) {
+  .service-level-objectives .service-row {
+    grid-template-columns: 1fr;
+  }
+
+  .service-level-objectives .service-value {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+  }
+
+  .service-level-objectives .service-incidents {
+    grid-row: 3;
+  }
+}
