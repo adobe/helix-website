@@ -12,6 +12,14 @@ import { generatePDFReport, downloadAsText } from '../../../blocks/rum-chat/pdf-
 // eslint-disable-next-line import/no-unresolved, import/no-relative-packages
 import { uploadToDA, getCurrentAnalyzedUrl } from '../../../blocks/rum-chat/da-upload.js';
 
+// Import OpTel Detective Report modal functionality
+// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
+import { openReportModal } from '../../../blocks/generate-ai-rum-report/generate-ai-rum-report.js';
+
+// Import Saved Reports functionality
+// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
+import { initializeSavedReports } from '../../../blocks/generate-ai-rum-report/report-actions.js';
+
 export default class FacetSidebar extends HTMLElement {
   constructor() {
     super();
@@ -78,7 +86,57 @@ export default class FacetSidebar extends HTMLElement {
 
     switchLabel.append(toggleInput, slider);
     analysisSwitcher.append(switchLabel);
-    quickFilter.append(filterInput, analysisSwitcher);
+
+    // Create metrics switcher (for saved reports)
+    const metricsSwitcher = document.createElement('div');
+    metricsSwitcher.className = 'analysis-switcher';
+    metricsSwitcher.title = 'Saved Reports';
+
+    const metricsSwitchLabel = document.createElement('label');
+    metricsSwitchLabel.className = 'switch';
+    const metricsToggleInput = document.createElement('input');
+    metricsToggleInput.type = 'checkbox';
+    metricsToggleInput.id = 'metrics-toggle';
+    const metricsSlider = document.createElement('span');
+    metricsSlider.className = 'slider';
+    metricsSlider.innerHTML = '📊';
+
+    metricsSwitchLabel.append(metricsToggleInput, metricsSlider);
+    metricsSwitcher.append(metricsSwitchLabel);
+
+    // Create OpTel Detective Report button - ASTHA NEW REPORT BUTTON
+    const generateReportButton = document.createElement('button');
+    generateReportButton.className = 'generate-ai-rum-report-button';
+    generateReportButton.title = 'OpTel Detective Report';
+    generateReportButton.innerHTML = '📄';
+    generateReportButton.style.cssText = `
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 8px 12px;
+      transition: all 0.2s;
+      margin-left: 8px;
+    `;
+    generateReportButton.addEventListener('mouseenter', () => {
+      generateReportButton.style.transform = 'scale(1.05)';
+      generateReportButton.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.3)';
+    });
+    generateReportButton.addEventListener('mouseleave', () => {
+      generateReportButton.style.transform = 'scale(1)';
+      generateReportButton.style.boxShadow = 'none';
+    });
+    generateReportButton.addEventListener('click', () => {
+      // Load the stylesheet dynamically
+      this.loadStylesheet('generate-ai-rum-report-styles', '/blocks/generate-ai-rum-report/generate-ai-rum-report.css');
+      // Open the modal
+      openReportModal();
+    });
+
+    quickFilter.append(filterInput, analysisSwitcher, metricsSwitcher, generateReportButton);
+    // end of ASTHA NEW REPORT BUTTON
     this.append(quickFilter);
 
     const selectFocus = document.createElement('form');
@@ -138,27 +196,41 @@ export default class FacetSidebar extends HTMLElement {
     this.elems.facetsElement = facetsElement;
     this.elems.selectFocus = selectFocus;
     this.elems.toggleInput = toggleInput;
+    this.elems.metricsToggleInput = metricsToggleInput;
     this.elems.analysisTile = analysisTile;
 
-    // Add toggle event listener
+    // Add toggle event listeners with mutual exclusivity
     toggleInput.addEventListener('change', () => {
-      this.toggleAnalysisMode(toggleInput.checked);
+      if (toggleInput.checked && metricsToggleInput.checked) metricsToggleInput.checked = false;
+      this.toggleMode('analysis', toggleInput.checked);
+    });
+
+    metricsToggleInput.addEventListener('change', () => {
+      if (metricsToggleInput.checked && toggleInput.checked) toggleInput.checked = false;
+      this.toggleMode('metrics', metricsToggleInput.checked);
     });
 
     // Restore toggle state from localStorage after page reload
-    const savedToggleState = localStorage.getItem('analysisToggleState');
-    if (savedToggleState === 'true') {
-      // Delay restoration to ensure DOM is fully ready
-      setTimeout(() => {
-        toggleInput.checked = true;
-        this.toggleAnalysisMode(true);
-        console.log('[Sidebar] Restored AI Insights view from previous session');
-      }, 100);
-    }
+    setTimeout(() => {
+      const restore = (key, input, mode) => {
+        if (localStorage.getItem(key) === 'true') {
+          input.checked = true;
+          this.toggleMode(mode, true);
+          return true;
+        }
+      };
+      restore('metricsToggleState', metricsToggleInput, 'metrics') 
+        || restore('analysisToggleState', toggleInput, 'analysis');
+    }, 100);
 
     predefinedFacets.forEach((facet) => {
       this.elems.facetsElement.append(facet);
     });
+
+    // Initialize saved reports after daterange-picker is ready
+    setTimeout(() => {
+      initializeSavedReports();
+    }, 500);
   }
 
   updateFacets(mode) {
@@ -192,38 +264,57 @@ export default class FacetSidebar extends HTMLElement {
     });
   }
 
-  toggleAnalysisMode(enabled) {
+  toggleMode(mode, enabled) {
+    const showFacets = !enabled;
+    this.elems.facetsElement.style.display = showFacets ? 'block' : 'none';
+    this.elems.selectFocus.style.display = showFacets ? 'block' : 'none';
+    this.elems.analysisTile.style.display = enabled ? 'block' : 'none';
+
     if (enabled) {
-      this.elems.facetsElement.style.display = 'none';
-      this.elems.selectFocus.style.display = 'none';
-      this.elems.analysisTile.style.display = 'block';
-      this.loadAnalysisInterface();
-      // Save toggle state to localStorage for persistence across reloads
-      localStorage.setItem('analysisToggleState', 'true');
+      const targetClass = mode === 'metrics' ? '.rum-metrics' : '.chat-interface';
+      if (!this.elems.analysisTile.querySelector(targetClass)) {
+        this.elems.analysisTile.innerHTML = '';
+        mode === 'metrics' ? this.loadMetricsInterface() : this.loadAnalysisInterface();
+      }
     } else {
-      this.elems.facetsElement.style.display = 'block';
-      this.elems.selectFocus.style.display = 'block';
-      this.elems.analysisTile.style.display = 'none';
-      // Save toggle state to localStorage
-      localStorage.setItem('analysisToggleState', 'false');
+      // Clear the analysis tile when toggling off to ensure fresh state on next toggle
+      this.elems.analysisTile.innerHTML = '';
+    }
+
+    const stateKey = mode === 'analysis' ? 'analysisToggleState' : 'metricsToggleState';
+    localStorage.setItem(stateKey, enabled.toString());
+  }
+
+  loadMetricsInterface() {
+    this.loadStylesheet('rum-metrics-styles', '/blocks/rum-metrics/rum-metrics.css');
+    Object.assign(this.elems.analysisTile.style, {
+      height: 'auto', display: 'flex', flexDirection: 'column', overflow: 'visible'
+    });
+
+    const container = document.createElement('div');
+    container.className = 'rum-metrics';
+    Object.assign(container.style, { width: '100%', height: 'auto' });
+    this.elems.analysisTile.appendChild(container);
+
+    import('../../../blocks/rum-metrics/rum-metrics.js')
+      .then((m) => m.default(container))
+      .catch((e) => {
+        container.innerHTML = `<div style="padding:20px;text-align:center;color:#d32f2f">
+          <p>Error loading saved reports.</p><p style="font-size:12px;color:#666">${e.message}</p></div>`;
+      });
+  }
+
+  loadStylesheet(id, href) {
+    if (!document.querySelector(`#${id}`)) {
+      document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href, id }));
     }
   }
 
   loadAnalysisInterface() {
-    // Load RUM chat CSS for proper styling
-    if (!document.querySelector('#rum-chat-styles')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = '/blocks/rum-chat/rum-chat.css';
-      link.id = 'rum-chat-styles';
-      document.head.appendChild(link);
-    }
-
-    // Set analysis tile height to match viewport like the left side graph
-    this.elems.analysisTile.style.height = 'calc(100vh - 200px)'; // Adjust for header space
-    this.elems.analysisTile.style.display = 'flex';
-    this.elems.analysisTile.style.flexDirection = 'column';
-    this.elems.analysisTile.style.overflow = 'hidden'; // No scrolling on the tile itself
+    this.loadStylesheet('rum-chat-styles', '/blocks/rum-chat/rum-chat.css');
+    Object.assign(this.elems.analysisTile.style, {
+      height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column', overflow: 'hidden'
+    });
 
     // Create the same RUM chat interface that appears in the sidebar
     if (!this.elems.analysisTile.querySelector('.chat-interface')) {
@@ -372,19 +463,19 @@ export default class FacetSidebar extends HTMLElement {
         return;
       }
 
-      // Add metrics=super to URL to ensure all checkpoints are available for analysis
-      const currentUrl = new URL(window.location);
+      // // Add metrics=super to URL to ensure all checkpoints are available for analysis
+      // const currentUrl = new URL(window.location);
       
-      if (!currentUrl.searchParams.has('metrics') || currentUrl.searchParams.get('metrics') !== 'super') {
-        currentUrl.searchParams.set('metrics', 'super');
-        window.history.replaceState({}, '', currentUrl);
-        console.log('[Sidebar] Added metrics=super to URL for comprehensive analysis');
+      // if (!currentUrl.searchParams.has('metrics') || currentUrl.searchParams.get('metrics') !== 'super') {
+      //   currentUrl.searchParams.set('metrics', 'super');
+      //   window.history.replaceState({}, '', currentUrl);
+      //   console.log('[Sidebar] Added metrics=super to URL for comprehensive analysis');
         
-        // Trigger a page reload to apply the new metrics parameter
-        // This ensures all checkpoints are loaded and available for analysis
-        window.location.reload();
-        return; // Exit early since we're reloading
-      }
+      //   // Trigger a page reload to apply the new metrics parameter
+      //   // This ensures all checkpoints are loaded and available for analysis
+      //   window.location.reload();
+      //   return; // Exit early since we're reloading
+      // }
 
       const isDetailed = detailedAnalysisCheckbox.checked;
       const originalText = startAnalysisButton.textContent;

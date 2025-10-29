@@ -201,8 +201,6 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('type', (bundle) => bundle.hostType);
 
-  dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
-
   dataChunks.addFacet(
     'conversions',
     (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
@@ -529,3 +527,6 @@ const io = new IntersectionObserver((entries) => {
 });
 
 io.observe(section);
+
+// Export draw function globally for report generator
+window.slicerDraw = draw;

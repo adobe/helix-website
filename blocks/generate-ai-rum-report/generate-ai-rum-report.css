@@ -1,0 +1,374 @@
+/* CSS Variables from rum-slicer.css */
+:root {
+  /* Colors */
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-border: #ccc;
+  --color-bg-light: #eee;
+  --color-bg-lighter: #fafafa;
+  --color-overlay: rgba(68, 68, 68, 0.7);
+  
+  /* Button colors */
+  --color-btn-primary: #28a745;
+  --color-btn-primary-hover: #218838;
+  --color-btn-disabled: #ccc;
+  
+  /* Status colors */
+  --color-success-bg: #adf4ce;
+  --color-success-text: #00653e;
+  --color-success-border: #49cc93;
+  --color-error-bg: #ffddd6;
+  --color-error-text: #b40000;
+  --color-error-border: #ff7c65;
+  --color-warning-bg: #ffdfad;
+  --color-warning-text: #cb5d00;
+  --color-warning-border: #ffa037;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 30px;
+  
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Transitions */
+  --transition-base: all 0.2s;
+}
+
+/* Modal Overlay */
+.report-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+/* Modal Container */
+.report-modal {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.report-modal-header {
+  padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.report-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.report-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-base);
+}
+
+.report-modal-close:hover {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-primary);
+}
+
+/* Modal Body */
+.report-modal-body {
+  padding: var(--spacing-2xl);
+}
+
+/* Form Group */
+.report-form-group {
+  margin-bottom: var(--spacing-xl);
+}
+
+.report-form-group label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.report-form-group input {
+  width: 100%;
+  padding: 10px var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: monospace;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.report-form-group input:focus {
+  outline: none;
+  border-color: var(--color-btn-primary);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.report-form-group input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* Buttons */
+.report-generate-btn,
+.report-action-btn.primary {
+  background: var(--color-btn-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.report-generate-btn {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 15px;
+}
+
+.report-generate-btn:hover:not(:disabled),
+.report-action-btn.primary:hover {
+  background: var(--color-btn-primary-hover);
+  transform: translateY(-1px);
+}
+
+.report-generate-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.report-generate-btn:disabled {
+  background: var(--color-btn-disabled);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+/* Info & Status Messages */
+.report-info,
+.report-status {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--spacing-xs);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.report-info {
+  background-color: var(--color-bg-light);
+  border-left: 3px solid var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.report-info p {
+  margin: 0;
+}
+
+.report-status {
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.report-status.success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+  border: 1px solid var(--color-success-border);
+}
+
+.report-status.error {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-text);
+  border: 1px solid var(--color-error-border);
+}
+
+.report-status.loading {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border: 1px solid var(--color-warning-border);
+}
+
+/* Circular Progress Bar */
+.circular-progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  margin: var(--spacing-xl) 0;
+}
+
+.circular-progress {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.circular-progress svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.circular-progress-bg {
+  fill: none;
+  stroke: var(--color-bg-light);
+  stroke-width: 8;
+}
+
+.circular-progress-bar {
+  fill: none;
+  stroke: url(#progressGradient);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+  filter: drop-shadow(0 2px 4px rgba(40, 167, 69, 0.3));
+}
+
+.circular-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-btn-primary);
+}
+
+.progress-status-text {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.progress-task-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Report Results Section */
+.report-results {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-lighter);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.report-results h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 16px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.report-file-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.report-file-icon svg {
+  margin-bottom: var(--spacing-md);
+}
+
+.report-file-label {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.report-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.report-action-btn {
+  flex: 1;
+  padding: 10px var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.report-action-btn.secondary {
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.report-action-btn.secondary:hover {
+  background: var(--color-border);
+}
+
+.report-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.circular-progress.animating svg {
+  animation: spin 2s linear infinite;
+}
+

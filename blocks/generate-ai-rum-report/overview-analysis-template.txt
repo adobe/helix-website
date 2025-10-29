@@ -1,0 +1,165 @@
+CREATE A STRUCTURED, SCANNABLE EXECUTIVE-LEVEL REPORT:
+
+⚠️ FORMAT REQUIREMENT - USE BULLETS IN PARAGRAPHS:
+- DO NOT write dense paragraphs of text
+- Use CLEAR HEADINGS with bold labels on separate lines (e.g., <b>Performance & Technical</b>)
+- Use BULLET POINTS (•) for all content, each wrapped in <p> tags: <p>• Bullet text here</p>
+- Wrap ALL text content in <p> tags for proper HTML structure
+- DO NOT use emojis in the report output
+- DO NOT use progress bars
+- Make the report EASY TO SCAN with clear structure and specific numbers
+
+⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:
+- You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)
+- Group related facets into natural categories and cover ALL of them in flowing bullet points
+- Go through the list SYSTEMATICALLY - don't skip any facet
+- Write naturally about multiple related facets together, not mechanically one-by-one
+- Balance positives and improvements in a conversational tone
+- This ensures ALL facets get coverage without mechanical repetition
+- Standard report: 1200-1400 words covering all facets
+- With forms data: 1400-1600 words (forms section + all other facets)
+
+⚠️ FORMS DATA PRIORITY:
+If fill_source, formsubmit_source, or formsubmit_target tools are available:
+- Forms section is MANDATORY and HIGH PRIORITY
+- Create dedicated forms section immediately after Executive Summary
+- Then continue with balanced facet coverage for all other facets
+
+<b>📅 Analysis Period</b>
+This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").
+
+<b>⚠️ Core Web Vitals Interpretation Guidelines</b>
+When analyzing LCP, CLS, and INP metrics:
+- If metric titles contain "and rising" or "and falling", these indicate TRENDS, not absolute performance
+- "Rising" means the metric is getting worse over time, "falling" means it's improving
+- DO NOT conclude the site is bad based solely on "rising" trends - consider the actual metric values
+- Focus on the current metric values and their impact, not just the trend direction
+- A metric can be "rising" but still within acceptable performance thresholds
+
+<b>🔍 Facet Analysis Guidelines</b>
+For ALL facets being analyzed:
+- ALWAYS check the title field of each facet (found in the help link's title attribute) to understand what it represents and its purpose
+- Use these descriptive titles to provide context and meaning to your insights and recommendations
+- DO NOT focus primarily on performance metrics - provide balanced analysis across ALL available facets
+- Include insights from user behavior, traffic acquisition, content engagement, errors, and other non-performance facets
+- Each facet provides unique business value - ensure comprehensive coverage of all data types
+
+<b>EXECUTIVE SUMMARY</b>
+Create a STRUCTURED, SCANNABLE summary (MAXIMUM 200 words) using this format:
+
+<b>Analysis Period:</b>
+<p>[Date range] - Start with this as the very first line</p>
+
+<b>Site Status:</b>
+<p>[1-2 sentence overall health assessment with specific metrics]</p>
+
+<b>Top 3 Critical Findings:</b>
+<p>1. [Finding with specific numbers and metrics]</p>
+<p>2. [Finding with specific numbers and metrics]</p>
+<p>3. [Finding with specific numbers and metrics]</p>
+
+<b>Top 3 Priority Actions:</b>
+<p>1. [Action with expected ROI/impact]</p>
+<p>2. [Action with expected ROI/impact]</p>
+<p>3. [Action with expected ROI/impact]</p>
+
+<b>Overall Recommendation:</b>
+<p>[Fix/Optimize/Monitor decision with brief rationale]</p>
+
+⚠️ EXCLUDE FORMS: If forms data is provided, forms get their own dedicated section. DO NOT mention forms in Executive Summary.
+
+⚠️ FORMAT: Use the exact structure shown above with bold labels and content in <p> tags for easy scanning. NO EMOJIS in output.
+
+<b>KEY METRICS & FINDINGS</b>
+⚠️ CRITICAL REQUIREMENT - SYSTEMATIC COVERAGE OF ALL NON-FORM FACETS:
+
+⚠️ USE THE FACET LIST: Above in the dashboard data, you received a "COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED" - this is your checklist.
+
+⚠️ EXCLUDE FORMS: If forms data was provided, it's already covered in the dedicated forms section above. DO NOT mention forms here.
+
+Create NATURAL, FLOWING insights organized by category that cover ALL NON-FORM facets from the provided list. Ensure complete coverage but write in a connected, narrative style.
+
+<b>How to ensure complete coverage:</b>
+- Group related facets into clear categories with bold headings (e.g., <b>Performance & Technical</b>, <b>Traffic & Acquisition</b>, <b>User Behavior & Engagement</b>, <b>Content Performance</b>, <b>Errors & Technical Issues</b>)
+- Within each category, write 2-4 bullet points that naturally discuss the facets in that group
+- Each bullet should flow naturally, mentioning multiple related facets together with specific metrics
+- Balance positives and areas for improvement in a natural conversational tone
+- Cross off each facet mentally as you cover it to ensure nothing is missed
+
+<b>Writing Style:</b>
+- Use CLEAR CATEGORY HEADINGS with <b>bold labels</b> on separate lines
+- Use BULLET POINTS (•) within each category, each wrapped in <p> tags: <p>• Content here</p>
+- Write in a NATURAL, CONVERSATIONAL flow - NOT mechanical [+]/[-] format
+- Discuss multiple related facets together in each bullet point
+- Use specific numbers and metrics from the actual data
+- Keep bullets concise but natural (2-3 sentences per bullet)
+- Wrap ALL text content in <p> tags for proper HTML structure
+- NO EMOJIS in the report content
+- NO progress bars
+
+<b>PRIORITY ACTION PLAN</b>
+Use structured format with clear categories:
+
+<b>HIGH PRIORITY (Implement First):</b>
+<p>• [Action 1]: [Expected impact with numbers] - [Timeframe]</p>
+<p>• [Action 2]: [Expected impact with numbers] - [Timeframe]</p>
+<p>• [Action 3]: [Expected impact with numbers] - [Timeframe]</p>
+
+<b>MEDIUM PRIORITY (Implement Second):</b>
+<p>• [Action 1]: [Expected impact with numbers] - [Timeframe]</p>
+<p>• [Action 2]: [Expected impact with numbers] - [Timeframe]</p>
+
+<b>Monitoring & Measurement:</b>
+<p>• [What to track and why]</p>
+<p>• [Key metrics to monitor with thresholds]</p>
+
+<b>Quick Wins:</b>
+<p>• [Easy implementation with immediate impact - 1-2 days]</p>
+<p>• [Low-effort high-impact fix - 1 week]</p>
+
+<b>BUSINESS IMPACT</b>
+Brief summary using structured bullets:
+
+<b>Performance Impact:</b>
+<p>[Core Web Vitals and UX effects with metrics]</p>
+
+<b>User Engagement:</b>
+<p>[Conversion opportunities and behavior insights with metrics]</p>
+
+<b>Traffic & Acquisition:</b>
+<p>[Channel effectiveness and growth opportunities with metrics]</p>
+
+<b>Content Effectiveness:</b>
+<p>[Engagement patterns and optimization opportunities with metrics]</p>
+
+<b>Technical Issues:</b>
+<p>[Error impact on UX and operations with severity levels]</p>
+
+<b>Market Opportunities:</b>
+<p>[Geographic/demographic insights with potential reach]</p>
+
+CRITICAL LENGTH & FORMAT REQUIREMENTS:
+- ENTIRE REPORT: 1200-1400 words
+- Executive Summary: Maximum 200 words in STRUCTURED format with bold labels
+- Key Metrics: 800-1000 words in STRUCTURED categories with bullet points
+- Priority Action Plan: 150-200 words in STRUCTURED bullet format
+- Business Impact: 150-200 words in STRUCTURED bullet format
+- Use bullet points and clear headings - NO dense paragraphs
+- Use specific metrics and actionable language
+- NO EMOJIS anywhere in the report content
+
+FORMATTING REQUIREMENTS:
+- Use HTML <b>text</b> tags for ALL headings and important text (NOT **text** markdown)
+- Wrap ALL text content in <p> tags: <p>Text content here</p>
+- Wrap each bullet point in <p> tags: <p>• Bullet text here</p>
+- Put headings on separate lines from content
+- Use HTML <b>tag</b> for any text that should appear bold
+- Do NOT use markdown formatting like **text** or *text*
+- DO NOT use <br> or <br/> tags - use <p> tags to separate content instead
+- NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)
+- NO progress bars (no ████████░░ or similar)
+- Output must render properly in HTML context
+
+CRITICAL: Use ONLY the actual data from the SOURCE MATERIAL provided above. 
+DO NOT use any example numbers, percentages, or metrics from this template.
+Extract real metrics from the dashboard data and insights provided.
