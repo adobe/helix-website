@@ -1,14 +1,14 @@
-// eslint-disable-next-line import/no-unresolved
-import { calculateUptime, getUptimeStatus } from 'https://www.aemstatus.net/scripts/slo-calculator.js';
-
 export default async function decorate(block) {
   try {
-    const response = await fetch('https://www.aemstatus.net/incidents/index.json');
-    if (!response.ok) {
-      throw new Error(`Failed to fetch incidents: ${response.status}`);
-    }
+    const [{ calculateUptime, getUptimeStatus }, { default: incidents }] = await Promise.all([
+      // eslint-disable-next-line import/no-unresolved
+      import('https://www.aemstatus.net/scripts/slo-calculator.js'),
+      fetch('https://www.aemstatus.net/incidents/index.json').then((r) => {
+        if (!r.ok) throw new Error(`Failed to fetch incidents: ${r.status}`);
+        return r.json();
+      }).then((data) => ({ default: data })),
+    ]);
 
-    const incidents = await response.json();
     const status = calculateUptime(incidents);
 
     block.innerHTML = '';
