@@ -40,12 +40,12 @@
 
 .service-level-objectives .service .uptime h4,
 .service-level-objectives .service .uptime p {
-  color: var(--color-accent-lightgreen-content, #3b5700);
+  color: #007a4d;
 }
 
 .service-level-objectives .service .uptime.ok h4,
 .service-level-objectives .service .uptime.ok p {
-  color: var(--color-accent-lightgreen-content, #3b5700);
+  color: #007a4d;
 }
 
 .service-level-objectives .service .uptime.warn h4,
