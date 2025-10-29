@@ -1,6 +1,6 @@
 /* Service Level Objective Block Styles */
 
-.slo {
+.service-level-objective {
   background: var(--color-background-light);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
@@ -8,11 +8,11 @@
   margin: var(--spacing-xl) 0;
 }
 
-.slo-container {
+.service-level-objective-container {
   max-width: 100%;
 }
 
-.slo-title {
+.service-level-objective-title {
   font-size: var(--type-heading-l-size);
   font-weight: var(--type-heading-l-weight);
   line-height: var(--type-heading-l-lh);
@@ -20,7 +20,7 @@
   margin: 0 0 var(--spacing-m) 0;
 }
 
-.slo-subtitle {
+.service-level-objective-subtitle {
   font-size: var(--type-body-m-size);
   line-height: var(--type-body-m-lh);
   color: var(--color-text-secondary);
@@ -104,13 +104,13 @@
   color: var(--color-text-secondary);
 }
 
-.slo-loading, .slo-error {
+.service-level-objective-loading, .service-level-objective-error {
   text-align: center;
   padding: var(--spacing-xxl);
   color: var(--color-text-secondary);
 }
 
-.slo-error {
+.service-level-objective-error {
   color: var(--color-error);
 }
 

@@ -135,14 +135,14 @@ const loadAndCalculateSLO = async (block) => {
     const status = calculateUptime(incidents);
 
     const containerEl = document.createElement('div');
-    containerEl.className = 'slo-container';
+    containerEl.className = 'service-level-objective-container';
 
     const titleEl = document.createElement('h2');
-    titleEl.className = 'slo-title';
+    titleEl.className = 'service-level-objective-title';
     titleEl.textContent = 'Actual Service Level Objectives';
 
     const subtitleEl = document.createElement('p');
-    subtitleEl.className = 'slo-subtitle';
+    subtitleEl.className = 'service-level-objective-subtitle';
     subtitleEl.textContent = 'Based on the last 90 days of incident data';
 
     const servicesEl = document.createElement('div');
@@ -165,7 +165,7 @@ const loadAndCalculateSLO = async (block) => {
     console.error('Error loading SLO data:', error);
 
     const errorEl = document.createElement('div');
-    errorEl.className = 'slo-error';
+    errorEl.className = 'service-level-objective-error';
     errorEl.innerHTML = `
       <p>Unable to load service level data. Please try again later.</p>
     `;
@@ -183,7 +183,7 @@ export default async function decorate(block) {
 
   // Add loading state
   const loadingEl = document.createElement('div');
-  loadingEl.className = 'slo-loading';
+  loadingEl.className = 'service-level-objective-loading';
   loadingEl.innerHTML = '<p>Loading service level data...</p>';
   block.appendChild(loadingEl);
 

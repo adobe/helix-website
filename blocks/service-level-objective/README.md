@@ -1,13 +1,13 @@
 # Service Level Objective (SLO) Block
 
-The SLO block calculates and displays actual service levels based on incident data from the AEM Status API.
+The Service Level Objective (SLO) block calculates and displays actual service levels based on incident data from the AEM Status API.
 
 ## Usage
 
-Add the SLO block to any page where you want to display actual service levels:
+Add the Service Level Objective block to any page where you want to display actual service levels:
 
 ```html
-<div class="slo">
+<div class="service-level-objective">
   <!-- Block will be automatically decorated -->
 </div>
 ```
