@@ -196,6 +196,9 @@
 
 .questionnaire details .has-logo .logo img {
   height: 100px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 @media (width >= 1200px) {
@@ -227,5 +230,7 @@
     left: 0;
     height: max-content;
     max-height: 100%;
+    width: 100%;
+    object-fit: contain;
   }
 }
