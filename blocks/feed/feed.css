@@ -24,6 +24,186 @@
   color: inherit;
 }
 
+.feed.blog.archive .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.feed.blog.archive .archive-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.feed.blog.archive .archive-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.feed.blog.archive .archive-search {
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+}
+
+.feed.blog.archive .archive-search input {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-m);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--spacing-xs);
+  font: inherit;
+  background-color: #fff;
+  color: inherit;
+}
+
+.feed.blog.archive .archive-search input:focus-visible {
+  outline: 2px solid var(--color-accent-purple-bg);
+  outline-offset: 2px;
+}
+
+.feed.blog.archive .archive-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.feed.blog.archive .archive-filter {
+  border: 1px solid var(--color-gray-200);
+  background: transparent;
+  color: inherit;
+  padding: calc(var(--spacing-xs) * 0.75) var(--spacing-s);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  font: inherit;
+}
+
+.feed.blog.archive .archive-filter:focus-visible {
+  outline: 2px solid var(--color-accent-purple-bg);
+  outline-offset: 2px;
+}
+
+.feed.blog.archive .archive-filter:hover {
+  border-color: var(--color-accent-purple-bg);
+}
+
+.feed.blog.archive .archive-filter-active {
+  background-color: var(--color-accent-purple-bg);
+  border-color: var(--color-accent-purple-bg);
+  color: var(--color-accent-purple-content);
+}
+
+.feed.blog.archive .archive-count {
+  font-weight: 600;
+  margin: 0;
+}
+
+.feed.blog.archive .archive-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+.feed.blog.archive .archive-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.feed.blog.archive .archive-year-heading {
+  font-size: var(--type-heading-l-size);
+  line-height: var(--type-heading-l-lh);
+  margin: 0;
+}
+
+.feed.blog.archive .archive-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--spacing-s);
+  grid-template-columns: 1fr;
+}
+
+.feed.blog.archive .archive-item {
+  background-color: var(--color-accent-purple-content);
+  border-radius: var(--spacing-xs);
+  padding: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  box-shadow: 0 6px 14px rgb(0 0 0 / 10%);
+}
+
+.feed.blog.archive .archive-item-date {
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  color: var(--color-gray-500);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.feed.blog.archive .archive-item-title {
+  margin: 0;
+  font-size: var(--type-heading-s-size);
+  line-height: var(--type-heading-s-lh);
+}
+
+.feed.blog.archive .archive-item-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.feed.blog.archive .archive-item-link:hover,
+.feed.blog.archive .archive-item-link:focus-visible {
+  text-decoration: underline;
+}
+
+.feed.blog.archive .archive-item-desc {
+  margin: 0;
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+}
+
+.feed.blog.archive .archive-empty-message {
+  margin: 0;
+  font-size: var(--type-body-m-size);
+  line-height: var(--type-body-m-lh);
+}
+
+@media screen and (width >= 768px) {
+  .feed.blog.archive .archive-controls {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .feed.blog.archive .archive-count {
+    margin-left: auto;
+  }
+}
+
+@media screen and (width >= 900px) {
+  .feed.blog.archive .archive-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (width >= 1200px) {
+  .feed.blog.archive .archive-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 /* Base blog container layout - mobile first */
 .blog-container {
   display: flex;
