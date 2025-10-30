@@ -1,4 +1,6 @@
 .service-level-objectives {
+  --spectrum-green-900: #007a4d;
+
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -40,7 +42,7 @@
 
 .service-level-objectives .service .uptime.ok h4,
 .service-level-objectives .service .uptime.ok p {
-  color: #007a4d;
+  color: var(--spectrum-green-900);
 }
 
 .service-level-objectives .service .uptime.warn h4,
