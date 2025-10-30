@@ -33,7 +33,7 @@ export default async function decorate(block) {
 
       uptimeDiv.innerHTML = `
         <h4>90-Day Uptime: ${serviceStatus.uptimePercentage}%</h4>
-        <p>${serviceStatus.numIncidents} incident${serviceStatus.numIncidents === 1 ? '' : 's'}</p>
+        <p><a href="https://www.aemstatus.net">${serviceStatus.numIncidents} incident${serviceStatus.numIncidents === 1 ? '' : 's'}</a></p>
       `;
 
       serviceDiv.appendChild(sloDiv);
