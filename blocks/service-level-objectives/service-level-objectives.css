@@ -1,4 +1,6 @@
 .service-level-objectives {
+  --spectrum-green-900: #007a4d;
+
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -40,7 +42,7 @@
 
 .service-level-objectives .service .uptime.ok h4,
 .service-level-objectives .service .uptime.ok p {
-  color: var(--color-success, #2fcc66);
+  color: var(--spectrum-green-900);
 }
 
 .service-level-objectives .service .uptime.warn h4,
@@ -57,6 +59,17 @@
   font-size: 0.875rem;
   font-weight: 400;
   color: var(--color-text-secondary, #666);
+}
+
+.service-level-objectives .service .uptime p a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.service-level-objectives .service .uptime p a:hover {
+  text-decoration-thickness: 2px;
 }
 
 @media (width <= 600px) {
