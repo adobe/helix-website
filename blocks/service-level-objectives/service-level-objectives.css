@@ -1,0 +1,67 @@
+.service-level-objectives {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.service-level-objectives .service {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border-gray, #e0e0e0);
+  border-radius: 8px;
+  background-color: var(--color-background-light, #f9f9f9);
+}
+
+.service-level-objectives .service .slo,
+.service-level-objectives .service .uptime {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.service-level-objectives .service h4 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.service-level-objectives .service p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #000);
+}
+
+.service-level-objectives .service .uptime.ok h4,
+.service-level-objectives .service .uptime.ok p {
+  color: var(--color-success, #2fcc66);
+}
+
+.service-level-objectives .service .uptime.warn h4,
+.service-level-objectives .service .uptime.warn p {
+  color: var(--color-warning, #f5a623);
+}
+
+.service-level-objectives .service .uptime.err h4,
+.service-level-objectives .service .uptime.err p {
+  color: var(--color-error, #e74c3c);
+}
+
+.service-level-objectives .service .uptime p:last-child {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-text-secondary, #666);
+}
+
+@media (width <= 600px) {
+  .service-level-objectives .service {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
