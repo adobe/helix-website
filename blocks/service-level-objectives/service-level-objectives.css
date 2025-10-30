@@ -59,6 +59,17 @@
   color: var(--color-text-secondary, #666);
 }
 
+.service-level-objectives .service .uptime p a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.service-level-objectives .service .uptime p a:hover {
+  text-decoration-thickness: 2px;
+}
+
 @media (width <= 600px) {
   .service-level-objectives .service {
     grid-template-columns: 1fr;
