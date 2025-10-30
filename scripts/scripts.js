@@ -101,7 +101,19 @@ export function addPublishDependencies(url) {
 export function addFavIcon(href) {
   const link = document.createElement('link');
   link.rel = 'icon';
-  link.type = 'image/png';
+  // infer type from extension with sensible defaults
+  try {
+    const url = new URL(href, window.location.origin);
+    const ext = (url.pathname.split('.').pop() || '').toLowerCase();
+    if (ext === 'svg') link.type = 'image/svg+xml';
+    else if (ext === 'ico') link.type = 'image/x-icon';
+    else link.type = 'image/png';
+  } catch (e) {
+    // fallback for non-URL-safe strings
+    if (href.endsWith('.svg')) link.type = 'image/svg+xml';
+    else if (href.endsWith('.ico')) link.type = 'image/x-icon';
+    else link.type = 'image/png';
+  }
   link.href = href;
   const existingLink = document.querySelector('head link[rel="icon"]');
   if (existingLink) {
@@ -660,6 +672,9 @@ async function loadEager(doc) {
   customDecorateTemplateAndTheme();
 
   await window.hlx.plugins.run('loadEager');
+
+  // Set favicon to AEM subcloud branding (see issue #664)
+  addFavIcon('https://cdn.experience.adobe.net/assets/AdobeExperienceSubCloud.6e2f998e.svg');
 
   // labs banner
   const labs = getMetadata('labs');
