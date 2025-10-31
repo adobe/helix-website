@@ -86,22 +86,27 @@ Determine what you're looking for and identify relevant search terms. **Think ab
 
 ### Step 2: Search Block Collection
 
-Execute the Block Collection search script from the project root:
+**IMPORTANT:** Use the GitHub API-based search for most reliable results:
 
 ```bash
-node .claude/skills/block-collection-and-party/scripts/search-block-collection.js <search-term>
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js <search-term>
 ```
+
+This searches actual block folders in the repository via GitHub API, not the navigation page, ensuring all blocks are discoverable.
 
 **Examples:**
 ```bash
 # Search for accordion/FAQ blocks
-node .claude/skills/block-collection-and-party/scripts/search-block-collection.js accordion
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js accordion
+
+# Search for embed block
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js embed
 
 # Search for carousel
-node .claude/skills/block-collection-and-party/scripts/search-block-collection.js carousel
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js carousel
 
 # Search for navigation/header
-node .claude/skills/block-collection-and-party/scripts/search-block-collection.js header
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js header
 ```
 
 ### Step 3: Search Block Party
@@ -342,10 +347,24 @@ Use the reference implementations to inform your approach:
 
 ## Troubleshooting
 
-**No results in Block Collection:**
-- Try alternative terms
-- Fall back to Block Party
+**No results in Block Collection (using the old search-block-collection.js script):**
+- The navigation-based script may miss blocks not listed in the nav
+- **Switch to the GitHub API script:** `search-block-collection-github.js`
+- This searches actual repository folders and is more comprehensive
+
+**No results even with GitHub API script:**
+- Try alternative search terms (e.g., "embed" vs "video", "faq" vs "accordion")
+- Fall back to Block Party search
+- If user insists the block exists, use WebFetch to manually check:
+  - `https://github.com/adobe/aem-block-collection/tree/main/blocks`
 - Consider building from scratch with guidance from `building-blocks` skill
+
+**IMPORTANT - When search returns no results but block likely exists:**
+- Don't immediately accept "no results" as definitive
+- If the user suggests a block should exist, investigate further
+- Common blocks that may exist: embed, video, form, consent-management
+- Use WebFetch to manually browse the GitHub repo
+- Cross-reference with blocks you know exist (like video, accordion, carousel)
 
 **Too many results in Block Party:**
 - Use `--category` to filter
