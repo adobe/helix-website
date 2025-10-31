@@ -309,8 +309,7 @@ export async function uploadToDA(content, options = {}) {
     
     const result = {
       success: true,
-      path: `/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`,
-      fullpath,
+      path: fullpath,
       filename,
       folder,
     };

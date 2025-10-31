@@ -4,6 +4,7 @@
 import { uploadToDA, getCurrentAnalyzedUrl, fetchReportsFromDA } from './da-upload.js';
 import { updateButtonState } from './modal-ui.js';
 import { closeReportModal } from './generate-ai-rum-report.js';
+import { showReportInline } from './report-viewer/report-viewer.js';
 
 const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
@@ -12,7 +13,7 @@ const CONFIG = {
     HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none;',
     ENTRY_UNVIEWED: 'color: #0066cc; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: 600;',
     ENTRY_VIEWED: 'color: #9370db; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: normal;',
-    BADGE: 'position: absolute; top: -2px; right: -2px; width: 12px; height: 12px; background: #ff4444; border-radius: 50%; z-index: 1000; pointer-events: none;',
+    BADGE: 'position: absolute; top: -4px; right: -4px; min-width: 20px; width: 20px; height: 20px; background: #ff4444; border-radius: 50%; z-index: 1000; pointer-events: none; color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1;',
   },
 };
 
@@ -43,6 +44,20 @@ async function handleSaveToDA(button, reportContent) {
 export async function getSavedReports() {
   try {
     return await fetchReportsFromDA();
+
+    // TODO: Remove this after testing
+    // const reports = await fetchReportsFromDA();
+
+    // // Add test report for testing
+    // const testReport = {
+    //   filename: 'optel-analysis-2025-10-29-13-57-44.html',
+    //   path: 'https://admin.da.live/source/asthabh23/da-demo/drafts/optel-reports/emigrationbrewing-com/optel-analysis-2025-10-29-13-57-44.html',
+    //   timestamp: new Date('2025-10-29T13:57:44').getTime(),
+    // };
+
+    // return [testReport, ...reports];
+
+    // TODO: Remove this after testing till this line
   } catch (error) {
     console.error('[OpTel Detective Report] Error fetching saved reports:', error);
     return [];
@@ -116,7 +131,8 @@ async function updateNotificationBadge() {
   
   const badge = Object.assign(document.createElement('div'), {
     className: 'report-notification-badge',
-    title: `${unviewedCount} new report${unviewedCount > 1 ? 's' : ''}`,
+    title: 'unviewed OpTel reports',
+    textContent: unviewedCount.toString(),
   });
   badge.style.cssText = CONFIG.STYLES.BADGE;
   
@@ -150,7 +166,7 @@ function addReportToDateRangePicker(result) {
     markReportAsViewed(result.path);
     entry.style.cssText = CONFIG.STYLES.ENTRY_VIEWED;
     await updateNotificationBadge();
-    window.open(result.path, '_blank');
+    showReportInline(result.path, result.filename);
   };
   
   // Find the last saved report entry or insert right after header
