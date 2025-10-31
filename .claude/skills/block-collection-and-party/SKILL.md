@@ -86,27 +86,34 @@ Determine what you're looking for and identify relevant search terms. **Think ab
 
 ### Step 2: Search Block Collection
 
-**IMPORTANT:** Use the GitHub API-based search for most reliable results:
+**IMPORTANT:** Run BOTH search scripts in parallel for comprehensive results:
 
 ```bash
-node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js <search-term>
+# Run both searches in parallel (preferred approach)
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js <search-term> & \
+node .claude/skills/block-collection-and-party/scripts/search-block-collection.js <search-term> & \
+wait
 ```
 
-This searches actual block folders in the repository via GitHub API, not the navigation page, ensuring all blocks are discoverable.
+**Why use both scripts:**
+- `search-block-collection-github.js` - Searches actual repository folders via GitHub API (most comprehensive)
+- `search-block-collection.js` - Searches navigation page (provides display names and catches edge cases)
+- Running both ensures maximum coverage and catches blocks that might be missed by either approach alone
 
 **Examples:**
 ```bash
-# Search for accordion/FAQ blocks
-node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js accordion
+# Search for accordion/FAQ blocks (both scripts)
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js accordion & \
+node .claude/skills/block-collection-and-party/scripts/search-block-collection.js accordion & \
+wait
 
-# Search for embed block
-node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js embed
+# Search for embed block (both scripts)
+node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js embed & \
+node .claude/skills/block-collection-and-party/scripts/search-block-collection.js embed & \
+wait
 
-# Search for carousel
+# If running both is problematic, prioritize the GitHub API version
 node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js carousel
-
-# Search for navigation/header
-node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js header
 ```
 
 ### Step 3: Search Block Party
@@ -255,14 +262,21 @@ Use the reference implementations to inform your approach:
 
 **Good Approach:**
 1. Recognize FAQ often uses accordion pattern
-2. Search Block Collection: `node .claude/skills/block-collection-and-party/scripts/search-block-collection.js accordion`
-3. Find the accordion block with JS, CSS, and live example URLs
-4. Review the implementation approach
-5. Adapt the pattern to your specific FAQ needs
+2. Search Block Collection with both scripts:
+   ```bash
+   node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js accordion & \
+   node .claude/skills/block-collection-and-party/scripts/search-block-collection.js accordion & \
+   wait
+   ```
+3. Review results from both searches (they should align, but running both ensures nothing is missed)
+4. Find the accordion block with JS, CSS, and live example URLs
+5. Review the implementation approach
+6. Adapt the pattern to your specific FAQ needs
 
 **Why this works:**
 - Used alternative term "accordion" for "FAQ"
 - Started with Block Collection (Adobe best practices)
+- Ran both search scripts for comprehensive coverage
 - Found a vetted, accessible, performant implementation
 
 ### Example 2: Finding Breadcrumb Implementation
@@ -270,16 +284,22 @@ Use the reference implementations to inform your approach:
 **User Request:** "Add breadcrumb navigation to the site"
 
 **Good Approach:**
-1. Search Block Collection first: `node .claude/skills/block-collection-and-party/scripts/search-block-collection.js breadcrumb`
-2. No results in Block Collection
+1. Search Block Collection first with both scripts:
+   ```bash
+   node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js breadcrumb & \
+   node .claude/skills/block-collection-and-party/scripts/search-block-collection.js breadcrumb & \
+   wait
+   ```
+2. Find that breadcrumbs is "default-content" (not a standalone block)
 3. Search Block Party: `node .claude/skills/block-collection-and-party/scripts/search-block-party.js breadcrumb`
 4. Find breadcrumb block in Block Party
 5. Review the implementation, noting it's community-contributed
 6. Evaluate if it meets your needs or needs adaptation
 
 **Why this works:**
-- Checked Block Collection first (best practices)
-- Fell back to Block Party when BC didn't have it
+- Checked Block Collection first with both scripts (best practices)
+- Discovered breadcrumbs exist in Block Collection but as default content (part of header block)
+- Fell back to Block Party for standalone implementation
 - Aware that Block Party code may need more review
 
 ### Example 3: Integrating Sass
@@ -305,8 +325,13 @@ Use the reference implementations to inform your approach:
 **Scenario:** Both Block Collection and Block Party have carousel implementations
 
 **Good Approach:**
-1. Search Block Collection: `node .claude/skills/block-collection-and-party/scripts/search-block-collection.js carousel`
-2. Find Block Collection carousel
+1. Search Block Collection with both scripts:
+   ```bash
+   node .claude/skills/block-collection-and-party/scripts/search-block-collection-github.js carousel & \
+   node .claude/skills/block-collection-and-party/scripts/search-block-collection.js carousel & \
+   wait
+   ```
+2. Find Block Collection carousel from both search results
 3. Also search Block Party: `node .claude/skills/block-collection-and-party/scripts/search-block-party.js carousel`
 4. Find multiple Block Party carousels
 5. **Prefer Block Collection** for best practices
@@ -314,7 +339,8 @@ Use the reference implementations to inform your approach:
 7. Make informed decision based on requirements
 
 **Why this works:**
-- Searched both resources to see all options
+- Searched Block Collection with both scripts for comprehensive coverage
+- Searched Block Party to see all options
 - Defaulted to Block Collection (Adobe vetted)
 - Considered Block Party for potential innovations
 - Made an informed decision rather than blindly copying
@@ -347,20 +373,23 @@ Use the reference implementations to inform your approach:
 
 ## Troubleshooting
 
-**No results in Block Collection (using the old search-block-collection.js script):**
-- The navigation-based script may miss blocks not listed in the nav
-- **Switch to the GitHub API script:** `search-block-collection-github.js`
-- This searches actual repository folders and is more comprehensive
-
-**No results even with GitHub API script:**
+**No results from both Block Collection scripts:**
+- Running both scripts ensures comprehensive coverage
+- If neither script returns results, the block likely doesn't exist in Block Collection
 - Try alternative search terms (e.g., "embed" vs "video", "faq" vs "accordion")
 - Fall back to Block Party search
 - If user insists the block exists, use WebFetch to manually check:
   - `https://github.com/adobe/aem-block-collection/tree/main/blocks`
 - Consider building from scratch with guidance from `building-blocks` skill
 
+**Different results between the two scripts:**
+- This is normal - the GitHub API script searches folder names, the nav script searches the navigation
+- Both results are valid - review both to ensure you haven't missed anything
+- Prefer GitHub API results if there's a discrepancy (it's more direct)
+
 **IMPORTANT - When search returns no results but block likely exists:**
 - Don't immediately accept "no results" as definitive
+- Running both scripts maximizes chances of finding existing blocks
 - If the user suggests a block should exist, investigate further
 - Common blocks that may exist: embed, video, form, consent-management
 - Use WebFetch to manually browse the GitHub repo
