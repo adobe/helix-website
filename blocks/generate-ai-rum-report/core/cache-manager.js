@@ -3,6 +3,8 @@
  * Handles analysis result caching and validation
  */
 
+/* eslint-disable no-console */
+
 // Cache configuration
 const CACHE_KEY = 'rumAnalysisCache_aiReport';
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours
@@ -34,13 +36,25 @@ function setAnalysisCache(cacheData) {
 }
 
 /**
+ * Clear analysis cache
+ */
+export function clearAnalysisCache() {
+  try {
+    localStorage.removeItem(CACHE_KEY);
+    console.log('[Cache] Analysis cache cleared');
+  } catch (error) {
+    console.warn('[Cache] Error clearing cache:', error);
+  }
+}
+
+/**
  * Check if cache is valid for the given dashboard hash
  * @param {string} currentDashboardHash - Current dashboard data hash
  * @returns {boolean} True if cache is valid
  */
 export function isCacheValid(currentDashboardHash) {
   const analysisCache = getAnalysisCache();
-  
+
   if (!analysisCache || !analysisCache.timestamp) {
     return false;
   }
@@ -78,18 +92,6 @@ export function cacheAnalysisResult(result, dashboardDataHash) {
   };
   setAnalysisCache(cacheData);
   console.log('[Cache] Analysis result cached for 4 hours');
-}
-
-/**
- * Clear analysis cache
- */
-export function clearAnalysisCache() {
-  try {
-    localStorage.removeItem(CACHE_KEY);
-    console.log('[Cache] Analysis cache cleared');
-  } catch (error) {
-    console.warn('[Cache] Error clearing cache:', error);
-  }
 }
 
 /**

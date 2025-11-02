@@ -4,7 +4,7 @@
  */
 
 import { createModalStructure, showStatus } from './modal-ui.js';
-import { generateReport } from './report-generator.js';
+import generateReport from './report-generator.js';
 
 // Constants
 const API_KEY_STORAGE_KEY = 'anthropicApiKey';
@@ -12,35 +12,40 @@ const API_KEY_STORAGE_KEY = 'anthropicApiKey';
 let modalInstance = null;
 
 /**
- * Create and show the report generation modal
+ * Remove metrics=super parameter and uncheck all checkpoints
  */
-export function openReportModal() {
-  // Remove existing modal if any
-  if (modalInstance) {
-    closeReportModal();
-  }
+function cleanupMetricsParameter() {
+  const currentUrl = new URL(window.location);
 
-  // Check if API key exists
-  const hasApiKey = !!localStorage.getItem(API_KEY_STORAGE_KEY);
+  // Check if metrics=super was added
+  if (currentUrl.searchParams.get('metrics') === 'super') {
+    // Remove metrics parameter
+    currentUrl.searchParams.delete('metrics');
 
-  // Create modal structure
-  const { overlay, modal } = createModalStructure(hasApiKey);
+    // Remove all checkpoint parameters
+    currentUrl.searchParams.delete('checkpoint');
 
-  // Add click-outside-to-close functionality
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      closeReportModal();
+    // Update URL
+    window.history.replaceState({}, '', currentUrl);
+
+    // Uncheck all checkpoint checkboxes in the sidebar
+    const sidebar = document.querySelector('facet-sidebar');
+    if (sidebar) {
+      const checkpointInputs = sidebar.querySelectorAll('input[id^="checkpoint="]');
+      checkpointInputs.forEach((input) => {
+        input.checked = false;
+        input.indeterminate = false;
+      });
     }
-  });
 
-  // Append to document
-  document.body.appendChild(overlay);
-  modalInstance = overlay;
-
-  // Set up event listeners
-  setupModalEventListeners(modal);
-
-  return overlay;
+    // Refresh dashboard to reflect changes
+    if (typeof window.slicerDraw === 'function') {
+      window.slicerDraw().catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error('[OpTel Detective Report] Error refreshing dashboard:', err);
+      });
+    }
+  }
 }
 
 /**
@@ -54,52 +59,6 @@ export function closeReportModal() {
 
     cleanupMetricsParameter();
   }
-}
-  
-/**
- * Remove metrics=super parameter and uncheck all checkpoints
- */
-function cleanupMetricsParameter() {
-  const currentUrl = new URL(window.location);
-  
-  // Check if metrics=super was added
-  if (currentUrl.searchParams.get('metrics') === 'super') {
-    console.log('[OpTel Detective Report] Cleaning up metrics=super and checkpoints');
-    
-    // Remove metrics parameter
-    currentUrl.searchParams.delete('metrics');
-    
-    // Remove all checkpoint parameters
-    currentUrl.searchParams.delete('checkpoint');
-    
-    // Update URL
-    window.history.replaceState({}, '', currentUrl);
-    
-    // Uncheck all checkpoint checkboxes in the sidebar
-    const sidebar = document.querySelector('facet-sidebar');
-    if (sidebar) {
-      const checkpointInputs = sidebar.querySelectorAll('input[id^="checkpoint="]');
-      checkpointInputs.forEach(input => {
-        input.checked = false;
-        input.indeterminate = false;
-      });
-    }
-    
-    // Refresh dashboard to reflect changes
-    if (typeof window.slicerDraw === 'function') {
-      window.slicerDraw().catch(err => 
-        console.error('[OpTel Detective Report] Error refreshing dashboard:', err)
-      );
-    }
-  }
-}
-
-/**
- * Set up event listeners for modal interactions
- */
-function setupModalEventListeners(modal) {
-  setupCloseHandlers(modal);
-  setupGenerateButton(modal);
 }
 
 /**
@@ -152,6 +111,45 @@ function setupGenerateButton(modal) {
   });
 }
 
+/**
+ * Set up event listeners for modal interactions
+ */
+function setupModalEventListeners(modal) {
+  setupCloseHandlers(modal);
+  setupGenerateButton(modal);
+}
+
+/**
+ * Create and show the report generation modal
+ */
+export function openReportModal() {
+  // Remove existing modal if any
+  if (modalInstance) {
+    closeReportModal();
+  }
+
+  // Check if API key exists
+  const hasApiKey = !!localStorage.getItem(API_KEY_STORAGE_KEY);
+
+  // Create modal structure
+  const { overlay, modal } = createModalStructure(hasApiKey);
+
+  // Add click-outside-to-close functionality
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      closeReportModal();
+    }
+  });
+
+  // Append to document
+  document.body.appendChild(overlay);
+  modalInstance = overlay;
+
+  // Set up event listeners
+  setupModalEventListeners(modal);
+
+  return overlay;
+}
 
 /**
  * Default export for block initialization
@@ -164,4 +162,3 @@ export default function decorate(block) {
   button.addEventListener('click', openReportModal);
   block.appendChild(button);
 }
-

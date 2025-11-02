@@ -3,6 +3,8 @@
  * Extracts metrics and segment data from the RUM dashboard DOM
  */
 
+/* eslint-disable no-console */
+
 /**
  * Extract all dashboard data including metrics and segments
  * @returns {Promise<Object>} Dashboard data with metrics, segments, and date range
@@ -29,19 +31,19 @@ export function extractDashboardData() {
       const keyMetricsContainer = document.querySelector('.key-metrics');
       if (keyMetricsContainer) {
         const metricItems = keyMetricsContainer.querySelectorAll('li[id]');
-        
+
         metricItems.forEach((item) => {
           const metricName = item.querySelector('h2')?.textContent?.trim() || item.id;
           const numberFormat = item.querySelector('number-format');
           const metricValue = numberFormat?.textContent?.trim();
           const metricTitle = numberFormat?.getAttribute('title');
-          
+
           if (metricName && metricValue && metricValue !== '0') {
             dashboardData.metrics[metricName] = metricTitle || metricValue;
             console.log(`[Dashboard Data] ✓ Captured metric: ${metricName} = ${metricTitle || metricValue}`);
           }
         });
-        
+
         console.log(`[Dashboard Data] ✓ Successfully captured ${Object.keys(dashboardData.metrics).length} metrics`);
       }
 
@@ -49,7 +51,6 @@ export function extractDashboardData() {
       const facetSidebar = document.querySelector('facet-sidebar');
       if (facetSidebar) {
         const facets = facetSidebar.querySelectorAll('list-facet, link-facet, literal-facet');
-        
         facets.forEach((facet) => {
           const facetName = facet.getAttribute('facet');
           if (!facetName) return;
@@ -120,14 +121,13 @@ export function generateDashboardHash(dashboardData) {
     }, {}),
     dateRange: dashboardData.dateRange,
   });
-  
-  // Simple hash function
+
+  // Simple hash function using Math operations instead of bitwise
   let hash = 0;
   for (let i = 0; i < dataString.length; i += 1) {
     const char = dataString.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash &= hash; // Convert to 32bit integer
+    hash = ((hash * 31) + char) % 2147483647;
   }
-  
+
   return hash.toString(36);
 }

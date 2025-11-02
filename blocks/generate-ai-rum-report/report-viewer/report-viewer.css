@@ -3,7 +3,7 @@
  */
 
 /* ============================================================================
-   CSS CUSTOM PROPERTIES
+   CSS CUSTOM PROPERTIES & BASE CONTAINER
    ========================================================================= */
 
 .report-viewer {
@@ -13,7 +13,7 @@
   --header-bg: var(--light-indigo, #e8eaf6);
   --text-primary: #333;
   --text-secondary: #666;
-  
+
   /* Spacing Variables */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -21,24 +21,19 @@
   --spacing-lg: 16px;
   --spacing-xl: 24px;
   --spacing-2xl: 32px;
-  
+
   /* Border Variables */
   --border-width: 2px;
   --border-radius: 4px;
   --border-radius-lg: 8px;
-  
+
   /* Typography */
   --font-size-sm: 13px;
   --font-size-base: 14px;
   --font-size-lg: 16px;
   --font-size-xl: 18px;
-}
 
-/* ============================================================================
-   BASE CONTAINER
-   ========================================================================= */
-
-.report-viewer {
+  /* Base Container */
   display: none;
   max-width: 100%;
 }
@@ -50,8 +45,7 @@
 /* Report viewer inside facet-sidebar */
 facet-sidebar .report-viewer {
   width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto hidden;
   box-sizing: border-box;
   margin-top: var(--spacing-lg);
   padding-top: var(--spacing-lg);
@@ -79,7 +73,7 @@ facet-sidebar.report-view-active > form {
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--btn-bg);
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .report-metadata {
@@ -103,8 +97,7 @@ facet-sidebar.report-view-active > form {
    BUTTONS
    ========================================================================= */
 
-.report-back-btn,
-.report-error button {
+.report-back-btn {
   background: var(--btn-bg);
   color: white;
   border: none;
@@ -114,20 +107,28 @@ facet-sidebar.report-view-active > form {
   font-size: var(--font-size-base);
   font-weight: 500;
   transition: background-color 0.2s ease;
-}
-
-.report-back-btn:hover,
-.report-error button:hover {
-  background: var(--btn-bg-hover);
-}
-
-.report-back-btn {
   margin-bottom: var(--spacing-md);
 }
 
+.report-back-btn:hover {
+  background: var(--btn-bg-hover);
+}
+
 .report-error button {
-  margin-top: var(--spacing-lg);
+  background: var(--btn-bg);
+  color: white;
+  border: none;
   padding: 10px 20px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  margin-top: var(--spacing-lg);
+}
+
+.report-error button:hover {
+  background: var(--btn-bg-hover);
 }
 
 /* ============================================================================
@@ -238,7 +239,7 @@ facet-sidebar.report-view-active > form {
    RESPONSIVE DESIGN
    ========================================================================= */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .report-viewer {
     --spacing-md: 8px;
     --spacing-lg: 12px;

@@ -35,16 +35,16 @@ const BATCH_CONFIG = {
 function createBatches(tools) {
   const batches = [];
   const totalBatches = Math.ceil(tools.length / BATCH_CONFIG.TOOLS_PER_BATCH);
-  
+
   for (let i = 0; i < totalBatches; i += 1) {
     const start = i * BATCH_CONFIG.TOOLS_PER_BATCH;
     const batchTools = tools.slice(start, start + BATCH_CONFIG.TOOLS_PER_BATCH);
-    
+
     if (batchTools.length > 0) {
       batches.push({ id: i + 1, tools: batchTools });
     }
   }
-  
+
   return batches;
 }
 
@@ -57,23 +57,23 @@ function formatDashboardData(dashboardData) {
   const metrics = Object.entries(dashboardData.metrics || {})
     .map(([k, v]) => `- ${k}: ${v}`)
     .join('\n');
-  
+
   const segments = Object.entries(dashboardData.segments || {})
     .map(([segment, items]) => {
       const top5 = items.slice(0, 5)
-        .map(item => {
-          const metrics = item.metrics && Object.keys(item.metrics).length > 0
+        .map((item) => {
+          const itemMetrics = item.metrics && Object.keys(item.metrics).length > 0
             ? `, metrics: ${JSON.stringify(item.metrics)}`
             : '';
-          return `${item.value} (${item.count.toLocaleString()}${metrics})`;
+          return `${item.value} (${item.count.toLocaleString()}${itemMetrics})`;
         })
         .join(', ');
-      
+
       const more = items.length > 5 ? ` ... and ${items.length - 5} more` : '';
       return `${segment}: ${top5}${more}`;
     })
     .join('\n');
-  
+
   return `DASHBOARD DATA:
 ${metrics}
 
@@ -92,12 +92,12 @@ ${segments}`;
 function createBatchMessage(batch, baseMessage, dashboardData, isFirstBatch) {
   const tool = batch.tools[0]; // Single tool per batch
   const toolName = tool.name;
-  
+
   if (isFirstBatch) {
-    const dateRange = dashboardData.dateRange 
+    const dateRange = dashboardData.dateRange
       ? `📅 This data covers: ${dashboardData.dateRange.toUpperCase()}`
       : '⚠️ Date range not specified';
-    
+
     return `${baseMessage}
 
 ==== DATA TIME PERIOD ====
@@ -123,7 +123,7 @@ INSTRUCTIONS:
 
 Start by calling the tool.`;
   }
-  
+
   return `ANALYZE METRIC: ${toolName}
 
 INSTRUCTIONS:
@@ -158,12 +158,11 @@ async function processBatch(
   systemPrompt,
   apiKey,
   toolHandler,
-  progressCallback
 ) {
   const batchMessage = createBatchMessage(batch, message, dashboardData, batch.id === 1);
-  
+
   const toolName = batch.tools[0].name; // Single tool per batch
-  
+
   try {
     const request = {
       model: API_CONFIG.MODEL,
@@ -173,7 +172,7 @@ async function processBatch(
       system: systemPrompt,
       temperature: API_CONFIG.TEMPERATURE,
     };
-    
+
     const response = await fetch(API_CONFIG.ENDPOINT, {
       method: 'POST',
       headers: {
@@ -182,32 +181,34 @@ async function processBatch(
       },
       body: JSON.stringify(request),
     });
-    
+
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
-      const error = errorText.includes('524') 
+      const error = errorText.includes('524')
         ? 'Timeout - analysis took too long'
         : `HTTP ${response.status}`;
       throw new Error(error);
     }
-    
+
     const data = await response.json();
-    
+
     if (!data.content?.length) {
-      return { batchId: batch.id, toolName, analysis: '', success: false, error: 'No content' };
+      return {
+        batchId: batch.id, toolName, analysis: '', success: false, error: 'No content',
+      };
     }
-    
+
     let analysis = '';
     const toolCalls = [];
-    
-    data.content.forEach(item => {
+
+    data.content.forEach((item) => {
       if (item.type === 'text' && item.text.trim()) {
         analysis += `${item.text.trim()}\n`;
       } else if (item.type === 'tool_use') {
         toolCalls.push(item);
       }
     });
-    
+
     // Execute tool calls (should be 1 call per batch)
     if (toolCalls.length > 0) {
       await Promise.all(
@@ -217,12 +218,12 @@ async function processBatch(
           } catch (error) {
             console.error(`[${toolName}] Tool error:`, error.message);
           }
-        })
+        }),
       );
     } else {
       console.warn(`[${toolName}] ⚠️ Tool not used by AI`);
     }
-    
+
     return {
       batchId: batch.id,
       toolName,
@@ -231,7 +232,7 @@ async function processBatch(
     };
   } catch (error) {
     console.error(`[${toolName}] ✗ Error:`, error.message);
-    
+
     return {
       batchId: batch.id,
       toolName,
@@ -251,9 +252,9 @@ async function processBatch(
  */
 async function performFollowUpAnalysis(analyses, systemPrompt, apiKey) {
   if (analyses.length === 0) return null;
-  
+
   console.log('[Follow-up] Generating comprehensive insights...');
-  
+
   const content = `Based on the comprehensive tool execution results from all batches, provide detailed insights analysis:
 
 BATCH RESULTS:
@@ -262,13 +263,13 @@ ${analyses.join('\n\n')}
 Analyze the findings and provide substantial insights covering:
 - Performance patterns and bottlenecks discovered
 - User behavior insights and engagement patterns
-- Traffic acquisition analysis and channel effectiveness  
+- Traffic acquisition analysis and channel effectiveness
 - Business impact findings and conversion opportunities
 - Technical issues, errors, and optimization recommendations
 - Cross-batch correlations and key discoveries
 
 Provide comprehensive analysis with specific details and actionable insights.`;
-  
+
   try {
     const response = await fetch(API_CONFIG.ENDPOINT, {
       method: 'POST',
@@ -284,25 +285,25 @@ Provide comprehensive analysis with specific details and actionable insights.`;
         temperature: API_CONFIG.FOLLOWUP_TEMPERATURE,
       }),
     });
-    
+
     if (!response.ok) return null;
-    
+
     const data = await response.json();
-    
+
     if (!data.content?.length) return null;
-    
+
     let synthesis = '';
-    data.content.forEach(item => {
+    data.content.forEach((item) => {
       if (item.type === 'text' && item.text.trim()) {
         synthesis += `${item.text.trim()}\n`;
       }
     });
-    
+
     if (synthesis) {
       console.log('[Follow-up] ✓ Complete');
       return synthesis;
     }
-    
+
     return null;
   } catch (error) {
     console.error('[Follow-up] Error:', error.message);
@@ -332,21 +333,28 @@ export async function processParallelBatches(
   apiKey,
   message,
   toolHandler,
-  progressCallback = null
+  progressCallback = null,
 ) {
   console.log('[Parallel] Starting analysis of', facetTools.length, 'metrics (all in parallel)');
-  
+
   const batches = createBatches(facetTools);
   console.log(`[Parallel] Processing ${batches.length} metrics simultaneously`);
-  
+
   let completedBatches = 0;
   const updateProgress = () => {
     if (progressCallback && batches.length > 0) {
-      const percent = Math.round((completedBatches / batches.length) * BATCH_CONFIG.PROGRESS_WEIGHT);
-      progressCallback(2, 'in-progress', `Analyzing metrics... ${completedBatches}/${batches.length} complete`, percent);
+      const percent = Math.round(
+        (completedBatches / batches.length) * BATCH_CONFIG.PROGRESS_WEIGHT,
+      );
+      progressCallback(
+        2,
+        'in-progress',
+        `Analyzing metrics... ${completedBatches}/${batches.length} complete`,
+        percent,
+      );
     }
   };
-  
+
   // Process ALL metrics in parallel (one per batch)
   const results = await Promise.all(
     batches.map(async (batch) => {
@@ -357,53 +365,51 @@ export async function processParallelBatches(
         systemPrompt,
         apiKey,
         toolHandler,
-        progressCallback
       );
-      
+
       completedBatches += 1;
       updateProgress();
-      
+
       return result;
-    })
+    }),
   );
-  
+
   // Collect successful analyses
   const successful = results
-    .filter(r => r.success)
-    .map(r => r.analysis?.trim())
+    .filter((r) => r.success)
+    .map((r) => r.analysis?.trim())
     .filter(Boolean);
-  
-  const failed = results.filter(r => !r.success);
-  
+
+  const failed = results.filter((r) => !r.success);
+
   console.log(`[Parallel] ✓ ${successful.length}/${results.length} metrics analyzed successfully`);
-  
+
   if (failed.length > 0) {
-    console.warn(`[Parallel] ⚠️ ${failed.length} metrics failed:`, failed.map(f => f.toolName).join(', '));
+    console.warn(`[Parallel] ⚠️ ${failed.length} metrics failed:`, failed.map((f) => f.toolName).join(', '));
   }
-  
+
   // Perform follow-up synthesis
   let followUp = null;
   if (successful.length > 0) {
     if (progressCallback) {
       progressCallback(2, 'in-progress', 'Synthesizing comprehensive insights...', 85);
     }
-    
+
     followUp = await performFollowUpAnalysis(successful, systemPrompt, apiKey);
-    
+
     if (progressCallback && followUp) {
       progressCallback(2, 'in-progress', 'Analysis complete', 100);
     }
   }
-  
+
   // Return all analyses including synthesis
   const allAnalyses = [...successful];
   if (followUp) allAnalyses.push(followUp);
-  
+
   const totalChars = allAnalyses.reduce((sum, a) => sum + a.length, 0);
   console.log(`[Parallel] ✓ Complete. ${successful.length} metrics, ${totalChars.toLocaleString()} total characters`);
-  
+
   return allAnalyses;
 }
 
 export default processParallelBatches;
-

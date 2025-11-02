@@ -3,6 +3,8 @@
  * Core AI orchestration for RUM dashboard analysis
  */
 
+/* eslint-disable no-console */
+
 import { extractDashboardData, generateDashboardHash } from './dashboard-extractor.js';
 import {
   extractFacetsFromExplorer,
@@ -67,89 +69,123 @@ async function getOverviewAnalysisTemplate() {
 }
 
 /**
- * Run complete RUM analysis
- * @param {Function} progressCallback - Progress callback function
- * @returns {Promise<string>} Analysis result
+ * Build form data section for the analysis
+ * @param {Object} dashboardData - Dashboard data
+ * @returns {string} Form data section text
  */
-export async function runCompleteRumAnalysis(progressCallback = null) {
-  console.log('[Analysis Engine] Starting RUM analysis...');
+function buildFormDataSection(dashboardData) {
+  let section = '\n\n==== 📝 FORMS DATA - FOR DEDICATED FORMS SECTION ONLY ====\n';
+  section += '⚠️ This data is ONLY for the "Forms Interaction & Conversion Analysis" section.\n';
+  section += '⚠️ DO NOT mention forms in Executive Summary, Key Metrics, or other sections.\n\n';
 
-  try {
-    // Step 1: Initialize analysis environment
-    if (progressCallback) {
-      progressCallback(0, 'in-progress', 'Setting up analysis tools...');
-    }
-
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        console.log('[Analysis Engine] Initializing facet manipulation...');
-        initializeDynamicFacets();
-        if (progressCallback) {
-          progressCallback(0, 'completed', 'Analysis environment ready');
-        }
-        resolve();
-      }, 200);
+  if (dashboardData.segments['fill.source']) {
+    section += '<b>FILL.SOURCE (Form Entry Pages):</b>\n';
+    dashboardData.segments['fill.source'].slice(0, 10).forEach((item, idx) => {
+      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form starts`;
+      if (item.metrics && Object.keys(item.metrics).length > 0) {
+        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
+      }
+      section += '\n';
     });
-
-    // Step 2: Extract dashboard data
-    if (progressCallback) {
-      progressCallback(1, 'in-progress', 'Scanning dashboard for data and available tools...');
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    console.log('[Analysis Engine] Extracting dashboard data...');
-    const dashboardData = await extractDashboardData();
-    console.log('[Analysis Engine] Dashboard data extracted:', {
-      metrics: Object.keys(dashboardData.metrics).length,
-      segments: Object.keys(dashboardData.segments).length,
-      dateRange: dashboardData.dateRange,
-    });
-
-    // Generate hash for cache validation
-    const currentDashboardHash = generateDashboardHash(dashboardData);
-
-    // Check cache
-    if (isCacheValid(currentDashboardHash)) {
-      console.log('[Analysis Engine] Using cached analysis');
-      const cachedResult = getCachedResult();
-      if (cachedResult) {
-        if (progressCallback) {
-          progressCallback(1, 'completed', 'Using cached analysis');
-          progressCallback(2, 'completed', 'Skipped (using cache)');
-          progressCallback(3, 'completed', 'Using cached report');
-        }
-        return cachedResult;
-      }
-    }
-
-    // Extract facet tools
-    const facetTools = extractFacetsFromExplorer();
-    console.log(`[Analysis Engine] Found ${facetTools.length} facet tools`);
-
-    if (facetTools.length > 0) {
-      if (progressCallback) {
-        progressCallback(1, 'completed', `Found ${facetTools.length} analysis metrics ready`);
-      }
-    } else {
-      if (progressCallback) {
-        progressCallback(1, 'completed', 'Basic analysis mode - no advanced tools found');
-      }
-    }
-
-    // Step 3: Run AI analysis
-    const response = await callAnthropicAPI(
-      dashboardData,
-      currentDashboardHash,
-      facetTools,
-      progressCallback,
-    );
-
-    return response;
-  } catch (error) {
-    console.error('[Analysis Engine] Error:', error);
-    throw error;
+    section += '\n';
   }
+
+  if (dashboardData.segments['formsubmit.source']) {
+    section += '<b>FORMSUBMIT.SOURCE (Form Submission Pages):</b>\n';
+    dashboardData.segments['formsubmit.source'].slice(0, 10).forEach((item, idx) => {
+      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form submissions`;
+      if (item.metrics && Object.keys(item.metrics).length > 0) {
+        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
+      }
+      section += '\n';
+    });
+    section += '\n';
+  }
+
+  if (dashboardData.segments['formsubmit.target']) {
+    section += '<b>FORMSUBMIT.TARGET (Post-Submission Destinations):</b>\n';
+    dashboardData.segments['formsubmit.target'].slice(0, 10).forEach((item, idx) => {
+      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} redirects`;
+      if (item.metrics && Object.keys(item.metrics).length > 0) {
+        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
+      }
+      section += '\n';
+    });
+    section += '\n';
+  }
+
+  section += '<b>INSTRUCTIONS:</b>\n';
+  section += '1. Create a dedicated "📝 Forms Interaction & Conversion Analysis" section\n';
+  section += '2. Use this forms data ONLY in that dedicated section\n';
+  section += '3. Analyze the complete funnel: fill.source → formsubmit.source → formsubmit.target\n';
+  section += '4. In ALL OTHER SECTIONS, focus on NON-FORM facets\n';
+  section += '==== END FORMS DATA ====\n\n';
+
+  return section;
+}
+
+/**
+ * Build final synthesis message for AI
+ * @param {Object} dashboardData - Dashboard data
+ * @param {Array} allInsights - Collected insights
+ * @param {string} formDataSection - Form data section
+ * @param {string} overviewTemplate - Overview template
+ * @returns {string} Final synthesis message
+ */
+function buildFinalSynthesisMessage(dashboardData, allInsights, formDataSection, overviewTemplate) {
+  const hasMetrics = Object.keys(dashboardData.metrics).length > 0;
+
+  return `Create a polished, professional analysis report based on the data below.
+
+DO NOT include any of the raw batch content in your response. Use it only as source material for your analysis.
+
+==== DATA TIME PERIOD ====
+${dashboardData.dateRange ? `📅 Analysis covers data from: ${dashboardData.dateRange.toUpperCase()}` : '⚠️ Date range not available'}
+
+IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
+==== END TIME PERIOD ====
+
+==== ✅ FACET COVERAGE CHECKLIST ====
+⚠️ The following NON-FORM facets MUST ALL be covered in the "Key Metrics & Findings" section.
+Each facet needs 1 positive + 1 improvement observation:
+
+${Object.keys(dashboardData.segments)
+    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
+    .map((facet, idx) => `${idx + 1}. ${facet}`)
+    .join('\n')}
+
+TOTAL: ${Object.keys(dashboardData.segments).filter((key) => !key.includes('fill') && !key.includes('formsubmit')).length} facets to cover
+==== END CHECKLIST ====
+${formDataSection}
+==== ACTUAL DASHBOARD METRICS (USE THESE EXACT VALUES) ====
+${hasMetrics
+    ? Object.entries(dashboardData.metrics)
+      .map(([metric, value]) => `${metric}: ${value}`)
+      .join('\n')
+    : '⚠️ WARNING: Dashboard metrics not available - focus analysis on segment data from tool results'}
+
+TOTAL SEGMENTS: ${Object.keys(dashboardData.segments).length} facets analyzed
+
+⚠️ COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED (EXCEPT FORMS):
+${Object.keys(dashboardData.segments)
+    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
+    .join(', ')}
+
+Each of these facets MUST get 1 positive + 1 improvement mention in the "Key Metrics & Findings" section.
+
+SEGMENT SUMMARY (showing top items per facet):
+${Object.entries(dashboardData.segments)
+    .slice(0, 10)
+    .map(([segment, items]) => `- ${segment}: ${items.length} items, top item: ${items[0]?.value || 'N/A'} (${items[0]?.count?.toLocaleString() || 0})`)
+    .join('\n')}
+${Object.keys(dashboardData.segments).length > 10 ? `... and ${Object.keys(dashboardData.segments).length - 10} more facets` : ''}
+==== END DASHBOARD METRICS ====
+
+==== SOURCE MATERIAL (FOR REFERENCE ONLY - DO NOT INCLUDE IN RESPONSE) ====
+${allInsights.join('\n\n')}
+==== END SOURCE MATERIAL ====
+
+${overviewTemplate}`;
 }
 
 /**
@@ -308,122 +344,87 @@ async function callAnthropicAPI(
 }
 
 /**
- * Build form data section for the analysis
- * @param {Object} dashboardData - Dashboard data
- * @returns {string} Form data section text
+ * Run complete RUM analysis
+ * @param {Function} progressCallback - Progress callback function
+ * @returns {Promise<string>} Analysis result
  */
-function buildFormDataSection(dashboardData) {
-  let section = '\n\n==== 📝 FORMS DATA - FOR DEDICATED FORMS SECTION ONLY ====\n';
-  section += '⚠️ This data is ONLY for the "Forms Interaction & Conversion Analysis" section.\n';
-  section += '⚠️ DO NOT mention forms in Executive Summary, Key Metrics, or other sections.\n\n';
+export default async function runCompleteRumAnalysis(progressCallback = null) {
+  console.log('[Analysis Engine] Starting RUM analysis...');
 
-  if (dashboardData.segments['fill.source']) {
-    section += '<b>FILL.SOURCE (Form Entry Pages):</b>\n';
-    dashboardData.segments['fill.source'].slice(0, 10).forEach((item, idx) => {
-      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form starts`;
-      if (item.metrics && Object.keys(item.metrics).length > 0) {
-        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
-      }
-      section += '\n';
+  try {
+    // Step 1: Initialize analysis environment
+    if (progressCallback) {
+      progressCallback(0, 'in-progress', 'Setting up analysis tools...');
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        console.log('[Analysis Engine] Initializing facet manipulation...');
+        initializeDynamicFacets();
+        if (progressCallback) {
+          progressCallback(0, 'completed', 'Analysis environment ready');
+        }
+        resolve();
+      }, 200);
     });
-    section += '\n';
-  }
 
-  if (dashboardData.segments['formsubmit.source']) {
-    section += '<b>FORMSUBMIT.SOURCE (Form Submission Pages):</b>\n';
-    dashboardData.segments['formsubmit.source'].slice(0, 10).forEach((item, idx) => {
-      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form submissions`;
-      if (item.metrics && Object.keys(item.metrics).length > 0) {
-        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
-      }
-      section += '\n';
+    // Step 2: Extract dashboard data
+    if (progressCallback) {
+      progressCallback(1, 'in-progress', 'Scanning dashboard for data and available tools...');
+    }
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 300);
     });
-    section += '\n';
-  }
 
-  if (dashboardData.segments['formsubmit.target']) {
-    section += '<b>FORMSUBMIT.TARGET (Post-Submission Destinations):</b>\n';
-    dashboardData.segments['formsubmit.target'].slice(0, 10).forEach((item, idx) => {
-      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} redirects`;
-      if (item.metrics && Object.keys(item.metrics).length > 0) {
-        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
-      }
-      section += '\n';
+    console.log('[Analysis Engine] Extracting dashboard data...');
+    const dashboardData = await extractDashboardData();
+    console.log('[Analysis Engine] Dashboard data extracted:', {
+      metrics: Object.keys(dashboardData.metrics).length,
+      segments: Object.keys(dashboardData.segments).length,
+      dateRange: dashboardData.dateRange,
     });
-    section += '\n';
+
+    // Generate hash for cache validation
+    const currentDashboardHash = generateDashboardHash(dashboardData);
+
+    // Check cache
+    if (isCacheValid(currentDashboardHash)) {
+      console.log('[Analysis Engine] Using cached analysis');
+      const cachedResult = getCachedResult();
+      if (cachedResult) {
+        if (progressCallback) {
+          progressCallback(1, 'completed', 'Using cached analysis');
+          progressCallback(2, 'completed', 'Skipped (using cache)');
+          progressCallback(3, 'completed', 'Using cached report');
+        }
+        return cachedResult;
+      }
+    }
+
+    // Extract facet tools
+    const facetTools = extractFacetsFromExplorer();
+    console.log(`[Analysis Engine] Found ${facetTools.length} facet tools`);
+
+    if (facetTools.length > 0) {
+      if (progressCallback) {
+        progressCallback(1, 'completed', `Found ${facetTools.length} analysis metrics ready`);
+      }
+    } else if (progressCallback) {
+      progressCallback(1, 'completed', 'Basic analysis mode - no advanced tools found');
+    }
+
+    // Step 3: Run AI analysis
+    const response = await callAnthropicAPI(
+      dashboardData,
+      currentDashboardHash,
+      facetTools,
+      progressCallback,
+    );
+
+    return response;
+  } catch (error) {
+    console.error('[Analysis Engine] Error:', error);
+    throw error;
   }
-
-  section += '<b>INSTRUCTIONS:</b>\n';
-  section += '1. Create a dedicated "📝 Forms Interaction & Conversion Analysis" section\n';
-  section += '2. Use this forms data ONLY in that dedicated section\n';
-  section += '3. Analyze the complete funnel: fill.source → formsubmit.source → formsubmit.target\n';
-  section += '4. In ALL OTHER SECTIONS, focus on NON-FORM facets\n';
-  section += '==== END FORMS DATA ====\n\n';
-
-  return section;
 }
-
-/**
- * Build final synthesis message for AI
- * @param {Object} dashboardData - Dashboard data
- * @param {Array} allInsights - Collected insights
- * @param {string} formDataSection - Form data section
- * @param {string} overviewTemplate - Overview template
- * @returns {string} Final synthesis message
- */
-function buildFinalSynthesisMessage(dashboardData, allInsights, formDataSection, overviewTemplate) {
-  const hasMetrics = Object.keys(dashboardData.metrics).length > 0;
-
-  return `Create a polished, professional analysis report based on the data below. 
-
-DO NOT include any of the raw batch content in your response. Use it only as source material for your analysis.
-
-==== DATA TIME PERIOD ====
-${dashboardData.dateRange ? `📅 Analysis covers data from: ${dashboardData.dateRange.toUpperCase()}` : '⚠️ Date range not available'}
-
-IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
-==== END TIME PERIOD ====
-
-==== ✅ FACET COVERAGE CHECKLIST ====
-⚠️ The following NON-FORM facets MUST ALL be covered in the "Key Metrics & Findings" section.
-Each facet needs 1 positive + 1 improvement observation:
-
-${Object.keys(dashboardData.segments)
-    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
-    .map((facet, idx) => `${idx + 1}. ${facet}`)
-    .join('\n')}
-
-TOTAL: ${Object.keys(dashboardData.segments).filter((key) => !key.includes('fill') && !key.includes('formsubmit')).length} facets to cover
-==== END CHECKLIST ====
-${formDataSection}
-==== ACTUAL DASHBOARD METRICS (USE THESE EXACT VALUES) ====
-${hasMetrics 
-    ? Object.entries(dashboardData.metrics)
-        .map(([metric, value]) => `${metric}: ${value}`)
-        .join('\n')
-    : '⚠️ WARNING: Dashboard metrics not available - focus analysis on segment data from tool results'}
-
-TOTAL SEGMENTS: ${Object.keys(dashboardData.segments).length} facets analyzed
-
-⚠️ COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED (EXCEPT FORMS):
-${Object.keys(dashboardData.segments)
-    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
-    .join(', ')}
-
-Each of these facets MUST get 1 positive + 1 improvement mention in the "Key Metrics & Findings" section.
-
-SEGMENT SUMMARY (showing top items per facet):
-${Object.entries(dashboardData.segments)
-    .slice(0, 10)
-    .map(([segment, items]) => `- ${segment}: ${items.length} items, top item: ${items[0]?.value || 'N/A'} (${items[0]?.count?.toLocaleString() || 0})`)
-    .join('\n')}
-${Object.keys(dashboardData.segments).length > 10 ? `... and ${Object.keys(dashboardData.segments).length - 10} more facets` : ''}
-==== END DASHBOARD METRICS ====
-
-==== SOURCE MATERIAL (FOR REFERENCE ONLY - DO NOT INCLUDE IN RESPONSE) ====
-${allInsights.join('\n\n')}
-==== END SOURCE MATERIAL ====
-
-${overviewTemplate}`;
-}
-

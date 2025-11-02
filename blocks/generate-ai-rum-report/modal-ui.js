@@ -4,27 +4,6 @@
  */
 
 /**
- * Create modal structure
- * @param {boolean} hasApiKey - Whether API key already exists
- * @returns {Object} Modal elements
- */
-export function createModalStructure(hasApiKey) {
-  const overlay = document.createElement('div');
-  overlay.className = 'report-modal-overlay';
-
-  const modal = document.createElement('div');
-  modal.className = 'report-modal';
-
-  const header = createModalHeader();
-  const body = createModalBody(hasApiKey);
-
-  modal.append(header, body);
-  overlay.appendChild(modal);
-
-  return { overlay, modal, body };
-}
-
-/**
  * Create modal header
  * @returns {HTMLElement}
  */
@@ -56,27 +35,48 @@ function createModalBody(hasApiKey) {
   body.innerHTML = `
     <div class="report-form-group">
       <label for="report-api-key">Anthropic API Key</label>
-      <input 
-        type="password" 
-        id="report-api-key" 
-        placeholder="sk-ant-..." 
+      <input
+        type="password"
+        id="report-api-key"
+        placeholder="sk-ant-..."
         value="${apiKey}"
         ${hasApiKey ? 'disabled' : ''}
       >
     </div>
-    
+
     <button id="report-generate-btn" class="report-generate-btn">
       ${buttonText}
     </button>
-    
+
     <div class="report-info">
       <p>${infoText}</p>
     </div>
-    
+
     <div id="report-status" style="display: none;"></div>
   `;
 
   return body;
+}
+
+/**
+ * Create modal structure
+ * @param {boolean} hasApiKey - Whether API key already exists
+ * @returns {Object} Modal elements
+ */
+export function createModalStructure(hasApiKey) {
+  const overlay = document.createElement('div');
+  overlay.className = 'report-modal-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'report-modal';
+
+  const header = createModalHeader();
+  const body = createModalBody(hasApiKey);
+
+  modal.append(header, body);
+  overlay.appendChild(modal);
+
+  return { overlay, modal, body };
 }
 
 /**
@@ -87,7 +87,7 @@ function createModalBody(hasApiKey) {
 export function toggleFormVisibility(modalBody, visible) {
   const formGroup = modalBody.querySelector('.report-form-group');
   const infoDiv = modalBody.querySelector('.report-info');
-  
+
   if (formGroup) formGroup.style.display = visible ? 'block' : 'none';
   if (infoDiv) infoDiv.style.display = visible ? 'block' : 'none';
 }
@@ -106,13 +106,12 @@ export function showStatus(statusDiv, type, message) {
 
 /**
  * Create report results UI with file icon
- * @param {string} reportContent
  * @returns {HTMLElement}
  */
-export function createReportResultsUI(reportContent) {
+export function createReportResultsUI() {
   const resultsSection = document.createElement('div');
   resultsSection.className = 'report-results';
-  
+
   resultsSection.innerHTML = `
     <div class="report-file-icon">
       <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -142,4 +141,3 @@ export function updateButtonState(button, disabled, text) {
   button.disabled = disabled;
   button.textContent = text;
 }
-

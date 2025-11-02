@@ -56,11 +56,11 @@ export default class FacetSidebar extends HTMLElement {
     filterInput.id = 'filter';
     filterInput.placeholder = 'Type to filter...';
 
-    // Create OpTel Detective Report button - ASTHA NEW REPORT BUTTON
+    // Create OpTel Detective Report button
     const generateReportButton = document.createElement('button');
     generateReportButton.className = 'generate-ai-rum-report-button';
     generateReportButton.title = 'Use Claude to generate OpTel Detective Report';
-    
+
     // Create icon element
     const icon = document.createElement('img');
     icon.src = '/icons/icon-claude.svg';
@@ -70,7 +70,7 @@ export default class FacetSidebar extends HTMLElement {
       height: 20px;
     `;
     generateReportButton.appendChild(icon);
-    
+
     generateReportButton.style.cssText = `
       background: white;
       border: 2px solid #D97757;
@@ -93,13 +93,12 @@ export default class FacetSidebar extends HTMLElement {
     });
     generateReportButton.addEventListener('click', () => {
       // Load the stylesheet dynamically
-      this.loadStylesheet('generate-ai-rum-report-styles', '/blocks/generate-ai-rum-report/generate-ai-rum-report.css');
+      FacetSidebar.loadStylesheet('generate-ai-rum-report-styles', '/blocks/generate-ai-rum-report/generate-ai-rum-report.css');
       // Open the modal
       openReportModal();
     });
 
     quickFilter.append(filterInput, generateReportButton);
-    // end of ASTHA NEW REPORT BUTTON
     this.append(quickFilter);
 
     const selectFocus = document.createElement('form');
@@ -193,7 +192,7 @@ export default class FacetSidebar extends HTMLElement {
     });
   }
 
-  loadStylesheet(id, href) {
+  static loadStylesheet(id, href) {
     if (!document.querySelector(`#${id}`)) {
       document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href, id }));
     }

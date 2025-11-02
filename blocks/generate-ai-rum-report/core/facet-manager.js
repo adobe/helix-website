@@ -3,6 +3,8 @@
  * Handles facet tool extraction, initialization, and manipulation
  */
 
+/* eslint-disable no-console */
+
 // Cache for facet tools
 let cachedFacetTools = null;
 
@@ -36,7 +38,6 @@ function createToolDefinition(facetName, description) {
   };
 }
 
-
 /**
  * Extract facets from DOM and convert to tool definitions
  * @returns {Array} Array of tool definitions
@@ -52,9 +53,9 @@ export function extractFacetsFromExplorer() {
     return [];
   }
 
-  const dataChunks = facetSidebar.dataChunks;
+  const { dataChunks } = facetSidebar;
   const facetElements = facetSidebar.querySelectorAll('list-facet, link-facet, literal-facet, file-facet, thumbnail-facet');
-  
+
   const tools = [];
   facetElements.forEach((facetElement) => {
     const facetName = facetElement.getAttribute('facet');
@@ -96,7 +97,8 @@ class DOMOperationQueue {
   async enqueue(operation) {
     return new Promise((resolve, reject) => {
       this.queue.push({ operation, resolve, reject });
-      this.processQueue();
+      // eslint-disable-next-line no-void
+      void this.processQueue();
     });
   }
 
@@ -113,7 +115,9 @@ class DOMOperationQueue {
         const result = await operation();
         resolve(result);
         // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => {
+          setTimeout(r, 500);
+        });
       } catch (error) {
         reject(error);
       }
@@ -149,7 +153,7 @@ export async function handleDynamicFacetToolCall(toolName, input, useQueue = tru
   const performOperation = async () => {
     try {
       let result;
-      
+
       switch (operation) {
         case 'filter': {
           if (!value) {
@@ -159,7 +163,9 @@ export async function handleDynamicFacetToolCall(toolName, input, useQueue = tru
           const filterInput = facetElement.querySelector(`input[value="${value}"]`);
           if (filterInput) {
             filterInput.click();
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => {
+              setTimeout(resolve, 1000);
+            });
             result = { success: true, message: `Applied filter: ${value}` };
           } else {
             result = { success: false, message: `Filter value ${value} not found` };
@@ -251,7 +257,7 @@ export async function handleDynamicFacetToolCall(toolName, input, useQueue = tru
         default:
           result = { success: false, message: `Unknown operation: ${operation}` };
       }
-      
+
       return result;
     } catch (error) {
       console.error('[Dynamic Facet] Error:', error);
@@ -331,4 +337,3 @@ export function initializeDynamicFacets() {
 export function resetCachedFacetTools() {
   cachedFacetTools = null;
 }
-
