@@ -59,22 +59,33 @@ export default class FacetSidebar extends HTMLElement {
     // Create OpTel Detective Report button - ASTHA NEW REPORT BUTTON
     const generateReportButton = document.createElement('button');
     generateReportButton.className = 'generate-ai-rum-report-button';
-    generateReportButton.title = 'OpTel Detective Report';
-    generateReportButton.innerHTML = '📄';
+    generateReportButton.title = 'Use Claude to generate OpTel Detective Report';
+    
+    // Create icon element
+    const icon = document.createElement('img');
+    icon.src = '/icons/icon-claude.svg';
+    icon.alt = 'Claude AI';
+    icon.style.cssText = `
+      width: 20px;
+      height: 20px;
+    `;
+    generateReportButton.appendChild(icon);
+    
     generateReportButton.style.cssText = `
-      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-      border: none;
+      background: white;
+      border: 2px solid #D97757;
       border-radius: 6px;
-      color: white;
       cursor: pointer;
-      font-size: 18px;
       padding: 8px 12px;
       transition: all 0.2s;
       margin-left: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     `;
     generateReportButton.addEventListener('mouseenter', () => {
       generateReportButton.style.transform = 'scale(1.05)';
-      generateReportButton.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.3)';
+      generateReportButton.style.boxShadow = '0 2px 8px rgba(217, 119, 87, 0.3)';
     });
     generateReportButton.addEventListener('mouseleave', () => {
       generateReportButton.style.transform = 'scale(1)';

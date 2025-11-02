@@ -14,8 +14,8 @@ const PROGRESS_CONFIG = {
   VIEWBOX_SIZE: 140,
   INITIAL_PERCENT: 0,
   GRADIENT_ID: 'progressGradient',
-  GRADIENT_START_COLOR: '#28a745',
-  GRADIENT_END_COLOR: '#218838',
+  GRADIENT_START_COLOR: '#49cc93', // --medium-green
+  GRADIENT_END_COLOR: '#00653e', // --dark-green
 };
 
 const SELECTORS = {

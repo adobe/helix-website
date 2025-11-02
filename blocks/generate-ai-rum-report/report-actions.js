@@ -11,19 +11,19 @@ const CONFIG = {
   ERROR_TIMEOUT: 2000,
   STYLES: {
     HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none;',
-    ENTRY_UNVIEWED: 'color: #0066cc; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: 600;',
-    ENTRY_VIEWED: 'color: #9370db; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: normal;',
-    BADGE: 'position: absolute; top: -4px; right: -4px; min-width: 20px; width: 20px; height: 20px; background: #ff4444; border-radius: 50%; z-index: 1000; pointer-events: none; color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1;',
+    ENTRY_UNVIEWED: 'color: #147af3; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: 600;', // --dark-blue
+    ENTRY_VIEWED: 'color: #7326d3; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: normal;', // --dark-purple
+    BADGE: 'position: absolute; top: -4px; right: -4px; min-width: 20px; width: 20px; height: 20px; background: #ff7c65; border-radius: 50%; z-index: 1000; pointer-events: none; color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1;', // --medium-red from rum-slicer.css
   },
 };
 
 export function setupReportActions(reportContent) {
-  document.getElementById('save-to-da-btn')?.addEventListener('click', (e) => 
-    handleSaveToDA(e.target, reportContent)
+  document.getElementById('save-report-btn')?.addEventListener('click', (e) => 
+    handleSaveReport(e.target, reportContent)
   );
 }
 
-async function handleSaveToDA(button, reportContent) {
+async function handleSaveReport(button, reportContent) {
   updateButtonState(button, true, '💾 Saving...');
   try {
     const currentUrl = getCurrentAnalyzedUrl();
@@ -44,20 +44,6 @@ async function handleSaveToDA(button, reportContent) {
 export async function getSavedReports() {
   try {
     return await fetchReportsFromDA();
-
-    // TODO: Remove this after testing
-    // const reports = await fetchReportsFromDA();
-
-    // // Add test report for testing
-    // const testReport = {
-    //   filename: 'optel-analysis-2025-10-29-13-57-44.html',
-    //   path: 'https://admin.da.live/source/asthabh23/da-demo/drafts/optel-reports/emigrationbrewing-com/optel-analysis-2025-10-29-13-57-44.html',
-    //   timestamp: new Date('2025-10-29T13:57:44').getTime(),
-    // };
-
-    // return [testReport, ...reports];
-
-    // TODO: Remove this after testing till this line
   } catch (error) {
     console.error('[OpTel Detective Report] Error fetching saved reports:', error);
     return [];
@@ -114,25 +100,31 @@ async function updateNotificationBadge() {
   const picker = document.querySelector('daterange-picker');
   if (!picker?.shadowRoot) return;
   
-  // Remove existing badges
-  picker.shadowRoot.querySelector('.report-notification-badge')?.remove();
-  picker.querySelector('.report-notification-badge')?.remove();
+  // Remove ALL existing badges from everywhere
+  const allBadges = [
+    ...picker.shadowRoot.querySelectorAll('.report-notification-badge'),
+    ...picker.querySelectorAll('.report-notification-badge'),
+    ...document.querySelectorAll('.report-notification-badge'),
+  ];
+  allBadges.forEach(badge => badge.remove());
   
-  if (!await hasUnviewedReports()) return;
+  // Force a fresh check for unviewed reports (don't cache)
+  const allReports = await getSavedReports();
+  const filteredReports = filterReportsByWeek(allReports);
+  const viewedReports = getViewedReports();
+  const unviewedReports = filteredReports.filter(r => !viewedReports.includes(r.path));
+  
+  // If no unviewed reports, we're done (badge already removed above)
+  if (unviewedReports.length === 0) return;
   
   const wrapper = picker.shadowRoot.querySelector('.daterange-wrapper');
   if (!wrapper) return;
   
-  const allReports = await getSavedReports();
-  const filteredReports = filterReportsByWeek(allReports);
-  const unviewedCount = filteredReports.filter(r => 
-    !getViewedReports().includes(r.path)
-  ).length;
-  
+  // Create badge with unviewed count
   const badge = Object.assign(document.createElement('div'), {
     className: 'report-notification-badge',
     title: 'unviewed OpTel reports',
-    textContent: unviewedCount.toString(),
+    textContent: unviewedReports.length.toString(),
   });
   badge.style.cssText = CONFIG.STYLES.BADGE;
   
@@ -163,9 +155,19 @@ function addReportToDateRangePicker(result) {
   entry.dataset.reportPath = result.path;
   entry.style.cssText = isViewed ? CONFIG.STYLES.ENTRY_VIEWED : CONFIG.STYLES.ENTRY_UNVIEWED;
   entry.onclick = async () => {
+    // Mark as viewed first
     markReportAsViewed(result.path);
+    
+    // Update the UI to show it's been viewed
     entry.style.cssText = CONFIG.STYLES.ENTRY_VIEWED;
+    
+    // Force a small delay to ensure localStorage write completes before badge check
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // Update the notification badge (this will remove it if no unviewed reports remain)
     await updateNotificationBadge();
+    
+    // Show the report
     showReportInline(result.path, result.filename);
   };
   

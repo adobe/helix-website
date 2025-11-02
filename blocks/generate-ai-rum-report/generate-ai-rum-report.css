@@ -9,8 +9,8 @@
   --color-overlay: rgba(68, 68, 68, 0.7);
   
   /* Button colors */
-  --color-btn-primary: #28a745;
-  --color-btn-primary-hover: #218838;
+  --color-btn-primary: #49cc93; /* --medium-green */
+  --color-btn-primary-hover: #00653e; /* --dark-green */
   --color-btn-disabled: #ccc;
   
   /* Status colors */
@@ -146,7 +146,7 @@
 .report-form-group input:focus {
   outline: none;
   border-color: var(--color-btn-primary);
-  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+  box-shadow: 0 0 0 3px rgba(73, 204, 147, 0.1); /* --medium-green with opacity */
 }
 
 .report-form-group input::placeholder {
@@ -264,7 +264,7 @@
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.5s ease;
-  filter: drop-shadow(0 2px 4px rgba(40, 167, 69, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(73, 204, 147, 0.3)); /* --medium-green with opacity */
 }
 
 .circular-progress-text {
