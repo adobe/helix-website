@@ -13,6 +13,9 @@
 }
 
 :root {
+  /* Enable automatic light/dark mode support */
+  color-scheme: light dark;
+
   /* Fonts */
   --body-font-family: "Adobe Clean", adobe-clean, "Trebuchet MS", sans-serif;
   --code-font-family:
@@ -87,12 +90,12 @@
   --brand-color-green-yellow: #ebf3a4;
   --highlight-gradient: linear-gradient(75deg, #db3278, #ee732f);
 
-  /* those (background) colors were missing */
-  --color-black: #000;
-  --color-gray-100: rgb(10% 10% 10%);
-  --color-gray-200: rgb(20% 20% 20%);
-  --color-gray-500: rgb(50% 50% 50%);
-  --color-white: #fff;
+  /* Core colors with automatic light/dark support */
+  --color-black: light-dark(#000, #fff);
+  --color-white: light-dark(#fff, #000);
+  --color-gray-100: light-dark(rgb(10% 10% 10%), rgb(90% 90% 90%));
+  --color-gray-200: light-dark(rgb(20% 20% 20%), rgb(80% 80% 80%));
+  --color-gray-500: light-dark(rgb(50% 50% 50%), rgb(50% 50% 50%));
   --color-info-accent: inherit;
   --color-info-accent-hover: inherit;
   --color-info-accent-down: inherit;
@@ -105,10 +108,10 @@
   --color-info-accent-reverse: inherit;
   --color-info-accent-reverse-down: inherit;
 
-  /* Redesign colors */
-  --color-font-grey: #2c2c2c;
-  --color-light-grey-600: #686868;
-  --color-eyebrow-light-grey: #444;
+  /* Redesign colors with light/dark support */
+  --color-font-grey: light-dark(#2c2c2c, #d3d3d3);
+  --color-light-grey-600: light-dark(#686868, #979797);
+  --color-eyebrow-light-grey: light-dark(#444, #bbb);
   --color-eyebrow-highlight: #6870ec;
   --color-accent-blue: #6870ec;
   --color-accent-highlight-yellow: #e3fa8c;
@@ -121,13 +124,13 @@
   --color-accent-yellow-bg: #f5e66b;
   --color-accent-yellow-content: #7f6000;
 
-  /* background colors */
-  --bg-color-lightgrey: #f8f8f8;
-  --bg-color-grey: #e8e8e8;
-  --bg-color-grey-2: #d6d6d6;
-  --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
+  /* background colors with light/dark support */
+  --bg-color-lightgrey: light-dark(#f8f8f8, #080808);
+  --bg-color-grey: light-dark(#e8e8e8, #181818);
+  --bg-color-grey-2: light-dark(#d6d6d6, #2a2a2a);
+  --overlay-curtain-bg-color: light-dark(rgb(0 0 0 / 60%), rgb(255 255 255 / 60%));
   --overlay-curtain-bg-filter: blur(0.05em);
-  --code-bg-color: #f1f1f1;
+  --code-bg-color: light-dark(#f1f1f1, #1a1a1a);
 
   /* Grid / container width -- 600px, 900px */
   --grid-mobile-container-width: 88%;
@@ -271,6 +274,8 @@ body {
   font-size: var(--type-body-l-size);
   line-height: var(--type-body-l-lh);
   display: none;
+  background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 body.appear {
@@ -366,7 +371,7 @@ header {
   top: 0;
   width: 100%;
   height: var(--nav-height);
-  background-color: #fff;
+  background-color: var(--color-white);
   z-index: var(--nav-z-index);
 }
 
@@ -451,7 +456,7 @@ h6 {
 }
 
 em a {
-  color: black;
+  color: var(--color-black);
   border: 2px solid;
   background-color: transparent;
   border-radius: 16px;
