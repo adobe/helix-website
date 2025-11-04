@@ -3,7 +3,7 @@
  */
 import { uploadToDA, getCurrentAnalyzedUrl, fetchReportsFromDA } from './da-upload.js';
 import { updateButtonState } from './modal-ui.js';
-import { showReportInline } from './report-viewer/report-viewer.js';
+import { showReportInline, checkForSharedReport } from './report-viewer/report-viewer.js';
 
 const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
@@ -54,7 +54,7 @@ function filterReportsByWeek(reports) {
   return Array.from(weekMap.values()).sort((a, b) => b.timestamp - a.timestamp);
 }
 
-function markReportAsViewed(path) {
+export function markReportAsViewed(path) {
   try {
     const viewed = getViewedReports();
     if (!viewed.includes(path)) {
@@ -67,7 +67,7 @@ function markReportAsViewed(path) {
   }
 }
 
-async function updateNotificationBadge() {
+export async function updateNotificationBadge() {
   const picker = document.querySelector('daterange-picker');
   if (!picker?.shadowRoot) return;
 
@@ -162,6 +162,10 @@ export async function initializeSavedReports() {
     }
 
     const allReports = await getSavedReports();
+
+    // Check for shared report immediately (reuse fetched reports)
+    await checkForSharedReport(() => Promise.resolve(allReports));
+
     const filteredReports = filterReportsByWeek(allReports);
     filteredReports.forEach(addReportToDateRangePicker);
     setTimeout(() => {

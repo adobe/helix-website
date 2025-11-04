@@ -4,6 +4,8 @@
 
 /* eslint-disable no-console */
 
+import { markReportAsViewed, updateNotificationBadge } from '../report-actions.js';
+
 // Load report viewer CSS
 if (!document.querySelector('link[href*="report-viewer.css"]')) {
   const css = document.createElement('link');
@@ -34,6 +36,19 @@ const METADATA_KEYS = {
 
 // State
 let cachedElements = {};
+
+// Generate hash from string (deterministic, better distribution)
+const makeHash = (str) => {
+  let h = 0;
+  for (let i = 0; i < str.length; i += 1) {
+    const char = str.charCodeAt(i);
+    h = Math.imul(31, h) + char;
+    // Keep in 32-bit range
+    h %= 2147483648;
+  }
+  // Convert to base36, pad to 10 chars for better uniqueness
+  return Math.abs(h).toString(36).padStart(10, '0');
+};
 
 /**
  * Get element by ID
@@ -76,17 +91,13 @@ function getFacetSidebar() {
   return cachedElements.facetSidebar;
 }
 
-/**
- * Toggle between report viewer and facets sections
- * @param {boolean} showReport - True to show report, false to show facets
- */
 function toggleView(showReport) {
   const viewer = getViewerContainer();
   const facets = cachedElements.facetsContainer
     || document.querySelector(ELEMENTS.FACETS_CONTAINER);
   const sidebar = getFacetSidebar();
 
-  if (viewer) viewer.style.display = showReport ? 'block' : 'none';
+  if (viewer) viewer.classList.toggle('visible', showReport);
   if (facets) facets.style.display = showReport ? 'none' : 'block';
   if (sidebar) sidebar.classList.toggle('report-view-active', showReport);
 }
@@ -103,6 +114,11 @@ function showLoading(container) {
  * Close report viewer and return to facets view
  */
 export function closeReportViewer() {
+  // Remove report hash from URL
+  const url = new URL(window.location);
+  url.searchParams.delete('report');
+  window.history.pushState({}, '', url);
+
   toggleView(false);
   cachedElements = {};
 }
@@ -250,25 +266,15 @@ function escapeHtml(text) {
 
 /**
  * Create HTML for report header
+ * @param {string} filename - Report filename
  * @returns {string}
  */
-function createHeader() {
-  // const meta = [
-  //   metadata.url && `<span class="meta-url"><strong>URL:</strong> ${metadata.url}</span>`,
-  //   metadata.date && `<span class="meta-date"><strong>Date:</strong> ${metadata.date}</span>`,
-  //   metadata.mode && `<span class="meta-mode"><strong>Mode:</strong> ${metadata.mode}</span>`,
-  // ].filter(Boolean).join('');
-
-  // return `
-  //   <div class="report-header">
-  //     <button class="report-back-btn">← Back to Dashboard</button>
-  //     <h2 class="report-title">${escapeHtml(filename)}</h2>
-  //     ${meta ? `<div class="report-metadata">${meta}</div>` : ''}
-  //   </div>
-  // `;
+function createHeader(filename) {
   return `
     <div class="report-header">
-      <button class="report-back-btn">← Back to Dashboard</button>
+      <button class="report-back-btn">← Back</button>
+      <span class="report-title">${filename || 'Report'}</span>
+      <button class="report-copy-link-btn">🔗 Copy Link</button>
     </div>
   `;
 }
@@ -298,8 +304,9 @@ function createSection(section) {
  * @param {HTMLElement} container
  * @param {string} htmlContent
  * @param {string} filename
+ * @param {string} reportHash - Hash ID for shareable link
  */
-function renderReport(container, htmlContent, filename) {
+function renderReport(container, htmlContent, filename, reportHash) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
   const metadata = extractMetadata(doc);
   const sections = extractSections(doc);
@@ -310,18 +317,35 @@ function renderReport(container, htmlContent, filename) {
   `;
 
   container.querySelector('.report-back-btn')?.addEventListener('click', closeReportViewer);
+
+  const copyBtn = container.querySelector('.report-copy-link-btn');
+  if (copyBtn && reportHash) {
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        const orig = copyBtn.textContent;
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyBtn.textContent = orig; }, 2000);
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
+    };
+  }
 }
 
-/**
- * Show report inline in place of facets sections
- * @param {string} reportPath - URL to the report
- * @param {string} reportFilename - Display name of the report
- */
 export function showReportInline(reportPath, reportFilename) {
   const viewer = getViewerContainer();
-  if (!viewer) {
-    console.error('[Report Viewer] Could not create viewer container');
-    return;
+  if (!viewer) return;
+
+  // Use filename for hash since it's unique for each report
+  const hash = makeHash(reportFilename);
+
+  const url = new URL(window.location);
+
+  // Only update URL if report hash is different or missing
+  if (url.searchParams.get('report') !== hash) {
+    url.searchParams.set('report', hash);
+    window.history.pushState({}, '', url);
   }
 
   toggleView(true);
@@ -329,6 +353,32 @@ export function showReportInline(reportPath, reportFilename) {
 
   fetch(reportPath)
     .then((res) => (res.ok ? res.text() : Promise.reject(new Error(`HTTP ${res.status}`))))
-    .then((html) => renderReport(viewer, html, reportFilename))
+    .then((html) => renderReport(viewer, html, reportFilename, hash))
     .catch((err) => showError(viewer, err.message));
+}
+
+export async function checkForSharedReport(getReports) {
+  const hash = new URLSearchParams(window.location.search).get('report');
+  if (!hash || !getReports) return;
+
+  // Fetch from DA to find matching report by filename hash
+  try {
+    const reports = await getReports();
+    const match = reports.find((r) => {
+      const name = r.filename || r.path.split('/').pop();
+      return makeHash(name) === hash;
+    });
+    if (match) {
+      const name = match.filename || match.path.split('/').pop();
+
+      // Mark as viewed and update badge
+      markReportAsViewed(match.path);
+      await updateNotificationBadge();
+
+      // Open the report
+      showReportInline(match.path, name);
+    }
+  } catch (err) {
+    console.error('Failed to fetch reports:', err);
+  }
 }

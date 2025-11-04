@@ -20,11 +20,14 @@ export function extractDashboardData() {
         dateRange: null,
       };
 
-      // Extract date range
-      const dateRangeInput = document.querySelector('.daterange-wrapper input[data-value]');
-      if (dateRangeInput) {
-        dashboardData.dateRange = dateRangeInput.getAttribute('data-value');
-        console.log(`[Dashboard Data] ✓ Captured date range: ${dashboardData.dateRange}`);
+      // Extract date range from shadow DOM
+      const dateRangePicker = document.querySelector('daterange-picker');
+      if (dateRangePicker?.shadowRoot) {
+        const dateRangeInput = dateRangePicker.shadowRoot.querySelector('.daterange-wrapper input[data-value]');
+        if (dateRangeInput) {
+          dashboardData.dateRange = dateRangeInput.getAttribute('data-value');
+          console.log(`[Dashboard Data] ✓ Captured date range: ${dashboardData.dateRange}`);
+        }
       }
 
       // Extract key metrics (pageviews, visits, conversions, LCP, CLS, INP, etc.)

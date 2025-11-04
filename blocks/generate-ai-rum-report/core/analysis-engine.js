@@ -140,9 +140,11 @@ function buildFinalSynthesisMessage(dashboardData, allInsights, formDataSection,
 DO NOT include any of the raw batch content in your response. Use it only as source material for your analysis.
 
 ==== DATA TIME PERIOD ====
-${dashboardData.dateRange ? `📅 Analysis covers data from: ${dashboardData.dateRange.toUpperCase()}` : '⚠️ Date range not available'}
+${dashboardData.dateRange ? `📅 Date Range Selected: ${dashboardData.dateRange}` : '⚠️ Date range not available'}
+${dashboardData.dateRange ? `(Found in: <daterange-wrapper><input data-value="${dashboardData.dateRange}">)` : ''}
 
 IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
+Convert the data-value to readable format in your report (e.g., "month" → "Last 30 Days", "week" → "Last 7 Days").
 ==== END TIME PERIOD ====
 
 ==== ✅ FACET COVERAGE CHECKLIST ====

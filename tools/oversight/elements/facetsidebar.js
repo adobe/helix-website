@@ -155,10 +155,12 @@ export default class FacetSidebar extends HTMLElement {
       this.elems.facetsElement.append(facet);
     });
 
-    // Initialize saved reports after daterange-picker is ready
+    // Initialize saved reports (check if URL has report param first for fast loading)
+    const hasReportParam = new URLSearchParams(window.location.search).get('report');
+    const delay = hasReportParam ? 100 : 500;
     setTimeout(() => {
       initializeSavedReports();
-    }, 500);
+    }, delay);
   }
 
   updateFacets(mode) {

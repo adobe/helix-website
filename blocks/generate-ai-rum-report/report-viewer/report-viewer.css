@@ -34,12 +34,18 @@
   --font-size-xl: 18px;
 
   /* Base Container */
-  display: none;
   max-width: 100%;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
 }
 
 .report-viewer.visible {
-  display: block;
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Report viewer inside facet-sidebar */
@@ -61,19 +67,24 @@ facet-sidebar.report-view-active > form {
    ========================================================================= */
 
 .report-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
-  background: var(--header-bg);
-  border: var(--border-width) solid var(--btn-bg);
+  background: var(--light-fuchsia);
+  border: var(--border-width) solid var(--dark-fuchsia);
   border-radius: var(--border-radius-lg);
 }
 
-.report-title {
-  margin: var(--spacing-sm) 0;
-  font-size: var(--font-size-xl);
+.report-header .report-title {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--btn-bg);
+  color: var(--text-primary);
   overflow-wrap: break-word;
+  text-align: center;
 }
 
 .report-metadata {
@@ -98,7 +109,7 @@ facet-sidebar.report-view-active > form {
    ========================================================================= */
 
 .report-back-btn {
-  background: var(--btn-bg);
+  background: var(--dark-fuchsia);
   color: white;
   border: none;
   padding: var(--spacing-sm) var(--spacing-lg);
@@ -107,15 +118,14 @@ facet-sidebar.report-view-active > form {
   font-size: var(--font-size-base);
   font-weight: 500;
   transition: background-color 0.2s ease;
-  margin-bottom: var(--spacing-md);
 }
 
 .report-back-btn:hover {
-  background: var(--btn-bg-hover);
+  background: var(--darker-fuchsia, #7a0f82);
 }
 
 .report-error button {
-  background: var(--btn-bg);
+  background: var(--dark-fuchsia);
   color: white;
   border: none;
   padding: 10px 20px;
@@ -128,7 +138,7 @@ facet-sidebar.report-view-active > form {
 }
 
 .report-error button:hover {
-  background: var(--btn-bg-hover);
+  background: var(--darker-fuchsia, #7a0f82);
 }
 
 /* ============================================================================
@@ -249,4 +259,28 @@ facet-sidebar.report-view-active > form {
     --font-size-lg: 14px;
     --font-size-xl: 16px;
   }
+
+  .report-copy-link-btn {
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   COPY LINK BUTTON
+   ========================================================================= */
+
+.report-copy-link-btn {
+  background: var(--dark-fuchsia);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.report-copy-link-btn:hover {
+  background: var(--darker-fuchsia, #7a0f82);
 }
