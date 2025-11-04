@@ -776,6 +776,32 @@ async function loadLazy(doc) {
   loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadCSS(`${window.hlx.codeBasePath}/styles/dark-mode.css`);
+
+  const themeToggle = document.createElement('button');
+  themeToggle.textContent = 'Toggle Dark Mode';
+  themeToggle.style.position = 'fixed';
+  themeToggle.style.bottom = '10px';
+  themeToggle.style.right = '10px';
+  themeToggle.style.zIndex = '9999';
+  document.body.appendChild(themeToggle);
+
+  function setTheme(theme) {
+    document.body.dataset.theme = theme;
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.body.dataset.theme;
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+  });
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  setTheme(prefersDark.matches ? 'dark' : 'light');
+
+  prefersDark.addEventListener('change', (e) => {
+    setTheme(e.matches ? 'dark' : 'light');
+  });
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();

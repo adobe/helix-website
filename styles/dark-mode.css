@@ -1,0 +1,57 @@
+
+[data-theme="dark"] {
+    --color-background: #121212;
+    --color-text: #fff;
+    --color-primary: #bb86fc;
+    --color-secondary: #03dac6;
+    --color-surface: #1e1e1e;
+    --color-error: #cf6679;
+    --color-font-grey: #c8c8c8;
+    --color-light-grey-600: #9a9a9a;
+    --color-eyebrow-light-grey: #c8c8c8;
+    --color-eyebrow-highlight: #bb86fc;
+    --color-accent-blue: #bb86fc;
+    --color-accent-highlight-yellow: #e3fa8c;
+    --color-accent-pink-bg: #f0b2f2;
+    --color-accent-pink-content: #88008d;
+    --color-accent-purple-bg: #474eb8;
+    --color-accent-purple-content: #e2e4ff;
+    --color-accent-lightgreen-bg: #e1fa82;
+    --color-accent-lightgreen-content: #3b5700;
+    --color-accent-yellow-bg: #f5e66b;
+    --color-accent-yellow-content: #7f6000;
+    --bg-color-lightgrey: #1e1e1e;
+    --bg-color-grey: #2c2c2c;
+    --bg-color-grey-2: #3c3c3c;
+    --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
+    --code-bg-color: #2c2c2c;
+    --color-black: #fff;
+    --color-white: #121212;
+
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] a {
+    color: var(--color-primary);
+}
+
+[data-theme="dark"] .button.primary {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+[data-theme="dark"] .button.secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-background);
+}
