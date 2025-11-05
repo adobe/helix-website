@@ -10,8 +10,8 @@ import runCompleteRumAnalysis from './core/analysis-engine.js';
 
 import {
   createCircularProgress,
-  updateCircularProgress,
-  animateProgressStages,
+  initializeStepProgress,
+  advanceStep,
   completeProgress,
 } from './progress-indicator.js';
 
@@ -28,7 +28,14 @@ import { setupReportActions } from './report-actions.js';
 const METRICS_URL_PARAM = 'metrics';
 const METRICS_URL_VALUE = 'super';
 const RESULTS_DISPLAY_DELAY = 1000;
-const PROGRESS_INTERVAL = 3000;
+
+// Report generation steps (4 steps, advance 3 times to 75%, then 100% = Report Ready)
+const REPORT_STEPS = [
+  { name: 'Loading Checkpoints', detail: 'Ensuring all metrics are available' },
+  { name: 'Extracting Data', detail: 'Gathering dashboard metrics and facets' },
+  { name: 'Processing Analysis', detail: 'Running AI-powered analysis' },
+  { name: 'Generating Report', detail: 'Creating insights and recommendations' },
+];
 
 /**
  * Ensure metrics=super parameter is in URL and reload dashboard data
@@ -45,19 +52,9 @@ async function ensureMetricsParameter() {
 
     // Reload dashboard data in background using global draw function
     if (typeof window.slicerDraw === 'function') {
-      updateCircularProgress(
-        15,
-        'Loading all checkpoints...',
-        'Refreshing dashboard with comprehensive metrics',
-      );
       try {
         await window.slicerDraw();
         console.log('[OpTel Detective Report] Dashboard reloaded with all checkpoints');
-        updateCircularProgress(
-          25,
-          'All checkpoints loaded',
-          'Dashboard ready for comprehensive analysis',
-        );
         await new Promise((resolve) => {
           setTimeout(resolve, 500);
         });
@@ -144,34 +141,33 @@ export default async function generateReport(apiKey, statusDiv, button, modal) {
   try {
     console.log('[OpTel Detective Report] Starting report generation...');
 
-    // Check and add metrics parameter if needed, reload data with all checkpoints
-    const metricsAdded = await ensureMetricsParameter();
+    // Initialize step-based progress (4 steps, advance 3 times to 75%)
+    initializeStepProgress(REPORT_STEPS);
 
-    // Track progress through the analysis phases
-    const { intervalId: progressInterval } = animateProgressStages(PROGRESS_INTERVAL);
+    // Step 1: Check and add metrics parameter if needed, reload data with all checkpoints
+    advanceStep(); // 25% - Loading Checkpoints
+    await ensureMetricsParameter();
 
-    // Create progress callback for analysis engine
-    // Start from 30% if we just loaded metrics, otherwise from 0%
-    const baseProgress = metricsAdded ? 30 : 0;
-    const progressCallback = (step, status, message, percent) => {
-      const adjustedPercent = percent
-        ? Math.min(baseProgress + percent * 0.7, 100)
-        : (baseProgress + step * 17);
-      updateCircularProgress(adjustedPercent, message, status);
+    // Steps 2-3: Run analysis - advance twice during analysis to reach 75%
+    let advanceCount = 0;
+    const progressCallback = (step) => {
+      // Advance twice: 50% (Extracting Data) and 75% (Processing Analysis)
+      if (step >= 0 && advanceCount < 2) {
+        advanceStep();
+        advanceCount += 1;
+      }
     };
 
-    // Run the actual RUM analysis
     const analysisResult = await runCompleteRumAnalysis(progressCallback);
 
-    // Complete progress
-    clearInterval(progressInterval);
-    completeProgress();
+    // Final step: 100% with "Report Ready" message
+    completeProgress('Report Ready', 'Analysis complete, report generated successfully');
 
     // Wait a moment then show results
     setTimeout(() => {
       showReportResults(modalBody, analysisResult);
       // Keep button disabled after successful generation
-      updateButtonState(button, true, '✅ Report Generated');
+      updateButtonState(button, true, 'Report Generated Successfully!');
     }, RESULTS_DISPLAY_DELAY);
 
     console.log('[OpTel Detective Report] Report generation completed successfully');

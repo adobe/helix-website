@@ -6,7 +6,7 @@
   --color-border: #ccc;
   --color-bg-light: #eee;
   --color-bg-lighter: #fafafa;
-  --color-overlay: rgba(68, 68, 68, 0.7);
+  --color-overlay: rgb(68 68 68 / 70%);
   
   /* Button colors */
   --color-btn-primary: #49cc93; /* --medium-green */
@@ -58,19 +58,20 @@
 .report-modal {
   background: white;
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  animation: modalSlideIn 0.3s ease-out;
+  animation: modal-slide-in 0.3s ease-out;
 }
 
-@keyframes modalSlideIn {
+@keyframes modal-slide-in {
   from {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -132,24 +133,31 @@
   color: var(--color-text-primary);
 }
 
-.report-form-group input {
+/* Quick filter style input (matches rum-slicer.css) */
+.report-quick-filter {
+  padding: var(--spacing-md) 0 var(--spacing-sm);
+  display: flex;
+}
+
+.report-quick-filter input {
   width: 100%;
-  padding: 10px var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 0;
+  padding: var(--spacing-md);
+  background-color: #eee;
   font-size: 14px;
-  font-family: monospace;
+  font-family: inherit;
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
 
-.report-form-group input:focus {
+.report-quick-filter input:focus {
   outline: none;
-  border-color: var(--color-btn-primary);
-  box-shadow: 0 0 0 3px rgba(73, 204, 147, 0.1); /* --medium-green with opacity */
+  border-bottom-color: var(--color-btn-primary);
 }
 
-.report-form-group input::placeholder {
+.report-quick-filter input::placeholder {
   color: var(--color-text-secondary);
 }
 
@@ -171,6 +179,12 @@
   font-size: 15px;
 }
 
+.report-generate-btn:disabled {
+  background: var(--color-btn-disabled);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
 .report-generate-btn:hover:not(:disabled),
 .report-action-btn.primary:hover {
   background: var(--color-btn-primary-hover);
@@ -179,12 +193,6 @@
 
 .report-generate-btn:active:not(:disabled) {
   transform: translateY(0);
-}
-
-.report-generate-btn:disabled {
-  background: var(--color-btn-disabled);
-  color: var(--color-text-secondary);
-  cursor: not-allowed;
 }
 
 /* Info & Status Messages */
@@ -260,11 +268,11 @@
 
 .circular-progress-bar {
   fill: none;
-  stroke: url(#progressGradient);
+  stroke: url("#progressGradient");
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.5s ease;
-  filter: drop-shadow(0 2px 4px rgba(73, 204, 147, 0.3)); /* --medium-green with opacity */
+  filter: drop-shadow(0 2px 4px rgb(73 204 147 / 30%)); /* --medium-green with opacity */
 }
 
 .circular-progress-text {
@@ -316,7 +324,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-3xl);
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
 }
 
 .report-file-icon svg {
@@ -328,6 +336,25 @@
   font-size: 14px;
   color: var(--color-text-secondary);
   font-weight: 500;
+}
+
+.report-meta {
+  text-align: center;
+  padding: 0 var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.report-date {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.report-description {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
 }
 
 .report-actions {

@@ -44,9 +44,11 @@ function createToolDefinition(facetName, description) {
  */
 export function extractFacetsFromExplorer() {
   if (cachedFacetTools) {
+    console.log('[Facet Extraction] Using cached facet tools');
     return cachedFacetTools;
   }
 
+  console.log('[Facet Extraction] Starting facet extraction');
   const facetSidebar = document.querySelector('facet-sidebar');
   if (!facetSidebar) {
     console.error('[Facet Extraction] Facet sidebar not found');
@@ -54,19 +56,33 @@ export function extractFacetsFromExplorer() {
   }
 
   const { dataChunks } = facetSidebar;
+  console.log('[Facet Extraction] DataChunks available:', !!dataChunks);
+  if (dataChunks?.facets) {
+    console.log('[Facet Extraction] DataChunks.facets keys:', Object.keys(dataChunks.facets));
+  }
+
   const facetElements = facetSidebar.querySelectorAll('list-facet, link-facet, literal-facet, file-facet, thumbnail-facet');
+  console.log(`[Facet Extraction] Found ${facetElements.length} facet elements in DOM`);
 
   const tools = [];
-  facetElements.forEach((facetElement) => {
+  const skippedEmptyFacets = [];
+
+  facetElements.forEach((facetElement, index) => {
     const facetName = facetElement.getAttribute('facet');
-    if (!facetName) return;
+    if (!facetName) {
+      console.log(`[Facet Extraction] Skipping facet #${index + 1} - no facet name`);
+      return;
+    }
 
     // Skip empty facets
     if (dataChunks && dataChunks.facets) {
       const facetData = dataChunks.facets[facetName];
       if (!facetData || facetData.length === 0) {
+        console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no data (0 items)`);
+        skippedEmptyFacets.push(facetName);
         return;
       }
+      console.log(`[Facet Extraction] Facet ${facetName} has ${facetData.length} items - including in tools`);
     }
 
     // Get description from help link or legend
@@ -77,10 +93,24 @@ export function extractFacetsFromExplorer() {
     const description = helpTitle || legendText || `Analyze data based on ${facetName}`;
 
     const tool = createToolDefinition(facetName, description);
-    if (tool) tools.push(tool);
+    if (tool) {
+      tools.push(tool);
+      console.log(`[Facet Extraction] ✓ Added tool: ${tool.name} (from facet: ${facetName})`);
+    }
   });
 
-  console.log(`[Facet Extraction] ✓ Created ${tools.length} tools`);
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log('[Facet Extraction] EXTRACTION SUMMARY');
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log(`Total facet elements in DOM: ${facetElements.length}`);
+  console.log(`Skipped empty facets: ${skippedEmptyFacets.length}`);
+  if (skippedEmptyFacets.length > 0) {
+    console.log(`  Empty facets: ${skippedEmptyFacets.join(', ')}`);
+  }
+  console.log(`✓ Created tools: ${tools.length}`);
+  console.log(`  Tool names: ${tools.map((t) => t.name).join(', ')}`);
+  console.log('═══════════════════════════════════════════════════════════');
+
   cachedFacetTools = tools;
   return tools;
 }

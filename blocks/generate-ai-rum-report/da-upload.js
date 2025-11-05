@@ -194,10 +194,16 @@ function transformToTableFormat(content) {
  */
 function generateFilename() {
   const now = new Date();
-  const date = now.toISOString().split('T')[0];
-  const time = now.toTimeString().split(' ')[0].replace(/:/g, '-');
 
-  return `optel-analysis-${date}-${time}.html`;
+  // Human-readable time format: optel-analysis-2025-01-15-at-2-30pm
+  const date = now.toISOString().split('T')[0];
+
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12 || 12; // Convert to 12-hour format
+
+  return `optel-analysis-${date}--${hours}-${minutes}${ampm}.html`;
 }
 
 /**

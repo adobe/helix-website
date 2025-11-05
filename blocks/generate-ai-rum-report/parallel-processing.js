@@ -209,17 +209,67 @@ async function processBatch(
       }
     });
 
-    // Execute tool calls (should be 1 call per batch)
+    // Execute tool calls and send results back to AI
     if (toolCalls.length > 0) {
-      await Promise.all(
+      console.log(`[${toolName}] Executing ${toolCalls.length} tool calls and sending results to AI`);
+
+      const toolResults = await Promise.all(
         toolCalls.map(async (toolCall) => {
           try {
-            await toolHandler(toolCall.name, toolCall.input || {}, true);
+            const result = await toolHandler(toolCall.name, toolCall.input || {}, true);
+            console.log(`[${toolName}] ✓ Tool executed:`, result.success ? `${result.totalItems || 0} items` : result.message);
+            return {
+              type: 'tool_result',
+              tool_use_id: toolCall.id,
+              content: JSON.stringify(result, null, 2),
+            };
           } catch (error) {
             console.error(`[${toolName}] Tool error:`, error.message);
+            return {
+              type: 'tool_result',
+              tool_use_id: toolCall.id,
+              content: JSON.stringify({ success: false, error: error.message }),
+              is_error: true,
+            };
           }
         }),
       );
+
+      // Send tool results back to AI for analysis
+      const followUpRequest = {
+        model: API_CONFIG.MODEL,
+        max_tokens: API_CONFIG.MAX_TOKENS,
+        messages: [
+          { role: 'user', content: batchMessage },
+          { role: 'assistant', content: data.content },
+          { role: 'user', content: toolResults },
+        ],
+        tools: batch.tools,
+        system: systemPrompt,
+        temperature: API_CONFIG.TEMPERATURE,
+      };
+
+      const followUpResponse = await fetch(API_CONFIG.ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+        },
+        body: JSON.stringify(followUpRequest),
+      });
+
+      if (followUpResponse.ok) {
+        const followUpData = await followUpResponse.json();
+        analysis = '';
+        followUpData.content.forEach((item) => {
+          if (item.type === 'text' && item.text.trim()) {
+            analysis += `${item.text.trim()}\n`;
+          }
+        });
+        console.log(`[${toolName}] ✓ AI analyzed tool results: ${analysis.length} chars`);
+      } else {
+        console.error(`[${toolName}] ✗ Failed to send tool results to AI`);
+      }
     } else {
       console.warn(`[${toolName}] ⚠️ Tool not used by AI`);
     }
@@ -335,10 +385,18 @@ export async function processParallelBatches(
   toolHandler,
   progressCallback = null,
 ) {
-  console.log('[Parallel] Starting analysis of', facetTools.length, 'metrics (all in parallel)');
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log('[Parallel] RECEIVED FACET TOOLS');
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log(`Total facet tools received: ${facetTools.length}`);
+  console.log(`Tool names: ${facetTools.map((t) => t.name).join(', ')}`);
+  console.log('═══════════════════════════════════════════════════════════');
 
   const batches = createBatches(facetTools);
-  console.log(`[Parallel] Processing ${batches.length} metrics simultaneously`);
+  console.log(`[Parallel] Created ${batches.length} batches (${BATCH_CONFIG.TOOLS_PER_BATCH} tool per batch)`);
+  batches.forEach((batch) => {
+    console.log(`  Batch ${batch.id}: ${batch.tools.map((t) => t.name).join(', ')}`);
+  });
 
   let completedBatches = 0;
   const updateProgress = () => {

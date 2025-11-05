@@ -4,6 +4,7 @@
 import { uploadToDA, getCurrentAnalyzedUrl, fetchReportsFromDA } from './da-upload.js';
 import { updateButtonState } from './modal-ui.js';
 import { showReportInline, checkForSharedReport } from './report-viewer/report-viewer.js';
+import cleanupMetricsParameter from './cleanup-utils.js';
 
 const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
@@ -177,22 +178,44 @@ export async function initializeSavedReports() {
   }
 }
 
+/**
+ * Close modal, cleanup metrics parameter, and open daterange picker dropdown
+ */
+function closeModalAndOpenDropdown() {
+  document.querySelector('.report-modal-overlay')?.remove();
+  cleanupMetricsParameter();
+
+  // Wait longer for cleanup to complete and dashboard to refresh
+  setTimeout(() => {
+    const picker = document.querySelector('daterange-picker');
+    if (!picker?.shadowRoot) return;
+
+    const input = picker.shadowRoot.querySelector('input');
+    if (!input) return;
+
+    const isExpanded = input.getAttribute('aria-expanded') === 'true';
+    if (!isExpanded) {
+      input.focus();
+      input.click();
+    }
+  }, 800);
+}
+
 async function handleSaveReport(button, reportContent) {
-  updateButtonState(button, true, '💾 Saving...');
+  updateButtonState(button, true, 'Saving Report...');
   try {
-    const currentUrl = getCurrentAnalyzedUrl();
-    await uploadToDA(reportContent, { url: currentUrl, debug: true });
-
-    updateButtonState(button, true, 'Report Saved Successfully');
-
-    // Refresh the reports list from DA after successful save
+    await uploadToDA(reportContent, { url: getCurrentAnalyzedUrl(), debug: true });
+    updateButtonState(button, true, 'Report Saved Successfully!');
     await initializeSavedReports();
     await updateNotificationBadge();
+    // Wait for all updates to complete before closing modal
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+    closeModalAndOpenDropdown();
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('[OpTel Detective Report] Error saving report:', error);
     updateButtonState(button, true, '❌ Error Saving Report');
-    setTimeout(() => updateButtonState(button, false, '💾 Save Report'), CONFIG.ERROR_TIMEOUT);
+    setTimeout(() => updateButtonState(button, false, 'Save Report'), CONFIG.ERROR_TIMEOUT);
   }
 }
 

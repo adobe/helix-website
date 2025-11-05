@@ -75,10 +75,10 @@ async function getOverviewAnalysisTemplate() {
  */
 function buildFormDataSection(dashboardData) {
   let section = '\n\n==== 📝 FORMS DATA - FOR DEDICATED FORMS SECTION ONLY ====\n';
-  section += '⚠️ This data is ONLY for the "Forms Interaction & Conversion Analysis" section.\n';
-  section += '⚠️ DO NOT mention forms in Executive Summary, Key Metrics, or other sections.\n\n';
+  section += '⚠️ This data is ONLY for the "Forms Conversion" section.\n';
+  section += '⚠️ DO NOT mention forms in Executive Summary or other sections.\n\n';
 
-  if (dashboardData.segments['fill.source']) {
+  if (dashboardData.segments['fill.source']?.length > 0) {
     section += '<b>FILL.SOURCE (Form Entry Pages):</b>\n';
     dashboardData.segments['fill.source'].slice(0, 10).forEach((item, idx) => {
       section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form starts`;
@@ -90,7 +90,7 @@ function buildFormDataSection(dashboardData) {
     section += '\n';
   }
 
-  if (dashboardData.segments['formsubmit.source']) {
+  if (dashboardData.segments['formsubmit.source']?.length > 0) {
     section += '<b>FORMSUBMIT.SOURCE (Form Submission Pages):</b>\n';
     dashboardData.segments['formsubmit.source'].slice(0, 10).forEach((item, idx) => {
       section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form submissions`;
@@ -102,7 +102,7 @@ function buildFormDataSection(dashboardData) {
     section += '\n';
   }
 
-  if (dashboardData.segments['formsubmit.target']) {
+  if (dashboardData.segments['formsubmit.target']?.length > 0) {
     section += '<b>FORMSUBMIT.TARGET (Post-Submission Destinations):</b>\n';
     dashboardData.segments['formsubmit.target'].slice(0, 10).forEach((item, idx) => {
       section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} redirects`;
@@ -115,7 +115,7 @@ function buildFormDataSection(dashboardData) {
   }
 
   section += '<b>INSTRUCTIONS:</b>\n';
-  section += '1. Create a dedicated "📝 Forms Interaction & Conversion Analysis" section\n';
+  section += '1. Create a dedicated "Forms Conversion" section with 3-4 bullet points\n';
   section += '2. Use this forms data ONLY in that dedicated section\n';
   section += '3. Analyze the complete funnel: fill.source → formsubmit.source → formsubmit.target\n';
   section += '4. In ALL OTHER SECTIONS, focus on NON-FORM facets\n';
@@ -243,17 +243,23 @@ async function callAnthropicAPI(
       }
       const overviewTemplate = await getOverviewAnalysisTemplate();
 
-      // Check for form data
+      // Check for form data (must have actual items, not just empty arrays)
       const hasFormData = !!(
-        dashboardData.segments['fill.source']
-        || dashboardData.segments['formsubmit.source']
-        || dashboardData.segments['formsubmit.target']
+        (dashboardData.segments['fill.source']?.length > 0)
+        || (dashboardData.segments['formsubmit.source']?.length > 0)
+        || (dashboardData.segments['formsubmit.target']?.length > 0)
       );
 
       let formDataSection = '';
       if (hasFormData) {
-        console.log('[Analysis Engine] Forms data detected - including in report');
+        console.log('[Analysis Engine] Forms data detected - including in report', {
+          'fill.source': dashboardData.segments['fill.source']?.length || 0,
+          'formsubmit.source': dashboardData.segments['formsubmit.source']?.length || 0,
+          'formsubmit.target': dashboardData.segments['formsubmit.target']?.length || 0,
+        });
         formDataSection = buildFormDataSection(dashboardData);
+      } else {
+        console.log('[Analysis Engine] No forms data found - skipping forms section');
       }
 
       // Build final synthesis message
@@ -405,8 +411,21 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
     }
 
     // Extract facet tools
+    console.log('[Analysis Engine] Extracting facet tools from explorer...');
     const facetTools = extractFacetsFromExplorer();
-    console.log(`[Analysis Engine] Found ${facetTools.length} facet tools`);
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('[Analysis Engine] FACET TOOLS EXTRACTION RESULT');
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log(`Total facet tools extracted: ${facetTools.length}`);
+    if (facetTools.length > 0) {
+      console.log('Tool names that will be passed to AI:');
+      facetTools.forEach((tool, idx) => {
+        console.log(`  ${idx + 1}. ${tool.name} - ${tool.description}`);
+      });
+    } else {
+      console.warn('⚠️ WARNING: No facet tools extracted! Analysis will be limited.');
+    }
+    console.log('═══════════════════════════════════════════════════════════');
 
     if (facetTools.length > 0) {
       if (progressCallback) {

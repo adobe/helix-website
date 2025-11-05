@@ -22,16 +22,8 @@ const ELEMENTS = {
 };
 
 const SELECTORS = {
-  METADATA_ITEM: '.metadata-item',
-  METADATA_VALUE: '.metadata-value',
   REPORT_CONTENT: '.report-content',
   REPORT_TABLE: 'table.report-table',
-};
-
-const METADATA_KEYS = {
-  URL: 'Analyzed URL:',
-  DATE: 'Generated on:',
-  MODE: 'Analysis Mode:',
 };
 
 // State
@@ -142,41 +134,6 @@ function showError(container, message = 'Failed to load report') {
 }
 
 /**
- * Extract metadata from report document
- * @param {Document} doc - Parsed HTML document
- * @returns {Object} Metadata object
- */
-function extractMetadata(doc) {
-  const metadata = { url: '', date: '', mode: '' };
-  const items = doc.querySelectorAll(SELECTORS.METADATA_ITEM);
-
-  items.forEach((item) => {
-    const text = item.textContent.trim();
-    const value = item.querySelector(SELECTORS.METADATA_VALUE)?.textContent.trim() || '';
-
-    if (text.includes(METADATA_KEYS.URL)) metadata.url = value;
-    else if (text.includes(METADATA_KEYS.DATE)) metadata.date = value;
-    else if (text.includes(METADATA_KEYS.MODE)) metadata.mode = value;
-  });
-
-  // Fallback: try simple paragraph extraction
-  if (!metadata.url && !metadata.date) {
-    const main = doc.querySelector('main');
-    const paras = main?.querySelectorAll('p') || [];
-    paras.forEach((p) => {
-      const text = p.textContent;
-      if (text.includes(METADATA_KEYS.URL)) {
-        metadata.url = text.replace(METADATA_KEYS.URL, '').trim();
-      } else if (text.includes(METADATA_KEYS.DATE)) {
-        metadata.date = text.replace(METADATA_KEYS.DATE, '').trim();
-      }
-    });
-  }
-
-  return metadata;
-}
-
-/**
  * Extract sections from table format
  * @param {NodeList} tables
  * @returns {Array<{title: string, content: string[]}>}
@@ -265,21 +222,6 @@ function escapeHtml(text) {
 }
 
 /**
- * Create HTML for report header
- * @param {string} filename - Report filename
- * @returns {string}
- */
-function createHeader(filename) {
-  return `
-    <div class="report-header">
-      <button class="report-back-btn">← Back</button>
-      <span class="report-title">${filename || 'Report'}</span>
-      <button class="report-copy-link-btn">🔗 Copy Link</button>
-    </div>
-  `;
-}
-
-/**
  * Create HTML for a report section
  * @param {Object} section - Section object with title and content
  * @returns {string}
@@ -303,34 +245,12 @@ function createSection(section) {
  * Render complete report in container
  * @param {HTMLElement} container
  * @param {string} htmlContent
- * @param {string} filename
- * @param {string} reportHash - Hash ID for shareable link
  */
-function renderReport(container, htmlContent, filename, reportHash) {
+function renderReport(container, htmlContent) {
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
-  const metadata = extractMetadata(doc);
   const sections = extractSections(doc);
 
-  container.innerHTML = `
-    ${createHeader(filename, metadata)}
-    <div class="report-sections">${sections.map(createSection).join('')}</div>
-  `;
-
-  container.querySelector('.report-back-btn')?.addEventListener('click', closeReportViewer);
-
-  const copyBtn = container.querySelector('.report-copy-link-btn');
-  if (copyBtn && reportHash) {
-    copyBtn.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        const orig = copyBtn.textContent;
-        copyBtn.textContent = '✓ Copied!';
-        setTimeout(() => { copyBtn.textContent = orig; }, 2000);
-      } catch (err) {
-        console.error('Copy failed:', err);
-      }
-    };
-  }
+  container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
 }
 
 export function showReportInline(reportPath, reportFilename) {
@@ -353,7 +273,7 @@ export function showReportInline(reportPath, reportFilename) {
 
   fetch(reportPath)
     .then((res) => (res.ok ? res.text() : Promise.reject(new Error(`HTTP ${res.status}`))))
-    .then((html) => renderReport(viewer, html, reportFilename, hash))
+    .then((html) => renderReport(viewer, html))
     .catch((err) => showError(viewer, err.message));
 }
 

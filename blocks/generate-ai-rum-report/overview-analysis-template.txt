@@ -130,32 +130,40 @@ Summarize overall business implications with 3-4 key points:
 <p>• [Competitive advantage or disadvantage based on current metrics and benchmarks]</p>
 
 <b>PRIORITY ACTIONS / CRITICAL FINDINGS</b>
-Conclude with actionable recommendations organized by urgency:
+Summarize the most critical findings and their priority levels with 3-4 key points:
 
-<b>Critical Actions (Immediate - Within 1 Week):</b>
-<p>• [Most critical issue requiring immediate attention with specific fix and expected impact]</p>
-<p>• [Urgent performance or error fix with business impact if delayed]</p>
-<p>• [High-priority optimization with clear ROI and implementation timeframe]</p>
+<p>• [#1 Critical Finding: Most urgent issue that requires immediate action with specific impact if not addressed]</p>
+<p>• [#2 High Priority Finding: Important improvement needed within 2-4 weeks with business justification]</p>
+<p>• [#3 Medium Priority Finding: Strategic enhancement for long-term growth with expected outcomes]</p>
+<p>• [Quick Wins: Low-effort high-impact changes that can be implemented immediately]</p>
 
-<b>High Priority Actions (Next 2-4 Weeks):</b>
-<p>• [Important improvement with significant user experience benefit]</p>
-<p>• [Content or conversion optimization with measurable outcome]</p>
-<p>• [Technical enhancement addressing identified gaps]</p>
+<b>CRITICAL ACTIONS (IMMEDIATE - WITHIN 1 WEEK)</b>
+Provide 3 specific critical actions that require immediate attention:
 
-<b>Medium Priority Actions (Next 1-2 Months):</b>
-<p>• [Strategic improvement for long-term growth]</p>
-<p>• [Optimization opportunity with moderate impact]</p>
-<p>• [Enhancement addressing identified market opportunities]</p>
+<p>• [Specific action 1 with implementation steps and expected impact]</p>
+<p>• [Specific action 2 with resource requirements and timeline]</p>
+<p>• [Specific action 3 with success metrics and monitoring plan]</p>
 
-<b>Quick Wins (Can Implement Immediately):</b>
-<p>• [Low-effort fix with immediate positive impact]</p>
-<p>• [Simple change addressing user pain point]</p>
-<p>• [Quick configuration or content update with measurable benefit]</p>
+<b>HIGH PRIORITY ACTIONS (NEXT 2-4 WEEKS)</b>
+Provide 3 high priority actions for near-term implementation:
 
-<b>Monitoring Recommendations:</b>
-<p>• [Key metrics to track regularly with target thresholds]</p>
-<p>• [Performance indicators to watch for regression or improvement]</p>
-<p>• [Business KPIs to measure success of implemented changes]</p>
+<p>• [Important improvement with implementation approach and expected benefit]</p>
+<p>• [Content or conversion optimization with specific changes needed]</p>
+<p>• [Technical enhancement with resource allocation and delivery timeline]</p>
+
+<b>MEDIUM PRIORITY ACTIONS (NEXT 1-2 MONTHS)</b>
+Provide 3 medium priority actions for strategic improvements:
+
+<p>• [Strategic improvement with long-term value and implementation roadmap]</p>
+<p>• [Optimization opportunity with moderate impact and effort estimation]</p>
+<p>• [Enhancement addressing market opportunities with competitive advantage]</p>
+
+<b>QUICK WINS (CAN IMPLEMENT IMMEDIATELY)</b>
+Provide 3 quick win opportunities for immediate implementation:
+
+<p>• [Low-effort fix with immediate positive impact and minimal resources needed]</p>
+<p>• [Simple change addressing user pain point with quick turnaround]</p>
+<p>• [Configuration or content update with measurable benefit within days]</p>
 
 CRITICAL REQUIREMENTS:
 - ENTIRE REPORT: 1200-1500 words total
