@@ -109,11 +109,10 @@ export default class ListFacet extends HTMLElement {
 
     const sort = this.getAttribute('sort') || 'count';
 
-    const optionKeys = facetEntries.map((f) => f.value)
-      .sort((a, b) => {
-        if (sort === 'count') return 0; // keep the order
-        return a.localeCompare(b);
-      });
+    // Preserve weight-based order from distiller when sort === 'count'
+    const optionKeys = sort === 'count'
+      ? facetEntries.map((f) => f.value)
+      : facetEntries.map((f) => f.value).sort((a, b) => a.localeCompare(b));
 
     const url = new URL(window.location);
     const mode = url.searchParams.get('mode') || this.getAttribute('mode');
