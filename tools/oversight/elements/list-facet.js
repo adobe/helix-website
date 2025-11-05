@@ -210,11 +210,15 @@ export default class ListFacet extends HTMLElement {
         : optionKeys;
 
       const paint = (start = 0, end = numOptions) => {
-        const entries = facetEntries
-          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
-          .sort(
+        let entries = facetEntries
+          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value));
+
+        // Only re-sort if sort !== 'count' (preserve weight-based order from distiller)
+        if (sort !== 'count') {
+          entries = entries.sort(
             ({ value: a }, { value: b }) => filteredKeys.indexOf(a) - filteredKeys.indexOf(b),
           );
+        }
         const prefix = entries.slice(start, end)
           .map((entry) => entry.value)
           .reduce((acc, entry) => {
