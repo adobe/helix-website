@@ -151,6 +151,7 @@ export default class ListFacet extends HTMLElement {
         : optionKeys;
 
       const paint = (start = 0, end = numOptions) => {
+        // Preserve weight-based sorting from distiller - only filter, don't re-sort
         const entries = facetEntries
           .filter((entry) => !filterKeys || filteredKeys.includes(entry.value));
         entries.slice(start, end).forEach((entry) => {
