@@ -16,22 +16,6 @@
   <meta property="og:title" content="Page not found">
   <script nonce="aem" src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
   <script nonce="aem" type="module">
-    window.addEventListener('load', () => {
-      if (document.referrer) {
-        const { origin, pathname } = new URL(document.referrer);
-        if (origin === window.location.origin) {
-          const backBtn = document.createElement('a');
-          backBtn.classList.add('button', 'error-button-back');
-          backBtn.href = pathname;
-          backBtn.textContent = 'Go back';
-          backBtn.title = 'Go back';
-          const btnContainer = document.querySelector('.button-container');
-          btnContainer.append(backBtn);
-        }
-      }
-    });
-  </script>
-  <script nonce="aem" type="module">
     import { sampleRUM } from '/scripts/lib-franklin.js';
     import { applyRedirects } from '/scripts/redirects.js';
     await applyRedirects();
@@ -44,15 +28,240 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: var(--spacing-s);
+    }
+
+    main.error .section {
+      max-width: 700px;
+      width: 100%;
       text-align: center;
     }
 
     main.error .error-number {
       width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
     }
 
     main.error .error-number text {
       font-family: monospace;
+      fill: var(--spectrum-blue);
+    }
+
+    main.error .error-message {
+      margin: var(--spacing-s) 0;
+    }
+
+    main.error .error-description {
+      color: var(--color-gray-500);
+      margin-bottom: var(--spacing-m);
+    }
+
+    /* Search box styling */
+    .error-search-container {
+      margin: var(--spacing-m) 0;
+    }
+
+    .error-search-form {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto var(--spacing-s);
+    }
+
+    .error-search-input {
+      width: 100%;
+      padding: 12px 40px 12px 16px;
+      font-size: 16px;
+      border: 2px solid var(--color-gray-200);
+      border-radius: 8px;
+      font-family: var(--body-font-family);
+      transition: border-color 0.2s ease;
+      background-color: var(--color-white);
+      color: var(--color-black);
+    }
+
+    .error-search-input:focus {
+      outline: none;
+      border-color: var(--spectrum-blue);
+    }
+
+    .error-search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .error-search-icon path {
+      fill: var(--color-gray-500);
+    }
+
+    .error-search-results {
+      margin-top: var(--spacing-s);
+      text-align: left;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .error-search-results.visible {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .error-search-results a {
+      display: block;
+      padding: var(--spacing-xs);
+      margin-bottom: var(--spacing-xxs);
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--color-black);
+      background-color: rgb(0 0 0 / 3%);
+      transition: background-color 0.2s ease;
+    }
+
+    .error-search-results a:hover {
+      background-color: rgb(0 0 0 / 6%);
+    }
+
+    .error-search-results a strong {
+      display: block;
+      color: var(--spectrum-blue);
+      margin-bottom: 4px;
+    }
+
+    .error-search-results a span {
+      font-size: 14px;
+      color: var(--color-gray-500);
+    }
+
+    /* Popular pages section */
+    .error-suggestions {
+      margin: var(--spacing-m) 0;
+      text-align: left;
+    }
+
+    .error-suggestions h3 {
+      font-size: 18px;
+      margin-bottom: var(--spacing-s);
+      text-align: center;
+    }
+
+    .error-suggestions-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: var(--spacing-xs);
+    }
+
+    .error-suggestions-list li a {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-xs);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--color-black);
+      background-color: rgb(0 0 0 / 3%);
+      transition: all 0.2s ease;
+    }
+
+    .error-suggestions-list li a:hover {
+      background-color: rgb(0 0 0 / 6%);
+      transform: translateX(4px);
+    }
+
+    .error-suggestions-list li a::before {
+      content: "→";
+      margin-right: var(--spacing-xs);
+      color: var(--spectrum-blue);
+      font-weight: bold;
+    }
+
+    /* Key sections */
+    .error-key-sections {
+      margin-top: var(--spacing-m);
+      display: flex;
+      gap: var(--spacing-xs);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .error-key-sections a {
+      text-decoration: none;
+    }
+
+    /* Buttons */
+    .button-container {
+      margin-top: var(--spacing-m);
+    }
+
+    .button-container a {
+      margin: 0 var(--spacing-xxs);
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      main.error .error-description {
+        color: #b3b3b3;
+      }
+
+      .error-search-input {
+        background-color: var(--color-gray-200);
+        border-color: var(--color-gray-500);
+        color: var(--color-white);
+      }
+
+      .error-search-results a {
+        background-color: rgb(255 255 255 / 8%);
+        color: var(--color-white);
+      }
+
+      .error-search-results a:hover {
+        background-color: rgb(255 255 255 / 12%);
+      }
+
+      .error-search-results a span {
+        color: #b3b3b3;
+      }
+
+      .error-suggestions-list li a {
+        background-color: rgb(255 255 255 / 8%);
+        color: var(--color-white);
+      }
+
+      .error-suggestions-list li a:hover {
+        background-color: rgb(255 255 255 / 12%);
+      }
+    }
+
+    /* Responsive design */
+    @media (width <= 600px) {
+      main.error {
+        padding: var(--spacing-xs);
+      }
+
+      .error-search-input {
+        font-size: 14px;
+        padding: 10px 36px 10px 12px;
+      }
+
+      .error-key-sections {
+        flex-direction: column;
+      }
+
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+      }
+
+      .button-container a {
+        margin: 0;
+      }
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -66,12 +275,173 @@
         <text x="0" y="17">404</text>
       </svg>
       <h2 class="error-message">Page Not Found</h2>
+      <p class="error-description">
+        We couldn't find the page you're looking for. Try searching or visit one of these helpful pages.
+      </p>
+
+      <!-- Search box -->
+      <div class="error-search-container">
+        <form class="error-search-form" action="/docs/" method="get">
+          <input
+            type="search"
+            name="q"
+            class="error-search-input"
+            placeholder="Search documentation..."
+            aria-label="Search documentation"
+            autofocus
+          >
+          <svg class="error-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z" />
+          </svg>
+        </form>
+        <div class="error-search-results" id="search-results" aria-live="polite"></div>
+      </div>
+
+      <!-- Popular/helpful pages -->
+      <div class="error-suggestions">
+        <h3>Popular Pages</h3>
+        <ul class="error-suggestions-list">
+          <li><a href="/developer/tutorial">Getting Started – Developer Tutorial</a></li>
+          <li><a href="/docs/">Documentation</a></li>
+          <li><a href="/docs/authoring">Authoring and Publishing Content</a></li>
+          <li><a href="/developer/block-collection">Block Collection</a></li>
+          <li><a href="/docs/sidekick">Using AEM Sidekick</a></li>
+          <li><a href="/docs/go-live-checklist">Go-Live Checklist</a></li>
+        </ul>
+      </div>
+
+      <!-- Key sections -->
+      <div class="error-key-sections">
+        <a href="/developer" class="button secondary">For Developers</a>
+        <a href="/business" class="button secondary">For Business</a>
+      </div>
+
+      <!-- Back/Home buttons -->
       <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
+        <a href="/" class="button primary error-button-home">Go Home</a>
       </p>
     </div>
   </main>
   <footer></footer>
+
+  <!-- Enhanced search functionality with JS -->
+  <script nonce="aem" type="module">
+    // Progressive enhancement: add live search if JS is available
+    (async () => {
+      const input = document.querySelector('.error-search-input');
+      const resultsContainer = document.getElementById('search-results');
+      const form = document.querySelector('.error-search-form');
+
+      if (!input || !resultsContainer) return;
+
+      let docs = [];
+
+      // Fetch documentation index
+      try {
+        const resp = await fetch('/docpages-index.json');
+        const json = await resp.json();
+        docs = json.data || [];
+      } catch (error) {
+        // Graceful degradation: search will submit to /docs/ if fetch fails
+        return;
+      }
+
+      // Add "Go back" button if coming from same site
+      if (document.referrer) {
+        const { origin, pathname } = new URL(document.referrer);
+        if (origin === window.location.origin) {
+          const backBtn = document.createElement('a');
+          backBtn.classList.add('button', 'secondary', 'error-button-back');
+          backBtn.href = pathname;
+          backBtn.textContent = 'Go Back';
+          backBtn.title = 'Go back';
+          const btnContainer = document.querySelector('.button-container');
+          btnContainer.prepend(backBtn);
+        }
+      }
+
+      // Simple search function
+      function searchDocs(query) {
+        if (!query.trim() || query.length < 2) {
+          resultsContainer.innerHTML = '';
+          resultsContainer.classList.remove('visible');
+          return;
+        }
+
+        const terms = query.toLowerCase().split(' ').filter(t => t.length > 2);
+        const matches = docs.filter(doc => {
+          const searchText = `${doc.title} ${doc.description || ''}`.toLowerCase();
+          return terms.some(term => searchText.includes(term));
+        }).slice(0, 5);
+
+        if (matches.length > 0) {
+          resultsContainer.innerHTML = matches.map(match => `
+            <a href="${match.path}">
+              <strong>${match.title}</strong>
+              ${match.description ? `<span>${match.description.substring(0, 100)}...</span>` : ''}
+            </a>
+          `).join('');
+          resultsContainer.classList.add('visible');
+        } else {
+          resultsContainer.innerHTML = '<a href="/docs/"><strong>No results found</strong><span>Visit our documentation page</span></a>';
+          resultsContainer.classList.add('visible');
+        }
+      }
+
+      // Debounce function
+      let debounceTimer;
+      function debounce(func, delay = 300) {
+        return (...args) => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => func(...args), delay);
+        };
+      }
+
+      // Listen for input
+      input.addEventListener('input', debounce((e) => {
+        searchDocs(e.target.value);
+      }, 200));
+
+      // Handle form submission
+      form.addEventListener('submit', (e) => {
+        const firstResult = resultsContainer.querySelector('a');
+        if (firstResult && input.value.trim()) {
+          e.preventDefault();
+          window.location.href = firstResult.href;
+        }
+      });
+
+      // Keyboard navigation
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const firstResult = resultsContainer.querySelector('a');
+          if (firstResult) firstResult.focus();
+        }
+      });
+
+      // Handle navigation within results
+      resultsContainer.addEventListener('keydown', (e) => {
+        const links = Array.from(resultsContainer.querySelectorAll('a'));
+        const currentIndex = links.indexOf(document.activeElement);
+
+        if (e.key === 'ArrowDown' && currentIndex < links.length - 1) {
+          e.preventDefault();
+          links[currentIndex + 1].focus();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (currentIndex > 0) {
+            links[currentIndex - 1].focus();
+          } else {
+            input.focus();
+          }
+        } else if (e.key === 'Escape') {
+          input.focus();
+          resultsContainer.classList.remove('visible');
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>
