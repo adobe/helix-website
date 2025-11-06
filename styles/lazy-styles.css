@@ -71,3 +71,87 @@
   font-style: normal;
   font-weight: 900;
 }
+
+/* Code block copy button */
+pre:has(code) {
+  position: relative;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px 10px;
+  background-color: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  font-family: var(--body-font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.code-copy-button:hover {
+  opacity: 1;
+  background-color: rgb(255 255 255 / 15%);
+  border-color: rgb(255 255 255 / 30%);
+}
+
+.code-copy-button:active {
+  transform: scale(0.95);
+}
+
+.code-copy-button:focus-visible {
+  outline: 2px solid var(--spectrum-blue);
+  outline-offset: 2px;
+}
+
+.code-copy-icon::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+}
+
+.code-copy-button.copied {
+  background-color: rgb(46 184 92 / 20%);
+  border-color: rgb(46 184 92 / 40%);
+}
+
+.code-copy-button.copied .code-copy-icon::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2346b85c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.code-copy-button.copied::after {
+  content: "Copied!";
+  margin-left: 6px;
+  font-size: 12px;
+  color: #46b85c;
+}
+
+/* Adjust for smaller screens */
+@media (width <= 600px) {
+  .code-copy-button {
+    top: 4px;
+    right: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .code-copy-icon::before {
+    width: 14px;
+    height: 14px;
+  }
+
+  .code-copy-button.copied::after {
+    font-size: 11px;
+  }
+}
