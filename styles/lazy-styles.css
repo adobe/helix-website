@@ -71,3 +71,95 @@
   font-style: normal;
   font-weight: 900;
 }
+
+/* Reading progress bar */
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--spectrum-blue), #4b9ff5);
+  z-index: 9999;
+  transition: width 0.1s ease-out;
+  pointer-events: none;
+}
+
+/* Back to top button */
+.back-to-top {
+  position: fixed;
+  bottom: var(--spacing-m);
+  right: var(--spacing-m);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--spectrum-blue);
+  color: var(--color-white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  z-index: 1000;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background-color: #0d66d0;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 25%);
+  transform: translateY(-2px);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+}
+
+.back-to-top:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(20 115 230 / 30%), 0 4px 12px rgb(0 0 0 / 15%);
+}
+
+.back-to-top svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .reading-progress-bar {
+    background: linear-gradient(90deg, #4b9ff5, #7db8f7);
+  }
+
+  .back-to-top {
+    background-color: #4b9ff5;
+  }
+
+  .back-to-top:hover {
+    background-color: #7db8f7;
+  }
+}
+
+/* Mobile adjustments */
+@media (width <= 600px) {
+  .back-to-top {
+    bottom: var(--spacing-s);
+    right: var(--spacing-s);
+    width: 44px;
+    height: 44px;
+  }
+
+  .back-to-top svg {
+    width: 20px;
+    height: 20px;
+  }
+}
