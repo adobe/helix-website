@@ -114,3 +114,8 @@ dist
 junit.xml
 # jetbrains files
 .idea/
+
+# Drafts and temporary test files
+drafts/
+test/tmp/
+.yolo/
