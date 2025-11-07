@@ -105,18 +105,20 @@ export default class ListFacet extends HTMLElement {
     const facetEntries = this.dataChunks.facets[facetName];
     const enabled = !this.closest('facet-sidebar[aria-disabled="true"]');
 
-    const sort = this.getAttribute('sort') || 'count';
+    const [sortMetric, sortProperty] = (this.getAttribute('sort') || 'weight').split('.');
 
-    const optionKeys = facetEntries.map((f) => f.value)
+    const optionKeys = facetEntries
       .sort((a, b) => {
-        if (sort === 'count') return 0; // keep the order
-        // try to coerce into number (ignore prefixes)
-        const aNum = Number.parseFloat(a.replace(/[^0-9.]/g, ''));
-        const bNum = Number.parseFloat(b.replace(/[^0-9.]/g, ''));
-        // if not a number, just sort alphabetically
-        if (Number.isNaN(aNum) || Number.isNaN(bNum)) return a.localeCompare(b);
-        return aNum - bNum;
-      });
+        if (sortMetric === 'count') return 0; // keep the default order from distiller
+        if (sortMetric === 'weight') return b.weight - a.weight; // order by weight, aka number of page views
+        if (sortMetric === 'value') return a.value.localeCompare(b.value);
+        // get metric and property (e.g. lcp.mean)
+        const aNum = a.metrics[sortMetric][sortProperty];
+        const bNum = b.metrics[sortMetric][sortProperty];
+        return bNum - aNum;
+      })
+      // we only care about the value, not the full object
+      .map((f) => f.value);
 
     const url = new URL(window.location);
     const drilldownAtt = this.getAttribute('drilldown');
