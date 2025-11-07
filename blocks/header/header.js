@@ -514,7 +514,7 @@ export default async function init(blockEl) {
   // OLD CODE: const url = getMetadata('gnav') || '/gnav';
   const url = '/new-nav';
   const header = blockEl.parentElement;
-  const inlined = header.firstChildElement !== blockEl;
+  const inlined = header.firstElementChild !== blockEl;
   let html = '';
   if (inlined) {
     while (header.firstElementChild && header.firstElementChild !== blockEl) {

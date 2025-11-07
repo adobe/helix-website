@@ -122,7 +122,7 @@ export default async function decorate(block) {
 
   const footerPath = cfg.footer || '/new-footer';
   const footerElement = block.parentElement;
-  const inlined = footerElement.firstChildElement !== block;
+  const inlined = footerElement.firstElementChild !== block;
   let html = '';
   if (inlined) {
     while (footerElement.firstElementChild && footerElement.firstElementChild !== block) {
