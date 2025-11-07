@@ -550,13 +550,13 @@ function rotatePlaceholder(currIndex, input, results, placeholders, isHomepage) 
 }
 
 /**
- * Finds last visible link within results container.
+ * Finds first visible link within results container.
  * @param {HTMLElement} results - Results container.
- * @returns {HTMLAnchorElement|null} Last visible link if exists, otherwise null.
+ * @returns {HTMLAnchorElement|null} First visible link if exists, otherwise null.
  */
 function findResultLink(results) {
   const links = results.querySelectorAll('a[href]');
-  const result = links[links.length - 1];
+  const result = links[0];
   // only return link if visible to user
   return result.offsetParent ? result : null;
 }
