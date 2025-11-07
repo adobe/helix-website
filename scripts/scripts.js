@@ -31,6 +31,8 @@ const AUDIENCES = {
   // define your custom audiences here as needed
 };
 
+const LONG_FORM_TEMPLATES = ['docs-template', 'guides-template', 'blog-template'];
+
 window.hlx.plugins.add('performance', {
   condition: () => window.name.includes('performance'),
   load: 'eager',
@@ -181,6 +183,113 @@ export function decorateHeadings(main) {
 export function addMessageBoxOnGuideTemplate(main) {
   const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
   main.append(messageBox);
+}
+
+const isLongFormPage = () => LONG_FORM_TEMPLATES
+  .some((tplClass) => document.body.classList.contains(tplClass));
+
+const hasScrollableLongFormContent = () => {
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  return scrollable > window.innerHeight * 0.35;
+};
+
+function initReadingProgress() {
+  if (!isLongFormPage() || document.querySelector('.reading-progress')) return;
+
+  const progressBar = createTag('div', {
+    class: 'reading-progress',
+    'aria-hidden': 'true',
+  });
+  const fill = createTag('span', { class: 'reading-progress-fill' });
+  progressBar.append(fill);
+  document.body.prepend(progressBar);
+
+  const updateProgress = () => {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const canScroll = scrollable > 0;
+    const isLongEnough = hasScrollableLongFormContent();
+    progressBar.classList.toggle('is-hidden', !isLongEnough);
+    if (!canScroll || !isLongEnough) {
+      fill.style.transform = 'scaleX(0)';
+      return;
+    }
+    const progress = Math.min(window.scrollY / scrollable, 1);
+    fill.style.transform = `scaleX(${progress})`;
+  };
+
+  updateProgress();
+
+  let ticking = false;
+  const handleScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        updateProgress();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('resize', updateProgress);
+}
+
+function initBackToTopButton() {
+  if (!isLongFormPage() || document.querySelector('.back-to-top-button')) return;
+
+  const button = createTag('button', {
+    type: 'button',
+    class: 'back-to-top-button',
+    'aria-label': 'Back to top',
+  });
+  const icon = createTag('span', {
+    class: 'back-to-top-button-icon',
+    'aria-hidden': 'true',
+  });
+  const label = createTag('span', { class: 'back-to-top-button-label' }, 'Back to top');
+  button.append(icon, label);
+  document.body.append(button);
+
+  const prefersReducedMotionQuery = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)')
+    : null;
+  let prefersReducedMotion = prefersReducedMotionQuery?.matches;
+  const updateMotionPreference = (event) => {
+    prefersReducedMotion = event.matches;
+  };
+  if (prefersReducedMotionQuery?.addEventListener) {
+    prefersReducedMotionQuery.addEventListener('change', updateMotionPreference);
+  } else if (prefersReducedMotionQuery?.addListener) {
+    prefersReducedMotionQuery.addListener(updateMotionPreference);
+  }
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
+    button.blur();
+  };
+
+  button.addEventListener('click', scrollToTop);
+
+  const toggleVisibility = () => {
+    const canScroll = hasScrollableLongFormContent();
+    if (!canScroll) {
+      button.classList.remove('is-visible');
+      button.setAttribute('aria-hidden', 'true');
+      button.setAttribute('tabindex', '-1');
+      return;
+    }
+    button.removeAttribute('aria-hidden');
+    button.removeAttribute('tabindex');
+    const shouldShow = window.scrollY > window.innerHeight * 0.8;
+    button.classList.toggle('is-visible', shouldShow);
+  };
+
+  toggleVisibility();
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  window.addEventListener('resize', toggleVisibility);
 }
 
 export function addHeadingAnchorLink(elem) {
@@ -776,6 +885,9 @@ async function loadLazy(doc) {
   loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+
+  initReadingProgress();
+  initBackToTopButton();
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
