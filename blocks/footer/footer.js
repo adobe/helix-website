@@ -121,8 +121,18 @@ export default async function decorate(block) {
   block.classList.add('contained');
 
   const footerPath = cfg.footer || '/new-footer';
-  const resp = await fetch(`${footerPath}.plain.html`);
-  const html = await resp.text();
+  const footerElement = block.parentElement;
+  const inlined = footerElement.firstChildElement !== block;
+  let html = '';
+  if (inlined) {
+    while (footerElement.firstElementChild && footerElement.firstElementChild !== block) {
+      html += footerElement.firstElementChild.outerHTML;
+      footerElement.firstElementChild.remove();
+    }
+  } else {
+    const resp = await fetch(`${footerPath}.plain.html`);
+    html = await resp.text();
+  }
 
   // create a wrapper & allow extract of fetched footer content
   const footer = document.createElement('div');
