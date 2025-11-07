@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-import { utils, stats } from '@adobe/rum-distiller';
+import { stats, utils } from '@adobe/rum-distiller';
 import {
   escapeHTML, toHumanReadable,
 } from '../utils.js';
@@ -109,7 +109,9 @@ export default class ListFacet extends HTMLElement {
 
     const sort = this.getAttribute('sort') || 'count';
 
-    const optionKeys = facetEntries.map((f) => f.value)
+    const optionKeys = facetEntries
+      .sort(({ weight: a }, { weight: b }) => b - a) // sort by weight first
+      .map((f) => f.value)
       .sort((a, b) => {
         if (sort === 'count') return 0; // keep the order
         return a.localeCompare(b);
