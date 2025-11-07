@@ -777,6 +777,61 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
 
+  // Initialize reading progress bar and back-to-top button
+  const initReadingProgressAndBackToTop = () => {
+    // Create reading progress bar
+    const progressContainer = createTag('div', { class: 'reading-progress' });
+    const progressBar = createTag('div', { class: 'reading-progress-bar' });
+    progressContainer.append(progressBar);
+    document.body.prepend(progressContainer);
+
+    // Create back-to-top button
+    const backToTopBtn = createTag('button', {
+      class: 'back-to-top',
+      'aria-label': 'Back to top',
+      type: 'button',
+    });
+    document.body.append(backToTopBtn);
+
+    // Update progress bar on scroll
+    const updateReadingProgress = () => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrollTop = window.scrollY;
+      const progress = documentHeight > 0 ? (scrollTop / documentHeight) * 100 : 0;
+      progressBar.style.width = `${progress}%`;
+
+      // Show/hide back-to-top button after scrolling past first screen
+      if (scrollTop > windowHeight) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    };
+
+    // Handle back-to-top button click
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Throttle scroll events for better performance
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateReadingProgress();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // Initialize on page load
+    updateReadingProgress();
+  };
+
+  initReadingProgressAndBackToTop();
+
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
     doc.querySelector('footer').remove();
