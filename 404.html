@@ -45,14 +45,280 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      padding: var(--spacing-m);
+    }
+
+    main.error .section {
+      max-width: 800px;
+      width: 100%;
     }
 
     main.error .error-number {
       width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
     }
 
     main.error .error-number text {
       font-family: monospace;
+    }
+
+    main.error .error-message {
+      margin: var(--spacing-m) 0;
+    }
+
+    main.error .error-description {
+      margin: var(--spacing-s) auto;
+      max-width: 600px;
+      color: var(--text-color, #2c2c2c);
+      font-size: var(--type-body-m-size);
+      line-height: var(--type-body-m-lh);
+    }
+
+    main.error .search-container {
+      margin: var(--spacing-l) auto;
+      max-width: 600px;
+    }
+
+    main.error .search-box {
+      position: relative;
+      width: 100%;
+    }
+
+    main.error .search-input {
+      width: 100%;
+      padding: 14px 48px 14px 16px;
+      font-size: var(--type-body-m-size);
+      font-family: var(--body-font-family);
+      border: 2px solid var(--color-gray-200, #e1e1e1);
+      border-radius: 8px;
+      background: var(--background-color, #fff);
+      color: var(--text-color, #2c2c2c);
+      transition: border-color 0.2s ease;
+    }
+
+    main.error .search-input:focus {
+      outline: none;
+      border-color: var(--spectrum-blue, #1473e6);
+    }
+
+    main.error .search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      color: var(--color-gray-500, #707070);
+    }
+
+    main.error .search-results {
+      margin-top: var(--spacing-xs);
+      text-align: left;
+      background: var(--background-color, #fff);
+      border: 1px solid var(--color-gray-200, #e1e1e1);
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    main.error .search-results.active {
+      display: block;
+    }
+
+    main.error .search-result-item {
+      padding: var(--spacing-xs);
+      border-bottom: 1px solid var(--color-gray-200, #e1e1e1);
+      transition: background-color 0.15s ease;
+    }
+
+    main.error .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    main.error .search-result-item:hover,
+    main.error .search-result-item:focus {
+      background-color: var(--color-gray-100, #f5f5f5);
+    }
+
+    main.error .search-result-link {
+      display: block;
+      color: var(--spectrum-blue, #1473e6);
+      text-decoration: none;
+      font-size: var(--type-body-s-size);
+      line-height: var(--type-body-s-lh);
+    }
+
+    main.error .search-result-link:hover {
+      text-decoration: underline;
+    }
+
+    main.error .search-result-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    main.error .search-result-desc {
+      color: var(--text-color, #2c2c2c);
+      opacity: 0.8;
+      font-size: var(--type-body-xs-size);
+    }
+
+    main.error .popular-pages {
+      margin: var(--spacing-xl) auto var(--spacing-m);
+      max-width: 600px;
+      text-align: left;
+    }
+
+    main.error .popular-pages h3 {
+      font-size: var(--type-heading-m-size);
+      line-height: var(--type-heading-m-lh);
+      margin-bottom: var(--spacing-s);
+      text-align: center;
+    }
+
+    main.error .popular-pages-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    main.error .popular-pages-item {
+      margin-bottom: var(--spacing-xs);
+    }
+
+    main.error .popular-pages-link {
+      display: block;
+      padding: var(--spacing-xs);
+      color: var(--spectrum-blue, #1473e6);
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.15s ease;
+      font-size: var(--type-body-s-size);
+    }
+
+    main.error .popular-pages-link:hover,
+    main.error .popular-pages-link:focus {
+      background-color: var(--color-gray-100, #f5f5f5);
+      text-decoration: underline;
+    }
+
+    main.error .key-sections {
+      margin: var(--spacing-l) auto 0;
+      text-align: left;
+      max-width: 600px;
+    }
+
+    main.error .key-sections h3 {
+      font-size: var(--type-heading-m-size);
+      line-height: var(--type-heading-m-lh);
+      margin-bottom: var(--spacing-s);
+      text-align: center;
+    }
+
+    main.error .key-sections-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-xs);
+    }
+
+    main.error .key-sections-item {
+      margin: 0;
+    }
+
+    main.error .key-sections-link {
+      display: block;
+      padding: var(--spacing-xs);
+      color: var(--spectrum-blue, #1473e6);
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.15s ease;
+      font-size: var(--type-body-s-size);
+      text-align: center;
+    }
+
+    main.error .key-sections-link:hover,
+    main.error .key-sections-link:focus {
+      background-color: var(--color-gray-100, #f5f5f5);
+      text-decoration: underline;
+    }
+
+    main.error .button-container {
+      margin-top: var(--spacing-l);
+      display: flex;
+      gap: var(--spacing-xs);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      main.error .error-description,
+      main.error .search-result-desc {
+        color: var(--text-color, #e1e1e1);
+      }
+
+      main.error .search-input {
+        background: var(--background-color, #2c2c2c);
+        color: var(--text-color, #e1e1e1);
+        border-color: var(--color-gray-500, #707070);
+      }
+
+      main.error .search-results {
+        background: var(--background-color, #2c2c2c);
+        border-color: var(--color-gray-500, #707070);
+      }
+
+      main.error .search-result-item {
+        border-bottom-color: var(--color-gray-500, #707070);
+      }
+
+      main.error .search-result-item:hover,
+      main.error .search-result-item:focus {
+        background-color: var(--color-gray-200, #404040);
+      }
+
+      main.error .popular-pages-link:hover,
+      main.error .popular-pages-link:focus,
+      main.error .key-sections-link:hover,
+      main.error .key-sections-link:focus {
+        background-color: var(--color-gray-200, #404040);
+      }
+    }
+
+    @media (max-width: 600px) {
+      main.error {
+        padding: var(--spacing-s);
+      }
+
+      main.error .error-number {
+        max-width: 200px;
+      }
+
+      main.error .key-sections-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .noscript-message {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: var(--spacing-xs);
+      margin-bottom: var(--spacing-m);
+      border-radius: 4px;
+      text-align: center;
+      font-size: var(--type-body-xs-size);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .noscript-message {
+        background-color: #856404;
+        color: #fff3cd;
+      }
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -62,16 +328,192 @@
   <header></header>
   <main class="error">
     <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
+      <svg viewBox="1 0 38 18" class="error-number" aria-hidden="true">
         <text x="0" y="17">404</text>
       </svg>
-      <h2 class="error-message">Page Not Found</h2>
+      <h1 class="error-message">Page Not Found</h1>
+      <p class="error-description">
+        Sorry, we couldn't find the page you're looking for. The page may have been moved, deleted, or the URL might be incorrect.
+      </p>
+
+      <noscript>
+        <div class="noscript-message">
+          Search functionality requires JavaScript. Please enable JavaScript for the best experience.
+        </div>
+      </noscript>
+
+      <div class="search-container">
+        <div class="search-box">
+          <label for="search-404" class="visually-hidden">Search for pages</label>
+          <input
+            type="search"
+            id="search-404"
+            class="search-input"
+            placeholder="Search for pages..."
+            autocomplete="off"
+            aria-label="Search for pages"
+            autofocus
+          />
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </div>
+        <div class="search-results" role="listbox" aria-label="Search results"></div>
+      </div>
+
+      <div class="popular-pages">
+        <h3>Popular Pages</h3>
+        <ul class="popular-pages-list">
+          <li class="popular-pages-item">
+            <a href="/developer/tutorial" class="popular-pages-link">Developer Tutorial</a>
+          </li>
+          <li class="popular-pages-item">
+            <a href="/developer/block-collection" class="popular-pages-link">Block Collection</a>
+          </li>
+          <li class="popular-pages-item">
+            <a href="/docs/" class="popular-pages-link">Documentation</a>
+          </li>
+          <li class="popular-pages-item">
+            <a href="/developer/keeping-it-100" class="popular-pages-link">Keeping it 100</a>
+          </li>
+          <li class="popular-pages-item">
+            <a href="/blog" class="popular-pages-link">Blog</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="key-sections">
+        <h3>Key Sections</h3>
+        <ul class="key-sections-list">
+          <li class="key-sections-item">
+            <a href="/home" class="key-sections-link">Home</a>
+          </li>
+          <li class="key-sections-item">
+            <a href="/developer" class="key-sections-link">For Developers</a>
+          </li>
+          <li class="key-sections-item">
+            <a href="/business" class="key-sections-link">For Business</a>
+          </li>
+          <li class="key-sections-item">
+            <a href="/community" class="key-sections-link">Community</a>
+          </li>
+        </ul>
+      </div>
+
       <p class="button-container">
         <a href="/" class="button secondary error-button-home">Go home</a>
       </p>
     </div>
   </main>
   <footer></footer>
+  <script nonce="aem" type="module">
+    // Progressive enhancement: Add search functionality
+    const searchInput = document.getElementById('search-404');
+    const searchResults = document.querySelector('.search-results');
+    let queryIndex = null;
+    let debounceTimer = null;
+
+    // Fetch query index
+    async function loadQueryIndex() {
+      try {
+        const response = await fetch('/query-index.json');
+        const data = await response.json();
+        queryIndex = data.data || [];
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load query index:', error);
+      }
+    }
+
+    // Search function
+    function performSearch(query) {
+      if (!query || !queryIndex) {
+        searchResults.classList.remove('active');
+        return;
+      }
+
+      const normalizedQuery = query.toLowerCase().trim();
+      const results = queryIndex
+        .filter((item) => {
+          const titleMatch = item.title?.toLowerCase().includes(normalizedQuery);
+          const pathMatch = item.path?.toLowerCase().includes(normalizedQuery);
+          const descMatch = item.description?.toLowerCase().includes(normalizedQuery);
+          return titleMatch || pathMatch || descMatch;
+        })
+        .slice(0, 8);
+
+      if (results.length === 0) {
+        searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+        searchResults.classList.add('active');
+        return;
+      }
+
+      searchResults.innerHTML = results
+        .map((item) => `
+          <div class="search-result-item">
+            <a href="${item.path}" class="search-result-link">
+              <div class="search-result-title">${item.title}</div>
+              ${item.description ? `<div class="search-result-desc">${item.description.substring(0, 120)}...</div>` : ''}
+            </a>
+          </div>
+        `)
+        .join('');
+      searchResults.classList.add('active');
+    }
+
+    // Debounced search
+    searchInput?.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        performSearch(e.target.value);
+      }, 300);
+    });
+
+    // Keyboard navigation
+    searchInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchResults.classList.remove('active');
+        searchInput.value = '';
+      } else if (e.key === 'ArrowDown' && searchResults.classList.contains('active')) {
+        e.preventDefault();
+        const firstLink = searchResults.querySelector('a');
+        firstLink?.focus();
+      }
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-box') && !e.target.closest('.search-results')) {
+        searchResults.classList.remove('active');
+      }
+    });
+
+    // Keyboard navigation in results
+    searchResults?.addEventListener('keydown', (e) => {
+      const items = Array.from(searchResults.querySelectorAll('a'));
+      const currentIndex = items.indexOf(document.activeElement);
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+        items[nextIndex]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentIndex === 0 || currentIndex === -1) {
+          searchInput.focus();
+        } else {
+          items[currentIndex - 1]?.focus();
+        }
+      } else if (e.key === 'Escape') {
+        searchResults.classList.remove('active');
+        searchInput.focus();
+      }
+    });
+
+    // Load query index on page load
+    loadQueryIndex();
+  </script>
 </body>
 
 </html>
