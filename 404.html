@@ -37,6 +37,106 @@
     await applyRedirects();
     sampleRUM('404', { source: document.referrer });
   </script>
+  <script nonce="aem" type="module">
+    // Enhanced 404 functionality with search
+    async function initSearch() {
+      const searchInput = document.getElementById('search-404');
+      const resultsContainer = document.getElementById('search-results');
+
+      if (!searchInput || !resultsContainer) return;
+
+      let index = [];
+
+      // Fetch the query index
+      try {
+        const response = await fetch('/query-index.json');
+        const data = await response.json();
+        index = data.data || [];
+      } catch (error) {
+        console.error('Failed to load search index:', error);
+      }
+
+      // Search function
+      function performSearch(query) {
+        if (!query || query.length < 2) {
+          resultsContainer.innerHTML = '';
+          resultsContainer.setAttribute('aria-hidden', 'true');
+          return;
+        }
+
+        const lowerQuery = query.toLowerCase();
+        const results = index
+          .filter(item => {
+            const title = (item.title || '').toLowerCase();
+            const description = (item.description || '').toLowerCase();
+            const path = (item.path || '').toLowerCase();
+            return title.includes(lowerQuery) || description.includes(lowerQuery) || path.includes(lowerQuery);
+          })
+          .slice(0, 8);
+
+        if (results.length === 0) {
+          resultsContainer.innerHTML = '<li class="no-results">No results found. Try a different search term.</li>';
+        } else {
+          resultsContainer.innerHTML = results
+            .map(result => `
+              <li class="search-result">
+                <a href="${result.path}">
+                  <strong>${highlightText(result.title || result.path, query)}</strong>
+                  ${result.description ? `<p>${highlightText(result.description, query)}</p>` : ''}
+                </a>
+              </li>
+            `)
+            .join('');
+        }
+
+        resultsContainer.setAttribute('aria-hidden', 'false');
+      }
+
+      // Highlight matching text
+      function highlightText(text, query) {
+        if (!text) return '';
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
+      }
+
+      // Debounce function
+      function debounce(func, delay = 300) {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func(...args), delay);
+        };
+      }
+
+      // Event listeners
+      searchInput.addEventListener('input', debounce((e) => {
+        performSearch(e.target.value);
+      }));
+
+      // Keyboard navigation
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          searchInput.value = '';
+          resultsContainer.innerHTML = '';
+          resultsContainer.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      // Click outside to close
+      document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+          resultsContainer.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    // Initialize after page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSearch);
+    } else {
+      initSearch();
+    }
+  </script>
   <link rel="stylesheet" href="/styles/styles.css">
   <style>
     main.error {
@@ -45,14 +145,262 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      padding: var(--spacing-m);
+    }
+
+    main.error .error-content {
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     main.error .error-number {
       width: 100%;
+      max-width: 300px;
+      margin: 0 auto var(--spacing-m);
     }
 
     main.error .error-number text {
       font-family: monospace;
+    }
+
+    main.error .error-message {
+      margin-bottom: var(--spacing-s);
+      font-size: var(--type-heading-xl-size);
+      line-height: var(--type-heading-xl-lh);
+    }
+
+    main.error .error-description {
+      margin-bottom: var(--spacing-m);
+      color: var(--color-light-grey-600);
+    }
+
+    /* Search styling */
+    .error-search {
+      margin: var(--spacing-m) auto;
+      position: relative;
+    }
+
+    .error-search label {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .error-search .search-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .error-search input {
+      width: 100%;
+      padding: var(--spacing-xs) var(--spacing-s);
+      padding-left: 44px;
+      font-size: 16px;
+      border: 2px solid var(--color-gray-500);
+      border-radius: var(--input-border-radius);
+      background: var(--color-white);
+      transition: border-color 0.2s ease;
+    }
+
+    .error-search input:focus {
+      outline: none;
+      border-color: var(--spectrum-blue);
+    }
+
+    .error-search .search-icon {
+      position: absolute;
+      left: var(--spacing-xs);
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      fill: var(--color-light-grey-600);
+      pointer-events: none;
+    }
+
+    #search-results {
+      position: absolute;
+      top: calc(100% + var(--spacing-xxs));
+      left: 0;
+      right: 0;
+      max-height: 400px;
+      overflow-y: auto;
+      background: var(--color-white);
+      border: 1px solid var(--color-gray-500);
+      border-radius: var(--input-border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #search-results[aria-hidden='true'] {
+      display: none;
+    }
+
+    #search-results li {
+      border-bottom: 1px solid var(--bg-color-grey);
+    }
+
+    #search-results li:last-child {
+      border-bottom: none;
+    }
+
+    #search-results .search-result a {
+      display: block;
+      padding: var(--spacing-xs) var(--spacing-s);
+      color: inherit;
+      text-decoration: none;
+      text-align: left;
+      transition: background-color 0.2s ease;
+    }
+
+    #search-results .search-result a:hover,
+    #search-results .search-result a:focus {
+      background-color: var(--bg-color-grey);
+    }
+
+    #search-results .search-result strong {
+      display: block;
+      margin-bottom: var(--spacing-xxxs);
+      color: var(--color-font-grey);
+    }
+
+    #search-results .search-result p {
+      margin: 0;
+      font-size: var(--type-body-xs-size);
+      color: var(--color-light-grey-600);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    #search-results mark {
+      background-color: var(--color-accent-highlight-yellow);
+      color: inherit;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    #search-results .no-results {
+      padding: var(--spacing-s);
+      text-align: center;
+      color: var(--color-light-grey-600);
+    }
+
+    /* Popular pages section */
+    .popular-pages {
+      margin: var(--spacing-m) auto;
+      text-align: left;
+    }
+
+    .popular-pages h3 {
+      margin-bottom: var(--spacing-s);
+      font-size: var(--type-heading-s-size);
+    }
+
+    .popular-pages ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .popular-pages li {
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .popular-pages a {
+      color: var(--spectrum-blue);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .popular-pages a:hover,
+    .popular-pages a:focus {
+      color: var(--dark-spectrum-blue);
+      text-decoration: underline;
+    }
+
+    .button-container {
+      display: flex;
+      gap: var(--spacing-xs);
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: var(--spacing-m);
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      main.error .error-description {
+        color: #b0b0b0;
+      }
+
+      .error-search input {
+        background: var(--color-gray-100);
+        border-color: var(--color-gray-500);
+        color: var(--color-white);
+      }
+
+      .error-search input:focus {
+        border-color: var(--spectrum-blue);
+      }
+
+      #search-results {
+        background: var(--color-gray-100);
+        border-color: var(--color-gray-500);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+
+      #search-results li {
+        border-bottom-color: var(--color-gray-500);
+      }
+
+      #search-results .search-result a {
+        color: var(--color-white);
+      }
+
+      #search-results .search-result a:hover,
+      #search-results .search-result a:focus {
+        background-color: var(--color-gray-200);
+      }
+
+      #search-results .search-result strong {
+        color: var(--color-white);
+      }
+
+      #search-results .search-result p {
+        color: #b0b0b0;
+      }
+
+      #search-results .no-results {
+        color: #b0b0b0;
+      }
+
+      .popular-pages a {
+        color: #6ba3ff;
+      }
+
+      .popular-pages a:hover,
+      .popular-pages a:focus {
+        color: #9fc5ff;
+      }
+    }
+
+    /* Responsive design */
+    @media (width >= 900px) {
+      main.error .error-message {
+        font-size: var(--type-heading-xxl-size);
+        line-height: var(--type-heading-xxl-lh);
+      }
+
+      main.error .error-number {
+        max-width: 400px;
+      }
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -62,13 +410,54 @@
   <header></header>
   <main class="error">
     <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
-        <text x="0" y="17">404</text>
-      </svg>
-      <h2 class="error-message">Page Not Found</h2>
-      <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
-      </p>
+      <div class="error-content">
+        <svg viewBox="1 0 38 18" class="error-number">
+          <text x="0" y="17">404</text>
+        </svg>
+        <h2 class="error-message">Page Not Found</h2>
+        <p class="error-description">
+          We couldn't find the page you're looking for. Try searching for what you need below, or explore our popular pages.
+        </p>
+
+        <!-- Search box -->
+        <div class="error-search">
+          <label for="search-404">Search for content</label>
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input
+              type="search"
+              id="search-404"
+              name="search"
+              placeholder="Search documentation, tutorials, guides..."
+              autofocus
+              autocomplete="off"
+              aria-label="Search site content"
+            >
+            <ul id="search-results" aria-hidden="true" role="listbox"></ul>
+          </div>
+        </div>
+
+        <!-- Popular pages (without JavaScript, static list) -->
+        <noscript>
+          <div class="popular-pages">
+            <h3>Popular Pages</h3>
+            <ul>
+              <li><a href="/developer">Developer Documentation</a></li>
+              <li><a href="/developer/tutorial">Getting Started Tutorial</a></li>
+              <li><a href="/developer/block-collection">Block Collection</a></li>
+              <li><a href="/docs">Documentation</a></li>
+              <li><a href="/home">Home</a></li>
+            </ul>
+          </div>
+        </noscript>
+
+        <!-- Action buttons -->
+        <p class="button-container">
+          <a href="/" class="button secondary error-button-home">Go home</a>
+        </p>
+      </div>
     </div>
   </main>
   <footer></footer>
