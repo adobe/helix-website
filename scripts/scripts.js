@@ -312,6 +312,88 @@ export function customDecorateTemplateAndTheme() {
   if (theme) addClasses(document.body, `${theme.toLowerCase()}-theme`);
 }
 
+function addCopyButtonToCodeBlocks() {
+  const codeBlocks = document.querySelectorAll('pre code');
+  codeBlocks.forEach((codeBlock) => {
+    const pre = codeBlock.parentElement;
+    if (pre.querySelector('.code-copy-button')) return; // Already decorated
+
+    // Create wrapper for positioning
+    const wrapper = createTag('div', { class: 'code-block-wrapper' });
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    // Create copy button
+    const copyButton = createTag('button', {
+      class: 'code-copy-button',
+      type: 'button',
+      'aria-label': 'Copy code to clipboard',
+      title: 'Copy code',
+    });
+
+    // Add icon (using a simple SVG)
+    copyButton.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span class="copy-button-text">Copy</span>
+      <span class="copy-button-success" aria-live="polite"></span>
+    `;
+
+    // Add click handler
+    copyButton.addEventListener('click', async () => {
+      try {
+        const code = codeBlock.textContent;
+        await navigator.clipboard.writeText(code);
+
+        // Show success state
+        copyButton.classList.add('copied');
+        const successSpan = copyButton.querySelector('.copy-button-success');
+        successSpan.textContent = 'Copied!';
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          copyButton.classList.remove('copied');
+          successSpan.textContent = '';
+        }, 2000);
+      } catch (err) {
+        // Fallback for browsers that don't support clipboard API
+        const textArea = createTag('textarea', {
+          style: 'position: absolute; left: -9999px;',
+        });
+        textArea.value = codeBlock.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          copyButton.classList.add('copied');
+          const successSpan = copyButton.querySelector('.copy-button-success');
+          successSpan.textContent = 'Copied!';
+          setTimeout(() => {
+            copyButton.classList.remove('copied');
+            successSpan.textContent = '';
+          }, 2000);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to copy code:', e);
+        }
+        document.body.removeChild(textArea);
+      }
+    });
+
+    // Add keyboard support
+    copyButton.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        copyButton.click();
+      }
+    });
+
+    wrapper.appendChild(copyButton);
+  });
+}
+
 async function loadHighlightLibrary() {
   const highlightCSS = createTag('link', {
     rel: 'stylesheet',
@@ -322,6 +404,11 @@ async function loadHighlightLibrary() {
   await loadScript('/libs/highlight/highlight.min.js');
   const initScript = createTag('script', {}, 'hljs.highlightAll();');
   document.body.append(initScript);
+
+  // Add copy buttons after highlighting is complete
+  setTimeout(() => {
+    addCopyButtonToCodeBlocks();
+  }, 100);
 }
 
 export async function decorateGuideTemplateCodeBlock() {
@@ -346,6 +433,16 @@ export async function decorateGuideTemplateCodeBlock() {
 
   // when first codeblock is coming into view, load highlight.js for page
   intersectionObserver.observe(firstCodeBlock);
+}
+
+export function decorateCodeBlocks() {
+  const firstCodeBlock = document.querySelector('pre code');
+  if (!firstCodeBlock) return;
+
+  // For pages without highlight.js (like docs-template), just add copy buttons
+  if (document.body.classList.contains('docs-template') && !document.body.classList.contains('guides-template')) {
+    addCopyButtonToCodeBlocks();
+  }
 }
 
 export function decorateGuideTemplate(main) {
@@ -787,6 +884,7 @@ async function loadLazy(doc) {
     const aside = main.querySelector('main > aside');
     if (aside) setUpSideNav(main, aside);
     decorateGuideTemplateCodeBlock();
+    decorateCodeBlocks();
   }
 
   window.hlx.plugins.run('loadLazy');
