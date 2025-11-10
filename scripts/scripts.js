@@ -171,11 +171,55 @@ export function addAnchorLink(elem) {
   elem.append(link);
 }
 
+function addCopyButtonToCodeBlock(pre) {
+  const button = createTag('button', {
+    class: 'code-copy-button',
+    type: 'button',
+    'aria-label': 'Copy code to clipboard',
+  });
+
+  const copyIcon = createTag('span', { class: 'copy-icon', 'aria-hidden': 'true' }, '📋');
+  const checkIcon = createTag('span', { class: 'check-icon', 'aria-hidden': 'true' }, '✓');
+  button.append(copyIcon, checkIcon);
+
+  button.addEventListener('click', async () => {
+    const code = pre.querySelector('code');
+    if (!code) return;
+
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      button.classList.add('copied');
+      button.setAttribute('aria-label', 'Code copied to clipboard');
+
+      setTimeout(() => {
+        button.classList.remove('copied');
+        button.setAttribute('aria-label', 'Copy code to clipboard');
+      }, 2000);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to copy code:', err);
+    }
+  });
+
+  pre.style.position = 'relative';
+  pre.append(button);
+}
+
+export function decorateCodeBlocks() {
+  const codeBlocks = document.querySelectorAll('pre:has(code)');
+  codeBlocks.forEach((pre) => {
+    if (!pre.querySelector('.code-copy-button')) {
+      addCopyButtonToCodeBlock(pre);
+    }
+  });
+}
+
 export function decorateHeadings(main) {
   if (!document.body.classList.contains('docs-template')) return;
   main.querySelectorAll('h2, h3, h4, h5, h6').forEach((h) => {
     addAnchorLink(h);
   });
+  decorateCodeBlocks();
 }
 
 export function addMessageBoxOnGuideTemplate(main) {
@@ -354,6 +398,7 @@ export function decorateGuideTemplate(main) {
   decorateGuideTemplateHeadings(main);
   decorateGuideTemplateHero(main);
   decorateGuideTemplateLinks(main);
+  decorateCodeBlocks();
 }
 
 export function decoratesSkillTemplate(main) {
@@ -361,6 +406,7 @@ export function decoratesSkillTemplate(main) {
   decorateGuideTemplateHeadings(main);
   decorateGuideTemplateHero(main);
   decorateGuideTemplateLinks(main);
+  decorateCodeBlocks();
 }
 
 /**
