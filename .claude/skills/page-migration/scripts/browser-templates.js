@@ -72,13 +72,7 @@ await new Promise((resolve) => {
 export const EXTRACT_HTML_SCRIPT = `
 // 1. Remove non-content elements
 const selectorsToRemove = [
-  'script', 'style', 'noscript', 'iframe', 'svg[class*="hidden"]',
-  'nav', 'header[role="banner"]', 'footer[role="contentinfo"]',
-  '[role="navigation"]', '[role="complementary"]', '[role="banner"]',
-  '.navigation', '.nav', '.header', '.footer', '.sidebar',
-  '.ad', '.advertisement', '.cookie-banner', '.popup',
-  'link', 'meta', 'form[role="search"]',
-  '[id*="cookie"]', '[class*="cookie"]', '[id*="Cookie"]', '[class*="Cookie"]'
+  'script', 'style', 'noscript'
 ];
 
 selectorsToRemove.forEach(selector => {
