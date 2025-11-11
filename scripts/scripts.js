@@ -24,6 +24,9 @@ import {
 
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
+const LONG_FORM_TEMPLATE_CLASSES = new Set(['docs-template', 'guides-template', 'blog-template', 'skills-template']);
+const LONG_FORM_TEMPLATE_METADATA = new Set(['docs', 'documentation', 'guide', 'guides', 'blog', 'skills']);
+const LONG_FORM_SCROLL_THRESHOLD = 0.35;
 
 const AUDIENCES = {
   mobile: () => window.innerWidth < 600,
@@ -181,6 +184,145 @@ export function decorateHeadings(main) {
 export function addMessageBoxOnGuideTemplate(main) {
   const messageBox = createTag('div', { class: 'message-box' }, 'Link copied!');
   main.append(messageBox);
+}
+
+const isLongFormPage = () => {
+  const { body } = document;
+  if (!body) return false;
+  const hasTemplateClass = [...LONG_FORM_TEMPLATE_CLASSES]
+    .some((tplClass) => body.classList.contains(tplClass));
+  if (hasTemplateClass) return true;
+  const templateMetadata = getMetadata('template');
+  if (!templateMetadata) return false;
+  return LONG_FORM_TEMPLATE_METADATA.has(templateMetadata.toLowerCase());
+};
+
+const hasScrollableLongFormContent = () => {
+  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  return scrollable > window.innerHeight * LONG_FORM_SCROLL_THRESHOLD;
+};
+
+function initReadingProgress() {
+  if (!isLongFormPage() || document.querySelector('.reading-progress')) return;
+
+  const progressBar = createTag('div', {
+    class: 'reading-progress',
+    role: 'progressbar',
+    'aria-label': 'Reading progress',
+    'aria-valuemin': '0',
+    'aria-valuemax': '100',
+    'aria-valuenow': '0',
+    'aria-hidden': 'true',
+  });
+  const fill = createTag('span', {
+    class: 'reading-progress-fill',
+    'aria-hidden': 'true',
+  });
+  progressBar.append(fill);
+  document.body.prepend(progressBar);
+
+  const updateProgress = () => {
+    const scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+    const canScroll = scrollable > 0;
+    const isLongEnough = hasScrollableLongFormContent();
+    const shouldHide = !canScroll || !isLongEnough;
+    progressBar.classList.toggle('is-hidden', shouldHide);
+    progressBar.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
+    if (shouldHide) {
+      fill.style.transform = 'scaleX(0)';
+      progressBar.setAttribute('aria-valuenow', '0');
+      return;
+    }
+    const progress = Math.min(window.scrollY / scrollable, 1);
+    fill.style.transform = `scaleX(${progress})`;
+    progressBar.setAttribute('aria-valuenow', `${Math.round(progress * 100)}`);
+  };
+
+  updateProgress();
+
+  let ticking = false;
+  const handleScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        updateProgress();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('resize', updateProgress);
+
+  if (window.ResizeObserver && document.body) {
+    const resizeObserver = new ResizeObserver(updateProgress);
+    resizeObserver.observe(document.body);
+  }
+}
+
+function initBackToTopButton() {
+  if (!isLongFormPage() || document.querySelector('.back-to-top-button')) return;
+
+  const button = createTag('button', {
+    type: 'button',
+    class: 'back-to-top-button',
+    'aria-label': 'Back to top',
+  });
+  const icon = createTag('span', {
+    class: 'back-to-top-button-icon',
+    'aria-hidden': 'true',
+  });
+  const label = createTag('span', { class: 'back-to-top-button-label' }, 'Back to top');
+  button.append(icon, label);
+  document.body.append(button);
+  button.setAttribute('aria-hidden', 'true');
+  button.setAttribute('tabindex', '-1');
+
+  const prefersReducedMotionQuery = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)')
+    : null;
+  let prefersReducedMotion = prefersReducedMotionQuery?.matches;
+  const updateMotionPreference = (event) => {
+    prefersReducedMotion = event.matches;
+  };
+  if (prefersReducedMotionQuery?.addEventListener) {
+    prefersReducedMotionQuery.addEventListener('change', updateMotionPreference);
+  } else if (prefersReducedMotionQuery?.addListener) {
+    prefersReducedMotionQuery.addListener(updateMotionPreference);
+  }
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
+    button.blur();
+  };
+
+  button.addEventListener('click', scrollToTop);
+
+  const toggleVisibility = () => {
+    const canScroll = hasScrollableLongFormContent();
+    if (!canScroll) {
+      button.classList.remove('is-visible');
+      button.setAttribute('aria-hidden', 'true');
+      button.setAttribute('tabindex', '-1');
+      return;
+    }
+    button.setAttribute('aria-hidden', 'false');
+    button.setAttribute('tabindex', '0');
+    const shouldShow = window.scrollY > window.innerHeight * 0.8;
+    button.classList.toggle('is-visible', shouldShow);
+  };
+
+  toggleVisibility();
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  window.addEventListener('resize', toggleVisibility);
+
+  if (window.ResizeObserver && document.body) {
+    const resizeObserver = new ResizeObserver(toggleVisibility);
+    resizeObserver.observe(document.body);
+  }
 }
 
 export function addHeadingAnchorLink(elem) {
@@ -776,6 +918,9 @@ async function loadLazy(doc) {
   loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+
+  initReadingProgress();
+  initBackToTopButton();
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
