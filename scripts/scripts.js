@@ -24,14 +24,15 @@ import {
 
 // Constants here
 const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
+const LONG_FORM_TEMPLATE_CLASSES = new Set(['docs-template', 'guides-template', 'blog-template', 'skills-template']);
+const LONG_FORM_TEMPLATE_METADATA = new Set(['docs', 'documentation', 'guide', 'guides', 'blog', 'skills']);
+const LONG_FORM_SCROLL_THRESHOLD = 0.35;
 
 const AUDIENCES = {
   mobile: () => window.innerWidth < 600,
   desktop: () => window.innerWidth >= 600,
   // define your custom audiences here as needed
 };
-
-const LONG_FORM_TEMPLATES = ['docs-template', 'guides-template', 'blog-template'];
 
 window.hlx.plugins.add('performance', {
   condition: () => window.name.includes('performance'),
@@ -185,12 +186,20 @@ export function addMessageBoxOnGuideTemplate(main) {
   main.append(messageBox);
 }
 
-const isLongFormPage = () => LONG_FORM_TEMPLATES
-  .some((tplClass) => document.body.classList.contains(tplClass));
+const isLongFormPage = () => {
+  const { body } = document;
+  if (!body) return false;
+  const hasTemplateClass = [...LONG_FORM_TEMPLATE_CLASSES]
+    .some((tplClass) => body.classList.contains(tplClass));
+  if (hasTemplateClass) return true;
+  const templateMetadata = getMetadata('template');
+  if (!templateMetadata) return false;
+  return LONG_FORM_TEMPLATE_METADATA.has(templateMetadata.toLowerCase());
+};
 
 const hasScrollableLongFormContent = () => {
   const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-  return scrollable > window.innerHeight * 0.35;
+  return scrollable > window.innerHeight * LONG_FORM_SCROLL_THRESHOLD;
 };
 
 function initReadingProgress() {
@@ -198,23 +207,35 @@ function initReadingProgress() {
 
   const progressBar = createTag('div', {
     class: 'reading-progress',
+    role: 'progressbar',
+    'aria-label': 'Reading progress',
+    'aria-valuemin': '0',
+    'aria-valuemax': '100',
+    'aria-valuenow': '0',
     'aria-hidden': 'true',
   });
-  const fill = createTag('span', { class: 'reading-progress-fill' });
+  const fill = createTag('span', {
+    class: 'reading-progress-fill',
+    'aria-hidden': 'true',
+  });
   progressBar.append(fill);
   document.body.prepend(progressBar);
 
   const updateProgress = () => {
-    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
     const canScroll = scrollable > 0;
     const isLongEnough = hasScrollableLongFormContent();
-    progressBar.classList.toggle('is-hidden', !isLongEnough);
-    if (!canScroll || !isLongEnough) {
+    const shouldHide = !canScroll || !isLongEnough;
+    progressBar.classList.toggle('is-hidden', shouldHide);
+    progressBar.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
+    if (shouldHide) {
       fill.style.transform = 'scaleX(0)';
+      progressBar.setAttribute('aria-valuenow', '0');
       return;
     }
     const progress = Math.min(window.scrollY / scrollable, 1);
     fill.style.transform = `scaleX(${progress})`;
+    progressBar.setAttribute('aria-valuenow', `${Math.round(progress * 100)}`);
   };
 
   updateProgress();
@@ -232,6 +253,11 @@ function initReadingProgress() {
 
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('resize', updateProgress);
+
+  if (window.ResizeObserver && document.body) {
+    const resizeObserver = new ResizeObserver(updateProgress);
+    resizeObserver.observe(document.body);
+  }
 }
 
 function initBackToTopButton() {
@@ -249,6 +275,8 @@ function initBackToTopButton() {
   const label = createTag('span', { class: 'back-to-top-button-label' }, 'Back to top');
   button.append(icon, label);
   document.body.append(button);
+  button.setAttribute('aria-hidden', 'true');
+  button.setAttribute('tabindex', '-1');
 
   const prefersReducedMotionQuery = window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -281,8 +309,8 @@ function initBackToTopButton() {
       button.setAttribute('tabindex', '-1');
       return;
     }
-    button.removeAttribute('aria-hidden');
-    button.removeAttribute('tabindex');
+    button.setAttribute('aria-hidden', 'false');
+    button.setAttribute('tabindex', '0');
     const shouldShow = window.scrollY > window.innerHeight * 0.8;
     button.classList.toggle('is-visible', shouldShow);
   };
@@ -290,6 +318,11 @@ function initBackToTopButton() {
   toggleVisibility();
   window.addEventListener('scroll', toggleVisibility, { passive: true });
   window.addEventListener('resize', toggleVisibility);
+
+  if (window.ResizeObserver && document.body) {
+    const resizeObserver = new ResizeObserver(toggleVisibility);
+    resizeObserver.observe(document.body);
+  }
 }
 
 export function addHeadingAnchorLink(elem) {
