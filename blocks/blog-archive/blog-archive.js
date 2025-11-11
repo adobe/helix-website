@@ -1,4 +1,3 @@
-import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 import { createTag, loadBlogData } from '../../scripts/scripts.js';
 
 /**
@@ -28,14 +27,14 @@ async function parseBlogPostDetails(url) {
     let excerpt = '';
     const firstParagraph = doc.querySelector('h1 ~ p');
     if (firstParagraph) {
-      const text = firstParagraph.textContent.trim();
+      const paragraphText = firstParagraph.textContent.trim();
       // Find first 2 sentence endings
-      const sentences = text.match(/[^.!?]+[.!?]+/g);
+      const sentences = paragraphText.match(/[^.!?]+[.!?]+/g);
       if (sentences && sentences.length > 0) {
         excerpt = sentences.slice(0, 2).join(' ').trim();
       } else {
         // Fallback: use first 150 characters
-        excerpt = text.substring(0, 150) + (text.length > 150 ? '...' : '');
+        excerpt = paragraphText.substring(0, 150) + (paragraphText.length > 150 ? '...' : '');
       }
     }
 
@@ -150,19 +149,22 @@ async function renderBlogArchive(block) {
   // Sort years in descending order
   const years = Object.keys(grouped).sort((a, b) => b - a);
 
-  for (const year of years) {
+  // Month order (reverse chronological within year)
+  const monthOrder = ['December', 'November', 'October', 'September', 'August', 'July',
+    'June', 'May', 'April', 'March', 'February', 'January'];
+
+  // Process all years
+  await Promise.all(years.map(async (year) => {
     // Year heading
     const yearSection = createTag('div', { class: 'blog-archive-year' });
     const yearHeading = createTag('h2', { class: 'blog-archive-year-title' }, year);
     yearSection.appendChild(yearHeading);
 
-    // Month order (reverse chronological within year)
-    const monthOrder = ['December', 'November', 'October', 'September', 'August', 'July',
-      'June', 'May', 'April', 'March', 'February', 'January'];
     const months = Object.keys(grouped[year])
       .sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
 
-    for (const month of months) {
+    // Process all months in this year
+    await Promise.all(months.map(async (month) => {
       const posts = grouped[year][month];
 
       // Month section
@@ -173,19 +175,24 @@ async function renderBlogArchive(block) {
       // Cards grid
       const cardsGrid = createTag('div', { class: 'blog-archive-cards' });
 
-      // Fetch details for each post and create card
-      for (const post of posts) {
-        const { heroImage, author, excerpt } = await parseBlogPostDetails(post.path);
+      // Fetch details for all posts in parallel
+      const postDetails = await Promise.all(
+        posts.map((post) => parseBlogPostDetails(post.path)),
+      );
+
+      // Create cards with fetched details
+      posts.forEach((post, index) => {
+        const { heroImage, author, excerpt } = postDetails[index];
         const card = createBlogCard(post, heroImage, author, excerpt);
         cardsGrid.appendChild(card);
-      }
+      });
 
       monthSection.appendChild(cardsGrid);
       yearSection.appendChild(monthSection);
-    }
+    }));
 
     container.appendChild(yearSection);
-  }
+  }));
 
   block.appendChild(container);
 }
