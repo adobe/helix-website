@@ -74,15 +74,23 @@ export function extractFacetsFromExplorer() {
       return;
     }
 
-    // Skip empty facets
+    // Skip empty facets - check both dataChunks and actual DOM labels
+    const labelElements = facetElement.querySelectorAll('label');
+    const hasLabels = labelElements.length > 0;
+
     if (dataChunks && dataChunks.facets) {
       const facetData = dataChunks.facets[facetName];
-      if (!facetData || facetData.length === 0) {
-        console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no data (0 items)`);
+      if (!facetData || facetData.length === 0 || !hasLabels) {
+        console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no data (dataChunks: ${facetData?.length || 0}, labels: ${labelElements.length})`);
         skippedEmptyFacets.push(facetName);
         return;
       }
-      console.log(`[Facet Extraction] Facet ${facetName} has ${facetData.length} items - including in tools`);
+      console.log(`[Facet Extraction] Facet ${facetName} has ${facetData.length} items and ${labelElements.length} labels - including in tools`);
+    } else if (!hasLabels) {
+      // If no dataChunks available, fall back to checking DOM labels
+      console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no labels in DOM`);
+      skippedEmptyFacets.push(facetName);
+      return;
     }
 
     // Get description from help link or legend

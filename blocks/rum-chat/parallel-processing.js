@@ -44,11 +44,11 @@ async function processParallelBatches(
 
   console.log(`[Parallel Processing] Created ${batches.length} batches from ${facetTools.length} total facets`);
   console.log('[Parallel Processing] Available facets:', facetTools.map((t) => t.name).join(', '));
-  
+
   // Log which batch contains form tools
-  const formToolsInBatches = batches.filter((batch) => 
-    batch.tools.some((t) => t.name.includes('fill') || t.name.includes('formsubmit'))
-  );
+  const formToolsInBatches = batches.filter((batch) => batch.tools.some(
+    (t) => t.name.includes('fill') || t.name.includes('formsubmit'),
+  ));
   if (formToolsInBatches.length > 0) {
     console.log('[Parallel Processing] 📝 Form tools distributed across batches:');
     formToolsInBatches.forEach((batch) => {
@@ -61,7 +61,8 @@ async function processParallelBatches(
   console.log('[Parallel Processing] Dashboard data summary:', {
     metricsCount: Object.keys(dashboardData.metrics).length,
     segmentsCount: Object.keys(dashboardData.segments).length,
-    totalSegmentItems: Object.values(dashboardData.segments).reduce((sum, items) => sum + items.length, 0),
+    totalSegmentItems: Object.values(dashboardData.segments)
+      .reduce((sum, items) => sum + items.length, 0),
   });
 
   // Track completed batches for progress updates
@@ -268,7 +269,7 @@ Analyze each facet systematically.`;
       };
     } catch (error) {
       console.error(`[Parallel Batch ${batch.id}] ❌ Error:`, error.message);
-      
+
       // Check if it's a timeout error
       if (error.message.includes('524') || error.message.includes('timeout')) {
         console.warn(`[Parallel Batch ${batch.id}] ⚠️ TIMEOUT - This batch took too long. Consider reducing batch size or simplifying prompts.`);
@@ -299,7 +300,7 @@ Analyze each facet systematically.`;
     .filter(Boolean);
 
   const failedBatches = batchResults.filter((result) => !result.success);
-  
+
   console.log(`[Parallel Processing] Completed ${successfulAnalyses.length}/${batchResults.length} batches successfully`);
   if (failedBatches.length > 0) {
     console.warn(`[Parallel Processing] ⚠️ ${failedBatches.length} batches failed (likely timeouts). Analysis will continue with successful batches.`);
@@ -427,7 +428,7 @@ Provide comprehensive analysis with specific details and actionable insights.`;
   if (followUpAnalysis) {
     allAnalyses.push(followUpAnalysis);
   }
-  
+
   return allAnalyses;
 }
 

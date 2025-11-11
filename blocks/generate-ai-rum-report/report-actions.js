@@ -119,10 +119,14 @@ function addReportToDateRangePicker(result) {
     dropdown.appendChild(header);
   }
 
+  // Format timestamp as yyyy-mm-dd for display
+  const date = new Date(result.timestamp);
+  const displayName = date.toISOString().split('T')[0]; // yyyy-mm-dd
+
   const isViewed = getViewedReports().includes(result.path);
   const entry = Object.assign(document.createElement('li'), {
     className: 'saved-report-entry',
-    textContent: result.filename,
+    textContent: displayName,
   });
   entry.dataset.reportPath = result.path;
   entry.style.cssText = isViewed ? CONFIG.STYLES.ENTRY_VIEWED : CONFIG.STYLES.ENTRY_UNVIEWED;
@@ -141,8 +145,8 @@ function addReportToDateRangePicker(result) {
     // Update the notification badge (this will remove it if no unviewed reports remain)
     await updateNotificationBadge();
 
-    // Show the report
-    showReportInline(result.path, result.filename);
+    // Show the report with date as URL parameter
+    showReportInline(result.path, displayName);
   };
 
   // Find the last saved report entry or insert right after header

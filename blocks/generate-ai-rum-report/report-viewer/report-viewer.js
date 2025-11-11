@@ -4,7 +4,7 @@
 
 /* eslint-disable no-console */
 
-import { markReportAsViewed, updateNotificationBadge } from '../report-actions.js';
+import { markReportAsViewed, updateNotificationBadge, getSavedReports } from '../report-actions.js';
 
 // Load report viewer CSS
 if (!document.querySelector('link[href*="report-viewer.css"]')) {
@@ -28,19 +28,6 @@ const SELECTORS = {
 
 // State
 let cachedElements = {};
-
-// Generate hash from string (deterministic, better distribution)
-const makeHash = (str) => {
-  let h = 0;
-  for (let i = 0; i < str.length; i += 1) {
-    const char = str.charCodeAt(i);
-    h = Math.imul(31, h) + char;
-    // Keep in 32-bit range
-    h %= 2147483648;
-  }
-  // Convert to base36, pad to 10 chars for better uniqueness
-  return Math.abs(h).toString(36).padStart(10, '0');
-};
 
 /**
  * Get element by ID
@@ -106,7 +93,7 @@ function showLoading(container) {
  * Close report viewer and return to facets view
  */
 export function closeReportViewer() {
-  // Remove report hash from URL
+  // Remove report date from URL
   const url = new URL(window.location);
   url.searchParams.delete('report');
   window.history.pushState({}, '', url);
@@ -253,18 +240,16 @@ function renderReport(container, htmlContent) {
   container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
 }
 
-export function showReportInline(reportPath, reportFilename) {
+export function showReportInline(reportPath, reportDate) {
   const viewer = getViewerContainer();
   if (!viewer) return;
 
-  // Use filename for hash since it's unique for each report
-  const hash = makeHash(reportFilename);
-
+  // Use date in yyyy-mm-dd format as URL parameter
   const url = new URL(window.location);
 
-  // Only update URL if report hash is different or missing
-  if (url.searchParams.get('report') !== hash) {
-    url.searchParams.set('report', hash);
+  // Only update URL if report date is different or missing
+  if (url.searchParams.get('report') !== reportDate) {
+    url.searchParams.set('report', reportDate);
     window.history.pushState({}, '', url);
   }
 
@@ -278,27 +263,54 @@ export function showReportInline(reportPath, reportFilename) {
 }
 
 export async function checkForSharedReport(getReports) {
-  const hash = new URLSearchParams(window.location.search).get('report');
-  if (!hash || !getReports) return;
+  const reportDate = new URLSearchParams(window.location.search).get('report');
+  if (!reportDate || !getReports) return;
 
-  // Fetch from DA to find matching report by filename hash
+  // Fetch from DA to find matching report by date (yyyy-mm-dd)
   try {
     const reports = await getReports();
     const match = reports.find((r) => {
-      const name = r.filename || r.path.split('/').pop();
-      return makeHash(name) === hash;
+      const date = new Date(r.timestamp);
+      const dateStr = date.toISOString().split('T')[0]; // yyyy-mm-dd
+      return dateStr === reportDate;
     });
     if (match) {
-      const name = match.filename || match.path.split('/').pop();
+      const date = new Date(match.timestamp);
+      const dateStr = date.toISOString().split('T')[0];
 
       // Mark as viewed and update badge
       markReportAsViewed(match.path);
       await updateNotificationBadge();
 
       // Open the report
-      showReportInline(match.path, name);
+      showReportInline(match.path, dateStr);
     }
   } catch (err) {
     console.error('Failed to fetch reports:', err);
   }
 }
+
+/**
+ * Handle browser back/forward button
+ */
+window.addEventListener('popstate', async () => {
+  const reportParam = new URLSearchParams(window.location.search).get('report');
+
+  if (!reportParam) {
+    toggleView(false);
+    cachedElements = {};
+    // Close date range dropdown if open
+    const input = document.querySelector('daterange-picker')?.shadowRoot?.querySelector('input');
+    if (input?.getAttribute('aria-expanded') === 'true') input.click();
+    return;
+  }
+
+  // Open report matching the date parameter
+  try {
+    const reports = await getSavedReports();
+    const match = reports.find((r) => new Date(r.timestamp).toISOString().split('T')[0] === reportParam);
+    if (match) showReportInline(match.path, reportParam);
+  } catch (err) {
+    console.error('Failed to open report on popstate:', err);
+  }
+});

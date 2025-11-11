@@ -1,195 +1,165 @@
 CREATE A STRUCTURED, SCANNABLE EXECUTIVE-LEVEL REPORT:
 
-⚠️ FORMAT REQUIREMENT:
-- Use CLEAR HEADINGS with bold labels on separate lines (e.g., <b>Executive Summary</b>)
+⚠️ FORMAT REQUIREMENT - USE BULLETS IN PARAGRAPHS:
+- DO NOT write dense paragraphs of text
+- Use CLEAR HEADINGS with bold labels on separate lines (e.g., <b>Performance & Technical</b>)
 - Use BULLET POINTS (•) for all content, each wrapped in <p> tags: <p>• Bullet text here</p>
 - Wrap ALL text content in <p> tags for proper HTML structure
 - DO NOT use emojis in the report output
 - DO NOT use progress bars
 - Make the report EASY TO SCAN with clear structure and specific numbers
-- Each section should have 3-4 focused bullet points with specific metrics
 
-⚠️ ANALYSIS GUIDELINES:
-<b>Analysis Period:</b>
-- Extract the time period from the daterange-wrapper element's nested input field
-- Look for: <input type="text" data-value="[PERIOD]"> where data-value contains the period (e.g., "month", "week", "7days")
-- Convert data-value to readable format:
-  * "month" = "Last 30 Days"
-  * "week" = "Last 7 Days"
-  * "year" = "Last 12 Months"
-  * Custom date ranges should be stated as specific dates if available
-- ALWAYS include the specific date range context in your findings
-- Clearly state the time period when presenting insights throughout the report
+⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:
+- You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)
+- Group related facets into natural categories and cover ALL of them in flowing bullet points
+- Go through the list SYSTEMATICALLY - don't skip any facet
+- Write naturally about multiple related facets together, not mechanically one-by-one
+- Balance positives and improvements in a conversational tone
+- This ensures ALL facets get coverage without mechanical repetition
+- Standard report: 1200-1400 words covering all facets
+- With forms data: 1400-1600 words (forms section + all other facets)
 
-<b>Core Web Vitals Interpretation:</b>
+⚠️ FORMS DATA PRIORITY:
+If fill_source, formsubmit_source, or formsubmit_target tools are available:
+- Forms section is MANDATORY and HIGH PRIORITY
+- Create dedicated forms section immediately after Executive Summary
+- Then continue with balanced facet coverage for all other facets
+
+<b>📅 Analysis Period</b>
+This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").
+
+<b>⚠️ Core Web Vitals Interpretation Guidelines</b>
+When analyzing LCP, CLS, and INP metrics:
 - If metric titles contain "and rising" or "and falling", these indicate TRENDS, not absolute performance
-- "Rising" means the metric is getting worse, "falling" means it's improving
-- DO NOT conclude the site is bad based solely on "rising" trends - consider actual metric values
-- Focus on current metric values and their impact, not just the trend direction
+- "Rising" means the metric is getting worse over time, "falling" means it's improving
+- DO NOT conclude the site is bad based solely on "rising" trends - consider the actual metric values
+- Focus on the current metric values and their impact, not just the trend direction
+- A metric can be "rising" but still within acceptable performance thresholds
 
-<b>Facet Analysis:</b>
-- ALWAYS check the title field of each facet to understand what it represents
-- Use descriptive titles to provide context and meaning to insights
-- Cover ALL available facets systematically across the report sections
-- Each facet provides unique business value - ensure comprehensive coverage
+<b>🔍 Facet Analysis Guidelines</b>
+For ALL facets being analyzed:
+- ALWAYS check the title field of each facet (found in the help link's title attribute) to understand what it represents and its purpose
+- Use these descriptive titles to provide context and meaning to your insights and recommendations
+- DO NOT focus primarily on performance metrics - provide balanced analysis across ALL available facets
+- Include insights from user behavior, traffic acquisition, content engagement, errors, and other non-performance facets
+- Each facet provides unique business value - ensure comprehensive coverage of all data types
 
 <b>EXECUTIVE SUMMARY</b>
-Create a comprehensive overview (200-250 words) that describes the site and highlights key findings:
+Create a STRUCTURED, SCANNABLE summary (MAXIMUM 200 words) using this format:
 
-<b>Analysis Period</b>
-<p>[Convert data-value to readable format - e.g., "Last 30 Days" for "month", "Last 7 Days" for "week"]</p>
+<b>Analysis Period:</b>
+<p>[Date range] - Start with this as the very first line</p>
 
-<b>Site Overview</b>
-<p>• [What kind of site this is - e.g., e-commerce, content site, SaaS platform, etc.]</p>
-<p>• [Primary purpose and target audience]</p>
-<p>• [Key business objectives or site goals]</p>
+<b>Site Status:</b>
+<p>[1-2 sentence overall health assessment with specific metrics]</p>
 
-<b>Current Site Health</b>
-<p>• [Overall performance status with specific Core Web Vitals metrics]</p>
-<p>• [User engagement levels with visit and page view metrics]</p>
-<p>• [Traffic volume and main acquisition sources]</p>
-<p>• [Critical technical issues if any, with severity]</p>
+<b>Top 3 Critical Findings:</b>
+<p>1. [Finding with specific numbers and metrics]</p>
+<p>2. [Finding with specific numbers and metrics]</p>
+<p>3. [Finding with specific numbers and metrics]</p>
 
-<b>Most Important Points for Stakeholders</b>
-<p>• [Top finding that impacts business goals with specific metric]</p>
-<p>• [Key opportunity or concern with quantifiable impact]</p>
-<p>• [Critical action needed with expected outcome]</p>
+<b>Top 3 Priority Actions:</b>
+<p>1. [Action with expected ROI/impact]</p>
+<p>2. [Action with expected ROI/impact]</p>
+<p>3. [Action with expected ROI/impact]</p>
 
-<b>JAVASCRIPT ERRORS THAT NEED ATTENTION</b>
-Analyze error-related facets and provide 3-4 focused points:
+<b>Overall Recommendation:</b>
+<p>[Fix/Optimize/Monitor decision with brief rationale]</p>
 
-<p>• [Most frequent JavaScript error with occurrence count and affected pages]</p>
-<p>• [Error impact on user experience with specific examples of functionality affected]</p>
-<p>• [Browser or device-specific errors with distribution metrics]</p>
-<p>• [Recommended fix priority based on error severity and user impact]</p>
+⚠️ EXCLUDE FORMS: If forms data is provided, forms get their own dedicated section. DO NOT mention forms in Executive Summary.
 
-<b>PERFORMANCE IMPACT</b>
-Focus on Core Web Vitals and loading metrics with 3-4 key points:
+⚠️ FORMAT: Use the exact structure shown above with bold labels and content in <p> tags for easy scanning. NO EMOJIS in output.
 
-<p>• [LCP (Largest Contentful Paint) current value, trend, and impact on user experience]</p>
-<p>• [CLS (Cumulative Layout Shift) status with specific pages or elements causing issues]</p>
-<p>• [INP (Interaction to Next Paint) or FID metrics with responsiveness assessment]</p>
-<p>• [Overall performance score and comparison to industry benchmarks with actionable insights]</p>
+<b>KEY METRICS & FINDINGS</b>
+⚠️ CRITICAL REQUIREMENT - SYSTEMATIC COVERAGE OF ALL NON-FORM FACETS:
 
-<b>USER ENGAGEMENT</b>
-Analyze user behavior patterns with 3-4 insights:
+⚠️ USE THE FACET LIST: Above in the dashboard data, you received a "COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED" - this is your checklist.
 
-<p>• [Average session duration, pages per visit, and engagement depth with trends]</p>
-<p>• [Bounce rate analysis across entry pages with high/low performers]</p>
-<p>• [User navigation patterns and content consumption behavior with specific paths]</p>
-<p>• [Engagement differences between new vs returning visitors with conversion correlation]</p>
+⚠️ EXCLUDE FORMS: If forms data was provided, it's already covered in the dedicated forms section above. DO NOT mention forms here.
 
-<b>TRAFFIC ACQUISITION</b>
-Break down traffic sources by device with 3-4 detailed points:
+Create NATURAL, FLOWING insights organized by category that cover ALL NON-FORM facets from the provided list. Ensure complete coverage but write in a connected, narrative style.
 
-<p>• [Desktop traffic volume and sources (organic, direct, referral, etc.) with percentages]</p>
-<p>• [Mobile traffic distribution and behavior differences compared to desktop]</p>
-<p>• [Tablet traffic patterns and unique characteristics if significant]</p>
-<p>• [Top performing acquisition channels by device with conversion rates or engagement metrics]</p>
+<b>How to ensure complete coverage:</b>
+- Group related facets into clear categories with bold headings (e.g., <b>Performance & Technical</b>, <b>Traffic & Acquisition</b>, <b>User Behavior & Engagement</b>, <b>Content Performance</b>, <b>Errors & Technical Issues</b>)
+- Within each category, write 2-4 bullet points that naturally discuss the facets in that group
+- Each bullet should flow naturally, mentioning multiple related facets together with specific metrics
+- Balance positives and areas for improvement in a natural conversational tone
+- Cross off each facet mentally as you cover it to ensure nothing is missed
 
-<b>CONTENT EFFECTIVENESS</b>
-Evaluate content performance with 3-4 specific insights:
+<b>Writing Style:</b>
+- Use CLEAR CATEGORY HEADINGS with <b>bold labels</b> on separate lines
+- Use BULLET POINTS (•) within each category, each wrapped in <p> tags: <p>• Content here</p>
+- Write in a NATURAL, CONVERSATIONAL flow - NOT mechanical [+]/[-] format
+- Discuss multiple related facets together in each bullet point
+- Use specific numbers and metrics from the actual data
+- Keep bullets concise but natural (2-3 sentences per bullet)
+- Wrap ALL text content in <p> tags for proper HTML structure
+- NO EMOJIS in the report content
+- NO progress bars
 
-<p>• [Top performing pages by traffic and engagement with specific page names and metrics]</p>
-<p>• [Content types driving most engagement (blog, product, landing pages) with performance data]</p>
-<p>• [Underperforming content with high traffic but low engagement and improvement opportunities]</p>
-<p>• [Content gaps or opportunities based on user search patterns and exit pages]</p>
+<b>PRIORITY ACTION PLAN</b>
+Use structured format with clear categories:
 
-<b>FORMS CONVERSION</b>
-⚠️ INCLUDE ONLY IF FORMS DATA IS AVAILABLE (fill_source, formsubmit_source, or formsubmit_target facets present)
+<b>HIGH PRIORITY (Implement First):</b>
+<p>• [Action 1]: [Expected impact with numbers] - [Timeframe]</p>
+<p>• [Action 2]: [Expected impact with numbers] - [Timeframe]</p>
+<p>• [Action 3]: [Expected impact with numbers] - [Timeframe]</p>
 
-<p>• [Form submission rate and completion metrics with specific form names]</p>
-<p>• [Form abandonment points and field-level drop-off analysis]</p>
-<p>• [Device-specific form performance differences (mobile vs desktop conversion rates)]</p>
-<p>• [Recommended optimizations based on user behavior patterns in form interactions]</p>
+<b>MEDIUM PRIORITY (Implement Second):</b>
+<p>• [Action 1]: [Expected impact with numbers] - [Timeframe]</p>
+<p>• [Action 2]: [Expected impact with numbers] - [Timeframe]</p>
 
-⚠️ If NO forms data available, skip this section.
+<b>Monitoring & Measurement:</b>
+<p>• [What to track and why]</p>
+<p>• [Key metrics to monitor with thresholds]</p>
 
-<b>CONVERSION FUNNEL</b>
-Analyze the user journey and conversion path with 3-4 points:
-
-<p>• [Entry point analysis with top landing pages and their conversion contribution]</p>
-<p>• [User flow through key pages with drop-off points and completion rates]</p>
-<p>• [Conversion path variations by traffic source with performance differences]</p>
-<p>• [Funnel optimization opportunities based on exit patterns and navigation behavior]</p>
-
-<b>MARKET OPPORTUNITIES</b>
-Identify growth potential with 3-4 strategic insights:
-
-<p>• [Geographic distribution of traffic with high-performing and untapped regions]</p>
-<p>• [Device and browser trends indicating market shifts or opportunities]</p>
-<p>• [Audience segment analysis with growth potential in specific demographics]</p>
-<p>• [Competitive positioning insights based on traffic sources and user behavior patterns]</p>
+<b>Quick Wins:</b>
+<p>• [Easy implementation with immediate impact - 1-2 days]</p>
+<p>• [Low-effort high-impact fix - 1 week]</p>
 
 <b>BUSINESS IMPACT</b>
-Summarize overall business implications with 3-4 key points:
+Brief summary using structured bullets:
 
-<p>• [Revenue or conversion impact from identified issues with quantified estimates]</p>
-<p>• [User experience implications affecting retention and customer satisfaction]</p>
-<p>• [SEO and organic visibility impact from performance and technical issues]</p>
-<p>• [Competitive advantage or disadvantage based on current metrics and benchmarks]</p>
+<b>Performance Impact:</b>
+<p>[Core Web Vitals and UX effects with metrics]</p>
 
-<b>PRIORITY ACTIONS / CRITICAL FINDINGS</b>
-Summarize the most critical findings and their priority levels with 3-4 key points:
+<b>User Engagement:</b>
+<p>[Conversion opportunities and behavior insights with metrics]</p>
 
-<p>• [#1 Critical Finding: Most urgent issue that requires immediate action with specific impact if not addressed]</p>
-<p>• [#2 High Priority Finding: Important improvement needed within 2-4 weeks with business justification]</p>
-<p>• [#3 Medium Priority Finding: Strategic enhancement for long-term growth with expected outcomes]</p>
-<p>• [Quick Wins: Low-effort high-impact changes that can be implemented immediately]</p>
+<b>Traffic & Acquisition:</b>
+<p>[Channel effectiveness and growth opportunities with metrics]</p>
 
-<b>CRITICAL ACTIONS (IMMEDIATE - WITHIN 1 WEEK)</b>
-Provide 3 specific critical actions that require immediate attention:
+<b>Content Effectiveness:</b>
+<p>[Engagement patterns and optimization opportunities with metrics]</p>
 
-<p>• [Specific action 1 with implementation steps and expected impact]</p>
-<p>• [Specific action 2 with resource requirements and timeline]</p>
-<p>• [Specific action 3 with success metrics and monitoring plan]</p>
+<b>Technical Issues:</b>
+<p>[Error impact on UX and operations with severity levels]</p>
 
-<b>HIGH PRIORITY ACTIONS (NEXT 2-4 WEEKS)</b>
-Provide 3 high priority actions for near-term implementation:
+<b>Market Opportunities:</b>
+<p>[Geographic/demographic insights with potential reach]</p>
 
-<p>• [Important improvement with implementation approach and expected benefit]</p>
-<p>• [Content or conversion optimization with specific changes needed]</p>
-<p>• [Technical enhancement with resource allocation and delivery timeline]</p>
-
-<b>MEDIUM PRIORITY ACTIONS (NEXT 1-2 MONTHS)</b>
-Provide 3 medium priority actions for strategic improvements:
-
-<p>• [Strategic improvement with long-term value and implementation roadmap]</p>
-<p>• [Optimization opportunity with moderate impact and effort estimation]</p>
-<p>• [Enhancement addressing market opportunities with competitive advantage]</p>
-
-<b>QUICK WINS (CAN IMPLEMENT IMMEDIATELY)</b>
-Provide 3 quick win opportunities for immediate implementation:
-
-<p>• [Low-effort fix with immediate positive impact and minimal resources needed]</p>
-<p>• [Simple change addressing user pain point with quick turnaround]</p>
-<p>• [Configuration or content update with measurable benefit within days]</p>
-
-CRITICAL REQUIREMENTS:
-- ENTIRE REPORT: 1200-1500 words total
-- Executive Summary: 200-250 words describing site and key findings
-- Each Section: 3-4 focused bullet points with specific metrics
-- Priority Actions: Clear categorization by urgency with timeframes
-- Use bullet points (•) wrapped in <p> tags for all content
-- Use <b>tags</b> for all headings and emphasis
+CRITICAL LENGTH & FORMAT REQUIREMENTS:
+- ENTIRE REPORT: 1200-1400 words
+- Executive Summary: Maximum 200 words in STRUCTURED format with bold labels
+- Key Metrics: 800-1000 words in STRUCTURED categories with bullet points
+- Priority Action Plan: 150-200 words in STRUCTURED bullet format
+- Business Impact: 150-200 words in STRUCTURED bullet format
+- Use bullet points and clear headings - NO dense paragraphs
+- Use specific metrics and actionable language
 - NO EMOJIS anywhere in the report content
-- NO progress bars or special characters
-- Use ONLY actual data from the source material provided
 
 FORMATTING REQUIREMENTS:
 - Use HTML <b>text</b> tags for ALL headings and important text (NOT **text** markdown)
 - Wrap ALL text content in <p> tags: <p>Text content here</p>
 - Wrap each bullet point in <p> tags: <p>• Bullet text here</p>
 - Put headings on separate lines from content
-- DO NOT use markdown formatting like **text** or *text*
-- DO NOT use <br> or <br/> tags - use <p> tags to separate content
-- NO EMOJIS in the report output
-- NO progress bars or special characters
+- Use HTML <b>tag</b> for any text that should appear bold
+- Do NOT use markdown formatting like **text** or *text*
+- DO NOT use <br> or <br/> tags - use <p> tags to separate content instead
+- NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)
+- NO progress bars (no ████████░░ or similar)
 - Output must render properly in HTML context
 
-DATA USAGE:
-- Use ONLY actual data from the SOURCE MATERIAL provided
-- DO NOT use example numbers, percentages, or metrics from this template
-- Extract real metrics from the dashboard data and facet insights
-- If a section has no relevant data, state "Data not available for this analysis period"
-- Ensure all facets provided in the dashboard are covered across appropriate sections
+CRITICAL: Use ONLY the actual data from the SOURCE MATERIAL provided above. 
+DO NOT use any example numbers, percentages, or metrics from this template.
+Extract real metrics from the dashboard data and insights provided.

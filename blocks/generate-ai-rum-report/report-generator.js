@@ -12,6 +12,7 @@ import {
   createCircularProgress,
   initializeStepProgress,
   advanceStep,
+  setProgress,
   completeProgress,
 } from './progress-indicator.js';
 
@@ -148,17 +149,26 @@ export default async function generateReport(apiKey, statusDiv, button, modal) {
     advanceStep(); // 25% - Loading Checkpoints
     await ensureMetricsParameter();
 
-    // Steps 2-3: Run analysis - advance twice during analysis to reach 75%
-    let advanceCount = 0;
-    const progressCallback = (step) => {
-      // Advance twice: 50% (Extracting Data) and 75% (Processing Analysis)
-      if (step >= 0 && advanceCount < 2) {
-        advanceStep();
-        advanceCount += 1;
-      }
+    // Step 2: Extracting Data - show briefly before batch processing
+    advanceStep(); // 50% - Extracting Data
+    await new Promise((resolve) => { setTimeout(resolve, 300); });
+
+    // Step 3: Processing Analysis with granular progress
+    // Map internal batch progress (0-100%) to overall progress (50-87.5%)
+    const progressCallback = (step, status, message, batchPercent = 0) => {
+      // Map batch progress to 50-87.5% range
+      const mappedPercent = 50 + (batchPercent * 0.375); // 0-100 maps to 50-87.5%
+      setProgress(
+        mappedPercent,
+        REPORT_STEPS[2].name, // "Processing Analysis"
+        message || REPORT_STEPS[2].detail,
+      );
     };
 
     const analysisResult = await runCompleteRumAnalysis(progressCallback);
+
+    // Step 4: Final synthesis at 87.5-100%
+    setProgress(87.5, REPORT_STEPS[3].name, REPORT_STEPS[3].detail);
 
     // Final step: 100% with "Report Ready" message
     completeProgress('Report Ready', 'Analysis complete, report generated successfully');

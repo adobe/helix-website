@@ -7,7 +7,7 @@
 
 // Cache configuration
 const CACHE_KEY = 'rumAnalysisCache_aiReport';
-const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Get cache from localStorage
@@ -91,7 +91,7 @@ export function cacheAnalysisResult(result, dashboardDataHash) {
     dashboardDataHash,
   };
   setAnalysisCache(cacheData);
-  console.log('[Cache] Analysis result cached for 4 hours');
+  console.log('[Cache] Analysis result cached for 24 hours');
 }
 
 /**
@@ -114,7 +114,12 @@ export function getCacheStatus() {
     return null;
   }
 
-  const remainingMinutes = Math.ceil(remainingTime / (60 * 1000));
+  const remainingHours = Math.floor(remainingTime / (60 * 60 * 1000));
+  const remainingMinutes = Math.ceil((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
+
+  if (remainingHours > 0) {
+    return `Cached result (expires in ${remainingHours}h ${remainingMinutes}m)`;
+  }
   return `Cached result (expires in ${remainingMinutes} min)`;
 }
 

@@ -181,6 +181,16 @@ export function resetProgress() {
 }
 
 /**
+ * Set progress to specific percentage with message
+ * @param {number} percent - Progress 0-100
+ * @param {string} message - Progress message  
+ * @param {string} detail - Progress detail
+ */
+export function setProgress(percent, message = '', detail = '') {
+  updateCircularProgress(percent, message, detail);
+}
+
+/**
  * Complete progress (100%)
  * @param {string} message - Completion message
  * @param {string} detail - Completion detail

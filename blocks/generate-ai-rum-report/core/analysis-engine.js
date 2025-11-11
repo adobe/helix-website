@@ -139,6 +139,11 @@ function buildFinalSynthesisMessage(dashboardData, allInsights, formDataSection,
 
 DO NOT include any of the raw batch content in your response. Use it only as source material for your analysis.
 
+==== 📋 REPORT STRUCTURE REQUIREMENTS ====
+1. Start with EXECUTIVE SUMMARY section (required, comes first)
+2. Follow with other sections as defined in the template
+3. Ensure all facets are covered across appropriate sections
+
 ==== DATA TIME PERIOD ====
 ${dashboardData.dateRange ? `📅 Date Range Selected: ${dashboardData.dateRange}` : '⚠️ Date range not available'}
 ${dashboardData.dateRange ? `(Found in: <daterange-wrapper><input data-value="${dashboardData.dateRange}">)` : ''}
@@ -184,7 +189,8 @@ ${Object.keys(dashboardData.segments).length > 10 ? `... and ${Object.keys(dashb
 ==== END DASHBOARD METRICS ====
 
 ==== SOURCE MATERIAL (FOR REFERENCE ONLY - DO NOT INCLUDE IN RESPONSE) ====
-${allInsights.join('\n\n')}
+${allInsights.map((insight) => insight.slice(0, 1000)).join('\n\n')}
+${allInsights.reduce((sum, i) => sum + i.length, 0) > allInsights.length * 1000 ? '\n\n[Additional analysis details available - use the dashboard metrics and segment data above for specific numbers]' : ''}
 ==== END SOURCE MATERIAL ====
 
 ${overviewTemplate}`;
