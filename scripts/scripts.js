@@ -653,6 +653,85 @@ function prepareSideNav(main) {
 }
 
 /**
+ * Adds a reading progress bar to long-form pages
+ */
+function addReadingProgressBar() {
+  // Create progress bar element
+  const progressBar = createTag('div', {
+    class: 'reading-progress-bar',
+    'aria-label': 'Reading progress',
+    role: 'progressbar',
+    'aria-valuenow': '0',
+    'aria-valuemin': '0',
+    'aria-valuemax': '100',
+  });
+
+  document.body.prepend(progressBar);
+
+  // Update progress on scroll
+  const updateProgress = () => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight - windowHeight;
+    const scrollTop = window.scrollY;
+    const progress = (scrollTop / documentHeight) * 100;
+
+    progressBar.style.width = `${Math.min(progress, 100)}%`;
+    progressBar.setAttribute('aria-valuenow', Math.min(Math.round(progress), 100));
+  };
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress(); // Initial call
+}
+
+/**
+ * Adds a floating back-to-top button
+ */
+function addBackToTopButton() {
+  // Create back-to-top button
+  const backToTop = createTag('button', {
+    class: 'back-to-top',
+    'aria-label': 'Back to top',
+    title: 'Back to top',
+  }, '↑');
+
+  document.body.append(backToTop);
+
+  // Show/hide button based on scroll position
+  const toggleButton = () => {
+    const scrollTop = window.scrollY;
+    const windowHeight = window.innerHeight;
+
+    if (scrollTop > windowHeight) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  };
+
+  // Scroll to top when clicked
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  });
+
+  // Keyboard accessibility
+  backToTop.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  });
+
+  window.addEventListener('scroll', toggleButton, { passive: true });
+  toggleButton(); // Initial call
+}
+
+/**
  * loads everything needed to get to LCP.
  */
 async function loadEager(doc) {
@@ -790,6 +869,10 @@ async function loadLazy(doc) {
   }
 
   window.hlx.plugins.run('loadLazy');
+
+  // Add reading progress bar and back-to-top button
+  addReadingProgressBar();
+  addBackToTopButton();
 
   sampleRUM('lazy');
 
