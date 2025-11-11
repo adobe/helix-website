@@ -231,7 +231,7 @@ export async function renderBlogArchive(block) {
 
       // Fetch additional data for each post and create card
       Promise.all(posts.map(async (post) => {
-        const additionalData = await fetchBlogPostData(`https://main--helix-website--adobe.aem.live${post.path}`);
+        const additionalData = await fetchBlogPostData(`https://main--helix-website--adobe.aem.page${post.path}`);
         return createBlogCard(post, additionalData);
       })).then((cards) => {
         cards.forEach((card) => postsGrid.appendChild(card));
