@@ -1,5 +1,7 @@
 # HTML File Structure for Test Content
 
+> **💡 Consider Markdown Instead:** For content modeling that matches the author CMS experience, consider using [markdown structure](md-structure.md) instead. Markdown uses block tables that match what authors see in their CMS and is more concise than HTML. Use this HTML guide when you need to test exact DOM structures or want immediate browser preview without conversion.
+
 When creating local HTML files for testing blocks in the `drafts/` folder, follow this structure to match how AEM Edge Delivery Services processes authored content.
 
 ## Complete HTML Structure
@@ -115,6 +117,99 @@ Each section is a top-level `<div>` directly inside `<main>`:
 - There are no strict rules about when to create a new section vs. adding to an existing one
 - This varies by project and authoring practices
 - Some blocks may require or assume they are in their own section (check block documentation)
+
+### Section Metadata
+
+Sections can include metadata to define styling and behavior using a special `section-metadata` div.
+
+**In HTML (using section-metadata div):**
+```html
+<div>
+  <div class="section-metadata">
+    <div>
+      <div>Style</div>
+      <div>dark</div>
+    </div>
+  </div>
+  <!-- Section content with dark background styling -->
+</div>
+```
+
+**In markdown (Section Metadata table):**
+```markdown
++------------------------------+
+| Section Metadata             |
++------------------+-----------+
+| style            | dark      |
++------------------+-----------+
+```
+
+**How it works:**
+- The `section-metadata` div is placed at the beginning of a section
+- It uses a nested div structure to represent key-value pairs (like a table)
+- The platform processes this metadata and applies it to the parent section
+- After processing, the `section-metadata` div is removed from the DOM
+- Metadata values become CSS classes or data attributes on the section
+
+**Common section styles:**
+- `light` - White or light background
+- `dark` - Dark background with light text
+- `grey` - Grey or off-white background
+- `accent` - Branded color background
+
+**Style naming best practices:**
+- Use consistent names across sections with same visual treatment
+- Don't create unique style names for every section
+- Example: If 3 sections have white backgrounds, use "light" for all 3
+
+**Example with multiple sections:**
+```html
+<main>
+  <!-- Section 1: Light background -->
+  <div>
+    <div class="section-metadata">
+      <div>
+        <div>Style</div>
+        <div>light</div>
+      </div>
+    </div>
+    <div class="hero">
+      <div><div><h1>Welcome</h1></div></div>
+    </div>
+  </div>
+
+  <!-- Section 2: Dark background -->
+  <div>
+    <div class="section-metadata">
+      <div>
+        <div>Style</div>
+        <div>dark</div>
+      </div>
+    </div>
+    <div class="cards">
+      <div>
+        <div>Card 1</div>
+        <div>Card 2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Light background (reuses "light") -->
+  <div>
+    <div class="section-metadata">
+      <div>
+        <div>Style</div>
+        <div>light</div>
+      </div>
+    </div>
+    <h2>About Our Company</h2>
+    <p>This section has default content, not blocks.</p>
+  </div>
+</main>
+```
+
+**For guidance on identifying sections and assigning styles:**
+Use the **page-decomposition** skill when migrating pages.
 
 ### Section Content Types
 

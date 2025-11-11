@@ -1,148 +1,159 @@
 ---
 name: page-decomposition
-description: Analyze webpage structure and decompose into Edge Delivery Services sections, blocks, and default content with consistent style naming. Use when migrating pages to identify section boundaries and metadata.
+description: Analyze content sequences within a section and provide neutral descriptions. Invoked per section during page migration to identify breaking points between default content and blocks.
 ---
 
 # Page Decomposition
 
-Analyze webpage structure and decompose into Edge Delivery Services sections with proper metadata.
+Analyze content sequences within an EDS section and provide neutral descriptions without assigning block names.
 
 ## When to Use This Skill
 
-This skill is called by **page-migration** after scraping to:
-- Identify visual section boundaries
-- Assign consistent style names for section metadata
-- Classify content as blocks vs default content
-- Provide structure for HTML/markdown generation
+This skill is called by **page-migration** for EACH section to:
+- Identify content sequences within that section
+- Provide neutral descriptions (NO block names yet)
+- Identify breaking points between sequences
+- Enable authoring-focused decisions later
+
+**IMPORTANT:** This skill analyzes ONE section at a time, not the whole page.
 
 ## Input Required
 
 From the calling skill (page-migration), you need:
-- Screenshot of the original page (for visual analysis)
-- Cleaned HTML content (from scraping step)
+- Section visual description and boundaries
+- Screenshot showing the section
+- Cleaned HTML content for the section
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that calls this skill
-- **content-driven-development** - References section metadata in html-structure.md
+- **page-migration** - Orchestrator that calls this skill per section (Step 2b)
+- **block-inventory** - Provides available blocks AFTER decomposition
+- **content-modeling** - Makes authoring decisions AFTER decomposition
+- **content-driven-development** - References section structure in html-structure.md
 
 ## Key Concepts
 
-**Edge Delivery Services page structure has three layers:**
-1. **Sections** - Top-level containers with optional metadata (style, background)
-2. **Blocks** - Structured components within sections (hero, cards, etc.)
-3. **Default content** - Regular HTML (headings, paragraphs, images) not in blocks
+**EDS Content Hierarchy:**
+```
+DOCUMENT
+├── SECTION (top-level, analyzed by page-migration Step 2a)
+│   ├── Content Sequence 1 ← THIS SKILL IDENTIFIES THESE
+│   ├── Content Sequence 2 ← THIS SKILL IDENTIFIES THESE
+│   └── ...
+└── SECTION
+    └── Content Sequence 1
+```
+
+**What is a "content sequence"?**
+A vertical flow of related content that will eventually become:
+- Default content (headings, paragraphs, lists, inline images), OR
+- A block (structured, repeating, or interactive component)
+
+**Breaking points between sequences:**
+- Visual/semantic shift in content type
+- Change from prose → structured pattern
+- Change from one pattern → different pattern
+
+**Philosophy:**
+- Describe WHAT you see, not WHAT it should be
+- "Two images side-by-side" not "Columns block"
+- "Grid of 8 items with icons" not "Cards block"
+- Stay neutral - authoring decisions come later
 
 ## Decomposition Workflow
 
-### Step 1: Identify Visual Sections
-
-Examine the screenshot to identify distinct visual sections.
-
-**Visual cues for section boundaries:**
-- Background color changes (white → grey → white)
-- Spacing/padding changes (tight → wide → normal)
-- Clear horizontal breaks or dividers
-- Thematic content shifts
-
-**Number sections sequentially** from top to bottom.
-
-**Output:** List of visual sections with their position
+**Context:** page-migration has already identified section boundaries (Step 2a). This skill is invoked FOR ONE SECTION to analyze its internal content sequences.
 
 ---
 
-### Step 2: Assign Consistent Style Names
+### Step 1: Examine the Section
 
-For each section, identify its visual style and assign a name.
+Look at the screenshot and HTML for THIS section only.
 
-**Style naming rules:**
-- Use short, descriptive names: `light`, `dark`, `grey`, `accent`
-- **REUSE the same name** for sections with identical visual treatment
-- Don't create unique names for every section
+**What to observe:**
+- Vertical flow of content from top to bottom
+- Where content changes type or pattern
+- Visual groupings or breaks
 
-**Common styles:**
-- `light` - White or light background
-- `dark` - Dark background with light text
-- `grey` - Grey or off-white background
-- `accent` - Branded color background
+**Ignore:**
+- Other sections (out of scope)
+- Section styling (already identified by page-migration)
+- Block names (stay neutral)
 
-**Anti-pattern example:**
+**Output:** Mental model of content flow within this section
+
+---
+
+### Step 2: Identify Breaking Points
+
+Find where content shifts from one type/pattern to another.
+
+**Breaking point indicators:**
+- Prose text → Structured grid
+- Heading/paragraph → Side-by-side images
+- One repeating pattern → Different repeating pattern
+- Structured content → Prose text
+
+**Example within a section:**
 ```
-Section 1: white background → style: "white"
-Section 2: grey background → style: "grey"
-Section 3: white background → style: "light"  ❌ Inconsistent!
-Section 4: white background → style: "default" ❌ Inconsistent!
-
-CORRECT:
-Section 1: white background → style: "light"
-Section 2: grey background → style: "grey"
-Section 3: white background → style: "light"  ✓ Reused!
-Section 4: white background → style: "light"  ✓ Reused!
+Content flows top to bottom:
+- Large heading
+- Paragraph
+- Two buttons
+[BREAK] ← Visual/semantic shift
+- Two images displayed side-by-side
 ```
 
-**Output:** Style name per section with consistency enforced
+**Output:** List of breaking points
 
 ---
 
-### Step 3: Classify Content Types
+### Step 3: Define Content Sequences
 
-For each section, determine if content should be blocks or default content.
+Between each breaking point is a content sequence.
 
-**Block content (structured components):**
-- Repeating patterns (card grids, testimonials, FAQ items)
-- Distinct visual components (hero banners, carousels)
-- Structured layouts (columns, tabs, accordions)
+**For each sequence, describe:**
+- What elements it contains (heading, paragraph, images, etc.)
+- How they're arranged (stacked, side-by-side, in a grid)
+- Quantity (one heading, two images, grid of 8 items)
 
-**Default content (regular HTML):**
-- Body text with headings and paragraphs
-- Inline images within text
-- Simple lists or quotes
-- Content that flows naturally without structure
+**Use neutral language:**
+- ✅ "Two images displayed side-by-side"
+- ❌ "Columns block with two images"
+- ✅ "Grid of 8 items, each with icon and short text"
+- ❌ "Cards block"
+- ✅ "Large centered heading, paragraph, two buttons stacked vertically"
+- ❌ "Hero block"
 
-**Decision criteria:**
-- If it needs decoration/interaction → Block
-- If it's just text/images flowing → Default content
-- If it repeats with structure → Block
-- If it's unique prose → Default content
-
-**Output:** Content type classification per section
+**Output:** Neutral descriptions for each sequence
 
 ---
 
-### Step 4: Generate Section Decomposition
+### Step 4: Return Structured Output
 
-Return structured section map for the calling skill.
+Provide content sequences for this section in structured format.
 
 **Output format:**
 ```javascript
 {
-  sections: [
+  sectionNumber: 1,  // From page-migration
+  sequences: [
     {
-      sectionNumber: 1,
-      style: "light",
-      contentType: "block",
-      contentDescription: "Large banner with heading + CTA"
+      sequenceNumber: 1,
+      description: "Large centered heading, paragraph, two buttons stacked vertically"
     },
     {
-      sectionNumber: 2,
-      style: "light",  // Reused style
-      contentType: "default",
-      contentDescription: "Paragraph text with inline images"
-    },
-    {
-      sectionNumber: 3,
-      style: "grey",
-      contentType: "block",
-      contentDescription: "Grid of 4 items with images + titles"
+      sequenceNumber: 2,
+      description: "Two images displayed side-by-side"
     }
   ]
 }
 ```
 
-**This data enables:**
-- Section metadata tables in markdown
-- Consistent style naming across sections
-- Clear separation of blocks from default content
+**This enables:**
+- Clear understanding of section's internal structure
+- Neutral foundation for authoring decisions
+- Separation of description from implementation
 
 ---
 
@@ -165,84 +176,148 @@ Return structured section map for the calling skill.
 
 ## Examples
 
-### Example 1: Homepage
+### Example 1: Hero Section
 
-**Visual analysis:**
-- Section 1: White background, hero banner
-- Section 2: White background, feature cards
-- Section 3: Grey background, testimonials
-- Section 4: White background, CTA banner
+**Input:** "Section 1 (light background): Large prominent content at top of page"
+
+**Visual observation:**
+- Large centered heading
+- Paragraph text below it
+- Two call-to-action buttons
+[BREAK - visual shift]
+- Two large images displayed next to each other
 
 **Output:**
 ```javascript
 {
-  sections: [
-    { sectionNumber: 1, style: "light", contentType: "block" },
-    { sectionNumber: 2, style: "light", contentType: "block" },  // Reused "light"
-    { sectionNumber: 3, style: "grey", contentType: "block" },
-    { sectionNumber: 4, style: "light", contentType: "block" }   // Reused "light"
+  sectionNumber: 1,
+  sequences: [
+    {
+      sequenceNumber: 1,
+      description: "Large centered heading, paragraph, two call-to-action buttons stacked vertically"
+    },
+    {
+      sequenceNumber: 2,
+      description: "Two large images displayed side-by-side"
+    }
   ]
 }
 ```
-
-**Note:** 3 sections use "light" style consistently.
 
 ---
 
-### Example 2: Blog Post
+### Example 2: Features Section
 
-**Visual analysis:**
-- Section 1: White background, article header
-- Section 2: White background, body text with images
-- Section 3: Grey background, related articles
+**Input:** "Section 2 (light background): Grid of feature items"
+
+**Visual observation:**
+- Centered heading
+[BREAK - shift to structured pattern]
+- Grid of 8 items
+- Each item has: small icon, short text description
+[BREAK - shift back to simple elements]
+- Two centered buttons
 
 **Output:**
 ```javascript
 {
-  sections: [
-    { sectionNumber: 1, style: "light", contentType: "block" },     // Hero
-    { sectionNumber: 2, style: "light", contentType: "default" },   // Body text (not block!)
-    { sectionNumber: 3, style: "grey", contentType: "block" }       // Cards
+  sectionNumber: 2,
+  sequences: [
+    {
+      sequenceNumber: 1,
+      description: "Single centered heading"
+    },
+    {
+      sequenceNumber: 2,
+      description: "Grid of 8 items, each with small icon and short text description"
+    },
+    {
+      sequenceNumber: 3,
+      description: "Two centered buttons"
+    }
   ]
 }
 ```
-
-**Note:** Section 2 is default content (flowing text), not a block.
 
 ---
 
-### Example 3: Landing Page
+### Example 3: Article Cards Section
 
-**Visual analysis:**
-- Section 1: Dark background with video, hero
-- Section 2: White background, features
-- Section 3: White background, social proof
-- Section 4: Dark background, form CTA
+**Input:** "Section 3 (grey background): Blog articles"
+
+**Visual observation:**
+- Eyebrow text "Latest Articles"
+- Large heading
+- Paragraph description
+- Browse button
+[BREAK - shift to repeating pattern]
+- 4 items in grid
+- Each item: image, category tag, heading, short description, read link
 
 **Output:**
 ```javascript
 {
-  sections: [
-    { sectionNumber: 1, style: "dark", contentType: "block" },
-    { sectionNumber: 2, style: "light", contentType: "block" },
-    { sectionNumber: 3, style: "light", contentType: "block" },  // Reused "light"
-    { sectionNumber: 4, style: "dark", contentType: "block" }    // Reused "dark"
+  sectionNumber: 3,
+  sequences: [
+    {
+      sequenceNumber: 1,
+      description: "Eyebrow text, large heading, paragraph description, browse button - all stacked vertically"
+    },
+    {
+      sequenceNumber: 2,
+      description: "Grid of 4 items, each with image, category tag, heading, description, and read link"
+    }
   ]
 }
 ```
+
+---
+
+### Example 4: Simple Content Section
+
+**Input:** "Section 4 (light background): Body content"
+
+**Visual observation:**
+- Multiple paragraphs of text
+- Some inline images within the text
+- Headings interspersed (H2, H3)
+- No clear breaking points - content flows naturally
+
+**Output:**
+```javascript
+{
+  sectionNumber: 4,
+  sequences: [
+    {
+      sequenceNumber: 1,
+      description: "Flowing prose content: multiple paragraphs with inline images and headings (H2, H3)"
+    }
+  ]
+}
+```
+
+**Note:** This entire section is one sequence because content flows naturally without structural breaks.
 
 ---
 
 ## Common Mistakes to Avoid
 
-**Style naming inconsistency:**
-❌ Section 1: "white", Section 2: "light", Section 3: "default" (all white background)
-✓ Section 1: "light", Section 2: "light", Section 3: "light" (consistent)
+**Using block names in descriptions:**
+❌ "Hero block with heading and buttons"
+✓ "Large centered heading, paragraph, two buttons stacked vertically"
 
-**Creating blocks for everything:**
-❌ Body text paragraphs as "text block"
-✓ Body text paragraphs as default content
+**Not identifying breaking points:**
+❌ Describing entire section as one sequence when there are clear shifts
+✓ Identifying where content type changes and breaking into sequences
 
-**Ignoring visual breaks:**
-❌ One section for entire page
-✓ Separate sections at visual boundaries
+**Being too granular:**
+❌ Each element as separate sequence: "Heading", "Paragraph", "Button"
+✓ Related elements together: "Heading, paragraph, two buttons stacked vertically"
+
+**Mixing analysis levels:**
+❌ Analyzing multiple sections at once
+✓ Focus on ONE section at a time (per invocation)
+
+**Making authoring decisions:**
+❌ "This should be a cards block because..."
+✓ "Grid of 4 items with images and text" (neutral description)
