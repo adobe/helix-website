@@ -645,6 +645,10 @@ export function decorateMain(main) {
   decorateBlocks(main);
   decorateTitleSection(main);
   decorateSVGs(main);
+
+  if (document.body.scrollHeight > window.innerHeight * 2) {
+    document.body.classList.add('long-form');
+  }
 }
 
 function prepareSideNav(main) {
@@ -776,6 +780,11 @@ async function loadLazy(doc) {
   loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+
+  if (document.body.classList.contains('long-form')) {
+    loadCSS(`${window.hlx.codeBasePath}/styles/reading-progress.css`);
+    await loadScript(`${window.hlx.codeBasePath}/scripts/reading-progress.js`);
+  }
 
   if (getMetadata('supressframe')) {
     doc.querySelector('header').remove();
