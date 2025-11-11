@@ -574,6 +574,15 @@ function buildAuthorBox(main) {
   main.append(div);
 }
 
+function convertBlogArchiveBlocks(main) {
+  const archiveBlocks = main.querySelectorAll('.feed.blog.archive');
+  archiveBlocks.forEach((block) => {
+    const preservedClasses = [...block.classList]
+      .filter((cls) => !['feed', 'blog', 'archive'].includes(cls));
+    block.className = ['blog-archive', ...preservedClasses].join(' ');
+  });
+}
+
 // --------------- Main functions here ---------------- //
 
 /**
@@ -586,6 +595,7 @@ export function buildAutoBlocks(main) {
       buildAuthorBox(main);
     }
     buildEmbeds(main);
+    convertBlogArchiveBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
