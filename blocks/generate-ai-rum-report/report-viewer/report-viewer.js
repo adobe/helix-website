@@ -23,7 +23,6 @@ const ELEMENTS = {
 
 const SELECTORS = {
   REPORT_CONTENT: '.report-content',
-  REPORT_TABLE: 'table.report-table',
 };
 
 // State
@@ -76,7 +75,10 @@ function toggleView(showReport) {
     || document.querySelector(ELEMENTS.FACETS_CONTAINER);
   const sidebar = getFacetSidebar();
 
-  if (viewer) viewer.classList.toggle('visible', showReport);
+  if (viewer) {
+    viewer.classList.toggle('visible', showReport);
+    viewer.style.display = showReport ? 'block' : 'none';
+  }
   if (facets) facets.style.display = showReport ? 'none' : 'block';
   if (sidebar) sidebar.classList.toggle('report-view-active', showReport);
 }
@@ -121,80 +123,57 @@ function showError(container, message = 'Failed to load report') {
 }
 
 /**
- * Extract sections from table format
- * @param {NodeList} tables
- * @returns {Array<{title: string, content: string[]}>}
- */
-function extractFromTables(tables) {
-  const sections = [];
-
-  tables.forEach((table) => {
-    let currentSection = null;
-
-    table.querySelectorAll('tbody tr td').forEach((cell) => {
-      const text = cell.textContent.trim();
-      if (text === 'facet') return;
-
-      const titleEl = cell.querySelector('strong');
-      if (titleEl) {
-        if (currentSection) sections.push(currentSection);
-        currentSection = { title: titleEl.textContent.trim(), content: [] };
-      } else if (currentSection && text) {
-        currentSection.content.push(cell.innerHTML);
-      }
-    });
-
-    if (currentSection) sections.push(currentSection);
-  });
-
-  return sections;
-}
-
-/**
- * Extract sections from DA facet format
- * @param {NodeList} facetDivs
- * @returns {Array<{title: string, content: string[]}>}
- */
-function extractFromFacets(facetDivs) {
-  const sections = [];
-
-  facetDivs.forEach((facet) => {
-    const divs = facet.querySelectorAll(':scope > div > div');
-    let title = '';
-    const content = [];
-
-    divs.forEach((div, i) => {
-      const strong = div.querySelector('strong');
-      if (strong && i === 0) {
-        title = strong.textContent.trim().replace(':', '');
-      } else if (div.textContent.trim()) {
-        content.push(div.innerHTML);
-      }
-    });
-
-    if (title && content.length) sections.push({ title, content });
-  });
-
-  return sections;
-}
-
-/**
  * Extract sections from report content
  * @param {Document} doc - Parsed HTML document
  * @returns {Array<{title: string, content: string[]}>}
  */
 function extractSections(doc) {
-  const container = doc.querySelector(SELECTORS.REPORT_CONTENT) || doc.querySelector('main');
+  const container = doc.querySelector(SELECTORS.REPORT_CONTENT) || doc.querySelector('main') || doc.body;
   if (!container) return [];
 
-  // Try table format first
-  const tables = container.querySelectorAll(SELECTORS.REPORT_TABLE);
+  const sections = [];
+  let currentSection = null;
+
+  // Check for table format (DA saved reports)
+  const tables = container.querySelectorAll('table.report-table');
   if (tables.length > 0) {
-    return extractFromTables(tables);
+    tables.forEach((table) => {
+      table.querySelectorAll('tbody tr td').forEach((cell) => {
+        const text = cell.textContent.trim();
+        if (text === 'facet') return;
+
+        // Check for h4 tags in table cells
+        const h4El = cell.querySelector('h4');
+        if (h4El) {
+          if (currentSection) sections.push(currentSection);
+          currentSection = { title: h4El.textContent.trim(), content: [] };
+        } else if (currentSection && text) {
+          currentSection.content.push(cell.innerHTML);
+        }
+      });
+    });
+    if (currentSection) sections.push(currentSection);
+    return sections;
   }
 
-  // Fallback to div.facet format
-  return extractFromFacets(container.querySelectorAll('div.facet'));
+  // Check for h4 headings (inline reports)
+  const children = Array.from(container.children);
+  children.forEach((el) => {
+    if (el.tagName === 'H4') {
+      if (currentSection && currentSection.content.length > 0) {
+        sections.push(currentSection);
+      }
+      currentSection = { title: el.textContent.trim(), content: [] };
+    } else if (currentSection && el.textContent.trim()) {
+      currentSection.content.push(el.outerHTML);
+    }
+  });
+
+  if (currentSection && currentSection.content.length > 0) {
+    sections.push(currentSection);
+  }
+
+  return sections;
 }
 
 /**
@@ -206,6 +185,19 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+/**
+ * Convert text to title case (handles all-caps conversion)
+ * @param {string} text - Text to convert
+ * @returns {string} - Title cased text
+ */
+function toTitleCase(text) {
+  return text
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**
@@ -222,7 +214,7 @@ function createSection(section) {
 
   return `
     <fieldset class="report-section">
-      <legend>${escapeHtml(section.title)}</legend>
+      <legend>${escapeHtml(toTitleCase(section.title))}</legend>
       <div class="section-content">${content}</div>
     </fieldset>
   `;
@@ -299,6 +291,7 @@ window.addEventListener('popstate', async () => {
   if (!reportParam) {
     toggleView(false);
     cachedElements = {};
+
     // Close date range dropdown if open
     const input = document.querySelector('daterange-picker')?.shadowRoot?.querySelector('input');
     if (input?.getAttribute('aria-expanded') === 'true') input.click();

@@ -1,6 +1,10 @@
 /**
  * Progress Indicator Module
  * Step-based progress tracking that automatically divides progress equally among steps.
+ * Features:
+ * - Automatic progress calculation based on steps
+ * - Prevents backward progress (monotonically increasing)
+ * - Supports both step-based and manual progress updates
  * 
  * @example
  * // Initialize with 4 steps (each = 25%)
@@ -30,7 +34,7 @@ const CONFIG = {
 };
 
 // Global state
-let state = { totalSteps: 0, currentStep: 0, steps: [] };
+let state = { totalSteps: 0, currentStep: 0, steps: [], maxProgress: 0 };
 
 /**
  * Create circular progress indicator
@@ -76,6 +80,16 @@ export function updateCircularProgress(percent, taskName = '', taskDetail = '') 
   const container = document.getElementById(CONFIG.CONTAINER_ID);
   if (!container) return;
 
+  // Ensure progress never goes backward
+  const actualPercent = Math.max(percent, state.maxProgress);
+  
+  if (percent < state.maxProgress) {
+    // eslint-disable-next-line no-console
+    console.warn(`[Progress] Prevented backward progress: ${percent.toFixed(1)}% → ${actualPercent.toFixed(1)}%`);
+  }
+  
+  state.maxProgress = actualPercent;
+
   const progressBar = container.querySelector('.circular-progress-bar');
   const progressText = container.querySelector('.circular-progress-text');
   const taskNameElem = container.querySelector('.progress-task-name');
@@ -83,11 +97,11 @@ export function updateCircularProgress(percent, taskName = '', taskDetail = '') 
 
   if (progressBar) {
     const circumference = 2 * Math.PI * CONFIG.RADIUS;
-    const offset = circumference - (percent / 100) * circumference;
+    const offset = circumference - (actualPercent / 100) * circumference;
     progressBar.style.strokeDashoffset = offset;
   }
 
-  if (progressText) progressText.textContent = `${Math.round(percent)}%`;
+  if (progressText) progressText.textContent = `${Math.round(actualPercent)}%`;
   if (taskNameElem && taskName) taskNameElem.textContent = taskName;
   if (taskDetailElem && taskDetail) taskDetailElem.textContent = taskDetail;
 }
@@ -101,7 +115,7 @@ export function initializeStepProgress(steps) {
     throw new Error('Steps must be a non-empty array');
   }
 
-  state = { totalSteps: steps.length, currentStep: 0, steps: [...steps] };
+  state = { totalSteps: steps.length, currentStep: 0, steps: [...steps], maxProgress: 0 };
   updateCircularProgress(0, CONFIG.INITIAL_MSG.name, CONFIG.INITIAL_MSG.detail);
 }
 
@@ -176,7 +190,7 @@ export function getProgressState() {
  * Reset progress state
  */
 export function resetProgress() {
-  state = { totalSteps: 0, currentStep: 0, steps: [] };
+  state = { totalSteps: 0, currentStep: 0, steps: [], maxProgress: 0 };
   updateCircularProgress(0, CONFIG.INITIAL_MSG.name, CONFIG.INITIAL_MSG.detail);
 }
 

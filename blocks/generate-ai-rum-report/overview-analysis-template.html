@@ -1,0 +1,257 @@
+<div class="report-template-instructions">
+
+<h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
+
+<p><b>⚠️ FORMAT REQUIREMENT - USE SEMANTIC HTML:</b></p>
+<ul>
+  <li>Use <code>&lt;h4&gt;</code> tags for main section headings (e.g., <code>&lt;h4&gt;EXECUTIVE SUMMARY&lt;/h4&gt;</code>)</li>
+  <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags for subsection headings</li>
+  <li>Use BULLET POINTS (•) for all content, each wrapped in <code>&lt;p&gt;</code> tags</li>
+  <li>Wrap ALL text content in <code>&lt;p&gt;</code> tags for proper HTML structure</li>
+  <li>DO NOT use emojis in the report output</li>
+  <li>DO NOT use progress bars</li>
+  <li>Make the report EASY TO SCAN with clear structure and specific numbers</li>
+</ul>
+
+<p><b>⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:</b></p>
+<ul>
+  <li>You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)</li>
+  <li>Group related facets into natural categories and cover ALL of them in flowing bullet points</li>
+  <li>Go through the list SYSTEMATICALLY - don't skip any facet</li>
+  <li>Write naturally about multiple related facets together, not mechanically one-by-one</li>
+  <li>Balance positives and improvements in a conversational tone</li>
+  <li>This ensures ALL facets get coverage without mechanical repetition</li>
+  <li>Standard report: 1200-1400 words covering all facets</li>
+  <li>With forms data: 1400-1600 words (forms section + all other facets)</li>
+</ul>
+
+<p><b>⚠️ FORMS DATA PRIORITY:</b></p>
+<p>If fill_source, formsubmit_source, or formsubmit_target tools are available:</p>
+<ul>
+  <li>Forms section is MANDATORY and HIGH PRIORITY</li>
+  <li>Create dedicated forms section immediately after Executive Summary</li>
+  <li>Then continue with balanced facet coverage for all other facets</li>
+</ul>
+
+<p><b>📅 Analysis Period</b></p>
+<p>This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").</p>
+
+<p><b>⚠️ Core Web Vitals Interpretation Guidelines</b></p>
+<p>When analyzing LCP, CLS, and INP metrics:</p>
+<ul>
+  <li>If metric titles contain "and rising" or "and falling", these indicate TRENDS, not absolute performance</li>
+  <li>"Rising" means the metric is getting worse over time, "falling" means it's improving</li>
+  <li>DO NOT conclude the site is bad based solely on "rising" trends - consider the actual metric values</li>
+  <li>Focus on the current metric values and their impact, not just the trend direction</li>
+  <li>A metric can be "rising" but still within acceptable performance thresholds</li>
+</ul>
+
+<p><b>🔍 Facet Analysis Guidelines</b></p>
+<p>For ALL facets being analyzed:</p>
+<ul>
+  <li>ALWAYS check the title field of each facet (found in the help link's title attribute) to understand what it represents and its purpose</li>
+  <li>Use these descriptive titles to provide context and meaning to your insights and recommendations</li>
+  <li>DO NOT focus primarily on performance metrics - provide balanced analysis across ALL available facets</li>
+  <li>Include insights from user behavior, traffic acquisition, content engagement, errors, and other non-performance facets</li>
+  <li>Each facet provides unique business value - ensure comprehensive coverage of all data types</li>
+</ul>
+
+<p><b>⚠️ CRITICAL: INTERPRETING CSS CLASSES FOR METRIC SEVERITY</b></p>
+<p>When analyzing tool results, metrics include CSS classes that indicate severity levels. You MUST pay special attention to these class indicators:</p>
+
+<p><b>Performance Metrics (LCP, CLS, INP):</b></p>
+<ul>
+  <li><code>classes: "performance score-poor"</code> = <b>CRITICAL ISSUE</b> - Metric is failing Core Web Vitals standards. This directly impacts user experience and SEO rankings. MUST be highlighted prominently.</li>
+  <li><code>classes: "performance score-ni"</code> = Needs Improvement - Metric is borderline. Mention if relevant but not critical.</li>
+  <li><code>classes: "performance score-good"</code> = Good - Metric is passing. Can be mentioned as a positive.</li>
+</ul>
+
+<p><b>Business Metrics (Engagement, Conversion, Bounces, Acquisition):</b></p>
+<ul>
+  <li><code>classes: "business-metric engagement conversion"</code> - Engagement/Conversion metric. If value is below 25%, this is a <b>CRITICAL ISSUE</b> indicating serious user interaction problems. Values above 75% are healthy.</li>
+  <li><code>classes: "business-metric acquisition bounces"</code> - Bounce rate metric. If value is above 60%, this is a <b>CRITICAL ISSUE</b> indicating serious retention problems. Values below 40% are healthy.</li>
+  <li><code>classes: "business-metric acquisition organic"</code> - Organic traffic/acquisition metric. Low values may indicate SEO or discoverability issues.</li>
+  <li>Note: The actual value is in <code>&lt;span class="formatted-value"&gt;</code> nested inside <code>&lt;number-format&gt;</code>, and <code>&lt;meter&gt;</code> attributes (<code>low</code>, <code>high</code>, <code>optimum</code>) provide threshold guidance</li>
+</ul>
+
+<p><b>⚠️ MANDATORY: When you see metrics with "score-poor" or critical thresholds, you MUST:</b></p>
+<ul>
+  <li>Prominently mention them in the relevant sections with specific values and context</li>
+  <li>Include them in "JAVASCRIPT ERRORS THAT NEED ATTENTION" if they relate to technical/performance issues</li>
+  <li>List them in "PRIORITY ACTIONS" with clear, actionable remediation steps</li>
+  <li>Reference them in "EXECUTIVE SUMMARY" if they have significant business impact</li>
+</ul>
+
+<p><b>Example of how metrics are structured:</b></p>
+<pre>
+"metrics": {
+  "LCP": {
+    "value": "3.2s",
+    "classes": "performance score-poor"  ← This means LCP is FAILING
+  },
+  "Engagement": {
+    "value": "18%",
+    "classes": "business-metric engagement conversion"  ← Check if below 25%
+  },
+  "Bounce Rate": {
+    "value": "65%",
+    "classes": "business-metric acquisition bounces"  ← Check if above 60%
+  }
+}
+</pre>
+
+</div>
+
+<!-- ====================================================================== -->
+<!-- ACTUAL REPORT STRUCTURE STARTS HERE -->
+<!-- ====================================================================== -->
+
+<h4>EXECUTIVE SUMMARY</h4>
+<p>Create a flowing, readable summary (MAXIMUM 150 words) in this structure:</p>
+
+<p>Start with the analysis period and site context: [During {date range}, this {type of site - e.g., e-commerce, content site, SaaS platform} focused on {primary purpose} was analyzed.]</p>
+
+<p>Current health status: [The site shows {overall health assessment} with Core Web Vitals at {specific metrics like LCP, CLS, INP values}. {Brief performance summary}.]</p>
+
+<p><b>Key Findings for Stakeholders:</b></p>
+<p>• [Critical finding or opportunity with specific numbers and business impact]</p>
+<p>• [Critical finding or opportunity with specific numbers and business impact]</p>
+<p>• [Critical finding or opportunity with specific numbers and business impact]</p>
+
+<p>⚠️ <b>WRITING STYLE:</b> Write the first two paragraphs as flowing prose (no bold labels). Only use bullets for the "Key Findings for Stakeholders" section. Keep it readable and not congested.</p>
+<p>⚠️ <b>EXCLUDE FORMS:</b> If forms data is provided, forms get their own dedicated section. DO NOT mention forms in Executive Summary.</p>
+<p>⚠️ <b>FORMAT:</b> Wrap all text in &lt;p&gt; tags. NO EMOJIS in output.</p>
+
+<!-- ====================================================================== -->
+
+<h4>JAVASCRIPT ERRORS THAT NEED ATTENTION</h4>
+<p>Write 2-3 flowing paragraphs analyzing error patterns and their impact. Use bullets for emphasis when listing specific errors or recommendations:</p>
+<p>[Describe the most significant error patterns observed, their frequency, and which pages or features are affected. Include specific numbers and error types.]</p>
+<p>[Explain the user experience impact with concrete examples and discuss root causes. If relevant, use bullets to highlight key error types or affected areas. Provide recommended fixes and monitoring strategies.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>PERFORMANCE IMPACT</h4>
+<p>Write 2-3 flowing paragraphs about Core Web Vitals and technical performance. Use bullets when emphasizing specific metrics or bottlenecks:</p>
+<p>[Discuss LCP performance across devices and connections, CLS issues affecting visual stability, and INP responsiveness. Include specific metric values and how they compare to thresholds. Use bullets if highlighting multiple metric issues.]</p>
+<p>[Analyze overall page load times and identify key bottlenecks. Use bullets to list major optimization opportunities with expected impact on user experience and business metrics.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>USER ENGAGEMENT</h4>
+<p>Write 2-3 flowing paragraphs about user interaction patterns. Use bullets to emphasize key metrics or notable patterns:</p>
+<p>[Describe page view patterns, session behavior, and how users navigate through the site. Include metrics like average session duration, pages per session, and bounce rates for key pages. Use bullets if highlighting multiple engagement metrics.]</p>
+<p>[Discuss device and browser usage patterns and their correlation with engagement. Use bullets to emphasize notable findings about content discovery or user behavior that could inform strategy.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>TRAFFIC & ACQUISITION</h4>
+<p>Write 2-3 flowing paragraphs analyzing traffic sources and acquisition. Use bullets when comparing multiple channels or sources:</p>
+<p>[Analyze traffic volume by channel (direct, referral, search) with growth trends. Use bullets if comparing multiple channels' performance with specific numbers and percentages.]</p>
+<p>[Discuss referrer effectiveness, partnership performance, and UTM campaign results where available. Use bullets to emphasize which acquisition channels drive the most engaged users and which need optimization.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>CONTENT EFFECTIVENESS</h4>
+<p>Write 2-3 flowing paragraphs evaluating content performance. Use bullets when listing top pages or key recommendations:</p>
+<p>[Identify top performing pages with engagement metrics. Use bullets if listing multiple high-performing pages. Discuss what makes them successful and which content types or topics resonate most with users.]</p>
+<p>[Analyze URL patterns showing high vs low engagement. Use bullets for specific optimization recommendations for underperforming content areas with expected impact.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>CONVERSION FUNNEL</h4>
+<p>Write 2-3 flowing paragraphs about conversion patterns (if form data available):</p>
+<p>[Discuss form submission rates, completion patterns, and identify drop-off points in the funnel. Include specific conversion rates and abandonment points.]</p>
+<p>[Analyze field-level form performance, user behavior patterns, and provide optimization recommendations with expected improvement in conversion rates.]</p>
+<p><b>⚠️ NOTE:</b> Skip this section if no form data is available.</p>
+
+<!-- ====================================================================== -->
+
+<h4>GEOGRAPHIC INSIGHTS</h4>
+<p>Write 2-3 flowing paragraphs about geographic patterns:</p>
+<p>[Describe traffic distribution by country/region with volume metrics. Highlight regional performance variations and any latency patterns affecting user experience.]</p>
+<p>[Discuss language preferences, localization opportunities, and geographic user behavior differences. Identify regions with growth potential or needing performance optimization.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>MARKET OPPORTUNITIES</h4>
+<p>Write 2-3 flowing paragraphs identifying growth opportunities:</p>
+<p>[Identify underserved markets or regions with high potential based on data. Discuss geographic expansion opportunities considering performance and user behavior patterns.]</p>
+<p>[Highlight device/platform optimization opportunities and emerging trends. Identify untapped segments with specific recommendations for capture and growth.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>BUSINESS IMPACT</h4>
+<p>Write 2-3 flowing paragraphs summarizing business implications:</p>
+<p>[Quantify the revenue impact of performance improvements and user experience enhancements. Discuss how technical issues affect business metrics and customer satisfaction.]</p>
+<p>[Summarize the cost of current technical issues and the growth potential from identified opportunities. Provide a clear business case for recommended actions with expected ROI.]</p>
+
+<!-- ====================================================================== -->
+
+<h4>PRIORITY ACTIONS</h4>
+<p>List the 3-4 most critical actions to take, prioritized by impact:</p>
+<p>• [Action 1]: [Specific recommendation with expected impact and timeframe]</p>
+<p>• [Action 2]: [Specific recommendation with expected impact and timeframe]</p>
+<p>• [Action 3]: [Specific recommendation with expected impact and timeframe]</p>
+<p>• [Action 4 (optional)]: [Specific recommendation with expected impact and timeframe]</p>
+
+<!-- ====================================================================== -->
+<!-- CRITICAL REQUIREMENTS -->
+<!-- ====================================================================== -->
+
+<div class="report-requirements">
+
+<h4>CRITICAL LENGTH & FORMAT REQUIREMENTS</h4>
+<ul>
+  <li><b>ENTIRE REPORT:</b> 1400-1600 words</li>
+  <li><b>Executive Summary:</b> Maximum 150 words (2 flowing paragraphs + 3 key findings as bullets)</li>
+  <li><b>JavaScript Errors That Need Attention:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Performance Impact:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>User Engagement:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Traffic & Acquisition:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Content Effectiveness:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Conversion Funnel:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed, skip if no form data)</li>
+  <li><b>Geographic Insights:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Market Opportunities:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Business Impact:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
+  <li><b>Priority Actions:</b> 100-150 words (3-4 action items as bullets)</li>
+  <li>Write in flowing paragraphs with specific metrics and examples - avoid dense text blocks</li>
+  <li>Use actionable language and quantify impact wherever possible</li>
+  <li>Keep paragraphs readable and well-spaced - NO congestion</li>
+  <li>NO EMOJIS anywhere in the report content</li>
+</ul>
+
+<h4>HTML FORMATTING REQUIREMENTS</h4>
+<ul>
+  <li>Use <code>&lt;h4&gt;</code> tags for ALL main section headings:
+    <ul>
+      <li>EXECUTIVE SUMMARY</li>
+      <li>JAVASCRIPT ERRORS THAT NEED ATTENTION</li>
+      <li>PERFORMANCE IMPACT</li>
+      <li>USER ENGAGEMENT</li>
+      <li>TRAFFIC & ACQUISITION</li>
+      <li>CONTENT EFFECTIVENESS</li>
+      <li>CONVERSION FUNNEL</li>
+      <li>GEOGRAPHIC INSIGHTS</li>
+      <li>MARKET OPPORTUNITIES</li>
+      <li>BUSINESS IMPACT</li>
+      <li>PRIORITY ACTIONS</li>
+    </ul>
+  </li>
+  <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags sparingly - only for subsection labels when needed for clarity</li>
+  <li>Write sections as flowing prose - wrap each paragraph in <code>&lt;p&gt;</code> tags</li>
+  <li>Use bullets (•) strategically when you need to emphasize specific points, list multiple items, or make key information scannable</li>
+  <li>Each paragraph should be wrapped: <code>&lt;p&gt;Paragraph text here&lt;/p&gt;</code></li>
+  <li>For bulleted items: <code>&lt;p&gt;• Bullet text here&lt;/p&gt;</code></li>
+  <li>Mix prose and bullets naturally - use bullets when they improve readability and emphasis</li>
+  <li>Do NOT use markdown formatting like **text** or *text*</li>
+  <li>DO NOT use <code>&lt;br&gt;</code> or <code>&lt;br/&gt;</code> tags - use <code>&lt;p&gt;</code> tags to separate paragraphs</li>
+  <li>NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)</li>
+  <li>NO progress bars (no ████████░░ or similar)</li>
+  <li>Output must render properly in HTML context</li>
+</ul>
+
+<p><b>⚠️ CRITICAL:</b> Use ONLY the actual data from the SOURCE MATERIAL provided above. DO NOT use any example numbers, percentages, or metrics from this template. Extract real metrics from the dashboard data and insights provided.</p>
+
+</div>
+

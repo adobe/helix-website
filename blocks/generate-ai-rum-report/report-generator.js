@@ -7,6 +7,7 @@
 
 // Import analysis engine functionality
 import runCompleteRumAnalysis from './core/analysis-engine.js';
+import { resetCachedFacetTools } from './core/facet-manager.js';
 
 import {
   createCircularProgress,
@@ -56,6 +57,11 @@ async function ensureMetricsParameter() {
       try {
         await window.slicerDraw();
         console.log('[OpTel Detective Report] Dashboard reloaded with all checkpoints');
+
+        // Clear facet cache to ensure fresh extraction after reload
+        resetCachedFacetTools();
+        console.log('[OpTel Detective Report] Cleared facet cache for fresh extraction');
+
         await new Promise((resolve) => {
           setTimeout(resolve, 500);
         });
@@ -154,21 +160,22 @@ export default async function generateReport(apiKey, statusDiv, button, modal) {
     await new Promise((resolve) => { setTimeout(resolve, 300); });
 
     // Step 3: Processing Analysis with granular progress
-    // Map internal batch progress (0-100%) to overall progress (50-87.5%)
+    // Map internal progress: step 2 (50-87.5%), step 3 (87.5-100%)
     const progressCallback = (step, status, message, batchPercent = 0) => {
-      // Map batch progress to 50-87.5% range
-      const mappedPercent = 50 + (batchPercent * 0.375); // 0-100 maps to 50-87.5%
+      const isStep3 = step === 3;
+      const stepIndex = isStep3 ? 3 : 2;
+      const mappedPercent = isStep3
+        ? 87.5 + (batchPercent * 0.125) // Final synthesis: 87.5-100%
+        : 50 + (batchPercent * 0.375); // Parallel processing: 50-87.5%
+
       setProgress(
         mappedPercent,
-        REPORT_STEPS[2].name, // "Processing Analysis"
-        message || REPORT_STEPS[2].detail,
+        REPORT_STEPS[stepIndex].name,
+        message || REPORT_STEPS[stepIndex].detail,
       );
     };
 
     const analysisResult = await runCompleteRumAnalysis(progressCallback);
-
-    // Step 4: Final synthesis at 87.5-100%
-    setProgress(87.5, REPORT_STEPS[3].name, REPORT_STEPS[3].detail);
 
     // Final step: 100% with "Report Ready" message
     completeProgress('Report Ready', 'Analysis complete, report generated successfully');

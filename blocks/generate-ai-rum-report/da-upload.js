@@ -18,7 +18,6 @@ const DA_CONFIG = {
 
 const TEMPLATE_PATH = '/blocks/generate-ai-rum-report/report-template.html';
 const STORAGE_KEY = 'rumChatDeepMode';
-const HEADING_MAX_LENGTH = 150;
 
 // Template cache
 let templateCache = null;
@@ -74,46 +73,18 @@ async function loadTemplate() {
 // ============================================================================
 
 /**
- * Check if element is a heading
- * @param {Element} element
- * @returns {string|boolean} Heading text or false
- */
-function isHeading(element) {
-  const tag = element.tagName.toLowerCase();
-
-  // Check h1-h6 tags
-  if (tag[0] === 'h' && tag.length === 2) {
-    return element.textContent.trim();
-  }
-
-  // Check bold/strong tags (AI-generated headings)
-  if (tag === 'b' || tag === 'strong') {
-    const text = element.textContent.trim();
-    const len = text.length;
-
-    if (len > 0 && len < HEADING_MAX_LENGTH) {
-      if (text.endsWith(':') || text === text.toUpperCase()) {
-        return text;
-      }
-    }
-  }
-
-  return false;
-}
-
-/**
- * Create table section for DA format
- * @param {string} title
+ * Create table section for DA format with h4 headings preserved
+ * @param {Element} titleElement - The h4 element
  * @param {Array<Element>} content
  * @returns {string} HTML table
  */
-function createSectionTable(title, content) {
+function createSectionTable(titleElement, content) {
   let table = '<table class="report-table"><tbody>';
 
-  // Section header
+  // Section header with facet marker
   table += `
     <tr><td colspan="2"><p>facet</p></td></tr>
-    <tr><td colspan="2"><p><strong>${title}</strong></p></td></tr>`;
+    <tr><td colspan="2">${titleElement.outerHTML}</td></tr>`;
 
   // Content rows
   if (content?.length > 0) {
@@ -133,7 +104,7 @@ function createSectionTable(title, content) {
 }
 
 /**
- * Transform content to table format for DA
+ * Transform content to table format for DA (preserving h4 tags)
  * @param {string} content
  * @returns {string} Table-formatted HTML
  */
@@ -145,43 +116,31 @@ function transformToTableFormat(content) {
   if (!container) return content;
 
   const children = Array.from(container.children);
-  if (children.length === 0) {
-    return container.textContent.trim()
-      ? createSectionTable('Analysis', [container])
-      : content;
-  }
+  if (children.length === 0) return content;
 
   let output = '';
-  let currentSection = null;
+  let currentHeading = null;
   let sectionContent = [];
 
   children.forEach((element) => {
-    if (element.tagName.toLowerCase() === 'br') return;
-
-    const headingText = isHeading(element);
-
-    if (headingText) {
-      if (currentSection) {
-        output += createSectionTable(currentSection, sectionContent);
+    if (element.tagName === 'H4') {
+      // Save previous section
+      if (currentHeading) {
+        output += createSectionTable(currentHeading, sectionContent);
         sectionContent = [];
       }
-      currentSection = headingText;
-    } else if (currentSection && element.textContent.trim()) {
+      currentHeading = element;
+    } else if (currentHeading && element.textContent.trim()) {
       sectionContent.push(element);
     }
   });
 
   // Output final section
-  if (currentSection) {
-    output += createSectionTable(currentSection, sectionContent);
+  if (currentHeading) {
+    output += createSectionTable(currentHeading, sectionContent);
   }
 
-  // Fallback if no headings found
-  if (!output && children.length > 0) {
-    output = createSectionTable('Analysis', children);
-  }
-
-  return output;
+  return output || content;
 }
 
 // ============================================================================
@@ -341,14 +300,61 @@ export function getCurrentAnalyzedUrl() {
 }
 
 /**
+ * Map folder items to report objects
+ * @param {Array} items - Items from DA folder
+ * @param {string} folder - Folder name
+ * @param {string} domain - Optional domain
+ * @returns {Array} Mapped report objects
+ */
+function mapFolderItemsToReports(items, folder, domain = null) {
+  return items
+    .filter((item) => item.ext === 'html' || item.name?.endsWith('.html'))
+    .map((item) => {
+      const filename = item.name.endsWith('.html') ? item.name : `${item.name}.html`;
+      const report = {
+        filename,
+        path: `${DA_CONFIG.BASE_URL}/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`,
+        timestamp: new Date(item.lastModified || item.modified || Date.now()).getTime(),
+      };
+      if (domain) report.domain = domain;
+      return report;
+    });
+}
+
+/**
+ * Fetch reports from a specific folder
+ * @param {string} listUrl - Base list URL
+ * @param {string} folder - Folder name
+ * @param {string} domain - Optional domain
+ * @returns {Promise<Array>} Reports from folder
+ */
+async function fetchReportsFromFolder(listUrl, folder, domain = null) {
+  const response = await fetch(`${listUrl}/${folder}`);
+  if (!response.ok) return [];
+  const items = await response.json();
+  return mapFolderItemsToReports(items, folder, domain);
+}
+
+/**
  * Fetch list of reports from DA storage
+ * @param {string} domainFilter - Optional domain to filter reports by
  * @returns {Promise<Array>} List of report objects
  */
-export async function fetchReportsFromDA() {
+export async function fetchReportsFromDA(domainFilter = null) {
   try {
     const listUrl = `https://admin.da.live/list/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}`;
-    const response = await fetch(listUrl);
 
+    // Fetch from specific domain folder
+    if (domainFilter) {
+      const folder = cleanUrlForFolder(domainFilter);
+      console.log(`[DA Upload] Fetching reports from folder: ${folder} (domain: ${domainFilter})`);
+      const reports = await fetchReportsFromFolder(listUrl, folder, domainFilter);
+      console.log(`[DA Upload] Found ${reports.length} report(s) for domain: ${domainFilter}`);
+      return reports.sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    // Fetch from all folders (legacy behavior)
+    const response = await fetch(listUrl);
     if (!response.ok) return [];
 
     const folders = (await response.json())
@@ -357,21 +363,9 @@ export async function fetchReportsFromDA() {
 
     if (!folders.length) return [];
 
-    const reportsArrays = await Promise.all(folders.map(async (folder) => {
-      const folderResponse = await fetch(`${listUrl}/${folder}`);
-      if (!folderResponse.ok) return [];
-
-      return (await folderResponse.json())
-        .filter((item) => item.ext === 'html' || item.name?.endsWith('.html'))
-        .map((item) => {
-          const filename = item.name.endsWith('.html') ? item.name : `${item.name}.html`;
-          return {
-            filename,
-            path: `${DA_CONFIG.BASE_URL}/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`,
-            timestamp: new Date(item.lastModified || item.modified || Date.now()).getTime(),
-          };
-        });
-    }));
+    const reportsArrays = await Promise.all(
+      folders.map((folder) => fetchReportsFromFolder(listUrl, folder)),
+    );
 
     return reportsArrays.flat().sort((a, b) => b.timestamp - a.timestamp);
   } catch (error) {

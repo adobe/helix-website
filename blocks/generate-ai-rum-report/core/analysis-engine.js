@@ -63,7 +63,7 @@ async function getSystemPrompt() {
  */
 async function getOverviewAnalysisTemplate() {
   if (!overviewAnalysisTemplateCache) {
-    overviewAnalysisTemplateCache = await loadTextFile('overview-analysis-template.txt');
+    overviewAnalysisTemplateCache = await loadTextFile('overview-analysis-template.html');
   }
   return overviewAnalysisTemplateCache || 'CREATE A CLEAN, PROFESSIONAL REPORT WITH STRUCTURED SECTIONS.';
 }

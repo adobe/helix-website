@@ -19,7 +19,11 @@ const CONFIG = {
 
 export async function getSavedReports() {
   try {
-    return await fetchReportsFromDA();
+    // Get current domain being analyzed and filter reports by it
+    const currentDomain = getCurrentAnalyzedUrl();
+    // eslint-disable-next-line no-console
+    console.log(`[Report Actions] Fetching reports for domain: ${currentDomain || 'all domains'}`);
+    return await fetchReportsFromDA(currentDomain);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('[OpTel Detective Report] Error fetching saved reports:', error);

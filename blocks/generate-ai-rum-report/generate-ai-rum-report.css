@@ -283,6 +283,11 @@
   font-size: 28px;
   font-weight: 700;
   color: var(--color-btn-primary);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.5px;
 }
 
 .progress-status-text {

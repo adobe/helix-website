@@ -27,11 +27,11 @@
   --border-radius: 4px;
   --border-radius-lg: 8px;
 
-  /* Typography */
-  --font-size-sm: 13px;
-  --font-size-base: 14px;
+  /* Typography - Matches facet-sidebar font sizes */
+  --font-size-sm: 12px;
+  --font-size-base: 16px; /* matches var(--type-body-s-size) */
   --font-size-lg: 16px;
-  --font-size-xl: 18px;
+  --font-size-xl: 20px;
 
   /* Base Container */
   max-width: 100%;
@@ -103,8 +103,8 @@ facet-sidebar.report-view-active > form {
   margin-left: 20px;
   padding: var(--spacing-sm);
   background-color: var(--section-bg);
-  font-size: var(--font-size-base);
-  font-weight: 600;
+  font-size: var(--font-size-xl);
+  font-weight: 500;
 }
 
 .report-sections .section-content {
@@ -157,7 +157,7 @@ facet-sidebar.report-view-active > form {
 .report-sections .content-item code {
   padding: 2px var(--spacing-xs);
   font-family: monospace;
-  font-size: 90%;
+  font-size: 80%; /* matches facet-sidebar monospace font-size */
   background-color: var(--spectrum-blue-200, #d4e3fc);
   border: 1px solid var(--spectrum-blue-400, #4285f4);
   border-radius: 3px;
@@ -179,14 +179,15 @@ facet-sidebar.report-view-active > form {
    RESPONSIVE DESIGN
    ========================================================================= */
 
-@media (width <= 768px) {
+/* Match facet-sidebar breakpoint at 900px */
+@media (width >= 900px) {
   .report-viewer {
-    --spacing-md: 8px;
-    --spacing-lg: 12px;
-    --spacing-xl: 16px;
-    --font-size-sm: 12px;
-    --font-size-base: 13px;
-    --font-size-lg: 14px;
-    --font-size-xl: 16px;
+    --font-size-base: 18px; /* matches facet-sidebar fieldset li at 900px+ */
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+  }
+
+  .report-sections legend {
+    font-size: var(--font-size-xl);
   }
 }

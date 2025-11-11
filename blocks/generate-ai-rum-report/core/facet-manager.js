@@ -224,7 +224,7 @@ export async function handleDynamicFacetToolCall(toolName, input, useQueue = tru
             const countTitle = countElement?.getAttribute('title') || '0';
             const numericCount = countTitle.split(' ')[0].replace(/[^\d]/g, '');
 
-            // Get metrics
+            // Get metrics with HTML context
             const cwvList = label.nextElementSibling?.querySelector?.('ul.cwv');
             const metrics = {};
             if (cwvList) {
@@ -233,7 +233,11 @@ export async function handleDynamicFacetToolCall(toolName, input, useQueue = tru
                 const metricValue = item.querySelector('number-format')?.textContent?.trim();
                 if (title && metricValue) {
                   const metricName = title.split(' - ')[0];
-                  metrics[metricName] = metricValue;
+                  const classList = Array.from(item.classList).join(' ');
+                  metrics[metricName] = {
+                    value: metricValue,
+                    classes: classList,
+                  };
                 }
               });
             }
