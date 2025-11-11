@@ -89,17 +89,100 @@ export async function fetchBlogContent(url) {
   }
 }
 
+/**
+ * Fetches blog post HTML and extracts metadata (author, excerpt)
+ * @param {string} url - Blog post URL
+ * @returns {Promise<Object>} Object with author and excerpt
+ */
+export async function fetchBlogMetadata(url) {
+  try {
+    const response = await fetch(url);
+    const text = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+
+    // Extract author from meta tag
+    const authorMeta = doc.querySelector('meta[name="author"]');
+    const author = authorMeta ? authorMeta.getAttribute('content') : '';
+
+    // Extract hero image from og:image meta tag
+    let heroImage = '';
+    const ogImageMeta = doc.querySelector('meta[property="og:image"]');
+    if (ogImageMeta) {
+      heroImage = ogImageMeta.getAttribute('content');
+      // Keep absolute URLs as-is, convert to relative if it's from the same origin
+      if (heroImage && heroImage.startsWith('https://')) {
+        try {
+          const imageUrl = new URL(heroImage);
+          // If same origin, use relative path; otherwise keep absolute URL
+          if (imageUrl.origin === window.location.origin) {
+            heroImage = imageUrl.pathname + imageUrl.search;
+          }
+          // Otherwise keep the full URL for cross-origin images
+        } catch (e) {
+          // Keep original if URL parsing fails
+        }
+      }
+    }
+
+    // Extract excerpt from first paragraph(s) in main content
+    const mainContent = doc.querySelector('main .default-content-wrapper');
+    let excerpt = '';
+    if (mainContent) {
+      const paragraphs = mainContent.querySelectorAll('p');
+      const paragraphText = Array.from(paragraphs)
+        .map((p) => p.textContent.trim())
+        .filter((item) => item.length > 0)
+        .join(' ');
+
+      // Get first 1-2 sentences (up to ~200 characters or 2 sentences)
+      const sentences = paragraphText.match(/[^.!?]+[.!?]+/g) || [];
+      if (sentences.length > 0) {
+        excerpt = sentences.slice(0, 2).join(' ').trim();
+        // Limit to ~200 characters if still too long
+        if (excerpt.length > 200) {
+          const lastSpace = excerpt.lastIndexOf(' ', 200);
+          excerpt = excerpt.substring(0, lastSpace > 150 ? lastSpace : 200).trim();
+          if (!excerpt.endsWith('.') && !excerpt.endsWith('!') && !excerpt.endsWith('?')) {
+            excerpt += '...';
+          }
+        }
+      } else {
+        // Fallback: first 200 characters
+        excerpt = paragraphText.substring(0, 200).trim();
+        if (excerpt.length === 200 && !excerpt.endsWith('.')) {
+          excerpt += '...';
+        }
+      }
+    }
+
+    return {
+      author: author || '',
+      heroImage: heroImage || '',
+      excerpt: excerpt || '',
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching blog metadata:', error);
+    return {
+      author: '',
+      heroImage: '',
+      excerpt: '',
+    };
+  }
+}
+
 export async function renderBlog(block) {
   if (!block) {
     return;
   }
   const blogIndex = window.blogindex.data;
 
-  // Sort blogs by publication date in descending order
+  // Sort blogs by publication date in descending order (newest first)
   blogIndex.sort((a, b) => {
     const dateA = new Date(a.publicationDate);
     const dateB = new Date(b.publicationDate);
-    return dateA - dateB;
+    return dateB - dateA;
   });
 
   // Skip if block has favorite class
@@ -107,102 +190,99 @@ export async function renderBlog(block) {
     return;
   }
 
-  let parentDiv = block.querySelector('.blog-container');
-  if (!parentDiv) {
-    parentDiv = createTag('div', { class: 'blog-container' });
-    block.appendChild(parentDiv);
-  }
+  // Clear existing content and create archive container
+  block.innerHTML = '';
+  const archiveContainer = createTag('div', { class: 'blog-archive-container' });
+  block.appendChild(archiveContainer);
 
-  let leftContainer = parentDiv.querySelector('.left-container');
-  let rightContainer = parentDiv.querySelector('.right-container');
+  // Create cards grid
+  const cardsGrid = createTag('div', { class: 'blog-cards-grid' });
+  archiveContainer.appendChild(cardsGrid);
 
-  if (!leftContainer) {
-    leftContainer = createTag('div', { class: 'left-container' });
-    parentDiv.appendChild(leftContainer);
-  }
-  if (!rightContainer) {
-    rightContainer = createTag('div', { class: 'right-container' });
-    parentDiv.appendChild(rightContainer);
-  }
-  rightContainer.innerHTML = '';
+  // Fetch metadata for all blog posts and create cards
+  const cardPromises = blogIndex.map(async (page) => {
+    // Fetch additional metadata (author, better excerpt, hero image)
+    const metadata = await fetchBlogMetadata(page.path);
 
-  // setting up the favorite blogs
-  const favoriteFeedWrapper = document.querySelector('.feed-wrapper:has(.favorite)');
-  if (favoriteFeedWrapper) {
-    const favoriteDiv = favoriteFeedWrapper.querySelector('.favorite > div');
-    favoriteDiv.classList.add('favorite-blogs');
-    if (favoriteDiv) {
-      favoriteDiv.querySelectorAll('a').forEach((link) => {
-        link.classList.remove('button', 'primary');
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
+    // Use fetched hero image if available, otherwise fall back to index image
+    const heroImage = metadata.heroImage || page.image || '';
+    // Use fetched excerpt if available, otherwise use description
+    const excerpt = metadata.excerpt || page.description || '';
+    // Use fetched author if available
+    const author = metadata.author || '';
+
+    // Create card
+    const card = createTag('article', { class: 'blog-card' });
+
+    // Hero image
+    if (heroImage) {
+      const imageWrapper = createTag('div', { class: 'blog-card-image-wrapper' });
+      const img = createTag('img', {
+        src: heroImage,
+        alt: page.title || '',
+        loading: 'lazy',
       });
-      rightContainer.appendChild(favoriteDiv);
-      favoriteFeedWrapper.remove();
-    }
-  }
-
-  // Get the latest blog (newest by publication date)
-  const latestBlog = blogIndex[blogIndex.length - 1];
-  if (!leftContainer.querySelector('.blog-item.latest')) {
-    const latestBlogItem = createTag('div', { class: 'blog-item latest' });
-    const latestBlogContent = await fetchBlogContent(latestBlog.path);
-    if (latestBlogContent) {
-      const targetLength = Math.floor(latestBlogContent.length * 0.70);
-
-      // Find last sentence ending (., !, ?) before 70% mark
-      const lastPeriod = latestBlogContent.lastIndexOf('.', targetLength);
-      const lastExclamation = latestBlogContent.lastIndexOf('!', targetLength);
-      const lastQuestion = latestBlogContent.lastIndexOf('?', targetLength);
-      const lastSentenceEnd = Math.max(lastPeriod, lastExclamation, lastQuestion);
-
-      const truncatedContent = lastSentenceEnd > targetLength * 0.5
-        ? latestBlogContent.substring(0, lastSentenceEnd + 1)
-        : latestBlogContent.substring(0, targetLength);
-
-      latestBlogItem.innerHTML = truncatedContent;
+      imageWrapper.appendChild(img);
+      card.appendChild(imageWrapper);
     }
 
-    const readMoreButton = createTag('a', { href: latestBlog.path, class: 'read-more button primary large' }, 'Read More');
-    readMoreButton.addEventListener('click', () => {
-      window.location.href = latestBlog.path;
+    // Card content
+    const cardContent = createTag('div', { class: 'blog-card-content' });
+
+    // Title
+    const title = createTag('h3', { class: 'blog-card-title' });
+    const titleLink = createTag('a', {
+      href: page.path,
+      class: 'blog-card-title-link',
+    }, page.title || '');
+    title.appendChild(titleLink);
+    cardContent.appendChild(title);
+
+    // Date
+    if (page.publicationDate) {
+      let dateTimeAttr = '';
+      try {
+        const dateObj = new Date(page.publicationDate);
+        if (!Number.isNaN(dateObj.getTime())) {
+          dateTimeAttr = dateObj.toISOString();
+        }
+      } catch (e) {
+        // If date parsing fails, just use the string as-is
+      }
+      const date = createTag('time', {
+        class: 'blog-card-date',
+        ...(dateTimeAttr && { datetime: dateTimeAttr }),
+      }, page.publicationDate);
+      cardContent.appendChild(date);
+    }
+
+    // Author
+    if (author) {
+      const authorEl = createTag('p', { class: 'blog-card-author' }, author);
+      cardContent.appendChild(authorEl);
+    }
+
+    // Excerpt
+    if (excerpt) {
+      const excerptEl = createTag('p', { class: 'blog-card-excerpt' }, excerpt);
+      cardContent.appendChild(excerptEl);
+    }
+
+    card.appendChild(cardContent);
+
+    // Wrap card in link
+    const cardLink = createTag('a', {
+      href: page.path,
+      class: 'blog-card-link',
+      'aria-label': `Read more: ${page.title || ''}`,
     });
-    latestBlogItem.appendChild(readMoreButton);
-
-    leftContainer.appendChild(latestBlogItem);
-  }
-
-  // Get next 5 blogs in newest to oldest order by publication date
-  const startIndex = Math.max(0, blogIndex.length - 6);
-  // Exclude the latest blog which is shown in left container
-  const endIndex = blogIndex.length - 1;
-  // Reverse to get newest to oldest
-  const recentBlogs = blogIndex.slice(startIndex, endIndex).reverse();
-
-  recentBlogs.forEach((page) => {
-    const blogItem = createTag('div', { class: 'blog-item' });
-
-    const h3 = createTag('h3', { class: 'title' }, page.title);
-    blogItem.appendChild(h3);
-
-    const desc = createTag('p', { class: 'desc' }, page.description);
-    blogItem.appendChild(desc);
-
-    const date = createTag('p', { class: 'date' }, page.publicationDate);
-    blogItem.appendChild(date);
-
-    const image = createTag('p', { class: 'image-wrapper' });
-    const img = createTag('img', { src: page.image });
-    image.appendChild(img);
-    blogItem.appendChild(image);
-
-    const blogLink = createTag('a', {
-      href: page.path, target: '_blank', rel: 'noopener noreferrer', class: 'blog-link',
-    });
-    blogLink.appendChild(blogItem);
-
-    rightContainer.appendChild(blogLink);
+    cardLink.appendChild(card);
+    return cardLink;
   });
+
+  // Wait for all cards to be created and append them
+  const cards = await Promise.all(cardPromises);
+  cards.forEach((card) => cardsGrid.appendChild(card));
 }
 
 export default async function decorate(block) {
