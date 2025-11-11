@@ -1,0 +1,121 @@
+/* Service Level Objective Block Styles */
+
+.service-level-objective {
+  background: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl) var(--spacing-xxl);
+  margin: var(--spacing-xl) 0;
+}
+
+.service-level-objective-container {
+  max-width: 100%;
+}
+
+.service-level-objective-title {
+  font-size: var(--type-heading-l-size);
+  font-weight: var(--type-heading-l-weight);
+  line-height: var(--type-heading-l-lh);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-m) 0;
+}
+
+.service-level-objective-subtitle {
+  font-size: var(--type-body-m-size);
+  line-height: var(--type-body-m-lh);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-xxl) 0;
+}
+
+.services {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+@media (width >= 600px) {
+  .services {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.service {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.2s ease;
+}
+
+.service.ok {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 1px var(--color-success-light);
+}
+
+.service.warn {
+  border-color: var(--color-warning);
+  box-shadow: 0 0 0 1px var(--color-warning-light);
+}
+
+.service:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+}
+
+.service-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-m);
+  gap: var(--spacing-s);
+}
+
+.service-name {
+  font-size: var(--type-heading-m-size);
+  font-weight: var(--type-heading-m-weight);
+  line-height: var(--type-heading-m-lh);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.uptime-percentage {
+  font-size: var(--type-heading-m-size);
+  line-height: var(--type-heading-m-lh);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.service.ok .uptime-percentage {
+  color: var(--color-success);
+}
+
+.service.warn .uptime-percentage {
+  color: var(--color-warning);
+}
+
+.service-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.incidents, .sla {
+  font-size: var(--type-body-s-size);
+  line-height: var(--type-body-s-lh);
+  color: var(--color-text-secondary);
+}
+
+.service-level-objective-loading, .service-level-objective-error {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--color-text-secondary);
+}
+
+.service-level-objective-error {
+  color: var(--color-error);
+}
+
+@media (width >= 900px) {
+  .slo {
+    padding: var(--spacing-xxl) var(--spacing-xxxl);
+  }
+}
