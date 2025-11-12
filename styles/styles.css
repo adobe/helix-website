@@ -2250,3 +2250,90 @@ body.contact-template main .default-content-wrapper img {
     padding-left: 32px;
   }
 }
+
+/* Code copy button styles */
+pre.code-block-wrapper {
+  position: relative;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px 8px;
+  background: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 4px;
+  color: #abb2bf;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  z-index: 1;
+}
+
+.code-copy-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.code-copy-button.copied svg {
+  opacity: 0;
+}
+
+.code-copy-button:focus {
+  opacity: 1;
+  outline: 2px solid #61aeee;
+  outline-offset: 2px;
+}
+
+.code-copy-button:hover {
+  background: rgb(255 255 255 / 15%);
+  border-color: rgb(255 255 255 / 30%);
+  color: #fff;
+}
+
+.code-copy-button:active {
+  background: rgb(255 255 255 / 20%);
+  transform: scale(0.95);
+}
+
+pre.code-block-wrapper:hover .code-copy-button {
+  opacity: 1;
+}
+
+.code-copy-button.copied {
+  background: rgb(152 195 121 / 20%);
+  border-color: rgb(152 195 121 / 40%);
+  color: #98c379;
+  opacity: 1;
+}
+
+.code-copy-button.copied::after {
+  content: '✓';
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+  animation: fade-in-out 2s ease;
+}
+
+@keyframes fade-in-out {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.code-copy-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
