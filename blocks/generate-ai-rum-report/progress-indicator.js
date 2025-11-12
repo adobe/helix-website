@@ -5,7 +5,7 @@
  * - Automatic progress calculation based on steps
  * - Prevents backward progress (monotonically increasing)
  * - Supports both step-based and manual progress updates
- * 
+ *
  * @example
  * // Initialize with 4 steps (each = 25%)
  * initializeStepProgress([
@@ -14,7 +14,7 @@
  *   { name: 'Generating', detail: 'Creating report' },
  *   { name: 'Finalizing', detail: 'Done' }
  * ]);
- * 
+ *
  * advanceStep(); // 25%
  * advanceStep(); // 50%
  * advanceStep(); // 75%
@@ -34,7 +34,9 @@ const CONFIG = {
 };
 
 // Global state
-let state = { totalSteps: 0, currentStep: 0, steps: [], maxProgress: 0 };
+let state = {
+  totalSteps: 0, currentStep: 0, steps: [], maxProgress: 0,
+};
 
 /**
  * Create circular progress indicator
@@ -82,12 +84,12 @@ export function updateCircularProgress(percent, taskName = '', taskDetail = '') 
 
   // Ensure progress never goes backward
   const actualPercent = Math.max(percent, state.maxProgress);
-  
+
   if (percent < state.maxProgress) {
     // eslint-disable-next-line no-console
     console.warn(`[Progress] Prevented backward progress: ${percent.toFixed(1)}% → ${actualPercent.toFixed(1)}%`);
   }
-  
+
   state.maxProgress = actualPercent;
 
   const progressBar = container.querySelector('.circular-progress-bar');
@@ -115,7 +117,9 @@ export function initializeStepProgress(steps) {
     throw new Error('Steps must be a non-empty array');
   }
 
-  state = { totalSteps: steps.length, currentStep: 0, steps: [...steps], maxProgress: 0 };
+  state = {
+    totalSteps: steps.length, currentStep: 0, steps: [...steps], maxProgress: 0,
+  };
   updateCircularProgress(0, CONFIG.INITIAL_MSG.name, CONFIG.INITIAL_MSG.detail);
 }
 
@@ -190,14 +194,16 @@ export function getProgressState() {
  * Reset progress state
  */
 export function resetProgress() {
-  state = { totalSteps: 0, currentStep: 0, steps: [], maxProgress: 0 };
+  state = {
+    totalSteps: 0, currentStep: 0, steps: [], maxProgress: 0,
+  };
   updateCircularProgress(0, CONFIG.INITIAL_MSG.name, CONFIG.INITIAL_MSG.detail);
 }
 
 /**
  * Set progress to specific percentage with message
  * @param {number} percent - Progress 0-100
- * @param {string} message - Progress message  
+ * @param {string} message - Progress message
  * @param {string} detail - Progress detail
  */
 export function setProgress(percent, message = '', detail = '') {

@@ -5,6 +5,7 @@ import { uploadToDA, getCurrentAnalyzedUrl, fetchReportsFromDA } from './da-uplo
 import { updateButtonState } from './modal-ui.js';
 import { showReportInline, checkForSharedReport } from './report-viewer/report-viewer.js';
 import cleanupMetricsParameter from './cleanup-utils.js';
+import { getCachedMetadata } from './core/cache-manager.js';
 
 const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
@@ -212,7 +213,13 @@ function closeModalAndOpenDropdown() {
 async function handleSaveReport(button, reportContent) {
   updateButtonState(button, true, 'Saving Report...');
   try {
-    await uploadToDA(reportContent, { url: getCurrentAnalyzedUrl(), debug: true });
+    // Get date range metadata from cache
+    const dateRange = getCachedMetadata() || {};
+    await uploadToDA(reportContent, {
+      url: getCurrentAnalyzedUrl(),
+      debug: true,
+      dateRange,
+    });
     updateButtonState(button, true, 'Report Saved Successfully!');
     await initializeSavedReports();
     await updateNotificationBadge();

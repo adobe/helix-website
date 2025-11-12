@@ -18,15 +18,24 @@ export function extractDashboardData() {
         metrics: {},
         segments: {},
         dateRange: null,
+        startDate: null,
+        endDate: null,
       };
 
-      // Extract date range from shadow DOM
+      // Extract date range directly from daterange-picker element
       const dateRangePicker = document.querySelector('daterange-picker');
-      if (dateRangePicker?.shadowRoot) {
-        const dateRangeInput = dateRangePicker.shadowRoot.querySelector('.daterange-wrapper input[data-value]');
-        if (dateRangeInput) {
-          dashboardData.dateRange = dateRangeInput.getAttribute('data-value');
+      if (dateRangePicker) {
+        const { value, from, to } = dateRangePicker.value;
+
+        if (value) {
+          dashboardData.dateRange = value;
           console.log(`[Dashboard Data] ✓ Captured date range: ${dashboardData.dateRange}`);
+        }
+
+        if (from && to) {
+          dashboardData.startDate = from;
+          dashboardData.endDate = to;
+          console.log(`[Dashboard Data] ✓ Captured date period: ${dashboardData.startDate} to ${dashboardData.endDate}`);
         }
       }
 

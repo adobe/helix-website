@@ -337,8 +337,9 @@ async function callAnthropicAPI(
             progressCallback(3, 'completed', 'Streamlined overview report completed successfully', 100);
           }
 
-          // Cache the result
-          cacheAnalysisResult(finalAnalysis, currentDashboardHash);
+          // Cache the result with metadata
+          const { startDate, endDate } = dashboardData;
+          cacheAnalysisResult(finalAnalysis, currentDashboardHash, { startDate, endDate });
           return finalAnalysis;
         }
       } else {
@@ -349,7 +350,8 @@ async function callAnthropicAPI(
 
     // Fallback result
     const result = 'Analysis completed successfully. Multiple insights were discovered across different data facets.';
-    cacheAnalysisResult(result, currentDashboardHash);
+    const { startDate, endDate } = dashboardData;
+    cacheAnalysisResult(result, currentDashboardHash, { startDate, endDate });
     return result;
   } catch (error) {
     console.error('[Analysis Engine] Error in API call:', error);

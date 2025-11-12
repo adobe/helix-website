@@ -14,127 +14,58 @@ if (!document.querySelector('link[href*="report-viewer.css"]')) {
   document.head.appendChild(css);
 }
 
-// Constants
-const ELEMENTS = {
-  FACET_SIDEBAR: 'facet-sidebar',
-  FACETS_CONTAINER: '#facets',
-  VIEWER_CONTAINER: 'report-viewer-container',
-};
-
-const SELECTORS = {
-  REPORT_CONTENT: '.report-content',
-};
-
-// State
-let cachedElements = {};
-
-/**
- * Get element by ID
- * @param {string} id
- * @returns {HTMLElement}
- */
-function getElement(id) {
-  return document.getElementById(id);
-}
-
-/**
- * Get or create report viewer container
- * @returns {HTMLElement}
- */
-function getViewerContainer() {
-  let container = getElement(ELEMENTS.VIEWER_CONTAINER);
-
+const getViewerContainer = () => {
+  let container = document.getElementById('report-viewer-container');
   if (!container) {
-    const facetsContainer = cachedElements.facetsContainer
-      || document.querySelector(ELEMENTS.FACETS_CONTAINER);
-    if (!facetsContainer?.parentNode) return null;
-
-    container = document.createElement('div');
-    container.id = ELEMENTS.VIEWER_CONTAINER;
-    container.className = 'report-viewer';
-    facetsContainer.parentNode.insertBefore(container, facetsContainer.nextSibling);
+    const facets = document.querySelector('#facets');
+    if (!facets?.parentNode) return null;
+    container = Object.assign(document.createElement('div'), {
+      id: 'report-viewer-container',
+      className: 'report-viewer',
+    });
+    facets.parentNode.insertBefore(container, facets.nextSibling);
   }
-
   return container;
-}
+};
 
-/**
- * Get facet sidebar element
- * @returns {HTMLElement}
- */
-function getFacetSidebar() {
-  if (!cachedElements.facetSidebar) {
-    cachedElements.facetSidebar = document.querySelector(ELEMENTS.FACET_SIDEBAR);
-  }
-  return cachedElements.facetSidebar;
-}
-
-function toggleView(showReport) {
+const toggleView = (show) => {
   const viewer = getViewerContainer();
-  const facets = cachedElements.facetsContainer
-    || document.querySelector(ELEMENTS.FACETS_CONTAINER);
-  const sidebar = getFacetSidebar();
+  const facets = document.querySelector('#facets');
+  const sidebar = document.querySelector('facet-sidebar');
 
   if (viewer) {
-    viewer.classList.toggle('visible', showReport);
-    viewer.style.display = showReport ? 'block' : 'none';
+    viewer.classList.toggle('visible', show);
+    viewer.style.display = show ? 'block' : 'none';
   }
-  if (facets) facets.style.display = showReport ? 'none' : 'block';
-  if (sidebar) sidebar.classList.toggle('report-view-active', showReport);
-}
+  if (facets) facets.style.display = show ? 'none' : 'block';
+  if (sidebar) sidebar.classList.toggle('report-view-active', show);
+};
 
-/**
- * Show loading state
- * @param {HTMLElement} container
- */
-function showLoading(container) {
-  container.innerHTML = '<div class="report-loading"><p>Loading report...</p></div>';
-}
-
-/**
- * Close report viewer and return to facets view
- */
-export function closeReportViewer() {
-  // Remove report date from URL
+export const closeReportViewer = () => {
   const url = new URL(window.location);
   url.searchParams.delete('report');
+  url.searchParams.delete('startDate');
+  url.searchParams.delete('endDate');
+  url.searchParams.delete('view');
   window.history.pushState({}, '', url);
-
   toggleView(false);
-  cachedElements = {};
-}
+};
 
-// Make globally available
 window.closeReportViewer = closeReportViewer;
 
-/**
- * Show error state
- * @param {HTMLElement} container
- * @param {string} message
- */
-function showError(container, message = 'Failed to load report') {
-  container.innerHTML = `
-    <div class="report-error">
-      <p>${message}</p>
-      <button class="error-back-btn">Back to Dashboard</button>
-    </div>
-  `;
+const showError = (container, message = 'Failed to load report') => {
+  container.innerHTML = `<div class="report-error"><p>${message}</p><button class="error-back-btn">Back to Dashboard</button></div>`;
   container.querySelector('.error-back-btn')?.addEventListener('click', closeReportViewer);
-}
+};
 
-/**
- * Extract sections from report content
- * @param {Document} doc - Parsed HTML document
- * @returns {Array<{title: string, content: string[]}>}
- */
-function extractSections(doc) {
-  const container = doc.querySelector(SELECTORS.REPORT_CONTENT) || doc.querySelector('main') || doc.body;
+const extractSections = (doc) => {
+  const container = doc.querySelector('.report-content') || doc.querySelector('main') || doc.body;
   if (!container) return [];
 
   const sections = [];
   let currentSection = null;
 
-  // Check for table format (DA saved reports)
+  // Table format (DA saved reports with h4 in cells)
   const tables = container.querySelectorAll('table.report-table');
   if (tables.length > 0) {
     tables.forEach((table) => {
@@ -142,7 +73,6 @@ function extractSections(doc) {
         const text = cell.textContent.trim();
         if (text === 'facet') return;
 
-        // Check for h4 tags in table cells
         const h4El = cell.querySelector('h4');
         if (h4El) {
           if (currentSection) sections.push(currentSection);
@@ -156,101 +86,106 @@ function extractSections(doc) {
     return sections;
   }
 
-  // Check for h4 headings (inline reports)
-  const children = Array.from(container.children);
-  children.forEach((el) => {
-    if (el.tagName === 'H4') {
-      if (currentSection && currentSection.content.length > 0) {
-        sections.push(currentSection);
+  // AEM facet divs (div.facet with h4 inside)
+  const facetDivs = container.querySelectorAll('div.facet');
+  if (facetDivs.length > 0) {
+    facetDivs.forEach((facetDiv) => {
+      const h4 = facetDiv.querySelector('h4');
+      if (!h4) return;
+
+      const content = Array.from(facetDiv.children)
+        .filter((child) => !child.contains(h4) && child.textContent.trim() && child.textContent.trim() !== 'facet')
+        .map((child) => child.outerHTML);
+
+      if (content.length > 0) {
+        sections.push({ title: h4.textContent.trim(), content });
       }
+    });
+    return sections;
+  }
+
+  // Inline h4 sections
+  const allH4s = container.querySelectorAll('h4');
+  if (allH4s.length > 0) {
+    allH4s.forEach((h4) => {
+      if (currentSection) sections.push(currentSection);
+      currentSection = { title: h4.textContent.trim(), content: [] };
+
+      let sibling = h4.parentElement.nextElementSibling;
+      while (sibling && !sibling.querySelector('h4')) {
+        const text = sibling.textContent.trim();
+        if (text && text !== 'facet') currentSection.content.push(sibling.outerHTML);
+        sibling = sibling.nextElementSibling;
+      }
+    });
+    if (currentSection) sections.push(currentSection);
+    return sections;
+  }
+
+  // Fallback: direct children
+  Array.from(container.children).forEach((el) => {
+    if (el.tagName === 'H4') {
+      if (currentSection?.content.length) sections.push(currentSection);
       currentSection = { title: el.textContent.trim(), content: [] };
     } else if (currentSection && el.textContent.trim()) {
       currentSection.content.push(el.outerHTML);
     }
   });
-
-  if (currentSection && currentSection.content.length > 0) {
-    sections.push(currentSection);
-  }
+  if (currentSection?.content.length) sections.push(currentSection);
 
   return sections;
-}
+};
 
-/**
- * Escape HTML to prevent XSS
- * @param {string} text
- * @returns {string}
- */
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+const escapeHtml = (text) => Object.assign(document.createElement('div'), { textContent: text }).innerHTML;
+const toTitleCase = (text) => text.toLowerCase().split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-/**
- * Convert text to title case (handles all-caps conversion)
- * @param {string} text - Text to convert
- * @returns {string} - Title cased text
- */
-function toTitleCase(text) {
-  return text
-    .toLowerCase()
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
-/**
- * Create HTML for a report section
- * @param {Object} section - Section object with title and content
- * @returns {string}
- */
-function createSection(section) {
+const createSection = (section) => {
   if (!section?.title) return '';
-
-  const content = section.content
-    .map((html) => `<div class="content-item">${html}</div>`)
-    .join('');
-
   return `
     <fieldset class="report-section">
       <legend>${escapeHtml(toTitleCase(section.title))}</legend>
-      <div class="section-content">${content}</div>
-    </fieldset>
-  `;
-}
+      <div class="section-content">${section.content.map((html) => `<div class="content-item">${html}</div>`).join('')}</div>
+    </fieldset>`;
+};
 
-/**
- * Render complete report in container
- * @param {HTMLElement} container
- * @param {string} htmlContent
- */
-function renderReport(container, htmlContent) {
-  const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
-  const sections = extractSections(doc);
-
+const renderReport = (container, htmlContent) => {
+  const sections = extractSections(new DOMParser().parseFromString(htmlContent, 'text/html'));
+  if (!sections.length) {
+    showError(container, 'No content found in report');
+    return;
+  }
   container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
-}
+};
 
 export function showReportInline(reportPath, reportDate) {
   const viewer = getViewerContainer();
   if (!viewer) return;
 
-  // Use date in yyyy-mm-dd format as URL parameter
-  const url = new URL(window.location);
-
-  // Only update URL if report date is different or missing
-  if (url.searchParams.get('report') !== reportDate) {
-    url.searchParams.set('report', reportDate);
-    window.history.pushState({}, '', url);
-  }
-
   toggleView(true);
-  showLoading(viewer);
+  viewer.innerHTML = '<div class="report-loading"><p>Loading report...</p></div>';
 
-  fetch(reportPath)
+  fetch(reportPath, { cache: 'no-store' })
     .then((res) => (res.ok ? res.text() : Promise.reject(new Error(`HTTP ${res.status}`))))
-    .then((html) => renderReport(viewer, html))
+    .then((html) => {
+      // Extract date range from report meta tags
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const startDateMeta = doc.querySelector('meta[name="report-start-date"]');
+      const endDateMeta = doc.querySelector('meta[name="report-end-date"]');
+
+      // Update URL with report date and date range
+      const url = new URL(window.location);
+      url.searchParams.set('report', reportDate);
+
+      if (startDateMeta?.content && endDateMeta?.content) {
+        url.searchParams.set('startDate', startDateMeta.content);
+        url.searchParams.set('endDate', endDateMeta.content);
+        url.searchParams.set('view', 'custom');
+      }
+
+      window.history.pushState({}, '', url);
+      renderReport(viewer, html);
+    })
     .catch((err) => showError(viewer, err.message));
 }
 
@@ -290,9 +225,6 @@ window.addEventListener('popstate', async () => {
 
   if (!reportParam) {
     toggleView(false);
-    cachedElements = {};
-
-    // Close date range dropdown if open
     const input = document.querySelector('daterange-picker')?.shadowRoot?.querySelector('input');
     if (input?.getAttribute('aria-expanded') === 'true') input.click();
     return;

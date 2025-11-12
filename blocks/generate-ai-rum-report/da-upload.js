@@ -210,15 +210,16 @@ function formatDates(timestamp) {
  * @param {string} url
  * @param {string} timestamp
  * @param {boolean} isDeepMode
+ * @param {Object} dateRange - Date range metadata {startDate, endDate}
  * @returns {Promise<string>} Complete HTML document
  */
-async function generateReportHTML(content, url, timestamp, isDeepMode) {
+async function generateReportHTML(content, url, timestamp, isDeepMode, dateRange = {}) {
   const template = await loadTemplate();
   const reportId = `RPT-${Date.now().toString(36).toUpperCase()}`;
   const { date, timestamp: formattedTimestamp } = formatDates(timestamp);
   const tableContent = transformToTableFormat(content);
 
-  return template
+  let html = template
     .replace(/{{REPORT_TITLE}}/g, `OpTel Analysis - ${url || 'Dashboard'}`)
     .replace(/{{ANALYZED_URL}}/g, url || 'Dashboard')
     .replace(/{{GENERATED_DATE}}/g, date)
@@ -226,6 +227,16 @@ async function generateReportHTML(content, url, timestamp, isDeepMode) {
     .replace(/{{REPORT_ID}}/g, reportId)
     .replace(/{{ANALYSIS_CONTENT}}/g, tableContent)
     .replace(/{{GENERATED_TIMESTAMP}}/g, formattedTimestamp);
+
+  // Inject date range meta tags if available
+  if (dateRange.startDate && dateRange.endDate) {
+    const metaTags = `
+    <meta name="report-start-date" content="${dateRange.startDate}">
+    <meta name="report-end-date" content="${dateRange.endDate}">`;
+    html = html.replace('</head>', `${metaTags}\n</head>`);
+  }
+
+  return html;
 }
 
 // ============================================================================
@@ -238,10 +249,11 @@ async function generateReportHTML(content, url, timestamp, isDeepMode) {
  * @param {Object} options
  * @param {string} options.url - URL being analyzed
  * @param {boolean} options.debug - Enable debug logging
+ * @param {Object} options.dateRange - Date range {startDate, endDate}
  * @returns {Promise<Object>} Upload result
  */
 export async function uploadToDA(content, options = {}) {
-  const { url = '', debug = false } = options;
+  const { url = '', debug = false, dateRange = {} } = options;
 
   if (!content?.trim()) {
     throw new Error('No content to upload');
@@ -251,9 +263,14 @@ export async function uploadToDA(content, options = {}) {
     const isDeepMode = localStorage.getItem(STORAGE_KEY) === 'true';
     const timestamp = new Date().toISOString();
 
-    if (debug) console.log('[DA Upload] Generating HTML...');
+    if (debug) {
+      console.log('[DA Upload] Generating HTML...');
+      if (dateRange.startDate && dateRange.endDate) {
+        console.log('[DA Upload] Including date range:', `${dateRange.startDate} to ${dateRange.endDate}`);
+      }
+    }
 
-    const htmlContent = await generateReportHTML(content, url, timestamp, isDeepMode);
+    const htmlContent = await generateReportHTML(content, url, timestamp, isDeepMode, dateRange);
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const formData = new FormData();
     formData.append('data', blob);

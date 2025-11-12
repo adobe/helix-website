@@ -147,7 +147,7 @@ facet-sidebar.report-view-active > form {
 
 .report-sections .content-item strong {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--section-color);
 }
 
 .report-sections .content-item em {

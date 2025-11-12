@@ -83,15 +83,16 @@ export function isCacheValid(currentDashboardHash) {
  * Cache analysis result
  * @param {string} result - Analysis result to cache
  * @param {string} dashboardDataHash - Dashboard data hash
+ * @param {Object} metadata - Metadata {startDate, endDate}
  */
-export function cacheAnalysisResult(result, dashboardDataHash) {
+export function cacheAnalysisResult(result, dashboardDataHash, metadata = {}) {
   const cacheData = {
     result,
     timestamp: Date.now(),
     dashboardDataHash,
+    metadata,
   };
   setAnalysisCache(cacheData);
-  console.log('[Cache] Analysis result cached for 24 hours');
 }
 
 /**
@@ -130,4 +131,13 @@ export function getCacheStatus() {
 export function getCachedResult() {
   const cache = getAnalysisCache();
   return cache ? cache.result : null;
+}
+
+/**
+ * Get cached dashboard metadata
+ * @returns {Object|null} Cached metadata {startDate, endDate} or null
+ */
+export function getCachedMetadata() {
+  const cache = getAnalysisCache();
+  return cache ? cache.metadata : null;
 }
