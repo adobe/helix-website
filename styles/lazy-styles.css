@@ -71,3 +71,108 @@
   font-style: normal;
   font-weight: 900;
 }
+
+/* Code block copy button */
+.code-block-wrapper {
+  position: relative;
+  margin: 1.5em 0;
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(0 0 0 / 10%);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: #24292f;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.code-copy-button:hover {
+  background-color: rgb(255 255 255 / 100%);
+  border-color: rgb(0 0 0 / 20%);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.code-copy-button:active {
+  transform: scale(0.95);
+}
+
+.code-copy-button:focus {
+  outline: 2px solid var(--spectrum-blue);
+  outline-offset: 2px;
+}
+
+.code-copy-button svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.code-copy-button .copy-text {
+  font-family: var(--body-font-family);
+}
+
+/* Copied state */
+.code-copy-button.copied {
+  background-color: rgb(22 163 74 / 90%);
+  border-color: rgb(22 163 74);
+  color: white;
+}
+
+.code-copy-button.copied:hover {
+  background-color: rgb(22 163 74 / 100%);
+}
+
+/* Dark mode friendly for highlight.js dark themes */
+.hljs:has(.code-copy-button) {
+  padding-top: 3em;
+}
+
+/* Responsive adjustments */
+@media (width <= 600px) {
+  .code-copy-button {
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .code-copy-button svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .code-copy-button .copy-text {
+    display: none;
+  }
+}
+
+/* Screen reader only class for enhanced accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
