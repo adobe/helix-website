@@ -511,6 +511,55 @@ code:not(pre > code) {
   }
 }
 
+/* Code copy button */
+.code-block-wrapper {
+  position: relative;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px 8px;
+  background-color: rgb(0 0 0 / 50%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.code-copy-button:hover {
+  background-color: rgb(0 0 0 / 70%);
+  opacity: 1;
+}
+
+.code-copy-button:focus {
+  opacity: 1;
+  outline: 2px solid #1473e6;
+  outline-offset: 2px;
+}
+
+.code-block-wrapper:hover .code-copy-button {
+  opacity: 1;
+}
+
+.code-copy-button.copied {
+  background-color: #2d8659;
+  border-color: rgb(255 255 255 / 30%);
+}
+
+.code-copy-button svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
 /* Icon on button */
 
 em a img,
