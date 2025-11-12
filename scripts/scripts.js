@@ -31,6 +31,15 @@ const AUDIENCES = {
   // define your custom audiences here as needed
 };
 
+const LONG_FORM_TEMPLATE_CLASSES = [
+  'guides-template',
+  'docs-template',
+  'skills-template',
+  'blog-template',
+];
+
+let longFormReadingUxInitialized = false;
+
 window.hlx.plugins.add('performance', {
   condition: () => window.name.includes('performance'),
   load: 'eager',
@@ -361,6 +370,93 @@ export function decoratesSkillTemplate(main) {
   decorateGuideTemplateHeadings(main);
   decorateGuideTemplateHero(main);
   decorateGuideTemplateLinks(main);
+}
+
+function shouldInitLongFormReadingUx() {
+  return LONG_FORM_TEMPLATE_CLASSES
+    .some((className) => document.body.classList.contains(className));
+}
+
+function initLongFormReadingUx() {
+  if (longFormReadingUxInitialized || !shouldInitLongFormReadingUx()) return;
+
+  const progressBar = createTag('div', {
+    class: 'reading-progress',
+    'aria-hidden': 'true',
+  });
+  const progressIndicator = createTag('div', { class: 'reading-progress-indicator' });
+  progressBar.append(progressIndicator);
+  document.body.prepend(progressBar);
+
+  const backToTopButton = createTag(
+    'button',
+    {
+      class: 'back-to-top',
+      type: 'button',
+      'aria-label': 'Back to top',
+    },
+    '<span class="back-to-top-label">Back to top</span>',
+  );
+  document.body.append(backToTopButton);
+
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const state = { scrollableHeight: 0 };
+
+  const setBackToTopVisibility = (visible) => {
+    backToTopButton.classList.toggle('back-to-top-visible', visible);
+    if (visible) {
+      backToTopButton.removeAttribute('aria-hidden');
+      backToTopButton.removeAttribute('tabindex');
+    } else {
+      backToTopButton.setAttribute('aria-hidden', 'true');
+      backToTopButton.setAttribute('tabindex', '-1');
+    }
+  };
+
+  const updateScrollableHeight = () => {
+    state.scrollableHeight = Math.max(
+      document.documentElement.scrollHeight - window.innerHeight,
+      0,
+    );
+    progressBar.classList.toggle('is-active', state.scrollableHeight > 0);
+  };
+
+  const updateProgress = () => {
+    if (state.scrollableHeight <= 0) {
+      progressIndicator.style.transform = 'scaleX(0)';
+      return;
+    }
+    const progress = Math.min(window.scrollY / state.scrollableHeight, 1);
+    progressIndicator.style.transform = `scaleX(${progress})`;
+  };
+
+  const handleScroll = () => {
+    updateProgress();
+    setBackToTopVisibility(window.scrollY > window.innerHeight);
+  };
+
+  const handleResize = () => {
+    updateScrollableHeight();
+    updateProgress();
+    setBackToTopVisibility(window.scrollY > window.innerHeight);
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('load', handleResize);
+
+  backToTopButton.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: motionPreference.matches ? 'auto' : 'smooth',
+    });
+  });
+
+  updateScrollableHeight();
+  setBackToTopVisibility(false);
+  handleScroll();
+
+  longFormReadingUxInitialized = true;
 }
 
 /**
@@ -788,6 +884,8 @@ async function loadLazy(doc) {
     if (aside) setUpSideNav(main, aside);
     decorateGuideTemplateCodeBlock();
   }
+
+  initLongFormReadingUx();
 
   window.hlx.plugins.run('loadLazy');
 
