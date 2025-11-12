@@ -322,6 +322,33 @@ async function loadHighlightLibrary() {
   await loadScript('/libs/highlight/highlight.min.js');
   const initScript = createTag('script', {}, 'hljs.highlightAll();');
   document.body.append(initScript);
+  addCopyButtonToCodeBlocks();
+}
+
+export function addCopyButtonToCodeBlocks() {
+  const codeBlocks = document.querySelectorAll('pre');
+  codeBlocks.forEach((codeBlock) => {
+    if (codeBlock.querySelector('.copy-button')) {
+      return;
+    }
+    const copyButton = createTag('button', {
+      class: 'copy-button',
+      'aria-label': 'Copy to clipboard',
+    });
+    const tooltip = createTag('span', { class: 'tooltip' }, 'Copy');
+    copyButton.append(tooltip);
+    codeBlock.append(copyButton);
+    copyButton.addEventListener('click', () => {
+      const code = codeBlock.querySelector('code').innerText;
+      navigator.clipboard.writeText(code);
+      tooltip.textContent = 'Copied';
+      copyButton.classList.add('copied');
+      setTimeout(() => {
+        tooltip.textContent = 'Copy';
+        copyButton.classList.remove('copied');
+      }, 2000);
+    });
+  });
 }
 
 export async function decorateGuideTemplateCodeBlock() {

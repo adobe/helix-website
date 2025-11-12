@@ -71,3 +71,57 @@
   font-style: normal;
   font-weight: 900;
 }
+
+pre {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #282c34;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+pre:hover .copy-button {
+  opacity: 1;
+}
+
+.copy-button .tooltip {
+  visibility: hidden;
+  width: 80px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -40px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy-button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.copy-button.copied {
+  background-color: #4caf50;
+}
+
+.copy-button.copied .tooltip {
+  visibility: visible;
+  opacity: 1;
+  background-color: #4caf50;
+}
