@@ -1997,7 +1997,6 @@ body.guides-template .icon-icon-caret-right {
 body.guides-template .icon-icon-caret-down {
   background-image: url("/icons/icon-caret-down.svg");
 }
-
 body.guides-template .guides-back-btn .icon-icon-arrow {
   background-image: url("/icons/icon-arrow.svg");
   filter:
@@ -2249,4 +2248,55 @@ body.contact-template main .default-content-wrapper img {
   body.faq-theme main .section:not(.content) {
     padding-left: 32px;
   }
+}
+
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: var(--spectrum-blue);
+  z-index: var(--nav-z-index, 9999);
+  width: 0;
+  transition: width 0.1s ease-out;
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-white);
+  border: 1px solid var(--bg-color-grey);
+  border-radius: 50%;
+  z-index: 999;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background-color: var(--bg-color-lightgrey);
+}
+
+.back-to-top .icon {
+  color: var(--color-black);
+}
+
+.back-to-top .icon-caret-up {
+  background-image: url("/icons/icon-caret-up.svg");
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center center;
 }

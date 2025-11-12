@@ -843,6 +843,7 @@ function loadDelayed() {
 async function loadPage(doc) {
   await window.hlx.plugins.load('eager');
   await loadEager(doc);
+  buildReadingProgress();
   await window.hlx.plugins.load('lazy');
   await loadLazy(doc);
   loadDelayed(doc);
@@ -857,3 +858,31 @@ if (window.location.hostname === 'www.hlx.live') {
 */
 
 loadPage(document);
+
+function buildReadingProgress() {
+  const progress = document.createElement('div');
+  progress.className = 'reading-progress-bar';
+  document.body.prepend(progress);
+
+  const backToTop = document.createElement('button');
+  backToTop.className = 'back-to-top';
+  backToTop.setAttribute('aria-label', 'Back to top');
+  backToTop.innerHTML = '<span class="icon icon-caret-up"></span>';
+  document.body.append(backToTop);
+
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  window.addEventListener('scroll', () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    const scrollPercent = (scrollTop / (scrollHeight - clientHeight)) * 100;
+    progress.style.width = `${scrollPercent}%`;
+
+    if (scrollTop > clientHeight) {
+      backToTop.classList.add('show');
+    } else {
+      backToTop.classList.remove('show');
+    }
+  });
+}
