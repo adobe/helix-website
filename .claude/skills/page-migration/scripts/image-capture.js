@@ -43,18 +43,6 @@ const IMAGE_FORMAT_MAP = {
 const SUPPORTED_FORMATS = ['jpeg', 'png'];
 
 /**
- * Check if a response is an image based on resource type
- */
-function isImageResponse(response) {
-  try {
-    return response.request().resourceType() === 'image';
-  } catch (error) {
-    console.error(`Error checking if response is an image: ${error.message}`);
-    return false;
-  }
-}
-
-/**
  * Convert image buffer to PNG using Sharp
  */
 async function convertToPng(buffer, originalFormat) {
@@ -78,8 +66,12 @@ function needsConversion(format) {
 }
 
 /**
- * Set up network event listener to capture images during page load
+ * Set up network event listeners to capture images during page load
  * Must be called BEFORE page.goto()
+ *
+ * Uses proper request lifecycle:
+ * 1. 'request' event - Track image requests as they are issued
+ * 2. 'requestfinished' event - Process once body is fully downloaded
  *
  * @param {import('playwright').Page} page - Playwright page object
  * @param {string} outputDir - Directory to save images
@@ -96,6 +88,7 @@ export function setupImageCapture(page, outputDir, options = {}) {
 
   const imageMap = new Map();
   const pendingImages = new Set();
+  const trackedRequests = new Set(); // Track image requests
   const stats = {
     total: 0,
     converted: 0,
@@ -105,17 +98,17 @@ export function setupImageCapture(page, outputDir, options = {}) {
     limitReached: 0
   };
 
-  // Create response handler that can be removed later
-  const responseHandler = async (response) => {
-    // Check if this is an image response
-    if (!isImageResponse(response)) {
+  // Handler for request event - track image requests as they start
+  const requestHandler = (request) => {
+    // Check if this is an image request
+    if (request.resourceType() !== 'image') {
       return;
     }
 
-    const url = response.url();
+    const url = request.url();
 
-    // Check if already captured (avoid duplicates)
-    if (imageMap.has(url)) {
+    // Check if already tracked (avoid duplicates)
+    if (trackedRequests.has(url)) {
       return;
     }
 
@@ -128,12 +121,44 @@ export function setupImageCapture(page, outputDir, options = {}) {
       return;
     }
 
-    // Track this image as pending
+    // Track this request
+    trackedRequests.add(url);
     pendingImages.add(url);
     stats.total++;
+  };
+
+  // Handler for requestfinished event - process images once fully downloaded
+  const requestFinishedHandler = async (request) => {
+    // Only process tracked image requests
+    if (request.resourceType() !== 'image') {
+      return;
+    }
+
+    const url = request.url();
+
+    // Only process if we tracked this request
+    if (!trackedRequests.has(url)) {
+      return;
+    }
+
+    // Check if already captured (should not happen, but safeguard)
+    if (imageMap.has(url)) {
+      pendingImages.delete(url);
+      return;
+    }
 
     try {
-      // Get binary data from response
+      // Get the response object
+      const response = await request.response();
+
+      if (!response) {
+        console.error(`⚠️  No response for image request: ${url.slice(0, 60)}...`);
+        stats.failed++;
+        pendingImages.delete(url);
+        return;
+      }
+
+      // Get binary data from response body (now fully downloaded)
       const buffer = await response.body();
 
       // Check image size
@@ -191,15 +216,17 @@ export function setupImageCapture(page, outputDir, options = {}) {
     }
   };
 
-  // Set up response listener
-  page.on('response', responseHandler);
+  // Set up both event listeners
+  page.on('request', requestHandler);
+  page.on('requestfinished', requestFinishedHandler);
 
   return {
     imageMap,
     pendingImages,
     stats,
     disable: () => {
-      page.off('response', responseHandler);
+      page.off('request', requestHandler);
+      page.off('requestfinished', requestFinishedHandler);
       console.error('🛑 Image capture disabled');
     },
   };
