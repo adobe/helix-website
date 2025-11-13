@@ -77,16 +77,13 @@ node .claude/skills/page-migration/scripts/analyze-webpage.js "https://example.c
 2. Loads the page in headless Chromium
 3. Scrolls through entire page to trigger lazy-loaded images
 4. Downloads all images locally (converts WebP/AVIF/SVG to PNG)
-5. Captures original screenshot for visual reference
-6. Enhances background color contrast to make section boundaries obvious
-7. Captures enhanced screenshot for section detection
-8. Reloads page for clean HTML extraction
-9. **Fixes images in DOM** (background-image→img, picture elements, srcset→src, relative→absolute, inline SVG→img)
-10. Extracts cleaned HTML (removes scripts/styles)
-11. Replaces image URLs in HTML with local paths (./images/...)
-12. Extracts metadata (title, description, Open Graph, JSON-LD, canonical, etc.)
-13. Generates Edge Delivery Services document paths (sanitized, lowercase, no .html)
-14. Saves complete analysis with image mapping to metadata.json file
+5. Captures full-page screenshot for visual reference
+6. Extracts metadata (title, description, Open Graph, JSON-LD, canonical, etc.)
+7. **Fixes images in DOM** (background-image→img, picture elements, srcset→src, relative→absolute, inline SVG→img)
+8. Extracts cleaned HTML (removes scripts/styles)
+9. Replaces image URLs in HTML with local paths (./images/...)
+10. Generates Edge Delivery Services document paths (sanitized, lowercase, no .html)
+11. Saves complete analysis with image mapping to metadata.json file
 
 **For detailed explanation:** See `resources/web-page-analysis.md`
 

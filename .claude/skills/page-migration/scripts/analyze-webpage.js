@@ -19,7 +19,8 @@
  *
  * Features:
  * - Scrolls to trigger lazy-loaded content
- * - Captures original and enhanced-contrast screenshots
+ * - Captures images and converts to web-friendly formats
+ * - Takes full-page screenshot
  * - Extracts cleaned HTML with preserved attributes
  * - Extracts metadata (SEO, Open Graph, etc.)
  *
@@ -62,124 +63,6 @@ async function scrollToTriggerLazyLoad(page) {
   });
 }
 
-/**
- * Enhance contrast of background colors to make section boundaries visible
- */
-async function enhanceContrast(page) {
-  const result = await page.evaluate(() => {
-    // Helper: Calculate color distance (Euclidean in RGB space)
-    function colorDistance(rgb1, rgb2) {
-      return Math.sqrt(
-        Math.pow(rgb1.r - rgb2.r, 2) +
-        Math.pow(rgb1.g - rgb2.g, 2) +
-        Math.pow(rgb1.b - rgb2.b, 2)
-      );
-    }
-
-    // Helper: Parse RGB string to object
-    function parseRGB(rgbString) {
-      const match = rgbString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-      if (match) {
-        return { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) };
-      }
-      return null;
-    }
-
-    // Helper: RGB object to string
-    function rgbToString(rgb) {
-      return `rgb(${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})`;
-    }
-
-    // Step 1: Collect all unique background colors
-    const elements = document.querySelectorAll('*');
-    const colorMap = new Map();
-
-    elements.forEach(el => {
-      const bg = window.getComputedStyle(el).backgroundColor;
-      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-        colorMap.set(bg, (colorMap.get(bg) || 0) + 1);
-      }
-    });
-
-    const uniqueColors = Array.from(colorMap.keys());
-    if (uniqueColors.length === 0) return { modified: 0, groups: 0 };
-
-    // Step 2: Parse all colors
-    const parsedColors = uniqueColors.map(c => ({
-      original: c,
-      parsed: parseRGB(c)
-    })).filter(c => c.parsed !== null);
-
-    // Step 3: Find groups of similar colors
-    const SIMILARITY_THRESHOLD = 20;
-    const colorGroups = [];
-    const processed = new Set();
-
-    parsedColors.forEach((color1, i) => {
-      if (processed.has(color1.original)) return;
-
-      const group = [color1];
-      processed.add(color1.original);
-
-      parsedColors.forEach((color2, j) => {
-        if (i !== j && !processed.has(color2.original)) {
-          const dist = colorDistance(color1.parsed, color2.parsed);
-          if (dist < SIMILARITY_THRESHOLD) {
-            group.push(color2);
-            processed.add(color2.original);
-          }
-        }
-      });
-
-      if (group.length > 1) {
-        colorGroups.push(group);
-      }
-    });
-
-    // Step 4: Create enhancement mapping
-    const enhancementMap = new Map();
-    const SPREAD_AMOUNT = 60;
-
-    colorGroups.forEach(group => {
-      // Sort by brightness
-      group.sort((a, b) => {
-        const avgA = (a.parsed.r + a.parsed.g + a.parsed.b) / 3;
-        const avgB = (b.parsed.r + b.parsed.g + b.parsed.b) / 3;
-        return avgA - avgB;
-      });
-
-      // Spread the group apart
-      group.forEach((color, idx) => {
-        const { r, g, b } = color.parsed;
-        const offset = (idx - (group.length - 1) / 2) * SPREAD_AMOUNT;
-
-        const newR = Math.max(0, Math.min(255, r + offset));
-        const newG = Math.max(0, Math.min(255, g + offset));
-        const newB = Math.max(0, Math.min(255, b + offset));
-
-        enhancementMap.set(color.original, rgbToString({ r: newR, g: newG, b: newB }));
-      });
-    });
-
-    // Step 5: Apply enhancements
-    let modifiedCount = 0;
-    elements.forEach(el => {
-      const bg = window.getComputedStyle(el).backgroundColor;
-      if (enhancementMap.has(bg)) {
-        el.style.backgroundColor = enhancementMap.get(bg);
-        modifiedCount++;
-      }
-    });
-
-    return {
-      modified: modifiedCount,
-      groups: colorGroups.length,
-      totalColors: uniqueColors.length
-    };
-  });
-
-  return result;
-}
 
 /**
  * Fix images in the DOM to ensure none are missed during extraction
@@ -482,38 +365,17 @@ async function analyzeWebpage(url, outputDir) {
     await waitForPendingImages(captureState, 5000);
     console.error(`✅ Image capture complete: ${captureState.stats.total} total, ${captureState.stats.converted} converted, ${captureState.stats.failed} failed`);
 
-    // Take original screenshot
-    console.error('Capturing original screenshot...');
-    const originalScreenshot = path.join(outputDir, 'original.png');
-    await page.screenshot({ path: originalScreenshot, fullPage: true });
+    // Take screenshot
+    console.error('Capturing screenshot...');
+    const screenshot = path.join(outputDir, 'screenshot.png');
+    await page.screenshot({ path: screenshot, fullPage: true });
 
-    // Extract metadata before modifications
+    // Extract metadata
     console.error('Extracting metadata...');
     const metadata = await extractMetadata(page);
 
-    // Enhance contrast for section detection
-    console.error('Enhancing contrast for section detection...');
-    const contrastResult = await enhanceContrast(page);
-    console.error(`Enhanced ${contrastResult.groups} color groups (${contrastResult.modified} elements modified)`);
-
-    // Take enhanced screenshot
-    const enhancedScreenshot = path.join(outputDir, 'enhanced-contrast.png');
-    await page.screenshot({ path: enhancedScreenshot, fullPage: true });
-
-    // Disable image capture before reload (images already captured)
+    // Disable image capture (images already captured)
     captureState.disable();
-
-    // Navigate again to get clean HTML (without contrast modifications)
-    console.error('Re-loading page for HTML extraction...');
-    try {
-      await page.goto(url);
-    } catch (error) {
-      console.error('⚠️  networkidle timeout on reload, falling back to domcontentloaded...');
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForTimeout(3000);
-    }
-    await scrollToTriggerLazyLoad(page);
-    await page.waitForTimeout(1000);
 
     // Fix images in DOM (background images, picture elements, relative URLs, inline SVGs)
     console.error('Fixing images in DOM...');
@@ -545,10 +407,7 @@ async function analyzeWebpage(url, outputDir) {
         dirPath: paths.dirPath,
         filename: paths.filename
       },
-      screenshots: {
-        original: originalScreenshot,
-        enhancedContrast: enhancedScreenshot
-      },
+      screenshot,
       html: {
         filePath: htmlPath,
         size: html.length
@@ -558,8 +417,7 @@ async function analyzeWebpage(url, outputDir) {
         count: captureState.imageMap.size,
         mapping: Object.fromEntries(captureState.imageMap),
         stats: captureState.stats
-      },
-      contrastEnhancement: contrastResult
+      }
     };
 
     // Save metadata.json file
@@ -596,10 +454,10 @@ Examples:
   node analyze-webpage.js "https://example.com/page" --output ./my-analysis
 
 Output:
-  - original.png              Screenshot of original page
-  - enhanced-contrast.png     Screenshot with enhanced section boundaries
+  - screenshot.png            Screenshot of the page
   - cleaned.html              Extracted HTML with preserved attributes
-  - JSON to stdout            Complete analysis results
+  - metadata.json             Complete analysis results
+  - images/                   Downloaded images
 
 Requirements:
   npm install playwright
@@ -634,4 +492,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-export { analyzeWebpage, scrollToTriggerLazyLoad, enhanceContrast, extractCleanedHTML, extractMetadata };
+export { analyzeWebpage, scrollToTriggerLazyLoad, extractCleanedHTML, extractMetadata };
