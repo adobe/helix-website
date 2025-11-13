@@ -7,6 +7,20 @@ description: Migrate a single webpage from any URL to Edge Delivery Services-com
 
 Convert a webpage URL to Edge Delivery Services-compliant HTML content file.
 
+## ⚠️ Critical Requirement: Complete Content Migration
+
+**THIS SKILL MUST MIGRATE ALL PAGE CONTENT WITHOUT EXCEPTION.**
+
+You MUST NOT:
+- ❌ Truncate or skip sections because the page is "too long"
+- ❌ Summarize or abbreviate any content
+- ❌ Use placeholders like "<!-- rest of content -->" or "..."
+- ❌ Stop generating HTML before all sections are complete
+
+If you encounter concerns about content length, you MUST generate the complete HTML anyway. Partial migration is a critical failure. The validation checklist in Step 4 will catch any incomplete migrations.
+
+---
+
 ## When to Use This Skill
 
 Use this skill when:
