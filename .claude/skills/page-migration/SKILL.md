@@ -28,8 +28,10 @@ Use this skill when:
 ## Prerequisites
 
 Before using this skill, ensure:
-- ✅ Node.js is available for running path generation script
-- ✅ Playwright MCP tools are available for web scraping
+- ✅ Node.js is available for running scripts
+- ✅ npm playwright is installed (`npm install playwright`)
+- ✅ Chromium browser is installed (`npx playwright install chromium`)
+- ✅ Sharp image library is installed (`cd scripts && npm install`)
 - ✅ Local dev server is running (`aem up`)
 - ✅ Required blocks already exist in the project (hero, cards, columns, etc.)
 - ✅ You understand basic Edge Delivery Services block table syntax (see `content-driven-development/resources/md-structure.md`)
@@ -44,6 +46,13 @@ This skill references and works with:
 - **content-driven-development** - References `resources/md-structure.md` for markdown syntax
 - **docs-search** - Use if you need clarification on Edge Delivery Services platform features
 
+## Internal Resources
+
+This skill includes self-contained resources:
+- **resources/web-page-analysis.md** - How the analyze-webpage.js script works
+- **resources/metadata-extraction.md** - How metadata is mapped to EDS format
+- **resources/metadata-mapping.md** - Detailed metadata mapping rules
+
 ## Philosophy
 
 Follow **David's Model** (https://www.aem.live/docs/davidsmodel):
@@ -56,64 +65,89 @@ Follow **David's Model** (https://www.aem.live/docs/davidsmodel):
 
 ### Step 1: Scrape Webpage
 
-Use Playwright MCP tools to capture the page with complete data preservation:
+Analyze the webpage using the automated script:
 
-**Actions (Execute in sequence):**
+**Command:**
+```bash
+node .claude/skills/page-migration/scripts/analyze-webpage.js "https://example.com/page" --output ./migration-work
+```
 
-1. **Navigate to URL:**
-   ```javascript
-   await browser_navigate({ url: 'https://example.com/page' });
-   ```
+**What the script does:**
+1. Sets up network interception to capture all images
+2. Loads the page in headless Chromium
+3. Scrolls through entire page to trigger lazy-loaded images
+4. Downloads all images locally (converts WebP/AVIF/SVG to PNG)
+5. Captures original screenshot for visual reference
+6. Enhances background color contrast to make section boundaries obvious
+7. Captures enhanced screenshot for section detection
+8. Reloads page for clean HTML extraction
+9. **Fixes images in DOM** (background-image→img, picture elements, srcset→src, relative→absolute, inline SVG→img)
+10. Extracts cleaned HTML (removes scripts/styles)
+11. Replaces image URLs in HTML with local paths (./images/...)
+12. Extracts metadata (title, description, Open Graph, JSON-LD, canonical, etc.)
+13. Generates Edge Delivery Services document paths (sanitized, lowercase, no .html)
+14. Saves complete analysis with image mapping to metadata.json file
 
-2. **Scroll to trigger lazy-loaded images:**
-   ```javascript
-   // Use SCROLL_SCRIPT from scripts/browser-templates.js
-   await browser_evaluate({ script: [scroll script] });
-   ```
-   Purpose: Ensures lazy-loaded images populate their `src` attributes
+**For detailed explanation:** See `resources/web-page-analysis.md`
 
-3. **Take screenshot:**
-   ```javascript
-   await browser_take_screenshot({ fullPage: true, filename: 'original.png' });
-   ```
-   Purpose: Visual reference for layout analysis
+**Output (JSON to stdout + saved to metadata.json):**
+```json
+{
+  "url": "https://example.com/page",
+  "timestamp": "2025-01-12T10:30:00.000Z",
+  "paths": {
+    "documentPath": "/us/en/about",
+    "htmlFilePath": "us/en/about.html",
+    "mdFilePath": "us/en/about.md",
+    "dirPath": "us/en",
+    "filename": "about"
+  },
+  "screenshots": {
+    "original": "./migration-work/original.png",
+    "enhancedContrast": "./migration-work/enhanced-contrast.png"
+  },
+  "html": {
+    "filePath": "./migration-work/cleaned.html",
+    "size": 45230
+  },
+  "metadata": {
+    "title": "Page Title",
+    "description": "Page description",
+    "og:image": "https://example.com/image.jpg",
+    "canonical": "https://example.com/page",
+    ...
+  },
+  "images": {
+    "count": 15,
+    "mapping": {
+      "https://example.com/hero.jpg": "./images/a1b2c3d4e5f6.jpg",
+      "https://example.com/logo.webp": "./images/f6e5d4c3b2a1.png",
+      ...
+    },
+    "stats": {
+      "total": 15,
+      "converted": 3,
+      "skipped": 12,
+      "failed": 0
+    }
+  },
+  "contrastEnhancement": {
+    "modified": 342,
+    "groups": 4,
+    "totalColors": 12
+  }
+}
+```
 
-4. **Enhance contrast for section detection:**
-   ```javascript
-   // Use ENHANCE_CONTRAST_SCRIPT from scripts/browser-templates.js
-   await browser_evaluate({ script: ENHANCE_CONTRAST_SCRIPT });
-   await browser_take_screenshot({ fullPage: true, filename: 'enhanced-contrast.png' });
-   ```
-   Purpose: Exaggerate subtle background color differences to make section boundaries obvious
+**Output files:**
+- `./migration-work/metadata.json` - Complete analysis results including paths and image mapping
+- `./migration-work/original.png` - Visual reference for layout comparison
+- `./migration-work/enhanced-contrast.png` - Section boundary detection aid
+- `./migration-work/cleaned.html` - Main content HTML with local image paths
+- `./migration-work/images/` - All downloaded images (WebP/AVIF/SVG converted to PNG)
 
-   **How the algorithm works:**
-   - Collects all background colors from the page
-   - Groups similar colors (within 20 RGB units distance)
-   - Spreads each group apart by 60 units
-   - Makes subtle differences (e.g., white vs light grey) visually obvious
-
-   **Result:** Enhanced screenshot where section background differences are clear
-
-5. **Extract HTML with attribute preservation:**
-   ```javascript
-   // Use EXTRACT_HTML_SCRIPT from scripts/browser-templates.js
-   const cleanedHTML = await browser_evaluate({ script: [extraction script] });
-   ```
-   Purpose: Capture cleaned HTML with guaranteed `src` and `href` preservation
-
-   **The extraction script does:**
-   - Removes non-content elements (scripts, styles, nav, footer, ads, iframes)
-   - Works on full body HTML (doesn't isolate - Claude identifies main content in Step 2)
-   - **Preserves essential attributes:** `src`, `href`, `alt`, `title`, `class`, `id`
-   - Strips all other attributes
-   - Compresses whitespace
-
-**Scripts reference:** See `scripts/browser-templates.js` for complete extraction logic
-
-**Output:**
-- Original screenshot for visual reference
-- Enhanced contrast screenshot for section boundary detection
-- Cleaned HTML with all image `src` URLs and link `href` URLs preserved
+**To skip metadata extraction:**
+User must explicitly request "no metadata" or "skip metadata". By default, metadata is always extracted.
 
 ---
 
@@ -246,14 +280,14 @@ BLOCK COLLECTION AVAILABLE:
 
 ---
 
----
-
 ### Step 3: Authoring Analysis - FOR EACH CONTENT SEQUENCE
 
 **Context:** You now have:
 - Section boundaries with styles (Step 2a)
 - Content sequences per section (Step 2b)
 - Available block palette (Step 2.5)
+
+**IMPORTANT:** After completing Step 3, you MUST execute Step 3e to validate single-block section styling before proceeding to Step 4.
 
 **For EACH content sequence, follow this mandatory process:**
 
@@ -485,46 +519,145 @@ Section 4 (dark):
 
 ---
 
-### Step 3.5: Generate Save Path
+#### Step 3e: Validate Section Styling (Single-Block Sections Only)
 
-Generate Edge Delivery Services-compliant file paths from the source URL.
+**⚠️ EXECUTION TRIGGER:** This step is executed AFTER Step 3 is complete. Execute this step if and only if:
+- ✅ You have completed Step 3 (identified which sequences become blocks)
+- ✅ At least one section contains exactly ONE sequence that became a block
+- ✅ That section has distinct background styling from Step 2a
 
-**Command:**
-```bash
-node .claude/skills/page-migration/scripts/generate-path.js "https://example.com/us/en/about.html"
+**If NO sections meet these criteria → Skip Step 3e entirely and proceed to Step 4**
+
+**If ANY sections meet these criteria → You MUST execute all sub-steps below for EACH qualifying section**
+
+---
+
+**Why this validation matters:**
+
+When a section contains a single block, the background styling might be:
+- **Block-specific design** (e.g., hero with dark background image) → Don't add section-metadata
+- **Section container styling** (e.g., dark section with tabs block) → Add section-metadata
+
+Without validation, we risk adding unnecessary section-metadata that conflicts with block styling or makes authoring more complex.
+
+**Sections with multiple sequences:** Always keep section-metadata (styling applies to all content, not validated in Step 3e)
+
+---
+
+**For EACH section with exactly one block, execute ALL these sub-steps:**
+
+**Sub-step 1: Identify the candidate sections**
+
+Review your Step 3 output. Find sections where:
+- Section contains exactly 1 content sequence
+- That sequence became a block (not default content)
+- Section has distinct background styling identified in Step 2a
+
+**Example:**
+```
+Section 1 (dark blue):
+  - Sequence 1: Large centered heading, paragraph, two buttons
+    → Decision: Hero block (from Step 3)
+
+Section 3 (grey):
+  - Sequence 1: Tab navigation with three switchable panels
+    → Decision: Tabs block (from Step 3)
 ```
 
-**Output:**
-```json
-{
-  "success": true,
-  "url": "https://example.com/us/en/about.html",
-  "documentPath": "/us/en/about",
-  "mdFilePath": "us/en/about.md",
-  "htmlFilePath": "us/en/about.html",
-  "dirPath": "us/en",
-  "filename": "about",
-  "directoryCreated": true
-}
+---
+
+**Sub-step 2: For each candidate section, examine the original screenshot**
+
+Open `./migration-work/original.png` and examine the section visually.
+
+**Ask these questions:**
+
+**Q1: Is the background an image (photo, gradient, illustration)?**
+- If YES → Likely block-specific design
+- If NO (solid color) → Continue to Q2
+
+**Q2: Does the content fill the colored area edge-to-edge, or is there visible section padding?**
+- Edge-to-edge (full-bleed) → Likely block-specific design
+- Visible padding around content → Likely section container styling
+
+**Q3: Does the block type typically have its own background styling?**
+- Hero, banner, full-width CTAs → Often have own backgrounds
+- Tabs, accordion, cards, columns → Often use section backgrounds
+
+---
+
+**Sub-step 3: Make the decision**
+
+Based on your analysis, decide for each single-block section:
+
+**SKIP section-metadata if:**
+- Background is an image/gradient (block-specific)
+- Content is full-bleed/edge-to-edge (no section padding visible)
+- Block type typically has intrinsic background (hero, banner)
+
+**KEEP section-metadata if:**
+- Background is solid color with visible section padding
+- Block type typically inherits section styling (tabs, cards, accordion)
+- Styling clearly provides container context (not block design)
+
+---
+
+**Sub-step 4: Document your decisions**
+
+For each validated section, note:
+- Section number
+- Block type
+- Background analysis (image vs solid, full-bleed vs padded)
+- Decision (keep or skip section-metadata)
+- Reason
+
+**Example output:**
+```
+VALIDATED SECTIONS:
+
+Section 1 (dark blue):
+  - Block: Hero
+  - Background: Full-width dark blue gradient image
+  - Layout: Edge-to-edge, no visible section padding
+  - Decision: SKIP section-metadata
+  - Reason: Background is hero's design, not section styling
+
+Section 3 (grey):
+  - Block: Tabs
+  - Background: Solid grey (#f5f5f5)
+  - Layout: Content centered with visible padding (~80px on sides)
+  - Decision: KEEP section-metadata style="grey"
+  - Reason: Section provides container styling for tabs block
 ```
 
-**What this does:**
-- Converts URL to Edge Delivery Services-compliant path (lowercase, sanitized)
-- Handles trailing slashes (appends 'index')
-- Removes `.html` extension
-- Sanitizes special characters and diacritics
-- Creates directory structure automatically
-- Returns paths for both .md and .html files
+---
 
-**Use these paths:**
-- `htmlFilePath` → Save HTML file in Step 4
-- `documentPath` → Preview URL in Step 5
+**When in doubt:**
+
+If you're uncertain whether background is block-specific or section-wide:
+- **Default to KEEPING section-metadata** (safer, easier for authors to remove than add)
+- **Add a note** in your documentation explaining the ambiguity
+- Consider asking the user for guidance
+
+---
+
+**Step 3e Completion Checklist:**
+
+Before proceeding to Step 4, verify you have completed:
+- ✅ Identified all single-block sections with background styling
+- ✅ Examined original screenshot for EACH candidate section
+- ✅ Answered Q1, Q2, Q3 for EACH candidate section
+- ✅ Made skip/keep decision for EACH candidate section
+- ✅ Documented reasoning for EACH decision
+- ✅ Updated section styling notes with validated decisions
+
+**Output:** Updated section list with validated styling decisions (some sections may now be marked "no section-metadata")
 
 ---
 
 ### Step 4: Generate HTML
 
-Create HTML file using Edge Delivery Services block structure with section metadata from Step 2.5.
+Create HTML file using Edge Delivery Services block structure with validated section styling from Steps 2a, 2.5, and 3e.
 
 **For complete HTML structure guidance:**
 Use the **content-driven-development** skill resource: `resources/html-structure.md`
@@ -542,9 +675,11 @@ This resource provides:
 - Empty `<header>` and `<footer>` tags (auto-populated)
 - Main content in sections: `<main><div>...</div></main>`
 - Blocks as `<div class="block-name">` with nested divs
-- **Include section metadata** using style names from Step 2.5
+- **Include section metadata** using validated style decisions from Step 3e
 
 **Section metadata structure:**
+
+**WITH section-metadata** (section provides container styling):
 ```html
 <div>
   <div class="section-metadata">
@@ -553,22 +688,165 @@ This resource provides:
       <div>dark</div>
     </div>
   </div>
-  <!-- Section content here -->
+  <div class="tabs">
+    <!-- Tabs block content -->
+  </div>
+</div>
+```
+
+**WITHOUT section-metadata** (background is block-specific):
+```html
+<div>
+  <div class="hero">
+    <!-- Hero block content with its own dark background -->
+  </div>
 </div>
 ```
 
 **Important:**
 - Do NOT include header or footer content. Only migrate main page content.
-- Use consistent style names from Step 2.5 for section metadata
-- Place `section-metadata` div at the start of each section that needs styling
+- Use consistent style names from Step 2a for section metadata
+- **Apply validated decisions from Step 3e** - Skip section-metadata for single-block sections where background is block-specific
+- Place `section-metadata` div at the start of each section that needs styling (only if Step 3e validation says to keep it)
 - The metadata div will be processed and removed by the platform
 - Separate sections with proper boundaries
 
-**Save to:** Use `htmlFilePath` from Step 3.5 (e.g., `content/us/en/about.html`)
+**Example application:**
+```
+Section 1 (dark blue) - Validated: SKIP section-metadata
+→ HTML: Just <div> with hero block, no section-metadata
+
+Section 2 (light) - Multiple sequences
+→ HTML: <div> with heading + cards + buttons, no section-metadata (light is default)
+
+Section 3 (grey) - Validated: KEEP section-metadata
+→ HTML: <div> with section-metadata style="grey" + tabs block
+```
+
+**Page Metadata Block (from Step 1):**
+
+**Unless user explicitly requested to skip metadata**, use the metadata extracted in Step 1 to generate a metadata block.
+
+**Process (execute each step):**
+
+**1. Review extracted metadata from Step 1 JSON output**
+
+You have raw metadata containing: `title`, `description`, `og:*` properties, `twitter:*` properties, `canonical`, `jsonLd`, etc.
+
+**2. Map each property to EDS format**
+
+For EACH metadata property, apply the decision logic:
+
+**Title:**
+- Compare source `title` (or `og:title`) with first H1 on page
+- If matches first H1 → Omit (EDS defaults to H1)
+- If differs → Include as `title` property
+
+**Description:**
+- Compare source `description` (or `og:description`) with first paragraph
+- If matches first paragraph → Consider omitting (EDS defaults to first paragraph)
+- If differs OR more descriptive → Include as `description` property
+- Check: 150-160 characters ideal
+
+**Image:**
+- Check source `og:image`
+- If matches first content image → Consider omitting (EDS defaults to first image)
+- If custom social image → Include as `image` property
+- Ensure absolute URL or correct relative path
+- Check: 1200x630 pixels recommended
+
+**Canonical:**
+- If points to same page URL → Omit (EDS auto-generates)
+- If points to different page → Include as `canonical` property
+
+**Tags:**
+- Map `article:tag` or `keywords` → comma-separated `tags` property
+
+**Properties to SKIP** (EDS auto-populates these):
+- `og:url`, `og:title`, `og:description`, `twitter:title`, `twitter:description`, `twitter:image`
+- `viewport`, `charset`, `X-UA-Compatible` (belong in head.html)
+
+**3. Handle JSON-LD (if present)**
+
+```
+Has JSON-LD?
+├─ Page-specific schema (Article, Product, Event)?
+│  ├─ Small payload (<500 chars)? → Include in metadata block as "schema.org" property
+│  └─ Large payload? → Note for client-side JS decoration
+└─ Site-wide schema (Organization, WebSite)? → Note for head.html
+```
+
+**4. Generate metadata block HTML**
+
+Create `<div class="metadata">` with only the properties you decided to include:
+
+```html
+<div>
+  <div class="metadata">
+    <div>
+      <div>title</div>
+      <div>[Your mapped title]</div>
+    </div>
+    <div>
+      <div>description</div>
+      <div>[Your mapped description]</div>
+    </div>
+    <!-- Only include image if custom -->
+    <!-- Only include canonical if differs from page URL -->
+    <!-- Only include tags if present -->
+  </div>
+</div>
+```
+
+**5. Document your decisions**
+
+Note which properties were:
+- **Included** and why (differs from EDS default)
+- **Omitted** and why (matches default OR redundant)
+- **Recommendations** (e.g., move to head.html, use bulk metadata)
+
+**Detailed guidance:** See `resources/metadata-extraction.md` and `resources/metadata-mapping.md` for full decision trees and examples
+
+Example placement:
+```html
+<main>
+  <div>
+    <!-- Section 1 content -->
+  </div>
+  <div>
+    <!-- Section 2 content -->
+  </div>
+  <!-- More sections... -->
+
+  <!-- Metadata block at the end -->
+  <div>
+    <div class="metadata">
+      <div>
+        <div>title</div>
+        <div>Buy Widgets Online | WidgetCo</div>
+      </div>
+      <div>
+        <div>description</div>
+        <div>Shop our extensive collection of high-quality widgets.</div>
+      </div>
+      <div>
+        <div>image</div>
+        <div><img src="https://example.com/social-image.jpg" alt="Social preview"></div>
+      </div>
+    </div>
+  </div>
+</main>
+```
+
+**Append metadata block at the end of `<main>` content, just before the closing `</main>` tag.**
+
+**Save to:** Use `paths.htmlFilePath` from `./migration-work/metadata.json` (e.g., `us/en/about.html`)
+
+Example: Read the metadata.json file from Step 1 to get the correct file path.
 
 **Alternative:** For markdown format, see `resources/md-structure.md`
 
-**Output:** HTML file in `htmlFilePath` with section metadata
+**Output:** HTML file saved to the path specified in metadata.json
 
 ---
 
@@ -576,30 +854,35 @@ This resource provides:
 
 Open the migrated content in your local dev server:
 
-**Actions:**
-```javascript
-// Navigate to preview URL using documentPath from Step 3.5
-await browser_navigate({ url: 'http://localhost:3000${documentPath}' });
-// Example: http://localhost:3000/us/en/about
-
-// Take screenshot to verify rendering
-await browser_take_screenshot({ fullPage: true });
+**Navigate in browser:**
 ```
+http://localhost:3000${documentPath}
+Example: http://localhost:3000/us/en/about
+```
+
+(Use `paths.documentPath` from `./migration-work/metadata.json`)
 
 **Verify:**
 - ✅ Blocks render with correct styling
-- ✅ Layout matches original page structure
+- ✅ Layout matches original page structure (compare to `original.png` from Step 1)
 - ✅ Images load (or show appropriate placeholders)
-- ✅ No raw markdown syntax visible
-- ✅ No table characters (`+`, `|`, `-`) visible
+- ✅ No raw HTML visible
+- ✅ Metadata appears in page source (view source, check `<meta>` tags)
+- ✅ Section styling applied correctly
+
+**Comparison:**
+- Open `./migration-work/original.png` alongside preview
+- Check that content structure matches
+- Verify blocks decorated correctly
 
 **If issues found:**
-- Check column alignment in markdown
+- Check HTML structure matches EDS format
 - Verify block names match exactly
-- Ensure images URLs are complete
-- Review `md-structure.md` for common pitfalls
+- Ensure image URLs are absolute or correct relative paths
+- Review `resources/html-structure.md` for format guidance
+- Check browser console for JavaScript errors
 
-**Output:** Verified preview + screenshot proof
+**Output:** Verified preview that matches original page structure
 
 ---
 
@@ -621,8 +904,17 @@ await browser_take_screenshot({ fullPage: true });
 
 ## Troubleshooting
 
+**Browser not installed**
+→ Run `npx playwright install chromium` to install Chromium
+
 **Blocks don't render correctly**
 → Check `content-driven-development/resources/html-structure.md` for structure guidance
+
+**Metadata not appearing in page**
+→ Check `resources/metadata-extraction.md` for mapping rules and EDS defaults
+
+**Lazy-loaded images not captured**
+→ Some advanced lazy-loading may need customization in analyze-webpage.js
 
 **Not sure which block to use**
 → Invoke **block-collection-and-party** skill to search for examples
@@ -632,6 +924,9 @@ await browser_take_screenshot({ fullPage: true });
 
 **Complex content doesn't fit standard blocks**
 → Invoke **content-driven-development** skill to create custom block first, then return to migration
+
+**Need to understand web page analysis**
+→ See `resources/web-page-analysis.md` for detailed explanation of the scraping process
 
 ---
 

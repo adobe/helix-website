@@ -101,7 +101,7 @@ function generateDocumentPath({ url }) {
  * @param {string} url - Source URL to process
  * @returns {Object} - Complete path information
  */
-async function generateDocumentPathInfo(url) {
+function generateDocumentPathInfo(url) {
   try {
     // Generate the Edge Delivery Services document path (no extension)
     const documentPath = generateDocumentPath({ url });
@@ -176,7 +176,7 @@ async function main() {
     }
 
     // Generate path info
-    const result = await generateDocumentPathInfo(urlArg);
+    const result = generateDocumentPathInfo(urlArg);
 
     // Output as JSON
     console.log(JSON.stringify(result, null, 2));
@@ -196,3 +196,6 @@ async function main() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
+
+// Export functions for use by other scripts
+export { sanitizeFilename, sanitizePath, generateDocumentPath, generateDocumentPathInfo };
