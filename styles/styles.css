@@ -370,6 +370,20 @@ header {
   z-index: var(--nav-z-index);
 }
 
+header,
+footer {
+  visibility: hidden;
+}
+
+.no-header-template header {
+  display: none;
+}
+
+header:has(.header.block[data-block-status="loaded"]),
+footer:has(.footer.block[data-block-status="loaded"]) {
+  visibility: unset;
+}
+
 header .header {
   width: 100%;
 }
@@ -932,10 +946,6 @@ main .section[data-section-status="initialized"] {
 
 body.no-header-template {
   padding: 0;
-}
-
-.no-header-template header {
-  display: none;
 }
 
 /* ---- Utility Classes ---- */

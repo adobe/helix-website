@@ -513,7 +513,17 @@ async function fetchGnav(url) {
 export default async function init(blockEl) {
   // OLD CODE: const url = getMetadata('gnav') || '/gnav';
   const url = '/new-nav';
-  const html = await fetchGnav(url);
+  const header = blockEl.parentElement;
+  const inlined = header.firstElementChild !== blockEl;
+  let html = '';
+  if (inlined) {
+    while (header.firstElementChild && header.firstElementChild !== blockEl) {
+      html += header.firstElementChild.outerHTML;
+      header.firstElementChild.remove();
+    }
+  } else {
+    html = await fetchGnav(url);
+  }
 
   if (html) {
     try {
