@@ -28,7 +28,7 @@
  *     "url": "https://example.com/us/en/about.html",
  *     "documentPath": "/us/en/about",
  *     "mdFilePath": "us/en/about.md",
- *     "htmlFilePath": "us/en/about.html",
+ *     "htmlFilePath": "us/en/about.plain.html",
  *     "dirPath": "us/en",
  *     "filename": "about",
  *     "directoryCreated": true,
@@ -108,7 +108,7 @@ function generateDocumentPathInfo(url) {
 
     // Build file paths
     const mdFilePath = `${documentPath}.md`;
-    const htmlFilePath = `${documentPath}.html`;
+    const htmlFilePath = `${documentPath}.plain.html`;
 
     // Extract directory path (parent directory)
     const dirPath = `${documentPath.substring(0, documentPath.lastIndexOf('/'))}`;

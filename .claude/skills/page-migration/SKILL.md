@@ -108,15 +108,12 @@ node .claude/skills/page-migration/scripts/analyze-webpage.js "https://example.c
   "timestamp": "2025-01-12T10:30:00.000Z",
   "paths": {
     "documentPath": "/us/en/about",
-    "htmlFilePath": "us/en/about.html",
+    "htmlFilePath": "us/en/about.plain.html",
     "mdFilePath": "us/en/about.md",
     "dirPath": "us/en",
     "filename": "about"
   },
-  "screenshots": {
-    "original": "./migration-work/original.png",
-    "enhancedContrast": "./migration-work/enhanced-contrast.png"
-  },
+  "screenshot": "./migration-work/screenshot.png",
   "html": {
     "filePath": "./migration-work/cleaned.html",
     "size": 45230
@@ -141,19 +138,13 @@ node .claude/skills/page-migration/scripts/analyze-webpage.js "https://example.c
       "skipped": 12,
       "failed": 0
     }
-  },
-  "contrastEnhancement": {
-    "modified": 342,
-    "groups": 4,
-    "totalColors": 12
   }
 }
 ```
 
 **Output files:**
 - `./migration-work/metadata.json` - Complete analysis results including paths and image mapping
-- `./migration-work/original.png` - Visual reference for layout comparison
-- `./migration-work/enhanced-contrast.png` - Section boundary detection aid
+- `./migration-work/screenshot.png` - Visual reference for layout comparison
 - `./migration-work/cleaned.html` - Main content HTML with local image paths
 - `./migration-work/images/` - All downloaded images (WebP/AVIF/SVG converted to PNG)
 
@@ -182,10 +173,7 @@ Sections contain content sequences. You must analyze BOTH levels.
 
 #### Step 2a: Identify Section Boundaries (Level 1)
 
-Examine the **enhanced contrast screenshot** to find visual/thematic breaks that indicate new sections.
-
-**Why use the enhanced screenshot?**
-Subtle background color differences (e.g., white vs light grey) are exaggerated, making section boundaries immediately obvious.
+Examine the **screenshot** to find visual/thematic breaks that indicate new sections.
 
 **Visual cues for section boundaries:**
 - Background color changes (white → grey → dark → white)
@@ -577,9 +565,9 @@ Section 3 (grey):
 
 ---
 
-**Sub-step 2: For each candidate section, examine the original screenshot**
+**Sub-step 2: For each candidate section, examine the screenshot**
 
-Open `./migration-work/original.png` and examine the section visually.
+Open `./migration-work/screenshot.png` and examine the section visually.
 
 **Ask these questions:**
 
@@ -668,25 +656,60 @@ Before proceeding to Step 4, verify you have completed:
 
 ### Step 4: Generate HTML
 
-Create HTML file using Edge Delivery Services block structure with validated section styling from Steps 2a, 2.5, and 3e.
+**⚠️ CRITICAL REQUIREMENT: COMPLETE CONTENT MIGRATION**
 
-**For complete HTML structure guidance:**
-Use the **content-driven-development** skill resource: `resources/html-structure.md`
+**YOU MUST MIGRATE ALL CONTENT FROM THE PAGE. PARTIAL MIGRATION IS UNACCEPTABLE.**
 
-This resource provides:
-- Complete HTML document template
-- Block structure mapping (rows/columns → nested divs)
-- Head content requirements (copy from head.html)
-- Image handling with picture elements
-- Section organization patterns
-- Section metadata guidance
+- ❌ NEVER truncate or skip sections due to length concerns
+- ❌ NEVER summarize or abbreviate content
+- ❌ NEVER use placeholders like "<!-- rest of content -->"
+- ❌ NEVER omit content because the page is "too long"
+- ✅ ALWAYS migrate every section identified in Steps 2a and 2b
+- ✅ ALWAYS include all text, images, and structure from the original page
+- ✅ If you encounter length issues, generate the FULL HTML anyway
 
-**Quick structure:**
-- Copy complete content from project's head.html
-- Empty `<header>` and `<footer>` tags (auto-populated)
-- Main content in sections: `<main><div>...</div></main>`
-- Blocks as `<div class="block-name">` with nested divs
-- **Include section metadata** using validated style decisions from Step 3e
+**Validation requirement:** After generating HTML, you MUST verify that the number of sections in your HTML matches the number of sections identified in Step 2a. If they don't match, you have made an error.
+
+---
+
+Create plain HTML file with ONLY the section content using Edge Delivery Services block structure with validated section styling from Steps 2a, 2.5, and 3e.
+
+**IMPORTANT CHANGE:** The AEM CLI now automatically wraps HTML content with the headful structure (head, header, footer). You MUST generate ONLY the section content.
+
+**What to generate:**
+- ✅ Section divs with content: `<div>...</div>` (one per section)
+- ✅ Blocks as `<div class="block-name">` with nested divs
+- ✅ Default content (headings, paragraphs, links, images)
+- ✅ Section metadata blocks where validated in Step 3e
+
+**What NOT to generate:**
+- ❌ NO `<html>`, `<head>`, or `<body>` tags
+- ❌ NO `<header>` or `<footer>` elements
+- ❌ NO `<main>` wrapper element
+- ❌ NO head content (meta tags, title, etc. - this comes from project's head.html)
+
+**Structure format:**
+```html
+<div>
+  <!-- Section 1 content -->
+</div>
+<div>
+  <!-- Section 2 content with section-metadata if needed -->
+  <div class="section-metadata">
+    <div>
+      <div>Style</div>
+      <div>grey</div>
+    </div>
+  </div>
+  <!-- Section 2 blocks/content -->
+</div>
+<div>
+  <!-- Section 3 content -->
+</div>
+```
+
+**For detailed structure guidance:**
+- See `content-driven-development/resources/html-structure.md` for block structure patterns, image handling, and section metadata examples
 
 **Section metadata structure:**
 
@@ -715,12 +738,12 @@ This resource provides:
 ```
 
 **Important:**
-- Do NOT include header or footer content. Only migrate main page content.
+- Only migrate the visible body content sections (skip header, navigation, and footer - these are auto-generated)
 - Use consistent style names from Step 2a for section metadata
 - **Apply validated decisions from Step 3e** - Skip section-metadata for single-block sections where background is block-specific
 - Place `section-metadata` div at the start of each section that needs styling (only if Step 3e validation says to keep it)
 - The metadata div will be processed and removed by the platform
-- Separate sections with proper boundaries
+- Each section is a separate top-level `<div>` element
 
 **Example application:**
 ```
@@ -820,44 +843,97 @@ Note which properties were:
 
 Example placement:
 ```html
-<main>
-  <div>
-    <!-- Section 1 content -->
-  </div>
-  <div>
-    <!-- Section 2 content -->
-  </div>
-  <!-- More sections... -->
+<div>
+  <!-- Section 1 content -->
+</div>
+<div>
+  <!-- Section 2 content -->
+</div>
+<!-- More sections... -->
 
-  <!-- Metadata block at the end -->
-  <div>
-    <div class="metadata">
-      <div>
-        <div>title</div>
-        <div>Buy Widgets Online | WidgetCo</div>
-      </div>
-      <div>
-        <div>description</div>
-        <div>Shop our extensive collection of high-quality widgets.</div>
-      </div>
-      <div>
-        <div>image</div>
-        <div><img src="https://example.com/social-image.jpg" alt="Social preview"></div>
-      </div>
+<!-- Metadata block at the end -->
+<div>
+  <div class="metadata">
+    <div>
+      <div>title</div>
+      <div>Buy Widgets Online | WidgetCo</div>
+    </div>
+    <div>
+      <div>description</div>
+      <div>Shop our extensive collection of high-quality widgets.</div>
+    </div>
+    <div>
+      <div>image</div>
+      <div><img src="https://example.com/social-image.jpg" alt="Social preview"></div>
     </div>
   </div>
-</main>
+</div>
 ```
 
-**Append metadata block at the end of `<main>` content, just before the closing `</main>` tag.**
+**Append metadata block as the last section div at the end of the HTML file.**
 
-**Save to:** Use `paths.htmlFilePath` from `./migration-work/metadata.json` (e.g., `us/en/about.html`)
+---
+
+**Images Folder Management (CRITICAL):**
+
+The images are currently in `./migration-work/images/` and the HTML references them as `./images/...`. You MUST handle the images folder correctly:
+
+**Step 1: Determine the correct images folder location**
+
+Based on `paths.htmlFilePath` from metadata.json:
+- HTML file: `us/en/about.plain.html` → Images should be at: `us/en/images/`
+- HTML file: `products/widget.plain.html` → Images should be at: `products/images/`
+- HTML file: `index.plain.html` → Images should be at: `images/`
+
+**Rule:** Images folder goes in the same directory as the HTML file.
+
+**Step 2: Copy the images folder**
+
+```bash
+# Example: If HTML is at us/en/about.plain.html
+mkdir -p us/en/images
+cp -r ./migration-work/images/* us/en/images/
+```
+
+**Step 3: Verify image paths in HTML are correct**
+
+The HTML should already reference images as `./images/...` which is correct for files in the same directory. No path changes needed in the HTML.
+
+**Example:**
+```
+HTML location: us/en/about.plain.html
+Images location: us/en/images/
+Image reference in HTML: <img src="./images/abc123.jpg">
+Result: ✅ Correct - browser resolves to us/en/images/abc123.jpg
+```
+
+---
+
+**Save HTML to:** Use `paths.htmlFilePath` from `./migration-work/metadata.json` (e.g., `us/en/about.plain.html`)
 
 Example: Read the metadata.json file from Step 1 to get the correct file path.
 
 **Alternative:** For markdown format, see `resources/md-structure.md`
 
-**Output:** HTML file saved to the path specified in metadata.json
+**Output:**
+- HTML file saved to the path specified in metadata.json
+- Images folder copied to the same directory as the HTML file
+
+---
+
+**Step 4 Validation Checklist (MANDATORY):**
+
+Before proceeding to Step 5, verify:
+- ✅ Section count: HTML has the same number of top-level `<div>` sections as identified in Step 2a
+- ✅ All sequences: Every content sequence from Step 2b appears in the HTML
+- ✅ No truncation: No "..." or "<!-- more content -->" or similar placeholders
+- ✅ Complete text: All headings, paragraphs, and text from cleaned.html are present
+- ✅ All images: Every image reference from the scraped page is included
+- ✅ HTML file saved: HTML file written to disk at the correct path
+- ✅ Images folder copied: Images folder exists in the same directory as the HTML file
+- ✅ Images accessible: Verify that at least one image file exists in the copied images folder
+
+**If any validation check fails, STOP and fix before proceeding.**
 
 ---
 
@@ -866,23 +942,32 @@ Example: Read the metadata.json file from Step 1 to get the correct file path.
 Open the migrated content in your local dev server:
 
 **Navigate in browser:**
+
+For most files, use the document path directly:
 ```
 http://localhost:3000${documentPath}
 Example: http://localhost:3000/us/en/about
 ```
 
-(Use `paths.documentPath` from `./migration-work/metadata.json`)
+**IMPORTANT:** For index files, use `/index` instead of `/`:
+```
+If file is: index.plain.html
+Preview at: http://localhost:3000/index
+NOT: http://localhost:3000/
+```
+
+(Use `paths.documentPath` from `./migration-work/metadata.json`, but for index files ensure the path is `/index` not `/`)
 
 **Verify:**
 - ✅ Blocks render with correct styling
-- ✅ Layout matches original page structure (compare to `original.png` from Step 1)
+- ✅ Layout matches original page structure (compare to `screenshot.png` from Step 1)
 - ✅ Images load (or show appropriate placeholders)
 - ✅ No raw HTML visible
 - ✅ Metadata appears in page source (view source, check `<meta>` tags)
 - ✅ Section styling applied correctly
 
 **Comparison:**
-- Open `./migration-work/original.png` alongside preview
+- Open `./migration-work/screenshot.png` alongside preview
 - Check that content structure matches
 - Verify blocks decorated correctly
 
