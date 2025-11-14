@@ -1,16 +1,16 @@
 ---
-name: page-migration
-description: Migrate a single webpage from any URL to Edge Delivery Services-compliant HTML content. Scrapes the page, analyzes structure, maps to existing blocks, and generates HTML for immediate local preview.
+name: page-import
+description: Import a single webpage from any URL to Edge Delivery Services-compliant HTML content. Scrapes the page, analyzes structure, maps to existing blocks, and generates HTML for immediate local preview. Also triggered by terms like "migrate", "migration", or "migrating".
 ---
 
-# Page Migration Orchestrator
+# Page Import Orchestrator
 
-You are an orchestrator of a website migration. You have specialized Skills at your disposal for each phase of the migration workflow. Below is a high-level overview of what you're going to do.
+You are an orchestrator of a website page import/migration. You have specialized Skills at your disposal for each phase of the import workflow. Below is a high-level overview of what you're going to do.
 
 ## When to Use This Skill
 
 Use this skill when:
-- Migrating individual pages from existing websites to Edge Delivery Services
+- Importing or migrating individual pages from existing websites to Edge Delivery Services
 - Converting competitor pages for reference or analysis
 - Creating content files from design prototypes or staging sites
 
@@ -21,8 +21,8 @@ Use this skill when:
 
 ## Scope
 
-**This skill migrates main content only:**
-- ✅ Migrate: Hero sections, features, testimonials, CTAs, body content
+**This skill imports/migrates main content only:**
+- ✅ Import: Hero sections, features, testimonials, CTAs, body content
 - ❌ Skip: Header, navigation, footer (handled by dedicated skills)
 
 ## Philosophy
@@ -39,8 +39,8 @@ This orchestrator delegates work to:
 - **scrape-webpage** - Extract content, metadata, and images from source URL
 - **identify-page-structure** - Identify section boundaries and content sequences
 - **authoring-analysis** - Make authoring decisions (default content vs blocks)
-- **generate-migration-html** - Create EDS-compliant HTML file
-- **preview-migration** - Verify in local dev server
+- **generate-import-html** - Create EDS-compliant HTML file
+- **preview-import** - Verify in local dev server
 
 These skills invoke additional skills as needed:
 - **page-decomposition** - (via identify-page-structure) Analyze content sequences per section
@@ -48,7 +48,7 @@ These skills invoke additional skills as needed:
 - **content-modeling** - (via authoring-analysis) Validate unclear block selections
 - **block-collection-and-party** - (via authoring-analysis) Validate block existence
 
-## Migration Workflow
+## Import Workflow
 
 ### Step 0: Create TodoList
 
@@ -63,10 +63,10 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 3. **Analyze authoring approach** (authoring-analysis skill)
    - Success: Every content sequence has decision (default content OR block name), section styling validated
 
-4. **Generate HTML file** (generate-migration-html skill)
+4. **Generate HTML file** (generate-import-html skill)
    - Success: HTML file exists, images folder copied, validation checklist passed
 
-5. **Preview and verify** (preview-migration skill)
+5. **Preview and verify** (preview-import skill)
    - Success: Page renders correctly in browser, matches original structure
 
 ---
@@ -77,7 +77,7 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 
 **Provide:**
 - Target URL
-- Output directory: `./migration-work`
+- Output directory: `./import-work`
 
 **Success criteria:**
 - ✅ metadata.json exists with paths, metadata, image mapping
@@ -127,7 +127,7 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 
 ### Step 4: Generate HTML File
 
-**Invoke:** generate-migration-html skill
+**Invoke:** generate-import-html skill
 
 **Provide:**
 - Authoring analysis from Step 3
@@ -137,7 +137,7 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 
 **Success criteria:**
 - ✅ HTML file saved at correct path (from metadata.json)
-- ✅ All sections migrated (no truncation)
+- ✅ All sections imported (no truncation)
 - ✅ Images folder copied to correct location
 - ✅ Metadata block included (unless skipped)
 - ✅ Validation checklist passed
@@ -148,7 +148,7 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 
 ### Step 5: Preview and Verify
 
-**Invoke:** preview-migration skill
+**Invoke:** preview-import skill
 
 **Provide:**
 - HTML file path from Step 4
@@ -172,7 +172,7 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 - ✅ Follow the workflow steps in order
 - ✅ Mark each todo complete after verification
 - ✅ Use TodoWrite to track progress
-- ✅ Migrate ALL content (partial migration is failure)
+- ✅ Import ALL content (partial import is failure)
 - ✅ Compare final preview with original screenshot
 
 **DON'T:**
@@ -180,24 +180,24 @@ Use the TodoWrite tool to create a todo list with the following tasks:
 - ❌ Make authoring decisions without block inventory
 - ❌ Generate HTML before completing authoring analysis
 - ❌ Truncate or summarize content
-- ❌ Consider migration complete without visual verification
+- ❌ Consider import complete without visual verification
 
 ## Success Criteria
 
-Migration is complete when:
+Import is complete when:
 - ✅ All 5 todos marked complete
 - ✅ HTML file renders in browser
 - ✅ Visual structure matches original page
-- ✅ All content migrated (no truncation)
+- ✅ All content imported (no truncation)
 - ✅ Images accessible
 
 ## Limitations
 
-This orchestrator manages single-page migration with existing blocks. It does NOT:
+This orchestrator manages single-page import with existing blocks. It does NOT:
 - Custom variant creation (blocks are used as-is)
-- Multi-page batch processing (migrate one page at a time)
+- Multi-page batch processing (import one page at a time)
 - Block code development (assumes blocks exist)
-- Advanced reuse detection across migrations
+- Advanced reuse detection across imports
 - Automatic block matching algorithms
 
-For those features, consider more comprehensive migration workflows in specialized tools.
+For those features, consider more comprehensive import workflows in specialized tools.

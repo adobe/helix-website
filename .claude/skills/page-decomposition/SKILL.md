@@ -1,6 +1,6 @@
 ---
 name: page-decomposition
-description: Analyze content sequences within a section and provide neutral descriptions. Invoked per section during page migration to identify breaking points between default content and blocks.
+description: Analyze content sequences within a section and provide neutral descriptions. Invoked per section during page import to identify breaking points between default content and blocks.
 ---
 
 # Page Decomposition
@@ -26,7 +26,7 @@ From the calling skill (identify-page-structure), you need:
 
 ## Related Skills
 
-- **page-migration** - Top-level orchestrator
+- **page-import** - Top-level orchestrator
 - **identify-page-structure** - Invokes this skill for each section (Step 2b)
 - **block-inventory** - Provides available blocks AFTER decomposition
 - **content-modeling** - Makes authoring decisions AFTER decomposition
@@ -78,7 +78,7 @@ Look at the screenshot and HTML for THIS section only.
 
 **Ignore:**
 - Other sections (out of scope)
-- Section styling (already identified by page-migration)
+- Section styling (already identified by page-import)
 - Block names (stay neutral)
 
 **Output:** Mental model of content flow within this section
@@ -171,7 +171,7 @@ Provide content sequences for this section in structured format.
 
 **Placement:** At the start of each section, before content
 
-**Usage:** Applied by generate-migration-html skill when generating final HTML
+**Usage:** Applied by generate-import-html skill when generating final HTML
 
 ---
 

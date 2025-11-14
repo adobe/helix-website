@@ -14,7 +14,7 @@ Use this skill when:
 - Need to identify section boundaries and content sequences
 - Ready to understand page structure before making authoring decisions
 
-**Invoked by:** page-migration skill (Step 2)
+**Invoked by:** page-import skill (Step 2)
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ From scrape-webpage skill, you need:
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that invokes this skill
+- **page-import** - Orchestrator that invokes this skill
 - **scrape-webpage** - Provides input (screenshot, HTML)
 - **page-decomposition** - This skill invokes it for EACH section
 - **block-inventory** - This skill invokes it to survey available blocks

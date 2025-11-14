@@ -1,33 +1,33 @@
 ---
-name: preview-migration
-description: Preview and verify migrated content in local dev server. Validates rendering, compares with original page, and troubleshoots common issues.
+name: preview-import
+description: Preview and verify imported content in local dev server. Validates rendering, compares with original page, and troubleshoots common issues.
 ---
 
-# Preview Migration
+# Preview Import
 
-Open and verify migrated content in local development server.
+Open and verify imported content in local development server.
 
 ## When to Use This Skill
 
 Use this skill when:
-- You have generated HTML file (from generate-migration-html)
+- You have generated HTML file (from generate-import-html)
 - Ready to preview in browser and verify rendering
 - Need to compare with original page structure
 
-**Invoked by:** page-migration skill (Step 5)
+**Invoked by:** page-import skill (Step 5)
 
 ## Prerequisites
 
 From previous skills, you need:
-- ✅ HTML file at correct path (from generate-migration-html)
+- ✅ HTML file at correct path (from generate-import-html)
 - ✅ Images folder in same directory
 - ✅ screenshot.png from scrape-webpage (for comparison)
 - ✅ documentPath from metadata.json (for URL construction)
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that invokes this skill
-- **generate-migration-html** - Provides HTML file to preview
+- **page-import** - Orchestrator that invokes this skill
+- **generate-import-html** - Provides HTML file to preview
 - **scrape-webpage** - Provides screenshot for comparison
 
 ## Preview Workflow
@@ -86,7 +86,7 @@ Use `paths.documentPath` from metadata.json, but for index files ensure the path
 ### Step 4: Compare with Original
 
 **Side-by-side comparison:**
-1. Open `./migration-work/screenshot.png` alongside browser preview
+1. Open `./import-work/screenshot.png` alongside browser preview
 2. Check that content structure matches
 3. Verify blocks decorated correctly
 4. Confirm section boundaries align
@@ -99,12 +99,12 @@ Use `paths.documentPath` from metadata.json, but for index files ensure the path
 **Blocks don't render correctly:**
 - Check HTML structure matches EDS format
 - Verify block names match exactly (case-sensitive)
-- Review `../page-migration/resources/html-structure.md` for format guidance
+- Review `../page-import/resources/html-structure.md` for format guidance
 
 **Images not loading:**
 - Verify images folder is in same directory as HTML file
 - Check image paths are `./images/...` format
-- Ensure images were copied correctly from `./migration-work/images/`
+- Ensure images were copied correctly from `./import-work/images/`
 
 **Raw HTML visible:**
 - Block name might not match existing block in project
@@ -137,4 +137,4 @@ This skill provides:
 - ✅ Validated block decoration
 - ✅ Confirmed metadata presence
 
-**Migration complete when all verification points pass.**
+**Import complete when all verification points pass.**

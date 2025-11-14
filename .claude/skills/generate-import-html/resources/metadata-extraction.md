@@ -31,7 +31,7 @@ EDS provides convenience properties that auto-populate multiple metadata tags:
 
 ## Metadata Extraction Process
 
-Metadata is extracted automatically by the `analyze-webpage.js` script during Step 1 of page migration. The script collects:
+Metadata is extracted automatically by the `analyze-webpage.js` script during Step 1 of page import. The script collects:
 
 - `<title>` tag content
 - All `<meta>` tags (both `name` and `property` attributes)
@@ -310,7 +310,7 @@ const absoluteImageUrl = new URL(relativeImagePath, baseUrl).href;
 
 ## Integration Notes
 
-The metadata extraction process is integrated into the page-migration workflow:
+The metadata extraction process is integrated into the page-import workflow:
 
 1. **Step 1**: `analyze-webpage.js` extracts raw metadata from source page
 2. **Step 2-3**: Analyze content structure (identify H1, first paragraph, first image)

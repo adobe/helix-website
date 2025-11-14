@@ -10,7 +10,7 @@ Survey and catalog available blocks to understand what authoring options exist.
 ## When to Use This Skill
 
 Use this skill when:
-- Starting a page migration to understand available blocks
+- Starting a page import to understand available blocks
 - Planning content structure and need to know block options
 - An author would see a block library and choose from available options
 
@@ -27,7 +27,7 @@ This skill provides that same context - understanding what blocks are available 
 
 ## Related Skills
 
-- **page-migration** - Top-level orchestrator
+- **page-import** - Top-level orchestrator
 - **identify-page-structure** - Invokes this skill to survey blocks (Step 2.5)
 - **block-collection-and-party** - This skill uses it to search Block Collection
 - **content-modeling** - Can reference block inventory but maintains independent judgment
@@ -135,7 +135,7 @@ BLOCK COLLECTION (can be added):
 
 ## Usage Example
 
-**Scenario:** Starting WKND Trendsetters homepage migration
+**Scenario:** Starting WKND Trendsetters homepage import
 
 **Step 1 - Local blocks:**
 ```bash

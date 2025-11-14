@@ -1,20 +1,20 @@
 ---
 name: scrape-webpage
-description: Scrape webpage content, extract metadata, download images, and prepare for Edge Delivery Services migration. Returns analysis JSON with paths, metadata, cleaned HTML, and local images.
+description: Scrape webpage content, extract metadata, download images, and prepare for Edge Delivery Services import/migration. Returns analysis JSON with paths, metadata, cleaned HTML, and local images.
 ---
 
 # Scrape Webpage
 
-Extract content, metadata, and images from a webpage for Edge Delivery Services migration.
+Extract content, metadata, and images from a webpage for Edge Delivery Services import/migration.
 
 ## When to Use This Skill
 
 Use this skill when:
-- Starting a page migration and need to extract content from source URL
+- Starting a page import and need to extract content from source URL
 - Need webpage analysis with local image downloads
 - Want metadata extraction (Open Graph, JSON-LD, etc.)
 
-**Invoked by:** page-migration skill (Step 1)
+**Invoked by:** page-import skill (Step 1)
 
 ## Prerequisites
 
@@ -26,9 +26,9 @@ Before using this skill, ensure:
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that invokes this skill
+- **page-import** - Orchestrator that invokes this skill
 - **identify-page-structure** - Uses this skill's output (screenshot, HTML, metadata)
-- **generate-migration-html** - Uses image mapping and paths from this skill
+- **generate-import-html** - Uses image mapping and paths from this skill
 
 ## Scraping Workflow
 
@@ -36,7 +36,7 @@ Before using this skill, ensure:
 
 **Command:**
 ```bash
-node .claude/skills/scrape-webpage/scripts/analyze-webpage.js "https://example.com/page" --output ./migration-work
+node .claude/skills/scrape-webpage/scripts/analyze-webpage.js "https://example.com/page" --output ./import-work
 ```
 
 **What the script does:**
@@ -59,15 +59,15 @@ node .claude/skills/scrape-webpage/scripts/analyze-webpage.js "https://example.c
 ### Step 2: Verify Output
 
 **Output files:**
-- `./migration-work/metadata.json` - Complete analysis with paths and image mapping
-- `./migration-work/screenshot.png` - Visual reference for layout comparison
-- `./migration-work/cleaned.html` - Main content HTML with local image paths
-- `./migration-work/images/` - All downloaded images (WebP/AVIF/SVG converted to PNG)
+- `./import-work/metadata.json` - Complete analysis with paths and image mapping
+- `./import-work/screenshot.png` - Visual reference for layout comparison
+- `./import-work/cleaned.html` - Main content HTML with local image paths
+- `./import-work/images/` - All downloaded images (WebP/AVIF/SVG converted to PNG)
 
 **Verify files exist:**
 ```bash
-ls -lh ./migration-work/metadata.json ./migration-work/screenshot.png ./migration-work/cleaned.html
-ls -lh ./migration-work/images/ | head -5
+ls -lh ./import-work/metadata.json ./import-work/screenshot.png ./import-work/cleaned.html
+ls -lh ./import-work/images/ | head -5
 ```
 
 ---
@@ -86,9 +86,9 @@ ls -lh ./migration-work/images/ | head -5
     "dirPath": "us/en",
     "filename": "about"
   },
-  "screenshot": "./migration-work/screenshot.png",
+  "screenshot": "./import-work/screenshot.png",
   "html": {
-    "filePath": "./migration-work/cleaned.html",
+    "filePath": "./import-work/cleaned.html",
     "size": 45230
   },
   "metadata": {
@@ -142,7 +142,7 @@ npx playwright install chromium
 
 **Sharp not installed:**
 ```bash
-cd .claude/skills/page-migration/scripts && npm install
+cd .claude/skills/scrape-webpage/scripts && npm install
 ```
 
 **Image download failures:**
