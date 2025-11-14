@@ -1,50 +1,86 @@
-#!/bin/bash
-# Discover available skills in .claude/skills/
+#!/usr/bin/env bash
+set -Eo pipefail
+IFS=$'\n\t'
+
+# Discover available skills in both project and global directories
 # Usage: .agents/discover-skills
 
-SKILLS_DIR=".claude/skills"
+PROJECT_SKILLS_DIR=".claude/skills"
+GLOBAL_SKILLS_DIR="$HOME/.claude/skills"
 
-if [ ! -d "$SKILLS_DIR" ]; then
-    echo "No skills directory found at $SKILLS_DIR"
-    exit 0
-fi
+process_skills_directory() {
+  local skills_dir="$1"
+  local location_label="$2"
 
-# Find all SKILL.md files
-SKILL_FILES=$(find "$SKILLS_DIR" -name "SKILL.md" -type f | sort)
+  if [[ ! -d "$skills_dir" ]]; then
+    return 0
+  fi
 
-if [ -z "$SKILL_FILES" ]; then
-    echo "No skills found in $SKILLS_DIR"
-    exit 0
-fi
+  local count=0
+  # Count skills first
+  while IFS= read -r -d '' skill_file; do
+    count=$((count + 1))
+  done < <(find "$skills_dir" -type f -name 'SKILL.md' -print0)
 
-echo "Available Skills:"
-echo "=================="
-echo ""
+  if [[ $count -eq 0 ]]; then
+    return 0
+  fi
 
-# Process each skill
-while IFS= read -r skill_file; do
-    # Extract skill name from path
+  echo "$location_label ($count skill(s)):"
+  # Generate underline matching label length
+  local len=${#location_label}
+  if [[ $len -gt 0 ]]; then
+    local underline=""
+    for ((i=0; i<len; i++)); do
+      underline+="="
+    done
+    echo "$underline"
+  fi
+  echo ""
+
+  # Iterate SKILL.md files robustly (handles spaces)
+  while IFS= read -r -d '' skill_file; do
     skill_dir=$(dirname "$skill_file")
     skill_name=$(basename "$skill_dir")
 
-    # Extract frontmatter if it exists
+    # Check for YAML frontmatter
     if head -n 1 "$skill_file" | grep -q "^---$"; then
-        # Parse YAML frontmatter
-        name=$(sed -n '/^---$/,/^---$/p' "$skill_file" | grep "^name:" | sed 's/^name: *//')
-        description=$(sed -n '/^---$/,/^---$/p' "$skill_file" | grep "^description:" | sed 's/^description: *//')
+      # Extract lines between first pair of --- delimiters
+      frontmatter=$(awk 'BEGIN{inside=0; c=0} /^---$/ {inside=!inside; if(++c==3) exit} inside==1 {print}' "$skill_file")
+      name=$(printf '%s\n' "$frontmatter" | awk -F': *' '/^name:/ {sub(/^name: */,"",$0); print substr($0, index($0,$2))}' 2>/dev/null)
+      description=$(printf '%s\n' "$frontmatter" | awk -F': *' '/^description:/ {sub(/^description: */,"",$0); print substr($0, index($0,$2))}' 2>/dev/null)
 
-        echo "Skill: ${name:-$skill_name}"
-        echo "Path: $skill_file"
+      echo "Skill: ${name:-$skill_name}"
+      echo "Path: $skill_file"
+      if [[ -n "$description" ]]; then
         echo "Description: $description"
+      fi
     else
-        # No frontmatter, show skill name and first few lines
-        echo "Skill: $skill_name"
-        echo "Path: $skill_file"
-        echo "Description:"
-        head -n 5 "$skill_file"
+      echo "Skill: $skill_name"
+      echo "Path: $skill_file"
+      echo "Description:"
+      head -n 5 "$skill_file"
     fi
 
     echo ""
     echo "---"
     echo ""
-done <<< "$SKILL_FILES"
+  done < <(find "$skills_dir" -type f -name 'SKILL.md' -print0)
+}
+
+echo "Available Skills:"
+echo "=================="
+echo ""
+
+# Check project skills
+process_skills_directory "$PROJECT_SKILLS_DIR" "Project Skills (.claude/skills)"
+
+# Check global skills
+process_skills_directory "$GLOBAL_SKILLS_DIR" "Personal Skills (~/.claude/skills)"
+
+# If no skills found at all
+if [[ ! -d "$PROJECT_SKILLS_DIR" && ! -d "$GLOBAL_SKILLS_DIR" ]]; then
+  echo "No skills directories found."
+  echo "- Project skills: $PROJECT_SKILLS_DIR"
+  echo "- Personal skills: $GLOBAL_SKILLS_DIR"
+fi
