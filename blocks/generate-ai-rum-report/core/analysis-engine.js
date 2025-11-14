@@ -19,6 +19,7 @@ import {
 import {
   processParallelBatches,
 } from '../parallel-processing.js';
+import { buildFacetInfoSection } from './facet-link-generator.js';
 
 // Template cache
 let systemPromptCache = null;
@@ -134,6 +135,7 @@ function buildFormDataSection(dashboardData) {
  */
 function buildFinalSynthesisMessage(dashboardData, allInsights, formDataSection, overviewTemplate) {
   const hasMetrics = Object.keys(dashboardData.metrics).length > 0;
+  const facetInfoSection = buildFacetInfoSection(dashboardData);
 
   return `Create a polished, professional analysis report based on the data below.
 
@@ -151,7 +153,7 @@ ${dashboardData.dateRange ? `(Found in: <daterange-wrapper><input data-value="${
 IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
 Convert the data-value to readable format in your report (e.g., "month" → "Last 30 Days", "week" → "Last 7 Days").
 ==== END TIME PERIOD ====
-
+${facetInfoSection}
 ==== ✅ FACET COVERAGE CHECKLIST ====
 ⚠️ The following NON-FORM facets MUST ALL be covered in the "Key Metrics & Findings" section.
 Each facet needs 1 positive + 1 improvement observation:

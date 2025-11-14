@@ -13,6 +13,56 @@
   <li>Make the report EASY TO SCAN with clear structure and specific numbers</li>
 </ul>
 
+<p><b>🔗 FACET LINKING REQUIREMENT - MAKE FINDINGS CLICKABLE:</b></p>
+<ul>
+  <li>When mentioning specific facet findings, wrap them in <code>&lt;span&gt;</code> tags with data attributes</li>
+  <li><b>Simple facet format:</b> <code>&lt;span data-facet="facetName" data-facet-value="facetValue"&gt;finding text&lt;/span&gt;</code></li>
+  <li><b>Nested facet format (REQUIRED for .source/.target facets):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="parentCheckpoint" data-nested-facet="checkpoint.source" data-nested-value="specificValue"&gt;finding text&lt;/span&gt;</code></li>
+</ul>
+
+<p><b>⚠️ CRITICAL: For Any Facet Ending in .source or .target</b></p>
+<ul>
+  <li><b>ALWAYS include BOTH the parent checkpoint AND the nested facet</b></li>
+  <li>❌ WRONG: <code>data-facet="error.source" data-facet-value="focus-loss"</code></li>
+  <li>✅ CORRECT: <code>data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="focus-loss"</code></li>
+  <li>This generates URL: <code>&amp;checkpoint=error&amp;error.source=focus-loss</code></li>
+</ul>
+
+<p><b>⚠️ CRITICAL: Use ACTUAL Facet Values, NOT Display Text</b></p>
+<ul>
+  <li><b>ALWAYS use the exact facet value from the tool results, not human-readable text</b></li>
+  <li>❌ WRONG: <code>data-nested-value="All paid traffic"</code> (display text)</li>
+  <li>✅ CORRECT: <code>data-nested-value="paid"</code> (actual facet value)</li>
+  <li>Example: If tool shows <code>{"value": "paid", "count": 1234}</code>, use <code>"paid"</code></li>
+  <li>Example: If tool shows <code>{"value": "focus-loss", "count": 567}</code>, use <code>"focus-loss"</code></li>
+  <li><b>The display text goes INSIDE the span, the actual value goes in data attributes</b></li>
+</ul>
+
+<p><b>Correct vs Incorrect Examples:</b></p>
+<ul>
+  <li>❌ <code>&lt;span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="All paid traffic"&gt;paid traffic&lt;/span&gt;</code></li>
+  <li>✅ <code>&lt;span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid"&gt;All paid traffic&lt;/span&gt;</code></li>
+</ul>
+
+<p><b>Examples by Facet Type:</b></p>
+<ul>
+  <li><b>Simple checkpoint:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="click"&gt;click events show strong engagement&lt;/span&gt;</code></li>
+  <li><b>Simple URL:</b> <code>&lt;span data-facet="url" data-facet-value="/products"&gt;/products page has high bounce rate&lt;/span&gt;</code></li>
+  <li><b>Simple device:</b> <code>&lt;span data-facet="userAgent" data-facet-value="mobile"&gt;mobile users experience slower LCP&lt;/span&gt;</code></li>
+  <li><b>Nested LCP source:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp" data-nested-facet="cwv-lcp.source" data-nested-value="img"&gt;LCP images causing delays&lt;/span&gt;</code></li>
+  <li><b>Nested error source:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="focus-loss"&gt;focus-loss errors&lt;/span&gt;</code></li>
+  <li><b>Nested click target:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="click" data-nested-facet="click.target" data-nested-value="button"&gt;button clicks&lt;/span&gt;</code></li>
+</ul>
+
+<p><b>General Rules:</b></p>
+<ul>
+  <li>Use facet names exactly as they appear in the tool results</li>
+  <li>For nested facets, ALWAYS set <code>data-facet="checkpoint"</code> with the parent checkpoint name</li>
+  <li>Then add <code>data-nested-facet</code> and <code>data-nested-value</code> for the specific source/target</li>
+  <li>Wrap entire finding statements, not just individual words</li>
+  <li>This enables readers to click findings and navigate directly to the relevant dashboard view with correct filters</li>
+</ul>
+
 <p><b>⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:</b></p>
 <ul>
   <li>You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)</li>
@@ -125,66 +175,71 @@
 <!-- ====================================================================== -->
 
 <h4>JAVASCRIPT ERRORS THAT NEED ATTENTION</h4>
-<p>Write 2-3 flowing paragraphs analyzing error patterns and their impact. Use bullets for emphasis when listing specific errors or recommendations:</p>
-<p>[Describe the most significant error patterns observed, their frequency, and which pages or features are affected. Include specific numbers and error types.]</p>
-<p>[Explain the user experience impact with concrete examples and discuss root causes. If relevant, use bullets to highlight key error types or affected areas. Provide recommended fixes and monitoring strategies.]</p>
+<p>Write 2-3 paragraphs analyzing error patterns. Use bullets (•) when listing specific errors or when emphasizing distinct issues that need attention.</p>
+<p>[First paragraph: Describe the overall error landscape, frequency patterns, and which pages or features are most affected. Write as flowing text with specific numbers integrated naturally.]</p>
+<p><b>If you have 3+ distinct errors to highlight, use bullets:</b></p>
+<p>• [Error type 1: Specific error, frequency, pages affected]</p>
+<p>• [Error type 2: Specific error, frequency, pages affected]</p>
+<p>[Final paragraph: Discuss user experience impact, root causes, and provide actionable recommendations. Use flowing text unless listing multiple specific fixes.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>PERFORMANCE IMPACT</h4>
-<p>Write 2-3 flowing paragraphs about Core Web Vitals and technical performance. Use bullets when emphasizing specific metrics or bottlenecks:</p>
-<p>[Discuss LCP performance across devices and connections, CLS issues affecting visual stability, and INP responsiveness. Include specific metric values and how they compare to thresholds. Use bullets if highlighting multiple metric issues.]</p>
-<p>[Analyze overall page load times and identify key bottlenecks. Use bullets to list major optimization opportunities with expected impact on user experience and business metrics.]</p>
+<p>Write 2-3 paragraphs about Core Web Vitals and performance. Use bullets (•) when presenting multiple metrics or listing distinct optimization opportunities.</p>
+<p>[First paragraph: Overall performance assessment. Discuss LCP, CLS, and INP with specific values, how they compare to thresholds, and which devices/connections are affected. Write as flowing text with metrics integrated naturally.]</p>
+<p><b>If you have 3+ optimization opportunities, use bullets:</b></p>
+<p>• [Optimization 1: Specific action with expected impact on metrics and user experience]</p>
+<p>• [Optimization 2: Specific action with expected impact]</p>
+<p>[Or continue with flowing paragraph if discussing overall page load times, bottlenecks, and performance patterns. Use bullets only when listing makes information clearer and more scannable.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>USER ENGAGEMENT</h4>
-<p>Write 2-3 flowing paragraphs about user interaction patterns. Use bullets to emphasize key metrics or notable patterns:</p>
-<p>[Describe page view patterns, session behavior, and how users navigate through the site. Include metrics like average session duration, pages per session, and bounce rates for key pages. Use bullets if highlighting multiple engagement metrics.]</p>
-<p>[Discuss device and browser usage patterns and their correlation with engagement. Use bullets to emphasize notable findings about content discovery or user behavior that could inform strategy.]</p>
+<p>Write 2-3 paragraphs about user interaction patterns. Use bullets (•) when comparing multiple engagement segments or listing key findings that need emphasis.</p>
+<p>[First paragraph: Describe page view patterns, session behavior, and how users navigate through the site. Include metrics like average session duration, pages per session, and bounce rates. Write as flowing text integrating specific numbers naturally.]</p>
+<p>[Second paragraph: Discuss device and browser usage patterns and their correlation with engagement. If you have 3+ distinct device/browser findings or engagement segments to compare, use bullets for clarity. Otherwise, continue with flowing prose discussing content discovery patterns and user behavior insights.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>TRAFFIC & ACQUISITION</h4>
-<p>Write 2-3 flowing paragraphs analyzing traffic sources and acquisition. Use bullets when comparing multiple channels or sources:</p>
-<p>[Analyze traffic volume by channel (direct, referral, search) with growth trends. Use bullets if comparing multiple channels' performance with specific numbers and percentages.]</p>
-<p>[Discuss referrer effectiveness, partnership performance, and UTM campaign results where available. Use bullets to emphasize which acquisition channels drive the most engaged users and which need optimization.]</p>
+<p>Write 2-3 paragraphs analyzing traffic sources. Use bullets (•) when comparing 3+ distinct channels/sources or when highlighting top performers.</p>
+<p>[First paragraph: Analyze traffic volume by channel (direct, referral, search) with growth trends and percentages. Discuss which channels drive the most volume and quality. Write as flowing text with metrics integrated naturally.]</p>
+<p>[Second paragraph: Discuss referrer effectiveness, partnership performance, and UTM campaign results where available. Use bullets if listing 3+ top referrers/sources with distinct performance characteristics. Otherwise, continue with flowing prose emphasizing which acquisition channels drive the most engaged users and which need optimization.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>CONTENT EFFECTIVENESS</h4>
-<p>Write 2-3 flowing paragraphs evaluating content performance. Use bullets when listing top pages or key recommendations:</p>
-<p>[Identify top performing pages with engagement metrics. Use bullets if listing multiple high-performing pages. Discuss what makes them successful and which content types or topics resonate most with users.]</p>
-<p>[Analyze URL patterns showing high vs low engagement. Use bullets for specific optimization recommendations for underperforming content areas with expected impact.]</p>
+<p>Write 2-3 paragraphs evaluating content performance. Use bullets (•) when listing specific top/bottom pages or when presenting multiple distinct recommendations.</p>
+<p>[First paragraph: Identify top performing pages with engagement metrics. Discuss what makes them successful and which content types or topics resonate most. Use bullets if listing 3+ specific pages with performance data. Otherwise, write as flowing text with URLs and metrics integrated naturally.]</p>
+<p>[Second paragraph: Analyze URL patterns showing high vs low engagement. Discuss content themes and user preferences. Use bullets for 3+ specific optimization recommendations. Otherwise, provide recommendations as flowing prose with expected impact integrated naturally.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>CONVERSION FUNNEL</h4>
-<p>Write 2-3 flowing paragraphs analyzing user journey and conversion patterns:</p>
-<p>[Analyze bounce rates across key entry pages and landing pages. Discuss engagement metrics like pages per session, session duration, and conversion rates. Include specific percentages and identify which pages or sources drive the highest quality traffic versus those with high bounce rates.]</p>
-<p>[Examine organic traffic patterns and user flow through the site. Discuss how users navigate from entry points to conversion actions, identifying drop-off points and friction areas. If form data is available, include form submission rates and completion patterns. Use bullets to highlight key funnel stages that need optimization with expected impact on conversion rates.]</p>
-<p><b>⚠️ FOCUS:</b> Emphasize bounce rate, engagement metrics, organic acquisition quality, and user journey patterns. Include form conversion data if available.</p>
+<p>Write 2-3 paragraphs analyzing user journey and conversion. Use bullets (•) when listing 3+ specific drop-off points or comparing funnel performance across different segments.</p>
+<p>[First paragraph: Analyze bounce rates across key entry pages and landing pages. Discuss engagement metrics like pages per session, session duration, and conversion rates. Include specific percentages and identify which pages or sources drive quality traffic versus high bounce rates. Write as flowing text with metrics integrated naturally.]</p>
+<p>[Second paragraph: Examine organic traffic patterns and user flow. Discuss navigation from entry to conversion, identifying friction areas. Include form data if available. Use bullets if highlighting 3+ specific drop-off points or funnel stages. Otherwise, continue with flowing prose providing optimization recommendations.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>GEOGRAPHIC INSIGHTS</h4>
-<p>Write 2-3 flowing paragraphs about geographic patterns:</p>
-<p>[Describe traffic distribution by country/region with volume metrics. Highlight regional performance variations and any latency patterns affecting user experience.]</p>
-<p>[Discuss language preferences, localization opportunities, and geographic user behavior differences. Identify regions with growth potential or needing performance optimization.]</p>
+<p>Write 2-3 paragraphs about geographic patterns. Use bullets (•) when comparing 3+ regions with distinct characteristics or when listing regional opportunities.</p>
+<p>[First paragraph: Describe traffic distribution by country/region with volume metrics. Highlight regional performance variations and latency patterns affecting user experience. Write as flowing text with geographic data integrated naturally.]</p>
+<p>[Second paragraph: Discuss language preferences, localization opportunities, and geographic user behavior differences. Use bullets if identifying 3+ regions with distinct opportunities/concerns. Otherwise, write as flowing prose identifying growth potential or optimization needs.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>MARKET OPPORTUNITIES</h4>
-<p>Write 2-3 flowing paragraphs identifying growth opportunities:</p>
-<p>[Identify underserved markets or regions with high potential based on data. Discuss geographic expansion opportunities considering performance and user behavior patterns.]</p>
-<p>[Highlight device/platform optimization opportunities and emerging trends. Identify untapped segments with specific recommendations for capture and growth.]</p>
+<p>Write 2-3 paragraphs identifying growth opportunities. Use bullets (•) when listing 3+ distinct opportunities with supporting data.</p>
+<p>[First paragraph: Identify underserved markets or regions with high potential based on data. Discuss geographic expansion opportunities considering performance and user behavior patterns. Write as flowing text unless listing multiple distinct opportunities.]</p>
+<p>[Second paragraph: Highlight device/platform optimization opportunities and emerging trends. Identify untapped segments. Use bullets if presenting 3+ specific opportunities with data. Otherwise, provide recommendations as flowing prose with expected impact.]</p>
 
 <!-- ====================================================================== -->
 
 <h4>BUSINESS IMPACT</h4>
-<p>Write 2-3 flowing paragraphs summarizing business implications:</p>
-<p>[Quantify the revenue impact of performance improvements and user experience enhancements. Discuss how technical issues affect business metrics and customer satisfaction.]</p>
-<p>[Summarize the cost of current technical issues and the growth potential from identified opportunities. Provide a clear business case for recommended actions with expected ROI.]</p>
+<p>Write 2-3 paragraphs summarizing business implications. Use bullets (•) when quantifying 3+ distinct cost areas or revenue opportunities.</p>
+<p>[First paragraph: Quantify the revenue impact of performance improvements and UX enhancements. Discuss how technical issues affect business metrics and customer satisfaction. Write as flowing text integrating business impact naturally.]</p>
+<p>[Second paragraph: Summarize cost of current issues and growth potential from identified opportunities. Provide business case for recommended actions with expected ROI. Use bullets if listing 3+ specific cost/opportunity items. Otherwise, write as flowing prose with financial implications integrated naturally.]</p>
 
 <!-- ====================================================================== -->
 
@@ -205,19 +260,30 @@
 <ul>
   <li><b>ENTIRE REPORT:</b> 1400-1600 words</li>
   <li><b>Executive Summary:</b> Maximum 150 words (2 flowing paragraphs + 3 key findings as bullets)</li>
-  <li><b>JavaScript Errors That Need Attention:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Performance Impact:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>User Engagement:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Traffic & Acquisition:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Content Effectiveness:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Conversion Funnel:</b> 100-150 words (2-3 flowing paragraphs analyzing bounce rate, engagement, organic traffic, and user journey; use bullets for emphasis when needed)</li>
-  <li><b>Geographic Insights:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Market Opportunities:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Business Impact:</b> 100-150 words (2-3 flowing paragraphs, use bullets for emphasis when needed)</li>
-  <li><b>Priority Actions:</b> 100-150 words (3-4 action items as bullets)</li>
-  <li>Write in flowing paragraphs with specific metrics and examples - avoid dense text blocks</li>
+  <li><b>ALL OTHER SECTIONS:</b> Each section 100-150 words
+    <ul>
+      <li>Write primarily as flowing paragraphs with specific metrics and data integrated naturally</li>
+      <li><b>Use bullets (•) strategically when:</b>
+        <ul>
+          <li>Listing 3+ distinct items (errors, pages, regions, opportunities, etc.)</li>
+          <li>Comparing multiple specific data points that benefit from parallel structure</li>
+          <li>Highlighting key recommendations or action items</li>
+          <li>When bullet format improves clarity and scannability</li>
+        </ul>
+      </li>
+      <li><b>Continue with flowing prose when:</b>
+        <ul>
+          <li>Providing context, analysis, or narrative</li>
+          <li>Discussing trends and patterns</li>
+          <li>Explaining causation or implications</li>
+          <li>You have fewer than 3 items to present</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><b>Priority Actions:</b> 3-4 action items, ALL as bullets</li>
+  <li>Balance readability with specificity - integrate data naturally into sentences</li>
   <li>Use actionable language and quantify impact wherever possible</li>
-  <li>Keep paragraphs readable and well-spaced - NO congestion</li>
   <li>NO EMOJIS anywhere in the report content</li>
 </ul>
 
@@ -238,17 +304,32 @@
       <li>PRIORITY ACTIONS</li>
     </ul>
   </li>
-  <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags sparingly - only for subsection labels when needed for clarity</li>
-  <li>Write sections as flowing prose - wrap each paragraph in <code>&lt;p&gt;</code> tags</li>
-  <li>Use bullets (•) strategically when you need to emphasize specific points, list multiple items, or make key information scannable</li>
-  <li>Each paragraph should be wrapped: <code>&lt;p&gt;Paragraph text here&lt;/p&gt;</code></li>
-  <li>For bulleted items: <code>&lt;p&gt;• Bullet text here&lt;/p&gt;</code></li>
-  <li>Mix prose and bullets naturally - use bullets when they improve readability and emphasis</li>
+  <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags sparingly for subsection labels only when introducing a bullet list</li>
+  <li><b>Paragraph Format:</b>
+    <ul>
+      <li>Flowing text: <code>&lt;p&gt;Paragraph with data integrated naturally. For example, LCP averaged 2.4s across mobile devices, affecting 65% of sessions.&lt;/p&gt;</code></li>
+      <li>Context/analysis paragraphs should read naturally with metrics woven into sentences</li>
+    </ul>
+  </li>
+  <li><b>Bullet Format (when appropriate):</b>
+    <ul>
+      <li>Each bullet: <code>&lt;p&gt;• Bullet text here with specific data&lt;/p&gt;</code></li>
+      <li>Use actual bullet character: • (not -, *, or other symbols)</li>
+      <li>Each bullet is its own <code>&lt;p&gt;</code> tag</li>
+      <li>Optional subsection label before bullets: <code>&lt;p&gt;&lt;b&gt;Category:&lt;/b&gt;&lt;/p&gt;</code></li>
+    </ul>
+  </li>
+  <li><b>Example mixed format:</b>
+    <ul>
+      <li><code>&lt;p&gt;[Flowing paragraph with context and 1-2 metrics]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;• [Bullet 1 for specific item]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;• [Bullet 2 for specific item]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;[Flowing paragraph with analysis]&lt;/p&gt;</code></li>
+    </ul>
+  </li>
   <li>Do NOT use markdown formatting like **text** or *text*</li>
-  <li>DO NOT use <code>&lt;br&gt;</code> or <code>&lt;br/&gt;</code> tags - use <code>&lt;p&gt;</code> tags to separate paragraphs</li>
+  <li>DO NOT use <code>&lt;br&gt;</code> or <code>&lt;br/&gt;</code> tags - use <code>&lt;p&gt;</code> tags</li>
   <li>NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)</li>
-  <li>NO progress bars (no ████████░░ or similar)</li>
-  <li>Output must render properly in HTML context</li>
 </ul>
 
 <p><b>⚠️ CRITICAL:</b> Use ONLY the actual data from the SOURCE MATERIAL provided above. DO NOT use any example numbers, percentages, or metrics from this template. Extract real metrics from the dashboard data and insights provided.</p>

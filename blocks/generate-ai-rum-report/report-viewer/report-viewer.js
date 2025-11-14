@@ -4,8 +4,6 @@
 
 /* eslint-disable no-console */
 
-import { markReportAsViewed, updateNotificationBadge, getSavedReports } from '../report-actions.js';
-
 // Load report viewer CSS
 if (!document.querySelector('link[href*="report-viewer.css"]')) {
   const css = document.createElement('link');
@@ -155,6 +153,14 @@ const renderReport = (container, htmlContent) => {
     return;
   }
   container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
+
+  // New reports have real <a> links baked in from DA upload - no processing needed
+  const linkCount = container.querySelectorAll('a.facet-link').length;
+  if (linkCount > 0) {
+    console.log(`[Report Viewer] Report loaded with ${linkCount} facet links ready`);
+  } else {
+    console.log('[Report Viewer] Report loaded (no facet links found)');
+  }
 };
 
 export function showReportInline(reportPath, reportDate) {
@@ -175,16 +181,36 @@ export function showReportInline(reportPath, reportDate) {
 
       // Update URL with report date and date range
       const url = new URL(window.location);
+      const currentStartDate = url.searchParams.get('startDate');
+      const currentEndDate = url.searchParams.get('endDate');
+
       url.searchParams.set('report', reportDate);
 
+      // Check if we need to update date range
+      let needsReload = false;
       if (startDateMeta?.content && endDateMeta?.content) {
-        url.searchParams.set('startDate', startDateMeta.content);
-        url.searchParams.set('endDate', endDateMeta.content);
-        url.searchParams.set('view', 'custom');
+        // Only reload if date range is different
+        if (currentStartDate !== startDateMeta.content || currentEndDate !== endDateMeta.content) {
+          url.searchParams.set('startDate', startDateMeta.content);
+          url.searchParams.set('endDate', endDateMeta.content);
+          url.searchParams.set('view', 'custom');
+          needsReload = true;
+
+          console.log('[Report Viewer] Date range changed, reloading dashboard:', {
+            from: { startDate: currentStartDate, endDate: currentEndDate },
+            to: { startDate: startDateMeta.content, endDate: endDateMeta.content },
+          });
+        }
       }
 
-      window.history.pushState({}, '', url);
-      renderReport(viewer, html);
+      // If date range changed, reload the page to refresh dashboard data
+      // Otherwise just update URL and render report inline
+      if (needsReload) {
+        window.location.href = url.toString();
+      } else {
+        window.history.pushState({}, '', url);
+        renderReport(viewer, html);
+      }
     })
     .catch((err) => showError(viewer, err.message));
 }
@@ -205,7 +231,9 @@ export async function checkForSharedReport(getReports) {
       const date = new Date(match.timestamp);
       const dateStr = date.toISOString().split('T')[0];
 
-      // Mark as viewed and update badge
+      // Mark as viewed and update badge (dynamic import to avoid circular dependency)
+      // eslint-disable-next-line import/no-cycle
+      const { markReportAsViewed, updateNotificationBadge } = await import('../report-actions.js');
       markReportAsViewed(match.path);
       await updateNotificationBadge();
 
@@ -232,6 +260,9 @@ window.addEventListener('popstate', async () => {
 
   // Open report matching the date parameter
   try {
+    // Dynamic import to avoid circular dependency
+    // eslint-disable-next-line import/no-cycle
+    const { getSavedReports } = await import('../report-actions.js');
     const reports = await getSavedReports();
     const match = reports.find((r) => new Date(r.timestamp).toISOString().split('T')[0] === reportParam);
     if (match) showReportInline(match.path, reportParam);

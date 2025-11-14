@@ -176,6 +176,32 @@ facet-sidebar.report-view-active > form {
 }
 
 /* ============================================================================
+   FACET LINKS - CLICKABLE FINDINGS
+   ========================================================================= */
+
+.report-sections .facet-finding {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: currentcolor;
+  text-underline-offset: 2px;
+  color: var(--dark-indigo, #0073e6);
+  transition: all 0.2s ease;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.report-sections .facet-finding:hover {
+  text-decoration-style: solid;
+  background-color: rgb(63 81 181 / 8%);
+  text-decoration-color: var(--btn-bg-hover, #303f9f);
+}
+
+.report-sections .facet-finding:active {
+  background-color: rgb(63 81 181 / 15%);
+}
+
+/* ============================================================================
    RESPONSIVE DESIGN
    ========================================================================= */
 

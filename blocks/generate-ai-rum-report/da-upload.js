@@ -5,6 +5,8 @@
 
 /* eslint-disable no-console */
 
+import { convertSpansToLinks } from './core/facet-link-generator.js';
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -217,7 +219,29 @@ async function generateReportHTML(content, url, timestamp, isDeepMode, dateRange
   const template = await loadTemplate();
   const reportId = `RPT-${Date.now().toString(36).toUpperCase()}`;
   const { date, timestamp: formattedTimestamp } = formatDates(timestamp);
-  const tableContent = transformToTableFormat(content);
+
+  // Transform to table format
+  let tableContent = transformToTableFormat(content);
+  console.log('[DA Upload] Table content length:', tableContent.length);
+
+  // Convert data-attribute spans to actual clickable links
+  // Pass date range so links include the report's time period
+  try {
+    const originalLength = tableContent.length;
+    tableContent = convertSpansToLinks(tableContent, dateRange);
+    console.log('[DA Upload] Converted spans to links with date range:', dateRange);
+    console.log('[DA Upload] Length before:', originalLength, 'after:', tableContent.length);
+
+    // Safety check: if conversion resulted in empty/corrupted content, use original
+    if (!tableContent || tableContent.length < originalLength * 0.5) {
+      console.warn('[DA Upload] Conversion resulted in suspicious content, using original');
+      tableContent = transformToTableFormat(content);
+    }
+  } catch (error) {
+    console.error('[DA Upload] Failed to convert spans to links:', error);
+    // Continue with original table content if conversion fails
+    tableContent = transformToTableFormat(content);
+  }
 
   let html = template
     .replace(/{{REPORT_TITLE}}/g, `OpTel Analysis - ${url || 'Dashboard'}`)
