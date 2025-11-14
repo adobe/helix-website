@@ -43,13 +43,13 @@ Always use the following process:
 
 ### Available Skills
 
-Skills will be added to `.claude/skills/` as needed for this project. Check the `.claude/skills/` directory or run `./.agents/discover-skills` for the current list of available skills.
+Skills will be added to `.claude/skills/` as needed for this project. Run `./.agents/discover-skills` for the current list of available skills.
 
 **For ALL development work involving blocks, core scripts, or functionality, you MUST start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
 
 ## Project Overview
 
-This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, while adding functionality according to the needs of the current site being developed.
+This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, adding functionality according to the needs of the site being developed.
 
 The repository provides the basic structure, blocks, and configuration needed to run a complete site with `*.aem.live` as the backend.
 

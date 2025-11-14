@@ -8,7 +8,7 @@ This project is a website built with Edge Delivery Services in Adobe Experience 
 
 ## Project Overview
 
-This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, while adding functionality according to the needs of the current site being developed.
+This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, adding functionality according to the needs of the site being developed.
 
 The repository provides the basic structure, blocks, and configuration needed to run a complete site with `*.aem.live` as the backend.
 
