@@ -385,7 +385,7 @@ export function updateState() {
 
   const viewConfig = elems.viewSelect.value;
   url.searchParams.set('view', viewConfig.value);
-  if (viewConfig.value === 'custom') {
+  if (viewConfig.from && viewConfig.to) {
     url.searchParams.set('startDate', viewConfig.from);
     url.searchParams.set('endDate', viewConfig.to);
   }

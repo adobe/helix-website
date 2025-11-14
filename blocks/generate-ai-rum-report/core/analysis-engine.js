@@ -27,6 +27,7 @@ let overviewAnalysisTemplateCache = null;
 
 // API configuration
 const API_ENDPOINT = 'https://chat-bot-test.asthabhargava001.workers.dev/';
+const USE_DIRECT_API = true; // Set to false to use Worker proxy
 const API_MODEL = 'claude-opus-4-1-20250805';
 
 /**
@@ -215,10 +216,11 @@ async function callAnthropicAPI(
   console.log('[Analysis Engine] Starting AI analysis...');
 
   try {
-    // Get API key
-    const mainApiKey = localStorage.getItem('anthropicApiKey') || '';
-    if (!mainApiKey) {
-      throw new Error('API key not found');
+    // Verify API credentials exist (checked in parallel-processing.js)
+    const { getApiProvider } = await import('../api/api-factory.js');
+    const provider = getApiProvider();
+    if (!provider.hasToken) {
+      throw new Error('No API credentials found. Please configure AWS Bedrock or Anthropic API key.');
     }
 
     // Get system prompt
@@ -233,7 +235,7 @@ async function callAnthropicAPI(
       facetTools,
       dashboardData,
       systemPromptText,
-      mainApiKey,
+      null, // API credentials auto-detected in parallel-processing.js
       'Analyze the RUM data from the dashboard.',
       handleDynamicFacetToolCall,
       progressCallback,
@@ -298,18 +300,35 @@ async function callAnthropicAPI(
         progressCallback(3, 'in-progress', 'Generating insights and findings...', 65);
       }
 
-      const finalResponse = await fetch(API_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': mainApiKey,
-        },
-        body: JSON.stringify(finalRequest),
-      });
+      let finalData;
+      if (USE_DIRECT_API) {
+        // Use API Factory (supports Bedrock or Anthropic Direct)
+        const { callAI } = await import('../api/api-factory.js');
+        finalData = await callAI(finalRequest);
+      } else {
+        // Use Worker proxy (requires Anthropic key)
+        const anthropicKey = localStorage.getItem('anthropicApiKey');
+        if (!anthropicKey) {
+          throw new Error('Worker proxy requires Anthropic API key. Set USE_DIRECT_API=true to use Bedrock.');
+        }
+        const finalResponse = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': anthropicKey,
+          },
+          body: JSON.stringify(finalRequest),
+        });
 
-      if (finalResponse.ok) {
-        const finalData = await finalResponse.json();
+        if (!finalResponse.ok) {
+          const errorData = await finalResponse.json();
+          throw new Error(errorData.error || `API request failed (${finalResponse.status})`);
+        }
 
+        finalData = await finalResponse.json();
+      }
+
+      if (finalData) {
         console.log('[Analysis Engine] API Response:', {
           stop_reason: finalData.stop_reason,
           content_blocks: finalData.content?.length || 0,
@@ -339,21 +358,16 @@ async function callAnthropicAPI(
             progressCallback(3, 'completed', 'Streamlined overview report completed successfully', 100);
           }
 
-          // Cache the result with metadata
-          const { startDate, endDate } = dashboardData;
-          cacheAnalysisResult(finalAnalysis, currentDashboardHash, { startDate, endDate });
+          // Cache the result
+          cacheAnalysisResult(finalAnalysis, currentDashboardHash);
           return finalAnalysis;
         }
-      } else {
-        const errorData = await finalResponse.json();
-        throw new Error(errorData.error || `API request failed (${finalResponse.status})`);
       }
     }
 
     // Fallback result
     const result = 'Analysis completed successfully. Multiple insights were discovered across different data facets.';
-    const { startDate, endDate } = dashboardData;
-    cacheAnalysisResult(result, currentDashboardHash, { startDate, endDate });
+    cacheAnalysisResult(result, currentDashboardHash);
     return result;
   } catch (error) {
     console.error('[Analysis Engine] Error in API call:', error);

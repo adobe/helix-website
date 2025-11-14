@@ -3,9 +3,7 @@
  */
 import { uploadToDA, getCurrentAnalyzedUrl, fetchReportsFromDA } from './da-upload.js';
 import { updateButtonState } from './modal-ui.js';
-import { showReportInline, checkForSharedReport } from './report-viewer/report-viewer.js';
 import cleanupMetricsParameter from './cleanup-utils.js';
-import { getCachedMetadata } from './core/cache-manager.js';
 
 const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
@@ -151,6 +149,8 @@ function addReportToDateRangePicker(result) {
     await updateNotificationBadge();
 
     // Show the report with date as URL parameter
+    // eslint-disable-next-line import/no-cycle
+    const { showReportInline } = await import('./report-viewer/report-viewer.js');
     showReportInline(result.path, displayName);
   };
 
@@ -174,6 +174,8 @@ export async function initializeSavedReports() {
     const allReports = await getSavedReports();
 
     // Check for shared report immediately (reuse fetched reports)
+    // eslint-disable-next-line import/no-cycle
+    const { checkForSharedReport } = await import('./report-viewer/report-viewer.js');
     await checkForSharedReport(() => Promise.resolve(allReports));
 
     const filteredReports = filterReportsByWeek(allReports);
@@ -213,12 +215,10 @@ function closeModalAndOpenDropdown() {
 async function handleSaveReport(button, reportContent) {
   updateButtonState(button, true, 'Saving Report...');
   try {
-    // Get date range metadata from cache
-    const dateRange = getCachedMetadata() || {};
+    // Upload report (dates automatically included from URL)
     await uploadToDA(reportContent, {
       url: getCurrentAnalyzedUrl(),
       debug: true,
-      dateRange,
     });
     updateButtonState(button, true, 'Report Saved Successfully!');
     await initializeSavedReports();

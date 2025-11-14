@@ -208,14 +208,14 @@ function formatDates(timestamp) {
 
 /**
  * Generate complete HTML report
+ * Date range is automatically included from current URL parameters
  * @param {string} content
  * @param {string} url
  * @param {string} timestamp
  * @param {boolean} isDeepMode
- * @param {Object} dateRange - Date range metadata {startDate, endDate}
  * @returns {Promise<string>} Complete HTML document
  */
-async function generateReportHTML(content, url, timestamp, isDeepMode, dateRange = {}) {
+async function generateReportHTML(content, url, timestamp, isDeepMode) {
   const template = await loadTemplate();
   const reportId = `RPT-${Date.now().toString(36).toUpperCase()}`;
   const { date, timestamp: formattedTimestamp } = formatDates(timestamp);
@@ -225,11 +225,11 @@ async function generateReportHTML(content, url, timestamp, isDeepMode, dateRange
   console.log('[DA Upload] Table content length:', tableContent.length);
 
   // Convert data-attribute spans to actual clickable links
-  // Pass date range so links include the report's time period
+  // Convert spans to links (date range automatically included from URL)
   try {
     const originalLength = tableContent.length;
-    tableContent = convertSpansToLinks(tableContent, dateRange);
-    console.log('[DA Upload] Converted spans to links with date range:', dateRange);
+    tableContent = convertSpansToLinks(tableContent);
+    console.log('[DA Upload] Converted spans to links (dates from URL)');
     console.log('[DA Upload] Length before:', originalLength, 'after:', tableContent.length);
 
     // Safety check: if conversion resulted in empty/corrupted content, use original
@@ -252,11 +252,15 @@ async function generateReportHTML(content, url, timestamp, isDeepMode, dateRange
     .replace(/{{ANALYSIS_CONTENT}}/g, tableContent)
     .replace(/{{GENERATED_TIMESTAMP}}/g, formattedTimestamp);
 
-  // Inject date range meta tags if available
-  if (dateRange.startDate && dateRange.endDate) {
+  // Inject date range meta tags from URL (always present now)
+  const urlParams = new URL(window.location.href).searchParams;
+  const startDate = urlParams.get('startDate');
+  const endDate = urlParams.get('endDate');
+
+  if (startDate && endDate) {
     const metaTags = `
-    <meta name="report-start-date" content="${dateRange.startDate}">
-    <meta name="report-end-date" content="${dateRange.endDate}">`;
+    <meta name="report-start-date" content="${startDate}">
+    <meta name="report-end-date" content="${endDate}">`;
     html = html.replace('</head>', `${metaTags}\n</head>`);
   }
 
@@ -269,15 +273,15 @@ async function generateReportHTML(content, url, timestamp, isDeepMode, dateRange
 
 /**
  * Upload analysis report to DA storage
+ * Date range is automatically included from current URL parameters
  * @param {string} content - Report content (HTML)
  * @param {Object} options
  * @param {string} options.url - URL being analyzed
  * @param {boolean} options.debug - Enable debug logging
- * @param {Object} options.dateRange - Date range {startDate, endDate}
  * @returns {Promise<Object>} Upload result
  */
 export async function uploadToDA(content, options = {}) {
-  const { url = '', debug = false, dateRange = {} } = options;
+  const { url = '', debug = false } = options;
 
   if (!content?.trim()) {
     throw new Error('No content to upload');
@@ -288,13 +292,10 @@ export async function uploadToDA(content, options = {}) {
     const timestamp = new Date().toISOString();
 
     if (debug) {
-      console.log('[DA Upload] Generating HTML...');
-      if (dateRange.startDate && dateRange.endDate) {
-        console.log('[DA Upload] Including date range:', `${dateRange.startDate} to ${dateRange.endDate}`);
-      }
+      console.log('[DA Upload] Generating HTML with dates from URL...');
     }
 
-    const htmlContent = await generateReportHTML(content, url, timestamp, isDeepMode, dateRange);
+    const htmlContent = await generateReportHTML(content, url, timestamp, isDeepMode);
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const formData = new FormData();
     formData.append('data', blob);

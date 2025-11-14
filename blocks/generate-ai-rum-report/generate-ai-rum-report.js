@@ -49,29 +49,53 @@ function setupCloseHandlers(modal) {
 function setupGenerateButton(modal) {
   const generateBtn = modal.querySelector('#report-generate-btn');
   const apiKeyInput = modal.querySelector('#report-api-key');
+  const bedrockTokenInput = modal.querySelector('#report-bedrock-token');
   const statusDiv = modal.querySelector('#report-status');
+  const providerNameSpan = modal.querySelector('#provider-name');
+
+  // Update provider name if span exists
+  if (providerNameSpan) {
+    import('./api/api-factory.js').then(({ getProviderName }) => {
+      providerNameSpan.textContent = getProviderName();
+    });
+  }
 
   generateBtn?.addEventListener('click', async () => {
     const apiKey = apiKeyInput.value.trim();
+    const bedrockToken = bedrockTokenInput.value.trim();
 
-    // Validate API key
-    if (!apiKey) {
-      showStatus(statusDiv, 'error', '❌ Please enter a valid API key');
+    // Validate at least one credential is provided
+    if (!apiKey && !bedrockToken) {
+      showStatus(statusDiv, 'error', '❌ Please enter either Anthropic API key or AWS Bedrock token');
       return;
     }
 
-    // Save API key if not already saved
+    // Save credentials if not already saved
     const existingApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
-    if (!existingApiKey) {
-      localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-      apiKeyInput.disabled = true;
+    const existingBedrockToken = localStorage.getItem('awsBedrockToken');
+
+    if ((!existingApiKey && apiKey) || (!existingBedrockToken && bedrockToken)) {
+      if (apiKey && !existingApiKey) {
+        localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
+        apiKeyInput.disabled = true;
+      }
+      if (bedrockToken && !existingBedrockToken) {
+        localStorage.setItem('awsBedrockToken', bedrockToken);
+        bedrockTokenInput.disabled = true;
+      }
       generateBtn.textContent = '📊 Generate Report';
-      showStatus(statusDiv, 'success', '✅ API key saved successfully!');
+      showStatus(statusDiv, 'success', '✅ API credentials saved successfully!');
+      // Update provider name
+      if (providerNameSpan) {
+        import('./api/api-factory.js').then(({ getProviderName }) => {
+          providerNameSpan.textContent = getProviderName();
+        });
+      }
       return;
     }
 
-    // Generate report
-    await generateReport(apiKey, statusDiv, generateBtn, modal);
+    // Generate report (apiKey param is kept for backwards compatibility but not used directly)
+    await generateReport(apiKey || 'using-factory', statusDiv, generateBtn, modal);
   });
 }
 

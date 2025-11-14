@@ -22,15 +22,18 @@ function createModalHeader() {
  * @param {boolean} hasApiKey
  * @returns {HTMLElement}
  */
-function createModalBody(hasApiKey) {
+function createModalBody() {
   const body = document.createElement('div');
   body.className = 'report-modal-body';
 
-  const apiKey = localStorage.getItem('anthropicApiKey') || '';
-  const buttonText = hasApiKey ? 'Generate Report' : 'Save Key & Generate';
-  const infoText = hasApiKey
-    ? 'Your API key is saved. Click "Generate Report" to start the analysis.'
-    : 'Enter your Anthropic API key to generate a comprehensive report of your site data.';
+  const anthropicKey = localStorage.getItem('anthropicApiKey') || '';
+  const bedrockToken = localStorage.getItem('awsBedrockToken') || '';
+  const hasAnyKey = anthropicKey || bedrockToken;
+
+  const buttonText = hasAnyKey ? 'Generate Report' : 'Save Key & Generate';
+  const infoText = hasAnyKey
+    ? 'Your API credentials are saved. Click "Generate Report" to start the analysis.'
+    : 'Enter your API credentials to generate a comprehensive report of your site data.';
 
   body.innerHTML = `
     <div class="report-form-group">
@@ -40,8 +43,21 @@ function createModalBody(hasApiKey) {
           type="password"
           id="report-api-key"
           placeholder="sk-ant-..."
-          value="${apiKey}"
-          ${hasApiKey ? 'disabled' : ''}
+          value="${anthropicKey}"
+          ${anthropicKey ? 'disabled' : ''}
+        >
+      </div>
+    </div>
+
+    <div class="report-form-group">
+      <label for="report-bedrock-token">AWS Bedrock Token (Optional - takes priority if provided)</label>
+      <div class="report-quick-filter">
+        <input
+          type="password"
+          id="report-bedrock-token"
+          placeholder="AWS Bearer Token..."
+          value="${bedrockToken}"
+          ${bedrockToken ? 'disabled' : ''}
         >
       </div>
     </div>
@@ -52,6 +68,7 @@ function createModalBody(hasApiKey) {
 
     <div class="report-info">
       <p>${infoText}</p>
+      ${hasAnyKey ? '<p style="font-size: 12px; opacity: 0.8;">Provider: <span id="provider-name">Checking...</span></p>' : ''}
     </div>
 
     <div id="report-status" style="display: none;"></div>

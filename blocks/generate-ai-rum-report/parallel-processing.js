@@ -173,30 +173,53 @@ async function processBatch(
       temperature: API_CONFIG.TEMPERATURE,
     };
 
-    const response = await fetch(API_CONFIG.ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-      },
-      body: JSON.stringify(request),
-    });
+    let data;
+    // Auto-detect which API to use based on available credentials
+    const anthropicKey = localStorage.getItem('anthropicApiKey');
+    const bedrockToken = localStorage.getItem('awsBedrockToken');
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      const error = errorText.includes('524')
-        ? 'Timeout - analysis took too long'
-        : `HTTP ${response.status}`;
-      throw new Error(error);
+    if (anthropicKey) {
+      // Use Worker proxy with Anthropic key
+      const response = await fetch(API_CONFIG.ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicKey,
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => '');
+        const error = errorText.includes('524')
+          ? 'Timeout - analysis took too long'
+          : `HTTP ${response.status}`;
+        throw new Error(error);
+      }
+
+      data = await response.json();
+    } else if (bedrockToken) {
+      // Use API Factory (Bedrock or Anthropic Direct)
+      const { callAI } = await import('./api/api-factory.js');
+      data = await callAI(request);
+    } else {
+      return {
+        batchId: batch.id, toolName, analysis: '', success: false, error: 'No API credentials',
+      };
     }
 
-    const data = await response.json();
-
-    if (!data.content?.length) {
+    if (!data?.content?.length) {
       return {
         batchId: batch.id, toolName, analysis: '', success: false, error: 'No content',
       };
     }
+
+    // Debug: Log what the AI returned
+    console.log(`[${toolName}] AI response content blocks:`, data.content.map((item) => ({
+      type: item.type,
+      hasText: item.type === 'text' ? !!item.text : undefined,
+      hasToolUse: item.type === 'tool_use' ? item.name : undefined,
+    })));
 
     let analysis = '';
     const toolCalls = [];
@@ -249,17 +272,28 @@ async function processBatch(
         temperature: API_CONFIG.TEMPERATURE,
       };
 
-      const followUpResponse = await fetch(API_CONFIG.ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-        },
-        body: JSON.stringify(followUpRequest),
-      });
+      let followUpData;
+      if (anthropicKey) {
+        // Use Worker proxy with Anthropic key
+        const followUpResponse = await fetch(API_CONFIG.ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': anthropicKey,
+          },
+          body: JSON.stringify(followUpRequest),
+        });
 
-      if (followUpResponse.ok) {
-        const followUpData = await followUpResponse.json();
+        if (followUpResponse.ok) {
+          followUpData = await followUpResponse.json();
+        }
+      } else if (bedrockToken) {
+        // Use API Factory (Bedrock or Anthropic Direct)
+        const { callAI } = await import('./api/api-factory.js');
+        followUpData = await callAI(followUpRequest);
+      }
+
+      if (followUpData) {
         analysis = '';
         followUpData.content.forEach((item) => {
           if (item.type === 'text' && item.text.trim()) {
@@ -297,10 +331,9 @@ async function processBatch(
  * Perform follow-up analysis on batch results
  * @param {Array} analyses
  * @param {string} systemPrompt
- * @param {string} apiKey
  * @returns {Promise<string|null>} Follow-up analysis
  */
-async function performFollowUpAnalysis(analyses, systemPrompt, apiKey) {
+async function performFollowUpAnalysis(analyses, systemPrompt) {
   if (analyses.length === 0) return null;
 
   console.log('[Follow-up] Generating comprehensive insights...');
@@ -321,24 +354,39 @@ Analyze the findings and provide substantial insights covering:
 Provide comprehensive analysis with specific details and actionable insights.`;
 
   try {
-    const response = await fetch(API_CONFIG.ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-      },
-      body: JSON.stringify({
-        model: API_CONFIG.MODEL,
-        max_tokens: API_CONFIG.FOLLOWUP_MAX_TOKENS,
-        messages: [{ role: 'user', content }],
-        system: systemPrompt,
-        temperature: API_CONFIG.FOLLOWUP_TEMPERATURE,
-      }),
-    });
+    const request = {
+      model: API_CONFIG.MODEL,
+      max_tokens: API_CONFIG.FOLLOWUP_MAX_TOKENS,
+      messages: [{ role: 'user', content }],
+      system: systemPrompt,
+      temperature: API_CONFIG.FOLLOWUP_TEMPERATURE,
+    };
 
-    if (!response.ok) return null;
+    let data;
+    // Auto-detect which API to use based on available credentials
+    const anthropicKey = localStorage.getItem('anthropicApiKey');
+    const bedrockToken = localStorage.getItem('awsBedrockToken');
 
-    const data = await response.json();
+    if (anthropicKey) {
+      // Use Worker proxy with Anthropic key
+      const response = await fetch(API_CONFIG.ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': anthropicKey,
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) return null;
+      data = await response.json();
+    } else if (bedrockToken) {
+      // Use API Factory (Bedrock or Anthropic Direct)
+      const { callAI } = await import('./api/api-factory.js');
+      data = await callAI(request);
+    } else {
+      return null; // No credentials available
+    }
 
     if (!data.content?.length) return null;
 
@@ -413,9 +461,17 @@ export async function processParallelBatches(
     }
   };
 
-  // Process ALL metrics in parallel (one per batch)
-  const results = await Promise.all(
-    batches.map(async (batch) => {
+  // Check which API is being used
+  const anthropicKey = localStorage.getItem('anthropicApiKey');
+  const bedrockToken = localStorage.getItem('awsBedrockToken');
+  const usingBedrock = !anthropicKey && bedrockToken;
+
+  let results;
+  if (usingBedrock) {
+    // Bedrock has strict rate limits - process sequentially
+    console.log('[Parallel] Using Bedrock - processing sequentially to avoid rate limits');
+    results = await batches.reduce(async (prevPromise, batch) => {
+      const acc = await prevPromise;
       const result = await processBatch(
         batch,
         message,
@@ -428,9 +484,34 @@ export async function processParallelBatches(
       completedBatches += 1;
       updateProgress();
 
-      return result;
-    }),
-  );
+      // Add small delay between requests to avoid rate limits
+      if (completedBatches < batches.length) {
+        await new Promise((resolve) => { setTimeout(resolve, 500); });
+      }
+
+      return [...acc, result];
+    }, Promise.resolve([]));
+  } else {
+    // Worker proxy or Anthropic Direct - process in parallel
+    console.log('[Parallel] Using Worker/Anthropic - processing in parallel');
+    results = await Promise.all(
+      batches.map(async (batch) => {
+        const result = await processBatch(
+          batch,
+          message,
+          dashboardData,
+          systemPrompt,
+          apiKey,
+          toolHandler,
+        );
+
+        completedBatches += 1;
+        updateProgress();
+
+        return result;
+      }),
+    );
+  }
 
   // Collect successful analyses
   const successful = results
@@ -453,7 +534,7 @@ export async function processParallelBatches(
       progressCallback(2, 'in-progress', 'Synthesizing comprehensive insights...', 85);
     }
 
-    followUp = await performFollowUpAnalysis(successful, systemPrompt, apiKey);
+    followUp = await performFollowUpAnalysis(successful, systemPrompt);
 
     if (progressCallback && followUp) {
       progressCallback(2, 'in-progress', 'Analysis complete', 100);

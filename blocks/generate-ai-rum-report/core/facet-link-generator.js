@@ -91,12 +91,11 @@ export function buildFacetInfoSection(dashboardData) {
  * @param {boolean} options.preserveExisting - Keep existing URL params (default: false)
  * @param {string} options.nestedFacet - Nested facet name (e.g., 'cwv-lcp.source')
  * @param {string} options.nestedValue - Nested facet value (e.g., 'img')
- * @param {Object} options.dateRange - Date range to include {startDate, endDate}
  * @returns {string} Dashboard URL with facet parameter(s)
  */
 function generateFacetLink(facetName, facetValue, options = {}) {
   const {
-    preserveExisting = false, nestedFacet, nestedValue, dateRange,
+    preserveExisting = false, nestedFacet, nestedValue,
   } = options;
 
   // Build search params instead of full URL to make links relative
@@ -114,19 +113,12 @@ function generateFacetLink(facetName, facetValue, options = {}) {
       }
     });
 
-    // Add date range from report metadata (takes precedence over current URL)
-    if (dateRange?.startDate && dateRange?.endDate) {
-      params.set('startDate', dateRange.startDate);
-      params.set('endDate', dateRange.endDate);
-      params.set('view', 'custom');
-    } else {
-      // Fall back to current URL params if no date range provided
-      ['view', 'startDate', 'endDate'].forEach((param) => {
-        if (currentParams.has(param)) {
-          params.set(param, currentParams.get(param));
-        }
-      });
-    }
+    // Preserve date range and view from current URL (always present now)
+    ['view', 'startDate', 'endDate'].forEach((param) => {
+      if (currentParams.has(param)) {
+        params.set(param, currentParams.get(param));
+      }
+    });
   } else {
     // Preserve all existing params
     const currentParams = new URL(window.location.href).searchParams;
@@ -163,11 +155,11 @@ function generateFacetLink(facetName, facetValue, options = {}) {
 /**
  * Convert data-attribute spans to actual clickable links in HTML
  * This makes links work in the uploaded DA report without client-side JS
+ * Date range is automatically included from the current URL parameters
  * @param {string} htmlContent - HTML content with data-attribute spans
- * @param {Object} dateRange - Date range metadata {startDate, endDate}
  * @returns {string} HTML with actual <a> links
  */
-export function convertSpansToLinks(htmlContent, dateRange = {}) {
+export function convertSpansToLinks(htmlContent) {
   // If no content or no spans to convert, return original
   if (!htmlContent || !htmlContent.includes('data-facet')) {
     return htmlContent;
@@ -202,11 +194,10 @@ export function convertSpansToLinks(htmlContent, dateRange = {}) {
     const nestedFacet = element.getAttribute('data-nested-facet');
     const nestedValue = element.getAttribute('data-nested-value');
 
-    // Generate link URL with date range
+    // Generate link URL (dates automatically included from current URL)
     const linkUrl = generateFacetLink(facetName, facetValue, {
       nestedFacet,
       nestedValue,
-      dateRange,
     });
 
     // Create anchor element

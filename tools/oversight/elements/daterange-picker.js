@@ -350,8 +350,8 @@ export default class DateRangePicker extends HTMLElement {
 
     if (value === 'week') {
       if (!fromElement.value) {
-        const lastWeek = now;
-        lastWeek.setHours(-7 * 24, 0, 0, 0);
+        const lastWeek = new Date(now);
+        lastWeek.setDate(now.getDate() - 7);
         fromElement.value = toDateString(lastWeek);
       }
       if (!toElement.value) {
@@ -359,7 +359,7 @@ export default class DateRangePicker extends HTMLElement {
       }
     } else if (value === 'month') {
       if (!fromElement.value) {
-        const lastMonth = now;
+        const lastMonth = new Date(now);
         lastMonth.setMonth(now.getMonth() - 1);
         fromElement.value = toDateString(lastMonth);
       }
@@ -368,7 +368,7 @@ export default class DateRangePicker extends HTMLElement {
       }
     } else if (value === 'year') {
       if (!fromElement.value) {
-        const lastYear = now;
+        const lastYear = new Date(now);
         lastYear.setFullYear(now.getFullYear() - 1);
         fromElement.value = toDateString(lastYear);
       }
