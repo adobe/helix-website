@@ -49,7 +49,9 @@ Skills will be added to `.claude/skills/` as needed for this project. Check the 
 
 ## Project Overview
 
-This project is based on the https://github.com/adobe/aem-boilerplate/ project and set up as a new project. You are expected to follow the coding style and practices established in the boilerplate, but add functionality according to the needs of the site currently developed.
+This project is **migrating the Bank of America "About" site** (https://about.bankofamerica.com/en) to Adobe Experience Manager (AEM) Edge Delivery Services. The original site serves as the source for content, design, and functionality that needs to be recreated using AEM's architecture.
+
+This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, while recreating the blocks and functionality from the source site to match its design and user experience.
 
 The repository provides the basic structure, blocks, and configuration needed to run a complete site with `*.aem.live` as the backend.
 
@@ -63,8 +65,7 @@ The repository provides the basic structure, blocks, and configuration needed to
 ## Setup Commands
 
 - Install dependencies: `npm install`
-- Start local development: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs` (run in background, if possible)
-  - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
+- Start local dev server, See "Local development" below
 - Run linting: `npm run lint`
 - Fix linting issues: `npm run lint:fix`
 
@@ -119,9 +120,9 @@ CMS authored content is a key part of every AEM Website. The content of a page i
 **For development workflow:** Use the **content-driven-development** skill for all development tasks. This skill ensures you identify or create test content before writing code, following AEM best practices.
 
 **Quick tips:**
-- Inspect page structure: `curl http://localhost:3000/path/to/page`
+- Inspect initial page structure: `curl http://localhost:3000/path/to/page`
 - View source markdown: `curl http://localhost:3000/path/to/page.md`
-- Local test content: Use `--html-folder drafts` flag when starting dev server
+- Local test content: Use `--html-folder drafts` flag when starting dev server. Note: the folder is still part of the path when using this option. Ex: a file at `drafts/test.html` would be accessed at `http://localhost:3000/drafts/test`
 
 ### Blocks
 
@@ -130,7 +131,7 @@ Blocks are the re-usable building blocks of AEM. Blocks add styling and function
 **Key principle:** The initial content structure is the contract between authors and developers. Design this structure before writing any code, and be careful when making changes that could break existing pages.
 
 **For creating or modifying blocks:** Use the **building-blocks** skill which guides you through:
-- Content model design (via content-driven-development)
+- Content model design (via the content-driven-development skill)
 - JavaScript decoration patterns
 - CSS styling conventions
 - Testing and validation
@@ -157,8 +158,12 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 3. Validation and testing (invokes testing-blocks skill)
 
 ### Local Development
-1. Run `npx -y @adobe/aem-cli up --no-open` to start the AEM Proxy server
-2. Open `http://localhost:3000` in your browser, puppeteer, playwright, or other tools. If none of those are available, instruct the human to open the URL in the browser and give feedback
+1. Run `aem up --no-open --forward-browser-logs` to start the AEM Proxy server
+  - Run in background if possible
+  - Requires AEM CLI installed globally: `npm install -g @adobe/aem-cli`
+  - Alternative: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs
+  - **IMPORTANT for agents:** Starting the dev server in a sandbox will likely fail, use `dangerouslyDisableSandbox: true` or equivlent to run this outside the sandbox
+2. Open `http://localhost:3000` in your browser, playwright, or other tools. If none of those are available, instruct the human to open the URL in the browser and give feedback
 3. Make changes to files - they will auto-reload
 4. Use browser dev tools to test responsive design
 
@@ -172,7 +177,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 
 **For comprehensive testing guidance:** Use the **testing-blocks** skill which covers:
 - Unit testing for logic-heavy utilities
-- Browser testing with Playwright/Puppeteer
+- Browser testing with Playwright
 - Linting and code quality
 - Performance validation
 - PR preparation
@@ -192,15 +197,15 @@ For all other environments, you need to know the GitHub owner and repository nam
 
 With this information, you can construct URLs for the preview environment (same content as `localhost:3000`) and the production environment (same content as the live website, approved by authors)
 
-- **Production Preview**: `https://main--{repo}--{owner}.aem.page/`
-- **Production Live**: `https://main--{repo}--{owner}.aem.live/`
-- **Feature Preview**: `https://{branch}--{repo}--{owner}.aem.page/`
+- **Production Preview**: `https://main--about-boa--aemsites.aem.page/`
+- **Production Live**: `https://main--about-boa--aemsites.aem.live/`
+- **Feature Preview**: `https://{branch}--about-boa--aemsites.aem.page/`
 
 ### Publishing Process
 1. Push changes to a feature branch
 2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
 3. Open a pull request to merge changes to `main`
-   - **REQUIRED:** Include preview link in PR description: `https://{branch}--{repo}--{owner}.aem.page/{path}`
+   - **REQUIRED:** Include preview link in PR description: `https://{branch}--about-boa--aemsites.aem.page/{path}`
    - This link is used for automated performance testing (PSI checks)
    - Without this link, your PR will be rejected
 4. Verify checks pass: `gh checks` or `gh pr checks --watch`
