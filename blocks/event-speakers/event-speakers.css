@@ -1,0 +1,211 @@
+.event-speakers {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.event-speakers h2 {
+  font-size: 3rem;
+  font-weight: 900;
+  color: inherit;
+  margin: 0 0 40px;
+  line-height: 1.1;
+}
+
+.event-speakers .speakers-carousel-wrapper {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.event-speakers .speakers-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 10px 0 20px;
+}
+
+.event-speakers .speakers-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.event-speakers .speaker-card {
+  flex: 0 0 220px;
+  position: relative;
+  transition: transform 0.3s ease;
+  align-self: flex-start;
+}
+
+/* Odd cards (1, 3, 5...) - Large, portrait aspect ratio */
+.event-speakers .speaker-card:nth-child(odd) img {
+  width: 220px;
+  height: 276px;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  border-radius: 0.5rem;
+}
+
+/* Even cards (2, 4, 6...) - Small, square */
+.event-speakers .speaker-card:nth-child(even) img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  border-radius: 0.5rem;
+}
+
+.event-speakers .speaker-info {
+  margin-top: 20px;
+}
+
+.event-speakers .speaker-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+.event-speakers .speaker-title {
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.4;
+  margin: 0 0 4px;
+}
+
+.event-speakers .speaker-company {
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.event-speakers .carousel-nav {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  z-index: 10;
+  transition: box-shadow 0.2s;
+}
+
+.event-speakers .carousel-nav:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+}
+
+.event-speakers .carousel-nav.prev {
+  left: -25px;
+}
+
+.event-speakers .carousel-nav.next {
+  right: -25px;
+}
+
+.event-speakers .carousel-nav svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.event-speakers .carousel-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Use site default button styles - no custom styling needed */
+
+/* Responsive */
+@media (width <= 1024px) {
+  .event-speakers .speaker-card {
+    flex: 0 0 200px;
+  }
+
+  .event-speakers .speaker-card:nth-child(odd) img {
+    width: 200px;
+    height: 251px;
+    border-radius: 0.5rem;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) img {
+    width: 200px;
+    height: 200px;
+    border-radius: 0.5rem;
+  }
+
+  .event-speakers .carousel-nav.prev {
+    left: -15px;
+  }
+
+  .event-speakers .carousel-nav.next {
+    right: -15px;
+  }
+}
+
+@media (width <= 768px) {
+  .event-speakers h2 {
+    font-size: 2rem;
+  }
+
+  .event-speakers .speaker-card {
+    flex: 0 0 180px;
+  }
+
+  .event-speakers .speaker-card:nth-child(odd) img {
+    width: 180px;
+    height: 226px;
+    border-radius: 0.5rem;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) img {
+    width: 180px;
+    height: 180px;
+    border-radius: 0.5rem;
+  }
+
+  .event-speakers .carousel-nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .event-speakers .carousel-nav.prev {
+    left: 0;
+  }
+
+  .event-speakers .carousel-nav.next {
+    right: 0;
+  }
+}
+
+@media (width <= 480px) {
+  .event-speakers .speaker-card {
+    flex: 0 0 160px;
+  }
+
+  .event-speakers .speaker-card:nth-child(odd) img {
+    width: 160px;
+    height: 201px;
+    border-radius: 0.5rem;
+  }
+
+  .event-speakers .speaker-card:nth-child(even) img {
+    width: 160px;
+    height: 160px;
+    border-radius: 0.5rem;
+  }
+}
+

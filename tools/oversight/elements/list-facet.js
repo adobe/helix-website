@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-import { utils, stats } from '@adobe/rum-distiller';
+import { stats, utils } from '@adobe/rum-distiller';
 import { escapeHTML } from '../utils.js';
 
 const { computeConversionRate, scoreCWV } = utils;
@@ -105,13 +105,20 @@ export default class ListFacet extends HTMLElement {
     const facetEntries = this.dataChunks.facets[facetName];
     const enabled = !this.closest('facet-sidebar[aria-disabled="true"]');
 
-    const sort = this.getAttribute('sort') || 'count';
+    const [sortMetric, sortProperty] = (this.getAttribute('sort') || 'weight').split('.');
 
-    const optionKeys = facetEntries.map((f) => f.value)
+    const optionKeys = facetEntries
       .sort((a, b) => {
-        if (sort === 'count') return 0; // keep the order
-        return a.localeCompare(b);
-      });
+        if (sortMetric === 'count') return 0; // keep the default order from distiller
+        if (sortMetric === 'weight') return b.weight - a.weight; // order by weight, aka number of page views
+        if (sortMetric === 'value') return a.value.localeCompare(b.value);
+        // get metric and property (e.g. lcp.mean)
+        const aNum = a.metrics[sortMetric][sortProperty];
+        const bNum = b.metrics[sortMetric][sortProperty];
+        return bNum - aNum;
+      })
+      // we only care about the value, not the full object
+      .map((f) => f.value);
 
     const url = new URL(window.location);
     const drilldownAtt = this.getAttribute('drilldown');
@@ -206,7 +213,10 @@ export default class ListFacet extends HTMLElement {
 
       const paint = (start = 0, end = numOptions) => {
         const entries = facetEntries
-          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value));
+          .filter((entry) => !filterKeys || filteredKeys.includes(entry.value))
+          .sort(
+            ({ value: a }, { value: b }) => filteredKeys.indexOf(a) - filteredKeys.indexOf(b),
+          );
         const prefix = entries.slice(start, end)
           .map((entry) => entry.value)
           .reduce((acc, entry) => {

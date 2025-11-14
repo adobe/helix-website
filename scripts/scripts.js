@@ -617,7 +617,9 @@ export function loadBlogData() {
   fetch(`/query-index.json?offset=${offset}`)
     .then((response) => response.json())
     .then((responseJson) => {
-      window.blogindex.data = responseJson?.data?.filter((entry) => entry.path.startsWith('/blog/')) || [];
+      window.blogindex.data = responseJson?.data
+        ?.filter((entry) => entry.path.startsWith('/blog/'))
+        ?.filter((entry) => entry.path !== '/blog/archive') || [];
       window.blogindex.loaded = true;
       const event = new Event('dataset-ready');
       document.dispatchEvent(event);

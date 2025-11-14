@@ -1,13 +1,11 @@
 // eslint-disable-next-line import/no-unresolved
-import { SankeyController, Flow } from 'chartjs-chart-sankey';
+import { Flow, SankeyController } from 'chartjs-chart-sankey';
 // eslint-disable-next-line import/no-unresolved
 import { Chart, registerables } from 'chartjs';
 // eslint-disable-next-line import/no-unresolved
 import { utils } from '@adobe/rum-distiller';
+import { cssVariable, parseConversionSpec } from '../utils.js';
 import AbstractChart from './chart.js';
-import {
-  cssVariable, parseConversionSpec,
-} from '../utils.js';
 
 const { classifyAcquisition, reclassifyAcquisition } = utils;
 
@@ -385,7 +383,7 @@ const stages = [
       detect: (bundle) => bundle.events
         .filter((e) => e.checkpoint === 'click')
         .filter((e) => !!e.target)
-        .filter((e) => new URL(e.target).hostname === new URL(bundle.url).hostname)
+        .filter((e) => new URL(e.target, bundle.url).hostname === new URL(bundle.url).hostname)
         .length > 0,
     },
   },

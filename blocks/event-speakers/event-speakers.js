@@ -1,0 +1,255 @@
+function createSpeakerCard(speaker) {
+  const card = document.createElement('div');
+  card.className = 'speaker-card';
+
+  const name = `${speaker.first_name} ${speaker.last_name}`;
+
+  // Parse title - only keep the part before the first comma
+  const fullTitle = speaker.title || '';
+  const title = fullTitle.split(',')[0].trim();
+
+  const imageUrl = speaker.picture?.thumbnail_url || speaker.picture?.url || '';
+
+  // Build the title/company HTML with separate lines
+  let titleHtml = title ? `<p class="speaker-title">${title}</p>` : '';
+  if (speaker.company) {
+    titleHtml += `<p class="speaker-company">${speaker.company}</p>`;
+  }
+
+  card.innerHTML = `
+    <img src="${imageUrl}" alt="${name}" loading="lazy">
+    <div class="speaker-info">
+      <h3 class="speaker-name">${name}</h3>
+      ${titleHtml}
+    </div>
+  `;
+
+  return card;
+}
+
+function createCarouselNav() {
+  const prevButton = document.createElement('button');
+  prevButton.className = 'carousel-nav prev';
+  prevButton.setAttribute('aria-label', 'Previous speakers');
+  prevButton.innerHTML = `
+    <svg viewBox="0 0 24 24">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  `;
+
+  const nextButton = document.createElement('button');
+  nextButton.className = 'carousel-nav next';
+  nextButton.setAttribute('aria-label', 'Next speakers');
+  nextButton.innerHTML = `
+    <svg viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  `;
+
+  return { prevButton, nextButton };
+}
+
+function setupCarouselNavigation(carousel, prevButton, nextButton) {
+  // Calculate scroll amount based on card width + gap
+  // Each scroll should show approximately 4 cards
+  const cardWidth = 220;
+  const gap = 20;
+  const cardsToScroll = 4;
+  const scrollAmount = (cardWidth + gap) * cardsToScroll;
+
+  prevButton.addEventListener('click', () => {
+    carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  });
+
+  nextButton.addEventListener('click', () => {
+    carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  });
+
+  // Update button states based on scroll position
+  function updateNavButtons() {
+    const isAtStart = carousel.scrollLeft <= 0;
+    const isAtEnd = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10;
+
+    prevButton.disabled = isAtStart;
+    nextButton.disabled = isAtEnd;
+  }
+
+  carousel.addEventListener('scroll', updateNavButtons);
+
+  // Wait for images to load before checking button states
+  const images = carousel.querySelectorAll('img');
+  if (images.length > 0) {
+    let loadedCount = 0;
+    const checkAllLoaded = () => {
+      loadedCount += 1;
+      if (loadedCount === images.length) {
+        updateNavButtons();
+      }
+    };
+
+    images.forEach((img) => {
+      if (img.complete) {
+        checkAllLoaded();
+      } else {
+        img.addEventListener('load', checkAllLoaded);
+        img.addEventListener('error', checkAllLoaded); // Still check even if image fails
+      }
+    });
+  } else {
+    // No images, check immediately
+    setTimeout(updateNavButtons, 100);
+  }
+}
+
+function reorderSpeakers(speakers, priorityNames) {
+  if (!priorityNames || priorityNames.length === 0) {
+    return speakers;
+  }
+
+  // Normalize priority names for matching (lowercase, trim)
+  const normalizedPriority = priorityNames.map((name) => name.toLowerCase().trim());
+
+  const prioritySpeakers = [];
+  const remainingSpeakers = [];
+
+  // Split speakers into priority and remaining
+  speakers.forEach((speaker) => {
+    const fullName = `${speaker.first_name} ${speaker.last_name}`.toLowerCase();
+    const matchIndex = normalizedPriority.findIndex(
+      (priorityName) => fullName.includes(priorityName) || priorityName.includes(fullName),
+    );
+
+    if (matchIndex !== -1) {
+      prioritySpeakers[matchIndex] = speaker;
+    } else {
+      remainingSpeakers.push(speaker);
+    }
+  });
+
+  // Filter out undefined entries and combine with remaining
+  return [...prioritySpeakers.filter(Boolean), ...remainingSpeakers];
+}
+
+export default async function decorate(block) {
+  // Get the content div (first div in block, standard pattern)
+  const content = block.querySelector('div');
+  if (!content) return;
+
+  // Extract heading and speaker order
+  let headingText = 'Speakers';
+  let speakerOrder = [];
+  const paragraphs = content.querySelectorAll('p');
+
+  let foundHeading = false;
+
+  paragraphs.forEach((p) => {
+    const text = p.textContent.trim();
+    // Skip if it's a link paragraph
+    if (p.querySelector('a')) return;
+
+    // Check if this looks like a speaker order list (contains multiple commas)
+    if (text.includes(',') && text.split(',').length > 2) {
+      speakerOrder = text.split(',').map((name) => name.trim());
+    } else if (!foundHeading && text && !text.includes(',')) {
+      // First non-link text without commas is the heading
+      headingText = text;
+      foundHeading = true;
+    }
+  });
+
+  // Extract API URL
+  let apiUrl = '';
+  const links = content.querySelectorAll('a');
+  links.forEach((link) => {
+    if (new URL(link.href).host === 'developerevents.adobe.com') {
+      apiUrl = link.href;
+    }
+  });
+
+  // Extract CTA link (any link that's not the API URL)
+  let ctaHtml = '';
+  links.forEach((link) => {
+    if (!link.href.includes('developerevents.adobe.com')) {
+      const ctaText = link.textContent.trim();
+      const ctaHref = link.href;
+      ctaHtml = `<p class="button-container"><a href="${ctaHref}" class="button black-border">${ctaText}</a></p>`;
+    }
+  });
+
+  // Clear the block
+  block.innerHTML = '';
+
+  // Add redesign class for button styling
+  block.classList.add('redesign');
+
+  // Create heading
+  const heading = document.createElement('h2');
+  heading.textContent = headingText;
+  block.appendChild(heading);
+
+  // Create carousel wrapper
+  const carouselWrapper = document.createElement('div');
+  carouselWrapper.className = 'speakers-carousel-wrapper';
+
+  // Create carousel
+  const carousel = document.createElement('div');
+  carousel.className = 'speakers-carousel';
+
+  // Add navigation buttons
+  const { prevButton, nextButton } = createCarouselNav();
+  carouselWrapper.appendChild(prevButton);
+  carouselWrapper.appendChild(carousel);
+  carouselWrapper.appendChild(nextButton);
+
+  block.appendChild(carouselWrapper);
+
+  // Add CTA if present
+  if (ctaHtml) {
+    const ctaContainer = document.createElement('div');
+    ctaContainer.innerHTML = ctaHtml;
+    block.appendChild(ctaContainer);
+  }
+
+  // Fetch speakers from API or use mock data
+  if (apiUrl) {
+    try {
+      // Add loading indicator
+      carousel.innerHTML = '<p style="padding: 40px; text-align: center;">Loading speakers...</p>';
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      let speakers = data.speakers || [];
+
+      // Clear loading indicator
+      carousel.innerHTML = '';
+
+      if (speakers.length === 0) {
+        carousel.innerHTML = '<p style="padding: 40px; text-align: center;">No speakers available yet.</p>';
+        return;
+      }
+
+      // Reorder speakers if priority order was specified
+      speakers = reorderSpeakers(speakers, speakerOrder);
+
+      // Add speaker cards from API data
+      speakers.forEach((speaker) => {
+        const card = createSpeakerCard(speaker);
+        carousel.appendChild(card);
+      });
+
+      // Setup navigation after speakers are loaded
+      setupCarouselNavigation(carousel, prevButton, nextButton);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching speakers:', error);
+      carousel.innerHTML = '<p style="padding: 40px; text-align: center;">Unable to load speakers at this time. Please try again later.</p>';
+    }
+  } else {
+    // No API URL provided
+    carousel.innerHTML = '<p style="padding: 40px; text-align: center;">No speaker information available.</p>';
+  }
+}

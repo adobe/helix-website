@@ -37,6 +37,8 @@
   --type-heading-s-lh: 20px;
   --type-heading-xs-size: 18px;
   --type-heading-xs-lh: 22px;
+  --type-heading-xxs-size: var(--type-body-s-size);
+  --type-heading-xxs-lh: var(--type-body-s-lh);
 
   /* Body (Consonant) */
   --type-body-l-size: 20px;
@@ -368,6 +370,20 @@ header {
   z-index: var(--nav-z-index);
 }
 
+header,
+footer {
+  visibility: hidden;
+}
+
+.no-header-template header {
+  display: none;
+}
+
+header:has(.header.block[data-block-status="loaded"]),
+footer:has(.footer.block[data-block-status="loaded"]) {
+  visibility: unset;
+}
+
 header .header {
   width: 100%;
 }
@@ -423,6 +439,24 @@ h2 {
 h3 {
   font-size: var(--type-heading-m-size);
   line-height: var(--type-heading-m-lh);
+}
+
+/* Heading S */
+h4 {
+  font-size: var(--type-heading-s-size);
+  line-height: var(--type-heading-s-lh);
+}
+
+/* Heading XS */
+h5 {
+  font-size: var(--type-heading-xs-size);
+  line-height: var(--type-heading-xs-lh);
+}
+
+/* Heading XS */
+h6 {
+  font-size: var(--type-heading-xxs-size);
+  line-height: var(--type-heading-xxs-lh);
 }
 
 /* Utilities */
@@ -912,10 +946,6 @@ main .section[data-section-status="initialized"] {
 
 body.no-header-template {
   padding: 0;
-}
-
-.no-header-template header {
-  display: none;
 }
 
 /* ---- Utility Classes ---- */

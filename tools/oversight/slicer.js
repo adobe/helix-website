@@ -1,10 +1,12 @@
 // eslint-disable-next-line import/no-relative-packages
 import {
-  DataChunks, utils, series, facets,
-// eslint-disable-next-line import/no-unresolved
+  DataChunks,
+  facets,
+  series,
+  utils,
 } from '@adobe/rum-distiller';
 import DataLoader from './loader.js';
-import { parseSearchParams, parseConversionSpec } from './utils.js';
+import { parseConversionSpec, parseSearchParams } from './utils.js';
 
 const {
   isKnownFacet,
@@ -105,6 +107,10 @@ export function updateKeyMetrics() {
     pageViewsExtra.setAttribute('precision', 2);
     pageViewsExtra.className = 'extra';
     document.querySelector('#pageviews p').appendChild(pageViewsExtra);
+
+    setTimeout(() => {
+      pageViewsExtra.setAttribute('title', 'Page views per visit');
+    }, 0);
   }
 
   if (dataChunks.totals.visits.sum > 0) {
@@ -117,6 +123,10 @@ export function updateKeyMetrics() {
     visitsExtra.setAttribute('total', 100);
     visitsExtra.className = 'extra';
     document.querySelector('#visits p').appendChild(visitsExtra);
+
+    setTimeout(() => {
+      visitsExtra.setAttribute('title', 'This is the share of traffic that enters your site, and leaves immediately without clicking anywhere on the page.');
+    }, 0);
   } else {
     document.querySelector('#visits p number-format').textContent = 'N/A';
   }
@@ -142,6 +152,10 @@ export function updateKeyMetrics() {
       conversionsExtra.setAttribute('total', 100);
       conversionsExtra.className = 'extra';
       document.querySelector('#conversions p').appendChild(conversionsExtra);
+
+      setTimeout(() => {
+        conversionsExtra.setAttribute('title', 'Percentage of page views where visitors either consumed significant amounts of content or clicked.');
+      }, 0);
     } else if (dataChunks.totals.visits.sum > 0 && !isDefaultConversion) {
       conversionsExtra.textContent = computeConversionRate(
         dataChunks.totals.conversions.sum,
@@ -152,6 +166,10 @@ export function updateKeyMetrics() {
       conversionsExtra.setAttribute('total', 100);
       conversionsExtra.className = 'extra';
       document.querySelector('#conversions p').appendChild(conversionsExtra);
+
+      setTimeout(() => {
+        conversionsExtra.setAttribute('title', 'Percentage of visits that completed a specific goal or action (based on your custom conversion configuration)');
+      }, 0);
     }
   } else {
     document.querySelector('#conversions p number-format').textContent = 'N/A';
@@ -183,21 +201,24 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('type', (bundle) => bundle.hostType);
 
-  dataChunks.addFacet(
-    'conversions',
-    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
-  );
-
   dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
 
   dataChunks.addFacet('rawURL', facets.url, 'some', 'never');
   dataChunks.addClusterFacet('url', 'rawURL', {
     count: Math.log10(dataChunks.facets.rawURL.length),
   });
-
-  dataChunks.addFacet('vitals', vitals);
+  dataChunks.addClusterFacet('url!', 'rawURL!', {
+    count: Math.log10(dataChunks.facets['rawURL!'].length),
+  });
 
   dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
+
+  dataChunks.addFacet(
+    'conversions',
+    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
+  );
+
+  dataChunks.addFacet('vitals', vitals);
 
   if (params.has('vitals') && params.getAll('vitals').filter((v) => v.endsWith('LCP')).length) {
     dataChunks.addFacet('lcp.target', lcpTarget);
@@ -456,9 +477,14 @@ const io = new IntersectionObserver((entries) => {
       loadData(elems.viewSelect.value).then(draw);
     }
 
+    let filterInputDebounce;
+    const debounceTimeout = 1000;
     elems.filterInput.addEventListener('input', () => {
-      updateState();
-      draw();
+      clearTimeout(filterInputDebounce);
+      filterInputDebounce = setTimeout(() => {
+        updateState();
+        draw();
+      }, debounceTimeout);
     });
 
     elems.viewSelect.addEventListener('change', () => {
