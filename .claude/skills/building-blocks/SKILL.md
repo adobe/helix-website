@@ -5,195 +5,248 @@ description: Guide for creating new AEM Edge Delivery blocks or modifying existi
 
 # Building Blocks
 
-This skill guides you through creating new AEM Edge Delivery blocks or modifying existing ones, following Content Driven Development (CDD) principles. Blocks are the reusable building blocks of AEM sites - each transforms authored content into rich, interactive experiences through JavaScript decoration and CSS styling. This skill covers the complete development process: understanding content models, implementing decoration logic, applying styles, and maintaining code quality standards.
+This skill guides you through implementing AEM Edge Delivery blocks following established patterns and best practices. Blocks transform authored content into rich, interactive experiences through JavaScript decoration and CSS styling.
+
+**IMPORTANT: This skill should ONLY be invoked from the content-driven-development skill during Phase 2 (Implementation).**
+
+If you are not already following the CDD process, STOP and invoke the **content-driven-development** skill first.
 
 ## Related Skills
 
 - **content-driven-development**: MUST be invoked before using this skill to ensure content and content models are ready
 - **block-collection-and-party**: Use to find similar blocks for patterns
-- **testing-blocks**: Automatically invoked after implementation for comprehensive testing
+- **testing-blocks**: Automatically invoked during Step 5 for comprehensive testing
 
 ## When to Use This Skill
 
-This skill should ONLY be invoked from the **content-driven-development** skill during Phase 2 (Implementation).
-
-If you are not already following the CDD process:
-- **STOP** - Do not proceed with this skill
-- **Invoke the content-driven-development skill first**
-- The CDD skill will ensure test content and content models are ready before implementation
-
-This skill handles:
+This skill is invoked automatically by **content-driven-development** during implementation. It handles:
 - Creating new block files and structure
 - Implementing JavaScript decoration
 - Adding CSS styling
-- Code quality and testing
+- Testing and documentation
 
-## Prerequisites
+Prerequisites (verified by CDD):
+- ✅ Test content exists (in CMS or local drafts)
+- ✅ Content model is defined
+- ✅ Test content URL is available
 
-**REQUIRED before using this skill:**
-- ✅ Test content must exist (in CMS or local drafts)
-- ✅ Content model must be defined
-- ✅ Test content URL must be available
+## Building Blocks Checklist
 
-**Information needed:**
-1. **Block name**: What should the block be called?
-2. **Content model**: The defined structure authors will use
-3. **Test content URL**: Path to test content for development
+Track your progress through block development:
 
-## Process Overview
+- [ ] Step 1: Find similar blocks for patterns (if new block or major changes)
+- [ ] Step 2: Create or modify block structure (files and directories)
+- [ ] Step 3: Implement JavaScript decoration
+- [ ] Step 4: Add CSS styling
+- [ ] Step 5: Test implementation (invokes testing-blocks skill)
+- [ ] Step 6: Document block (developer and author-facing)
 
-1. Verify Prerequisites (CDD completed)
-2. Find Similar Blocks (for patterns and reuse)
-3. Create or Modify Block Structure (files and directories)
-4. Implement JavaScript Decoration (DOM transformation)
-5. Add CSS Styling (scoped, responsive styles)
-6. Test the Implementation (local testing, linting)
-7. Document Block (developer and author-facing docs)
+## Step 1: Find Similar Blocks
 
-## Detailed Process
+**When to use:** Creating new blocks or making major structural modifications
 
-### 1. Verify Prerequisites
+**Skip this step when:** Making minor modifications to existing blocks (CSS tweaks, small decoration changes)
 
-**Before proceeding, confirm with the user:**
+**Quick start:**
 
-"Do you have:
-- ✅ Test content created (URL or path)?
-- ✅ Content model defined?
+1. Search the codebase for similar blocks:
+   ```bash
+   ls blocks/
+   ```
 
-If not, we need to use the content-driven-development skill first."
+2. Use the **block-collection-and-party** skill to find reference implementations
 
-If prerequisites are not met, STOP and invoke the **content-driven-development** skill.
+3. Review patterns from similar blocks:
+   - DOM manipulation strategies
+   - CSS architecture
+   - Variant handling
+   - Performance optimizations
 
-If prerequisites are met, get the test content URL from the user and proceed to step 2.
+## Step 2: Create or Modify Block Structure
 
-### 2. Find Similar Blocks
+### For New Blocks:
 
-**For new blocks or major modifications:**
+1. Create the block directory and files:
+   ```bash
+   mkdir -p blocks/{block-name}
+   touch blocks/{block-name}/{block-name}.js
+   touch blocks/{block-name}/{block-name}.css
+   ```
 
-1. Search the codebase for similar blocks that might provide useful patterns or code we can re-use
-2. Use the **block-collection-and-party** skill to find relevant reference blocks
+2. Basic JavaScript structure:
+   ```javascript
+   /**
+    * decorate the block
+    * @param {Element} block the block
+    */
+   export default async function decorate(block) {
+     // Your decoration logic here
+   }
+   ```
 
-Review the implementation patterns in similar blocks to inform your approach.
+3. Basic CSS structure:
+   ```css
+   /* All selectors scoped to block */
+   main .{block-name} {
+     /* block styles */
+   }
+   ```
 
-**For minor modifications to existing blocks:** Skip to step 3.
+### For Existing Blocks:
 
-### 3. Create or Modify Block Structure
+1. Locate the block directory: `blocks/{block-name}/`
+2. Review current implementation:
+   ```bash
+   # View the initial HTML structure from the server
+   curl http://localhost:3000/{test-content-path}
+   ```
+3. Understand existing decoration logic and styles
 
-**For new blocks:**
+## Step 3: Implement JavaScript Decoration
 
-1. Create directory: `blocks/{block-name}/`
-2. Create files: `{block-name}.js` and `{block-name}.css`
-3. Use the boilerplate structure (or reference templates in `resources/` if helpful):
-   - JS file exports a default `decorate(block)` function (can be async if needed)
-   - CSS file targets the `.{block-name}` class
+**Essential pattern - re-use existing DOM elements:**
 
-**For existing blocks:**
+```javascript
+export default async function decorate(block) {
+  // Platform delivers images as <picture> elements with <source> tags
+  const picture = block.querySelector('picture');
+  const heading = block.querySelector('h2');
 
-1. Locate the existing block directory in `blocks/{block-name}/`
-2. Review the current implementation before making changes
-3. Understand the existing decoration logic and styles
+  // Create new structure, re-using existing elements
+  const figure = document.createElement('figure');
+  figure.append(picture);  // Re-uses picture element
 
-### 4. Implement JavaScript Decoration
+  const wrapper = document.createElement('div');
+  wrapper.className = 'content-wrapper';
+  wrapper.append(heading, figure);
 
-Follow patterns and conventions in `resources/js-guidelines.md`:
+  block.replaceChildren(wrapper);
 
-- Use DOM APIs to transform the initial block HTML structure
-- Keep decoration logic focused and single-purpose
-- Handle variants appropriately (check block.classList for variant classes)
-- Follow established patterns from similar blocks
+  // Only check variants when they affect decoration logic
+  // CSS-only variants like 'dark', 'wide' don't need JS
+  if (block.classList.contains('carousel')) {
+    // Carousel variant needs different DOM structure/behavior
+    setupCarousel(block);
+  }
+}
+```
 
-**Read `resources/js-guidelines.md` for detailed examples, code standards, and best practices.**
+**For complete JavaScript guidelines including:**
+- Advanced DOM manipulation patterns
+- Fetching data and loading modules
+- Performance optimization techniques
+- Helper functions from aem.js
+- Code style and linting rules
 
-### 5. Add CSS Styling
+**Read `resources/js-guidelines.md`**
 
-Follow patterns and conventions in `resources/css-guidelines.md`:
+## Step 4: Add CSS Styling
 
-- All CSS selectors must be scoped to the block (start with `.{block-name}`)
-- Use BEM-like naming within the block scope
-- Leverage CSS custom properties for theming
-- Write mobile-first responsive styles
-- Keep specificity low
-- Follow established patterns from similar blocks
+**Essential patterns - scoped, responsive, using custom properties:**
 
-**Read `resources/css-guidelines.md` for detailed examples, code standards, and best practices.**
+```css
+/* All selectors MUST be scoped to block */
+main .my-block {
+  /* Use CSS custom properties for consistency */
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--body-font-family);
+  max-width: var(--max-content-width);
 
-### 6. Test the Implementation
+  /* Mobile-first styles (default) */
+  padding: 1rem;
+  flex-direction: column;
+}
 
-**After implementation is complete, invoke the testing-blocks skill:**
+main .my-block h2 {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-m);
+}
+
+main .my-block .item {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Tablet and up */
+@media (width >= 600px) {
+  main .my-block {
+    padding: 2rem;
+  }
+}
+
+/* Desktop and up */
+@media (width >= 900px) {
+  main .my-block {
+    flex-direction: row;
+    padding: 4rem;
+  }
+}
+
+/* Variants - most are CSS-only */
+main .my-block.dark {
+  background-color: var(--dark-color);
+  color: var(--clr-white);
+}
+```
+
+**For complete CSS guidelines including:**
+- All available CSS custom properties
+- Modern CSS features (grid, logical properties, etc.)
+- Performance optimization
+- Naming conventions
+- Common patterns and anti-patterns
+
+**Read `resources/css-guidelines.md`**
+
+## Step 5: Test Implementation
+
+**After implementation is complete, invoke the testing-blocks skill.**
 
 The testing-blocks skill will guide you through:
-- Writing unit tests for any logic-heavy utilities
+- Writing unit tests for logic-heavy utilities
 - Browser testing to validate block behavior
 - Taking screenshots for validation and PR documentation
 - Running linting and fixing issues
-- Verifying GitHub checks pass
 
-Provide the testing-blocks skill with:
+**Provide the testing-blocks skill with:**
 - Block name being tested
 - Test content URL (from CDD process)
 - Any variants that need testing
+- Screenshots of existing implementation/design/mockup to verify against
 
-Return to this skill after testing is complete to proceed to step 7.
+Return to this skill after testing is complete to proceed to Step 6.
 
-### 7. Document Block
+## Step 6: Document Block
 
-Blocks require two types of documentation:
+### Developer Documentation
 
-#### Developer Documentation
+Most blocks are self-contained and only need code comments. For especially complex blocks (many variants, complex logic), add a brief `README.md` in the block folder.
 
-- Most blocks are simple and self-contained and only need code comments for documentation
-- If a block is especially complex (has many variants, or especially complex code) consider adding a brief README.md in the block folder
-- Keep any README documentation very brief so it can be consumed at a glance
+### Author-Facing Documentation
 
-#### Author-Facing Documentation
+Almost all blocks need author documentation to help content authors understand how to use the block in the CMS.
 
-Author-facing documentation helps content authors understand how to use the block in the CMS. This documentation typically exists as draft/library content in the CMS itself, not in the codebase.
+**When to update author docs:**
+- ✅ Variants are added, removed, or modified
+- ✅ Content structure changes
+- ✅ Block behavior or functionality changes
 
-**When author documentation is needed:**
+**Skip author documentation for:**
+- Deprecated blocks (shouldn't be used)
+- Special-purpose blocks used infrequently
+- Auto-blocked blocks (authors don't use directly)
 
-Almost all blocks should have author-facing documentation. The only exceptions are:
-- Deprecated blocks that should no longer be used but can't be removed yet
-- Special-purpose blocks used very infrequently on a need-to-know basis
-- Auto-blocked blocks that shouldn't be used directly by authors
+**For complete guidance on:**
+- Determining which documentation approach your project uses
+- Where author documentation lives (Sidekick Library, DA Library, etc.)
+- What to include in author documentation
+- Maintaining documentation in sync with code
 
-**Maintaining author documentation:**
-
-Author documentation must be kept in sync with the block implementation:
-- Update when variants are added, removed, or modified
-- Update when the content structure changes
-- Update when block behavior or functionality changes
-
-**Where author documentation lives:**
-
-Different projects use different approaches for author documentation:
-
-1. **Sidekick Library** (Google Drive/SharePoint authoring):
-   - Uses https://github.com/adobe/franklin-sidekick-library
-   - Check for `/tools/sidekick/library.html` in the codebase
-   - If present, guide user to add/update block documentation in the library
-
-2. **Document Authoring (DA) Library**:
-   - Uses https://docs.da.live/administrators/guides/setup-library
-   - Different implementation than Sidekick Library
-   - If in use, guide user to update block documentation in DA library
-
-3. **Universal Editor (UE) projects**:
-   - Often skip dedicated author documentation libraries
-   - May use inline help or other mechanisms
-
-4. **Simple documentation pages**:
-   - Some projects maintain documentation under `/drafts` or `/docs`
-   - Pages contain authoring guides and block examples
-
-**What to include in author documentation:**
-
-The specific content of author documentation varies by project. As an agent:
-1. Identify that author documentation needs to be created or updated
-2. Determine which documentation approach the project uses (check for `/tools/sidekick/library.html` as a signal)
-3. Guide the user on what aspects of the block should be documented based on the changes made
-4. Provide specific guidance based on the project's documentation approach
+**Read `resources/block-documentation.md`**
 
 ## Reference Materials
 
-- `resources/js-guidelines.md`
-- `resources/css-guidelines.md`
+- `resources/js-guidelines.md` - Complete JavaScript patterns and best practices
+- `resources/css-guidelines.md` - Complete CSS patterns and best practices
+- `resources/block-documentation.md` - Complete documentation guidance
