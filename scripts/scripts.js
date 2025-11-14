@@ -734,14 +734,15 @@ async function loadLazy(doc) {
 
   const { hash } = window.location;
   if (hash) {
-    // Wait for all images to load before scrolling to hash target
-    const images = [...doc.querySelectorAll('main img')];
-    await Promise.all(images.map((img) => {
-      if (img.complete) return Promise.resolve();
-      img.setAttribute('loading', 'eager');
+    // Wait for all images and videos to load before scrolling to hash target
+    const media = [...doc.querySelectorAll('main img, main video')];
+    await Promise.all(media.map((m) => {
+      if (m.complete) return Promise.resolve();
+      m.setAttribute('loading', 'eager');
       return new Promise((resolve) => {
-        img.addEventListener('load', resolve, { once: true });
-        img.addEventListener('error', resolve, { once: true });
+        m.addEventListener('load', resolve, { once: true });
+        m.addEventListener('error', resolve, { once: true });
+        m.addEventListener('loadedmetadata', resolve, { once: true });
       });
     }));
 
