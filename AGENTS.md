@@ -2,6 +2,7 @@
 
 This project is a website built with Edge Delivery Services in Adobe Experience Manager Sites as a Cloud Service. As an agent, follow the instructions in this file to deliver code based on Adobe's standards for fast, easy-to-author, and maintainable web experiences.
 
+<!-- upskill:skills:start -->
 ## Skills
 
 You have access to a set of skills in .claude/skills. Each skill consists of a SKILL.md file, and other files such as scripts and resources, which are referenced from there.
@@ -46,6 +47,7 @@ Always use the following process:
 Skills will be added to `.claude/skills/` as needed for this project. Run `./.agents/discover-skills` for the current list of available skills.
 
 **For ALL development work involving blocks, core scripts, or functionality, you MUST start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
+<!-- upskill:skills:end -->
 
 ## Project Overview
 
