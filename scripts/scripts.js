@@ -711,67 +711,6 @@ async function loadLazy(doc) {
   await loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 
-  const { hash } = window.location;
-  if (hash) {
-    setTimeout(() => {
-      const element = hash ? main.querySelector(hash) : false;
-      if (element) {
-        // Handle lazy-loaded images that might cause content shift
-        const handleLazyLoadedImages = () => {
-          // Find all images above the target element that are lazy-loaded
-          const allImages = Array.from(document.querySelectorAll('img'));
-          const precedingImages = allImages
-            // eslint-disable-next-line no-bitwise
-            .filter((img) => (img.compareDocumentPosition(element)
-              & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
-
-          if (precedingImages.length === 0) {
-            // No lazy-loaded images above target, scroll immediately
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-          }
-
-          // Track loaded images
-          let loadedCount = 0;
-          const totalImages = precedingImages.length;
-
-          // Function to scroll after each image loads
-          const scrollAfterLoad = () => {
-            loadedCount += 1;
-            // Always scroll to the element to account for content shift
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            // Remove listeners from remaining images if all are loaded
-            if (loadedCount === totalImages) {
-              precedingImages.forEach((img) => {
-                img.removeEventListener('load', scrollAfterLoad);
-                img.removeEventListener('error', scrollAfterLoad);
-              });
-            }
-          };
-
-          // Add load listeners to all preceding lazy images
-          precedingImages.forEach((img) => {
-            if (img.complete) {
-              // Image already loaded
-              loadedCount += 1;
-            } else {
-              // Add one-time load listener
-              img.addEventListener('load', scrollAfterLoad, { once: true });
-              // Also handle error case
-              img.addEventListener('error', scrollAfterLoad, { once: true });
-            }
-          });
-
-          // Initial scroll
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        };
-
-        handleLazyLoadedImages();
-      }
-    }, 500);
-  }
-
   loadHeader(doc.querySelector('header'));
   loadFooter(doc.querySelector('footer'));
 
@@ -792,6 +731,22 @@ async function loadLazy(doc) {
   window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
+
+  const hashTarget = window.location.hash ? doc.querySelector(window.location.hash) : null;
+  if (hashTarget) {
+    // Wait for all images and videos to load before scrolling to hash target
+    const media = [...doc.querySelectorAll('main img, main video')];
+    await Promise.all(media.map((m) => {
+      if (m.complete) return Promise.resolve();
+      m.setAttribute('loading', 'eager');
+      return new Promise((resolve) => {
+        m.addEventListener('load', resolve, { once: true });
+        m.addEventListener('error', resolve, { once: true });
+        m.addEventListener('loadedmetadata', resolve, { once: true });
+      });
+    }));
+    setTimeout(() => hashTarget.scrollIntoView({ behavior: 'smooth' }), 10);
+  }
 
   // check to see if this is reflected in google indexed page
   document.documentElement.classList.add('index-test-scripts-js-2024-08-23');
