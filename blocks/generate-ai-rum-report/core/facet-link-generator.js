@@ -99,10 +99,8 @@ function generateFacetLink(facetName, facetValue, options = {}) {
     preserveExisting = false, nestedFacet, nestedValue, dateRange,
   } = options;
 
-  // Get base URL (remove existing params if not preserving)
-  const baseUrl = preserveExisting
-    ? new URL(window.location.href)
-    : new URL(window.location.origin + window.location.pathname);
+  // Build search params instead of full URL to make links relative
+  const params = new URLSearchParams();
 
   // If not preserving, copy only essential params
   if (!preserveExisting) {
@@ -112,45 +110,54 @@ function generateFacetLink(facetName, facetValue, options = {}) {
 
     essentialParams.forEach((param) => {
       if (currentParams.has(param)) {
-        baseUrl.searchParams.set(param, currentParams.get(param));
+        params.set(param, currentParams.get(param));
       }
     });
 
     // Add date range from report metadata (takes precedence over current URL)
     if (dateRange?.startDate && dateRange?.endDate) {
-      baseUrl.searchParams.set('startDate', dateRange.startDate);
-      baseUrl.searchParams.set('endDate', dateRange.endDate);
-      baseUrl.searchParams.set('view', 'custom');
+      params.set('startDate', dateRange.startDate);
+      params.set('endDate', dateRange.endDate);
+      params.set('view', 'custom');
     } else {
       // Fall back to current URL params if no date range provided
       ['view', 'startDate', 'endDate'].forEach((param) => {
         if (currentParams.has(param)) {
-          baseUrl.searchParams.set(param, currentParams.get(param));
+          params.set(param, currentParams.get(param));
         }
       });
     }
+  } else {
+    // Preserve all existing params
+    const currentParams = new URL(window.location.href).searchParams;
+    currentParams.forEach((value, key) => {
+      params.set(key, value);
+    });
   }
 
   // Remove ONLY the report viewer UI parameter
   // Keep view, startDate, endDate so dashboard shows data from report's time period
-  baseUrl.searchParams.delete('report');
+  params.delete('report');
 
   // Handle multiple facets passed as object
   if (typeof facetName === 'object' && !Array.isArray(facetName)) {
     Object.entries(facetName).forEach(([name, value]) => {
-      baseUrl.searchParams.append(name, value);
+      params.append(name, value);
     });
   } else {
     // Add the primary facet parameter
-    baseUrl.searchParams.append(facetName, facetValue);
+    params.append(facetName, facetValue);
 
     // Add nested facet if provided
     if (nestedFacet && nestedValue) {
-      baseUrl.searchParams.append(nestedFacet, nestedValue);
+      params.append(nestedFacet, nestedValue);
     }
   }
 
-  return baseUrl.toString();
+  // Return relative URL (pathname + search params) so it works on any domain
+  const { pathname } = window.location;
+  const queryString = params.toString();
+  return queryString ? `${pathname}?${queryString}` : pathname;
 }
 
 /**
