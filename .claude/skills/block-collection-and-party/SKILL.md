@@ -207,14 +207,55 @@ node .claude/skills/block-collection-and-party/scripts/search-block-party.js ado
 }
 ```
 
-### Step 5: Examine the Code
+### Step 5: Get Block Structure Examples (CRITICAL for HTML generation)
+
+**IMPORTANT:** Before writing any HTML for a block, ALWAYS fetch the pre-decoration structure examples first.
+
+```bash
+node .claude/skills/block-collection-and-party/scripts/get-block-structure.js <block-name>
+```
+
+**Why this is critical:**
+- Shows the exact HTML structure the block expects BEFORE JavaScript decoration
+- Reveals the row/column pattern (e.g., each card is a row with 2 columns: image | content)
+- Displays multiple variants (e.g., "Cards" vs "Cards (no images)")
+- Prevents HTML structure mistakes that cause blocks to fail decoration
+
+**Examples:**
+```bash
+# Get accordion structure
+node .claude/skills/block-collection-and-party/scripts/get-block-structure.js accordion
+
+# Get cards structure (will show multiple variants)
+node .claude/skills/block-collection-and-party/scripts/get-block-structure.js cards
+
+# Get tabs structure
+node .claude/skills/block-collection-and-party/scripts/get-block-structure.js tabs
+```
+
+**Output includes:**
+- Block description and source code URL
+- All available variants with their names
+- Pre-decoration HTML for each variant (simplified, without image optimization noise)
+- Structural analysis (rows, columns, content types per column)
+
+**When to use:**
+- ✅ Before generating HTML for page migration
+- ✅ Before writing block content in HTML files
+- ✅ When block decoration is failing (verify your HTML matches expected structure)
+- ✅ When uncertain about content model (e.g., "Is each card a row or all cards in one row?")
+
+**This step prevents the most common mistake:** Writing incorrect HTML structure that doesn't match what the block's JavaScript decoration expects.
+
+### Step 6: Examine the Code
 
 Use the provided URLs to review the implementation:
 
 **For Block Collection results with `type: "block"`:**
-1. Read the JS file to understand decoration logic
-2. Read the CSS file to see styling approach
-3. Visit the live example URL to see the block in action and understand the content model
+1. **FIRST:** Get block structure examples (Step 5) to understand the expected HTML
+2. Read the JS file to understand decoration logic
+3. Read the CSS file to see styling approach
+4. Visit the live example URL to see the block in action
 
 **For Block Collection results with `type: "default-content"`:**
 1. These represent standard HTML elements and patterns (breadcrumbs, buttons, headings, etc.)
@@ -228,7 +269,7 @@ Use the provided URLs to review the implementation:
 2. Visit the showcase URL to see it in action (if available)
 3. Review the description to understand the purpose and approach
 
-### Step 6: Apply Learnings
+### Step 7: Apply Learnings
 
 Use the reference implementations to inform your approach:
 - Understand the content model used

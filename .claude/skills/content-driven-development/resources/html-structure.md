@@ -1,112 +1,94 @@
 # HTML File Structure for Test Content
 
-When creating local HTML files for testing blocks in the `drafts/` folder, follow this structure to match how AEM Edge Delivery Services processes authored content.
+When creating local `.plain.html` files for testing blocks in the `drafts/` folder, follow this structure to match how AEM Edge Delivery Services processes authored content.
 
-## Complete HTML Structure
+## Important Change: Plain HTML Format
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- ALWAYS copy the complete content from head.html -->
-  <!-- Then add page-specific meta tags as needed -->
-  <title>Your Page Title</title>
-  <meta name="description" content="Page description">
-</head>
+**The AEM CLI now automatically wraps HTML content with the headful structure (head, header, footer).** When you create `.plain.html` files, you ONLY need to provide the section content.
 
-<body>
-  <header></header>
+**What you create:**
+- ✅ Section divs with content: `<div>...</div>` (one per section)
+- ✅ Blocks as `<div class="block-name">` with nested divs
+- ✅ Default content (headings, paragraphs, links, images)
+- ✅ Section metadata blocks when needed
 
-  <main>
-    <!-- Sections can contain blocks, default content, or a mix of both -->
-    <div>
-      <!-- Section 1: Mixed content - default content and a block -->
-      <h1>Page Heading</h1>
-      <p>This is regular paragraph content.</p>
+**What the AEM CLI adds automatically:**
+- ❌ `<html>`, `<head>`, `<body>` tags
+- ❌ `<header>` and `<footer>` elements
+- ❌ `<main>` wrapper
+- ❌ Head content (comes from project's head.html)
 
-      <div class="block-name">
-        <!-- Block content goes here -->
-        <div>
-          <div>Block content cell 1</div>
-          <div>Block content cell 2</div>
-        </div>
-      </div>
-
-      <p>More content after the block.</p>
-    </div>
-
-    <div>
-      <!-- Section 2: Block in its own section -->
-      <div class="block-name variant-name">
-        <!-- Block content -->
-      </div>
-    </div>
-
-    <div>
-      <!-- Section 3: Multiple blocks in one section -->
-      <div class="block-one">
-        <!-- First block content -->
-      </div>
-
-      <div class="block-two">
-        <!-- Second block content -->
-      </div>
-    </div>
-  </main>
-
-  <footer></footer>
-</body>
-</html>
-```
-
-## Head Structure
-
-**ALWAYS start by copying the complete content from `head.html`:**
-- Copy everything from your project's `head.html` file
-- This ensures all required scripts, styles, and meta tags are included
-- The content of `head.html` varies by project
-
-**Then add page-specific meta tags:**
-- `<title>` - Page title for the test content
-- `<meta name="description">` - Page description
-- Any other page-specific meta tags needed for testing
-
-## Body Structure
-
-The body must contain three main elements:
+## Plain HTML Structure
 
 ```html
-<body>
-  <header></header>  <!-- Empty, will be auto-populated -->
-  <main>
-    <!-- Your content goes here -->
-  </main>
-  <footer></footer>  <!-- Empty, will be auto-populated -->
-</body>
-```
+<div>
+  <!-- Section 1: Mixed content - default content and a block -->
+  <h1>Page Heading</h1>
+  <p>This is regular paragraph content.</p>
 
-**Important:**
-- Header and footer tags should be empty - they will be automatically populated by the platform
-- All page content goes inside `<main>`
-
-## Main Content Structure
-
-Inside `<main>`, content is organized into **sections** (top-level `<div>` elements).
-
-### Sections
-
-Each section is a top-level `<div>` directly inside `<main>`:
-
-```html
-<main>
-  <div>
-    <!-- Section 1 content -->
+  <div class="block-name">
+    <!-- Block content goes here -->
+    <div>
+      <div>Block content cell 1</div>
+      <div>Block content cell 2</div>
+    </div>
   </div>
 
-  <div>
-    <!-- Section 2 content -->
+  <p>More content after the block.</p>
+</div>
+
+<div>
+  <!-- Section 2: Block in its own section -->
+  <div class="block-name variant-name">
+    <!-- Block content -->
   </div>
-</main>
+</div>
+
+<div>
+  <!-- Section 3: Multiple blocks in one section -->
+  <div class="block-one">
+    <!-- First block content -->
+  </div>
+
+  <div class="block-two">
+    <!-- Second block content -->
+  </div>
+</div>
+```
+
+## File Naming Convention
+
+**IMPORTANT:** HTML files must use the `.plain.html` extension:
+- ✅ `drafts/hero-test.plain.html`
+- ✅ `drafts/blocks/cards.plain.html`
+- ❌ `drafts/hero-test.html` (old format, no longer used)
+
+## Running with Local HTML
+
+**Start dev server with:**
+```bash
+aem up --html-folder drafts
+```
+
+**Preview URLs:**
+- File: `drafts/hero-test.plain.html` → URL: `http://localhost:3000/drafts/hero-test`
+- File: `drafts/blocks/cards.plain.html` → URL: `http://localhost:3000/drafts/blocks/cards`
+- **Special case:** `drafts/index.plain.html` → URL: `http://localhost:3000/drafts/index` (NOT `/drafts/`)
+
+## Section Structure
+
+Content is organized into **sections** (top-level `<div>` elements).
+
+### Basic Sections
+
+```html
+<div>
+  <!-- Section 1 content -->
+</div>
+
+<div>
+  <!-- Section 2 content -->
+</div>
 ```
 
 **Important notes about sections:**
@@ -116,11 +98,102 @@ Each section is a top-level `<div>` directly inside `<main>`:
 - This varies by project and authoring practices
 - Some blocks may require or assume they are in their own section (check block documentation)
 
-### Section Content Types
+### Section Metadata
+
+Sections can include metadata to define styling and behavior using a special `section-metadata` div.
+
+**In HTML (using section-metadata div):**
+```html
+<div>
+  <div class="section-metadata">
+    <div>
+      <div>Style</div>
+      <div>dark</div>
+    </div>
+  </div>
+  <!-- Section content with dark background styling -->
+</div>
+```
+
+**In markdown (Section Metadata table):**
+```markdown
++------------------------------+
+| Section Metadata             |
++------------------+-----------+
+| style            | dark      |
++------------------+-----------+
+```
+
+**How it works:**
+- The `section-metadata` div is placed at the beginning of a section
+- It uses a nested div structure to represent key-value pairs (like a table)
+- The platform processes this metadata and applies it to the parent section
+- After processing, the `section-metadata` div is removed from the DOM
+- Metadata values become CSS classes or data attributes on the section
+
+**Common section styles:**
+- `light` - White or light background
+- `dark` - Dark background with light text
+- `grey` - Grey or off-white background
+- `accent` - Branded color background
+
+**Style naming best practices:**
+- Use consistent names across sections with same visual treatment
+- Don't create unique style names for every section
+- Example: If 3 sections have white backgrounds, use "light" for all 3
+
+**Example with multiple sections:**
+```html
+<!-- Section 1: Light background -->
+<div>
+  <div class="section-metadata">
+    <div>
+      <div>Style</div>
+      <div>light</div>
+    </div>
+  </div>
+  <div class="hero">
+    <div><div><h1>Welcome</h1></div></div>
+  </div>
+</div>
+
+<!-- Section 2: Dark background -->
+<div>
+  <div class="section-metadata">
+    <div>
+      <div>Style</div>
+      <div>dark</div>
+    </div>
+  </div>
+  <div class="cards">
+    <div>
+      <div>Card 1</div>
+      <div>Card 2</div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Light background (reuses "light") -->
+<div>
+  <div class="section-metadata">
+    <div>
+      <div>Style</div>
+      <div>light</div>
+    </div>
+  </div>
+  <h2>About Our Company</h2>
+  <p>This section has default content, not blocks.</p>
+</div>
+```
+
+**For guidance on identifying sections and assigning styles:**
+Use the **page-decomposition** skill when migrating pages.
+
+## Section Content Types
 
 Sections can contain any combination of:
 
-#### 1. Default Content
+### 1. Default Content
 
 Regular HTML elements like headings, paragraphs, lists, etc.
 
@@ -147,7 +220,7 @@ Regular HTML elements like headings, paragraphs, lists, etc.
 - Code blocks: `<pre>`, `<code>`
 - Block quotes: `<blockquote>`
 
-#### 2. Blocks
+### 2. Blocks
 
 Blocks are `<div>` elements with specific class names that trigger decoration logic.
 
@@ -178,7 +251,7 @@ Blocks are `<div>` elements with specific class names that trigger decoration lo
 </div>
 ```
 
-#### 3. Icons
+### 3. Icons
 
 Icons are authored using the `:iconName:` syntax and are processed into `<span>` elements with icon classes.
 
@@ -215,7 +288,7 @@ Icon by itself:
 <p><span class="icon icon-home"></span></p>
 ```
 
-#### 4. Images
+### 4. Images
 
 Images should always use the `<picture>` element with `<source>` elements for responsive images and format optimization.
 
@@ -370,94 +443,70 @@ The nested `<div>` structure in HTML corresponds to the table structure in autho
 
 ## Complete Example
 
-Here's a complete example of a test HTML file for a hero block:
+Here's a complete example of a test `.plain.html` file for a hero block:
+
+**File:** `drafts/hero-test.plain.html`
 
 ```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- Start: Content copied from head.html -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="/scripts/aem.js" type="module"></script>
-  <script src="/scripts/scripts.js" type="module"></script>
-  <link rel="stylesheet" href="/styles/styles.css">
-  <link rel="icon" href="/icons/favicon.svg">
-  <!-- End: Content copied from head.html -->
-
-  <!-- Page-specific meta tags -->
-  <title>Hero Block Test</title>
-  <meta name="description" content="Test page for hero block">
-</head>
-
-<body>
-  <header></header>
-
-  <main>
-    <!-- Hero block section -->
+<!-- Hero block section -->
+<div>
+  <div class="hero">
     <div>
-      <div class="hero">
-        <div>
-          <div>
-            <picture>
-              <img src="/media/hero-image.jpg" alt="Welcome to our site">
-            </picture>
-          </div>
-        </div>
-        <div>
-          <div>
-            <h1>Welcome to Our Site</h1>
-            <p>This is a compelling hero message that encourages visitors to take action.</p>
-            <p><a href="/contact">Get Started</a></p>
-          </div>
-        </div>
+      <div>
+        <picture>
+          <img src="/media/hero-image.jpg" alt="Welcome to our site">
+        </picture>
       </div>
     </div>
-
-    <!-- Regular content section -->
     <div>
-      <h2>About This Test</h2>
-      <p>This page demonstrates the hero block in action.</p>
-    </div>
-
-    <!-- Hero block with variant -->
-    <div>
-      <div class="hero dark">
-        <div>
-          <div>
-            <picture>
-              <img src="/media/hero-dark.jpg" alt="Dark variant hero">
-            </picture>
-          </div>
-        </div>
-        <div>
-          <div>
-            <h2>Dark Variant Hero</h2>
-            <p>Testing the dark variant of the hero block.</p>
-          </div>
-        </div>
+      <div>
+        <h1>Welcome to Our Site</h1>
+        <p>This is a compelling hero message that encourages visitors to take action.</p>
+        <p><a href="/contact">Get Started</a></p>
       </div>
     </div>
-  </main>
+  </div>
+</div>
 
-  <footer></footer>
-</body>
-</html>
+<!-- Regular content section -->
+<div>
+  <h2>About This Test</h2>
+  <p>This page demonstrates the hero block in action.</p>
+</div>
+
+<!-- Hero block with variant -->
+<div>
+  <div class="hero dark">
+    <div>
+      <div>
+        <picture>
+          <img src="/media/hero-dark.jpg" alt="Dark variant hero">
+        </picture>
+      </div>
+    </div>
+    <div>
+      <div>
+        <h2>Dark Variant Hero</h2>
+        <p>Testing the dark variant of the hero block.</p>
+      </div>
+    </div>
+  </div>
+</div>
 ```
+
+**Preview at:** `http://localhost:3000/drafts/hero-test`
 
 ## Important Notes
 
 **File location:**
 - Create test HTML files in the `drafts/` folder
-- Can be organized in subfolders: `drafts/blocks/hero/test.html`
+- Can be organized in subfolders: `drafts/blocks/hero/test.plain.html`
+- Always use `.plain.html` extension
 
 **Running with local HTML:**
 - Start dev server with: `aem up --html-folder drafts`
 - This tells the dev server to serve HTML files from the drafts folder
-
-**Head section:**
-- ALWAYS copy the complete content from `head.html` first
-- Then add any page-specific meta tags
-- Do not manually type out head content - copy it to ensure consistency
+- The CLI automatically wraps your plain HTML with head, header, and footer
 
 **Section organization:**
 - Sections can contain any mix of blocks and default content
