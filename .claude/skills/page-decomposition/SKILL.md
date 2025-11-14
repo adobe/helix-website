@@ -9,7 +9,7 @@ Analyze content sequences within an EDS section and provide neutral descriptions
 
 ## When to Use This Skill
 
-This skill is called by **page-migration** for EACH section to:
+This skill is called by **identify-page-structure** for EACH section to:
 - Identify content sequences within that section
 - Provide neutral descriptions (NO block names yet)
 - Identify breaking points between sequences
@@ -19,14 +19,15 @@ This skill is called by **page-migration** for EACH section to:
 
 ## Input Required
 
-From the calling skill (page-migration), you need:
+From the calling skill (identify-page-structure), you need:
 - Section visual description and boundaries
 - Screenshot showing the section
 - Cleaned HTML content for the section
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that calls this skill per section (Step 2b)
+- **page-migration** - Top-level orchestrator
+- **identify-page-structure** - Invokes this skill for each section (Step 2b)
 - **block-inventory** - Provides available blocks AFTER decomposition
 - **content-modeling** - Makes authoring decisions AFTER decomposition
 - **content-driven-development** - References section structure in html-structure.md
@@ -36,7 +37,7 @@ From the calling skill (page-migration), you need:
 **EDS Content Hierarchy:**
 ```
 DOCUMENT
-├── SECTION (top-level, analyzed by page-migration Step 2a)
+├── SECTION (top-level, analyzed by identify-page-structure Step 2a)
 │   ├── Content Sequence 1 ← THIS SKILL IDENTIFIES THESE
 │   ├── Content Sequence 2 ← THIS SKILL IDENTIFIES THESE
 │   └── ...
@@ -62,7 +63,7 @@ A vertical flow of related content that will eventually become:
 
 ## Decomposition Workflow
 
-**Context:** page-migration has already identified section boundaries (Step 2a). This skill is invoked FOR ONE SECTION to analyze its internal content sequences.
+**Context:** identify-page-structure has already identified section boundaries (Step 2a). This skill is invoked FOR ONE SECTION to analyze its internal content sequences.
 
 ---
 
@@ -136,7 +137,7 @@ Provide content sequences for this section in structured format.
 **Output format:**
 ```javascript
 {
-  sectionNumber: 1,  // From page-migration
+  sectionNumber: 1,  // From identify-page-structure
   sequences: [
     {
       sequenceNumber: 1,
@@ -170,7 +171,7 @@ Provide content sequences for this section in structured format.
 
 **Placement:** At the start of each section, before content
 
-**Usage:** Applied by page-migration skill when generating final HTML/markdown
+**Usage:** Applied by generate-migration-html skill when generating final HTML
 
 ---
 

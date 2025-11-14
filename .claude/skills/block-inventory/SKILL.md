@@ -27,7 +27,8 @@ This skill provides that same context - understanding what blocks are available 
 
 ## Related Skills
 
-- **page-migration** - Invokes this skill before content modeling (Step 2.5)
+- **page-migration** - Top-level orchestrator
+- **identify-page-structure** - Invokes this skill to survey blocks (Step 2.5)
 - **block-collection-and-party** - This skill uses it to search Block Collection
 - **content-modeling** - Can reference block inventory but maintains independent judgment
 
