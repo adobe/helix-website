@@ -732,8 +732,8 @@ async function loadLazy(doc) {
 
   sampleRUM('lazy');
 
-  const { hash } = window.location;
-  if (hash) {
+  const hashTarget = window.location.hash ? doc.querySelector(window.location.hash) : null;
+  if (hashTarget) {
     // Wait for all images and videos to load before scrolling to hash target
     const media = [...doc.querySelectorAll('main img, main video')];
     await Promise.all(media.map((m) => {
@@ -745,13 +745,7 @@ async function loadLazy(doc) {
         m.addEventListener('loadedmetadata', resolve, { once: true });
       });
     }));
-
-    setTimeout(() => {
-      const hashTarget = doc.querySelector(hash);
-      if (hashTarget) {
-        hashTarget.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 10);
+    setTimeout(() => hashTarget.scrollIntoView({ behavior: 'smooth' }), 10);
   }
 
   // check to see if this is reflected in google indexed page
