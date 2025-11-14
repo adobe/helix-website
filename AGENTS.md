@@ -49,8 +49,6 @@ Skills will be added to `.claude/skills/` as needed for this project. Check the 
 
 ## Project Overview
 
-This project is **migrating the Bank of America "About" site** (https://about.bankofamerica.com/en) to Adobe Experience Manager (AEM) Edge Delivery Services. The original site serves as the source for content, design, and functionality that needs to be recreated using AEM's architecture.
-
 This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, while recreating the blocks and functionality from the source site to match its design and user experience.
 
 The repository provides the basic structure, blocks, and configuration needed to run a complete site with `*.aem.live` as the backend.
