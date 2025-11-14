@@ -201,11 +201,6 @@ function updateDataFacets(filterText, params, checkpoint) {
 
   dataChunks.addFacet('type', (bundle) => bundle.hostType);
 
-  dataChunks.addFacet(
-    'conversions',
-    (bundle) => (dataChunks.hasConversion(bundle, conversionSpec) ? 'converted' : 'not-converted'),
-  );
-
   dataChunks.addFacet('userAgent', userAgent, 'some', 'none');
 
   dataChunks.addFacet('rawURL', facets.url, 'some', 'never');
@@ -216,6 +211,7 @@ function updateDataFacets(filterText, params, checkpoint) {
     count: Math.log10(dataChunks.facets['rawURL!'].length),
   });
 
+  // Add checkpoint facet BEFORE conversions facet (which uses hasConversion that checks checkpoint)
   dataChunks.addFacet('checkpoint', facets.checkpoint, 'every', 'none');
 
   dataChunks.addFacet(
