@@ -324,6 +324,98 @@ async function loadHighlightLibrary() {
   document.body.append(initScript);
 }
 
+/**
+ * Adds copy buttons to all code blocks
+ */
+export function addCopyButtonToCodeBlocks() {
+  const codeBlocks = document.querySelectorAll('pre code');
+  if (!codeBlocks || codeBlocks.length === 0) return;
+
+  codeBlocks.forEach((codeBlock) => {
+    const pre = codeBlock.parentElement;
+    if (pre.querySelector('.code-copy-button')) return; // Already has a copy button
+
+    // Create wrapper for positioning
+    if (!pre.classList.contains('code-block-wrapper')) {
+      pre.classList.add('code-block-wrapper');
+    }
+
+    // Create copy button
+    const copyButton = createTag('button', {
+      class: 'code-copy-button',
+      type: 'button',
+      'aria-label': 'Copy code to clipboard',
+      title: 'Copy code',
+    });
+
+    // Add icon (using SVG)
+    copyButton.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="4" width="8" height="10" rx="1" ry="1"></rect>
+        <path d="M8 4V2a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-2"></path>
+      </svg>
+    `;
+
+    // Create status element for screen readers
+    const statusElement = createTag('span', {
+      class: 'code-copy-status',
+      role: 'status',
+      'aria-live': 'polite',
+      'aria-atomic': 'true',
+    });
+
+    // Copy functionality
+    const handleCopy = async () => {
+      const code = codeBlock.textContent;
+      try {
+        await navigator.clipboard.writeText(code);
+        copyButton.classList.add('copied');
+        copyButton.setAttribute('aria-label', 'Code copied to clipboard');
+        statusElement.textContent = 'Code copied to clipboard';
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          copyButton.classList.remove('copied');
+          copyButton.setAttribute('aria-label', 'Copy code to clipboard');
+          statusElement.textContent = '';
+        }, 2000);
+      } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          copyButton.classList.add('copied');
+          setTimeout(() => copyButton.classList.remove('copied'), 2000);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to copy code:', e);
+        }
+        document.body.removeChild(textArea);
+      }
+    };
+
+    // Click handler
+    copyButton.addEventListener('click', handleCopy);
+
+    // Keyboard accessibility
+    copyButton.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleCopy();
+      }
+    });
+
+    // Append button and status to pre element
+    pre.appendChild(copyButton);
+    pre.appendChild(statusElement);
+  });
+}
+
 export async function decorateGuideTemplateCodeBlock() {
   const firstCodeBlock = document.querySelector('pre code');
   if (!firstCodeBlock) return;
@@ -333,7 +425,12 @@ export async function decorateGuideTemplateCodeBlock() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           observer.unobserve(entry.target);
-          loadHighlightLibrary();
+          loadHighlightLibrary().then(() => {
+            // Add copy buttons after highlight.js has processed the code blocks
+            setTimeout(() => {
+              addCopyButtonToCodeBlocks();
+            }, 100);
+          });
         }
       });
     },
