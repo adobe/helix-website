@@ -1,6 +1,6 @@
 # The 4 Canonical Block Models
 
-AEM Edge Delivery Services has 4 canonical patterns for structuring block content. Choosing the right model is the foundation of creating effective, author-friendly content structures.
+AEM Edge Delivery Services has 4 canonical patterns for structuring block content. These proven patterns can inform your design and help you create effective, author-friendly content structures.
 
 ## Model Selection Guide
 
@@ -154,6 +154,28 @@ Each row represents an item, with columns defining the parts of that item. Ideal
 - Remove config row, use variant: `| Cards (Grid) |`
 - Use columns instead of rows for each card's parts
 - One row = one complete card
+
+### Bad Example: Cards with Header Row (Anti-Pattern)
+
+```markdown
+| Cards |
+|-------|
+| Image | Content |
+| ![Product 1](product1.jpg) | ## Product Name<p>High-quality product description.</p> |
+| ![Product 2](product2.jpg) | ## Another Product<p>Different description.</p> |
+```
+
+**Why this fails:**
+- ❌ Header row with cell names makes it spreadsheet-like
+- ❌ First row (`| Image | Content |`) is not actual content - it's just labels
+- ❌ Authors must understand to skip the first row
+- ❌ Decoration code must filter out the header row
+- ❌ Creates confusion about what is content vs. structure
+
+**How to fix:**
+- Remove the header row entirely
+- Let semantic formatting and decoration code identify parts of each card
+- Each row should be actual content, not labels
 
 ---
 
