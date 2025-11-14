@@ -71,9 +71,9 @@ aem up --html-folder drafts
 ```
 
 **Preview URLs:**
-- File: `drafts/hero-test.plain.html` → URL: `http://localhost:3000/hero-test`
-- File: `drafts/blocks/cards.plain.html` → URL: `http://localhost:3000/blocks/cards`
-- **Special case:** `drafts/index.plain.html` → URL: `http://localhost:3000/index` (NOT `/`)
+- File: `drafts/hero-test.plain.html` → URL: `http://localhost:3000/drafts/hero-test`
+- File: `drafts/blocks/cards.plain.html` → URL: `http://localhost:3000/drafts/blocks/cards`
+- **Special case:** `drafts/index.plain.html` → URL: `http://localhost:3000/drafts/index` (NOT `/drafts/`)
 
 ## Section Structure
 
@@ -494,7 +494,7 @@ Here's a complete example of a test `.plain.html` file for a hero block:
 </div>
 ```
 
-**Preview at:** `http://localhost:3000/hero-test`
+**Preview at:** `http://localhost:3000/drafts/hero-test`
 
 ## Important Notes
 

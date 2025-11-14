@@ -939,7 +939,12 @@ Before proceeding to Step 5, verify:
 
 ### Step 5: Preview and Verify
 
-Open the migrated content in your local dev server:
+Open the migrated content in your local dev server.
+
+**Start dev server:**
+```bash
+aem up
+```
 
 **Navigate in browser:**
 
@@ -954,6 +959,12 @@ Example: http://localhost:3000/us/en/about
 If file is: index.plain.html
 Preview at: http://localhost:3000/index
 NOT: http://localhost:3000/
+```
+
+**Note:** If you used `--html-folder` flag (e.g., `aem up --html-folder drafts`), prepend that folder to the URL:
+```
+File: drafts/test.plain.html
+URL: http://localhost:3000/drafts/test
 ```
 
 (Use `paths.documentPath` from `./migration-work/metadata.json`, but for index files ensure the path is `/index` not `/`)
