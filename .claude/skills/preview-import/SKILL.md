@@ -1,6 +1,6 @@
 ---
 name: preview-import
-description: Preview and verify imported content in local dev server. Validates rendering, compares with original page, and troubleshoots common issues.
+description: Preview and verify imported content in local AEM Edge Delivery Services dev server. Validates rendering, compares with original page, and troubleshoots common issues.
 ---
 
 # Preview Import
@@ -97,7 +97,7 @@ Use `paths.documentPath` from metadata.json, but for index files ensure the path
 ## Troubleshooting
 
 **Blocks don't render correctly:**
-- Check HTML structure matches EDS format
+- Check HTML structure matches expected format
 - Verify block names match exactly (case-sensitive)
 - Review `../page-import/resources/html-structure.md` for format guidance
 
@@ -114,7 +114,7 @@ Use `paths.documentPath` from metadata.json, but for index files ensure the path
 **Metadata not in page source:**
 - Check metadata block is at end of HTML file
 - View page source and search for `<meta>` tags in `<head>`
-- Verify metadata properties match EDS format
+- Verify metadata properties match expected format
 
 **Dev server not running:**
 - Start server with `aem up`

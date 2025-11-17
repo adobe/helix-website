@@ -168,7 +168,7 @@ Extracts SEO and social metadata:
 
 ### 7. Document Path Generation
 
-Generates Edge Delivery Services-compliant document paths from the source URL:
+Generates document paths from the source URL:
 
 **Algorithm:**
 1. Extracts pathname from URL
@@ -353,5 +353,5 @@ After running web page analysis:
 1. Review screenshots to understand page structure
 2. Examine enhanced-contrast.png to identify section boundaries
 3. Use cleaned HTML to map content to blocks
-4. Use metadata to generate EDS metadata block
+4. Use metadata to generate metadata block
 5. Proceed with page-import Steps 2-5

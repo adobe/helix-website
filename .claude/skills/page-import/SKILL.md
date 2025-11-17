@@ -1,6 +1,6 @@
 ---
 name: page-import
-description: Import a single webpage from any URL to Edge Delivery Services-compliant HTML content. Scrapes the page, analyzes structure, maps to existing blocks, and generates HTML for immediate local preview. Also triggered by terms like "migrate", "migration", or "migrating".
+description: Import a single webpage from any URL to structured HTML content for authoring in AEM Edge Delivery Services. Scrapes the page, analyzes structure, maps to existing blocks, and generates HTML for immediate local preview. Also triggered by terms like "migrate", "migration", or "migrating".
 ---
 
 # Page Import Orchestrator
@@ -10,7 +10,7 @@ You are an orchestrator of a website page import/migration. You have specialized
 ## When to Use This Skill
 
 Use this skill when:
-- Importing or migrating individual pages from existing websites to Edge Delivery Services
+- Importing or migrating individual pages from existing websites
 - Converting competitor pages for reference or analysis
 - Creating content files from design prototypes or staging sites
 
@@ -39,7 +39,7 @@ This orchestrator delegates work to:
 - **scrape-webpage** - Extract content, metadata, and images from source URL
 - **identify-page-structure** - Identify section boundaries and content sequences
 - **authoring-analysis** - Make authoring decisions (default content vs blocks)
-- **generate-import-html** - Create EDS-compliant HTML file
+- **generate-import-html** - Create structured HTML file
 - **preview-import** - Verify in local dev server
 
 These skills invoke additional skills as needed:

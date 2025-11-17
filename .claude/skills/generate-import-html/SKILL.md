@@ -1,11 +1,11 @@
 ---
 name: generate-import-html
-description: Generate Edge Delivery Services-compliant HTML from authoring analysis. Creates section structure, applies block tables, handles metadata, and manages images folder.
+description: Generate structured HTML from authoring analysis for AEM Edge Delivery Services. Creates section structure, applies block tables, handles metadata, and manages images folder.
 ---
 
 # Generate Import HTML
 
-Create plain HTML file with EDS block structure from authoring analysis.
+Create plain HTML file with block structure from authoring analysis.
 
 ## When to Use This Skill
 
@@ -136,34 +136,34 @@ From previous skills, you need:
 
 **1. Review extracted metadata from metadata.json**
 
-**2. Map each property to EDS format:**
+**2. Map each property to standard format:**
 
 **Title:**
 - Compare source `title` (or `og:title`) with first H1 on page
-- If matches first H1 → Omit (EDS defaults to H1)
+- If matches first H1 → Omit (platform defaults to H1)
 - If differs → Include as `title` property
 
 **Description:**
 - Compare source `description` (or `og:description`) with first paragraph
-- If matches first paragraph → Consider omitting (EDS defaults to first paragraph)
+- If matches first paragraph → Consider omitting (platform defaults to first paragraph)
 - If differs OR more descriptive → Include as `description` property
 - Check: 150-160 characters ideal
 
 **Image:**
 - Check source `og:image`
-- If matches first content image → Consider omitting (EDS defaults to first image)
+- If matches first content image → Consider omitting (platform defaults to first image)
 - If custom social image → Include as `image` property
 - Ensure absolute URL or correct relative path
 - Check: 1200x630 pixels recommended
 
 **Canonical:**
-- If points to same page URL → Omit (EDS auto-generates)
+- If points to same page URL → Omit (platform auto-generates)
 - If points to different page → Include as `canonical` property
 
 **Tags:**
 - Map `article:tag` or `keywords` → comma-separated `tags` property
 
-**Properties to SKIP** (EDS auto-populates):
+**Properties to SKIP** (platform auto-populates):
 - `og:url`, `og:title`, `og:description`, `twitter:title`, `twitter:description`, `twitter:image`
 - `viewport`, `charset`, `X-UA-Compatible` (belong in head.html)
 
@@ -258,7 +258,7 @@ This skill provides:
 - ✅ HTML file at correct path (e.g., `us/en/about.plain.html`)
 - ✅ Images folder in same directory (e.g., `us/en/images/`)
 - ✅ Complete content import (all sections)
-- ✅ Proper EDS block structure
+- ✅ Proper block structure
 - ✅ Section metadata applied per validation
 - ✅ Page metadata block included
 

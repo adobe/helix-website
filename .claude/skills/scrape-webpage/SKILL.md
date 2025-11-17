@@ -1,11 +1,11 @@
 ---
 name: scrape-webpage
-description: Scrape webpage content, extract metadata, download images, and prepare for Edge Delivery Services import/migration. Returns analysis JSON with paths, metadata, cleaned HTML, and local images.
+description: Scrape webpage content, extract metadata, download images, and prepare for import/migration to AEM Edge Delivery Services. Returns analysis JSON with paths, metadata, cleaned HTML, and local images.
 ---
 
 # Scrape Webpage
 
-Extract content, metadata, and images from a webpage for Edge Delivery Services import/migration.
+Extract content, metadata, and images from a webpage for import/migration.
 
 ## When to Use This Skill
 
@@ -49,7 +49,7 @@ node .claude/skills/scrape-webpage/scripts/analyze-webpage.js "https://example.c
 7. **Fixes images in DOM** (background-image→img, picture elements, srcset→src, relative→absolute, inline SVG→img)
 8. Extracts cleaned HTML (removes scripts/styles)
 9. Replaces image URLs in HTML with local paths (./images/...)
-10. Generates Edge Delivery Services document paths (sanitized, lowercase, no .html)
+10. Generates document paths (sanitized, lowercase, no .html extension)
 11. Saves complete analysis with image mapping to metadata.json
 
 **For detailed explanation:** See `resources/web-page-analysis.md`

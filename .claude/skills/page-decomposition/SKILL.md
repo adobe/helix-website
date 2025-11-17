@@ -1,11 +1,11 @@
 ---
 name: page-decomposition
-description: Analyze content sequences within a section and provide neutral descriptions. Invoked per section during page import to identify breaking points between default content and blocks.
+description: Analyze content sequences within a section and provide neutral descriptions for AEM Edge Delivery Services. Invoked per section during page import to identify breaking points between default content and blocks.
 ---
 
 # Page Decomposition
 
-Analyze content sequences within an EDS section and provide neutral descriptions without assigning block names.
+Analyze content sequences within a section and provide neutral descriptions without assigning block names.
 
 ## When to Use This Skill
 
@@ -34,7 +34,7 @@ From the calling skill (identify-page-structure), you need:
 
 ## Key Concepts
 
-**EDS Content Hierarchy:**
+**Content Hierarchy:**
 ```
 DOCUMENT
 ├── SECTION (top-level, analyzed by identify-page-structure Step 2a)
@@ -160,7 +160,7 @@ Provide content sequences for this section in structured format.
 
 ## Section Metadata Format
 
-**Markdown format:**
+**Table format:**
 ```markdown
 +------------------------------+
 | Section Metadata             |
