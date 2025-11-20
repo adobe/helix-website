@@ -7,7 +7,7 @@ description: Searches the aem.live documentation for information on features of 
 
 ## Overview
 
-This skill helps you efficiently search the complete aem.live documentation (docs and blog posts) without wasting context on irrelevant pages. Use the provided search script to find relevant documentation pages, then use WebFetch to read the full content of the most relevant results.
+This skill helps you efficiently search the complete aem.live documentation (docs and blog posts) without wasting context on irrelevant pages. Use the provided search script to find relevant documentation pages, then fetch and read the full content of the most relevant results.
 
 ## When to Use This Skill
 
@@ -97,46 +97,29 @@ The script returns JSON with the following structure:
 - The `description` field provides the best quick summary of the page
 - The `snippet` shows keyword context but may not be comprehensive
 
-### Step 4: Use WebFetch for Full Content
+### Step 4: Fetch and Read Full Documentation
 
-The search results give you an overview. To get detailed information, use WebFetch to read the full page:
+The search results give you an overview. To get detailed information, you must fetch and read the complete page content.
 
+**Target URL format:**
 ```
-WebFetch: https://www.aem.live{path}
+https://www.aem.live{path}
 ```
 
-**Best Practice:** Start with the top 2-3 most relevant results, read them fully with WebFetch, then decide if you need more.
+**How to retrieve:** Use whatever method you have available to fetch the full HTML/text content:
+- Dedicated web fetching tools
+- Terminal commands (curl, wget, etc.)
+- Web browsing/scraping capabilities
+
+**Best Practice:** Start with the top 2-3 most relevant results, read them fully, then decide if you need more. You may also follow links referenced in the documentation or conduct additional searches based on what you learn.
 
 ### Step 5: Alert User to Deprecations
 
 If any results have a `deprecation` field with content, **inform the user** that the feature is deprecated and include the deprecation message. Suggest they look at higher-ranked (non-deprecated) alternatives.
 
-## Search Behavior Details
+## What Gets Searched
 
-### What Gets Searched
-
-1. **Primary**: Full documentation (docpages-index.json) - 150+ pages with complete content
-2. **Secondary**: Blog posts (query-index.json) - Only searched if < 5 doc results found
-
-### Stop Words (Automatically Filtered)
-
-These common words are ignored in searches:
-- Articles: the, a, an
-- Conjunctions: and, or, but
-- Prepositions: in, on, at, to, for, of, with, by
-- AEM-specific: aem, cms, edge, delivery, services
-
-### Relevance Scoring
-
-- **Title match**: 10 points per occurrence
-- **Description match**: 5 points per occurrence
-- **Content match**: 1 point per occurrence
-- **Multi-keyword bonus**: 1.5x multiplier if multiple keywords match
-- **Deprecation penalty**: 0.5x multiplier (score halved) for deprecated features
-
-### Caching
-
-Index files are cached locally for 24 hours in `.claude/skills/docs-search/.cache/`. This speeds up subsequent searches.
+The search script searches documentation first (150+ pages). Blog posts are only searched if fewer than 5 doc results are found. If you need comprehensive coverage including blogs, use the `--all` flag.
 
 ## Examples
 
@@ -147,11 +130,11 @@ Index files are cached locally for 24 hours in `.claude/skills/docs-search/.cach
 **Good Approach:**
 1. Search: `node .claude/skills/docs-search/scripts/search.js block decoration`
 2. Review top 3 results
-3. WebFetch the most relevant: `https://www.aem.live/developer/markup-sections-blocks`
+3. Fetch the most relevant: `https://www.aem.live/developer/markup-sections-blocks`
 4. Read full content and provide answer
 
 **Poor Approach:**
-- Using WebSearch instead (wastes time on irrelevant results)
+- Using general web search instead (wastes time on irrelevant results)
 - Not using the search script (might miss the best documentation page)
 
 ### Example 2: Learning About Metadata
@@ -162,7 +145,7 @@ Index files are cached locally for 24 hours in `.claude/skills/docs-search/.cach
 1. Search: `node .claude/skills/docs-search/scripts/search.js metadata`
 2. Notice top result is "/docs/bulk-metadata" (score: 63)
 3. Also see "/docs/metadata" (score: 30)
-4. WebFetch both to understand page-level vs bulk metadata
+4. Fetch and read both to understand page-level vs bulk metadata
 5. Provide comprehensive answer with both approaches
 
 **Poor Approach:**
@@ -207,7 +190,7 @@ Index files are cached locally for 24 hours in `.claude/skills/docs-search/.cach
 ## Important Reminders
 
 1. **Always check for deprecation warnings** and alert the user
-2. **Use WebFetch to read full pages** - search results are just for finding the right pages
+2. **Fetch and read full pages** - search results are just for finding the right pages
 3. **Start with top 2-3 results** before expanding search
 4. **The description field is your friend** - it's usually well-written and concise
 5. **Don't rely solely on snippets** - they're for context, not comprehensive information
