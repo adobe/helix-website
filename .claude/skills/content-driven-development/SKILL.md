@@ -92,7 +92,7 @@ node .claude/skills/content-driven-development/scripts/find-block-content.js <bl
    - Validate content loads in local dev environment
 
 3. **For Local HTML:**
-   - Create HTML file(s) in `drafts/tmp/{block-name}.html`
+   - Create HTML file(s) in `drafts/tmp/{block-name}.plain.html`
    - Restart dev server: `aem up --html-folder drafts`
    - Remind user that CMS content will be needed before PR
 

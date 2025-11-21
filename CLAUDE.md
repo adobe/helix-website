@@ -4,7 +4,13 @@ This project is a website built with Edge Delivery Services in Adobe Experience 
 
 ## Skills
 
-**For ALL development work involving blocks, core scripts, or functionality, you MUST start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
+Two skills serve as primary entry points for common workflows:
+
+**content-driven-development** - Start here for all development work including building new blocks, modifying existing blocks, or making changes to core decoration functionality. This skill orchestrates the complete development workflow from content modeling through implementation and testing.
+
+**page-import** - Start here when importing or migrating webpages from any URL to AEM Edge Delivery Services. This skill orchestrates the complete import workflow including scraping, analysis, structure identification, and HTML generation.
+
+All other skills are either invoked by these primary skills or used for specific standalone tasks (e.g., searching platform documentation, finding reference implementations). Let skill descriptions guide you to the right tool for your task.
 
 ## Project Overview
 
