@@ -13,8 +13,8 @@
  */
 
 /**
- * Path generation script for Edge Delivery Services page migration
- * Generates Edge Delivery Services-compliant document paths from source URLs
+ * Path generation script for page migration
+ * Generates document paths from source URLs
  *
  * This uses the exact same algorithm as the EXCAT MCP tool's generate_document_path
  * to ensure consistent path generation across all migration workflows.
@@ -44,7 +44,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Sanitize a filename according to AEM Edge Delivery Services naming conventions
+ * Sanitize a filename according to standard naming conventions
  * @param {string} name - The filename to sanitize
  * @returns {string} - Sanitized filename
  */
@@ -59,7 +59,7 @@ function sanitizeFilename(name) {
 }
 
 /**
- * Sanitize a path according to AEM Edge Delivery Services naming conventions
+ * Sanitize a path according to standard naming conventions
  * @param {string} pathStr - The path to sanitize
  * @returns {string} - Sanitized path
  */
@@ -80,7 +80,7 @@ function sanitizePath(pathStr) {
 }
 
 /**
- * Generate Edge Delivery Services document path from URL according to AEM Edge Delivery Services conventions
+ * Generate document path from URL according to standard conventions
  * @param {string} url - Source URL
  * @returns {string} - Document path (without extension)
  */
@@ -103,7 +103,7 @@ function generateDocumentPath({ url }) {
  */
 function generateDocumentPathInfo(url) {
   try {
-    // Generate the Edge Delivery Services document path (no extension)
+    // Generate the document path (no extension)
     const documentPath = generateDocumentPath({ url });
 
     // Build file paths

@@ -1,6 +1,6 @@
 ---
 name: identify-page-structure
-description: Identify section boundaries and content sequences within a scraped webpage. Performs two-level analysis (sections, then sequences per section) and surveys available blocks.
+description: Identify section boundaries and content sequences within a scraped webpage for AEM Edge Delivery Services import. Performs two-level analysis (sections, then sequences per section) and surveys available blocks.
 ---
 
 # Identify Page Structure
@@ -14,7 +14,7 @@ Use this skill when:
 - Need to identify section boundaries and content sequences
 - Ready to understand page structure before making authoring decisions
 
-**Invoked by:** page-migration skill (Step 2)
+**Invoked by:** page-import skill (Step 2)
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ From scrape-webpage skill, you need:
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that invokes this skill
+- **page-import** - Orchestrator that invokes this skill
 - **scrape-webpage** - Provides input (screenshot, HTML)
 - **page-decomposition** - This skill invokes it for EACH section
 - **block-inventory** - This skill invokes it to survey available blocks
@@ -33,7 +33,7 @@ From scrape-webpage skill, you need:
 
 ## Key Concepts
 
-**CRITICAL:** EDS content has a strict two-level hierarchy:
+**CRITICAL:** Content follows a strict two-level hierarchy:
 
 ```
 DOCUMENT

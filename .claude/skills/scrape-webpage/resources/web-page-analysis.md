@@ -22,7 +22,7 @@ The web page analysis workflow prepares a source webpage for content migration b
 ### Command Line
 
 ```bash
-node .claude/skills/page-migration/scripts/analyze-webpage.js "https://example.com/page" --output ./analysis
+node .claude/skills/scrape-webpage/scripts/analyze-webpage.js "https://example.com/page" --output ./analysis
 ```
 
 ### Parameters
@@ -168,7 +168,7 @@ Extracts SEO and social metadata:
 
 ### 7. Document Path Generation
 
-Generates Edge Delivery Services-compliant document paths from the source URL:
+Generates document paths from the source URL:
 
 **Algorithm:**
 1. Extracts pathname from URL
@@ -253,9 +253,9 @@ This means the migrated HTML file already references local images - no manual UR
 
 ## When to Use
 
-### Automatic (within page-migration skill)
+### Automatic (within page-import skill)
 
-The analyze-webpage.js script is invoked automatically as Step 1 of page-migration. You don't need to run it manually.
+The analyze-webpage.js script is invoked automatically as Step 1 of page-import. You don't need to run it manually.
 
 ### Standalone Use Cases
 
@@ -298,17 +298,17 @@ Some pages hide content behind:
 
 The script attempts basic popup dismissal, but complex cases may need customization.
 
-## Integration with Page Migration
+## Integration with Page Import
 
 ```
-page-migration Step 1: Scrape Webpage
+page-import Step 1: Scrape Webpage
 └─ Runs: node analyze-webpage.js [URL] --output ./work
    ├─ Returns: JSON with all extracted data
    ├─ Saves: Screenshots for visual analysis
    ├─ Saves: Cleaned HTML for content mapping
    └─ Saves: Metadata for SEO preservation
 
-page-migration Step 2-5: Use the extracted data
+page-import Step 2-5: Use the extracted data
 ├─ Enhanced screenshot → Identify section boundaries
 ├─ Original screenshot → Visual reference
 ├─ Cleaned HTML → Map to blocks
@@ -353,5 +353,5 @@ After running web page analysis:
 1. Review screenshots to understand page structure
 2. Examine enhanced-contrast.png to identify section boundaries
 3. Use cleaned HTML to map content to blocks
-4. Use metadata to generate EDS metadata block
-5. Proceed with page-migration Steps 2-5
+4. Use metadata to generate metadata block
+5. Proceed with page-import Steps 2-5

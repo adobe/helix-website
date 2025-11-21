@@ -1,11 +1,11 @@
 ---
-name: generate-migration-html
-description: Generate Edge Delivery Services-compliant HTML from authoring analysis. Creates section structure, applies block tables, handles metadata, and manages images folder.
+name: generate-import-html
+description: Generate structured HTML from authoring analysis for AEM Edge Delivery Services. Creates section structure, applies block tables, handles metadata, and manages images folder.
 ---
 
-# Generate Migration HTML
+# Generate Import HTML
 
-Create plain HTML file with EDS block structure from authoring analysis.
+Create plain HTML file with block structure from authoring analysis.
 
 ## When to Use This Skill
 
@@ -14,7 +14,7 @@ Use this skill when:
 - You have section styling validation (from authoring-analysis)
 - Ready to generate the HTML file for preview
 
-**Invoked by:** page-migration skill (Step 4)
+**Invoked by:** page-import skill (Step 4)
 
 ## Prerequisites
 
@@ -27,20 +27,20 @@ From previous skills, you need:
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that invokes this skill
+- **page-import** - Orchestrator that invokes this skill
 - **authoring-analysis** - Provides authoring decisions and styling validation
 - **scrape-webpage** - Provides metadata, paths, cleaned HTML, images
-- **preview-migration** - Uses this skill's HTML output
+- **preview-import** - Uses this skill's HTML output
 
-## ⚠️ CRITICAL REQUIREMENT: Complete Content Migration
+## ⚠️ CRITICAL REQUIREMENT: Complete Content Import
 
-**YOU MUST MIGRATE ALL CONTENT FROM THE PAGE. PARTIAL MIGRATION IS UNACCEPTABLE.**
+**YOU MUST IMPORT ALL CONTENT FROM THE PAGE. PARTIAL IMPORT IS UNACCEPTABLE.**
 
 - ❌ NEVER truncate or skip sections due to length concerns
 - ❌ NEVER summarize or abbreviate content
 - ❌ NEVER use placeholders like "<!-- rest of content -->"
 - ❌ NEVER omit content because the page is "too long"
-- ✅ ALWAYS migrate every section from authoring analysis
+- ✅ ALWAYS import every section from authoring analysis
 - ✅ ALWAYS include all text, images, and structure from cleaned.html
 - ✅ If you encounter length issues, generate the FULL HTML anyway
 
@@ -86,7 +86,7 @@ From previous skills, you need:
 </div>
 ```
 
-**For detailed block structure patterns:** See `../page-migration/resources/html-structure.md`
+**For detailed block structure patterns:** See `../page-import/resources/html-structure.md`
 
 ---
 
@@ -136,34 +136,34 @@ From previous skills, you need:
 
 **1. Review extracted metadata from metadata.json**
 
-**2. Map each property to EDS format:**
+**2. Map each property to standard format:**
 
 **Title:**
 - Compare source `title` (or `og:title`) with first H1 on page
-- If matches first H1 → Omit (EDS defaults to H1)
+- If matches first H1 → Omit (platform defaults to H1)
 - If differs → Include as `title` property
 
 **Description:**
 - Compare source `description` (or `og:description`) with first paragraph
-- If matches first paragraph → Consider omitting (EDS defaults to first paragraph)
+- If matches first paragraph → Consider omitting (platform defaults to first paragraph)
 - If differs OR more descriptive → Include as `description` property
 - Check: 150-160 characters ideal
 
 **Image:**
 - Check source `og:image`
-- If matches first content image → Consider omitting (EDS defaults to first image)
+- If matches first content image → Consider omitting (platform defaults to first image)
 - If custom social image → Include as `image` property
 - Ensure absolute URL or correct relative path
 - Check: 1200x630 pixels recommended
 
 **Canonical:**
-- If points to same page URL → Omit (EDS auto-generates)
+- If points to same page URL → Omit (platform auto-generates)
 - If points to different page → Include as `canonical` property
 
 **Tags:**
 - Map `article:tag` or `keywords` → comma-separated `tags` property
 
-**Properties to SKIP** (EDS auto-populates):
+**Properties to SKIP** (platform auto-populates):
 - `og:url`, `og:title`, `og:description`, `twitter:title`, `twitter:description`, `twitter:image`
 - `viewport`, `charset`, `X-UA-Compatible` (belong in head.html)
 
@@ -195,7 +195,7 @@ From previous skills, you need:
 
 ### Images Folder Management (CRITICAL)
 
-The images are currently in `./migration-work/images/` and the HTML references them as `./images/...`. You MUST handle the images folder correctly:
+The images are currently in `./import-work/images/` and the HTML references them as `./images/...`. You MUST handle the images folder correctly:
 
 **Step 1: Determine the correct images folder location**
 
@@ -211,7 +211,7 @@ Based on `paths.htmlFilePath` from metadata.json:
 ```bash
 # Example: If HTML is at us/en/about.plain.html
 mkdir -p us/en/images
-cp -r ./migration-work/images/* us/en/images/
+cp -r ./import-work/images/* us/en/images/
 ```
 
 **Step 3: Verify image paths in HTML are correct**
@@ -238,7 +238,7 @@ Read the metadata.json file from scrape-webpage to get the correct file path.
 
 ## Validation Checklist (MANDATORY)
 
-Before proceeding to preview-migration skill, verify:
+Before proceeding to preview-import skill, verify:
 - ✅ Section count: HTML has the same number of top-level `<div>` sections as identified in identify-page-structure
 - ✅ All sequences: Every content sequence from authoring-analysis appears in the HTML
 - ✅ No truncation: No "..." or "<!-- more content -->" or similar placeholders
@@ -257,9 +257,9 @@ Before proceeding to preview-migration skill, verify:
 This skill provides:
 - ✅ HTML file at correct path (e.g., `us/en/about.plain.html`)
 - ✅ Images folder in same directory (e.g., `us/en/images/`)
-- ✅ Complete content migration (all sections)
-- ✅ Proper EDS block structure
+- ✅ Complete content import (all sections)
+- ✅ Proper block structure
 - ✅ Section metadata applied per validation
 - ✅ Page metadata block included
 
-**Next step:** Pass HTML file path to preview-migration skill
+**Next step:** Pass HTML file path to preview-import skill
