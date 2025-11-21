@@ -1,8 +1,8 @@
 # Metadata Mapping Reference
 
-Detailed mapping rules for converting source webpage metadata to EDS metadata properties.
+Detailed mapping rules for converting source webpage metadata to standard metadata properties.
 
-## EDS Special Properties Reference
+## Special Properties Reference
 
 ### canonical
 - **Used in:** `<link rel="canonical">`, `<meta property="og:url">`, `<meta name="twitter:url">`
@@ -52,20 +52,20 @@ Detailed mapping rules for converting source webpage metadata to EDS metadata pr
 ### Title Mapping
 
 ```
-Source                    → EDS Property
+Source                    → Property
 ──────────────────────────────────────────
 <title>                   → title (only if differs from first H1)
 og:title                  → title (if different from <title>)
 twitter:title             → title (if different from <title>)
 
-Note: EDS auto-populates og:title and twitter:title from title
+Note: Platform auto-populates og:title and twitter:title from title
 ```
 
 **Decision Logic:**
 1. Extract `<title>`, `og:title`, `twitter:title` from source
 2. If all consistent → Use single `title` property
 3. If inconsistent → Document conflict, choose best one (typically `<title>`)
-4. If title will match first H1 in content → Omit (rely on EDS default)
+4. If title will match first H1 in content → Omit (rely on platform default)
 
 **Examples:**
 
@@ -77,7 +77,7 @@ Source:
   <meta name="twitter:title" content="About Us | Acme Corp">
   Page has H1: "About Our Company"
 
-EDS Metadata:
+Metadata:
   title: About Us | Acme Corp
 
 Reason: Title is consistent across sources but differs from H1
@@ -89,10 +89,10 @@ Source:
   <title>About Our Company</title>
   Page has H1: "About Our Company"
 
-EDS Metadata:
+Metadata:
   (omit title property)
 
-Reason: EDS will use H1 as default
+Reason: Platform will use H1 as default
 ```
 
 ```markdown
@@ -101,7 +101,7 @@ Source:
   <title>About Us | Acme Corp</title>
   <meta property="og:title" content="Learn About Acme Corporation">
 
-EDS Metadata:
+Metadata:
   title: About Us | Acme Corp
 
 Note: Document the conflict. Chose <title> as primary.
@@ -113,13 +113,13 @@ Alternative: Use og:title value if it's better for social sharing.
 ### Description Mapping
 
 ```
-Source                    → EDS Property
+Source                    → Property
 ──────────────────────────────────────────
 <meta name="description"> → description
 og:description            → description (if different from meta description)
 twitter:description       → description (if different from meta description)
 
-Note: EDS auto-populates og:description and twitter:description from description
+Note: Platform auto-populates og:description and twitter:description from description
 ```
 
 **Decision Logic:**
@@ -136,7 +136,7 @@ Source:
   <meta name="description" content="Learn about our company history and values">
   <meta property="og:description" content="Learn about our company history and values">
 
-EDS Metadata:
+Metadata:
   description: Learn about our company history and values
 ```
 
@@ -146,10 +146,10 @@ Source:
   <meta name="description" content="Welcome to our website">
   First paragraph: "Welcome to our website. We are glad you're here."
 
-EDS Metadata:
+Metadata:
   (consider omitting description)
 
-Note: EDS will use first paragraph. Consider if meta description is sufficient.
+Note: Platform will use first paragraph. Consider if meta description is sufficient.
 ```
 
 ---
@@ -157,12 +157,12 @@ Note: EDS will use first paragraph. Consider if meta description is sufficient.
 ### Image Mapping
 
 ```
-Source                    → EDS Property
+Source                    → Property
 ──────────────────────────────────────────
 og:image                  → image
 twitter:image             → image (if different from og:image)
 
-Note: EDS auto-populates og:image and twitter:image from image
+Note: Platform auto-populates og:image and twitter:image from image
 ```
 
 **Decision Logic:**
@@ -179,7 +179,7 @@ Source:
   <meta property="og:image" content="https://example.com/social-share.jpg">
   First image on page: hero-background.jpg
 
-EDS Metadata:
+Metadata:
   image: https://example.com/social-share.jpg
 
 Reason: Custom social sharing image differs from first page image
@@ -191,10 +191,10 @@ Source:
   <meta property="og:image" content="https://example.com/hero.jpg">
   First image on page: https://example.com/hero.jpg
 
-EDS Metadata:
+Metadata:
   (consider omitting image)
 
-Reason: EDS will use first image as default
+Reason: Platform will use first image as default
 ```
 
 ---
@@ -202,17 +202,17 @@ Reason: EDS will use first image as default
 ### Canonical Mapping
 
 ```
-Source                         → EDS Property
+Source                         → Property
 ─────────────────────────────────────────────
 <link rel="canonical">         → canonical (only if custom URL needed)
 og:url                         → canonical (if consistent with link rel)
 twitter:url                    → canonical (if consistent with link rel)
 
-Note: EDS auto-generates canonical if omitted
+Note: Platform auto-generates canonical if omitted
 ```
 
 **Decision Logic:**
-1. If canonical points to same page → Omit (EDS auto-generates)
+1. If canonical points to same page → Omit (Platform auto-generates)
 2. If canonical points to different page → Include (syndicated content)
 3. If URL needs extension → Consider `canonical:extension` in bulk metadata
 
@@ -224,10 +224,10 @@ Source:
   <link rel="canonical" href="https://example.com/about">
   Current page: https://example.com/about
 
-EDS Metadata:
+Metadata:
   (omit canonical)
 
-Reason: EDS will auto-generate canonical for same page
+Reason: Platform will auto-generate canonical for same page
 ```
 
 ```markdown
@@ -236,7 +236,7 @@ Source:
   <link rel="canonical" href="https://originalsource.com/article">
   Current page: https://example.com/republished-article
 
-EDS Metadata:
+Metadata:
   canonical: https://originalsource.com/article
 
 Reason: Points to original source for syndicated content
@@ -247,7 +247,7 @@ Reason: Points to original source for syndicated content
 ### Tags Mapping
 
 ```
-Source                    → EDS Property
+Source                    → Property
 ──────────────────────────────────────────
 article:tag (multiple)    → tags (comma-separated or bullet list)
 keywords                  → tags (if article:tag not present)
@@ -266,7 +266,7 @@ Source:
   <meta property="article:tag" content="performance">
   <meta property="article:tag" content="edge delivery">
 
-EDS Metadata:
+Metadata:
   tags: web development, performance, edge delivery
 ```
 
@@ -276,7 +276,7 @@ Source:
   <meta name="keywords" content="web, development, seo">
   (no article:tag present)
 
-EDS Metadata:
+Metadata:
   tags: web, development, seo
 ```
 
@@ -285,7 +285,7 @@ EDS Metadata:
 ### Other Standard Properties
 
 ```
-Source                    → EDS Property
+Source                    → Property
 ──────────────────────────────────────────
 author / article:author   → author
 robots                    → robots
@@ -307,9 +307,9 @@ Skip these - they belong in `head.html`:
 - `X-UA-Compatible`
 - `theme-color`
 
-### Auto-populated by EDS
+### Auto-populated by Platform
 
-Skip these - EDS generates from canonical/title/description:
+Skip these - platform generates from canonical/title/description:
 - `og:url` (if same as canonical)
 - `twitter:url` (if same as canonical)
 - `og:title` (if same as title)
@@ -328,7 +328,7 @@ Skip these - EDS generates from canonical/title/description:
 - `robots`
 - `canonical` (if points elsewhere)
 
-### Social Sharing (map to EDS special properties)
+### Social Sharing (map to special properties)
 - `og:title` → `title`
 - `og:description` → `description`
 - `og:image` → `image`

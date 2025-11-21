@@ -1,16 +1,16 @@
 # Metadata Extraction
 
-Extract and map metadata from source webpages to Edge Delivery Services-compliant metadata structure.
+Extract and map metadata from source webpages to standard metadata structure.
 
 ## Purpose
 
-Metadata extraction preserves SEO and social sharing properties when migrating pages to Edge Delivery Services. This resource explains how to map source page metadata to EDS-compliant properties.
+Metadata extraction preserves SEO and social sharing properties when migrating pages. This resource explains how to map source page metadata to standard properties.
 
 ## Key Principles
 
-### Leverage EDS Defaults
+### Leverage Platform Defaults
 
-EDS automatically generates metadata from page content when not explicitly provided:
+The platform automatically generates metadata from page content when not explicitly provided:
 
 - **Title** → Defaults to first H1
 - **Description** → Defaults to first paragraph (10+ words)
@@ -19,9 +19,9 @@ EDS automatically generates metadata from page content when not explicitly provi
 
 **Only include metadata when it differs from defaults.**
 
-### EDS Special Properties
+### Special Properties
 
-EDS provides convenience properties that auto-populate multiple metadata tags:
+The platform provides convenience properties that auto-populate multiple metadata tags:
 
 - `title` → Auto-populates `og:title`, `twitter:title`, `<title>`
 - `description` → Auto-populates `og:description`, `twitter:description`
@@ -31,14 +31,14 @@ EDS provides convenience properties that auto-populate multiple metadata tags:
 
 ## Metadata Extraction Process
 
-Metadata is extracted automatically by the `analyze-webpage.js` script during Step 1 of page migration. The script collects:
+Metadata is extracted automatically by the `analyze-webpage.js` script during Step 1 of page import. The script collects:
 
 - `<title>` tag content
 - All `<meta>` tags (both `name` and `property` attributes)
 - `<link rel="canonical">` href
 - JSON-LD structured data (`<script type="application/ld+json">`)
 
-## Mapping to EDS Properties
+## Mapping to Standard Properties
 
 Use the `metadata-mapping.md` resource for detailed mapping rules. Key decision points:
 
@@ -48,7 +48,7 @@ Use the `metadata-mapping.md` resource for detailed mapping rules. Key decision 
 ```
 Source has <title> tag?
 ├─ Matches first H1 on page?
-│  └─ Omit (use EDS default)
+│  └─ Omit (use platform default)
 └─ Differs from first H1?
    └─ Include as "title" property
 ```
@@ -64,7 +64,7 @@ Source has <title> tag?
 ```
 Source has meta description?
 ├─ Matches first paragraph?
-│  └─ Consider omitting (use EDS default)
+│  └─ Consider omitting (use platform default)
 ├─ More descriptive than first paragraph?
 │  └─ Include as "description" property
 └─ Differs significantly?
@@ -82,7 +82,7 @@ Source has meta description?
 ```
 Source has og:image?
 ├─ Matches first content image?
-│  └─ Consider omitting (use EDS default)
+│  └─ Consider omitting (use platform default)
 ├─ Custom social image?
 │  └─ Include as "image" property
 └─ No og:image?
@@ -100,7 +100,7 @@ Source has og:image?
 ```
 Source has canonical link?
 ├─ Points to same page?
-│  └─ Omit (EDS auto-generates)
+│  └─ Omit (platform auto-generates)
 ├─ Points to different page?
 │  └─ Include as "canonical" property (syndicated content)
 └─ Uses .html extension?
@@ -129,7 +129,7 @@ Multiple sources?
 - `X-UA-Compatible`
 - `theme-color`
 
-**Auto-populated by EDS (redundant):**
+**Auto-populated by platform (redundant):**
 - `og:url` (use canonical instead)
 - `og:title` (use title instead)
 - `og:description` (use description instead)
@@ -241,9 +241,9 @@ When generating metadata blocks, document why properties were included or omitte
 - **tags**: "e-commerce, widgets, online shopping" - Mapped from article:tag properties
 
 ### Omitted Properties
-- **canonical**: Points to same page URL - EDS will auto-generate
-- **og:title, twitter:title**: Redundant - EDS auto-populates from title
-- **og:description**: Redundant - EDS auto-populates from description
+- **canonical**: Points to same page URL - platform will auto-generate
+- **og:title, twitter:title**: Redundant - platform auto-populates from title
+- **og:description**: Redundant - platform auto-populates from description
 - **viewport**: Technical metadata - Belongs in head.html
 
 ### Recommendations
@@ -259,8 +259,8 @@ Before finalizing the metadata block:
 - ✅ **Description**: 150-160 characters
 - ✅ **Image**: Absolute URL or correct relative path
 - ✅ **Image**: 1200x630 pixels for optimal social sharing
-- ✅ **No redundancy**: Removed og:*/twitter:* properties that EDS auto-populates
-- ✅ **Defaults leveraged**: Omitted properties that match EDS defaults
+- ✅ **No redundancy**: Removed og:*/twitter:* properties that platform auto-populates
+- ✅ **Defaults leveraged**: Omitted properties that match platform defaults
 
 ## Troubleshooting
 
@@ -305,16 +305,16 @@ const absoluteImageUrl = new URL(relativeImagePath, baseUrl).href;
 ## Related Resources
 
 - **metadata-mapping.md** - Comprehensive mapping rules and examples
-- https://www.aem.live/docs/metadata - EDS metadata documentation
+- https://www.aem.live/docs/metadata - Platform metadata documentation
 - https://www.aem.live/developer/block-collection/metadata - Metadata block reference
 
 ## Integration Notes
 
-The metadata extraction process is integrated into the page-migration workflow:
+The metadata extraction process is integrated into the page-import workflow:
 
 1. **Step 1**: `analyze-webpage.js` extracts raw metadata from source page
 2. **Step 2-3**: Analyze content structure (identify H1, first paragraph, first image)
-3. **Step 4**: Map metadata to EDS properties, generate metadata block
+3. **Step 4**: Map metadata to standard properties, generate metadata block
 4. **Step 5**: Append metadata block to end of generated HTML (unless user explicitly skips)
 
 The metadata block is included by default. To skip: user must explicitly request "no metadata" or "skip metadata".

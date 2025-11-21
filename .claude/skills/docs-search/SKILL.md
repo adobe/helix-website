@@ -1,6 +1,6 @@
 ---
 name: Searching AEM Documentation
-description: Searches the aem.live documentation for information on features of the platform. Use this skill when you need more information about a feature, want guidance on how to implement a feature, and using existing tools you have to search the web isn't turning up relevant results.
+description: Searches the aem.live documentation for information on AEM Edge Delivery Services features. Use this skill when you need more information about a feature, want guidance on how to implement a feature, and using existing tools you have to search the web isn't turning up relevant results.
 ---
 
 # Searching AEM Documentation

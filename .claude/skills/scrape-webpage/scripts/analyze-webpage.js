@@ -393,7 +393,7 @@ async function analyzeWebpage(url, outputDir) {
     fs.writeFileSync(htmlPath, html, 'utf-8');
 
     // Generate document paths
-    console.error('Generating EDS document paths...');
+    console.error('Generating document paths...');
     const paths = generateDocumentPathInfo(url);
 
     // Build result object

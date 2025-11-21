@@ -1,6 +1,6 @@
 ---
 name: authoring-analysis
-description: Analyze content sequences and determine authoring approach (default content vs blocks). Validates block selection and section styling for Edge Delivery Services migration.
+description: Analyze content sequences and determine authoring approach (default content vs blocks). Validates block selection and section styling for import/migration to AEM Edge Delivery Services.
 ---
 
 # Authoring Analysis
@@ -14,7 +14,7 @@ Use this skill when:
 - You have block inventory (local + Block Collection)
 - Ready to make authoring decisions following David's Model
 
-**Invoked by:** page-migration skill (Step 3)
+**Invoked by:** page-import skill (Step 3)
 
 ## Prerequisites
 
@@ -26,11 +26,11 @@ From identify-page-structure skill, you need:
 
 ## Related Skills
 
-- **page-migration** - Orchestrator that invokes this skill
+- **page-import** - Orchestrator that invokes this skill
 - **identify-page-structure** - Provides section structure and block inventory
 - **content-modeling** - This skill invokes it when block selection is unclear
 - **block-collection-and-party** - This skill invokes it to validate blocks
-- **generate-migration-html** - Uses this skill's output to create HTML
+- **generate-import-html** - Uses this skill's output to create HTML
 
 ## **IMPORTANT: Step 3e Execution Trigger**
 
@@ -372,4 +372,4 @@ This skill provides complete authoring analysis:
 - Updated section list with validated styling decisions
 - Some sections may be marked "no section-metadata"
 
-**Next step:** Pass these outputs to generate-migration-html skill
+**Next step:** Pass these outputs to generate-import-html skill
