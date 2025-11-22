@@ -236,15 +236,15 @@ For all other environments, you need to know the GitHub owner and repository nam
 
 With this information, you can construct URLs for the preview environment (same content as `localhost:3000`) and the production environment (same content as the live website, approved by authors)
 
-- **Production Preview**: `https://main--helix-website--aemsites.aem.page/`
-- **Production Live**: `https://main--helix-website--aemsites.aem.live/`
-- **Feature Preview**: `https://{branch}--helix-website--aemsites.aem.page/`
+- **Production Preview**: `https://main--helix-website--adobe.aem.page/`
+- **Production Live**: `https://main--helix-website--adobe.aem.live/`
+- **Feature Preview**: `https://{branch}--helix-website--adobe.aem.page/`
 
 ### Publishing Process
 1. Push changes to a feature branch
 2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
 3. Open a pull request to merge changes to `main`
-   - **REQUIRED:** Include preview link in PR description: `https://{branch}--helix-website--aemsites.aem.page/{path}`
+   - **REQUIRED:** Include preview link in PR description: `https://{branch}--helix-website--adobe.aem.page/{path}`
    - This link is used for automated performance testing (PSI checks)
    - Without this link, your PR will be rejected
 4. Verify checks pass: `gh checks` or `gh pr checks --watch`
