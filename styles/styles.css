@@ -625,27 +625,68 @@ a.button.primary-cta:any-link:active {
   border-color: var(--color-info-accent-down);
 }
 
-a.button.primary:any-link {
-  color: var(--color-white);
-  background-color: var(--color-info-primary);
-  border-color: var(--color-info-primary);
+a.button.primary:any-link,
+.redesign a.button.primary:any-link {
+  color: #fff;
+  background-color: #1473e6;
+  border-color: #1473e6;
+}
+
+@media (prefers-color-scheme: dark) {
+  a.button.primary:any-link,
+  .redesign a.button.primary:any-link {
+    color: #fff;
+    background-color: #0d66d0;
+    border-color: #0d66d0;
+  }
 }
 
 a.button.primary:focus,
-a.button.primary.reverse:focus {
-  background-color: var(--color-info-primary-hover);
-  border-color: var(--color-info-primary-hover);
-  color: var(--color-white);
+a.button.primary.reverse:focus,
+.redesign a.button.primary:focus,
+.redesign a.button.primary.reverse:focus {
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+  color: #fff;
 }
 
-a.button.primary:any-link:hover {
-  background-color: var(--color-info-primary-hover);
-  border-color: var(--color-info-primary-hover);
+@media (prefers-color-scheme: dark) {
+  a.button.primary:focus,
+  a.button.primary.reverse:focus,
+  .redesign a.button.primary:focus,
+  .redesign a.button.primary.reverse:focus {
+    background-color: #095aba;
+    border-color: #095aba;
+  }
 }
 
-a.button.primary:any-link:active {
-  background-color: var(--color-info-primary-down);
-  border-color: var(--color-info-primary-down);
+a.button.primary:any-link:hover,
+.redesign a.button.primary:any-link:hover {
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  a.button.primary:any-link:hover,
+  .redesign a.button.primary:any-link:hover {
+    background-color: #095aba;
+    border-color: #095aba;
+  }
+}
+
+a.button.primary:any-link:active,
+.redesign a.button.primary:any-link:active {
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+@media (prefers-color-scheme: dark) {
+  a.button.primary:any-link:active,
+  .redesign a.button.primary:any-link:active {
+    background-color: #074a8e;
+    border-color: #074a8e;
+  }
 }
 
 a.button.secondary:any-link {
@@ -757,7 +798,7 @@ main .form .button {
 }
 
 .redesign a.button:any-link span {
-  color: var(--color-white);
+  color: #fff;
   transition: all 0.3s ease-in-out;
 }
 
