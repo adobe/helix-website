@@ -149,13 +149,13 @@
 
 .doc-search .doc-search-results > li.doc-search-result a {
   display: grid;
-  grid-template: 
+  grid-template:
     'pic title' auto
     'pic desc' auto / auto 1fr;
   gap: 0 7px;
   padding: 7px 6px;
   padding-right: 32px;
-  color: unset;
+  color: #2c2c2c;
   text-decoration: none;
   transition: background-color 130ms;
 }
@@ -197,7 +197,7 @@
 
 .doc-search .doc-search-results > li.doc-search-result a p:first-of-type {
   grid-area: title;
-  color: #2e2e2e;
+  color: #1e1e1e;
   font-weight: bold;
 }
 
@@ -208,4 +208,5 @@
   -webkit-line-clamp: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #4b4b4b;
 }
