@@ -33,7 +33,7 @@
 
   /* stylelint-disable-next-line declaration-property-value-no-unknown */
   background: light-dark(
-    linear-gradient(180deg, rgb(255 255 255 / 30%) 0%, rgb(255 255 255 / 70%) 100%),
+    linear-gradient(180deg, rgb(0 0 0 / 25%) 0%, rgb(0 0 0 / 45%) 100%),
     linear-gradient(180deg, rgb(0 0 0 / 50%) 0%, rgb(0 0 0 / 70%) 100%)
   );
   z-index: 1;
@@ -63,12 +63,14 @@
   color: var(--color-accent-blue);
   text-transform: uppercase;
   line-height: 100%;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+}
 
-  /* stylelint-disable-next-line declaration-property-value-no-unknown */
-  text-shadow: light-dark(
-    0 1px 8px rgb(0 0 0 / 20%),
-    0 1px 8px rgb(0 0 0 / 40%)
-  );
+@media (prefers-color-scheme: dark) {
+  .inner-content h3 {
+    text-shadow: none;
+    color: #4b52d9;
+  }
 }
 
 .inner-content h3.icon-eyebrow {
@@ -79,12 +81,16 @@
   font-size: var(--type-heading-xxxl-size);
   line-height: var(--type-heading-xxxl-lh);
   margin-bottom: 0;
+  text-shadow: 0 2px 16px rgb(0 0 0 / 60%);
+}
 
-  /* stylelint-disable-next-line declaration-property-value-no-unknown */
-  text-shadow: light-dark(
-    0 2px 12px rgb(0 0 0 / 25%),
-    0 2px 12px rgb(0 0 0 / 50%)
-  );
+@media (prefers-color-scheme: dark) {
+  .inner-content h1 {
+    text-shadow:
+      0 0 20px rgb(0 0 0 / 90%),
+      0 0 40px rgb(0 0 0 / 80%),
+      0 2px 4px rgb(0 0 0 / 100%);
+  }
 }
 
 .inner-content > h1:last-of-type {
@@ -98,12 +104,14 @@
   margin: var(--spacing-xs) auto;
   line-height: 1.25;
   font-size: var(--type-body-xs-size);
+  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+}
 
-  /* stylelint-disable-next-line declaration-property-value-no-unknown */
-  text-shadow: light-dark(
-    0 1px 8px rgb(0 0 0 / 20%),
-    0 1px 8px rgb(0 0 0 / 40%)
-  );
+@media (prefers-color-scheme: dark) {
+  .inner-content p {
+    text-shadow: none;
+    color: #2c2c2c;
+  }
 }
 
 .inner-content strong {
