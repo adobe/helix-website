@@ -210,3 +210,44 @@
   text-overflow: ellipsis;
   color: #4b4b4b;
 }
+
+@media (prefers-color-scheme: dark) {
+  .doc-search form button {
+    background: #3c3c3c;
+    color: #e8e8e8;
+  }
+
+  .doc-search form input:hover + button {
+    color: #e8e8e8;
+  }
+
+  .doc-search .doc-search-results {
+    background-color: #2c2c2c;
+    border-color: #505050;
+  }
+
+  .doc-search .doc-search-results > li.doc-search-result a {
+    color: #e8e8e8;
+  }
+
+  .doc-search .doc-search-results > li.doc-search-result a:hover,
+  .doc-search .doc-search-results > li.doc-search-result a:focus {
+    background-color: #3c3c3c;
+  }
+
+  .doc-search .doc-search-results > li.doc-search-result a mark::after {
+    background-color: rgb(255 208 0 / 75%);
+  }
+
+  .doc-search .doc-search-results > li.doc-search-result a p:first-of-type {
+    color: #f5f5f5;
+  }
+
+  .doc-search .doc-search-results > li.doc-search-result a p:last-of-type {
+    color: #b8b8b8;
+  }
+
+  .doc-search .doc-search-results > li.doc-search-result + li {
+    border-top-color: #505050;
+  }
+}
