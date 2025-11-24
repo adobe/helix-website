@@ -112,7 +112,6 @@ button.gnav-toggle::after {
 /* Navbar Logo + Brand Name */
 .gnav .gnav-brand-wrapper {
   grid-area: brand;
-  background: var(--color-white);
 }
 
 .gnav .gnav-brand {
@@ -279,7 +278,6 @@ button.gnav-toggle::after {
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--color-gray-50);
 }
 
 .franklin .gnav .gnav-mainnav {
@@ -651,13 +649,12 @@ button.gnav-toggle::after {
 
   .franklin .gnav-mainnav.with-search,
   .gnav-brand-wrapper {
-    border-bottom: 1px solid #eaeaea;
     display: flex;
   }
 
   .franklin .gnav .gnav-mainnav,
   .franklin .gnav .gnav-mainnav.with-search {
-    background: var(--color-white);
+    background: unset;
     min-height: calc(var(--nav-height) - 2px);
   }
 
