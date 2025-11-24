@@ -1,5 +1,5 @@
 :root {
-  --footer-footer-nav-title-section-border: 2px solid #4b4b4b;
+  --footer-footer-nav-title-section-border: 2px solid var(--color-gray-700);
 }
 
 footer {
@@ -161,7 +161,7 @@ footer .new-footer {
   /* footer bottom */
   .footer .footer-bottom {
     text-align: right;
-    border-top: 1px solid var(--color-font-grey);
+    border-top: 1px solid var(--color-gray-300);
   }
 
   .footer .footer-bottom p {
