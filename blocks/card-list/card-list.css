@@ -104,3 +104,17 @@
   font-size: var(--type-body-l-size);
   max-width: 20rem;
 }
+
+@media (prefers-color-scheme: dark) {
+  .card-list .cards-card-body {
+    color: #e8e8e8;
+  }
+
+  .card-list .cards-card-body h3 {
+    color: #f5f5f5;
+  }
+
+  .card-list .cards-card-body p {
+    color: #e8e8e8;
+  }
+}
