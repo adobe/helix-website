@@ -130,14 +130,14 @@
   /* Accent colors - adjusted for dark mode visibility */
   --color-accent-blue: light-dark(#6870ec, #8b92ff);
   --color-accent-highlight-yellow: light-dark(#e3fa8c, #c5dc6e);
-  --color-accent-pink-bg: light-dark(#f0b2f2, #9d4b9f);
-  --color-accent-pink-content: light-dark(#88008d, #f5c2f7);
-  --color-accent-purple-bg: light-dark(#474eb8, #6b73e8);
-  --color-accent-purple-content: light-dark(#e2e4ff, #e2e4ff);
-  --color-accent-lightgreen-bg: light-dark(#e1fa82, #b8d95f);
-  --color-accent-lightgreen-content: light-dark(#3b5700, #e8ffa8);
-  --color-accent-yellow-bg: light-dark(#f5e66b, #cfc555);
-  --color-accent-yellow-content: light-dark(#7f6000, #fff4a8);
+  --color-accent-pink-bg: light-dark(#f0b2f2, #7d2d7f);
+  --color-accent-pink-content: light-dark(#88008d, #fff);
+  --color-accent-purple-bg: light-dark(#474eb8, #4a52c4);
+  --color-accent-purple-content: light-dark(#e2e4ff, #fff);
+  --color-accent-lightgreen-bg: light-dark(#e1fa82, #8fa940);
+  --color-accent-lightgreen-content: light-dark(#3b5700, #fff);
+  --color-accent-yellow-bg: light-dark(#f5e66b, #a89a2f);
+  --color-accent-yellow-content: light-dark(#7f6000, #fff);
 
   /* Background colors */
   --bg-color-lightgrey: light-dark(#f8f8f8, #1e1e1e);

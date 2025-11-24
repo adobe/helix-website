@@ -357,4 +357,13 @@
   .testimonials .tab-list .tablist-container button img {
     filter: grayscale(1) invert(1) brightness(1.3) contrast(1.5);
   }
+
+  .testimonials .testimonial-info .testimonial-quote,
+  .testimonials .tabcontent-container .tabpanel .customer-info p {
+    color: #e8e8e8;
+  }
+
+  .testimonials .testimonial-info .testimonial-stats-info {
+    color: #e8e8e8;
+  }
 }
