@@ -67,9 +67,9 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .inner-content h3 {
+  .hero.colorful-bg .inner-content h3.icon-eyebrow {
     text-shadow: none;
-    color: #4b52d9;
+    color: #2a2f8f;
   }
 }
 

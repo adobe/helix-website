@@ -879,6 +879,14 @@ main .form .button:hover::before {
     );
 }
 
+@media (prefers-color-scheme: dark) {
+  .hero.colorful-bg a.button.black-border:any-link {
+    --color-black: #000;
+    --color-white: #fff;
+    font-weight: 700;
+  }
+}
+
 /* larger size */
 .redesign a.button.large:any-link {
   font-size: var(--type-body-s-size);
