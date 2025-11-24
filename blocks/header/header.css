@@ -706,7 +706,7 @@ button.gnav-toggle::after {
     border-bottom: unset;
   }
 
-  .gnav-navitem > a {
+  .franklin .gnav-navitem > a {
     border-top: none;
   }
 
