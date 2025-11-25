@@ -44,7 +44,7 @@
   height: 276px;
   object-fit: cover;
   display: block;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  box-shadow: 0 4px 12px var(--shadow-color-10);
   border-radius: 0.5rem;
 }
 
@@ -54,7 +54,7 @@
   height: 220px;
   object-fit: cover;
   display: block;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  box-shadow: 0 4px 12px var(--shadow-color-10);
   border-radius: 0.5rem;
 }
 
@@ -65,21 +65,21 @@
 .event-speakers .speaker-name {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #000;
+  color: var(--color-black);
   margin: 0 0 8px;
   line-height: 1.2;
 }
 
 .event-speakers .speaker-title {
   font-size: 1rem;
-  color: #000;
+  color: var(--color-black);
   line-height: 1.4;
   margin: 0 0 4px;
 }
 
 .event-speakers .speaker-company {
   font-size: 1rem;
-  color: #000;
+  color: var(--color-black);
   line-height: 1.4;
   margin: 0;
 }
@@ -90,20 +90,20 @@
   transform: translateY(-50%);
   width: 50px;
   height: 50px;
-  background: white;
+  background: var(--color-white);
   border: none;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  box-shadow: 0 2px 8px var(--shadow-color-15);
   z-index: 10;
   transition: box-shadow 0.2s;
 }
 
 .event-speakers .carousel-nav:hover {
-  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+  box-shadow: 0 4px 12px var(--shadow-color-25);
 }
 
 .event-speakers .carousel-nav.prev {
@@ -118,7 +118,7 @@
   width: 24px;
   height: 24px;
   fill: none;
-  stroke: #000;
+  stroke: var(--color-black);
   stroke-width: 2;
 }
 

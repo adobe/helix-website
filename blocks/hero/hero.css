@@ -63,13 +63,13 @@
   color: var(--color-accent-blue);
   text-transform: uppercase;
   line-height: 100%;
-  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+  text-shadow: 0 2px 12px var(--shadow-color-50);
 }
 
 @media (prefers-color-scheme: dark) {
   .hero.colorful-bg .inner-content h3.icon-eyebrow {
     text-shadow: none;
-    color: #2a2f8f;
+    color: var(--color-brand-deep-blue);
   }
 }
 
@@ -81,15 +81,15 @@
   font-size: var(--type-heading-xxxl-size);
   line-height: var(--type-heading-xxxl-lh);
   margin-bottom: 0;
-  text-shadow: 0 2px 16px rgb(0 0 0 / 60%);
+  text-shadow: 0 2px 16px var(--shadow-color-60);
 }
 
 @media (prefers-color-scheme: dark) {
   .inner-content h1 {
     text-shadow:
-      0 0 20px rgb(0 0 0 / 90%),
-      0 0 40px rgb(0 0 0 / 80%),
-      0 2px 4px rgb(0 0 0 / 100%);
+      0 0 20px var(--shadow-color-90),
+      0 0 40px var(--shadow-color-80),
+      0 2px 4px var(--shadow-color-100);
   }
 }
 
@@ -104,13 +104,13 @@
   margin: var(--spacing-xs) auto;
   line-height: 1.25;
   font-size: var(--type-body-xs-size);
-  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+  text-shadow: 0 2px 12px var(--shadow-color-50);
 }
 
 @media (prefers-color-scheme: dark) {
   .inner-content p {
     text-shadow: none;
-    color: #2c2c2c;
+    color: var(--color-gray-800);
   }
 }
 

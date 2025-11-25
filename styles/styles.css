@@ -147,6 +147,54 @@
   --overlay-curtain-bg-filter: blur(0.05em);
   --code-bg-color: light-dark(#f1f1f1, #2c2c2c);
 
+  /* Shadow colors - for consistent shadow treatment */
+  --shadow-color-5: rgb(0 0 0 / 5%);
+  --shadow-color-7: rgb(0 0 0 / 7%);
+  --shadow-color-10: rgb(0 0 0 / 10%);
+  --shadow-color-15: rgb(0 0 0 / 15%);
+  --shadow-color-20: rgb(0 0 0 / 20%);
+  --shadow-color-25: rgb(0 0 0 / 25%);
+  --shadow-color-30: rgb(0 0 0 / 30%);
+  --shadow-color-33: rgb(0 0 0 / 33%);
+  --shadow-color-40: rgb(0 0 0 / 40%);
+  --shadow-color-50: rgb(0 0 0 / 50%);
+  --shadow-color-60: rgb(0 0 0 / 60%);
+  --shadow-color-70: rgb(0 0 0 / 70%);
+  --shadow-color-80: rgb(0 0 0 / 80%);
+  --shadow-color-90: rgb(0 0 0 / 90%);
+  --shadow-color-100: rgb(0 0 0 / 100%);
+
+  /* Border colors */
+  --border-color-light: light-dark(#eaeaea, #3a3a3a);
+  --border-color-medium: light-dark(#d6d6d6, #4a4a4a);
+  --border-color-dark: light-dark(#ccc, #555);
+
+  /* Brand/accent colors - non-semantic */
+  --color-brand-red: #d31510;
+  --color-brand-pink: #e6118a;
+  --color-brand-orange: #fe833f;
+  --color-brand-deep-blue: #2a2f8f;
+
+  /* Status/semantic colors */
+  --color-warning: light-dark(#ffc107, #ffca28);
+  --color-error: light-dark(#d31510, #ff5252);
+  --color-success: light-dark(#2e7d32, #66bb6a);
+
+  /* Highlight/search colors */
+  --color-search-highlight: light-dark(rgb(255 208 0 / 30%), rgb(255 208 0 / 75%));
+
+  /* Release tag colors */
+  --color-release-blue: #d4e8ff;
+  --color-release-pink: #ffd4f1;
+  --color-release-green: #d1ffed;
+  --color-release-gray: #e8e8e8;
+  --color-release-lime: #e4e8bf;
+  --color-release-yellow: #f4f8cf;
+  --color-release-orange: #ffebd4;
+  --color-release-cyan: #cfebf8;
+  --color-release-purple: #edd1ff;
+  --color-release-peach: #ffe4d4;
+
   /* Grid / container width -- 600px, 900px */
   --grid-mobile-container-width: 88%;
   --grid-tablet-container-width: 83%;

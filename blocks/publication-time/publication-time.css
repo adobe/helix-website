@@ -1,5 +1,5 @@
 .highlight {
   margin-left: 1em;
   width: max-content;
-  background-color: yellow;
+  background-color: var(--color-warning);
 }
