@@ -1,6 +1,6 @@
 ---
 name: Building Blocks
-description: Guide for creating new AEM Edge Delivery blocks or modifying existing blocks. Use this skill whenever you are creating a new block from scratch or making significant changes to existing blocks that involve JavaScript decoration, CSS styling, or content model changes.
+description: Guide for implementing code changes in AEM Edge Delivery Services. Handles block development (new or modified), core functionality changes (scripts.js, styles, delayed.js, etc.), or both. Use this skill for all implementation work guided by the content-driven-development workflow.
 ---
 
 # Building Blocks
@@ -19,27 +19,38 @@ If you are not already following the CDD process, STOP and invoke the **content-
 
 ## When to Use This Skill
 
-This skill is invoked automatically by **content-driven-development** during implementation. It handles:
+This skill is invoked automatically by **content-driven-development** during Step 5 (Implementation). It handles:
+
+**Block Development:**
 - Creating new block files and structure
 - Implementing JavaScript decoration
 - Adding CSS styling
-- Testing and documentation
+
+**Core Functionality:**
+- Scripts.js modifications (decoration, utilities, auto-blocking)
+- Global styles (styles.css, lazy-styles.css)
+- Delayed functionality (delayed.js)
+- Configuration changes
+
+**Combined:**
+- Blocks with supporting core changes (utilities, global styles, etc.)
 
 Prerequisites (verified by CDD):
 - ✅ Test content exists (in CMS or local drafts)
-- ✅ Content model is defined
+- ✅ Content model is defined/documented (if applicable)
 - ✅ Test content URL is available
+- ✅ Dev server is running
 
-## Building Blocks Checklist
+## Block Implementation Workflow
 
-Track your progress through block development:
-
+Track your progress:
 - [ ] Step 1: Find similar blocks for patterns (if new block or major changes)
 - [ ] Step 2: Create or modify block structure (files and directories)
-- [ ] Step 3: Implement JavaScript decoration
+- [ ] Step 3: Implement JavaScript decoration (skip if CSS-only)
 - [ ] Step 4: Add CSS styling
 - [ ] Step 5: Test implementation (invokes testing-blocks skill)
-- [ ] Step 6: Document block (developer and author-facing)
+
+**Note:** If your changes require core modifications (utilities in scripts.js, global styles, etc.), make those changes first, test them, then return to this workflow. See "When Modifying Core Files" below.
 
 ## Step 1: Find Similar Blocks
 
@@ -199,54 +210,63 @@ main .my-block.dark {
 
 **Read `resources/css-guidelines.md`**
 
+**Note on iterative validation:** While building, you can test changes in your browser as you go (load test content URL, check console, verify layout and functionality). For comprehensive testing guidance including browser testing techniques, responsive testing, and validation approaches, see the testing-blocks skill invoked in Step 5.
+
 ## Step 5: Test Implementation
 
 **After implementation is complete, invoke the testing-blocks skill.**
 
 The testing-blocks skill will guide you through:
-- Writing unit tests for logic-heavy utilities
-- Browser testing to validate block behavior
-- Taking screenshots for validation and PR documentation
-- Running linting and fixing issues
+- Browser testing (functionality, responsive behavior across viewports)
+- Linting and fixing issues
+- Writing unit tests for logic-heavy utilities (if needed)
+- Screenshot capture for validation
+- Performance validation
 
 **Provide the testing-blocks skill with:**
 - Block name being tested
-- Test content URL (from CDD process)
+- Test content URL(s) (from step 4 of CDD process)
 - Any variants that need testing
 - Screenshots of existing implementation/design/mockup to verify against
+- Acceptance criteria to verify (from step 2 of CDD process)
 
-Return to this skill after testing is complete to proceed to Step 6.
+**After testing is complete, return to CDD workflow.**
 
-## Step 6: Document Block
+---
 
-### Developer Documentation
+## When Modifying Core Files
 
-Most blocks are self-contained and only need code comments. For especially complex blocks (many variants, complex logic), add a brief `README.md` in the block folder.
+If your changes require modifying core files (scripts.js, styles.css, delayed.js), follow these principles:
 
-### Author-Facing Documentation
+**Common core files:**
+- **scripts.js** - Decoration utilities, auto-blocking logic, page loading
+- **styles.css** - Global styles (eager), CSS custom properties
+- **lazy-styles.css** - Global styles (lazy loaded)
+- **delayed.js** - Marketing, analytics, third-party integrations
 
-Almost all blocks need author documentation to help content authors understand how to use the block in the CMS.
+**Key principles:**
 
-**When to update author docs:**
-- ✅ Variants are added, removed, or modified
-- ✅ Content structure changes
-- ✅ Block behavior or functionality changes
+1. **Make core changes first** (before block changes that depend on them)
+2. **Test core changes independently** with existing content before using in blocks
+3. **Consider impact** - core changes can affect multiple blocks/pages
+4. **Test thoroughly** - verify no regressions in existing functionality
+5. **Keep it minimal** - only add what's necessary
+6. **Document with code comments** - most core changes don't need separate docs
 
-**Skip author documentation for:**
-- Deprecated blocks (shouldn't be used)
-- Special-purpose blocks used infrequently
-- Auto-blocked blocks (authors don't use directly)
+**Testing core changes:**
+- Test with existing content URLs that use affected functionality
+- For auto-blocking: test pages that should/shouldn't trigger it
+- For global styles: test across multiple blocks and pages
+- Check console for errors
+- Verify responsive behavior
 
-**For complete guidance on:**
-- Determining which documentation approach your project uses
-- Where author documentation lives (Sidekick Library, DA Library, etc.)
-- What to include in author documentation
-- Maintaining documentation in sync with code
+**For detailed patterns:**
+- JavaScript: See `resources/js-guidelines.md`
+- CSS: See `resources/css-guidelines.md`
 
-**Read `resources/block-documentation.md`**
+---
 
 ## Reference Materials
 
 - `resources/js-guidelines.md` - Complete JavaScript patterns and best practices
 - `resources/css-guidelines.md` - Complete CSS patterns and best practices
-- `resources/block-documentation.md` - Complete documentation guidance

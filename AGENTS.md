@@ -72,7 +72,7 @@ When you need to use a skill:
 When skills reference tools you don't have, substitute your equivalent tools. Some examples:
   - `TodoWrite` → Use your planning/task tracking tool
   - `Skill` → Follow these instructions for executing skills
-  - `WebFetch` → Use your Bash/Sheel tool and execute curl to retrieve the page mentioned
+  - `WebFetch` → Use your Bash/Shell tool and execute curl to retrieve the page mentioned
   - `Read`, `Write`, `Edit`, `Bash` → Use your native tools with similar functions
   
   When in doubt, try your best to follow the instructions as written using the tools you have available.
@@ -81,7 +81,9 @@ When skills reference tools you don't have, substitute your equivalent tools. So
 
 Two skills serve as primary entry points for common workflows:
 
-**content-driven-development** - Start here for all development work including building new blocks, modifying existing blocks, or making changes to core decoration functionality. This skill orchestrates the complete development workflow from content modeling through implementation and testing.
+**content-driven-development** - Start here for ALL code changes including: new blocks, block modifications, CSS styling, bug fixes, core functionality (scripts.js, styles.css, delayed.js), auto-blocking changes, or any JavaScript/CSS work. This skill orchestrates the complete development workflow from content modeling through implementation and testing.
+
+⚠️ IMPORTANT: Even "simple" changes like CSS tweaks or small bug fixes should use CDD. The workflow ensures you have test content and validation, both required for PR approval and automated checks.
 
 **page-import** - Start here when importing or migrating webpages from any URL to AEM Edge Delivery Services. This skill orchestrates the complete import workflow including scraping, analysis, structure identification, and HTML generation.
 
@@ -170,11 +172,7 @@ Blocks are the re-usable building blocks of AEM. Blocks add styling and function
 
 **Key principle:** The initial content structure is the contract between authors and developers. Design this structure before writing any code, and be careful when making changes that could break existing pages.
 
-**For creating or modifying blocks:** Use the **building-blocks** skill which guides you through:
-- Content model design (via the content-driven-development skill)
-- JavaScript decoration patterns
-- CSS styling conventions
-- Testing and validation
+**For creating or modifying blocks:** Use the **content-driven-development** skill which orchestrates the complete workflow from content modeling through implementation and testing.
 
 **Tip:** Use `curl http://localhost:3000/path/to/page` to inspect the HTML delivered by the backend before making assumptions.
 

@@ -9,14 +9,14 @@ This skill guides you through designing content models for AEM Edge Delivery Ser
 
 ## Related Skills
 
-- **content-driven-development**: This skill is typically invoked FROM the CDD skill during Phase 1 (Content Model Design)
+- **content-driven-development**: This skill is typically invoked FROM the CDD skill during Step 3 (Design Content Model)
 - **building-blocks**: After content modeling is complete, this skill handles implementation
 - **block-collection-and-party**: Use to find similar blocks and their content models for reference
 
 ## When to Use This Skill
 
 ✅ **Use this skill when:**
-- Creating new blocks (usually invoked by CDD at step 1.2)
+- Creating new blocks (usually invoked by CDD at Step 3)
 - Modifying existing blocks in ways that change author-facing structure
 - Reviewing content models for best practices conformance
 - User explicitly asks about content modeling
