@@ -354,25 +354,16 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .testimonials .tab-list .tablist-container button picture {
-    opacity: 0.5;
+  .testimonials .tab-list .tablist-container button {
+    border-bottom-color: #3a3a3a;
   }
 
-  .testimonials .tab-list .tablist-container button:hover picture,
-  .testimonials .tab-list .tablist-container button[aria-selected="true"] picture {
-    opacity: 1;
+  .testimonials .tab-list .tablist-container button:hover,
+  .testimonials .tab-list .tablist-container button[aria-selected="true"] {
+    border-bottom-color: #fff;
   }
 
   .testimonials .tab-list .tablist-container button img {
-    filter: grayscale(1) invert(1) brightness(1.2);
-  }
-
-  .testimonials .testimonial-info .testimonial-quote,
-  .testimonials .tabcontent-container .tabpanel .customer-info p {
-    color: #e8e8e8;
-  }
-
-  .testimonials .testimonial-info .testimonial-stats-info {
-    color: #e8e8e8;
+    filter: grayscale(1) invert(1) brightness(1.3) contrast(1.5);
   }
 }
