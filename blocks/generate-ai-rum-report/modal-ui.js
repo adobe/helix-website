@@ -36,7 +36,7 @@ function createModalBody() {
     : 'Enter your API credentials to generate a comprehensive report of your site data.';
 
   body.innerHTML = `
-    <div class="report-form-group">
+    <!-- <div class="report-form-group">
       <label for="report-api-key">Anthropic API Key (<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Get your key</a>)</label>
       <div class="report-quick-filter">
         <input
@@ -47,7 +47,7 @@ function createModalBody() {
           ${anthropicKey ? 'disabled' : ''}
         >
       </div>
-    </div>
+    </div> -->
 
     <div class="report-form-group">
       <label for="report-bedrock-token">AWS Bedrock Token</label>
