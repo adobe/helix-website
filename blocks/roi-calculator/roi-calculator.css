@@ -35,7 +35,7 @@
   font-weight: 700;
   margin: 0 auto var(--spacing-s);
   max-width: 300px;
-  text-shadow: 0 2px 16px rgb(0 0 0 / 60%);
+  text-shadow: 0 2px 16px var(--shadow-color-60);
 }
 
 .roi-calculator .inner-content a.button:any-link {
@@ -66,8 +66,8 @@
 @media (prefers-color-scheme: dark) {
   .roi-calculator .upper-content h2 {
     text-shadow:
-      0 0 20px rgb(0 0 0 / 90%),
-      0 0 40px rgb(0 0 0 / 80%),
-      0 2px 4px rgb(0 0 0 / 100%);
+      0 0 20px var(--shadow-color-90),
+      0 0 40px var(--shadow-color-80),
+      0 2px 4px var(--shadow-color-100);
   }
 }
