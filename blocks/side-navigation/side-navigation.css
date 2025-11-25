@@ -580,6 +580,10 @@
     color: #f5f5f5;
   }
 
+  .side-navigation .list-section .list-section-inner li a.active {
+    color: #f5f5f5;
+  }
+
   .side-navigation .list-section .side-navigation-nested-target .icon.icon-icon-caret-down {
     filter: invert(1);
   }

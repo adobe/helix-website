@@ -520,7 +520,7 @@ code:not(pre > code) {
   overflow-wrap: break-word;
   border: 1px solid var(--color-gray-200);
   background-color: var(--code-bg-color);
-  color: light-dark(#0463d6, #4b9cf5);
+  color: light-dark(#0463d6, #6cb2ff);
   padding: 1px 4px;
   border-radius: 4px;
 }
