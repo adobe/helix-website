@@ -50,7 +50,7 @@ function createModalBody() {
     </div> -->
 
     <div class="report-form-group">
-      <label for="report-bedrock-token">AWS Bedrock Token</label>
+      <label for="report-bedrock-token">Enter your AWS Bedrock Token</label>
       <div class="report-quick-filter">
         <input
           type="password"
