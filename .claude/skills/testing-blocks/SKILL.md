@@ -12,7 +12,7 @@ This skill guides you through testing code changes in AEM Edge Delivery Services
 ## Related Skills
 
 - **content-driven-development**: Test content created during CDD serves as the basis for testing
-- **building-blocks**: This skill is automatically invoked after block implementation
+- **building-blocks**: Invokes this skill during Step 5 for comprehensive testing
 - **block-collection-and-party**: May provide reference test patterns from similar blocks
 
 ## When to Use This Skill
@@ -24,7 +24,7 @@ Use this skill:
 - ✅ After configuration changes that affect functionality
 - ✅ Before opening any pull request with code changes
 
-This skill should be automatically invoked by the **building-blocks** skill after implementation is complete.
+This skill is typically invoked by the **building-blocks** skill during Step 5 (Test Implementation).
 
 ## Testing Workflow
 
@@ -274,7 +274,7 @@ For detailed troubleshooting guide, see `resources/troubleshooting.md`.
 
 ## Integration with Building Blocks Skill
 
-The **building-blocks** skill automatically invokes this skill after implementation (Step 5).
+The **building-blocks** skill invokes this skill during Step 5 (Test Implementation).
 
 **Inputs received from building-blocks:**
 - Block name being tested

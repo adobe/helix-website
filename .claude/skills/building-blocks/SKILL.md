@@ -7,7 +7,7 @@ description: Guide for implementing code changes in AEM Edge Delivery Services. 
 
 This skill guides you through implementing AEM Edge Delivery blocks following established patterns and best practices. Blocks transform authored content into rich, interactive experiences through JavaScript decoration and CSS styling.
 
-**IMPORTANT: This skill should ONLY be invoked from the content-driven-development skill during Phase 2 (Implementation).**
+**IMPORTANT: This skill should ONLY be invoked from the content-driven-development skill during Step 5 (Implementation).**
 
 If you are not already following the CDD process, STOP and invoke the **content-driven-development** skill first.
 
