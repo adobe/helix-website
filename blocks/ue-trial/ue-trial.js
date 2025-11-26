@@ -630,6 +630,16 @@ async function buildForm(block) {
 
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
+  
+  const isAgenticPlaygournd = block.classList.contains('agentic-playground');
+  if (isAgenticPlaygournd) {
+    const hiddenScopeInput = createTag('input', {
+      type: 'hidden',
+      name: 'scope',
+      value: 'agentic-playground',
+    });
+    buttonContainer.append(hiddenScopeInput); 
+  }
   const submitButton = createTag('button', {
     type: 'submit',
     class: 'continue',
