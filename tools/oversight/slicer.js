@@ -321,7 +321,9 @@ export async function draw() {
   updateDataFacets(filterText, params, checkpoint);
 
   // After updating data facets, check if we need to auto-select all checkpoints
-  if (params.get('metrics') === 'super' && checkpoint.length === 0) {
+  // Skip auto-selection if we're in report view mode (report parameter exists)
+  const isReportView = params.has('report');
+  if (params.get('metrics') === 'super' && checkpoint.length === 0 && !isReportView) {
     // Now that data facets are updated, get all available checkpoint values from the actual data
     const checkpointFacet = dataChunks.facets.checkpoint;
     const allCheckpoints = checkpointFacet ? checkpointFacet.map((f) => f.value) : [];

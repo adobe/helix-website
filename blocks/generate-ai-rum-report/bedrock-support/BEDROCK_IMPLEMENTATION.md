@@ -46,7 +46,7 @@
 - Adds `id`, `type`, `role`, `model` for compatibility
 
 ### 3. Endpoint
-**Expected:** `https://bedrock-runtime.us-east-1.amazonaws.com/model/us.anthropic.claude-sonnet-4-20250514-v1:0/converse`
+**Expected:** `https://bedrock-runtime.us-east-1.amazonaws.com/model/global.anthropic.claude-sonnet-4-20250514-v1:0/converse`
 
 **Our Implementation:** ✅ Matches exactly
 

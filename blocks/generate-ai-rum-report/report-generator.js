@@ -25,6 +25,7 @@ import {
 } from './modal-ui.js';
 
 import { setupReportActions } from './report-actions.js';
+import { getCurrentAnalyzedUrl } from './da-upload.js';
 
 // Constants
 const METRICS_URL_PARAM = 'metrics';
@@ -89,8 +90,11 @@ function showReportResults(modalBody, reportContent) {
   const progressContainer = modalBody.querySelector('#circular-progress-container');
   progressContainer?.remove();
 
+  // Get current analyzed URL for report description
+  const url = getCurrentAnalyzedUrl();
+
   // Create and append results section
-  const resultsSection = createReportResultsUI(reportContent);
+  const resultsSection = createReportResultsUI(url);
   modalBody.appendChild(resultsSection);
 
   // Set up action buttons
@@ -134,7 +138,7 @@ function handleGenerationError(
  */
 export default async function generateReport(apiKey, statusDiv, button, modal) {
   const originalText = button.textContent;
-  updateButtonState(button, true, '⏳ Generating...');
+  updateButtonState(button, true, 'Generating...');
 
   // Clear status and add progress indicator
   statusDiv.style.display = 'none';

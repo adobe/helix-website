@@ -12,11 +12,6 @@ import {
   handleDynamicFacetToolCall,
 } from './facet-manager.js';
 import {
-  isCacheValid,
-  cacheAnalysisResult,
-  getCachedResult,
-} from './cache-manager.js';
-import {
   processParallelBatches,
 } from '../parallel-processing.js';
 import { buildFacetInfoSection } from './facet-link-generator.js';
@@ -71,72 +66,14 @@ async function getOverviewAnalysisTemplate() {
 }
 
 /**
- * Build form data section for the analysis
- * @param {Object} dashboardData - Dashboard data
- * @returns {string} Form data section text
- */
-function buildFormDataSection(dashboardData) {
-  let section = '\n\n==== 📝 FORMS DATA - FOR DEDICATED FORMS SECTION ONLY ====\n';
-  section += '⚠️ This data is ONLY for the "Forms Conversion" section.\n';
-  section += '⚠️ DO NOT mention forms in Executive Summary or other sections.\n\n';
-
-  if (dashboardData.segments['fill.source']?.length > 0) {
-    section += '<b>FILL.SOURCE (Form Entry Pages):</b>\n';
-    dashboardData.segments['fill.source'].slice(0, 10).forEach((item, idx) => {
-      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form starts`;
-      if (item.metrics && Object.keys(item.metrics).length > 0) {
-        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
-      }
-      section += '\n';
-    });
-    section += '\n';
-  }
-
-  if (dashboardData.segments['formsubmit.source']?.length > 0) {
-    section += '<b>FORMSUBMIT.SOURCE (Form Submission Pages):</b>\n';
-    dashboardData.segments['formsubmit.source'].slice(0, 10).forEach((item, idx) => {
-      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} form submissions`;
-      if (item.metrics && Object.keys(item.metrics).length > 0) {
-        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
-      }
-      section += '\n';
-    });
-    section += '\n';
-  }
-
-  if (dashboardData.segments['formsubmit.target']?.length > 0) {
-    section += '<b>FORMSUBMIT.TARGET (Post-Submission Destinations):</b>\n';
-    dashboardData.segments['formsubmit.target'].slice(0, 10).forEach((item, idx) => {
-      section += `${idx + 1}. ${item.value}: ${item.count.toLocaleString()} redirects`;
-      if (item.metrics && Object.keys(item.metrics).length > 0) {
-        section += ` (Metrics: ${JSON.stringify(item.metrics)})`;
-      }
-      section += '\n';
-    });
-    section += '\n';
-  }
-
-  section += '<b>INSTRUCTIONS:</b>\n';
-  section += '1. Create a dedicated "Forms Conversion" section with 3-4 bullet points\n';
-  section += '2. Use this forms data ONLY in that dedicated section\n';
-  section += '3. Analyze the complete funnel: fill.source → formsubmit.source → formsubmit.target\n';
-  section += '4. In ALL OTHER SECTIONS, focus on NON-FORM facets\n';
-  section += '==== END FORMS DATA ====\n\n';
-
-  return section;
-}
-
-/**
  * Build final synthesis message for AI
  * @param {Object} dashboardData - Dashboard data
  * @param {Array} allInsights - Collected insights
- * @param {string} formDataSection - Form data section
  * @param {string} overviewTemplate - Overview template
  * @returns {string} Final synthesis message
  */
-function buildFinalSynthesisMessage(dashboardData, allInsights, formDataSection, overviewTemplate) {
+function buildFinalSynthesisMessage(dashboardData, allInsights, overviewTemplate) {
   const hasMetrics = Object.keys(dashboardData.metrics).length > 0;
-  const facetInfoSection = buildFacetInfoSection(dashboardData);
 
   return `Create a polished, professional analysis report based on the data below.
 
@@ -154,19 +91,16 @@ ${dashboardData.dateRange ? `(Found in: <daterange-wrapper><input data-value="${
 IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
 Convert the data-value to readable format in your report (e.g., "month" → "Last 30 Days", "week" → "Last 7 Days").
 ==== END TIME PERIOD ====
-${facetInfoSection}
 ==== ✅ FACET COVERAGE CHECKLIST ====
-⚠️ The following NON-FORM facets MUST ALL be covered in the "Key Metrics & Findings" section.
+⚠️ The following facets MUST ALL be covered in the "Key Metrics & Findings" section.
 Each facet needs 1 positive + 1 improvement observation:
 
 ${Object.keys(dashboardData.segments)
-    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
     .map((facet, idx) => `${idx + 1}. ${facet}`)
     .join('\n')}
 
-TOTAL: ${Object.keys(dashboardData.segments).filter((key) => !key.includes('fill') && !key.includes('formsubmit')).length} facets to cover
+TOTAL: ${Object.keys(dashboardData.segments).length} facets to cover
 ==== END CHECKLIST ====
-${formDataSection}
 ==== ACTUAL DASHBOARD METRICS (USE THESE EXACT VALUES) ====
 ${hasMetrics
     ? Object.entries(dashboardData.metrics)
@@ -176,10 +110,8 @@ ${hasMetrics
 
 TOTAL SEGMENTS: ${Object.keys(dashboardData.segments).length} facets analyzed
 
-⚠️ COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED (EXCEPT FORMS):
-${Object.keys(dashboardData.segments)
-    .filter((key) => !key.includes('fill') && !key.includes('formsubmit'))
-    .join(', ')}
+⚠️ COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED:
+${Object.keys(dashboardData.segments).join(', ')}
 
 Each of these facets MUST get 1 positive + 1 improvement mention in the "Key Metrics & Findings" section.
 
@@ -228,7 +160,7 @@ async function callAnthropicAPI(
 
     // Process with parallel batches
     if (progressCallback) {
-      progressCallback(2, 'in-progress', 'Starting parallel batch processing...');
+      progressCallback(2, 'in-progress', 'Starting analysis...');
     }
 
     const allInsights = await processParallelBatches(
@@ -253,41 +185,25 @@ async function callAnthropicAPI(
       }
       const overviewTemplate = await getOverviewAnalysisTemplate();
 
-      // Check for form data (must have actual items, not just empty arrays)
-      const hasFormData = !!(
-        (dashboardData.segments['fill.source']?.length > 0)
-        || (dashboardData.segments['formsubmit.source']?.length > 0)
-        || (dashboardData.segments['formsubmit.target']?.length > 0)
-      );
-
-      let formDataSection = '';
-      if (hasFormData) {
-        console.log('[Analysis Engine] Forms data detected - including in report', {
-          'fill.source': dashboardData.segments['fill.source']?.length || 0,
-          'formsubmit.source': dashboardData.segments['formsubmit.source']?.length || 0,
-          'formsubmit.target': dashboardData.segments['formsubmit.target']?.length || 0,
-        });
-        formDataSection = buildFormDataSection(dashboardData);
-      } else {
-        console.log('[Analysis Engine] No forms data found - skipping forms section');
-      }
-
       // Build final synthesis message
       const finalSynthesisMessage = buildFinalSynthesisMessage(
         dashboardData,
         allInsights,
-        formDataSection,
         overviewTemplate,
       );
 
-      // Calculate max tokens
-      const maxTokens = hasFormData ? 5500 : 4500;
+      // Add facet info to system prompt (instructions belong in system, not user message)
+      const facetInfoSection = buildFacetInfoSection(dashboardData);
+      const enhancedSystemPrompt = `${systemPromptText}\n\n${facetInfoSection}`;
+
+      // Calculate max tokens (increased to prevent truncation)
+      const maxTokens = 6500;
 
       const finalRequest = {
         model: API_MODEL,
         max_tokens: maxTokens,
         messages: [{ role: 'user', content: finalSynthesisMessage }],
-        system: systemPromptText,
+        system: enhancedSystemPrompt,
         temperature: 0.35,
       };
 
@@ -358,8 +274,6 @@ async function callAnthropicAPI(
             progressCallback(3, 'completed', 'Streamlined overview report completed successfully', 100);
           }
 
-          // Cache the result
-          cacheAnalysisResult(finalAnalysis, currentDashboardHash);
           return finalAnalysis;
         }
       }
@@ -367,7 +281,6 @@ async function callAnthropicAPI(
 
     // Fallback result
     const result = 'Analysis completed successfully. Multiple insights were discovered across different data facets.';
-    cacheAnalysisResult(result, currentDashboardHash);
     return result;
   } catch (error) {
     console.error('[Analysis Engine] Error in API call:', error);
@@ -419,20 +332,6 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
 
     // Generate hash for cache validation
     const currentDashboardHash = generateDashboardHash(dashboardData);
-
-    // Check cache
-    if (isCacheValid(currentDashboardHash)) {
-      console.log('[Analysis Engine] Using cached analysis');
-      const cachedResult = getCachedResult();
-      if (cachedResult) {
-        if (progressCallback) {
-          progressCallback(1, 'completed', 'Using cached analysis');
-          progressCallback(2, 'completed', 'Skipped (using cache)');
-          progressCallback(3, 'completed', 'Using cached report');
-        }
-        return cachedResult;
-      }
-    }
 
     // Extract facet tools
     console.log('[Analysis Engine] Extracting facet tools from explorer...');

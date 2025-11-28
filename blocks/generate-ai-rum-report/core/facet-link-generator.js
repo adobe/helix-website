@@ -13,73 +13,148 @@
  */
 export function buildFacetInfoSection(dashboardData) {
   const facetList = Object.keys(dashboardData.segments);
+  const [simpleFacets, nestedFacets] = [
+    facetList.filter((f) => !f.includes('.')),
+    facetList.filter((f) => f.includes('.')),
+  ];
 
-  let section = '\n\n==== 🔗 AVAILABLE FACETS FOR LINKING ====\n';
-  section += 'When creating your report, wrap findings in <span> tags with data attributes to make them clickable.\n';
-  section += 'The following facets are available in the dashboard and can be linked:\n\n';
+  const formatFacet = (facet, showParent = false) => {
+    const topValues = dashboardData.segments[facet].slice(0, 2).map((item) => item.value).join('", "');
+    const parent = showParent ? `, Parent="${facet.split('.')[0]}"` : '';
+    return `- ${facet}:${parent} Example values "${topValues}"`;
+  };
 
-  // Separate simple facets from nested facets
-  const simpleFacets = facetList.filter((f) => !f.includes('.'));
-  const nestedFacets = facetList.filter((f) => f.includes('.'));
-
-  section += 'SIMPLE FACETS (single parameter):\n';
-  simpleFacets.forEach((facet) => {
-    const topValues = dashboardData.segments[facet]
-      .slice(0, 2)
-      .map((item) => item.value)
-      .join('", "');
-    section += `- ${facet}: Example values "${topValues}"\n`;
-  });
+  const sections = [
+    '\n\n==== 🔗 AVAILABLE FACETS FOR LINKING ====',
+    'When creating your report, wrap findings in <span> tags with data attributes to make them clickable.',
+    'The following facets are available in the dashboard and can be linked:\n',
+    'SIMPLE FACETS (single parameter):',
+    ...simpleFacets.map((f) => formatFacet(f)),
+  ];
 
   if (nestedFacets.length > 0) {
-    section += '\nNESTED FACETS (require parent checkpoint + nested parameter):\n';
-    nestedFacets.forEach((facet) => {
-      const topValues = dashboardData.segments[facet]
-        .slice(0, 2)
-        .map((item) => item.value)
-        .join('", "');
-      const parentCheckpoint = facet.split('.')[0];
-      section += `- ${facet}: Parent="${parentCheckpoint}", Example values "${topValues}"\n`;
-    });
+    sections.push(
+      '\nNESTED FACETS (require parent checkpoint + nested parameter):',
+      ...nestedFacets.map((f) => formatFacet(f, true)),
+    );
   }
 
-  section += '\nEXAMPLE USAGE:\n';
-  section += 'Simple facet:\n';
-  section += '<p>• <span data-facet="checkpoint" data-facet-value="click">Click events show strong engagement</span> with 1,234 interactions.</p>\n';
-  section += '<p>• <span data-facet="url" data-facet-value="/products">The /products page</span> has a 65% bounce rate.</p>\n';
+  sections.push(
+    '\n✅ CORRECT USAGE EXAMPLES:',
+    '\n1️⃣ Simple facets (single checkbox):',
+    '⚠️ IMPORTANT: Include relevant metrics/numbers INSIDE the data-facet span so they become part of the clickable link!',
+    '\n<p>• <span data-facet="checkpoint" data-facet-value="click">Click events show strong engagement with <span class="num">1,234</span> interactions</span>.</p>',
+    'Result: Checks "click" checkbox - entire phrase including number is clickable',
+    '\n<p>• <span data-facet="userAgent" data-facet-value="mobile:ios">iOS Mobile users have <span class="num">2.3s</span> average LCP</span>.</p>',
+    'Result: Checks "mobile:ios" checkbox - metric is part of the link',
+    '\n<p>• When tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}</p>',
+    '✅ CORRECT: <span data-facet-value="mobile"> (use the VALUE field)',
+    '❌ WRONG: <span data-facet-value="All Mobile"> (do NOT use the text/label field)',
+    '\n<p>• <span data-facet="url" data-facet-value="/products">The /products page has a <span class="num">65%</span> bounce rate</span>.</p>',
+    'Result: Checks "/products" checkbox - bounce rate is part of the clickable link',
+  );
 
   if (nestedFacets.length > 0) {
-    // Find a good nested facet example
     const errorSource = nestedFacets.find((f) => f === 'error.source');
     const acquisitionSource = nestedFacets.find((f) => f === 'acquisition.source');
 
     if (errorSource && dashboardData.segments[errorSource]?.length > 0) {
       const exampleValue = dashboardData.segments[errorSource][0].value;
-      section += '\nNested facet (BOTH checkpoint AND nested):\n';
-      section += `<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="${exampleValue}">${exampleValue} errors</span> affecting users.</p>\n`;
-      section += `URL result: &checkpoint=error&error.source=${exampleValue}\n`;
+      sections.push(
+        '\n2️⃣ Nested facet (checkbox + drilldown):',
+        '⚠️ Include metrics inside the span to make them clickable!',
+        `<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="${exampleValue}">${exampleValue} errors affecting <span class="num">1,234</span> users</span>.</p>`,
+        `Result: Checks "error" checkbox AND selects "${exampleValue}" in error.source drilldown - entire phrase with number is clickable`,
+        `URL result: &checkpoint=error&error.source=${exampleValue}`,
+      );
     }
 
     if (acquisitionSource && dashboardData.segments[acquisitionSource]?.length > 0) {
       const paidValue = dashboardData.segments[acquisitionSource].find((item) => item.value === 'paid');
       if (paidValue) {
-        section += '\n⚠️ ACTUAL VALUE vs DISPLAY TEXT:\n';
-        section += 'When tool returns: {"value": "paid", "count": 1234}\n';
-        section += '✅ CORRECT: <span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid">All paid traffic</span>\n';
-        section += '❌ WRONG: <span data-nested-value="All paid traffic">...</span> (do NOT use display text in data attribute)\n';
-        section += 'URL result: &checkpoint=acquisition&acquisition.source=paid\n';
+        sections.push(
+          '\n⚠️ IMPORTANT - ALWAYS USE "value" FIELD, NOT "text" OR "label":',
+          '',
+          'Example 1 - Device Type:',
+          'Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
+          '✅ CORRECT: <span data-facet="userAgent" data-facet-value="mobile">Mobile users with <span class="num">8.1k</span> sessions</span>',
+          '❌ WRONG: <span data-facet-value="All Mobile"> (uses text field - will NOT work)',
+          '',
+          'Example 2 - Acquisition Source:',
+          'Tool returns: {"text": "Paid Traffic", "value": "paid", "count": 1234}',
+          '✅ CORRECT: <span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid">Paid traffic shows <span class="num">1,234</span> conversions</span>',
+          '❌ WRONG: <span data-nested-value="Paid Traffic">... (uses text field - will NOT work)',
+          '',
+          'REMEMBER: Always inspect the "value" field in tool responses, ignore "text" and "label" fields for data attributes',
+          '⚠️ KEY POINT: Wrap your complete insight (including metrics) inside the data-facet span to make everything clickable!',
+        );
       }
     }
   }
 
-  section += '\n⚠️ CRITICAL RULES:\n';
-  section += '  1. For .source/.target facets: data-facet="checkpoint" + data-nested-facet + data-nested-value\n';
-  section += '  2. Use EXACT facet value from tool results (e.g., "paid", not "All paid traffic")\n';
-  section += '  3. Display text goes INSIDE span, actual value goes in data-* attributes\n';
-  section += '  4. Never use human-readable labels or descriptions as facet values\n';
-  section += '==== END FACET INFO ====\n\n';
+  sections.push(
+    '\n❌ INVALID EXAMPLES (will NOT check checkboxes):',
+    '• <span data-facet="browser">Chrome</span> - Wrong name! Use "userAgent" not "browser"',
+    '• <span data-nested-facet="error.source" data-nested-value="network">Errors</span> - Missing parent checkpoint!',
+    '• <span data-facet="checkpoint" data-facet-value="error">Errors</span> - Incomplete! If talking about error.source, include nested attributes!',
+    '\n⚠️ CRITICAL RULES - LINKS MUST BE DATA-BACKED:',
+    '  1. ONLY create links for values you see in TOOL RESPONSES (not assumptions or inferences)',
+    '  2. ALWAYS use the "value" field from tool response, NEVER the "text" or "label" field',
+    '     Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
+    '     ✅ USE: data-facet-value="mobile"',
+    '     ❌ NEVER: data-facet-value="All Mobile"',
+    '  3. When a tool returns {"value": "mobile:ios", "count": 123}, use "mobile:ios" exactly',
+    '  4. DO NOT create links for values you think might exist but didn\'t see in tools',
+    '  5. Use EXACT value format from tool (e.g., URLs with trailing slash: "https://example.com/")',
+    '  6. Simple facets: <span data-facet="NAME" data-facet-value="VALUE">text</span>',
+    '  7. Nested facets (parent.child): ALWAYS include ALL 4 attributes:',
+    '     - data-facet="checkpoint" (parent)',
+    '     - data-facet-value="PARENT" (e.g., "error", "acquisition", "click")',
+    '     - data-nested-facet="PARENT.CHILD" (e.g., "error.source", "acquisition.source")',
+    '     - data-nested-value="VALUE" (exact "value" field from tool, not "text" field)',
+    '  8. When discussing aggregate patterns without specific values, DO NOT create links',
+    '  9. Example: "Mobile users have slower performance" → NO LINK (aggregate, no specific value)',
+    '  10. Example: "mobile:ios users have 2.5s LCP" → LINK (specific value from tool)',
+    '  11. INCLUDE METRICS INSIDE SPANS: Put relevant numbers/metrics inside the data-facet span to make them clickable',
+    '      ✅ CORRECT: <span data-facet="url" data-facet-value="/checkout">The /checkout page has <span class="num">3.2s</span> LCP</span>',
+    '      ❌ WRONG: <span data-facet="url" data-facet-value="/checkout">The /checkout page</span> has 3.2s LCP',
+    '      (In the wrong example, only "The /checkout page" becomes clickable, not the metric)',
+    '==== END FACET INFO ====\n',
+  );
 
-  return section;
+  return sections.join('\n');
+}
+
+/**
+ * Normalize URL values to match dashboard format
+ * @param {string} url - URL to normalize
+ * @returns {string} Normalized URL that matches dashboard format
+ */
+function normalizeUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+
+  const normalized = url.replace(/([^:]\/)\/+/g, '$1'); // Remove double slashes
+
+  // Check dashboard for exact format match (try with and without trailing slash)
+  const facetSidebar = document.querySelector('facet-sidebar');
+  const urlData = facetSidebar?.facets?.url;
+  if (urlData) {
+    // Try exact match first
+    if (urlData.some((item) => item.value === normalized)) {
+      return normalized;
+    }
+    // Try with trailing slash added
+    if (!normalized.endsWith('/') && urlData.some((item) => item.value === `${normalized}/`)) {
+      return `${normalized}/`;
+    }
+    // Try with trailing slash removed
+    if (normalized.endsWith('/') && urlData.some((item) => item.value === normalized.slice(0, -1))) {
+      return normalized.slice(0, -1);
+    }
+  }
+
+  // No match found - return as-is (don't modify)
+  return normalized;
 }
 
 /**
@@ -94,56 +169,28 @@ export function buildFacetInfoSection(dashboardData) {
  * @returns {string} Dashboard URL with facet parameter(s)
  */
 function generateFacetLink(facetName, facetValue, options = {}) {
-  const {
-    preserveExisting = false, nestedFacet, nestedValue,
-  } = options;
-
-  // Build search params instead of full URL to make links relative
+  const { preserveExisting = false, nestedFacet, nestedValue } = options;
+  const currentParams = new URL(window.location.href).searchParams;
   const params = new URLSearchParams();
 
-  // If not preserving, copy only essential params
-  if (!preserveExisting) {
-    const currentParams = new URL(window.location.href).searchParams;
-    // Essential params that should always be preserved
-    const essentialParams = ['domain', 'domainkey'];
+  // Copy params based on preservation mode
+  const paramsToCopy = preserveExisting
+    ? Array.from(currentParams.entries())
+    : ['domain', 'domainkey', 'view', 'startDate', 'endDate', 'metrics']
+      .filter((p) => currentParams.has(p))
+      .map((p) => [p, currentParams.get(p)]);
 
-    essentialParams.forEach((param) => {
-      if (currentParams.has(param)) {
-        params.set(param, currentParams.get(param));
-      }
-    });
+  paramsToCopy.forEach(([key, value]) => params.set(key, value));
+  params.delete('report'); // Remove report viewer UI parameter
 
-    // Preserve date range and view from current URL (always present now)
-    ['view', 'startDate', 'endDate'].forEach((param) => {
-      if (currentParams.has(param)) {
-        params.set(param, currentParams.get(param));
-      }
-    });
-  } else {
-    // Preserve all existing params
-    const currentParams = new URL(window.location.href).searchParams;
-    currentParams.forEach((value, key) => {
-      params.set(key, value);
-    });
-  }
+  // Add facet parameters (normalize URLs)
+  const addParam = (name, value) => params.append(name, name === 'url' ? normalizeUrl(value) : value);
 
-  // Remove ONLY the report viewer UI parameter
-  // Keep view, startDate, endDate so dashboard shows data from report's time period
-  params.delete('report');
-
-  // Handle multiple facets passed as object
   if (typeof facetName === 'object' && !Array.isArray(facetName)) {
-    Object.entries(facetName).forEach(([name, value]) => {
-      params.append(name, value);
-    });
+    Object.entries(facetName).forEach(([name, value]) => addParam(name, value));
   } else {
-    // Add the primary facet parameter
-    params.append(facetName, facetValue);
-
-    // Add nested facet if provided
-    if (nestedFacet && nestedValue) {
-      params.append(nestedFacet, nestedValue);
-    }
+    addParam(facetName, facetValue);
+    if (nestedFacet && nestedValue) params.append(nestedFacet, nestedValue);
   }
 
   // Return relative URL (pathname + search params) so it works on any domain
@@ -153,72 +200,87 @@ function generateFacetLink(facetName, facetValue, options = {}) {
 }
 
 /**
+ * Validate if a facet value exists in dashboard data
+ * @param {string} facetName - Facet name
+ * @param {string} facetValue - Facet value to check
+ * @param {string} nestedFacet - Optional nested facet name
+ * @param {string} nestedValue - Optional nested value
+ * @returns {boolean} True if value exists in dashboard
+ */
+function validateFacetValue(facetName, facetValue, nestedFacet, nestedValue) {
+  try {
+    const facets = document.querySelector('facet-sidebar')?.facets;
+    if (!facets) return true; // Can't validate, allow
+
+    const checkExists = (data, value, isUrl) => {
+      if (!data) return false;
+      if (!isUrl) return data.some((item) => item.value === value);
+
+      // For URLs, check with and without trailing slash
+      return data.some((item) => item.value === value
+        || item.value === `${value}/`
+        || (value.endsWith('/') && item.value === value.slice(0, -1)));
+    };
+
+    // Validate main facet value
+    if (!checkExists(facets[facetName], facetValue, facetName === 'url')) return false;
+
+    // Validate nested facet if provided
+    if (nestedFacet && !checkExists(facets[nestedFacet], nestedValue, nestedFacet === 'url')) return false;
+
+    return true;
+  } catch (error) {
+    console.warn('[Facet Link Generator] Validation error:', error);
+    return true;
+  }
+}
+
+/**
  * Convert data-attribute spans to actual clickable links in HTML
- * This makes links work in the uploaded DA report without client-side JS
- * Date range is automatically included from the current URL parameters
+ * Validates that facet values exist in dashboard before creating links
  * @param {string} htmlContent - HTML content with data-attribute spans
- * @returns {string} HTML with actual <a> links
+ * @returns {string} HTML with actual <a> links (only for validated values)
  */
 export function convertSpansToLinks(htmlContent) {
-  // If no content or no spans to convert, return original
-  if (!htmlContent || !htmlContent.includes('data-facet')) {
+  if (!htmlContent?.includes('data-facet')) return htmlContent;
+
+  const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
+  if (doc.querySelector('parsererror')) {
+    console.error('[Facet Link Generator] Parser error');
     return htmlContent;
   }
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlContent, 'text/html');
-
-  // Check for parser errors
-  const parserError = doc.querySelector('parsererror');
-  if (parserError) {
-    console.error('[Facet Link Generator] Parser error:', parserError.textContent);
-    return htmlContent; // Return original if parsing failed
-  }
-
-  // Find all elements with data-facet attributes
   const facetElements = doc.querySelectorAll('[data-facet][data-facet-value]');
+  if (!facetElements.length) return htmlContent;
 
-  if (facetElements.length === 0) {
-    return htmlContent; // No spans to convert, return original
-  }
+  let converted = 0;
+  let skipped = 0;
 
-  console.log(`[Facet Link Generator] Converting ${facetElements.length} spans to links`);
-
-  facetElements.forEach((element) => {
-    const facetName = element.getAttribute('data-facet');
-    const facetValue = element.getAttribute('data-facet-value');
-
+  facetElements.forEach((el) => {
+    const facetName = el.getAttribute('data-facet');
+    const facetValue = el.getAttribute('data-facet-value');
     if (!facetName || !facetValue) return;
 
-    // Check for nested facet
-    const nestedFacet = element.getAttribute('data-nested-facet');
-    const nestedValue = element.getAttribute('data-nested-value');
+    const nestedFacet = el.getAttribute('data-nested-facet');
+    const nestedValue = el.getAttribute('data-nested-value');
 
-    // Generate link URL (dates automatically included from current URL)
-    const linkUrl = generateFacetLink(facetName, facetValue, {
-      nestedFacet,
-      nestedValue,
-    });
-
-    // Create anchor element
-    const anchor = doc.createElement('a');
-    anchor.href = linkUrl;
-    anchor.className = 'facet-link';
-    anchor.innerHTML = element.innerHTML;
-    anchor.style.color = '#0073e6';
-    anchor.style.textDecoration = 'underline';
-
-    // Build tooltip text
-    let tooltipText = `View ${facetName}: ${facetValue}`;
-    if (nestedFacet && nestedValue) {
-      tooltipText += ` → ${nestedFacet}: ${nestedValue}`;
+    if (!validateFacetValue(facetName, facetValue, nestedFacet, nestedValue)) {
+      skipped += 1;
+      return;
     }
-    anchor.title = tooltipText;
 
-    // Replace span with anchor
-    element.parentNode.replaceChild(anchor, element);
+    const anchor = Object.assign(doc.createElement('a'), {
+      href: generateFacetLink(facetName, facetValue, { nestedFacet, nestedValue }),
+      className: 'facet-link',
+      innerHTML: el.innerHTML,
+      title: `View ${facetName}: ${facetValue}${nestedFacet ? ` → ${nestedFacet}: ${nestedValue}` : ''}`,
+    });
+    Object.assign(anchor.style, { color: '#0073e6', textDecoration: 'underline' });
+
+    el.parentNode.replaceChild(anchor, el);
+    converted += 1;
   });
 
-  // Return the processed HTML
+  console.log(`[Facet Link Generator] ✓ ${converted} links created${skipped ? `, ${skipped} skipped` : ''}`);
   return doc.body.innerHTML;
 }

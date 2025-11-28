@@ -9,9 +9,9 @@ const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
   ERROR_TIMEOUT: 2000,
   STYLES: {
-    HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none;',
-    ENTRY_UNVIEWED: 'color: #147af3; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: 600;', // --dark-blue
-    ENTRY_VIEWED: 'color: #7326d3; padding-left: 2rem; cursor: pointer; font-size: 14px; line-height: 1.4; font-weight: normal;', // --dark-purple
+    HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none; font-size: 16px;',
+    ENTRY_UNVIEWED: 'color: #147af3; padding-left: 2rem; cursor: pointer; font-size: 16px; line-height: 1.6; font-weight: 600; border: none;', // --dark-blue
+    ENTRY_VIEWED: 'color: #7326d3; padding-left: 2rem; cursor: pointer; font-size: 16px; line-height: 1.6; font-weight: normal; border: none;', // --dark-purple
     BADGE: 'position: absolute; top: -4px; right: -4px; min-width: 20px; width: 20px; height: 20px; background: #ff7c65; border-radius: 50%; z-index: 1000; pointer-events: none; color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1;', // --medium-red
   },
 };
@@ -24,6 +24,12 @@ export async function getSavedReports() {
     console.log(`[Report Actions] Fetching reports for domain: ${currentDomain || 'all domains'}`);
     return await fetchReportsFromDA(currentDomain);
   } catch (error) {
+    // Silently handle CORS errors (common when using wrong port)
+    if (error.message?.includes('Failed to fetch') || error.message?.includes('CORS')) {
+      // eslint-disable-next-line no-console
+      console.warn('[Report Actions] Could not fetch saved reports (CORS/network error). Use port 3001 to fix.');
+      return [];
+    }
     // eslint-disable-next-line no-console
     console.error('[OpTel Detective Report] Error fetching saved reports:', error);
     return [];
@@ -147,6 +153,15 @@ function addReportToDateRangePicker(result) {
 
     // Update the notification badge (this will remove it if no unviewed reports remain)
     await updateNotificationBadge();
+
+    // Close the daterange picker dropdown
+    const picker = document.querySelector('daterange-picker');
+    if (picker?.shadowRoot) {
+      const input = picker.shadowRoot.querySelector('input');
+      if (input?.getAttribute('aria-expanded') === 'true') {
+        input.click(); // Toggle to close
+      }
+    }
 
     // Show the report with date as URL parameter
     // eslint-disable-next-line import/no-cycle

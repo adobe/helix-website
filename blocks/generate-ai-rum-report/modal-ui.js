@@ -26,29 +26,15 @@ function createModalBody() {
   const body = document.createElement('div');
   body.className = 'report-modal-body';
 
-  const anthropicKey = localStorage.getItem('anthropicApiKey') || '';
   const bedrockToken = localStorage.getItem('awsBedrockToken') || '';
-  const hasAnyKey = anthropicKey || bedrockToken;
+  const hasAnyKey = bedrockToken;
 
-  const buttonText = hasAnyKey ? 'Generate Report' : 'Save Key & Generate';
+  const buttonText = hasAnyKey ? 'Generate Report' : 'Save Token & Generate';
   const infoText = hasAnyKey
     ? 'Your API credentials are saved. Click "Generate Report" to start the analysis.'
-    : 'Enter your API credentials to generate a comprehensive report of your site data.';
+    : 'Enter your AWS Bedrock token to generate a comprehensive report of your site data.';
 
   body.innerHTML = `
-    <!-- <div class="report-form-group">
-      <label for="report-api-key">Anthropic API Key (<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Get your key</a>)</label>
-      <div class="report-quick-filter">
-        <input
-          type="password"
-          id="report-api-key"
-          placeholder="sk-ant-..."
-          value="${anthropicKey}"
-          ${anthropicKey ? 'disabled' : ''}
-        >
-      </div>
-    </div> -->
-
     <div class="report-form-group">
       <label for="report-bedrock-token">Enter your AWS Bedrock Token</label>
       <div class="report-quick-filter">
@@ -125,15 +111,19 @@ export function showStatus(statusDiv, type, message) {
 
 /**
  * Create report results UI with file icon
+ * @param {string} url - The analyzed URL for the report description
  * @returns {HTMLElement}
  */
-export function createReportResultsUI() {
+export function createReportResultsUI(url = '') {
   const resultsSection = document.createElement('div');
   resultsSection.className = 'report-results';
 
   // Get current date in yyyy-mm-dd format
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0];
+
+  // Use provided URL or default text
+  const currentDomain = url || 'your site';
 
   resultsSection.innerHTML = `
     <div class="report-file-icon">
@@ -146,7 +136,7 @@ export function createReportResultsUI() {
     </div>
     <div class="report-meta">
       <div class="report-date">${dateStr}.html</div>
-      <div class="report-description">AI-powered analysis of Real User Monitoring (RUM) data to identify performance issues, user experience patterns, and optimization opportunities.</div>
+      <div class="report-description">AI-powered analysis of Operational Telemetry data for ${currentDomain} website to identify performance issues, user experience patterns, and optimization opportunities.</div>
     </div>
     <div class="report-actions">
       <button class="report-action-btn primary" id="save-report-btn">Save Report</button>

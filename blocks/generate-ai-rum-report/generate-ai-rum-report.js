@@ -26,16 +26,28 @@ export function closeReportModal() {
 }
 
 /**
+ * Check if modal can be closed (not during generation or waiting to save)
+ */
+function canCloseModal(modal) {
+  const generateBtn = modal.querySelector('#report-generate-btn');
+  const progressIndicator = modal.querySelector('#circular-progress-container');
+  const reportResults = modal.querySelector('.report-results');
+  return !(generateBtn?.disabled || progressIndicator || reportResults);
+}
+
+/**
  * Set up modal close handlers
  */
 function setupCloseHandlers(modal) {
   // Close button
   const closeBtn = modal.querySelector('.report-modal-close');
-  closeBtn?.addEventListener('click', closeReportModal);
+  closeBtn?.addEventListener('click', () => {
+    if (canCloseModal(modal)) closeReportModal();
+  });
 
-  // ESC key to close
+  // ESC key
   const escHandler = (e) => {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' && canCloseModal(modal)) {
       closeReportModal();
       document.removeEventListener('keydown', escHandler);
     }
@@ -61,12 +73,12 @@ function setupGenerateButton(modal) {
   }
 
   generateBtn?.addEventListener('click', async () => {
-    const apiKey = apiKeyInput.value.trim();
-    const bedrockToken = bedrockTokenInput.value.trim();
+    const apiKey = apiKeyInput?.value.trim() || '';
+    const bedrockToken = bedrockTokenInput?.value.trim() || '';
 
     // Validate at least one credential is provided
     if (!apiKey && !bedrockToken) {
-      showStatus(statusDiv, 'error', '❌ Please enter either Anthropic API key or AWS Bedrock token');
+      showStatus(statusDiv, 'error', '❌ Please enter your AWS Bedrock token');
       return;
     }
 
@@ -75,23 +87,22 @@ function setupGenerateButton(modal) {
     const existingBedrockToken = localStorage.getItem('awsBedrockToken');
 
     if ((!existingApiKey && apiKey) || (!existingBedrockToken && bedrockToken)) {
-      if (apiKey && !existingApiKey) {
+      if (apiKey && !existingApiKey && apiKeyInput) {
         localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
         apiKeyInput.disabled = true;
       }
-      if (bedrockToken && !existingBedrockToken) {
+      if (bedrockToken && !existingBedrockToken && bedrockTokenInput) {
         localStorage.setItem('awsBedrockToken', bedrockToken);
         bedrockTokenInput.disabled = true;
       }
       generateBtn.textContent = '📊 Generate Report';
-      showStatus(statusDiv, 'success', '✅ API credentials saved successfully!');
       // Update provider name
       if (providerNameSpan) {
         import('./api/api-factory.js').then(({ getProviderName }) => {
           providerNameSpan.textContent = getProviderName();
         });
       }
-      return;
+      // Don't return - continue to generate report
     }
 
     // Generate report (apiKey param is kept for backwards compatibility but not used directly)
@@ -122,9 +133,9 @@ export function openReportModal() {
   // Create modal structure
   const { overlay, modal } = createModalStructure(hasApiKey);
 
-  // Add click-outside-to-close functionality
+  // Click outside to close
   overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
+    if (e.target === overlay && canCloseModal(modal)) {
       closeReportModal();
     }
   });

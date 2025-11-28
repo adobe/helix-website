@@ -42,6 +42,7 @@ const toggleView = (show) => {
 export const closeReportViewer = () => {
   const url = new URL(window.location);
   url.searchParams.delete('report');
+  url.searchParams.delete('metrics'); // Remove metrics parameter added for report view
   url.searchParams.delete('startDate');
   url.searchParams.delete('endDate');
   url.searchParams.delete('view');
@@ -137,6 +138,22 @@ const extractSections = (doc) => {
 const escapeHtml = (text) => Object.assign(document.createElement('div'), { textContent: text }).innerHTML;
 const toTitleCase = (text) => text.toLowerCase().split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
+/**
+ * Wait for dashboard elements to be ready
+ * @returns {Promise<boolean>}
+ */
+const waitForDashboard = async (maxAttempts = 20, delay = 100) => {
+  for (let i = 0; i < maxAttempts; i += 1) {
+    const facets = document.querySelector('#facets');
+    if (facets) {
+      return true;
+    }
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((resolve) => { setTimeout(resolve, delay); });
+  }
+  return false;
+};
+
 const createSection = (section) => {
   if (!section?.title) return '';
   return `
@@ -155,15 +172,57 @@ const renderReport = (container, htmlContent) => {
   container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
 
   // New reports have real <a> links baked in from DA upload - no processing needed
-  const linkCount = container.querySelectorAll('a.facet-link').length;
-  if (linkCount > 0) {
-    console.log(`[Report Viewer] Report loaded with ${linkCount} facet links ready`);
+  const facetLinks = container.querySelectorAll('a.facet-link');
+  if (facetLinks.length > 0) {
+    console.log(`[Report Viewer] Report loaded with ${facetLinks.length} facet links ready`);
+
+    // Add click handlers to update dashboard without full page reload
+    facetLinks.forEach((link) => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        // Close report viewer first (removes report params, shows dashboard)
+        toggleView(false);
+
+        // Update URL with filter parameters (without page reload)
+        const newUrl = new URL(link.href, window.location.origin);
+
+        // Preserve metrics parameter from current URL (if present)
+        const currentMetrics = new URLSearchParams(window.location.search).get('metrics');
+        if (currentMetrics) {
+          newUrl.searchParams.set('metrics', currentMetrics);
+        }
+
+        window.history.pushState({}, '', newUrl);
+
+        // Reload dashboard data using global draw function (same pattern as report generation)
+        if (typeof window.slicerDraw === 'function') {
+          try {
+            console.log('[Report Viewer] Refreshing dashboard with filter:', newUrl.search);
+            await window.slicerDraw();
+            console.log('[Report Viewer] Dashboard refreshed successfully');
+          } catch (error) {
+            console.error('[Report Viewer] Error refreshing dashboard:', error);
+          }
+        } else {
+          console.warn('[Report Viewer] Dashboard draw function not available, falling back to full reload');
+          // Use newUrl (which already has metrics preserved) instead of link.href
+          window.location.href = newUrl.toString();
+        }
+      });
+    });
   } else {
     console.log('[Report Viewer] Report loaded (no facet links found)');
   }
 };
 
-export function showReportInline(reportPath, reportDate) {
+export async function showReportInline(reportPath, reportDate) {
+  // Wait for dashboard to be ready first
+  const dashboardReady = await waitForDashboard();
+  if (!dashboardReady) {
+    console.warn('[Report Viewer] Dashboard not ready after waiting');
+  }
+
   const viewer = getViewerContainer();
   if (!viewer) return;
 
@@ -185,6 +244,7 @@ export function showReportInline(reportPath, reportDate) {
       const currentEndDate = url.searchParams.get('endDate');
 
       url.searchParams.set('report', reportDate);
+      url.searchParams.set('metrics', 'super'); // Show all checkpoints in report view (matches generation mode)
 
       // Check if we need to update date range
       let needsReload = false;

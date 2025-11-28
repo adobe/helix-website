@@ -2,12 +2,16 @@
 
 <h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
 
+<p><b>🚨 CRITICAL: USE ONLY REAL DATA FROM TOOL RESPONSES</b></p>
+<p>This template contains NO actual data - only structure and formatting guidelines. ALL metrics, numbers, percentages, and values MUST come from the tool responses and dashboard data provided in the SOURCE MATERIAL section. DO NOT use any placeholder values, example numbers, or hypothetical data.</p>
+
 <p><b>⚠️ FORMAT REQUIREMENT - USE SEMANTIC HTML:</b></p>
 <ul>
   <li>Use <code>&lt;h4&gt;</code> tags for main section headings (e.g., <code>&lt;h4&gt;EXECUTIVE SUMMARY&lt;/h4&gt;</code>)</li>
   <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags for subsection headings</li>
   <li>Use BULLET POINTS (•) for all content, each wrapped in <code>&lt;p&gt;</code> tags</li>
   <li>Wrap ALL text content in <code>&lt;p&gt;</code> tags for proper HTML structure</li>
+  <li><b>CRITICAL: Wrap ALL numbers, metrics, and percentages in <code>&lt;span class="num"&gt;</code> tags</b></li>
   <li>DO NOT use emojis in the report output</li>
   <li>DO NOT use progress bars</li>
   <li>Make the report EASY TO SCAN with clear structure and specific numbers</li>
@@ -71,16 +75,7 @@
   <li>Write naturally about multiple related facets together, not mechanically one-by-one</li>
   <li>Balance positives and improvements in a conversational tone</li>
   <li>This ensures ALL facets get coverage without mechanical repetition</li>
-  <li>Standard report: 1200-1400 words covering all facets</li>
-  <li>With forms data: 1400-1600 words (forms section + all other facets)</li>
-</ul>
-
-<p><b>⚠️ FORMS DATA PRIORITY:</b></p>
-<p>If fill_source, formsubmit_source, or formsubmit_target tools are available:</p>
-<ul>
-  <li>Forms section is MANDATORY and HIGH PRIORITY</li>
-  <li>Create dedicated forms section immediately after Executive Summary</li>
-  <li>Then continue with balanced facet coverage for all other facets</li>
+  <li>Target report length: 1200-1600 words covering all facets comprehensively</li>
 </ul>
 
 <p><b>📅 Analysis Period</b></p>
@@ -136,15 +131,15 @@
 <pre>
 "metrics": {
   "LCP": {
-    "value": "3.2s",
+    "value": "[actual value from data]",
     "classes": "performance score-poor"  ← This means LCP is FAILING
   },
   "Engagement": {
-    "value": "18%",
+    "value": "[actual value from data]",
     "classes": "business-metric engagement conversion"  ← Check if below 25%
   },
   "Bounce Rate": {
-    "value": "65%",
+    "value": "[actual value from data]",
     "classes": "business-metric acquisition bounces"  ← Check if above 60%
   }
 }
@@ -169,8 +164,7 @@
 <p>• [Critical finding or opportunity with specific numbers and business impact]</p>
 
 <p>⚠️ <b>WRITING STYLE:</b> Write the first two paragraphs as flowing prose (no bold labels). Only use bullets for the "Key Findings for Stakeholders" section. Keep it readable and not congested.</p>
-<p>⚠️ <b>EXCLUDE FORMS:</b> If forms data is provided, forms get their own dedicated section. DO NOT mention forms in Executive Summary.</p>
-<p>⚠️ <b>FORMAT:</b> Wrap all text in &lt;p&gt; tags. NO EMOJIS in output.</p>
+<p>⚠️ <b>FORMAT:</b> Wrap all text in &lt;p&gt; tags and ALL numbers in &lt;span class="num"&gt; tags. NO EMOJIS in output.</p>
 
 <!-- ====================================================================== -->
 
@@ -258,9 +252,9 @@
 
 <h4>CRITICAL LENGTH & FORMAT REQUIREMENTS</h4>
 <ul>
-  <li><b>ENTIRE REPORT:</b> 1400-1600 words</li>
+  <li><b>ENTIRE REPORT:</b> 1200-1600 words (comprehensive coverage of all facets)</li>
   <li><b>Executive Summary:</b> Maximum 150 words (2 flowing paragraphs + 3 key findings as bullets)</li>
-  <li><b>ALL OTHER SECTIONS:</b> Each section 100-150 words
+  <li><b>ALL OTHER SECTIONS:</b> Each section 100-150 words (adjust based on data richness)
     <ul>
       <li>Write primarily as flowing paragraphs with specific metrics and data integrated naturally</li>
       <li><b>Use bullets (•) strategically when:</b>
@@ -305,34 +299,54 @@
     </ul>
   </li>
   <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags sparingly for subsection labels only when introducing a bullet list</li>
+  <li><b>Number Formatting (CRITICAL):</b>
+    <ul>
+      <li><b>ALWAYS wrap numbers in <code>&lt;span class="num"&gt;</code> tags</b></li>
+      <li>Metrics: <code>&lt;span class="num"&gt;[metric value]&lt;/span&gt;</code> (e.g., seconds, milliseconds)</li>
+      <li>Percentages: <code>&lt;span class="num"&gt;[percentage]&lt;/span&gt;</code></li>
+      <li>Counts: <code>&lt;span class="num"&gt;[count]&lt;/span&gt;</code> (use actual formatting from data)</li>
+      <li>Regular numbers: <code>&lt;span class="num"&gt;[number]&lt;/span&gt;</code></li>
+    </ul>
+  </li>
   <li><b>Paragraph Format:</b>
     <ul>
-      <li>Flowing text: <code>&lt;p&gt;Paragraph with data integrated naturally. For example, LCP averaged 2.4s across mobile devices, affecting 65% of sessions.&lt;/p&gt;</code></li>
-      <li>Context/analysis paragraphs should read naturally with metrics woven into sentences</li>
+      <li>Flowing text: <code>&lt;p&gt;Paragraph with data integrated naturally from actual metrics.&lt;/p&gt;</code></li>
+      <li>Context/analysis paragraphs should read naturally with metrics woven into sentences, but ALL numbers wrapped in <code>&lt;span class="num"&gt;</code> tags</li>
+      <li>Use ONLY real data from tool results - no placeholder values</li>
     </ul>
   </li>
   <li><b>Bullet Format (when appropriate):</b>
     <ul>
-      <li>Each bullet: <code>&lt;p&gt;• Bullet text here with specific data&lt;/p&gt;</code></li>
+      <li>Each bullet: <code>&lt;p&gt;• Bullet text with metrics from actual data wrapped in &lt;span class="num"&gt; tags&lt;/p&gt;</code></li>
       <li>Use actual bullet character: • (not -, *, or other symbols)</li>
       <li>Each bullet is its own <code>&lt;p&gt;</code> tag</li>
       <li>Optional subsection label before bullets: <code>&lt;p&gt;&lt;b&gt;Category:&lt;/b&gt;&lt;/p&gt;</code></li>
+      <li><b>Remember: Wrap ALL numbers in <code>&lt;span class="num"&gt;</code> tags, use ONLY real data</b></li>
     </ul>
   </li>
-  <li><b>Example mixed format:</b>
+  <li><b>Example format structure (use real data, not these placeholders):</b>
     <ul>
-      <li><code>&lt;p&gt;[Flowing paragraph with context and 1-2 metrics]&lt;/p&gt;</code></li>
-      <li><code>&lt;p&gt;• [Bullet 1 for specific item]&lt;/p&gt;</code></li>
-      <li><code>&lt;p&gt;• [Bullet 2 for specific item]&lt;/p&gt;</code></li>
-      <li><code>&lt;p&gt;[Flowing paragraph with analysis]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;[Context paragraph with metrics from actual data wrapped in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;• [Bullet with specific finding and real numbers in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;• [Another bullet with actual data in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
+      <li><code>&lt;p&gt;[Analysis paragraph with real insights and numbers in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
     </ul>
   </li>
   <li>Do NOT use markdown formatting like **text** or *text*</li>
   <li>DO NOT use <code>&lt;br&gt;</code> or <code>&lt;br/&gt;</code> tags - use <code>&lt;p&gt;</code> tags</li>
   <li>NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)</li>
+  <li><b>⚠️ CRITICAL: Wrap EVERY number, metric, percentage, and count in <code>&lt;span class="num"&gt;</code> tags</b></li>
 </ul>
 
-<p><b>⚠️ CRITICAL:</b> Use ONLY the actual data from the SOURCE MATERIAL provided above. DO NOT use any example numbers, percentages, or metrics from this template. Extract real metrics from the dashboard data and insights provided.</p>
+<p><b>🚨 ABSOLUTELY CRITICAL - NO PLACEHOLDER DATA:</b></p>
+<ul>
+  <li>Use ONLY actual data from the SOURCE MATERIAL and tool responses provided above</li>
+  <li>DO NOT use ANY example numbers, percentages, or metrics from this template</li>
+  <li>DO NOT use ANY placeholder values shown in formatting examples</li>
+  <li>Extract REAL metrics from dashboard data and insights only</li>
+  <li>If a metric is not in the tool responses, DO NOT make up a value</li>
+  <li>This template is for STRUCTURE ONLY - all data must be real</li>
+</ul>
 
 </div>
 

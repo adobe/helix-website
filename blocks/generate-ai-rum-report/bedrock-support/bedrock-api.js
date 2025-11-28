@@ -6,7 +6,7 @@
 
 const BEDROCK_CONFIG = {
   REGION: 'us-east-1',
-  MODEL_ID: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+  MODEL_ID: 'global.anthropic.claude-sonnet-4-20250514-v1:0',
   MAX_TOKENS: 4096,
   TEMPERATURE: 0.7,
 };

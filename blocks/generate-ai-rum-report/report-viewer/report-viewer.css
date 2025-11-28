@@ -163,6 +163,15 @@ facet-sidebar.report-view-active > form {
   border-radius: 3px;
 }
 
+/* Number formatting - makes metrics visually distinct */
+.report-sections .content-item .num {
+  font-family: 'SF Mono', monaco, consolas, 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-size: 0.92em; /* Compensate for monospace appearing larger */
+  vertical-align: baseline;
+}
+
 /* ============================================================================
    LOADING & ERROR STATES
    ========================================================================= */

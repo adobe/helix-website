@@ -258,10 +258,13 @@ async function generateReportHTML(content, url, timestamp, isDeepMode) {
   const endDate = urlParams.get('endDate');
 
   if (startDate && endDate) {
+    console.log('[DA Upload] Saving date range to report:', { startDate, endDate });
     const metaTags = `
     <meta name="report-start-date" content="${startDate}">
     <meta name="report-end-date" content="${endDate}">`;
     html = html.replace('</head>', `${metaTags}\n</head>`);
+  } else {
+    console.warn('[DA Upload] No startDate/endDate in URL, report will not have date range meta tags');
   }
 
   return html;
@@ -311,9 +314,23 @@ export async function uploadToDA(content, options = {}) {
 
     const response = await fetch(fullpath, { method: 'POST', body: formData });
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      throw new Error(`Upload failed: ${response.status} ${response.statusText}${errorText ? `\n${errorText}` : ''}`);
+    // DA API sometimes returns 500 status but with valid response data
+    // Try to parse response as JSON first
+    let responseData = null;
+    try {
+      const text = await response.text();
+      if (text) {
+        responseData = JSON.parse(text);
+      }
+    } catch (e) {
+      // Not JSON, ignore
+    }
+
+    // Check if response has valid data structure (even with 500 status)
+    // DA API returns 500 but includes source/aem URLs when upload succeeds
+    if (!response.ok && (!responseData || !responseData.source)) {
+      const errorMsg = responseData ? JSON.stringify(responseData) : '';
+      throw new Error(`Upload failed: ${response.status} ${response.statusText}${errorMsg ? `\n${errorMsg}` : ''}`);
     }
 
     const result = {
@@ -321,6 +338,7 @@ export async function uploadToDA(content, options = {}) {
       path: fullpath,
       filename,
       folder,
+      responseData, // Include DA response for reference
     };
 
     if (debug) console.log('[DA Upload] Success:', result);
