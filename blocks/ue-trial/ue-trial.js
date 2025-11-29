@@ -558,17 +558,20 @@ async function buildForm(block) {
   });
 
   templateField.append(templateLabel, templateGrid);
-
-  // GitHub ID (moved after template)
-  const githubField = createTag('div', { class: 'form-field', id: 'github-field' });
-  const githubLabel = createTag('label', { for: 'github-id' }, 'GitHub ID (optional)');
-  const githubInput = createTag('input', {
-    type: 'text',
-    id: 'github-id',
-    name: 'githubId',
-  });
-  const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
-  githubField.append(githubLabel, githubInput, githubHelpText);
+  const isAgenticPlaygournd = block.classList.contains('agentic-playground');
+  let githubField = null;
+  if (!isAgenticPlaygournd) {
+    // GitHub ID (moved after template)
+    githubField = createTag('div', { class: 'form-field', id: 'github-field' });
+    const githubLabel = createTag('label', { for: 'github-id' }, 'GitHub ID (optional)');
+    const githubInput = createTag('input', {
+      type: 'text',
+      id: 'github-id',
+      name: 'githubId',
+    });
+    const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
+    githubField.append(githubLabel, githubInput, githubHelpText);
+  }
 
   // Terms and Conditions - extract from block content
   const agreement = createTag('div', { class: 'agreement' });
@@ -630,6 +633,15 @@ async function buildForm(block) {
 
   // Submit button
   const buttonContainer = createTag('div', { class: 'button-container' });
+
+  if (isAgenticPlaygournd) {
+    const hiddenScopeInput = createTag('input', {
+      type: 'hidden',
+      name: 'scope',
+      value: 'agentic-playground',
+    });
+    buttonContainer.append(hiddenScopeInput);
+  }
   const submitButton = createTag('button', {
     type: 'submit',
     class: 'continue',
@@ -639,7 +651,7 @@ async function buildForm(block) {
   // Append all elements to form
   form.append(
     emailField,
-    githubField,
+    githubField || '',
     templateField,
     agreement,
     altchaContainer,

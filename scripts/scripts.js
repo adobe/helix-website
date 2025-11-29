@@ -312,6 +312,65 @@ export function customDecorateTemplateAndTheme() {
   if (theme) addClasses(document.body, `${theme.toLowerCase()}-theme`);
 }
 
+function addCopyButtonsToCodeBlocks() {
+  const codeBlocks = document.querySelectorAll('pre code');
+  codeBlocks.forEach((codeBlock) => {
+    const pre = codeBlock.parentElement;
+    if (pre.querySelector('.code-copy-button')) return; // Already has button
+
+    // Create wrapper for positioning
+    if (!pre.classList.contains('code-block-wrapper')) {
+      pre.classList.add('code-block-wrapper');
+    }
+
+    // Create copy button
+    const copyButton = createTag('button', {
+      class: 'code-copy-button',
+      type: 'button',
+      'aria-label': 'Copy code to clipboard',
+      title: 'Copy code',
+    }, `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M4 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z"/>
+      <path d="M2 6V2h4v1H2.5v3H2z"/>
+    </svg>`);
+
+    // Add click handler
+    copyButton.addEventListener('click', async () => {
+      const code = codeBlock.textContent;
+      try {
+        await navigator.clipboard.writeText(code);
+        copyButton.classList.add('copied');
+        copyButton.setAttribute('aria-label', 'Code copied!');
+        copyButton.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+        </svg>`;
+
+        setTimeout(() => {
+          copyButton.classList.remove('copied');
+          copyButton.setAttribute('aria-label', 'Copy code to clipboard');
+          copyButton.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M4 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z"/>
+            <path d="M2 6V2h4v1H2.5v3H2z"/>
+          </svg>`;
+        }, 2000);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to copy code:', err);
+      }
+    });
+
+    // Add keyboard support
+    copyButton.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        copyButton.click();
+      }
+    });
+
+    pre.appendChild(copyButton);
+  });
+}
+
 async function loadHighlightLibrary() {
   const highlightCSS = createTag('link', {
     rel: 'stylesheet',
@@ -322,6 +381,9 @@ async function loadHighlightLibrary() {
   await loadScript('/libs/highlight/highlight.min.js');
   const initScript = createTag('script', {}, 'hljs.highlightAll();');
   document.body.append(initScript);
+
+  // Add copy buttons after highlighting is applied
+  setTimeout(() => addCopyButtonsToCodeBlocks(), 100);
 }
 
 export async function decorateGuideTemplateCodeBlock() {
@@ -711,67 +773,6 @@ async function loadLazy(doc) {
   await loadBlocks(main);
   addBlockLevelInViewAnimation(main);
 
-  const { hash } = window.location;
-  if (hash) {
-    setTimeout(() => {
-      const element = hash ? main.querySelector(hash) : false;
-      if (element) {
-        // Handle lazy-loaded images that might cause content shift
-        const handleLazyLoadedImages = () => {
-          // Find all images above the target element that are lazy-loaded
-          const allImages = Array.from(document.querySelectorAll('img'));
-          const precedingImages = allImages
-            // eslint-disable-next-line no-bitwise
-            .filter((img) => (img.compareDocumentPosition(element)
-              & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
-
-          if (precedingImages.length === 0) {
-            // No lazy-loaded images above target, scroll immediately
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-          }
-
-          // Track loaded images
-          let loadedCount = 0;
-          const totalImages = precedingImages.length;
-
-          // Function to scroll after each image loads
-          const scrollAfterLoad = () => {
-            loadedCount += 1;
-            // Always scroll to the element to account for content shift
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            // Remove listeners from remaining images if all are loaded
-            if (loadedCount === totalImages) {
-              precedingImages.forEach((img) => {
-                img.removeEventListener('load', scrollAfterLoad);
-                img.removeEventListener('error', scrollAfterLoad);
-              });
-            }
-          };
-
-          // Add load listeners to all preceding lazy images
-          precedingImages.forEach((img) => {
-            if (img.complete) {
-              // Image already loaded
-              loadedCount += 1;
-            } else {
-              // Add one-time load listener
-              img.addEventListener('load', scrollAfterLoad, { once: true });
-              // Also handle error case
-              img.addEventListener('error', scrollAfterLoad, { once: true });
-            }
-          });
-
-          // Initial scroll
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        };
-
-        handleLazyLoadedImages();
-      }
-    }, 500);
-  }
-
   loadHeader(doc.querySelector('header'));
   loadFooter(doc.querySelector('footer'));
 
@@ -792,6 +793,22 @@ async function loadLazy(doc) {
   window.hlx.plugins.run('loadLazy');
 
   sampleRUM('lazy');
+
+  const hashTarget = window.location.hash ? doc.querySelector(window.location.hash) : null;
+  if (hashTarget) {
+    // Wait for all images and videos to load before scrolling to hash target
+    const media = [...doc.querySelectorAll('main img, main video')];
+    await Promise.all(media.map((m) => {
+      if (m.complete) return Promise.resolve();
+      m.setAttribute('loading', 'eager');
+      return new Promise((resolve) => {
+        m.addEventListener('load', resolve, { once: true });
+        m.addEventListener('error', resolve, { once: true });
+        m.addEventListener('loadedmetadata', resolve, { once: true });
+      });
+    }));
+    setTimeout(() => hashTarget.scrollIntoView({ behavior: 'smooth' }), 10);
+  }
 
   // check to see if this is reflected in google indexed page
   document.documentElement.classList.add('index-test-scripts-js-2024-08-23');
