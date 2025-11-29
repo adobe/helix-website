@@ -9,9 +9,9 @@ const CONFIG = {
   VIEWED_KEY: 'optel-detective-viewed-reports',
   ERROR_TIMEOUT: 2000,
   STYLES: {
-    HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none; font-size: 16px;',
-    ENTRY_UNVIEWED: 'color: #147af3; padding-left: 2rem; cursor: pointer; font-size: 16px; line-height: 1.6; font-weight: 600; border: none;', // --dark-blue
-    ENTRY_VIEWED: 'color: #7326d3; padding-left: 2rem; cursor: pointer; font-size: 16px; line-height: 1.6; font-weight: normal; border: none;', // --dark-purple
+    HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none; font-size: var(--type-body-l-size);',
+    ENTRY_UNVIEWED: 'color: #147af3; padding-left: 2rem; cursor: pointer; font-size: var(--type-body-l-size); line-height: 1.6; font-weight: 600; border: none;', // --dark-blue
+    ENTRY_VIEWED: 'color: #7326d3; padding-left: 2rem; cursor: pointer; font-size: var(--type-body-l-size); line-height: 1.6; font-weight: normal; border: none;', // --dark-purple
     BADGE: 'position: absolute; top: -4px; right: -4px; min-width: 20px; width: 20px; height: 20px; background: #ff7c65; border-radius: 50%; z-index: 1000; pointer-events: none; color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1;', // --medium-red
   },
 };

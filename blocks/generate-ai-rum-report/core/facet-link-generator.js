@@ -43,15 +43,16 @@ export function buildFacetInfoSection(dashboardData) {
     '\n✅ CORRECT USAGE EXAMPLES:',
     '\n1️⃣ Simple facets (single checkbox):',
     '⚠️ IMPORTANT: Include relevant metrics/numbers INSIDE the data-facet span so they become part of the clickable link!',
-    '\n<p>• <span data-facet="checkpoint" data-facet-value="click">Click events show strong engagement with <span class="num">1,234</span> interactions</span>.</p>',
+    '⚠️ Use <number-format> tags with proper attributes for all numbers (see Number Formatting section).',
+    '\n<p>• <span data-facet="checkpoint" data-facet-value="click">Click events show strong engagement with <number-format sample-size="1234"><span class="formatted-value">1,234</span></number-format> interactions</span>.</p>',
     'Result: Checks "click" checkbox - entire phrase including number is clickable',
-    '\n<p>• <span data-facet="userAgent" data-facet-value="mobile:ios">iOS Mobile users have <span class="num">2.3s</span> average LCP</span>.</p>',
-    'Result: Checks "mobile:ios" checkbox - metric is part of the link',
+    '\n<p>• <span data-facet="userAgent" data-facet-value="mobile:ios">iOS Mobile users have <number-format title="2.3s ±0.8s" sample-size="4500"><span class="formatted-value">2.3s</span></number-format> average LCP</span>.</p>',
+    'Result: Checks "mobile:ios" checkbox - metric with uncertainty is part of the link',
     '\n<p>• When tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}</p>',
     '✅ CORRECT: <span data-facet-value="mobile"> (use the VALUE field)',
     '❌ WRONG: <span data-facet-value="All Mobile"> (do NOT use the text/label field)',
-    '\n<p>• <span data-facet="url" data-facet-value="/products">The /products page has a <span class="num">65%</span> bounce rate</span>.</p>',
-    'Result: Checks "/products" checkbox - bounce rate is part of the clickable link',
+    '\n<p>• <span data-facet="url" data-facet-value="/products">The /products page has a <number-format title="65% ±5%" sample-size="450"><span class="formatted-value">65%</span></number-format> bounce rate</span>.</p>',
+    'Result: Checks "/products" checkbox - bounce rate with uncertainty is part of the clickable link',
   );
 
   if (nestedFacets.length > 0) {
@@ -62,8 +63,8 @@ export function buildFacetInfoSection(dashboardData) {
       const exampleValue = dashboardData.segments[errorSource][0].value;
       sections.push(
         '\n2️⃣ Nested facet (checkbox + drilldown):',
-        '⚠️ Include metrics inside the span to make them clickable!',
-        `<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="${exampleValue}">${exampleValue} errors affecting <span class="num">1,234</span> users</span>.</p>`,
+        '⚠️ Include metrics inside the span to make them clickable! Use <number-format> tags with proper attributes.',
+        `<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="${exampleValue}">${exampleValue} errors affecting <number-format title="1,234 ±456" sample-size="1234"><span class="formatted-value">1,234</span></number-format> users</span>.</p>`,
         `Result: Checks "error" checkbox AND selects "${exampleValue}" in error.source drilldown - entire phrase with number is clickable`,
         `URL result: &checkpoint=error&error.source=${exampleValue}`,
       );
@@ -77,16 +78,16 @@ export function buildFacetInfoSection(dashboardData) {
           '',
           'Example 1 - Device Type:',
           'Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
-          '✅ CORRECT: <span data-facet="userAgent" data-facet-value="mobile">Mobile users with <span class="num">8.1k</span> sessions</span>',
+          '✅ CORRECT: <span data-facet="userAgent" data-facet-value="mobile">Mobile users with <number-format sample-size="8100"><span class="formatted-value">8.1k</span></number-format> sessions</span>',
           '❌ WRONG: <span data-facet-value="All Mobile"> (uses text field - will NOT work)',
           '',
           'Example 2 - Acquisition Source:',
           'Tool returns: {"text": "Paid Traffic", "value": "paid", "count": 1234}',
-          '✅ CORRECT: <span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid">Paid traffic shows <span class="num">1,234</span> conversions</span>',
+          '✅ CORRECT: <span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid">Paid traffic shows <number-format sample-size="1234"><span class="formatted-value">1,234</span></number-format> conversions</span>',
           '❌ WRONG: <span data-nested-value="Paid Traffic">... (uses text field - will NOT work)',
           '',
           'REMEMBER: Always inspect the "value" field in tool responses, ignore "text" and "label" fields for data attributes',
-          '⚠️ KEY POINT: Wrap your complete insight (including metrics) inside the data-facet span to make everything clickable!',
+          '⚠️ KEY POINT: Wrap your complete insight (including metrics with <number-format> tags) inside the data-facet span to make everything clickable!',
         );
       }
     }
@@ -116,7 +117,8 @@ export function buildFacetInfoSection(dashboardData) {
     '  9. Example: "Mobile users have slower performance" → NO LINK (aggregate, no specific value)',
     '  10. Example: "mobile:ios users have 2.5s LCP" → LINK (specific value from tool)',
     '  11. INCLUDE METRICS INSIDE SPANS: Put relevant numbers/metrics inside the data-facet span to make them clickable',
-    '      ✅ CORRECT: <span data-facet="url" data-facet-value="/checkout">The /checkout page has <span class="num">3.2s</span> LCP</span>',
+    '      Use <number-format> tags with proper attributes (title, trend, sample-size) for all metrics',
+    '      ✅ CORRECT: <span data-facet="url" data-facet-value="/checkout">The /checkout page has <number-format title="3.2s ±1.1s" sample-size="890"><span class="formatted-value">3.2s</span></number-format> LCP</span>',
     '      ❌ WRONG: <span data-facet="url" data-facet-value="/checkout">The /checkout page</span> has 3.2s LCP',
     '      (In the wrong example, only "The /checkout page" becomes clickable, not the metric)',
     '==== END FACET INFO ====\n',

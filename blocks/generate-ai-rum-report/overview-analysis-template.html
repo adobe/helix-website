@@ -7,14 +7,10 @@
 
 <p><b>⚠️ FORMAT REQUIREMENT - USE SEMANTIC HTML:</b></p>
 <ul>
-  <li>Use <code>&lt;h4&gt;</code> tags for main section headings (e.g., <code>&lt;h4&gt;EXECUTIVE SUMMARY&lt;/h4&gt;</code>)</li>
-  <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags for subsection headings</li>
-  <li>Use BULLET POINTS (•) for all content, each wrapped in <code>&lt;p&gt;</code> tags</li>
-  <li>Wrap ALL text content in <code>&lt;p&gt;</code> tags for proper HTML structure</li>
-  <li><b>CRITICAL: Wrap ALL numbers, metrics, and percentages in <code>&lt;span class="num"&gt;</code> tags</b></li>
-  <li>DO NOT use emojis in the report output</li>
-  <li>DO NOT use progress bars</li>
-  <li>Make the report EASY TO SCAN with clear structure and specific numbers</li>
+  <li><code>&lt;h4&gt;</code> for main section headings, <code>&lt;b&gt;</code> for subsection labels</li>
+  <li>Wrap ALL text in <code>&lt;p&gt;</code> tags, use bullet character (•) for lists</li>
+  <li><b>CRITICAL: Wrap ALL numbers in <code>&lt;number-format&gt;</code> tags (see Number Formatting section below)</b></li>
+  <li>NO emojis or progress bars - keep report easy to scan with clear structure</li>
 </ul>
 
 <p><b>🔗 FACET LINKING REQUIREMENT - MAKE FINDINGS CLICKABLE:</b></p>
@@ -77,6 +73,24 @@
   <li>This ensures ALL facets get coverage without mechanical repetition</li>
   <li>Target report length: 1200-1600 words covering all facets comprehensively</li>
 </ul>
+
+<p><b>📊 Number Formatting (CRITICAL)</b></p>
+<p><b>ALWAYS wrap ALL numbers in <code>&lt;number-format&gt;</code> tags.</b> Extract these attributes from source data:</p>
+<ul>
+  <li><code>title</code> - Full value with uncertainty (e.g., "2.3s ±0.5s and rising") - preserve exactly as shown</li>
+  <li><code>trend</code> - "rising" or "falling" (only if present in source)</li>
+  <li><code>sample-size</code> - Raw count (ALWAYS include)</li>
+  <li><code>&lt;span class="formatted-value"&gt;</code> - Display value (e.g., "1.6k", "2.3s", "65%")</li>
+</ul>
+
+<p><b>Format examples:</b></p>
+<ul>
+  <li>With trend: <code>&lt;number-format title="1600 ±784 and rising" trend="rising" sample-size="16"&gt;&lt;span class="formatted-value"&gt;1.6k&lt;/span&gt;&lt;/number-format&gt;</code></li>
+  <li>With uncertainty: <code>&lt;number-format title="2.3s ±0.5s" sample-size="1234"&gt;&lt;span class="formatted-value"&gt;2.3s&lt;/span&gt;&lt;/number-format&gt;</code></li>
+  <li>Simple count: <code>&lt;number-format sample-size="8100"&gt;&lt;span class="formatted-value"&gt;8.1k&lt;/span&gt;&lt;/number-format&gt;</code></li>
+</ul>
+
+<p><b>⚠️ CRITICAL:</b> Extract attributes EXACTLY from source data. DO NOT make up uncertainty values (±) or trends. If source lacks <code>title</code> attribute, omit it but ALWAYS include <code>sample-size</code>.</p>
 
 <p><b>📅 Analysis Period</b></p>
 <p>This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").</p>
@@ -163,8 +177,8 @@
 <p>• [Critical finding or opportunity with specific numbers and business impact]</p>
 <p>• [Critical finding or opportunity with specific numbers and business impact]</p>
 
-<p>⚠️ <b>WRITING STYLE:</b> Write the first two paragraphs as flowing prose (no bold labels). Only use bullets for the "Key Findings for Stakeholders" section. Keep it readable and not congested.</p>
-<p>⚠️ <b>FORMAT:</b> Wrap all text in &lt;p&gt; tags and ALL numbers in &lt;span class="num"&gt; tags. NO EMOJIS in output.</p>
+<p>⚠️ <b>STYLE:</b> First two paragraphs as flowing prose (no bold labels), bullets for Key Findings. Keep readable.</p>
+<p>⚠️ <b>FORMAT:</b> Wrap text in &lt;p&gt; tags, ALL numbers in &lt;number-format&gt; tags with source attributes. NO EMOJIS.</p>
 
 <!-- ====================================================================== -->
 
@@ -299,53 +313,24 @@
     </ul>
   </li>
   <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags sparingly for subsection labels only when introducing a bullet list</li>
-  <li><b>Number Formatting (CRITICAL):</b>
+  <li><b>Number Formatting:</b> Wrap ALL numbers in <code>&lt;number-format&gt;</code> tags (see Number Formatting section above for details)</li>
+  <li><b>Paragraphs:</b> Wrap in <code>&lt;p&gt;</code> tags with metrics integrated naturally into flowing text</li>
+  <li><b>Bullets:</b> Use actual bullet character (•), wrap each in <code>&lt;p&gt;</code> tag, optional <code>&lt;b&gt;Label:&lt;/b&gt;</code> before list</li>
+  <li><b>Examples:</b>
     <ul>
-      <li><b>ALWAYS wrap numbers in <code>&lt;span class="num"&gt;</code> tags</b></li>
-      <li>Metrics: <code>&lt;span class="num"&gt;[metric value]&lt;/span&gt;</code> (e.g., seconds, milliseconds)</li>
-      <li>Percentages: <code>&lt;span class="num"&gt;[percentage]&lt;/span&gt;</code></li>
-      <li>Counts: <code>&lt;span class="num"&gt;[count]&lt;/span&gt;</code> (use actual formatting from data)</li>
-      <li>Regular numbers: <code>&lt;span class="num"&gt;[number]&lt;/span&gt;</code></li>
+      <li>Paragraph: <code>&lt;p&gt;Mobile users experienced LCP of &lt;number-format title="2.8s ±1.2s" sample-size="4500"&gt;&lt;span class="formatted-value"&gt;2.8s&lt;/span&gt;&lt;/number-format&gt;, affecting &lt;number-format sample-size="8100"&gt;&lt;span class="formatted-value"&gt;8.1k&lt;/span&gt;&lt;/number-format&gt; sessions.&lt;/p&gt;</code></li>
+      <li>Bullet: <code>&lt;p&gt;• Error rate peaked at &lt;number-format title="1,234 ±456" sample-size="1234"&gt;&lt;span class="formatted-value"&gt;1.2k&lt;/span&gt;&lt;/number-format&gt; incidents.&lt;/p&gt;</code></li>
     </ul>
   </li>
-  <li><b>Paragraph Format:</b>
-    <ul>
-      <li>Flowing text: <code>&lt;p&gt;Paragraph with data integrated naturally from actual metrics.&lt;/p&gt;</code></li>
-      <li>Context/analysis paragraphs should read naturally with metrics woven into sentences, but ALL numbers wrapped in <code>&lt;span class="num"&gt;</code> tags</li>
-      <li>Use ONLY real data from tool results - no placeholder values</li>
-    </ul>
-  </li>
-  <li><b>Bullet Format (when appropriate):</b>
-    <ul>
-      <li>Each bullet: <code>&lt;p&gt;• Bullet text with metrics from actual data wrapped in &lt;span class="num"&gt; tags&lt;/p&gt;</code></li>
-      <li>Use actual bullet character: • (not -, *, or other symbols)</li>
-      <li>Each bullet is its own <code>&lt;p&gt;</code> tag</li>
-      <li>Optional subsection label before bullets: <code>&lt;p&gt;&lt;b&gt;Category:&lt;/b&gt;&lt;/p&gt;</code></li>
-      <li><b>Remember: Wrap ALL numbers in <code>&lt;span class="num"&gt;</code> tags, use ONLY real data</b></li>
-    </ul>
-  </li>
-  <li><b>Example format structure (use real data, not these placeholders):</b>
-    <ul>
-      <li><code>&lt;p&gt;[Context paragraph with metrics from actual data wrapped in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
-      <li><code>&lt;p&gt;• [Bullet with specific finding and real numbers in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
-      <li><code>&lt;p&gt;• [Another bullet with actual data in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
-      <li><code>&lt;p&gt;[Analysis paragraph with real insights and numbers in &lt;span class="num"&gt; tags]&lt;/p&gt;</code></li>
-    </ul>
-  </li>
-  <li>Do NOT use markdown formatting like **text** or *text*</li>
-  <li>DO NOT use <code>&lt;br&gt;</code> or <code>&lt;br/&gt;</code> tags - use <code>&lt;p&gt;</code> tags</li>
-  <li>NO EMOJIS in the report (no 🎯, 📊, ⚡, ✅, ⚠️, etc.)</li>
-  <li><b>⚠️ CRITICAL: Wrap EVERY number, metric, percentage, and count in <code>&lt;span class="num"&gt;</code> tags</b></li>
+  <li>Do NOT use markdown (**text**), <code>&lt;br&gt;</code> tags, or emojis (🎯, 📊, etc.)</li>
 </ul>
 
-<p><b>🚨 ABSOLUTELY CRITICAL - NO PLACEHOLDER DATA:</b></p>
+<p><b>🚨 CRITICAL - USE ONLY REAL DATA:</b></p>
 <ul>
-  <li>Use ONLY actual data from the SOURCE MATERIAL and tool responses provided above</li>
-  <li>DO NOT use ANY example numbers, percentages, or metrics from this template</li>
-  <li>DO NOT use ANY placeholder values shown in formatting examples</li>
-  <li>Extract REAL metrics from dashboard data and insights only</li>
-  <li>If a metric is not in the tool responses, DO NOT make up a value</li>
-  <li>This template is for STRUCTURE ONLY - all data must be real</li>
+  <li>ALL metrics MUST come from SOURCE MATERIAL and tool responses - NO placeholder/example values from this template</li>
+  <li>Extract <code>title</code>, <code>trend</code>, <code>sample-size</code> attributes EXACTLY as shown in source data</li>
+  <li>DO NOT make up uncertainty (±), trends, or any values - only use what exists in source</li>
+  <li>This template provides STRUCTURE ONLY - all data must be real</li>
 </ul>
 
 </div>
