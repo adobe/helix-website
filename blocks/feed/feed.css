@@ -311,3 +311,23 @@
     margin-bottom: 1em;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .blog-item:not(.blog-item.latest) {
+    background-color: #2c2c2c;
+  }
+
+  .blog-item:not(.blog-item.latest) h3,
+  .blog-item:not(.blog-item.latest) p,
+  .blog-item:not(.blog-item.latest) .desc {
+    color: #e8e8e8;
+  }
+
+  .feed.blog .favorite-blogs {
+    background-color: #3a3a3a;
+  }
+
+  .feed.blog .favorite-blogs h2 {
+    color: #e8e8e8;
+  }
+}
