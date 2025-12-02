@@ -4,14 +4,9 @@
 
 /* eslint-disable no-console */
 
-const BEDROCK_CONFIG = {
-  REGION: 'us-east-1',
-  MODEL_ID: 'global.anthropic.claude-sonnet-4-20250514-v1:0',
-  MAX_TOKENS: 4096,
-  TEMPERATURE: 0.7,
-};
+import { AI_MODELS, BEDROCK_CONFIG } from '../config.js';
 
-const ENDPOINT = `https://bedrock-runtime.${BEDROCK_CONFIG.REGION}.amazonaws.com/model/${BEDROCK_CONFIG.MODEL_ID}/converse`;
+const ENDPOINT = `https://bedrock-runtime.${BEDROCK_CONFIG.REGION}.amazonaws.com/model/${AI_MODELS.BEDROCK_MODEL_ID}/converse`;
 
 /**
  * Call AWS Bedrock API

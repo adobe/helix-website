@@ -219,6 +219,69 @@ const createSection = (section) => {
     </fieldset>`;
 };
 
+/**
+ * Format and style numbers in the report for better visual distinction
+ * Wraps standalone numbers in <span class="num"> for styling
+ */
+const formatNumbers = (container) => {
+  // Find all text nodes and wrap numbers
+  const walk = document.createTreeWalker(
+    container,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: (node) => {
+        // Skip if parent is already .num, script, style, or inside a link href
+        if (node.parentElement?.matches('.num, script, style, a[href]')) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        // Accept if contains numbers
+        return /\d/.test(node.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      },
+    },
+  );
+
+  const nodesToProcess = [];
+  let node = walk.nextNode();
+  while (node) {
+    nodesToProcess.push(node);
+    node = walk.nextNode();
+  }
+
+  // Pattern: Numbers with optional decimals, commas, units (%, s, ms, k, M)
+  const numberPattern = /(\d{1,3}(?:,\d{3})*(?:\.\d+)?(?:[%skmKM]|ms)?)/g;
+
+  nodesToProcess.forEach((textNode) => {
+    const text = textNode.textContent;
+    if (!numberPattern.test(text)) return;
+
+    const fragment = document.createDocumentFragment();
+    let lastIndex = 0;
+
+    text.replace(numberPattern, (match, num, offset) => {
+      // Add text before the number
+      if (offset > lastIndex) {
+        fragment.appendChild(document.createTextNode(text.slice(lastIndex, offset)));
+      }
+
+      // Wrap number in styled span
+      const span = document.createElement('span');
+      span.className = 'num';
+      span.textContent = num;
+      fragment.appendChild(span);
+
+      lastIndex = offset + match.length;
+      return match;
+    });
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+    }
+
+    textNode.parentNode.replaceChild(fragment, textNode);
+  });
+};
+
 const renderReport = (container, htmlContent) => {
   const sections = extractSections(new DOMParser().parseFromString(htmlContent, 'text/html'));
   if (!sections.length) {
@@ -226,6 +289,9 @@ const renderReport = (container, htmlContent) => {
     return;
   }
   container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
+
+  // Format numbers for better visual distinction
+  formatNumbers(container);
 
   // New reports have real <a> links baked in from DA upload - no processing needed
   const facetLinks = container.querySelectorAll('a.facet-link');

@@ -6,9 +6,7 @@
 import { createModalStructure, showStatus } from './modal-ui.js';
 import generateReport from './report-generator.js';
 import cleanupMetricsParameter from './cleanup-utils.js';
-
-// Constants
-const API_KEY_STORAGE_KEY = 'anthropicApiKey';
+import { STORAGE_KEYS } from './config.js';
 
 let modalInstance = null;
 
@@ -60,7 +58,6 @@ function setupCloseHandlers(modal) {
  */
 function setupGenerateButton(modal) {
   const generateBtn = modal.querySelector('#report-generate-btn');
-  const apiKeyInput = modal.querySelector('#report-api-key');
   const bedrockTokenInput = modal.querySelector('#report-bedrock-token');
   const statusDiv = modal.querySelector('#report-status');
   const providerNameSpan = modal.querySelector('#provider-name');
@@ -73,28 +70,20 @@ function setupGenerateButton(modal) {
   }
 
   generateBtn?.addEventListener('click', async () => {
-    const apiKey = apiKeyInput?.value.trim() || '';
     const bedrockToken = bedrockTokenInput?.value.trim() || '';
 
-    // Validate at least one credential is provided
-    if (!apiKey && !bedrockToken) {
+    // Validate Bedrock token is provided
+    if (!bedrockToken) {
       showStatus(statusDiv, 'error', '❌ Please enter your AWS Bedrock token');
       return;
     }
 
-    // Save credentials if not already saved
-    const existingApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
-    const existingBedrockToken = localStorage.getItem('awsBedrockToken');
+    // Save token if not already saved
+    const existingBedrockToken = localStorage.getItem(STORAGE_KEYS.BEDROCK_TOKEN);
 
-    if ((!existingApiKey && apiKey) || (!existingBedrockToken && bedrockToken)) {
-      if (apiKey && !existingApiKey && apiKeyInput) {
-        localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-        apiKeyInput.disabled = true;
-      }
-      if (bedrockToken && !existingBedrockToken && bedrockTokenInput) {
-        localStorage.setItem('awsBedrockToken', bedrockToken);
-        bedrockTokenInput.disabled = true;
-      }
+    if (!existingBedrockToken && bedrockToken) {
+      localStorage.setItem(STORAGE_KEYS.BEDROCK_TOKEN, bedrockToken);
+      if (bedrockTokenInput) bedrockTokenInput.disabled = true;
       generateBtn.textContent = '📊 Generate Report';
       // Update provider name
       if (providerNameSpan) {
@@ -102,11 +91,10 @@ function setupGenerateButton(modal) {
           providerNameSpan.textContent = getProviderName();
         });
       }
-      // Don't return - continue to generate report
     }
 
-    // Generate report (apiKey param is kept for backwards compatibility but not used directly)
-    await generateReport(apiKey || 'using-factory', statusDiv, generateBtn, modal);
+    // Generate report
+    await generateReport(null, statusDiv, generateBtn, modal);
   });
 }
 
@@ -127,11 +115,11 @@ export function openReportModal() {
     closeReportModal();
   }
 
-  // Check if API key exists
-  const hasApiKey = !!localStorage.getItem(API_KEY_STORAGE_KEY);
+  // Check if Bedrock token exists
+  const hasBedrockToken = !!localStorage.getItem(STORAGE_KEYS.BEDROCK_TOKEN);
 
   // Create modal structure
-  const { overlay, modal } = createModalStructure(hasApiKey);
+  const { overlay, modal } = createModalStructure(hasBedrockToken);
 
   // Click outside to close
   overlay.addEventListener('click', (e) => {

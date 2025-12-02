@@ -5,18 +5,11 @@
 
 /* eslint-disable no-console */
 
+import { API_CONFIG } from './config.js';
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
-
-const API_CONFIG = {
-  ENDPOINT: 'https://chat-bot-test.asthabhargava001.workers.dev/',
-  MODEL: 'claude-opus-4-1-20250805',
-  MAX_TOKENS: 2048,
-  TEMPERATURE: 0.35,
-  FOLLOWUP_MAX_TOKENS: 3072,
-  FOLLOWUP_TEMPERATURE: 0.3,
-};
 
 const BATCH_CONFIG = {
   TOOLS_PER_BATCH: 1, // One tool per batch - ensures ALL metrics are analyzed
@@ -165,48 +158,16 @@ async function processBatch(
 
   try {
     const request = {
-      model: API_CONFIG.MODEL,
-      max_tokens: API_CONFIG.MAX_TOKENS,
+      max_tokens: API_CONFIG.BATCH_MAX_TOKENS,
       messages: [{ role: 'user', content: batchMessage }],
       tools: batch.tools,
       system: systemPrompt,
-      temperature: API_CONFIG.TEMPERATURE,
+      temperature: API_CONFIG.BATCH_TEMPERATURE,
     };
 
-    let data;
-    // Auto-detect which API to use based on available credentials
-    const anthropicKey = localStorage.getItem('anthropicApiKey');
-    const bedrockToken = localStorage.getItem('awsBedrockToken');
-
-    if (anthropicKey) {
-      // Use Worker proxy with Anthropic key
-      const response = await fetch(API_CONFIG.ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': anthropicKey,
-        },
-        body: JSON.stringify(request),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => '');
-        const error = errorText.includes('524')
-          ? 'Timeout - analysis took too long'
-          : `HTTP ${response.status}`;
-        throw new Error(error);
-      }
-
-      data = await response.json();
-    } else if (bedrockToken) {
-      // Use API Factory (Bedrock or Anthropic Direct)
-      const { callAI } = await import('./api/api-factory.js');
-      data = await callAI(request);
-    } else {
-      return {
-        batchId: batch.id, toolName, analysis: '', success: false, error: 'No API credentials',
-      };
-    }
+    // Use API Factory (AWS Bedrock)
+    const { callAI } = await import('./api/api-factory.js');
+    const data = await callAI(request);
 
     if (!data?.content?.length) {
       return {
@@ -260,8 +221,7 @@ async function processBatch(
 
       // Send tool results back to AI for analysis
       const followUpRequest = {
-        model: API_CONFIG.MODEL,
-        max_tokens: API_CONFIG.MAX_TOKENS,
+        max_tokens: API_CONFIG.FOLLOWUP_MAX_TOKENS,
         messages: [
           { role: 'user', content: batchMessage },
           { role: 'assistant', content: data.content },
@@ -269,29 +229,11 @@ async function processBatch(
         ],
         tools: batch.tools,
         system: systemPrompt,
-        temperature: API_CONFIG.TEMPERATURE,
+        temperature: API_CONFIG.FOLLOWUP_TEMPERATURE,
       };
 
-      let followUpData;
-      if (anthropicKey) {
-        // Use Worker proxy with Anthropic key
-        const followUpResponse = await fetch(API_CONFIG.ENDPOINT, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': anthropicKey,
-          },
-          body: JSON.stringify(followUpRequest),
-        });
-
-        if (followUpResponse.ok) {
-          followUpData = await followUpResponse.json();
-        }
-      } else if (bedrockToken) {
-        // Use API Factory (Bedrock or Anthropic Direct)
-        const { callAI } = await import('./api/api-factory.js');
-        followUpData = await callAI(followUpRequest);
-      }
+      // Reuse callAI from above
+      const followUpData = await callAI(followUpRequest);
 
       if (followUpData) {
         analysis = '';
@@ -355,38 +297,15 @@ Provide comprehensive analysis with specific details and actionable insights.`;
 
   try {
     const request = {
-      model: API_CONFIG.MODEL,
       max_tokens: API_CONFIG.FOLLOWUP_MAX_TOKENS,
       messages: [{ role: 'user', content }],
       system: systemPrompt,
       temperature: API_CONFIG.FOLLOWUP_TEMPERATURE,
     };
 
-    let data;
-    // Auto-detect which API to use based on available credentials
-    const anthropicKey = localStorage.getItem('anthropicApiKey');
-    const bedrockToken = localStorage.getItem('awsBedrockToken');
-
-    if (anthropicKey) {
-      // Use Worker proxy with Anthropic key
-      const response = await fetch(API_CONFIG.ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': anthropicKey,
-        },
-        body: JSON.stringify(request),
-      });
-
-      if (!response.ok) return null;
-      data = await response.json();
-    } else if (bedrockToken) {
-      // Use API Factory (Bedrock or Anthropic Direct)
-      const { callAI } = await import('./api/api-factory.js');
-      data = await callAI(request);
-    } else {
-      return null; // No credentials available
-    }
+    // Use API Factory (AWS Bedrock)
+    const { callAI } = await import('./api/api-factory.js');
+    const data = await callAI(request);
 
     if (!data.content?.length) return null;
 
@@ -461,57 +380,29 @@ export async function processParallelBatches(
     }
   };
 
-  // Check which API is being used
-  const anthropicKey = localStorage.getItem('anthropicApiKey');
-  const bedrockToken = localStorage.getItem('awsBedrockToken');
-  const usingBedrock = !anthropicKey && bedrockToken;
-
-  let results;
-  if (usingBedrock) {
-    // Bedrock has strict rate limits - process sequentially
-    console.log('[Parallel] Using Bedrock - processing sequentially to avoid rate limits');
-    results = await batches.reduce(async (prevPromise, batch) => {
-      const acc = await prevPromise;
-      const result = await processBatch(
-        batch,
-        message,
-        dashboardData,
-        systemPrompt,
-        apiKey,
-        toolHandler,
-      );
-
-      completedBatches += 1;
-      updateProgress();
-
-      // Add small delay between requests to avoid rate limits
-      if (completedBatches < batches.length) {
-        await new Promise((resolve) => { setTimeout(resolve, 500); });
-      }
-
-      return [...acc, result];
-    }, Promise.resolve([]));
-  } else {
-    // Worker proxy or Anthropic Direct - process in parallel
-    console.log('[Parallel] Using Worker/Anthropic - processing in parallel');
-    results = await Promise.all(
-      batches.map(async (batch) => {
-        const result = await processBatch(
-          batch,
-          message,
-          dashboardData,
-          systemPrompt,
-          apiKey,
-          toolHandler,
-        );
-
-        completedBatches += 1;
-        updateProgress();
-
-        return result;
-      }),
+  // AWS Bedrock has strict rate limits - process sequentially
+  console.log('[Parallel] Using AWS Bedrock - processing sequentially to avoid rate limits');
+  const results = await batches.reduce(async (prevPromise, batch) => {
+    const acc = await prevPromise;
+    const result = await processBatch(
+      batch,
+      message,
+      dashboardData,
+      systemPrompt,
+      apiKey,
+      toolHandler,
     );
-  }
+
+    completedBatches += 1;
+    updateProgress();
+
+    // Add small delay between requests to avoid rate limits
+    if (completedBatches < batches.length) {
+      await new Promise((resolve) => { setTimeout(resolve, 500); });
+    }
+
+    return [...acc, result];
+  }, Promise.resolve([]));
 
   // Collect successful analyses
   const successful = results

@@ -9,7 +9,7 @@
 <ul>
   <li><code>&lt;h4&gt;</code> for main section headings, <code>&lt;b&gt;</code> for subsection labels</li>
   <li>Wrap ALL text in <code>&lt;p&gt;</code> tags, use bullet character (•) for lists</li>
-  <li><b>CRITICAL: Wrap ALL numbers in <code>&lt;number-format&gt;</code> tags (see Number Formatting section below)</b></li>
+  <li>Include specific numbers and metrics from tool responses in your text</li>
   <li>NO emojis or progress bars - keep report easy to scan with clear structure</li>
 </ul>
 
@@ -74,23 +74,14 @@
   <li>Target report length: 1200-1600 words covering all facets comprehensively</li>
 </ul>
 
-<p><b>📊 Number Formatting (CRITICAL)</b></p>
-<p><b>ALWAYS wrap ALL numbers in <code>&lt;number-format&gt;</code> tags.</b> Extract these attributes from source data:</p>
+<p><b>📊 Number Formatting</b></p>
+<p>Use raw numbers directly in your text. Include specific counts, percentages, and metrics from the tool responses without complex formatting.</p>
+<p><b>Examples:</b></p>
 <ul>
-  <li><code>title</code> - Full value with uncertainty (e.g., "2.3s ±0.5s and rising") - preserve exactly as shown</li>
-  <li><code>trend</code> - "rising" or "falling" (only if present in source)</li>
-  <li><code>sample-size</code> - Raw count (ALWAYS include)</li>
-  <li><code>&lt;span class="formatted-value"&gt;</code> - Display value (e.g., "1.6k", "2.3s", "65%")</li>
+  <li>"Mobile users experienced 4,900 sessions with an average LCP of 2.3 seconds"</li>
+  <li>"Error rate peaked at 234 incidents affecting 15% of users"</li>
+  <li>"Desktop traffic accounted for 8,100 page views"</li>
 </ul>
-
-<p><b>Format examples:</b></p>
-<ul>
-  <li>With trend: <code>&lt;number-format title="1600 ±784 and rising" trend="rising" sample-size="16"&gt;&lt;span class="formatted-value"&gt;1.6k&lt;/span&gt;&lt;/number-format&gt;</code></li>
-  <li>With uncertainty: <code>&lt;number-format title="2.3s ±0.5s" sample-size="1234"&gt;&lt;span class="formatted-value"&gt;2.3s&lt;/span&gt;&lt;/number-format&gt;</code></li>
-  <li>Simple count: <code>&lt;number-format sample-size="8100"&gt;&lt;span class="formatted-value"&gt;8.1k&lt;/span&gt;&lt;/number-format&gt;</code></li>
-</ul>
-
-<p><b>⚠️ CRITICAL:</b> Extract attributes EXACTLY from source data. DO NOT make up uncertainty values (±) or trends. If source lacks <code>title</code> attribute, omit it but ALWAYS include <code>sample-size</code>.</p>
 
 <p><b>📅 Analysis Period</b></p>
 <p>This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").</p>
@@ -130,13 +121,13 @@
   <li><code>classes: "business-metric engagement conversion"</code> - Engagement/Conversion metric. If value is below 25%, this is a <b>CRITICAL ISSUE</b> indicating serious user interaction problems. Values above 75% are healthy.</li>
   <li><code>classes: "business-metric acquisition bounces"</code> - Bounce rate metric. If value is above 60%, this is a <b>CRITICAL ISSUE</b> indicating serious retention problems. Values below 40% are healthy.</li>
   <li><code>classes: "business-metric acquisition organic"</code> - Organic traffic/acquisition metric. Low values may indicate SEO or discoverability issues.</li>
-  <li>Note: The actual value is in <code>&lt;span class="formatted-value"&gt;</code> nested inside <code>&lt;number-format&gt;</code>, and <code>&lt;meter&gt;</code> attributes (<code>low</code>, <code>high</code>, <code>optimum</code>) provide threshold guidance</li>
+  <li>Note: Metric values may have <code>&lt;meter&gt;</code> attributes (<code>low</code>, <code>high</code>, <code>optimum</code>) that provide threshold guidance</li>
 </ul>
 
 <p><b>⚠️ MANDATORY: When you see metrics with "score-poor" or critical thresholds, you MUST:</b></p>
 <ul>
   <li>Prominently mention them in the relevant sections with specific values and context</li>
-  <li>Include them in "JAVASCRIPT ERRORS THAT NEED ATTENTION" if they relate to technical/performance issues</li>
+  <li>Include them in "JAVASCRIPT ERRORS THAT NEED ATTENTION" if they relate to technical/performance issues AND errors ≥1% of traffic</li>
   <li>List them in "PRIORITY ACTIONS" with clear, actionable remediation steps</li>
   <li>Reference them in "EXECUTIVE SUMMARY" if they have significant business impact</li>
 </ul>
@@ -165,6 +156,14 @@
 <!-- ACTUAL REPORT STRUCTURE STARTS HERE -->
 <!-- ====================================================================== -->
 
+<p><b>📋 CONDITIONAL SECTIONS:</b></p>
+<ul>
+  <li><b>JavaScript Errors:</b> Only include if errors ≥1% of total traffic. Skip entirely if below threshold.</li>
+  <li><b>All Other Sections:</b> Always include (Executive Summary, Performance Impact, User Engagement, Traffic & Acquisition, Business Impact, Priority Actions)</li>
+</ul>
+
+<!-- ====================================================================== -->
+
 <h4>EXECUTIVE SUMMARY</h4>
 <p>Create a flowing, readable summary (MAXIMUM 150 words) in this structure:</p>
 
@@ -178,11 +177,13 @@
 <p>• [Critical finding or opportunity with specific numbers and business impact]</p>
 
 <p>⚠️ <b>STYLE:</b> First two paragraphs as flowing prose (no bold labels), bullets for Key Findings. Keep readable.</p>
-<p>⚠️ <b>FORMAT:</b> Wrap text in &lt;p&gt; tags, ALL numbers in &lt;number-format&gt; tags with source attributes. NO EMOJIS.</p>
+<p>⚠️ <b>FORMAT:</b> Wrap text in &lt;p&gt; tags, include specific numbers from tool responses. NO EMOJIS.</p>
 
 <!-- ====================================================================== -->
 
 <h4>JAVASCRIPT ERRORS THAT NEED ATTENTION</h4>
+<p><b>⚠️ THRESHOLD CHECK:</b> Only include this section if JavaScript errors represent <b>≥1% of total traffic</b>. Calculate: (error count / total page views) × 100. If errors are &lt;1%, <b>SKIP THIS ENTIRE SECTION</b> and move directly to "PERFORMANCE IMPACT".</p>
+
 <p>Write 2-3 paragraphs analyzing error patterns. Use bullets (•) when listing specific errors or when emphasizing distinct issues that need attention.</p>
 <p>[First paragraph: Describe the overall error landscape, frequency patterns, and which pages or features are most affected. Write as flowing text with specific numbers integrated naturally.]</p>
 <p><b>If you have 3+ distinct errors to highlight, use bullets:</b></p>
@@ -252,11 +253,19 @@
 <!-- ====================================================================== -->
 
 <h4>PRIORITY ACTIONS</h4>
-<p>List the 3-4 most critical actions to take, prioritized by impact:</p>
-<p>• [Action 1]: [Specific recommendation with expected impact and timeframe]</p>
-<p>• [Action 2]: [Specific recommendation with expected impact and timeframe]</p>
-<p>• [Action 3]: [Specific recommendation with expected impact and timeframe]</p>
-<p>• [Action 4 (optional)]: [Specific recommendation with expected impact and timeframe]</p>
+<p>List the 3-4 most critical actions to take, prioritized by impact. Format each action with the recommendation first, followed by expected impact on a new line:</p>
+<p>• [Action 1]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
+<p>• [Action 2]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
+<p>• [Action 3]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
+<p>• [Action 4 (optional)]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
+
+<p><b>⚠️ FORMAT RULES:</b></p>
+<ul>
+  <li>NO timelines (e.g., "1-2 days", "within a week") - focus on impact only</li>
+  <li>Expected Impact must be on a separate line using <code>&lt;br&gt;</code> tag</li>
+  <li>Use <code>&lt;br&gt;Expected Impact:</code> format exactly as shown above</li>
+  <li>Quantify impact with specific numbers where possible</li>
+</ul>
 
 <!-- ====================================================================== -->
 <!-- CRITICAL REQUIREMENTS -->
@@ -289,9 +298,10 @@
       </li>
     </ul>
   </li>
-  <li><b>Priority Actions:</b> 3-4 action items, ALL as bullets</li>
+  <li><b>Priority Actions:</b> 3-4 action items, ALL as bullets with Expected Impact on separate line using <code>&lt;br&gt;</code></li>
   <li>Balance readability with specificity - integrate data naturally into sentences</li>
   <li>Use actionable language and quantify impact wherever possible</li>
+  <li>NO timelines in Priority Actions - focus on impact only</li>
   <li>NO EMOJIS anywhere in the report content</li>
 </ul>
 
@@ -300,7 +310,7 @@
   <li>Use <code>&lt;h4&gt;</code> tags for ALL main section headings:
     <ul>
       <li>EXECUTIVE SUMMARY</li>
-      <li>JAVASCRIPT ERRORS THAT NEED ATTENTION</li>
+      <li>JAVASCRIPT ERRORS THAT NEED ATTENTION (only if errors ≥1% of traffic)</li>
       <li>PERFORMANCE IMPACT</li>
       <li>USER ENGAGEMENT</li>
       <li>TRAFFIC & ACQUISITION</li>
@@ -313,23 +323,24 @@
     </ul>
   </li>
   <li>Use <code>&lt;b&gt;</code> or <code>&lt;strong&gt;</code> tags sparingly for subsection labels only when introducing a bullet list</li>
-  <li><b>Number Formatting:</b> Wrap ALL numbers in <code>&lt;number-format&gt;</code> tags (see Number Formatting section above for details)</li>
   <li><b>Paragraphs:</b> Wrap in <code>&lt;p&gt;</code> tags with metrics integrated naturally into flowing text</li>
   <li><b>Bullets:</b> Use actual bullet character (•), wrap each in <code>&lt;p&gt;</code> tag, optional <code>&lt;b&gt;Label:&lt;/b&gt;</code> before list</li>
   <li><b>Examples:</b>
     <ul>
-      <li>Paragraph: <code>&lt;p&gt;Mobile users experienced LCP of &lt;number-format title="2.8s ±1.2s" sample-size="4500"&gt;&lt;span class="formatted-value"&gt;2.8s&lt;/span&gt;&lt;/number-format&gt;, affecting &lt;number-format sample-size="8100"&gt;&lt;span class="formatted-value"&gt;8.1k&lt;/span&gt;&lt;/number-format&gt; sessions.&lt;/p&gt;</code></li>
-      <li>Bullet: <code>&lt;p&gt;• Error rate peaked at &lt;number-format title="1,234 ±456" sample-size="1234"&gt;&lt;span class="formatted-value"&gt;1.2k&lt;/span&gt;&lt;/number-format&gt; incidents.&lt;/p&gt;</code></li>
+      <li>Paragraph: <code>&lt;p&gt;Mobile users experienced LCP of 2.8 seconds, affecting 8,100 sessions.&lt;/p&gt;</code></li>
+      <li>Bullet: <code>&lt;p&gt;• Error rate peaked at 1,234 incidents affecting 15% of users.&lt;/p&gt;</code></li>
+      <li>Priority Action: <code>&lt;p&gt;• Fix missing author profile&lt;br&gt;Expected Impact: Immediate reduction in 404 errors and improved page load times.&lt;/p&gt;</code></li>
     </ul>
   </li>
-  <li>Do NOT use markdown (**text**), <code>&lt;br&gt;</code> tags, or emojis (🎯, 📊, etc.)</li>
+  <li>Do NOT use markdown (**text**) or emojis (🎯, 📊, etc.)</li>
+  <li>Use <code>&lt;br&gt;</code> tags ONLY in Priority Actions section to separate Expected Impact</li>
 </ul>
 
 <p><b>🚨 CRITICAL - USE ONLY REAL DATA:</b></p>
 <ul>
   <li>ALL metrics MUST come from SOURCE MATERIAL and tool responses - NO placeholder/example values from this template</li>
-  <li>Extract <code>title</code>, <code>trend</code>, <code>sample-size</code> attributes EXACTLY as shown in source data</li>
-  <li>DO NOT make up uncertainty (±), trends, or any values - only use what exists in source</li>
+  <li>Include raw numbers, counts, percentages, and metrics directly from the tool responses</li>
+  <li>DO NOT make up values - only use what exists in source data</li>
   <li>This template provides STRUCTURE ONLY - all data must be real</li>
 </ul>
 

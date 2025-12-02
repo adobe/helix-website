@@ -6,20 +6,13 @@
 /* eslint-disable no-console */
 
 import { convertSpansToLinks } from './core/facet-link-generator.js';
+import { DA_CONFIG, PATHS } from './config.js';
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const DA_CONFIG = {
-  ORG: 'asthabh23',
-  REPO: 'da-demo',
-  BASE_URL: 'https://admin.da.live/source',
-  UPLOAD_PATH: 'drafts/optel-reports',
-};
-
-const TEMPLATE_PATH = '/blocks/generate-ai-rum-report/report-template.html';
-const STORAGE_KEY = 'rumChatDeepMode';
+const TEMPLATE_PATH = `${PATHS.BLOCK_BASE}/${PATHS.REPORT_TEMPLATE}`;
 
 // Template cache
 let templateCache = null;
@@ -212,10 +205,9 @@ function formatDates(timestamp) {
  * @param {string} content
  * @param {string} url
  * @param {string} timestamp
- * @param {boolean} isDeepMode
  * @returns {Promise<string>} Complete HTML document
  */
-async function generateReportHTML(content, url, timestamp, isDeepMode) {
+async function generateReportHTML(content, url, timestamp) {
   const template = await loadTemplate();
   const reportId = `RPT-${Date.now().toString(36).toUpperCase()}`;
   const { date, timestamp: formattedTimestamp } = formatDates(timestamp);
@@ -247,7 +239,7 @@ async function generateReportHTML(content, url, timestamp, isDeepMode) {
     .replace(/{{REPORT_TITLE}}/g, `OpTel Analysis - ${url || 'Dashboard'}`)
     .replace(/{{ANALYZED_URL}}/g, url || 'Dashboard')
     .replace(/{{GENERATED_DATE}}/g, date)
-    .replace(/{{ANALYSIS_MODE}}/g, isDeepMode ? 'Deep Analysis' : 'Standard Analysis')
+    .replace(/{{ANALYSIS_MODE}}/g, 'AI Analysis')
     .replace(/{{REPORT_ID}}/g, reportId)
     .replace(/{{ANALYSIS_CONTENT}}/g, tableContent)
     .replace(/{{GENERATED_TIMESTAMP}}/g, formattedTimestamp);
@@ -291,14 +283,13 @@ export async function uploadToDA(content, options = {}) {
   }
 
   try {
-    const isDeepMode = localStorage.getItem(STORAGE_KEY) === 'true';
     const timestamp = new Date().toISOString();
 
     if (debug) {
       console.log('[DA Upload] Generating HTML with dates from URL...');
     }
 
-    const htmlContent = await generateReportHTML(content, url, timestamp, isDeepMode);
+    const htmlContent = await generateReportHTML(content, url, timestamp);
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const formData = new FormData();
     formData.append('data', blob);

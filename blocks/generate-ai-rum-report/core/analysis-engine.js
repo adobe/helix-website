@@ -15,15 +15,11 @@ import {
   processParallelBatches,
 } from '../parallel-processing.js';
 import { buildFacetInfoSection } from './facet-link-generator.js';
+import { PATHS } from '../config.js';
 
 // Template cache
 let systemPromptCache = null;
 let overviewAnalysisTemplateCache = null;
-
-// API configuration
-const API_ENDPOINT = 'https://chat-bot-test.asthabhargava001.workers.dev/';
-const USE_DIRECT_API = true; // Set to false to use Worker proxy
-const API_MODEL = 'claude-opus-4-1-20250805';
 
 /**
  * Load text file content from parent directory
@@ -32,7 +28,7 @@ const API_MODEL = 'claude-opus-4-1-20250805';
  */
 async function loadTextFile(filename) {
   try {
-    const response = await fetch(`/blocks/generate-ai-rum-report/${filename}`);
+    const response = await fetch(`${PATHS.BLOCK_BASE}/${filename}`);
     if (!response.ok) {
       throw new Error(`Failed to load ${filename}: ${response.status}`);
     }
@@ -49,7 +45,7 @@ async function loadTextFile(filename) {
  */
 async function getSystemPrompt() {
   if (!systemPromptCache) {
-    systemPromptCache = await loadTextFile('system-prompt.txt');
+    systemPromptCache = await loadTextFile(PATHS.SYSTEM_PROMPT);
   }
   return systemPromptCache || 'You are a RUM data analyst specializing in web performance and user engagement analysis.';
 }
@@ -60,7 +56,7 @@ async function getSystemPrompt() {
  */
 async function getOverviewAnalysisTemplate() {
   if (!overviewAnalysisTemplateCache) {
-    overviewAnalysisTemplateCache = await loadTextFile('overview-analysis-template.html');
+    overviewAnalysisTemplateCache = await loadTextFile(PATHS.OVERVIEW_TEMPLATE);
   }
   return overviewAnalysisTemplateCache || 'CREATE A CLEAN, PROFESSIONAL REPORT WITH STRUCTURED SECTIONS.';
 }
@@ -132,7 +128,7 @@ ${overviewTemplate}`;
 }
 
 /**
- * Call Anthropic API for analysis
+ * Call AWS Bedrock API for analysis
  * @param {Object} dashboardData - Dashboard data object
  * @param {string} currentDashboardHash - Dashboard hash for caching
  * @param {Array} facetTools - Array of facet tools
@@ -152,7 +148,7 @@ async function callAnthropicAPI(
     const { getApiProvider } = await import('../api/api-factory.js');
     const provider = getApiProvider();
     if (!provider.hasToken) {
-      throw new Error('No API credentials found. Please configure AWS Bedrock or Anthropic API key.');
+      throw new Error('AWS Bedrock token not found. Please configure your token.');
     }
 
     // Get system prompt
@@ -200,7 +196,6 @@ async function callAnthropicAPI(
       const maxTokens = 6500;
 
       const finalRequest = {
-        model: API_MODEL,
         max_tokens: maxTokens,
         messages: [{ role: 'user', content: finalSynthesisMessage }],
         system: enhancedSystemPrompt,
@@ -211,38 +206,13 @@ async function callAnthropicAPI(
         progressCallback(3, 'in-progress', 'Preparing the overview analysis...', 40);
       }
 
-      // Make final API call
+      // Make final API call using API Factory (AWS Bedrock)
       if (progressCallback) {
         progressCallback(3, 'in-progress', 'Generating insights and findings...', 65);
       }
 
-      let finalData;
-      if (USE_DIRECT_API) {
-        // Use API Factory (supports Bedrock or Anthropic Direct)
-        const { callAI } = await import('../api/api-factory.js');
-        finalData = await callAI(finalRequest);
-      } else {
-        // Use Worker proxy (requires Anthropic key)
-        const anthropicKey = localStorage.getItem('anthropicApiKey');
-        if (!anthropicKey) {
-          throw new Error('Worker proxy requires Anthropic API key. Set USE_DIRECT_API=true to use Bedrock.');
-        }
-        const finalResponse = await fetch(API_ENDPOINT, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': anthropicKey,
-          },
-          body: JSON.stringify(finalRequest),
-        });
-
-        if (!finalResponse.ok) {
-          const errorData = await finalResponse.json();
-          throw new Error(errorData.error || `API request failed (${finalResponse.status})`);
-        }
-
-        finalData = await finalResponse.json();
-      }
+      const { callAI } = await import('../api/api-factory.js');
+      const finalData = await callAI(finalRequest);
 
       if (finalData) {
         console.log('[Analysis Engine] API Response:', {

@@ -136,7 +136,7 @@ export function createReportResultsUI(url = '') {
     </div>
     <div class="report-meta">
       <div class="report-date">${dateStr}.html</div>
-      <div class="report-description">AI-powered analysis of Operational Telemetry data for ${currentDomain} website to identify performance issues, user experience patterns, and optimization opportunities.</div>
+      <div class="report-description">AI-powered analysis of Operational Telemetry data for <strong>${currentDomain}</strong> website to identify performance issues, user experience patterns, and optimization opportunities.</div>
     </div>
     <div class="report-actions">
       <button class="report-action-btn primary" id="save-report-btn">Save Report</button>

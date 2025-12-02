@@ -131,7 +131,7 @@ function handleGenerationError(
 
 /**
  * Generate the RUM analysis report
- * @param {string} apiKey - Anthropic API key
+ * @param {string} apiKey - API key (deprecated)
  * @param {HTMLElement} statusDiv - Status message container
  * @param {HTMLElement} button - Generate button element
  * @param {HTMLElement} modal - Modal container element
