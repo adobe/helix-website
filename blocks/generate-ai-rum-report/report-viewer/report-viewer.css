@@ -179,17 +179,49 @@ facet-sidebar.report-view-active > form {
   font-variant-numeric: tabular-nums;
 }
 
-/* Back to Report button */
-.back-to-report-icon {
-  position: absolute;
-  top: -40px;
-  right: 8px;
-  padding: 8px;
-  background: var(--background-color);
-  border: none;
+/* Floating "Back to Report" button - matches dashboard styling */
+.back-to-report-floating {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+  padding: 4px 10px;
+  color: black;
+  background: white;
+  border: 2px solid currentcolor;
+  border-radius: 4px;
   cursor: pointer;
-  font: 600 14px sans-serif;
+  font-size: 12px;
+  font-weight: 400;
   white-space: nowrap;
+  opacity: 0.9;
+  transition: opacity 0.2s ease, background-color 0.3s ease;
+  animation: attention-pulse 3s ease-in-out infinite;
+}
+
+.back-to-report-floating:hover {
+  opacity: 1;
+  animation: none;
+  background: white;
+}
+
+.back-to-report-floating:active {
+  opacity: 0.9;
+}
+
+@keyframes attention-pulse {
+  0%,
+  100% {
+    background: white;
+  }
+
+  40% {
+    background: #fffacd; /* light yellow */
+  }
+
+  50% {
+    background: white;
+  }
 }
 
 /* ============================================================================

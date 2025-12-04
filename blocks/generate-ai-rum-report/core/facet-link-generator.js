@@ -1,6 +1,10 @@
 /**
  * Facet Link Generator Module
  * Creates dashboard links with specific facet parameters for report navigation
+ *
+ * Supports flexible nested facet linking:
+ * - Main facets: checkpoint, url, userAgent
+ * - Nested facets: parent.source, parent.target (can be used independently or together)
  */
 
 /* eslint-disable no-console */
@@ -13,114 +17,136 @@
  */
 export function buildFacetInfoSection(dashboardData) {
   const facetList = Object.keys(dashboardData.segments);
-  const [simpleFacets, nestedFacets] = [
-    facetList.filter((f) => !f.includes('.')),
-    facetList.filter((f) => f.includes('.')),
-  ];
+  const simpleFacets = facetList.filter((f) => !f.includes('.'));
 
-  const formatFacet = (facet, showParent = false) => {
+  const formatFacet = (facet) => {
     const topValues = dashboardData.segments[facet].slice(0, 2).map((item) => item.value).join('", "');
-    const parent = showParent ? `, Parent="${facet.split('.')[0]}"` : '';
-    return `- ${facet}:${parent} Example values "${topValues}"`;
+    return `- ${facet}: Example values "${topValues}"`;
   };
+
+  const nestedFacets = facetList.filter((f) => f.includes('.'));
+
+  // Group nested facets by parent to identify source/target pairs
+  const nestedByParent = {};
+  nestedFacets.forEach((f) => {
+    const parent = f.split('.')[0];
+    if (!nestedByParent[parent]) nestedByParent[parent] = [];
+    nestedByParent[parent].push(f);
+  });
 
   const sections = [
     '\n\n==== 🔗 AVAILABLE FACETS FOR LINKING ====',
     'When creating your report, wrap findings in <span> tags with data attributes to make them clickable.',
-    'The following facets are available in the dashboard and can be linked:\n',
-    'SIMPLE FACETS (single parameter):',
-    ...simpleFacets.map((f) => formatFacet(f)),
+    '',
+    '⚠️ CRITICAL: All links PRESERVE existing url and userAgent filters in the URL',
+    '   Checkpoint may be changed/added based on the link, but url/userAgent context is never lost.',
+    '',
+    '📋 FACET LINKING STRUCTURE:',
+    '  • Main facets: checkpoint, url, userAgent (required)',
+    '  • Nested facets: parent.source, parent.target (optional, can use one or both)',
+    '',
+    'MAIN FACETS (required for all links):',
+    ...simpleFacets.filter((f) => ['checkpoint', 'url', 'userAgent'].includes(f)).map((f) => formatFacet(f)),
+    '',
+    '⚠️ NESTED FACETS - ONLY USE THESE EXACT NAMES (can be combined independently):',
+    ...nestedFacets.map((f) => {
+      const parent = f.split('.')[0];
+      const values = dashboardData.segments[f]?.slice(0, 2).map((item) => item.value).join('", "') || '';
+      return `- ${f} (parent: ${parent}): Example values "${values}"`;
+    }),
+    '',
+    '📊 NESTED FACET COMBINATIONS (all valid):',
+    ...Object.entries(nestedByParent)
+      .filter(([, facets]) => facets.length >= 2)
+      .map(([parent, facets]) => {
+        const sourceFacet = facets.find((f) => f.includes('.source'));
+        const targetFacet = facets.find((f) => f.includes('.target'));
+        if (sourceFacet && targetFacet) {
+          return [
+            `  • checkpoint=${parent} only (broad filter)`,
+            `  • checkpoint=${parent} + ${sourceFacet}=VALUE (filter by source)`,
+            `  • checkpoint=${parent} + ${targetFacet}=VALUE (filter by target directly)`,
+            `  • checkpoint=${parent} + ${sourceFacet}=VALUE + ${targetFacet}=VALUE (both)`,
+          ].join('\n');
+        }
+        return null;
+      })
+      .filter(Boolean),
+    '',
+    '⚠️ CRITICAL: ONLY use nested facet names from the list above. DO NOT invent nested facet names!',
   ];
-
-  if (nestedFacets.length > 0) {
-    sections.push(
-      '\nNESTED FACETS (require parent checkpoint + nested parameter):',
-      ...nestedFacets.map((f) => formatFacet(f, true)),
-    );
-  }
 
   sections.push(
     '\n✅ CORRECT USAGE EXAMPLES:',
-    '\n1️⃣ Simple facets (single checkbox):',
+    '',
     '⚠️ IMPORTANT: Include relevant metrics/numbers INSIDE the data-facet span so they become part of the clickable link!',
     '⚠️ Use <number-format> tags with proper attributes for all numbers (see Number Formatting section).',
-    '\n<p>• <span data-facet="checkpoint" data-facet-value="click">Click events show strong engagement with <number-format sample-size="1234"><span class="formatted-value">1,234</span></number-format> interactions</span>.</p>',
-    'Result: Checks "click" checkbox - entire phrase including number is clickable',
-    '\n<p>• <span data-facet="userAgent" data-facet-value="mobile:ios">iOS Mobile users have <number-format title="2.3s ±0.8s" sample-size="4500"><span class="formatted-value">2.3s</span></number-format> average LCP</span>.</p>',
-    'Result: Checks "mobile:ios" checkbox - metric with uncertainty is part of the link',
-    '\n<p>• When tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}</p>',
-    '✅ CORRECT: <span data-facet-value="mobile"> (use the VALUE field)',
-    '❌ WRONG: <span data-facet-value="All Mobile"> (do NOT use the text/label field)',
-    '\n<p>• <span data-facet="url" data-facet-value="/products">The /products page has a <number-format title="65% ±5%" sample-size="450"><span class="formatted-value">65%</span></number-format> bounce rate</span>.</p>',
-    'Result: Checks "/products" checkbox - bounce rate with uncertainty is part of the clickable link',
+    '',
+    '1️⃣ SIMPLE LINK (Main facet only - Checkpoint):',
+    '<p>• <span data-facet="checkpoint" data-facet-value="lcp">LCP events show <number-format title="2.3s ±0.4s" sample-size="1234"><span class="formatted-value">2.3s</span></number-format> average load time</span>.</p>',
+    'URL: ?checkpoint=lcp',
+    '',
+    '2️⃣ SIMPLE LINK (Main facet only - URL):',
+    '<p>• <span data-facet="url" data-facet-value="/checkout">The /checkout page has <number-format title="65% ±5%" sample-size="450"><span class="formatted-value">65%</span></number-format> bounce rate</span>.</p>',
+    'URL: ?url=/checkout',
+    '',
+    '3️⃣ SIMPLE LINK (Main facet only - UserAgent):',
+    'Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
+    '✅ CORRECT: <span data-facet="userAgent" data-facet-value="mobile">Mobile users have <number-format sample-size="8100"><span class="formatted-value">8.1k</span></number-format> page views</span>',
+    '❌ WRONG: <span data-facet-value="All Mobile">... (uses "text" field - will NOT work)',
+    '⚠️ ALWAYS use the "value" field from tool response, NEVER use "text" or "label"',
+    '',
+    '4️⃣ NESTED LINK (One nested facet - error.source):',
+    '<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network">Network errors affect <number-format sample-size="456"><span class="formatted-value">456</span></number-format> users</span>.</p>',
+    'URL: ?checkpoint=error&error.source=network',
+    '',
+    '5️⃣ NESTED LINK (One nested facet - error.target directly, without source):',
+    '<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.target" data-nested-value="TypeError: Cannot read property">This TypeError affects <number-format sample-size="89"><span class="formatted-value">89</span></number-format> users</span>.</p>',
+    'URL: ?checkpoint=error&error.target=TypeError: Cannot read property',
+    '⚠️ You can link directly to error.target WITHOUT specifying error.source!',
+    '',
+    '6️⃣ NESTED LINK (Two nested facets - both source and target):',
+    '<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network" data-nested-facet-2="error.target" data-nested-value-2="TypeError: Cannot read property">This specific TypeError from network: <number-format sample-size="45"><span class="formatted-value">45</span></number-format></span>.</p>',
+    'URL: ?checkpoint=error&error.source=network&error.target=TypeError: Cannot read property',
+    '',
+    '7️⃣ NESTED LINK (Click target URL - EXACT URL from tool required):',
+    'Tool returns: {"facet": "click.target", "value": "https://example.com/watch-collection.html", "count": 123}',
+    '✅ CORRECT: <span data-facet="checkpoint" data-facet-value="click" data-nested-facet="click.target" data-nested-value="https://example.com/watch-collection.html">Watch collection clicks</span>',
+    '❌ WRONG: data-nested-value="https://example.com/watches.html" (different URL - will NOT work!)',
+    '⚠️ For nested facets with URLs: Use the EXACT full URL from tool response',
+    '',
+    '💡 WHEN TO USE NESTED FACETS:',
+    '  • Use one nested facet when you have data for that specific dimension',
+    '  • Use two nested facets when you have data for both and want precise filtering',
+    '  • You can use .target WITHOUT .source - they are independent filters!',
+    '  ⚠️ ONLY create nested links if you called a tool for that nested facet!',
   );
 
-  if (nestedFacets.length > 0) {
-    const errorSource = nestedFacets.find((f) => f === 'error.source');
-    const acquisitionSource = nestedFacets.find((f) => f === 'acquisition.source');
-
-    if (errorSource && dashboardData.segments[errorSource]?.length > 0) {
-      const exampleValue = dashboardData.segments[errorSource][0].value;
-      sections.push(
-        '\n2️⃣ Nested facet (checkbox + drilldown):',
-        '⚠️ Include metrics inside the span to make them clickable! Use <number-format> tags with proper attributes.',
-        `<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="${exampleValue}">${exampleValue} errors affecting <number-format title="1,234 ±456" sample-size="1234"><span class="formatted-value">1,234</span></number-format> users</span>.</p>`,
-        `Result: Checks "error" checkbox AND selects "${exampleValue}" in error.source drilldown - entire phrase with number is clickable`,
-        `URL result: &checkpoint=error&error.source=${exampleValue}`,
-      );
-    }
-
-    if (acquisitionSource && dashboardData.segments[acquisitionSource]?.length > 0) {
-      const paidValue = dashboardData.segments[acquisitionSource].find((item) => item.value === 'paid');
-      if (paidValue) {
-        sections.push(
-          '\n⚠️ IMPORTANT - ALWAYS USE "value" FIELD, NOT "text" OR "label":',
-          '',
-          'Example 1 - Device Type:',
-          'Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
-          '✅ CORRECT: <span data-facet="userAgent" data-facet-value="mobile">Mobile users with <number-format sample-size="8100"><span class="formatted-value">8.1k</span></number-format> sessions</span>',
-          '❌ WRONG: <span data-facet-value="All Mobile"> (uses text field - will NOT work)',
-          '',
-          'Example 2 - Acquisition Source:',
-          'Tool returns: {"text": "Paid Traffic", "value": "paid", "count": 1234}',
-          '✅ CORRECT: <span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid">Paid traffic shows <number-format sample-size="1234"><span class="formatted-value">1,234</span></number-format> conversions</span>',
-          '❌ WRONG: <span data-nested-value="Paid Traffic">... (uses text field - will NOT work)',
-          '',
-          'REMEMBER: Always inspect the "value" field in tool responses, ignore "text" and "label" fields for data attributes',
-          '⚠️ KEY POINT: Wrap your complete insight (including metrics with <number-format> tags) inside the data-facet span to make everything clickable!',
-        );
-      }
-    }
-  }
-
   sections.push(
-    '\n❌ INVALID EXAMPLES (will NOT check checkboxes):',
-    '• <span data-facet="browser">Chrome</span> - Wrong name! Use "userAgent" not "browser"',
-    '• <span data-nested-facet="error.source" data-nested-value="network">Errors</span> - Missing parent checkpoint!',
-    '• <span data-facet="checkpoint" data-facet-value="error">Errors</span> - Incomplete! If talking about error.source, include nested attributes!',
-    '\n⚠️ CRITICAL RULES - LINKS MUST BE DATA-BACKED:',
-    '  1. ONLY create links for values you see in TOOL RESPONSES (not assumptions or inferences)',
-    '  2. ALWAYS use the "value" field from tool response, NEVER the "text" or "label" field',
+    '\n❌ INVALID EXAMPLES (will NOT work):',
+    '• <span data-facet="browser">Chrome</span> - Wrong facet! Use "userAgent" not "browser"',
+    '• <span data-facet="device">mobile</span> - Wrong facet! Use "userAgent" not "device"',
+    '• <span data-nested-facet="error.source" data-nested-value="network">...</span> - Missing parent checkpoint!',
+    '• <span data-facet="url" data-facet-value="/checkout">The page</span> has 3.2s LCP - Metric outside span!',
+    '',
+    '⚠️ CRITICAL RULES:',
+    '  1. MAIN FACET REQUIRED: Every link needs data-facet and data-facet-value',
+    '  2. NESTED FACETS ARE OPTIONAL: Add them when you have specific drill-down data',
+    '  3. NESTED FACETS ARE INDEPENDENT: You can use .source, .target, or both',
+    '  4. ONLY create links for values AND facet names you see in TOOL RESPONSES',
+    '     ❌ DO NOT invent nested facet names - verify from "NESTED FACETS" list above',
+    '  5. ALWAYS use the EXACT "value" field from tool response, NEVER "text" or "label"',
     '     Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
     '     ✅ USE: data-facet-value="mobile"',
     '     ❌ NEVER: data-facet-value="All Mobile"',
-    '  3. When a tool returns {"value": "mobile:ios", "count": 123}, use "mobile:ios" exactly',
-    '  4. DO NOT create links for values you think might exist but didn\'t see in tools',
-    '  5. Use EXACT value format from tool (e.g., URLs with trailing slash: "https://example.com/")',
-    '  6. Simple facets: <span data-facet="NAME" data-facet-value="VALUE">text</span>',
-    '  7. Nested facets (parent.child): ALWAYS include ALL 4 attributes:',
-    '     - data-facet="checkpoint" (parent)',
-    '     - data-facet-value="PARENT" (e.g., "error", "acquisition", "click")',
-    '     - data-nested-facet="PARENT.CHILD" (e.g., "error.source", "acquisition.source")',
-    '     - data-nested-value="VALUE" (exact "value" field from tool, not "text" field)',
-    '  8. When discussing aggregate patterns without specific values, DO NOT create links',
-    '  9. Example: "Mobile users have slower performance" → NO LINK (aggregate, no specific value)',
-    '  10. Example: "mobile:ios users have 2.5s LCP" → LINK (specific value from tool)',
-    '  11. INCLUDE METRICS INSIDE SPANS: Put relevant numbers/metrics inside the data-facet span to make them clickable',
-    '      Use <number-format> tags with proper attributes (title, trend, sample-size) for all metrics',
-    '      ✅ CORRECT: <span data-facet="url" data-facet-value="/checkout">The /checkout page has <number-format title="3.2s ±1.1s" sample-size="890"><span class="formatted-value">3.2s</span></number-format> LCP</span>',
-    '      ❌ WRONG: <span data-facet="url" data-facet-value="/checkout">The /checkout page</span> has 3.2s LCP',
-    '      (In the wrong example, only "The /checkout page" becomes clickable, not the metric)',
+    '  6. Use EXACT value format from tool - DO NOT paraphrase, shorten, or modify',
+    '  7. SYNTAX REFERENCE:',
+    '     Simple: <span data-facet="NAME" data-facet-value="VALUE">text</span>',
+    '     One nested: + data-nested-facet="NAME" data-nested-value="VALUE"',
+    '     Two nested: + data-nested-facet-2="NAME" data-nested-value-2="VALUE"',
+    '  8. INCLUDE METRICS INSIDE SPANS: Put numbers inside data-facet span to make them clickable',
+    '  9. All links automatically PRESERVE existing url and userAgent filters',
+    '',
     '==== END FACET INFO ====\n',
   );
 
@@ -161,38 +187,63 @@ function normalizeUrl(url) {
 
 /**
  * Generate a dashboard URL with specific facet parameter(s)
+ * Supports flexible nested facet linking:
+ * - Main facets: checkpoint, url, userAgent (required)
+ * - Nested facets: up to 2 independent nested facets (optional)
+ *
+ * Always preserves existing url and userAgent filters (checkpoint may be changed/added)
  * Private helper function used by convertSpansToLinks()
+ *
  * @param {string|Object} facetName - The facet name or object with multiple facets
  * @param {string} facetValue - The facet value to filter by (ignored if facetName is object)
- * @param {Object} options - Additional options
- * @param {boolean} options.preserveExisting - Keep existing URL params (default: false)
- * @param {string} options.nestedFacet - Nested facet name (e.g., 'cwv-lcp.source')
- * @param {string} options.nestedValue - Nested facet value (e.g., 'img')
+ * @param {Object} options - Additional options for nested facets
+ * @param {string} options.nestedFacet - First nested facet name (e.g., 'error.source')
+ * @param {string} options.nestedValue - First nested facet value
+ * @param {string} options.nestedFacet2 - Second nested facet name (e.g., 'error.target')
+ * @param {string} options.nestedValue2 - Second nested facet value
  * @returns {string} Dashboard URL with facet parameter(s)
  */
 function generateFacetLink(facetName, facetValue, options = {}) {
-  const { preserveExisting = false, nestedFacet, nestedValue } = options;
+  const {
+    nestedFacet, nestedValue, nestedFacet2, nestedValue2,
+  } = options;
   const currentParams = new URL(window.location.href).searchParams;
   const params = new URLSearchParams();
 
-  // Copy params based on preservation mode
-  const paramsToCopy = preserveExisting
-    ? Array.from(currentParams.entries())
-    : ['domain', 'domainkey', 'view', 'startDate', 'endDate', 'metrics']
-      .filter((p) => currentParams.has(p))
-      .map((p) => [p, currentParams.get(p)]);
+  // Always preserve these base parameters
+  ['domain', 'domainkey', 'view', 'startDate', 'endDate', 'metrics']
+    .filter((p) => currentParams.has(p))
+    .forEach((p) => params.set(p, currentParams.get(p)));
 
-  paramsToCopy.forEach(([key, value]) => params.set(key, value));
+  // CRITICAL: Preserve existing checkpoint, url, userAgent filters
+  // (these will be overridden below if the link changes them)
+  ['checkpoint', 'url', 'userAgent']
+    .filter((p) => currentParams.has(p))
+    .forEach((p) => params.set(p, currentParams.get(p)));
+
   params.delete('report'); // Remove report viewer UI parameter
 
-  // Add facet parameters (normalize URLs)
-  const addParam = (name, value) => params.append(name, name === 'url' ? normalizeUrl(value) : value);
+  // Helper to add param with URL normalization
+  const addParam = (name, value) => {
+    const isUrl = name === 'url' || (typeof value === 'string' && value.startsWith('http'));
+    params.set(name, isUrl ? normalizeUrl(value) : value);
+  };
 
   if (typeof facetName === 'object' && !Array.isArray(facetName)) {
     Object.entries(facetName).forEach(([name, value]) => addParam(name, value));
   } else {
+    // Set the main facet (checkpoint, url, or userAgent)
     addParam(facetName, facetValue);
-    if (nestedFacet && nestedValue) params.append(nestedFacet, nestedValue);
+
+    // Add first nested facet if provided (e.g., error.source OR error.target)
+    if (nestedFacet && nestedValue) {
+      addParam(nestedFacet, nestedValue);
+    }
+
+    // Add second nested facet if provided (e.g., error.target when error.source is also set)
+    if (nestedFacet2 && nestedValue2) {
+      addParam(nestedFacet2, nestedValue2);
+    }
   }
 
   // Return relative URL (pathname + search params) so it works on any domain
@@ -203,32 +254,64 @@ function generateFacetLink(facetName, facetValue, options = {}) {
 
 /**
  * Validate if a facet value exists in dashboard data
- * @param {string} facetName - Facet name
- * @param {string} facetValue - Facet value to check
- * @param {string} nestedFacet - Optional nested facet name
- * @param {string} nestedValue - Optional nested value
- * @returns {boolean} True if value exists in dashboard
+ * Supports validation for main facet and up to 2 nested facets
+ *
+ * @param {string} facetName - Main facet name (checkpoint, url, userAgent)
+ * @param {string} facetValue - Main facet value
+ * @param {Object} options - Optional nested facet options
+ * @param {string} options.nestedFacet - First nested facet name
+ * @param {string} options.nestedValue - First nested facet value
+ * @param {string} options.nestedFacet2 - Second nested facet name
+ * @param {string} options.nestedValue2 - Second nested facet value
+ * @returns {boolean} True if all values exist in dashboard
  */
-function validateFacetValue(facetName, facetValue, nestedFacet, nestedValue) {
+function validateFacetValue(facetName, facetValue, options = {}) {
+  const {
+    nestedFacet, nestedValue, nestedFacet2, nestedValue2,
+  } = options;
+
   try {
     const facets = document.querySelector('facet-sidebar')?.facets;
     if (!facets) return true; // Can't validate, allow
 
     const checkExists = (data, value, isUrl) => {
       if (!data) return false;
-      if (!isUrl) return data.some((item) => item.value === value);
 
       // For URLs, check with and without trailing slash
-      return data.some((item) => item.value === value
-        || item.value === `${value}/`
-        || (value.endsWith('/') && item.value === value.slice(0, -1)));
+      if (isUrl) {
+        return data.some((item) => item.value === value
+          || item.value === `${value}/`
+          || (value.endsWith('/') && item.value === value.slice(0, -1)));
+      }
+
+      // For other facets, exact match
+      return data.some((item) => item.value === value);
     };
 
-    // Validate main facet value
-    if (!checkExists(facets[facetName], facetValue, facetName === 'url')) return false;
+    const isUrlValue = (val) => typeof val === 'string' && val.startsWith('http');
 
-    // Validate nested facet if provided
-    if (nestedFacet && !checkExists(facets[nestedFacet], nestedValue, nestedFacet === 'url')) return false;
+    // Validate main facet value
+    if (!checkExists(facets[facetName], facetValue, facetName === 'url')) {
+      return false;
+    }
+
+    // Validate first nested facet if provided
+    if (nestedFacet && nestedValue) {
+      if (!checkExists(facets[nestedFacet], nestedValue, isUrlValue(nestedValue))) {
+        console.warn(`[Facet Link Generator] Nested facet value not found: ${nestedFacet}="${nestedValue}"`);
+        console.warn('[Facet Link Generator] Available values:', facets[nestedFacet]?.slice(0, 5).map((item) => item.value));
+        return false;
+      }
+    }
+
+    // Validate second nested facet if provided
+    if (nestedFacet2 && nestedValue2) {
+      if (!checkExists(facets[nestedFacet2], nestedValue2, isUrlValue(nestedValue2))) {
+        console.warn(`[Facet Link Generator] Nested facet 2 value not found: ${nestedFacet2}="${nestedValue2}"`);
+        console.warn('[Facet Link Generator] Available values:', facets[nestedFacet2]?.slice(0, 5).map((item) => item.value));
+        return false;
+      }
+    }
 
     return true;
   } catch (error) {
@@ -239,6 +322,12 @@ function validateFacetValue(facetName, facetValue, nestedFacet, nestedValue) {
 
 /**
  * Convert data-attribute spans to actual clickable links in HTML
+ * Supports flexible nested facet linking:
+ * - Main: data-facet + data-facet-value (required)
+ * - Nested 1: data-nested-facet + data-nested-value (optional)
+ * - Nested 2: data-nested-facet-2 + data-nested-value-2 (optional)
+ *
+ * Nested facets are INDEPENDENT - you can use either, both, or neither
  * Validates that facet values exist in dashboard before creating links
  * @param {string} htmlContent - HTML content with data-attribute spans
  * @returns {string} HTML with actual <a> links (only for validated values)
@@ -255,34 +344,124 @@ export function convertSpansToLinks(htmlContent) {
   const facetElements = doc.querySelectorAll('[data-facet][data-facet-value]');
   if (!facetElements.length) return htmlContent;
 
-  let converted = 0;
-  let skipped = 0;
+  const stats = {
+    converted: 0,
+    simpleLinks: 0,
+    oneNested: 0,
+    twoNested: 0,
+    skippedNested: [],
+    skippedInvalidFacet: [],
+    skippedNonExistent: [],
+  };
 
   facetElements.forEach((el) => {
     const facetName = el.getAttribute('data-facet');
     const facetValue = el.getAttribute('data-facet-value');
     if (!facetName || !facetValue) return;
 
+    // First nested facet (optional)
     const nestedFacet = el.getAttribute('data-nested-facet');
     const nestedValue = el.getAttribute('data-nested-value');
 
-    if (!validateFacetValue(facetName, facetValue, nestedFacet, nestedValue)) {
-      skipped += 1;
+    // Second nested facet (optional, independent of first)
+    const nestedFacet2 = el.getAttribute('data-nested-facet-2');
+    const nestedValue2 = el.getAttribute('data-nested-value-2');
+
+    // Validate first nested facet (must have both attributes or neither)
+    if ((nestedFacet && !nestedValue) || (!nestedFacet && nestedValue)) {
+      stats.skippedNested.push(`${facetName}="${facetValue}" (incomplete nested facet attributes)`);
       return;
     }
 
+    // Validate second nested facet (must have both attributes or neither)
+    if ((nestedFacet2 && !nestedValue2) || (!nestedFacet2 && nestedValue2)) {
+      stats.skippedNested.push(`${facetName}="${facetValue}" (incomplete nested facet 2 attributes)`);
+      return;
+    }
+
+    // For nested facets, parent must be 'checkpoint'
+    if ((nestedFacet || nestedFacet2) && facetName !== 'checkpoint') {
+      stats.skippedNested.push(`${facetName}="${facetValue}" (nested facets require checkpoint as parent)`);
+      return;
+    }
+
+    // Verify nested facet names exist in dashboard
+    const facets = document.querySelector('facet-sidebar')?.facets;
+    if (nestedFacet && facets && !facets[nestedFacet]) {
+      stats.skippedNested.push(`${nestedFacet}="${nestedValue}" (nested facet "${nestedFacet}" does not exist)`);
+      console.error(`[Facet Link Generator] AI generated invalid nested facet: "${nestedFacet}". This facet does not exist!`);
+      return;
+    }
+    if (nestedFacet2 && facets && !facets[nestedFacet2]) {
+      stats.skippedNested.push(`${nestedFacet2}="${nestedValue2}" (nested facet "${nestedFacet2}" does not exist)`);
+      console.error(`[Facet Link Generator] AI generated invalid nested facet: "${nestedFacet2}". This facet does not exist!`);
+      return;
+    }
+
+    // Only allow main facets: checkpoint, url, userAgent
+    if (!['checkpoint', 'url', 'userAgent'].includes(facetName)) {
+      stats.skippedInvalidFacet.push(`${facetName}="${facetValue}"`);
+      return;
+    }
+
+    // Validate all facet values exist in dashboard
+    const validationOptions = {
+      nestedFacet, nestedValue, nestedFacet2, nestedValue2,
+    };
+    if (!validateFacetValue(facetName, facetValue, validationOptions)) {
+      let errorMsg = `${facetName}="${facetValue}"`;
+      if (nestedFacet) errorMsg += ` + ${nestedFacet}="${nestedValue}"`;
+      if (nestedFacet2) errorMsg += ` + ${nestedFacet2}="${nestedValue2}"`;
+      stats.skippedNonExistent.push(errorMsg);
+      return;
+    }
+
+    // Build title showing the filter path
+    let title = `View ${facetName}: ${facetValue}`;
+    if (nestedFacet) title += ` + ${nestedFacet}: ${nestedValue}`;
+    if (nestedFacet2) title += ` + ${nestedFacet2}: ${nestedValue2}`;
+
     const anchor = Object.assign(doc.createElement('a'), {
-      href: generateFacetLink(facetName, facetValue, { nestedFacet, nestedValue }),
+      href: generateFacetLink(facetName, facetValue, {
+        nestedFacet, nestedValue, nestedFacet2, nestedValue2,
+      }),
       className: 'facet-link',
       innerHTML: el.innerHTML,
-      title: `View ${facetName}: ${facetValue}${nestedFacet ? ` → ${nestedFacet}: ${nestedValue}` : ''}`,
+      title,
     });
     Object.assign(anchor.style, { color: '#0073e6', textDecoration: 'underline' });
 
     el.parentNode.replaceChild(anchor, el);
-    converted += 1;
+    stats.converted += 1;
+
+    // Track link types for logging
+    if (nestedFacet && nestedFacet2) {
+      stats.twoNested += 1;
+    } else if (nestedFacet || nestedFacet2) {
+      stats.oneNested += 1;
+    } else {
+      stats.simpleLinks += 1;
+    }
   });
 
-  console.log(`[Facet Link Generator] ✓ ${converted} links created${skipped ? `, ${skipped} skipped` : ''}`);
+  // Log validation summary
+  console.log(`[Facet Link Validation] ✅ ${stats.converted} valid links created (simple: ${stats.simpleLinks}, 1 nested: ${stats.oneNested}, 2 nested: ${stats.twoNested})`);
+  if (stats.skippedNested.length) {
+    console.warn(`[Facet Link Validation] ❌ ${stats.skippedNested.length} invalid nested facet links:`, stats.skippedNested);
+  }
+  if (stats.skippedInvalidFacet.length) {
+    console.warn(`[Facet Link Validation] ❌ ${stats.skippedInvalidFacet.length} invalid facet names:`, stats.skippedInvalidFacet);
+  }
+  if (stats.skippedNonExistent.length) {
+    console.warn(`[Facet Link Validation] ❌ ${stats.skippedNonExistent.length} non-existent values:`, stats.skippedNonExistent);
+  }
+
+  const totalSkipped = stats.skippedNested.length
+    + stats.skippedInvalidFacet.length
+    + stats.skippedNonExistent.length;
+  if (totalSkipped === 0) {
+    console.log('[Facet Link Validation] 🎯 All AI-generated links are valid!');
+  }
+
   return doc.body.innerHTML;
 }

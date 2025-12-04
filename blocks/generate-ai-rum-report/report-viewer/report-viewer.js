@@ -48,6 +48,7 @@ const toggleView = (show) => {
 export const closeReportViewer = () => {
   // Clear the source report from sessionStorage when closing report
   sessionStorage.removeItem('optel-detective-source-report');
+  sessionStorage.removeItem('optel-detective-source-report-path');
 
   const url = new URL(window.location);
   url.searchParams.delete('report');
@@ -61,56 +62,60 @@ export const closeReportViewer = () => {
 
 window.closeReportViewer = closeReportViewer;
 
-// Add "Back to Report" button at extreme right of fieldset
+// Add floating "Back to Report" button (fixed position, top right)
 const addBackToReportButton = () => {
-  // Remove existing button
-  document.querySelectorAll('.back-to-report-icon').forEach((b) => b.remove());
+  // Remove any existing button
+  document.querySelectorAll('.back-to-report-floating').forEach((b) => b.remove());
 
-  // Check if we came from a report
   const reportDate = sessionStorage.getItem('optel-detective-source-report');
-  if (!reportDate) return;
+  const reportPath = sessionStorage.getItem('optel-detective-source-report-path');
+  if (!reportDate || !reportPath) return;
 
-  // Find first checked checkbox
-  const facetSidebar = document.querySelector('facet-sidebar');
-  if (!facetSidebar) return;
-
-  const checkedInput = facetSidebar.querySelector('input[type="checkbox"]:checked');
-  if (!checkedInput) return;
-
-  // Find the fieldset element
-  const fieldsetEl = checkedInput.closest('fieldset');
-  if (!fieldsetEl) return;
-
-  // Ensure fieldset has relative positioning for absolute button
-  if (window.getComputedStyle(fieldsetEl).position === 'static') {
-    fieldsetEl.style.position = 'relative';
-  }
-
-  // Create button
   const btn = Object.assign(document.createElement('button'), {
-    className: 'back-to-report-icon',
+    className: 'back-to-report-floating',
     title: 'Return to AI Report',
-    onclick: () => {
+    innerHTML: '↩ Back to Report',
+    onclick: async () => {
       sessionStorage.removeItem('optel-detective-source-report');
+      sessionStorage.removeItem('optel-detective-source-report-path');
+      btn.remove();
+
       const url = new URL(window.location);
       url.searchParams.set('report', reportDate);
       url.searchParams.set('metrics', 'super');
-      ['checkpoint', 'url', 'userAgent'].forEach((k) => url.searchParams.delete(k));
-      Array.from(url.searchParams.keys())
-        .filter((k) => k.includes('.'))
+      ['checkpoint', 'url', 'userAgent', ...Array.from(url.searchParams.keys()).filter((k) => k.includes('.'))]
         .forEach((k) => url.searchParams.delete(k));
-      window.location.href = url.toString();
+
+      window.history.pushState({}, '', url.toString());
+      if (typeof window.slicerDraw === 'function') await window.slicerDraw();
+      // eslint-disable-next-line no-use-before-define
+      await showReportInline(reportPath, reportDate);
     },
   });
 
-  btn.innerHTML = '↩ Back to Report';
-  fieldsetEl.appendChild(btn);
-  console.log('[Report Viewer] ✅ Added "Back to Report" button at extreme right');
+  document.body.appendChild(btn);
+  console.log('[Report Viewer] ✅ Added floating "Back to Report" button');
 };
 
 const showError = (container, message = 'Failed to load report') => {
   container.innerHTML = `<div class="report-error"><p>${message}</p><button class="error-back-btn">Back to Dashboard</button></div>`;
   container.querySelector('.error-back-btn')?.addEventListener('click', closeReportViewer);
+};
+
+/**
+ * Scroll to the first checked/selected facet in sidebar (retries for async DOM)
+ */
+const scrollToFirstCheckedFacet = (retries = 5) => {
+  const facets = document.querySelector('facet-sidebar #facets');
+  const el = facets?.querySelector('input:checked, [aria-selected="true"]');
+  const fieldset = el?.closest('fieldset');
+
+  if (fieldset) {
+    fieldset.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log('[Report Viewer] ✅ Scrolled to:', fieldset.querySelector('legend')?.textContent);
+  } else if (retries > 0) {
+    setTimeout(() => scrollToFirstCheckedFacet(retries - 1), 200);
+  }
 };
 
 const extractSections = (doc) => {
@@ -282,7 +287,7 @@ const formatNumbers = (container) => {
   });
 };
 
-const renderReport = (container, htmlContent) => {
+const renderReport = (container, htmlContent, reportPath) => {
   const sections = extractSections(new DOMParser().parseFromString(htmlContent, 'text/html'));
   if (!sections.length) {
     showError(container, 'No content found in report');
@@ -303,57 +308,57 @@ const renderReport = (container, htmlContent) => {
       link.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        // Store current report date in sessionStorage
-        // so "Back to Report" button knows where to return
+        // Store current report date and path in sessionStorage for "Back to Report" button
         const currentReportDate = new URLSearchParams(window.location.search).get('report');
-        if (currentReportDate) {
+        console.log('[Report Viewer] Facet link clicked:', {
+          reportDate: currentReportDate,
+          reportPath,
+          willStore: !!(currentReportDate && reportPath),
+        });
+        if (currentReportDate && reportPath) {
           sessionStorage.setItem('optel-detective-source-report', currentReportDate);
-          console.log('[Report Viewer] Stored source report date:', currentReportDate);
+          sessionStorage.setItem('optel-detective-source-report-path', reportPath);
+          console.log('[Report Viewer] ✅ Stored source report in sessionStorage');
+        } else {
+          console.warn('[Report Viewer] ⚠️ Cannot store report - missing date or path');
         }
 
         // Close report viewer first (removes report params, shows dashboard)
         toggleView(false);
 
-        // Update URL with filter parameters (without page reload)
+        // Build new URL from link, preserving essential params from current URL
+        const currentUrl = new URL(window.location);
         const newUrl = new URL(link.href, window.location.origin);
 
-        // Preserve metrics parameter from current URL (if present)
-        const currentMetrics = new URLSearchParams(window.location.search).get('metrics');
-        if (currentMetrics) {
-          newUrl.searchParams.set('metrics', currentMetrics);
-        }
+        // Preserve date range and metrics parameter
+        ['startDate', 'endDate', 'view', 'domainkey', 'metrics'].forEach((param) => {
+          const value = currentUrl.searchParams.get(param);
+          if (value && !newUrl.searchParams.has(param)) {
+            newUrl.searchParams.set(param, value);
+          }
+        });
 
         window.history.pushState({}, '', newUrl);
 
-        // Reload dashboard data using global draw function (same pattern as report generation)
+        // Reload dashboard data using global draw function
+        // This should refresh all metrics and facets based on new URL parameters
         if (typeof window.slicerDraw === 'function') {
           try {
-            console.log('[Report Viewer] Refreshing dashboard with filter:', newUrl.search);
+            console.log('[Report Viewer] Refreshing dashboard with filters:', newUrl.search);
+            console.log('[Report Viewer] Active filters:', {
+              checkpoint: newUrl.searchParams.get('checkpoint'),
+              url: newUrl.searchParams.get('url'),
+              userAgent: newUrl.searchParams.get('userAgent'),
+              nested: Array.from(newUrl.searchParams.keys()).filter((k) => k.includes('.')),
+            });
             await window.slicerDraw();
             console.log('[Report Viewer] Dashboard refreshed successfully');
 
-            // Scroll to the activated checkbox after dashboard loads and add back button
+            // Wait for DOM to settle, then add button and scroll to checked input
             setTimeout(() => {
-              // Find the first checked checkbox in facet-sidebar
-              const facetSidebar = document.querySelector('facet-sidebar');
-              if (facetSidebar) {
-                // Look for checked checkboxes (they have aria-checked="true" or checked attribute)
-                const checkedInput = facetSidebar.querySelector('input[type="checkbox"]:checked, input[aria-checked="true"]');
-                if (checkedInput) {
-                  // Scroll to the checkbox's parent label or container, positioned at top
-                  const scrollTarget = checkedInput.closest('label') || checkedInput.closest('li') || checkedInput;
-                  scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  console.log('[Report Viewer] Scrolled to activated checkbox at top:', scrollTarget);
-
-                  // Add "Back to Report" button
-                  addBackToReportButton();
-                } else {
-                  // Fallback: scroll to facet sidebar if no checkbox found
-                  facetSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  console.log('[Report Viewer] Scrolled to facet sidebar (no checkbox found)');
-                }
-              }
-            }, 300); // Increased delay to ensure checkboxes are updated
+              addBackToReportButton();
+              scrollToFirstCheckedFacet();
+            }, 500);
           } catch (error) {
             console.error('[Report Viewer] Error refreshing dashboard:', error);
           }
@@ -372,6 +377,7 @@ const renderReport = (container, htmlContent) => {
 export async function showReportInline(reportPath, reportDate) {
   // Clear any stored source report (we're now viewing a report, not coming from one)
   sessionStorage.removeItem('optel-detective-source-report');
+  sessionStorage.removeItem('optel-detective-source-report-path');
 
   // Wait for dashboard to be ready first
   const dashboardReady = await waitForDashboard();
@@ -425,7 +431,7 @@ export async function showReportInline(reportPath, reportDate) {
         window.location.href = url.toString();
       } else {
         window.history.pushState({}, '', url);
-        renderReport(viewer, html);
+        renderReport(viewer, html, reportPath);
       }
     })
     .catch((err) => showError(viewer, err.message));
@@ -459,6 +465,34 @@ export async function checkForSharedReport(getReports) {
   } catch (err) {
     console.error('Failed to fetch reports:', err);
   }
+}
+
+/**
+ * Initialize "Back to Report" button on page load if coming from a report
+ */
+const initBackToReportButton = () => {
+  const sourceReport = sessionStorage.getItem('optel-detective-source-report');
+  const sourcePath = sessionStorage.getItem('optel-detective-source-report-path');
+  if (!sourceReport || !sourcePath) return;
+
+  // If viewing report, clear stale session data; otherwise add button and scroll to filter
+  if (new URLSearchParams(window.location.search).get('report')) {
+    sessionStorage.removeItem('optel-detective-source-report');
+    sessionStorage.removeItem('optel-detective-source-report-path');
+  } else {
+    setTimeout(() => {
+      addBackToReportButton();
+      // Also scroll to the checked facet when returning from report
+      scrollToFirstCheckedFacet();
+    }, 500);
+  }
+};
+
+// Run on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initBackToReportButton);
+} else {
+  initBackToReportButton();
 }
 
 /**
