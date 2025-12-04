@@ -1,30 +1,20 @@
 :root {
-  /* Tab Colors */
+  /* Tab Colors - using light-dark() for dark mode support */
   --tabs-active-color: #1473e6;
-  --tabs-border-color: #d8d8d8;
+  --tabs-border-color: light-dark(#d8d8d8, rgb(56 56 56));
   --tabs-border-hover-color: #acacac;
-  --tabs-text-color: #7e7e7e;
-  --tabs-active-text-color: #2c2c2c;
-  --tabs-bg-color: rgb(250 250 250);
-  --tabs-active-bg-color: #fff;
-  --tabs-list-bg-gradient:
-    linear-gradient(
-      rgb(255 255 255 0%) 60%,
-      rgb(245 245 245 80%)
-    );
+  --tabs-text-color: light-dark(#7e7e7e, #cdcdcd);
+  --tabs-active-text-color: light-dark(#2c2c2c, #fff);
+  --tabs-bg-color: light-dark(rgb(250 250 250), #1a1a1a);
+  --tabs-active-bg-color: light-dark(#fff, #111);
+  --tabs-list-bg-gradient: light-dark(
+    linear-gradient(rgb(255 255 255 / 0%) 60%, rgb(245 245 245 / 80%)),
+    linear-gradient(rgb(0 0 0 / 0%) 60%, rgb(0 0 0 / 80%))
+  );
 
   /* redesign */
-  --tabs-image-based-border-color: #e8e8e8;
-  --tabs-image-based-active-border-color: #000;
-}
-
-:root .dark {
-  --tabs-border-color: rgb(56 56 56);
-  --tabs-text-color: #cdcdcd;
-  --tabs-active-text-color: #fff;
-  --tabs-bg-color: #1a1a1a;
-  --tabs-active-bg-color: #111;
-  --tabs-list-bg-gradient: linear-gradient(rgb(0 0 0 0%) 60%, rgb(0 0 0 80%));
+  --tabs-image-based-border-color: light-dark(#e8e8e8, #3a3a3a);
+  --tabs-image-based-active-border-color: light-dark(#000, #fff);
 }
 
 .tabs[data-block-status="loaded"] {

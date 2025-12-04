@@ -20,7 +20,7 @@
   left: 18px;
   width: 20px;
   height: 20px;
-  fill: rgb(110 110 110);
+  fill: var(--color-gray-500);
   transition: fill 130ms ease-in-out;
 }
 
@@ -30,7 +30,7 @@
   width: 100%;
   outline: none;
   border: 1px solid;
-  border-color: rgb(202 202 202);
+  border-color: var(--border-color-medium);
   border-radius: 4px;
   padding: 0 0 0 30px;
   font: inherit;
@@ -44,14 +44,14 @@
 }
 
 .doc-search form input:focus {
-  border-color: rgb(42 124 223);
+  border-color: var(--color-info-accent);
 }
 
 .doc-search form input::placeholder {
   font-style: italic;
 }
 
-.doc-search form button { 
+.doc-search form button {
   display: none;
   pointer-events: none;
   position: absolute;
@@ -62,7 +62,8 @@
   border: none;
   border-radius: 3px;
   padding: 7px 12px;
-  background: white;
+  background: light-dark(var(--color-white), #3c3c3c);
+  color: light-dark(inherit, var(--color-gray-100));
   transition: color 130ms ease-in-out;
   cursor: inherit;
   -webkit-tap-highlight-color: transparent;
@@ -70,7 +71,7 @@
 
 .doc-search form input:hover + button {
   display: block;
-  color: white;
+  color: var(--color-gray-100);
 }
 
 .doc-search form input:not(:placeholder-shown) + button {
@@ -91,9 +92,9 @@
   top: calc(50% + 15px);
   margin-top: 0;
   padding: 0;
-  border: 1px solid rgb(202 202 202);
+  border: 1px solid light-dark(var(--border-color-medium), #505050);
   border-radius: 3px;
-  background-color: white;
+  background-color: light-dark(var(--color-white), #2c2c2c);
   opacity: 0;
   animation: fade-in 580ms ease forwards;
   z-index: 1;
@@ -134,7 +135,7 @@
 }
 
 .doc-search .doc-search-results > li.doc-search-result + li {
-  border-top: 1px solid var(--bg-color-grey);
+  border-top: 1px solid light-dark(var(--bg-color-grey), #505050);
 }
 
 .doc-search .doc-search-results > li.doc-search-no-result {
@@ -149,20 +150,20 @@
 
 .doc-search .doc-search-results > li.doc-search-result a {
   display: grid;
-  grid-template: 
+  grid-template:
     'pic title' auto
     'pic desc' auto / auto 1fr;
   gap: 0 7px;
   padding: 7px 6px;
   padding-right: 32px;
-  color: unset;
+  color: light-dark(var(--color-gray-800), var(--color-gray-100));
   text-decoration: none;
   transition: background-color 130ms;
 }
 
 .doc-search .doc-search-results > li.doc-search-result a:hover,
 .doc-search .doc-search-results > li.doc-search-result a:focus {
-  background-color: var(--bg-color-grey);
+  background-color: light-dark(var(--bg-color-grey), #3c3c3c);
 }
 
 .doc-search .doc-search-results > li.doc-search-result a picture {
@@ -187,7 +188,7 @@
   position: absolute;
   z-index: -1;
   inset: 0 -4px;
-  background-color: rgb(255 208 0 / 30%);
+  background-color: var(--color-search-highlight);
   border-radius: 4px;
 }
 
@@ -197,7 +198,7 @@
 
 .doc-search .doc-search-results > li.doc-search-result a p:first-of-type {
   grid-area: title;
-  color: #2e2e2e;
+  color: light-dark(var(--color-gray-900), var(--color-gray-100));
   font-weight: bold;
 }
 
@@ -208,4 +209,6 @@
   -webkit-line-clamp: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: light-dark(var(--color-gray-600), var(--color-gray-400));
 }
+

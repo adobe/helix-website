@@ -1,10 +1,10 @@
 /* Event CTA Block */
 .event-cta {
   position: relative;
-  color: #fff;
+  color: var(--color-white);
   padding: 24px 24px 16px;
   text-align: center;
-  background: #000;
+  background: var(--color-black);
   overflow: hidden;
   margin: 0 auto;
   max-width: 1200px;
@@ -26,15 +26,15 @@
   font-size: 22px;
   line-height: 1.4;
   font-weight: 500;
-  color: #fff;
+  color: var(--color-white);
   margin: 0;
-  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  text-shadow: 0 1px 4px var(--shadow-color-30);
 }
 
 /* CTA Button - matching event-banner style */
 .event-cta .button {
   background-color: var(--spectrum-blue);
-  color: #fff;
+  color: var(--color-white);
   font-size: 16px;
   padding: 12px 32px;
   border-radius: 25px;
@@ -73,9 +73,9 @@
   font-size: 28px;
   line-height: 1.3;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-white);
   margin: 0 0 8px;
-  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  text-shadow: 0 1px 4px var(--shadow-color-30);
   text-align: center;
 }
 

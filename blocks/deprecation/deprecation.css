@@ -1,8 +1,8 @@
 .deprecation {
   padding: 10px 16px;
   margin-bottom: 16px;
-  background-color: #d31510;
-  color: #fff;
+  background-color: var(--color-brand-red);
+  color: var(--color-white);
   border-radius: var(--image-border-radius-l);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
@@ -17,7 +17,7 @@
 .deprecation > div > div > p,
 .deprecation a:any-link,
 .deprecation code {
-  color: #fff;
+  color: var(--color-white);
 }
 
 .deprecation code {

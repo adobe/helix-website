@@ -158,7 +158,7 @@
   margin: auto 0;
   border-radius: 2rem;
   padding: 5px 1.2em 6px;
-  color: white;
+  color: var(--color-white);
   font-size: var(--type-detail-m-size);
   font-weight: normal;
   line-height: var(--type-detail-m-lh);

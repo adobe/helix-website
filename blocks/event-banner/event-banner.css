@@ -11,7 +11,7 @@
 /* Base Event Banner Block */
 .event-banner {
   position: relative;
-  color: #fff;
+  color: var(--color-white);
   padding: 0;
   text-align: center;
   overflow: hidden;
@@ -43,7 +43,7 @@
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 20px;
-  color: #fff;
+  color: var(--color-white);
 }
 
 /* Subtitle */
@@ -53,7 +53,7 @@
   font-size: 24px;
   font-weight: 400;
   margin: 0 0 20px;
-  color: #fff;
+  color: var(--color-white);
   opacity: 0.9;
 }
 
@@ -125,7 +125,7 @@
   font-weight: 700;
   line-height: 1;
   margin: 0 0 8px;
-  color: #fff;
+  color: var(--color-white);
   letter-spacing: -0.02em;
 }
 
@@ -137,7 +137,7 @@
   line-height: 1;
   margin: 0 0 25px;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
+  text-shadow: 0 2px 8px var(--shadow-color-30);
 }
 
 /* DevLive Subtitle */
@@ -147,7 +147,7 @@
   font-weight: 500;
   margin: 0 0 70px;
   opacity: 0.95;
-  text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  text-shadow: 0 1px 4px var(--shadow-color-30);
 }
 
 

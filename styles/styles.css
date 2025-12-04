@@ -13,6 +13,9 @@
 }
 
 :root {
+  /* Enable native dark mode support */
+  color-scheme: light dark;
+
   /* Fonts */
   --body-font-family: "Adobe Clean", adobe-clean, "Trebuchet MS", sans-serif;
   --code-font-family:
@@ -78,7 +81,9 @@
   --spacing-xxl: 80px;
   --spacing-xxxl: 104px;
 
-  /* Colors */
+  /* Adobe Spectrum Colors with light-dark() support */
+
+  /* Primary brand colors */
   --dark-spectrum-blue: #0463d6;
   --spectrum-blue: #1473e6;
   --brand-color-purple: #8a8df3;
@@ -87,47 +92,108 @@
   --brand-color-green-yellow: #ebf3a4;
   --highlight-gradient: linear-gradient(75deg, #db3278, #ee732f);
 
-  /* those (background) colors were missing */
-  --color-black: #000;
-  --color-gray-100: rgb(10% 10% 10%);
-  --color-gray-200: rgb(20% 20% 20%);
-  --color-gray-500: rgb(50% 50% 50%);
-  --color-white: #fff;
-  --color-info-accent: inherit;
-  --color-info-accent-hover: inherit;
-  --color-info-accent-down: inherit;
-  --color-info-primary: inherit;
-  --color-info-primary-hover: inherit;
-  --color-info-primary-down: inherit;
-  --color-info-secondary: inherit;
-  --color-info-secondary-hover: inherit;
-  --color-info-secondary-down: inherit;
-  --color-info-accent-reverse: inherit;
-  --color-info-accent-reverse-down: inherit;
+  /* Base colors using Adobe Spectrum palette with light-dark() */
+  --color-black: light-dark(#000, #fff);
+  --color-white: light-dark(#fff, #000);
 
-  /* Redesign colors */
-  --color-font-grey: #2c2c2c;
-  --color-light-grey-600: #686868;
-  --color-eyebrow-light-grey: #444;
+  /* Gray scale - Adobe Spectrum inspired */
+  --color-gray-50: light-dark(#fff, #1e1e1e);
+  --color-gray-100: light-dark(#f5f5f5, #2c2c2c);
+  --color-gray-200: light-dark(#e1e1e1, #3e3e3e);
+  --color-gray-300: light-dark(#d6d6d6, #4a4a4a);
+  --color-gray-400: light-dark(#b3b3b3, #6e6e6e);
+  --color-gray-500: light-dark(#8e8e8e, #909090);
+  --color-gray-600: light-dark(#686868, #b3b3b3);
+  --color-gray-700: light-dark(#4b4b4b, #d4d4d4);
+  --color-gray-800: light-dark(#2c2c2c, #e1e1e1);
+  --color-gray-900: light-dark(#1e1e1e, #f5f5f5);
+
+  /* Semantic colors for buttons and interactions */
+  --color-info-accent: light-dark(#1473e6, #378ef0);
+  --color-info-accent-hover: light-dark(#0d66d0, #4b9cf5);
+  --color-info-accent-down: light-dark(#095aba, #2680eb);
+  --color-info-primary: light-dark(#1473e6, #378ef0);
+  --color-info-primary-hover: light-dark(#0d66d0, #4b9cf5);
+  --color-info-primary-down: light-dark(#095aba, #2680eb);
+  --color-info-secondary: light-dark(#f5f5f5, #2c2c2c);
+  --color-info-secondary-hover: light-dark(#e1e1e1, #3e3e3e);
+  --color-info-secondary-down: light-dark(#d6d6d6, #4a4a4a);
+  --color-info-accent-reverse: light-dark(#e3f2fd, #1a2332);
+  --color-info-accent-reverse-down: light-dark(#c8e4fb, #0d1824);
+
+  /* Text colors */
+  --color-font-grey: light-dark(#2c2c2c, #e1e1e1);
+  --color-light-grey-600: light-dark(#686868, #b3b3b3);
+  --color-eyebrow-light-grey: light-dark(#444, #d4d4d4);
   --color-eyebrow-highlight: #6870ec;
-  --color-accent-blue: #6870ec;
-  --color-accent-highlight-yellow: #e3fa8c;
-  --color-accent-pink-bg: #f0b2f2;
-  --color-accent-pink-content: #88008d;
-  --color-accent-purple-bg: #474eb8;
-  --color-accent-purple-content: #e2e4ff;
-  --color-accent-lightgreen-bg: #e1fa82;
-  --color-accent-lightgreen-content: #3b5700;
-  --color-accent-yellow-bg: #f5e66b;
-  --color-accent-yellow-content: #7f6000;
 
-  /* background colors */
-  --bg-color-lightgrey: #f8f8f8;
-  --bg-color-grey: #e8e8e8;
-  --bg-color-grey-2: #d6d6d6;
-  --overlay-curtain-bg-color: rgb(0 0 0 / 60%);
+  /* Accent colors - adjusted for dark mode visibility */
+  --color-accent-blue: light-dark(#6870ec, #8b92ff);
+  --color-accent-highlight-yellow: light-dark(#e3fa8c, #c5dc6e);
+  --color-accent-pink-bg: light-dark(#f0b2f2, #7d2d7f);
+  --color-accent-pink-content: light-dark(#88008d, #fff);
+  --color-accent-purple-bg: light-dark(#474eb8, #4a52c4);
+  --color-accent-purple-content: light-dark(#e2e4ff, #fff);
+  --color-accent-lightgreen-bg: light-dark(#e1fa82, #8fa940);
+  --color-accent-lightgreen-content: light-dark(#3b5700, #fff);
+  --color-accent-yellow-bg: light-dark(#f5e66b, #a89a2f);
+  --color-accent-yellow-content: light-dark(#7f6000, #fff);
+
+  /* Background colors */
+  --bg-color-lightgrey: light-dark(#f8f8f8, #1e1e1e);
+  --bg-color-grey: light-dark(#e8e8e8, #2c2c2c);
+  --bg-color-grey-2: light-dark(#d6d6d6, #3e3e3e);
+  --overlay-curtain-bg-color: light-dark(rgb(0 0 0 / 60%), rgb(0 0 0 / 80%));
   --overlay-curtain-bg-filter: blur(0.05em);
-  --code-bg-color: #f1f1f1;
+  --code-bg-color: light-dark(#f1f1f1, #2c2c2c);
+
+  /* Shadow colors - for consistent shadow treatment */
+  --shadow-color-5: rgb(0 0 0 / 5%);
+  --shadow-color-7: rgb(0 0 0 / 7%);
+  --shadow-color-10: rgb(0 0 0 / 10%);
+  --shadow-color-15: rgb(0 0 0 / 15%);
+  --shadow-color-20: rgb(0 0 0 / 20%);
+  --shadow-color-25: rgb(0 0 0 / 25%);
+  --shadow-color-30: rgb(0 0 0 / 30%);
+  --shadow-color-33: rgb(0 0 0 / 33%);
+  --shadow-color-40: rgb(0 0 0 / 40%);
+  --shadow-color-50: rgb(0 0 0 / 50%);
+  --shadow-color-60: rgb(0 0 0 / 60%);
+  --shadow-color-70: rgb(0 0 0 / 70%);
+  --shadow-color-80: rgb(0 0 0 / 80%);
+  --shadow-color-90: rgb(0 0 0 / 90%);
+  --shadow-color-100: rgb(0 0 0 / 100%);
+
+  /* Border colors */
+  --border-color-light: light-dark(#eaeaea, #3a3a3a);
+  --border-color-medium: light-dark(#d6d6d6, #4a4a4a);
+  --border-color-dark: light-dark(#ccc, #555);
+
+  /* Brand/accent colors - non-semantic */
+  --color-brand-red: #d31510;
+  --color-brand-pink: #e6118a;
+  --color-brand-orange: #fe833f;
+  --color-brand-deep-blue: #2a2f8f;
+
+  /* Status/semantic colors */
+  --color-warning: light-dark(#ffc107, #ffca28);
+  --color-error: light-dark(#d31510, #ff5252);
+  --color-success: light-dark(#2e7d32, #66bb6a);
+
+  /* Highlight/search colors */
+  --color-search-highlight: light-dark(rgb(255 208 0 / 30%), rgb(255 208 0 / 75%));
+
+  /* Release tag colors */
+  --color-release-blue: #d4e8ff;
+  --color-release-pink: #ffd4f1;
+  --color-release-green: #d1ffed;
+  --color-release-gray: #e8e8e8;
+  --color-release-lime: #e4e8bf;
+  --color-release-yellow: #f4f8cf;
+  --color-release-orange: #ffebd4;
+  --color-release-cyan: #cfebf8;
+  --color-release-purple: #edd1ff;
+  --color-release-peach: #ffe4d4;
 
   /* Grid / container width -- 600px, 900px */
   --grid-mobile-container-width: 88%;
@@ -271,6 +337,8 @@ body {
   font-size: var(--type-body-l-size);
   line-height: var(--type-body-l-lh);
   display: none;
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
 }
 
 body.appear {
@@ -366,7 +434,7 @@ header {
   top: 0;
   width: 100%;
   height: var(--nav-height);
-  background-color: #fff;
+  background-color: var(--color-gray-50);
   z-index: var(--nav-z-index);
 }
 
@@ -465,7 +533,7 @@ h6 {
 }
 
 em a {
-  color: black;
+  color: var(--color-gray-900);
   border: 2px solid;
   background-color: transparent;
   border-radius: 16px;
@@ -512,9 +580,9 @@ pre code {
 code:not(pre > code) {
   font-size: 14px;
   overflow-wrap: break-word;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--color-gray-200);
   background-color: var(--code-bg-color);
-  color: var(--dark-spectrum-blue);
+  color: light-dark(#0463d6, #6cb2ff);
   padding: 1px 4px;
   border-radius: 4px;
 }
@@ -669,26 +737,97 @@ a.button.primary-cta:any-link:active {
 }
 
 a.button.primary:any-link {
-  color: var(--color-white);
-  background-color: var(--color-info-primary);
-  border-color: var(--color-info-primary);
+  color: #fff;
+  background-color: #1473e6;
+  border-color: #1473e6;
 }
 
 a.button.primary:focus,
 a.button.primary.reverse:focus {
-  background-color: var(--color-info-primary-hover);
-  border-color: var(--color-info-primary-hover);
-  color: var(--color-white);
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+  color: #fff;
 }
 
 a.button.primary:any-link:hover {
-  background-color: var(--color-info-primary-hover);
-  border-color: var(--color-info-primary-hover);
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+  color: #fff;
 }
 
 a.button.primary:any-link:active {
-  background-color: var(--color-info-primary-down);
-  border-color: var(--color-info-primary-down);
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+.redesign a.button.primary:any-link {
+  color: #fff;
+  background-color: #1473e6;
+  border-color: #1473e6;
+}
+
+.redesign a.button.primary:focus,
+.redesign a.button.primary.reverse:focus {
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+  color: #fff;
+}
+
+.redesign a.button.primary:any-link:hover {
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+  color: #fff;
+}
+
+.redesign a.button.primary:any-link:active {
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+@media (prefers-color-scheme: dark) {
+  a.button.primary:any-link {
+    color: #fff;
+    background-color: #0d66d0;
+    border-color: #0d66d0;
+  }
+
+  a.button.primary:focus,
+  a.button.primary.reverse:focus {
+    background-color: #095aba;
+    border-color: #095aba;
+  }
+
+  a.button.primary:any-link:hover {
+    background-color: #095aba;
+    border-color: #095aba;
+  }
+
+  a.button.primary:any-link:active {
+    background-color: #074a8e;
+    border-color: #074a8e;
+  }
+
+  .redesign a.button.primary:any-link {
+    color: #fff;
+    background-color: #0d66d0;
+    border-color: #0d66d0;
+  }
+
+  .redesign a.button.primary:focus,
+  .redesign a.button.primary.reverse:focus {
+    background-color: #095aba;
+    border-color: #095aba;
+  }
+
+  .redesign a.button.primary:any-link:hover {
+    background-color: #095aba;
+    border-color: #095aba;
+  }
+
+  .redesign a.button.primary:any-link:active {
+    background-color: #074a8e;
+    border-color: #074a8e;
+  }
 }
 
 a.button.secondary:any-link {
@@ -800,7 +939,7 @@ main .form .button {
 }
 
 .redesign a.button:any-link span {
-  color: var(--color-white);
+  color: #fff;
   transition: all 0.3s ease-in-out;
 }
 
@@ -879,6 +1018,15 @@ main .form .button:hover::before {
       rgb(0 0 0 / 50%) 50%,
       transparent 50%
     );
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero.colorful-bg a.button.black-border:any-link {
+    --color-black: #000;
+    --color-white: #fff;
+
+    font-weight: 700;
+  }
 }
 
 /* larger size */
@@ -982,7 +1130,7 @@ main .section.highlight {
 main .section.separator {
   margin: auto;
   width: 60%;
-  border-top: 2px solid #ccc;
+  border-top: 2px solid var(--color-gray-300);
   padding: 20px 0;
 }
 
@@ -1321,7 +1469,7 @@ body.no-header-template {
 .breadcrumb-link-underline-effect::before {
   content: "";
   position: absolute;
-  background: var(--color-black);
+  background: var(--color-gray-900);
   height: 1px;
   left: auto;
   right: 0;
@@ -2174,8 +2322,8 @@ body.contact-template main .default-content-wrapper img {
   display: none;
   width: 100%;
   max-height: var(--breadcrumb-height);
-  background: var(--color-white);
-  box-shadow: 0 4px 6px rgb(0 0 0 / 15%);
+  background: var(--color-gray-50);
+  box-shadow: 0 4px 6px light-dark(rgb(0 0 0 / 15%), rgb(0 0 0 / 40%));
   z-index: 100;
 }
 

@@ -19,11 +19,11 @@
 
 .gnav-wrapper {
   position: relative;
-  background: #fff;
+  background: var(--color-gray-50);
   width: 100%;
   height: 64px;
   display: flex;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid var(--color-gray-200);
 }
 
 .gnav {
@@ -66,7 +66,7 @@ header .gnav {
     top: 0;
     background: var(--color-white);
     height: calc(var(--nav-height) - 1px);
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: 1px solid var(--border-color-light);
     z-index: 10;
     color: var(--bg-color-black);
   }
@@ -78,7 +78,7 @@ header .gnav {
 }
 
 .gnav a {
-  color: #2e2e2e;
+  color: var(--color-gray-800);
   text-decoration: none;
 }
 
@@ -102,7 +102,7 @@ button.gnav-toggle {
 button.gnav-toggle::after {
   content: "\2630";
   font-weight: 700;
-  color: var(--bg-color-black);
+  color: var(--color-gray-900);
 }
 
 .gnav.is-open button.gnav-toggle::after {
@@ -112,7 +112,6 @@ button.gnav-toggle::after {
 /* Navbar Logo + Brand Name */
 .gnav .gnav-brand-wrapper {
   grid-area: brand;
-  background: var(--color-white);
 }
 
 .gnav .gnav-brand {
@@ -144,7 +143,7 @@ button.gnav-toggle::after {
 .gnav .gnav-cta-button-wrapper.mobile {
   display: flex;
   padding: 16px 12px;
-  border-top: 1px solid #eaeaea;
+  border-top: 1px solid var(--border-color-light);
 }
 
 .gnav .gnav-cta-button-wrapper.desktop {
@@ -203,8 +202,8 @@ button.gnav-toggle::after {
   right: 0;
   top: 64px;
   min-width: 320px;
-  background: #fff;
-  border: 1px solid #e1e1e1;
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
   border-radius: 0 0 4px 4px;
   overflow: hidden;
 
@@ -238,7 +237,7 @@ button.gnav-toggle::after {
 }
 
 .gnav-profile-email {
-  color: #707070;
+  color: var(--color-gray-500);
   font-size: 14px;
   line-height: 1.25;
   margin: 0;
@@ -263,13 +262,13 @@ button.gnav-toggle::after {
 .gnav-profile-actions a {
   padding: 14px 20px;
   display: block;
-  border-top: 1px solid #e1e1e1;
+  border-top: 1px solid var(--border-color-light);
   box-sizing: border-box;
-  color: #4b4b4b;
+  color: var(--color-gray-600);
 }
 
 .gnav-profile-menu a:hover {
-  background-color: #fafafa;
+  background-color: var(--color-gray-50);
 }
 
 /* nav menu list */
@@ -279,7 +278,6 @@ button.gnav-toggle::after {
   margin: 0;
   padding: 0;
   list-style: none;
-  background: #fff;
 }
 
 .franklin .gnav .gnav-mainnav {
@@ -300,7 +298,7 @@ button.gnav-toggle::after {
 }
 
 .gnav-navitem.has-menu.is-open::before {
-  background: #969796;
+  background: var(--color-gray-400);
   position: absolute;
   width: 4px;
   top: 0;
@@ -316,18 +314,18 @@ button.gnav-toggle::after {
   justify-content: space-between;
   align-items: center;
   padding: 20px 12px;
-  color: rgb(44 44 44);
+  color: var(--color-gray-800);
   transition: background-color 0.1s ease;
 }
 
 .franklin .gnav-navitem > a {
   border-bottom: none;
-  border-top: 1px solid #eaeaea;
+  border-top: 1px solid var(--border-color-light);
   font-weight: 500;
 }
 
 .gnav .gnav-navitem > a:hover {
-  background-color: #fafafa;
+  background-color: var(--color-gray-100);
 }
 
 .franklin .gnav .gnav-mainnav a {
@@ -339,7 +337,7 @@ button.gnav-toggle::after {
   font-weight: 700;
   position: relative;
   border-bottom: none;
-  background-color: #fafafa;
+  background-color: var(--color-gray-50);
 }
 
 .gnav-navitem.has-menu.is-open > a::before {
@@ -349,7 +347,7 @@ button.gnav-toggle::after {
   right: 20px;
   bottom: 0;
   display: block;
-  border-bottom: 1px solid #d1d1d1;
+  border-bottom: 1px solid var(--border-color-medium);
 }
 
 .franklin .gnav-navitem > a.active {
@@ -471,8 +469,8 @@ button.gnav-toggle::after {
 
 .gnav-search-bar {
   display: none;
-  background: #fff;
-  border-bottom: 1px solid #eaeaea;
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--color-gray-200);
   padding-bottom: 20px;
 }
 
@@ -486,7 +484,7 @@ button.gnav-toggle::after {
 }
 
 .gnav-search .gnav-search-button:hover {
-  fill: #2b9af3;
+  fill: var(--spectrum-blue);
 }
 
 .gnav-search.is-open .gnav-search-button::after {
@@ -512,12 +510,12 @@ button.gnav-toggle::after {
   position: absolute;
   top: 6px;
   left: 18px;
-  fill: rgb(110 110 110);
+  fill: var(--color-gray-500);
   transition: fill 130ms ease-in-out;
 }
 
 .gnav-search-field:hover svg {
-  fill: rgb(44 44 44);
+  fill: var(--color-gray-800);
 }
 
 .gnav-search.is-open .gnav-search-button svg {
@@ -529,7 +527,7 @@ button.gnav-toggle::after {
   width: 100%;
   line-height: 30px;
   border: 1px solid;
-  border-color: rgb(202 202 202);
+  border-color: var(--color-gray-300);
   border-radius: 4px;
   padding: 0 30px;
   font-size: 14px;
@@ -538,26 +536,28 @@ button.gnav-toggle::after {
   appearance: none;
   box-sizing: border-box;
   transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
 }
 
 .gnav-search-field:hover .gnav-search-input {
-  border-color: rgb(179 179 179);
+  border-color: var(--color-gray-400);
 }
 
 .gnav-search-field .gnav-search-input:focus {
-  border-color: rgb(42 124 223);
+  border-color: var(--color-info-accent);
 }
 
 .gnav-search-input::placeholder {
   font-style: italic;
   font-weight: 400;
-  color: #8e8e8e;
+  color: var(--color-gray-400);
   transition: color 130ms ease-in-out;
 }
 
 .gnav-search-input:focus::placeholder,
 .gnav-search-field:hover .gnav-search-input::placeholder {
-  color: #2c2c2c;
+  color: var(--color-gray-800);
 }
 
 .gnav-search-results {
@@ -616,7 +616,7 @@ button.gnav-toggle::after {
   position: absolute;
   z-index: -1;
   inset: 0 -4px;
-  background-color: rgb(255 208 0 / 30%);
+  background-color: var(--color-search-highlight);
   border-radius: 4px;
 }
 
@@ -649,13 +649,12 @@ button.gnav-toggle::after {
 
   .franklin .gnav-mainnav.with-search,
   .gnav-brand-wrapper {
-    border-bottom: 1px solid #eaeaea;
     display: flex;
   }
 
   .franklin .gnav .gnav-mainnav,
   .franklin .gnav .gnav-mainnav.with-search {
-    background: var(--color-white);
+    background: unset;
     min-height: calc(var(--nav-height) - 2px);
   }
 
@@ -707,7 +706,7 @@ button.gnav-toggle::after {
     border-bottom: unset;
   }
 
-  .gnav-navitem > a {
+  .franklin .gnav-navitem > a {
     border-top: none;
   }
 
@@ -834,7 +833,7 @@ button.gnav-toggle::after {
     grid-template-areas:
       "menu-icon title"
       "menu-icon description";
-    border-top: 1px solid #d4d4d4;
+    border-top: 1px solid var(--border-color-medium);
   }
 
   .franklin .gnav .gnav-navitem.has-menu.is-open .submenu-content a.submenu {

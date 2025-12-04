@@ -2,7 +2,7 @@
   background: var(--highlight-gradient);
   border-radius: 25px;
   padding: 20px 30px;
-  color: white;
+  color: var(--color-white);
   margin: 64px 0;
 }
 
@@ -34,10 +34,10 @@
 }
 
 .copy > div > button {
-  color: white;
+  color: var(--color-white);
   border-radius: 20px;
   background-color: unset;
-  border: 2px solid white;
+  border: 2px solid var(--color-white);
   padding: 5px 20px;
 }
 

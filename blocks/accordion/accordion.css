@@ -1,13 +1,13 @@
 .accordion {
-  background: #efefef;
-  border: 1px solid #ddd;
+  background: var(--color-gray-100);
+  border: 1px solid var(--border-color-medium);
   border-radius: 6px;
 }
 
 .item-title {
   cursor: pointer;
   padding: 12px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color-medium);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -16,8 +16,8 @@
 .item-title::after {
   width: 10px;
   height: 10px;
-  border-bottom: 2px solid #a7a7a7;
-  border-right: 2px solid #a7a7a7;
+  border-bottom: 2px solid var(--color-gray-400);
+  border-right: 2px solid var(--color-gray-400);
   transform-origin: 75% 75%;
   transform: rotate(-45deg) translateY(-50%);
   transition: transform 0.1s ease;
@@ -25,7 +25,7 @@
 }
 
 .item-title.open {
-  background: #ddd;
+  background: var(--border-color-medium);
 }
 
 .item-title.open::after {
@@ -37,7 +37,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   padding: 12px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color-medium);
 }
 
 .item-title.open + .item-content {
