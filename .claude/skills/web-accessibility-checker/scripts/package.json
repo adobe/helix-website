@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "description": "Web accessibility checker scripts for WCAG 2.2 Level AA compliance",
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "@axe-core/playwright": "^4.8.0",
+    "jsdom": "^23.0.0"
+  }
+}
