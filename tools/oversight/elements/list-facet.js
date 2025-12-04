@@ -427,12 +427,14 @@ export default class ListFacet extends HTMLElement {
       li.title = metricName.toUpperCase();
       if (metrics[metricName] && metrics[metricName].count >= CWVDISPLAYTHRESHOLD) {
         const value = metrics[metricName].percentile(75);
+        const median = metrics[metricName].percentile(50);
         cwv = metricName !== 'cls'
           ? value / 1000
           : (Math.round(value * 100) / 100);
         nf.textContent = cwv;
         score = scoreCWV(value, metricName);
         addSignificanceFlag(li, metrics[metricName], this.dataChunks.totals[metricName]);
+        li.dataset.median = median;
         li.title += ` - based on ${metrics[metricName].count} samples`;
       } else {
         li.title += ` - not enough samples (${metrics[metricName].count})`;
