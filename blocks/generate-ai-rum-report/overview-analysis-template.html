@@ -2,6 +2,13 @@
 
 <h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
 
+<p><b>🚨🚨🚨 PRIORITY ACTIONS FORMAT - READ THIS FIRST 🚨🚨🚨</b></p>
+<p>In the PRIORITY ACTIONS section, you MUST insert the literal HTML tag <code>&lt;br&gt;</code> between the action and "Expected Impact:"</p>
+<pre>CORRECT: &lt;p&gt;• Fix broken links.&lt;br&gt;Expected Impact: Reduce 404 errors&lt;/p&gt;
+WRONG:   &lt;p&gt;• Fix broken links.Expected Impact: Reduce 404 errors&lt;/p&gt;
+WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p&gt;</pre>
+<p>The literal characters <code>.&lt;br&gt;Expected</code> must appear — period, then br tag, then Expected. No space between period and br tag.</p>
+
 <p><b>🚨 CRITICAL: USE ONLY REAL DATA FROM TOOL RESPONSES</b></p>
 <p>This template contains NO actual data - only structure and formatting guidelines. ALL metrics, numbers, percentages, and values MUST come from the tool responses and dashboard data provided in the SOURCE MATERIAL section. DO NOT use any placeholder values, example numbers, or hypothetical data.</p>
 
@@ -104,6 +111,15 @@
   <li>DO NOT focus primarily on performance metrics - provide balanced analysis across ALL available facets</li>
   <li>Include insights from user behavior, traffic acquisition, content engagement, errors, and other non-performance facets</li>
   <li>Each facet provides unique business value - ensure comprehensive coverage of all data types</li>
+</ul>
+
+<p><b>⚠️ UTM TRACKING - PRIVACY BY DESIGN:</b></p>
+<ul>
+  <li>UTM data only records <b>parameter names</b> (utm_source, utm_medium, etc.), NOT their values — this is <b>intentional for privacy</b></li>
+  <li>DO NOT recommend "capturing UTM values" or suggest this is a limitation to fix</li>
+  <li>DO NOT say "only parameter names are recorded" as if it's a problem</li>
+  <li>Instead, focus on: which UTM parameters are being used, tracking coverage, and campaign tagging consistency</li>
+  <li>Valid insights: "UTM parameters are present on X% of traffic" or "utm_source is the most commonly used parameter"</li>
 </ul>
 
 <p><b>⚠️ CRITICAL: INTERPRETING CSS CLASSES FOR METRIC SEVERITY</b></p>
@@ -253,19 +269,21 @@
 <!-- ====================================================================== -->
 
 <h4>PRIORITY ACTIONS</h4>
-<p>List the 3-4 most critical actions to take, prioritized by impact. Format each action with the recommendation first, followed by expected impact on a new line:</p>
-<p>• [Action 1]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
-<p>• [Action 2]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
-<p>• [Action 3]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
-<p>• [Action 4 (optional)]: [Specific, actionable recommendation with context]<br>Expected Impact: [Quantified impact on metrics, user experience, or business outcomes]</p>
+<p>List 4-6 most critical actions — focus on <b>HIGH IMPACT + EASY TO FIX</b> issues (quick wins):</p>
 
-<p><b>⚠️ FORMAT RULES:</b></p>
+<p><b>🎯 PRIORITIZATION CRITERIA (in order):</b></p>
 <ul>
-  <li>NO timelines (e.g., "1-2 days", "within a week") - focus on impact only</li>
-  <li>Expected Impact must be on a separate line using <code>&lt;br&gt;</code> tag</li>
-  <li>Use <code>&lt;br&gt;Expected Impact:</code> format exactly as shown above</li>
-  <li>Quantify impact with specific numbers where possible</li>
+  <li><b>Quick wins first:</b> Issues that are easy to fix AND bring significant improvement</li>
+  <li><b>High traffic impact:</b> Fixes affecting the most users/page views</li>
+  <li><b>Core Web Vitals:</b> LCP, CLS, INP issues that hurt SEO and user experience</li>
+  <li><b>Revenue-impacting:</b> Issues on conversion paths or high-value pages</li>
+  <li><b>Low-hanging fruit:</b> Simple config changes, image optimization, broken links</li>
 </ul>
+<p>DO NOT include complex, long-term projects. Focus on actions that can be done quickly with measurable results.</p>
+
+<p><b>Content Actions</b> = quick fixes by authors/editors (no code): image optimization, broken links, missing alt text, metadata updates</p>
+<p><b>Code Actions</b> = quick fixes by developers: lazy loading, caching, error fixes, performance tweaks</p>
+<p>2-3 actions per category (4-6 total). NO timelines. Use format from top of template: <code>[Action].&lt;br&gt;Expected Impact:</code></p>
 
 <!-- ====================================================================== -->
 <!-- CRITICAL REQUIREMENTS -->
@@ -298,7 +316,7 @@
       </li>
     </ul>
   </li>
-  <li><b>Priority Actions:</b> 3-4 action items, ALL as bullets with Expected Impact on separate line using <code>&lt;br&gt;</code></li>
+  <li><b>Priority Actions:</b> 4-6 QUICK WINS (high impact + easy fix). Use format from top of template.</li>
   <li>Balance readability with specificity - integrate data naturally into sentences</li>
   <li>Use actionable language and quantify impact wherever possible</li>
   <li>NO timelines in Priority Actions - focus on impact only</li>
@@ -329,11 +347,11 @@
     <ul>
       <li>Paragraph: <code>&lt;p&gt;Mobile users experienced LCP of 2.8 seconds, affecting 8,100 sessions.&lt;/p&gt;</code></li>
       <li>Bullet: <code>&lt;p&gt;• Error rate peaked at 1,234 incidents affecting 15% of users.&lt;/p&gt;</code></li>
-      <li>Priority Action: <code>&lt;p&gt;• Fix missing author profile&lt;br&gt;Expected Impact: Immediate reduction in 404 errors and improved page load times.&lt;/p&gt;</code></li>
+      <li>Priority Action subheading: <code>&lt;p&gt;&lt;b&gt;Content Actions&lt;/b&gt;&lt;/p&gt;</code> or <code>&lt;p&gt;&lt;b&gt;Code Actions&lt;/b&gt;&lt;/p&gt;</code></li>
+      <li>Priority Action item: Use format from top of template</li>
     </ul>
   </li>
   <li>Do NOT use markdown (**text**) or emojis (🎯, 📊, etc.)</li>
-  <li>Use <code>&lt;br&gt;</code> tags ONLY in Priority Actions section to separate Expected Impact</li>
 </ul>
 
 <p><b>🚨 CRITICAL - USE ONLY REAL DATA:</b></p>

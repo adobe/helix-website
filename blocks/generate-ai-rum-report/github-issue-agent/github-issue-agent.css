@@ -1,0 +1,248 @@
+/* GitHub Issue Agent */
+
+.github-log-legend {
+  position: absolute;
+  right: 1em;
+  top: -2em;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #24292f;
+  background: var(--current-color);
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.github-log-legend:hover {
+  filter: brightness(0.85);
+}
+
+.github-chat-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 40%);
+}
+
+.github-chat-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  height: min(480px, 80vh);
+  background: #fff;
+  border: 2px solid var(--dark-indigo, #3f51b5);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 20%);
+}
+
+.github-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--dark-indigo, #3f51b5);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.github-chat-header span {
+  flex: 1;
+}
+
+.github-chat-close {
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
+  color: rgb(255 255 255 / 70%);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.github-chat-close:hover {
+  color: white;
+  background: rgb(255 255 255 / 15%);
+}
+
+.github-chat-messages {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  background: var(--light-indigo, #e8eaf6);
+}
+
+.github-chat-message {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.github-chat-message.agent {
+  align-self: flex-start;
+  background: white;
+  color: #333;
+  border: 1px solid #d0d7de;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+}
+
+.github-chat-message.agent strong {
+  color: var(--dark-indigo, #3f51b5);
+}
+
+.github-chat-message.user {
+  align-self: flex-end;
+  background: var(--dark-indigo, #3f51b5);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.github-chat-message.typing {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+}
+
+.github-chat-message.typing span {
+  width: 8px;
+  height: 8px;
+  background: var(--dark-indigo, #3f51b5);
+  border-radius: 50%;
+  animation: typing-bounce 1.2s infinite;
+}
+
+.github-chat-message.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.github-chat-message.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.github-chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  background: white;
+  border-top: 1px solid #d0d7de;
+  position: relative;
+  z-index: 1;
+}
+
+.github-chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #333;
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.github-chat-input:focus {
+  border-color: var(--dark-indigo, #3f51b5);
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(63 81 181 / 15%);
+}
+
+.github-chat-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: white;
+  background: var(--dark-indigo, #3f51b5);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.github-chat-send:hover {
+  background: var(--darker-indigo, #303f9f);
+}
+
+/* Confirmation dialog */
+.github-confirm {
+  height: auto;
+}
+
+.github-confirm-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.github-confirm-body p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.github-confirm-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.github-confirm-btns button {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.github-btn-no {
+  color: #333;
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+}
+
+.github-btn-no:hover {
+  background: #eaeef2;
+}
+
+.github-btn-yes {
+  color: white;
+  background: var(--dark-indigo, #3f51b5);
+  border: none;
+}
+
+.github-btn-yes:hover {
+  background: var(--darker-indigo, #303f9f);
+}
