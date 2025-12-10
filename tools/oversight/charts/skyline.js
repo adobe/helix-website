@@ -493,7 +493,8 @@ export default class SkylineChart extends AbstractChart {
   /**
    * Get breakdown facet categories based on the skyline parameter
    * @param {string} skylineParam - The skyline parameter value ('type' or 'userAgent')
-   * @returns {Object} - Object with facetName and categories array
+   * @returns {Object|null} Object with facetName (string), extractValue (function),
+   *                        and categories (array), or null if skylineParam is invalid
    */
   // eslint-disable-next-line class-methods-use-this
   getBreakdownConfig(skylineParam) {
