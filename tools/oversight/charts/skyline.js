@@ -777,15 +777,23 @@ export default class SkylineChart extends AbstractChart {
     // Helper to find dataset by label
     const findDataset = (label) => this.chart.data.datasets.find((ds) => ds.label === label);
 
-    findDataset('Good LCP').data = iGoodLCPs;
-    findDataset('Needs Improvement LCP').data = iNiLCPs;
-    findDataset('Poor LCP').data = iPoorLCPs;
-    findDataset('Good CLS').data = iGoodCLSs;
-    findDataset('Needs Improvement CLS').data = iNiCLSs;
-    findDataset('Poor CLS').data = iPoorCLSs;
-    findDataset('Good INP').data = iGoodINPs;
-    findDataset('Needs Improvement INP').data = iNiINPs;
-    findDataset('Poor INP').data = iPoorINPs;
+    // Helper to set dataset data with error checking
+    const setDatasetData = (label, data) => {
+      const dataset = findDataset(label);
+      if (dataset) {
+        dataset.data = data;
+      }
+    };
+
+    setDatasetData('Good LCP', iGoodLCPs);
+    setDatasetData('Needs Improvement LCP', iNiLCPs);
+    setDatasetData('Poor LCP', iPoorLCPs);
+    setDatasetData('Good CLS', iGoodCLSs);
+    setDatasetData('Needs Improvement CLS', iNiCLSs);
+    setDatasetData('Poor CLS', iPoorCLSs);
+    setDatasetData('Good INP', iGoodINPs);
+    setDatasetData('Needs Improvement INP', iNiINPs);
+    setDatasetData('Poor INP', iPoorINPs);
 
     this.chart.data.labels = chartLabels;
     this.chart.options.scales.x.time.unit = config.unit;
