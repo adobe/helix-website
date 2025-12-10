@@ -76,7 +76,7 @@ main .author-box-info .sharing-details svg {
 
 main .author-box-info .blog-author-blurb {
   font-style: italic;
-  color: grey;
+  color: var(--color-gray-500);
   font-size: 15px;
 }
 
@@ -98,7 +98,7 @@ main .author-containers .blog-author-info .sharing-details {
   position: absolute;
   bottom: 0;
   right: 20px;
-  background-color: white;
+  background-color: var(--color-white);
   border-radius: 20px;
 }
 
@@ -153,7 +153,7 @@ main .author-box-info .multiple-authors .blog-author-blurb {
   main .author-box-info .single-author .blog-author-blurb {
     display: block;
     padding-left: 30px;
-    border-left: 1px solid grey;
+    border-left: 1px solid var(--color-gray-500);
   }
 
   main .author-box-info .blog-author-details {

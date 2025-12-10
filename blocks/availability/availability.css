@@ -30,7 +30,7 @@
   border-radius: var(--image-border-radius-xxl);
   background-color: var(--color-white);
   color: var(--bg-color-grey-2);
-  box-shadow: 0 4px 8px rgb(0 0 0 / 33%);
+  box-shadow: 0 4px 8px var(--shadow-color-33);
 }
 
 .availability svg circle {

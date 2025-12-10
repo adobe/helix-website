@@ -3,43 +3,43 @@
 }
 
 .releases .release-aem-certificate-rotation {
-  background-color: #d4e8ff;
+  background-color: var(--color-release-blue);
 }
 
 .releases .release-helix-admin {
-  background-color: #ffd4f1;
+  background-color: var(--color-release-pink);
 }
 
 .releases .release-helix-pipeline-service {
-  background-color: #d1ffed;
+  background-color: var(--color-release-green);
 }
 
 .releases .release-helix-importer-ui {
-  background-color: #e8e8e8;
+  background-color: var(--color-release-gray);
 }
 
 .releases .release-aem-sidekick {
-  background-color: #e4e8bf;
+  background-color: var(--color-release-lime);
 }
 
 .releases .release-franklin-sidekick-library {
-  background-color: #f4f8cf;
+  background-color: var(--color-release-yellow);
 }
 
 .releases .release-helix-cli {
-  background-color: #ffebd4;
+  background-color: var(--color-release-orange);
 }
 
 .releases .release-aem-lib {
-  background-color: #cfebf8;
+  background-color: var(--color-release-cyan);
 }
 
 .releases .release-helix-config-service {
-  background-color: #edd1ff;
+  background-color: var(--color-release-purple);
 }
 
 .releases .release-helix-reviews {
-  background-color: #ffe4d4;
+  background-color: var(--color-release-peach);
 }
 
 .releases .release {
