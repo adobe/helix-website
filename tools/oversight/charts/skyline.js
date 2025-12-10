@@ -681,6 +681,10 @@ export default class SkylineChart extends AbstractChart {
           const category = extractValue(bundle);
           if (categories.includes(category)) {
             categoryTotals[category] += bundle.weight;
+          } else {
+            // Add uncategorized bundles to the last category (unknown/undefined)
+            const fallbackCategory = categories[categories.length - 1];
+            categoryTotals[fallbackCategory] += bundle.weight;
           }
         });
 
