@@ -531,7 +531,10 @@ export default class SkylineChart extends AbstractChart {
     const domain = params.get('domain');
     // Default skyline breakdown: 'type' for aem.live:all, 'userAgent' for everything else
     const defaultSkyline = domain === 'aem.live:all' ? 'type' : 'userAgent';
-    const skylineParam = params.get('skyline') || defaultSkyline;
+    const allowedSkylines = ['type', 'userAgent'];
+    const skylineParam = allowedSkylines.includes(params.get('skyline'))
+      ? params.get('skyline')
+      : defaultSkyline;
 
     // eslint-disable-next-line no-unused-vars
     const startDate = params.get('startDate');
