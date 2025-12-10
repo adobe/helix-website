@@ -48,7 +48,7 @@ export default class NumberFormat extends HTMLElement {
       // set the title to the original number
       this.title = number;
       if (!Number.isNaN(sampleSize)) {
-        this.title = `${number} ±${samplingError(number, sampleSize)}`;
+        this.title = `${number.toLocaleString()} ±${samplingError(number, sampleSize).toLocaleString()}`;
       }
       // remove all classes ending with '-of-total'
       Array.from(this.classList)
