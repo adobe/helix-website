@@ -146,6 +146,8 @@ export const INTERPOLATION_THRESHOLD = 10;
  * @returns {string[]} - Array of CSS color values
  */
 export function purpleShades(count) {
+  if (count <= 0) return [];
+
   // Define a range of purple shades from light to dark
   const shades = [
     '--spectrum-purple-1300', // darkest
@@ -158,7 +160,10 @@ export function purpleShades(count) {
   // Select evenly distributed shades based on count
   const result = [];
   for (let i = 0; i < count; i += 1) {
-    const index = Math.min(Math.floor((i / count) * shades.length), shades.length - 1);
+    // Distribute indices evenly across the full range of shades
+    const index = count === 1
+      ? 0
+      : Math.floor((i / (count - 1)) * (shades.length - 1));
     result.push(cssVariable(shades[index]));
   }
   return result;
