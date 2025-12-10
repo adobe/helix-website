@@ -17,6 +17,7 @@ import {
   cwvInterpolationFn,
   simpleCWVInterpolationFn,
   INTERPOLATION_THRESHOLD,
+  purpleShades,
 } from '../utils.js';
 
 const {
@@ -221,8 +222,14 @@ export default class SkylineChart extends AbstractChart {
                 const value = context.parsed.y;
                 // show page views as human readable
                 if (context.dataset.label === 'Page Views') return `${context.dataset.label}: ${toHumanReadable(value)}`;
-                // hide fake data
+                // show breakdown datasets as page views
+                if (context.dataset.breakdownDataset) {
+                  if (value === 0) return '';
+                  return `${context.dataset.label}: ${toHumanReadable(value)}`;
+                }
+                // hide fake data and hidden datasets
                 if (context.dataset.label.indexOf('Fake') > -1) return '';
+                if (context.dataset.label.indexOf('hidden') > -1) return '';
 
                 const { datasets } = context.chart.data;
                 const i = context.dataIndex;
@@ -453,9 +460,48 @@ export default class SkylineChart extends AbstractChart {
     );
   }
 
+  /**
+   * Get breakdown facet categories based on the skyline parameter
+   * @param {string} skylineParam - The skyline parameter value ('type' or 'userAgent')
+   * @returns {Object} - Object with facetName and categories array
+   */
+  // eslint-disable-next-line class-methods-use-this
+  getBreakdownConfig(skylineParam) {
+    if (skylineParam === 'type') {
+      return {
+        facetName: 'type',
+        // Extract facet value from bundle - hostType for 'type'
+        extractValue: (bundle) => bundle.hostType || 'unknown',
+        // Only show these categories (in order)
+        categories: ['aemcs', 'helix', 'ams', 'commerce', 'unknown'],
+      };
+    }
+    if (skylineParam === 'userAgent') {
+      return {
+        facetName: 'userAgent',
+        // For userAgent, only use top-level categories (no colon)
+        extractValue: (bundle) => {
+          // Get user agent from bundle - need to determine the top-level type
+          const ua = bundle.userAgent || '';
+          // Only return top-level categories (mobile, desktop, bot, or undefined)
+          if (ua.startsWith('mobile')) return 'mobile';
+          if (ua.startsWith('desktop')) return 'desktop';
+          if (ua.startsWith('bot')) return 'bot';
+          return 'undefined';
+        },
+        categories: ['desktop', 'mobile', 'bot', 'undefined'],
+      };
+    }
+    return null;
+  }
+
   async draw() {
     const params = new URL(window.location).searchParams;
     const view = params.get('view');
+    const domain = params.get('domain');
+    // Default skyline breakdown: 'type' for aem.live:all, 'userAgent' for everything else
+    const defaultSkyline = domain === 'aem.live:all' ? 'type' : 'userAgent';
+    const skylineParam = params.get('skyline') || defaultSkyline;
 
     // eslint-disable-next-line no-unused-vars
     const startDate = params.get('startDate');
@@ -541,6 +587,9 @@ export default class SkylineChart extends AbstractChart {
     const group = this.dataChunks.group(this.groupBy);
     const chartLabels = Object.keys(group).sort();
 
+    // Check if we need to break down by a facet
+    const breakdownConfig = this.getBreakdownConfig(skylineParam);
+
     const {
       iGoodLCPs,
       iNiLCPs,
@@ -579,20 +628,134 @@ export default class SkylineChart extends AbstractChart {
         allTraffic: [],
       });
 
-    this.chart.data.datasets[0].data = allTraffic;
+    // Handle breakdown datasets for pageviews
+    if (breakdownConfig) {
+      const { categories, extractValue } = breakdownConfig;
+      const colors = purpleShades(categories.length);
 
-    this.chart.data.datasets[1].data = iGoodLCPs;
-    this.chart.data.datasets[2].data = iNiLCPs;
-    this.chart.data.datasets[3].data = iPoorLCPs;
-    // 4 is fake data
-    this.chart.data.datasets[5].data = iGoodCLSs;
-    this.chart.data.datasets[6].data = iNiCLSs;
-    this.chart.data.datasets[7].data = iPoorCLSs;
-    // 8 is fake data
-    this.chart.data.datasets[9].data = iGoodINPs;
-    this.chart.data.datasets[10].data = iNiINPs;
-    this.chart.data.datasets[11].data = iPoorINPs;
-    // 12 is fake data
+      // Calculate breakdown data for each category and time slot
+      const breakdownData = {};
+      categories.forEach((cat) => {
+        breakdownData[cat] = [];
+      });
+
+      // For each time slot, calculate pageviews per category
+      chartLabels.forEach((timeSlot) => {
+        const bundles = group[timeSlot] || [];
+        const categoryTotals = {};
+        categories.forEach((cat) => {
+          categoryTotals[cat] = 0;
+        });
+
+        bundles.forEach((bundle) => {
+          const category = extractValue(bundle);
+          if (categories.includes(category)) {
+            categoryTotals[category] += bundle.weight;
+          }
+        });
+
+        categories.forEach((cat) => {
+          breakdownData[cat].push(categoryTotals[cat]);
+        });
+      });
+
+      // Remove existing pageviews dataset and add breakdown datasets
+      // Keep only the first dataset slot for now, we'll add breakdown datasets
+      // We need to dynamically adjust the datasets array
+
+      // Clear existing pageviews data in dataset 0
+      this.chart.data.datasets[0].data = [];
+      this.chart.data.datasets[0].backgroundColor = 'transparent';
+      this.chart.data.datasets[0].label = 'Page Views (hidden)';
+
+      // Check if breakdown datasets already exist, if not create them
+      const existingBreakdownCount = this.chart.data.datasets
+        .filter((ds) => ds.breakdownDataset).length;
+
+      // Helper to get border radius for stacked bars
+      // First category (bottom): rounded bottom, Last category (top): rounded top
+      const getBorderRadius = (catIndex, total) => {
+        if (catIndex === 0) {
+          // Bottom of stack - rounded bottom corners only
+          return {
+            topLeft: 0, topRight: 0, bottomLeft: 3, bottomRight: 3,
+          };
+        }
+        if (catIndex === total - 1) {
+          // Top of stack - rounded top corners only
+          return {
+            topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0,
+          };
+        }
+        // Middle - no rounded corners
+        return {
+          topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0,
+        };
+      };
+
+      if (existingBreakdownCount === 0) {
+        // Insert breakdown datasets at the beginning (after hidden dataset 0)
+        // We need to insert them in reverse order to maintain stacking order
+        categories.slice().reverse().forEach((cat, i) => {
+          const colorIndex = categories.length - 1 - i;
+          const catIndex = categories.length - 1 - i;
+          this.chart.data.datasets.splice(1, 0, {
+            label: cat,
+            backgroundColor: colors[colorIndex],
+            data: [],
+            breakdownDataset: true, // marker to identify breakdown datasets
+            yAxisID: 'y',
+            borderRadius: getBorderRadius(catIndex, categories.length),
+            borderSkipped: false,
+            barPercentage: 1,
+            categoryPercentage: 0.9,
+          });
+        });
+      }
+
+      // Update breakdown dataset data and border radius
+      let datasetIndex = 1;
+      categories.forEach((cat, catIndex) => {
+        const ds = this.chart.data.datasets[datasetIndex];
+        if (ds && ds.breakdownDataset) {
+          ds.data = breakdownData[cat];
+          ds.label = cat;
+          ds.borderRadius = getBorderRadius(catIndex, categories.length);
+          ds.borderSkipped = false;
+          ds.barPercentage = 1;
+          ds.categoryPercentage = 0.9;
+        }
+        datasetIndex += 1;
+      });
+    } else {
+      // No breakdown - use original single dataset
+      // Remove any breakdown datasets if they exist
+      this.chart.data.datasets = this.chart.data.datasets
+        .filter((ds) => !ds.breakdownDataset);
+
+      // Restore original pageviews dataset
+      this.chart.data.datasets[0].data = allTraffic;
+      this.chart.data.datasets[0].label = 'Page Views';
+      this.chart.data.datasets[0].backgroundColor = (context) => {
+        const { chart } = context;
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return null;
+        return getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
+      };
+    }
+
+    // Helper to find dataset by label
+    const findDataset = (label) => this.chart.data.datasets.find((ds) => ds.label === label);
+
+    findDataset('Good LCP').data = iGoodLCPs;
+    findDataset('Needs Improvement LCP').data = iNiLCPs;
+    findDataset('Poor LCP').data = iPoorLCPs;
+    findDataset('Good CLS').data = iGoodCLSs;
+    findDataset('Needs Improvement CLS').data = iNiCLSs;
+    findDataset('Poor CLS').data = iPoorCLSs;
+    findDataset('Good INP').data = iGoodINPs;
+    findDataset('Needs Improvement INP').data = iNiINPs;
+    findDataset('Poor INP').data = iPoorINPs;
 
     this.chart.data.labels = chartLabels;
     this.chart.options.scales.x.time.unit = config.unit;

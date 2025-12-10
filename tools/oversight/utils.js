@@ -140,6 +140,30 @@ export function parseConversionSpec() {
 
 export const INTERPOLATION_THRESHOLD = 10;
 
+/**
+ * Returns an array of purple shades for breakdown visualization
+ * @param {number} count - Number of shades needed
+ * @returns {string[]} - Array of CSS color values
+ */
+export function purpleShades(count) {
+  // Define a range of purple shades from light to dark
+  const shades = [
+    '--spectrum-purple-1300', // darkest
+    '--spectrum-purple-1100',
+    '--spectrum-purple-900',
+    '--spectrum-purple-700',
+    '--spectrum-purple-500',
+    '--spectrum-purple-400', // lightest
+  ];
+  // Select evenly distributed shades based on count
+  const result = [];
+  for (let i = 0; i < count; i += 1) {
+    const index = Math.min(Math.floor((i / count) * shades.length), shades.length - 1);
+    result.push(cssVariable(shades[index]));
+  }
+  return result;
+}
+
 export function simpleCWVInterpolationFn(metric, threshold) {
   return (cwvs) => {
     const valuedWeights = Object.values(cwvs)
