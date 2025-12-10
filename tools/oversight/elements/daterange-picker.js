@@ -152,6 +152,38 @@ const STYLES = `
       position: absolute;
     }
   }
+
+  @media (prefers-color-scheme: dark) {
+    input {
+      background-color: #2c2c2c;
+      border-color: #4a4a4a;
+      color: #e1e1e1;
+    }
+
+    .input-wrapper {
+      background-color: #2c2c2c;
+    }
+
+    input[data-custom='true'] ~ .input-wrapper {
+      background-color: #2c2c2c;
+      border-color: #4a4a4a;
+      box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    ul {
+      background-color: #2c2c2c;
+      border-color: #4a4a4a;
+      box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    ul.menu li:last-child::before {
+      background-color: #4a4a4a;
+    }
+
+    input ~ ul li:hover {
+      background-color: #3e3e3e;
+    }
+  }
 `;
 
 const TEMPLATE = `

@@ -154,7 +154,9 @@ export default class BarChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? '#1e1e1e'
+              : 'white',
           },
         },
         interaction: {
@@ -182,12 +184,25 @@ export default class BarChart extends AbstractChart {
             stacked: true,
             ticks: {
               callback: (value) => toHumanReadable(value),
+              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? '#b3b3b3'
+                : undefined,
+            },
+            grid: {
+              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'rgba(255, 255, 255, 0.15)'
+                : undefined,
             },
           },
           y: {
             stacked: true,
             grid: {
               display: false,
+            },
+            ticks: {
+              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? '#b3b3b3'
+                : undefined,
             },
           },
         },
