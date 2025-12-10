@@ -87,9 +87,9 @@
 @media (prefers-color-scheme: dark) {
   .inner-content h1 {
     text-shadow:
-      0 0 20px var(--shadow-color-90),
-      0 0 40px var(--shadow-color-80),
-      0 2px 4px var(--shadow-color-100);
+      0 0 8px var(--shadow-color-50),
+      0 0 16px var(--shadow-color-40),
+      0 2px 2px var(--shadow-color-60);
   }
 }
 
@@ -110,7 +110,7 @@
 @media (prefers-color-scheme: dark) {
   .inner-content p {
     text-shadow: none;
-    color: var(--color-gray-800);
+    color: var(--color-gray-300);
   }
 }
 

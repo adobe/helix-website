@@ -1436,6 +1436,12 @@ body.no-header-template {
   background-color: var(--color-black);
 }
 
+@media (prefers-color-scheme: dark) {
+  .colored-tag.black {
+    background-color: var(--color-gray-200);
+  }
+}
+
 .colored-tag-description {
   font-size: var(--type-body-xs-size);
   line-height: var(--type-body-xs-lh);
@@ -1531,6 +1537,19 @@ use .link-underline-effect for normal case */
     rgb(255 251 232 / 100%) 50%,
     rgb(238 246 172 / 100%) 100%
   );
+}
+
+/* effect 2 dark theme: richer tones for better contrast with white text */
+@media (prefers-color-scheme: dark) {
+  .link-highlight-colorful-effect-2 {
+    /* stylelint-disable-next-line declaration-colon-newline-after */
+    background-image: linear-gradient(
+      90deg,
+      rgb(180 100 160 / 80%) 0%,
+      rgb(190 150 60 / 85%) 50%,
+      rgb(130 170 60 / 85%) 100%
+    );
+  }
 }
 
 /* can add `.link-highlight-colorful-effect-hover-wrapper` to trigger hover child highlight effect */
