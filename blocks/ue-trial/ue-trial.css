@@ -793,3 +793,14 @@
     font-size: 15px;
   }
 }
+
+/* Dark mode overrides for form labels */
+@media (prefers-color-scheme: dark) {
+  .ue-trial label {
+    color: var(--color-gray-700);
+  }
+
+  .ue-trial .help-text {
+    color: var(--color-gray-600);
+  }
+}
