@@ -49,6 +49,7 @@
 
 .doc-search form input::placeholder {
   font-style: italic;
+  color: var(--color-gray-800);
 }
 
 .doc-search form button {
@@ -198,8 +199,8 @@
 
 .doc-search .doc-search-results > li.doc-search-result a p:first-of-type {
   grid-area: title;
-  color: light-dark(var(--color-gray-900), var(--color-gray-100));
   font-weight: bold;
+  color: var(--color-gray-800);
 }
 
 .doc-search .doc-search-results > li.doc-search-result a p:last-of-type {
@@ -210,5 +211,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: light-dark(var(--color-gray-600), var(--color-gray-400));
+  color: var(--color-gray-600);
 }
 

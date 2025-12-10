@@ -66,8 +66,8 @@
 @media (prefers-color-scheme: dark) {
   .roi-calculator .upper-content h2 {
     text-shadow:
-      0 0 20px var(--shadow-color-90),
-      0 0 40px var(--shadow-color-80),
-      0 2px 4px var(--shadow-color-100);
+      0 0 8px var(--shadow-color-50),
+      0 0 16px var(--shadow-color-40),
+      0 2px 2px var(--shadow-color-60);
   }
 }
