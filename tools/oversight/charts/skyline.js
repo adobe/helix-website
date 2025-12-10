@@ -104,27 +104,38 @@ export default class SkylineChart extends AbstractChart {
                 // This case happens on initial chart load
                 return null;
               }
-              return getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
+              const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              // Brighter purples in dark mode with visible gradient
+              return isDark
+                ? getGradient(ctx, chartArea, cssVariable('--spectrum-purple-1100'), cssVariable('--spectrum-purple-700'))
+                : getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
             },
             data: [],
           },
           {
             label: 'Good LCP',
-            backgroundColor: cssVariable('--spectrum-green-600'),
+            // Darker greens in dark mode to match metric indicators
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-green-900')
+              : cssVariable('--spectrum-green-600'),
             data: [],
             yAxisID: 'lcp',
             borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement LCP',
-            backgroundColor: cssVariable('--spectrum-orange-600'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-orange-900')
+              : cssVariable('--spectrum-orange-600'),
             data: [],
             yAxisID: 'lcp',
             borderSkipped: true,
           },
           {
             label: 'Poor LCP',
-            backgroundColor: cssVariable('--spectrum-red-600'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-red-900')
+              : cssVariable('--spectrum-red-600'),
             data: [],
             yAxisID: 'lcp',
             borderSkipped: 'bottom',
@@ -137,22 +148,27 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Good CLS',
-            // slightly lighter green than #49cc93 which is the good LCP color
-            backgroundColor: cssVariable('--spectrum-green-500'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-green-800')
+              : cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement CLS',
-            backgroundColor: cssVariable('--spectrum-orange-500'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-orange-800')
+              : cssVariable('--spectrum-orange-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: true,
           },
           {
             label: 'Poor CLS',
-            backgroundColor: cssVariable('--spectrum-red-500'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-red-800')
+              : cssVariable('--spectrum-red-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: 'bottom',
@@ -165,22 +181,27 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Good INP',
-            // slightly lighter green than #49cc93 which is the good LCP color
-            backgroundColor: cssVariable('--spectrum-green-400'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-green-700')
+              : cssVariable('--spectrum-green-400'),
             data: [],
             yAxisID: 'inp',
             borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement INP',
-            backgroundColor: cssVariable('--spectrum-orange-400'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-orange-700')
+              : cssVariable('--spectrum-orange-400'),
             data: [],
             yAxisID: 'inp',
             borderSkipped: true,
           },
           {
             label: 'Poor INP',
-            backgroundColor: cssVariable('--spectrum-red-400'),
+            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? cssVariable('--spectrum-red-700')
+              : cssVariable('--spectrum-red-400'),
             data: [],
             yAxisID: 'inp',
             borderSkipped: 'bottom',
@@ -213,7 +234,9 @@ export default class SkylineChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? '#1e1e1e'
+              : 'white',
           },
           tooltip: {
             callbacks: {
@@ -280,6 +303,9 @@ export default class SkylineChart extends AbstractChart {
               minRotation: 90,
               maxRotation: 90,
               autoSkip: false,
+              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? '#b3b3b3'
+                : undefined,
             },
           },
           y: {
@@ -291,6 +317,9 @@ export default class SkylineChart extends AbstractChart {
             ticks: {
               autoSkip: false,
               maxTicksLimit: 16,
+              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? '#b3b3b3'
+                : undefined,
               callback: (value, index, arr) => {
                 if (value === 0) return '';
                 if (value > 0) {
@@ -304,7 +333,8 @@ export default class SkylineChart extends AbstractChart {
             },
             grid: {
               color: (context) => {
-                if (context.tick.value > 0) return 'rgba(0, 0, 0, 0.1)';
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (context.tick.value > 0) return isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
                 return 'rgba(0, 0, 0, 0.0)';
               },
             },

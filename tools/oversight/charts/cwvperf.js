@@ -130,7 +130,9 @@ export default class CWVPerfChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? '#1e1e1e'
+              : 'white',
           },
           tooltip: {
             intersect: false,
@@ -182,6 +184,9 @@ export default class CWVPerfChart extends AbstractChart {
               minRotation: 90,
               maxRotation: 90,
               autoSkip: false,
+              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? '#b3b3b3'
+                : undefined,
             },
           },
           y: {
