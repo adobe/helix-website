@@ -718,10 +718,6 @@ export default class SkylineChart extends AbstractChart {
       this.chart.data.datasets[0].backgroundColor = 'transparent';
       this.chart.data.datasets[0].label = 'Page Views (hidden)';
 
-      // Check if breakdown datasets already exist, if not create them
-      const existingBreakdownCount = this.chart.data.datasets
-        .filter((ds) => ds.breakdownDataset).length;
-
       // Helper to get border radius for stacked bars
       // First category (bottom): rounded bottom, Last category (top): rounded top
       const getBorderRadius = (catIndex, total) => {
@@ -743,39 +739,27 @@ export default class SkylineChart extends AbstractChart {
         };
       };
 
-      if (existingBreakdownCount === 0) {
-        // Insert breakdown datasets at the beginning (after hidden dataset 0)
-        // We need to insert them in reverse order to maintain stacking order
-        categories.slice().reverse().forEach((cat, i) => {
-          const colorIndex = categories.length - 1 - i;
-          const catIndex = categories.length - 1 - i;
-          this.chart.data.datasets.splice(1, 0, {
-            label: cat,
-            backgroundColor: colors[colorIndex],
-            data: [],
-            breakdownDataset: true, // marker to identify breakdown datasets
-            yAxisID: 'y',
-            borderRadius: getBorderRadius(catIndex, categories.length),
-            borderSkipped: false,
-            barPercentage: 1,
-            categoryPercentage: 0.9,
-          });
-        });
-      }
+      // Always remove all existing breakdown datasets before inserting new ones
+      // This handles cases where category count changes between different skyline parameters
+      this.chart.data.datasets = this.chart.data.datasets.filter((ds) => !ds.breakdownDataset);
 
-      // Update breakdown dataset data and border radius
-      let datasetIndex = 1;
-      categories.forEach((cat, catIndex) => {
-        const ds = this.chart.data.datasets[datasetIndex];
-        if (ds && ds.breakdownDataset) {
-          ds.data = breakdownData[cat];
-          ds.label = cat;
-          ds.borderRadius = getBorderRadius(catIndex, categories.length);
-          ds.borderSkipped = false;
-          ds.barPercentage = 1;
-          ds.categoryPercentage = 0.9;
-        }
-        datasetIndex += 1;
+      // Insert breakdown datasets at the beginning (after hidden dataset 0)
+      // We need to insert them in reverse order to maintain stacking order
+      categories.slice().reverse().forEach((cat) => {
+        // Use indexOf to ensure consistent color assignment for each category
+        const colorIndex = categories.indexOf(cat);
+        const catIndex = categories.indexOf(cat);
+        this.chart.data.datasets.splice(1, 0, {
+          label: cat,
+          backgroundColor: colors[colorIndex],
+          data: breakdownData[cat],
+          breakdownDataset: true, // marker to identify breakdown datasets
+          yAxisID: 'y',
+          borderRadius: getBorderRadius(catIndex, categories.length),
+          borderSkipped: false,
+          barPercentage: 1,
+          categoryPercentage: 0.9,
+        });
       });
     } else {
       // No breakdown - use original single dataset
