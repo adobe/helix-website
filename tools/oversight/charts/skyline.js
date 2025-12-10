@@ -673,6 +673,15 @@ export default class SkylineChart extends AbstractChart {
         breakdownData[cat] = [];
       });
 
+      // Helper to check if bundle qualifies as a page view (matching rum-distiller pageViews logic)
+      const isPageView = (bundle) => {
+        const isPrerender = bundle.events.find((evt) => evt.checkpoint === 'prerender');
+        const isPrerenderThenNavigate = bundle.events.find(
+          (evt) => evt.checkpoint === 'navigate' && evt.target === 'prerendered',
+        );
+        return !isPrerender || isPrerenderThenNavigate;
+      };
+
       // For each time slot, calculate pageviews per category
       chartLabels.forEach((timeSlot) => {
         const bundles = group[timeSlot] || [];
@@ -682,6 +691,9 @@ export default class SkylineChart extends AbstractChart {
         });
 
         bundles.forEach((bundle) => {
+          // Only count bundles that qualify as page views (skip prerender-only bundles)
+          if (!isPageView(bundle)) return;
+
           const category = extractValue(bundle);
           if (categories.includes(category)) {
             categoryTotals[category] += bundle.weight;
