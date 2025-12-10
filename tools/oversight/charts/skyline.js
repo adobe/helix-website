@@ -788,9 +788,10 @@ export default class SkylineChart extends AbstractChart {
     // Helper to set dataset data with error checking
     const setDatasetData = (label, data) => {
       const dataset = findDataset(label);
-      if (dataset) {
-        dataset.data = data;
+      if (!dataset) {
+        throw new Error(`Dataset with label "${label}" not found.`);
       }
+      dataset.data = data;
     };
 
     setDatasetData('Good LCP', iGoodLCPs);
