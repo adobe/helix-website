@@ -20,11 +20,13 @@ export default class NumberFormat extends HTMLElement {
 
   updateState() {
     const isPureNumber = !!this.textContent.trim().match(/^\d+(\.\d+)?$/);
-    const titleValue = parseFloat((this.getAttribute('title') || '').replace(/ .*/g, ''), 10);
+    // prefer data-value for the raw number, fall back to parsing title (without locale formatting)
+    const dataValue = parseFloat(this.getAttribute('data-value'), 10);
+    const titleValue = parseFloat((this.getAttribute('title') || '').replace(/,/g, '').replace(/ .*/g, ''), 10);
     const contentValue = parseFloat(this.textContent, 10);
     const number = isPureNumber
       ? contentValue
-      : titleValue || contentValue;
+      : dataValue || titleValue || contentValue;
 
     const sampleSize = parseInt(this.getAttribute('sample-size'), 10);
     const total = parseInt(this.getAttribute('total'), 10);
@@ -45,8 +47,9 @@ export default class NumberFormat extends HTMLElement {
       );
       this.replaceChildren(fv);
 
-      // set the title to the original number
-      this.title = number;
+      // store the raw number for future parsing, display formatted in title
+      this.setAttribute('data-value', number);
+      this.title = number.toLocaleString();
       if (!Number.isNaN(sampleSize)) {
         this.title = `${number.toLocaleString()} ±${samplingError(number, sampleSize).toLocaleString()}`;
       }
