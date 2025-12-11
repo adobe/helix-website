@@ -51,26 +51,19 @@ Flow: 1. Ask for owner/repo 2. Ask: ALL or SELECT? 3. If select, show numbered l
 After issues created, if remaining actions exist, ask "Log remaining issues?" If no, say goodbye.
 Rules: Be concise. Use numbered lists (not tables). Parse input flexibly.`;
 
-const TOOLS = [
-  {
-    name: 'create_issues',
-    description: 'Generate GitHub issue links',
-    input_schema: {
-      type: 'object',
-      properties: {
-        owner: { type: 'string' },
-        repo: { type: 'string' },
-        action_ids: { type: 'array', items: { type: 'number' } },
-      },
-      required: ['owner', 'repo', 'action_ids'],
+const TOOL = {
+  name: 'create_issues',
+  description: 'Generate GitHub issue links',
+  input_schema: {
+    type: 'object',
+    properties: {
+      owner: { type: 'string' },
+      repo: { type: 'string' },
+      action_ids: { type: 'array', items: { type: 'number' } },
     },
+    required: ['owner', 'repo', 'action_ids'],
   },
-  {
-    name: 'close_modal',
-    description: 'Close modal when user declines to log more issues',
-    input_schema: { type: 'object', properties: {} },
-  },
-];
+};
 
 class GitHubIssueAgent {
   constructor(actions, date, url) {
@@ -101,11 +94,13 @@ class GitHubIssueAgent {
     modal.classList.remove('github-confirm');
     modal.innerHTML = `<div class="github-chat-header">${GH}<span>GitHub Issue Agent</span><button class="github-chat-close">&times;</button></div>
       <div class="github-chat-messages"></div>
-      <div class="github-chat-input-area"><input type="text" class="github-chat-input" placeholder="Type here..." autocomplete="off"><button class="github-chat-send">${GH}</button></div>`;
+      <div class="github-chat-input-area"><input type="text" class="github-chat-input" placeholder="Type here..." autocomplete="off"><button class="github-chat-send">${GH}</button></div>
+      <div class="github-chat-footer"><button class="github-exit-btn">Exit</button></div>`;
 
     this.msgArea = modal.querySelector('.github-chat-messages');
     this.inp = modal.querySelector('.github-chat-input');
     modal.querySelector('.github-chat-close').onclick = this.close;
+    modal.querySelector('.github-exit-btn').onclick = this.close;
 
     const send = () => { const m = this.inp.value.trim(); if (m) { this.inp.value = ''; this.onUser(m); } };
     this.inp.addEventListener('keydown', (e) => e.key === 'Enter' && send());
@@ -136,14 +131,13 @@ class GitHubIssueAgent {
 
     try {
       const { content } = await callBedrockAPI({
-        system: SYSTEM, messages: this.msgs, tools: TOOLS, max_tokens: 1024,
+        system: SYSTEM, messages: this.msgs, tools: [TOOL], max_tokens: 1024,
       }, token);
       typing.remove();
       this.msgs.push({ role: 'assistant', content });
 
       const tool = content.find((c) => c.type === 'tool_use');
       if (tool?.name === 'create_issues') { await this.createIssues(tool); return; }
-      if (tool?.name === 'close_modal') { this.addMsg('Goodbye! 👋'); setTimeout(this.close, 1000); return; }
 
       const txt = content.find((c) => c.type === 'text');
       if (txt) this.addMsg(txt.text);
@@ -174,8 +168,6 @@ class GitHubIssueAgent {
       : `Created ${sel.length} issues. All done!`;
 
     this.msgs.push({ role: 'user', content: [{ type: 'tool_result', tool_use_id: tool.id, content: result }] });
-
-    if (!remaining.length) { setTimeout(this.close, 2000); return; }
     await this.callAI();
   }
 

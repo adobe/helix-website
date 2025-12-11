@@ -252,11 +252,10 @@ export default class DateRangePicker extends HTMLElement {
   }
 
   get value() {
-    return {
-      value: this.inputElement.dataset.value,
-      from: this.fromElement.value,
-      to: this.toElement.value,
-    };
+    const v = this.inputElement.dataset.value;
+    return v === 'custom'
+      ? { value: v, from: this.fromElement.value, to: this.toElement.value }
+      : { value: v };
   }
 
   set value(config) {

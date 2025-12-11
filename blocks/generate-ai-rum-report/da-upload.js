@@ -267,7 +267,8 @@ async function generateReportHTML(content, url, timestamp) {
 // ============================================================================
 
 /**
- * Upload analysis report to DA storage
+ * Upload analysis report to DA storage via Cloudflare Worker
+ * The worker handles OAuth server-to-server authentication securely
  * Date range is automatically included from current URL parameters
  * @param {string} content - Report content (HTML)
  * @param {Object} options
@@ -290,46 +291,51 @@ export async function uploadToDA(content, options = {}) {
     }
 
     const htmlContent = await generateReportHTML(content, url, timestamp);
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const formData = new FormData();
-    formData.append('data', blob);
-
     const filename = generateFilename();
     const folder = cleanUrlForFolder(url);
-    const fullpath = `${DA_CONFIG.BASE_URL}/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`;
+
+    // Path for DA storage (without base URL - worker handles that)
+    const daPath = `/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`;
 
     if (debug) {
-      console.log('[DA Upload] Target:', fullpath);
-      console.log('[DA Upload] Size:', blob.size, 'bytes');
+      console.log('[DA Upload] Target path:', daPath);
+      console.log('[DA Upload] Size:', htmlContent.length, 'bytes');
+      console.log('[DA Upload] Using CF Worker:', DA_CONFIG.WORKER_URL);
     }
 
-    const response = await fetch(fullpath, { method: 'POST', body: formData });
+    // Get RUM token for authentication
+    const rumToken = localStorage.getItem('rum-bundler-token')
+      || localStorage.getItem('rum-admin-token');
 
-    // DA API sometimes returns 500 status but with valid response data
-    // Try to parse response as JSON first
-    let responseData = null;
-    try {
-      const text = await response.text();
-      if (text) {
-        responseData = JSON.parse(text);
-      }
-    } catch (e) {
-      // Not JSON, ignore
+    if (!rumToken) {
+      throw new Error('No RUM token found. Please authenticate first.');
     }
 
-    // Check if response has valid data structure (even with 500 status)
-    // DA API returns 500 but includes source/aem URLs when upload succeeds
-    if (!response.ok && (!responseData || !responseData.source)) {
-      const errorMsg = responseData ? JSON.stringify(responseData) : '';
-      throw new Error(`Upload failed: ${response.status} ${response.statusText}${errorMsg ? `\n${errorMsg}` : ''}`);
+    // Upload via Cloudflare Worker (handles OAuth securely)
+    const response = await fetch(DA_CONFIG.WORKER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-RUM-Token': rumToken,
+      },
+      body: JSON.stringify({
+        html: htmlContent,
+        path: daPath,
+      }),
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok || !responseData.success) {
+      throw new Error(responseData.error || `Upload failed: ${response.status}`);
     }
 
     const result = {
       success: true,
-      path: fullpath,
+      path: `${DA_CONFIG.BASE_URL}${daPath}`,
       filename,
       folder,
-      responseData, // Include DA response for reference
+      responseData,
     };
 
     if (debug) console.log('[DA Upload] Success:', result);
@@ -373,49 +379,69 @@ function mapFolderItemsToReports(items, folder, domain = null) {
 }
 
 /**
- * Fetch reports from a specific folder
- * @param {string} listUrl - Base list URL
- * @param {string} folder - Folder name
+ * Fetch reports from a specific folder via CF Worker (public - no auth needed)
+ * @param {string} folderPath - Full folder path
+ * @param {string} folder - Folder name for mapping
  * @param {string} domain - Optional domain
  * @returns {Promise<Array>} Reports from folder
  */
-async function fetchReportsFromFolder(listUrl, folder, domain = null) {
-  const response = await fetch(`${listUrl}/${folder}`);
+async function fetchReportsFromFolder(folderPath, folder, domain = null) {
+  const response = await fetch(DA_CONFIG.WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'list',
+      path: folderPath,
+    }),
+  });
+
   if (!response.ok) return [];
-  const items = await response.json();
-  return mapFolderItemsToReports(items, folder, domain);
+  const data = await response.json();
+  if (!data.success || !data.items) return [];
+  return mapFolderItemsToReports(data.items, folder, domain);
 }
 
 /**
- * Fetch list of reports from DA storage
+ * Fetch list of reports from DA storage via CF Worker (public - no auth needed)
  * @param {string} domainFilter - Optional domain to filter reports by
  * @returns {Promise<Array>} List of report objects
  */
 export async function fetchReportsFromDA(domainFilter = null) {
   try {
-    const listUrl = `https://admin.da.live/list/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}`;
+    const basePath = `/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}`;
 
     // Fetch from specific domain folder
     if (domainFilter) {
       const folder = cleanUrlForFolder(domainFilter);
-      console.log(`[DA Upload] Fetching reports from folder: ${folder} (domain: ${domainFilter})`);
-      const reports = await fetchReportsFromFolder(listUrl, folder, domainFilter);
+      const folderPath = `${basePath}/${folder}`;
+      console.log(`[DA Upload] Fetching reports from: ${folderPath}`);
+      const reports = await fetchReportsFromFolder(folderPath, folder, domainFilter);
       console.log(`[DA Upload] Found ${reports.length} report(s) for domain: ${domainFilter}`);
       return reports.sort((a, b) => b.timestamp - a.timestamp);
     }
 
-    // Fetch from all folders (legacy behavior)
-    const response = await fetch(listUrl);
-    if (!response.ok) return [];
+    // Fetch all folders via worker (no auth needed for list)
+    const response = await fetch(DA_CONFIG.WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'list',
+        path: basePath,
+      }),
+    });
 
-    const folders = (await response.json())
+    if (!response.ok) return [];
+    const data = await response.json();
+    if (!data.success || !data.items) return [];
+
+    const folders = data.items
       .filter((item) => item.type === 'folder' || (!item.ext && item.name))
       .map((item) => item.name);
 
     if (!folders.length) return [];
 
     const reportsArrays = await Promise.all(
-      folders.map((folder) => fetchReportsFromFolder(listUrl, folder)),
+      folders.map((folder) => fetchReportsFromFolder(`${basePath}/${folder}`, folder)),
     );
 
     return reportsArrays.flat().sort((a, b) => b.timestamp - a.timestamp);

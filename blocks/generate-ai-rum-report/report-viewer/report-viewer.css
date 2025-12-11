@@ -179,48 +179,49 @@ facet-sidebar.report-view-active > form {
   font-variant-numeric: tabular-nums;
 }
 
-/* Floating "Back to Report" button - matches dashboard styling */
+/* Floating "Back to Report" button */
 .back-to-report-floating {
   position: fixed;
-  top: 80px;
-  right: 20px;
+  top: 150px;
+  right: 24px;
   z-index: 9999;
-  padding: 4px 10px;
-  color: black;
-  background: white;
-  border: 2px solid currentcolor;
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  color: white;
+  background: var(--dark-indigo, #3f51b5);
+  border: none;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 400;
-  white-space: nowrap;
-  opacity: 0.9;
-  transition: opacity 0.2s ease, background-color 0.3s ease;
-  animation: attention-pulse 3s ease-in-out infinite;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: gentle-glow 4s ease-in-out infinite;
 }
 
 .back-to-report-floating:hover {
-  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgb(63 81 181 / 50%);
   animation: none;
-  background: white;
 }
 
 .back-to-report-floating:active {
-  opacity: 0.9;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
 }
 
-@keyframes attention-pulse {
+@keyframes gentle-glow {
   0%,
   100% {
-    background: white;
-  }
-
-  40% {
-    background: #fffacd; /* light yellow */
+    box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+    transform: scale(1);
   }
 
   50% {
-    background: white;
+    box-shadow: 0 0 0 8px rgb(63 81 181 / 30%), 0 4px 20px rgb(63 81 181 / 50%);
+    transform: scale(1.03);
   }
 }
 

@@ -197,6 +197,29 @@
   background: var(--darker-indigo, #303f9f);
 }
 
+/* Footer with exit button */
+.github-chat-footer {
+  padding: 10px 14px;
+  text-align: center;
+  background: #f6f8fa;
+  border-top: 1px solid #d0d7de;
+}
+
+.github-exit-btn {
+  padding: 8px 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  background: white;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.github-exit-btn:hover {
+  background: #eaeef2;
+}
+
 /* Confirmation dialog */
 .github-confirm {
   height: auto;

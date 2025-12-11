@@ -30,16 +30,19 @@ export const BEDROCK_CONFIG = {
 
 export const DA_CONFIG = {
   // Organization name in DA
-  ORG: 'asthabh23',
+  ORG: 'adobe',
 
   // Repository name in DA
-  REPO: 'da-demo',
+  REPO: 'helix-optel',
 
   // Base URL for DA API
   BASE_URL: 'https://admin.da.live/source',
 
   // Upload path for reports (relative to repo root)
-  UPLOAD_PATH: 'drafts/optel-reports',
+  UPLOAD_PATH: 'optel-reports',
+
+  // Cloudflare Worker for authenticated DA access (handles OAuth)
+  WORKER_URL: 'https://optel-da-upload.adobeaem.workers.dev/',
 };
 
 // ============================================================================

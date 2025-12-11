@@ -5,6 +5,24 @@
 /* eslint-disable no-console */
 
 import { addLogIssuesButton } from '../github-issue-agent/github-issue-agent.js';
+import { DA_CONFIG } from '../config.js';
+
+/**
+ * Fetch report content via CF Worker (handles DA auth)
+ * @param {string} reportPath - Full DA source URL or path
+ * @returns {Promise<string>} HTML content
+ */
+async function fetchReportContent(reportPath) {
+  const path = reportPath.includes('/source') ? reportPath.split('/source')[1] : reportPath;
+  const res = await fetch(DA_CONFIG.WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'read', path }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.error || `HTTP ${res.status}`);
+  return data.content;
+}
 
 // Load report viewer CSS
 if (!document.querySelector('link[href*="report-viewer.css"]')) {
@@ -75,8 +93,8 @@ const addBackToReportButton = () => {
 
   const btn = Object.assign(document.createElement('button'), {
     className: 'back-to-report-floating',
-    title: 'Return to AI Report',
-    innerHTML: '↩ Back to Report',
+    title: 'Back to Report',
+    innerHTML: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
     onclick: async () => {
       sessionStorage.removeItem('optel-detective-source-report');
       sessionStorage.removeItem('optel-detective-source-report-path');
@@ -400,8 +418,7 @@ export async function showReportInline(reportPath, reportDate) {
   toggleView(true);
   viewer.innerHTML = '<div class="report-loading"><p>Loading report...</p></div>';
 
-  fetch(reportPath, { cache: 'no-store' })
-    .then((res) => (res.ok ? res.text() : Promise.reject(new Error(`HTTP ${res.status}`))))
+  fetchReportContent(reportPath)
     .then((html) => {
       // Extract date range from report meta tags
       const parser = new DOMParser();

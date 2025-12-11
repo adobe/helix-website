@@ -70,6 +70,17 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>This enables readers to click findings and navigate directly to the relevant dashboard view with correct filters</li>
 </ul>
 
+<p><b>⚠️ CRITICAL: Only Link to VERIFIED Facet Data</b></p>
+<ul>
+  <li><b>DO NOT create facet links unless the data exists as a selectable checkbox in the sidebar</b></li>
+  <li>Before adding a facet link, verify the value appears in the tool results with actual counts</li>
+  <li>If a facet/value combination doesn't have a corresponding checkbox, the link will be broken</li>
+  <li>Example of INVALID link: <code>checkpoint=enter&amp;enter.source=https://www.google.com/</code> — if this doesn't appear as a checkbox in sidebar, DON'T link it</li>
+  <li><b>Test:</b> Would clicking this link check a box in the facet sidebar? If NO, don't create the link.</li>
+  <li>It's better to mention data WITHOUT a facet link than to create a broken/misleading link</li>
+  <li>Only wrap text in facet spans when you're CERTAIN the facet value exists in the sidebar data</li>
+</ul>
+
 <p><b>⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:</b></p>
 <ul>
   <li>You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)</li>

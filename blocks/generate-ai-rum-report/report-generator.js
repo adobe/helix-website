@@ -41,42 +41,55 @@ const REPORT_STEPS = [
 ];
 
 /**
- * Ensure metrics=super parameter is in URL and reload dashboard data
- * @returns {Promise<boolean>} True if parameter was just added
+ * Ensure date params and metrics=super are in URL, then reload dashboard
+ * @returns {Promise<boolean>} True if URL was updated
  */
 async function ensureMetricsParameter() {
-  const currentUrl = new URL(window.location);
+  const url = new URL(window.location);
+  let updated = false;
 
-  if (!currentUrl.searchParams.has(METRICS_URL_PARAM)
-      || currentUrl.searchParams.get(METRICS_URL_PARAM) !== METRICS_URL_VALUE) {
-    currentUrl.searchParams.set(METRICS_URL_PARAM, METRICS_URL_VALUE);
-    window.history.replaceState({}, '', currentUrl);
-    console.log('[OpTel Detective Report] Added metrics=super to URL');
+  // Add dates if missing
+  if (!url.searchParams.has('startDate') || !url.searchParams.has('endDate')) {
+    const view = url.searchParams.get('view') || 'week';
+    const end = url.searchParams.get('endDate') ? new Date(url.searchParams.get('endDate')) : new Date();
+    const start = new Date(end);
+    if (view === 'month') start.setDate(end.getDate() - 31);
+    else if (view === 'year') start.setMonth(end.getMonth() - 12);
+    else start.setDate(end.getDate() - 7);
 
-    // Reload dashboard data in background using global draw function
-    if (typeof window.slicerDraw === 'function') {
-      try {
-        await window.slicerDraw();
-        console.log('[OpTel Detective Report] Dashboard reloaded with all checkpoints');
-
-        // Clear facet cache to ensure fresh extraction after reload
-        resetCachedFacetTools();
-        console.log('[OpTel Detective Report] Cleared facet cache for fresh extraction');
-
-        await new Promise((resolve) => {
-          setTimeout(resolve, 500);
-        });
-        return true;
-      } catch (error) {
-        console.error('[OpTel Detective Report] Error reloading dashboard:', error);
-        return false;
-      }
-    }
-
-    console.warn('[OpTel Detective Report] Dashboard draw function not available');
-    return false;
+    const fmt = (d) => d.toISOString().split('T')[0];
+    url.searchParams.set('startDate', fmt(start));
+    url.searchParams.set('endDate', fmt(end));
+    console.log(`[OpTel Detective Report] Added date range: ${fmt(start)} to ${fmt(end)}`);
+    updated = true;
   }
 
+  // Add metrics=super if missing
+  if (url.searchParams.get(METRICS_URL_PARAM) !== METRICS_URL_VALUE) {
+    url.searchParams.set(METRICS_URL_PARAM, METRICS_URL_VALUE);
+    console.log('[OpTel Detective Report] Added metrics=super to URL');
+    updated = true;
+  }
+
+  if (!updated) return false;
+
+  // Update URL and reload dashboard
+  window.history.replaceState({}, '', url);
+
+  if (typeof window.slicerDraw === 'function') {
+    try {
+      await window.slicerDraw();
+      console.log('[OpTel Detective Report] Dashboard reloaded');
+      resetCachedFacetTools();
+      await new Promise((resolve) => { setTimeout(resolve, 500); });
+      return true;
+    } catch (e) {
+      console.error('[OpTel Detective Report] Error reloading dashboard:', e);
+      return false;
+    }
+  }
+
+  console.warn('[OpTel Detective Report] Dashboard draw function not available');
   return false;
 }
 
