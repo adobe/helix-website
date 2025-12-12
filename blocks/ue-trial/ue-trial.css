@@ -794,7 +794,7 @@
   }
 }
 
-/* Dark mode overrides for form labels */
+/* Dark mode overrides */
 @media (prefers-color-scheme: dark) {
   .ue-trial label {
     color: var(--color-gray-700);
@@ -802,5 +802,20 @@
 
   .ue-trial .help-text {
     color: var(--color-gray-600);
+  }
+
+  /* trial-info panel */
+  .ue-trial .trial-info {
+    background-color: #2c2c2c;
+  }
+
+  .ue-trial .trial-info > div > div:nth-child(2) h3,
+  .ue-trial .trial-info > div > div:nth-child(2) h4,
+  .ue-trial .trial-info > div > div:nth-child(2) p {
+    color: var(--spectrum-gray-100);
+  }
+
+  .ue-trial .trial-info > div > div:nth-child(2) li {
+    color: var(--spectrum-gray-200);
   }
 }
