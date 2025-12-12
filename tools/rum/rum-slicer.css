@@ -959,6 +959,11 @@ img.facet-thumbnail {
     border-bottom-color: var(--spectrum-gray-600);
   }
 
+  /* url-selector input */
+  main .title url-selector input {
+    color: var(--spectrum-gray-100);
+  }
+
   /* daterange-picker */
   daterange-picker {
     color: var(--spectrum-gray-100);
