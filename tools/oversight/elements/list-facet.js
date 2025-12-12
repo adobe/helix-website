@@ -489,6 +489,11 @@ export default class ListFacet extends HTMLElement {
       }
 
       li.append(nf, meter);
+
+      // add stddev for a given metric
+      if (rate === 'timeOnPage') {
+        li.dataset.stddev = entry.metrics[rate].stddev;
+      }
     };
     // fill the element, but don't wait for it
     window.setTimeout(fillEl, 0);
