@@ -4,6 +4,11 @@ export default class AbstractChart {
     this.dataChunks = dataChunks;
     this.elems = elems;
     this.chart = {};
+
+    // Listen for color scheme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      this.updateColorScheme();
+    });
   }
 
   set config(config) {
@@ -20,5 +25,15 @@ export default class AbstractChart {
 
   async draw() {
     throw new Error('draw method must be implemented', this);
+  }
+
+  /**
+   * Update chart colors when color scheme changes.
+   * Override in subclasses to update specific chart colors.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  updateColorScheme() {
+    // Default implementation does nothing
+    // Subclasses should override to update their specific colors
   }
 }

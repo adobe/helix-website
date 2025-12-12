@@ -209,4 +209,26 @@ export default class BarChart extends AbstractChart {
       },
     });
   }
+
+  /**
+   * Update chart colors when color scheme changes
+   */
+  updateColorScheme() {
+    if (!this.chart || !this.chart.options) return;
+
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Update canvas background color
+    this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';
+
+    // Update axis tick colors
+    const tickColor = isDark ? '#b3b3b3' : undefined;
+    this.chart.options.scales.x.ticks.color = tickColor;
+    this.chart.options.scales.y.ticks.color = tickColor;
+
+    // Update grid color
+    this.chart.options.scales.x.grid.color = isDark ? 'rgba(255, 255, 255, 0.15)' : undefined;
+
+    this.chart.update();
+  }
 }

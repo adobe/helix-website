@@ -370,4 +370,21 @@ export default class CWVPerfChart extends AbstractChart {
 
     this.chart.update();
   }
+
+  /**
+   * Update chart colors when color scheme changes
+   */
+  updateColorScheme() {
+    if (!this.chart || !this.chart.options) return;
+
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Update canvas background color
+    this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';
+
+    // Update axis tick colors
+    this.chart.options.scales.x.ticks.color = isDark ? '#b3b3b3' : undefined;
+
+    this.chart.update();
+  }
 }

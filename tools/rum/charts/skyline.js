@@ -653,4 +653,77 @@ export default class SkylineChart extends AbstractChart {
 
     this.chart.update();
   }
+
+  /**
+   * Update chart colors when color scheme changes
+   */
+  updateColorScheme() {
+    if (!this.chart || !this.chart.options) return;
+
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Update canvas background color
+    this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';
+
+    // Update axis tick colors
+    const tickColor = isDark ? '#b3b3b3' : undefined;
+    this.chart.options.scales.x.ticks.color = tickColor;
+    this.chart.options.scales.y.ticks.color = tickColor;
+
+    // Update dataset colors
+    const { datasets } = this.chart.data;
+    datasets.forEach((dataset) => {
+      switch (dataset.label) {
+        case 'Good LCP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-green-900')
+            : cssVariable('--spectrum-green-600');
+          break;
+        case 'Needs Improvement LCP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-orange-900')
+            : cssVariable('--spectrum-orange-600');
+          break;
+        case 'Poor LCP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-red-900')
+            : cssVariable('--spectrum-red-600');
+          break;
+        case 'Good CLS':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-green-800')
+            : cssVariable('--spectrum-green-500');
+          break;
+        case 'Needs Improvement CLS':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-orange-800')
+            : cssVariable('--spectrum-orange-500');
+          break;
+        case 'Poor CLS':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-red-800')
+            : cssVariable('--spectrum-red-500');
+          break;
+        case 'Good INP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-green-700')
+            : cssVariable('--spectrum-green-400');
+          break;
+        case 'Needs Improvement INP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-orange-700')
+            : cssVariable('--spectrum-orange-400');
+          break;
+        case 'Poor INP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-red-700')
+            : cssVariable('--spectrum-red-400');
+          break;
+        default:
+          break;
+      }
+    });
+
+    this.chart.update();
+  }
 }
