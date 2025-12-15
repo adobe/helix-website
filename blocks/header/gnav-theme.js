@@ -107,7 +107,7 @@ function getNextTheme(current) {
  * @param {HTMLElement} button - The button element to initialize
  */
 export default function initThemeToggle(button) {
-  // Get initial theme and apply it
+  // Get initial theme
   let currentTheme = getStoredTheme();
   applyTheme(currentTheme);
   updateButton(button, currentTheme);
@@ -119,10 +119,4 @@ export default function initThemeToggle(button) {
     storeTheme(currentTheme);
     updateButton(button, currentTheme);
   });
-}
-
-// Apply stored theme immediately on script load to prevent flash
-const storedTheme = getStoredTheme();
-if (storedTheme !== 'system') {
-  applyTheme(storedTheme);
 }
