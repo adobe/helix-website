@@ -9,12 +9,17 @@ const THEMES = ['system', 'light', 'dark'];
 // Cache for loaded SVG icons
 const iconsCache = {};
 
-// TODO: Move these labels to /placeholders.json sheet for i18n support
-// Keys: themeSystem, themeLight, themeDark
 const LABELS = {
   system: 'Theme: System (click for Light)',
   light: 'Theme: Light (click for Dark)',
   dark: 'Theme: Dark (click for System)',
+};
+
+// Shorter tooltips for desktop users
+const TITLES = {
+  system: 'System theme',
+  light: 'Light theme',
+  dark: 'Dark theme',
 };
 
 /**
@@ -84,7 +89,7 @@ function applyTheme(theme) {
 }
 
 /**
- * Update the toggle button's icon and aria-label
+ * Update the toggle button's icon, aria-label, and title
  * @param {HTMLElement} button - The toggle button element
  * @param {string} theme - Current theme
  */
@@ -92,6 +97,7 @@ async function updateButton(button, theme) {
   const svg = await fetchIcon(theme);
   button.innerHTML = svg;
   button.setAttribute('aria-label', LABELS[theme]);
+  button.setAttribute('title', TITLES[theme]);
 }
 
 /**
