@@ -1548,8 +1548,18 @@ use .link-underline-effect for normal case */
   );
 }
 
-/* effect 2 dark theme: richer tones for better contrast with white text */
+/* dark theme: richer tones for better contrast with white text */
 @media (prefers-color-scheme: dark) {
+  .link-highlight-colorful-effect {
+    /* stylelint-disable-next-line declaration-colon-newline-after */
+    background-image: linear-gradient(
+      90deg,
+      rgb(80 82 160 / 70%) 0%,
+      rgb(120 100 140 / 70%) 50%,
+      rgb(140 80 130 / 70%) 100%
+    );
+  }
+
   .link-highlight-colorful-effect-2 {
     /* stylelint-disable-next-line declaration-colon-newline-after */
     background-image: linear-gradient(
@@ -1559,6 +1569,27 @@ use .link-underline-effect for normal case */
       rgb(130 170 60 / 85%) 100%
     );
   }
+}
+
+/* manual theme toggle dark mode support */
+html[data-theme="dark"] .link-highlight-colorful-effect {
+  /* stylelint-disable-next-line declaration-colon-newline-after */
+  background-image: linear-gradient(
+    90deg,
+    rgb(80 82 160 / 70%) 0%,
+    rgb(120 100 140 / 70%) 50%,
+    rgb(140 80 130 / 70%) 100%
+  );
+}
+
+html[data-theme="dark"] .link-highlight-colorful-effect-2 {
+  /* stylelint-disable-next-line declaration-colon-newline-after */
+  background-image: linear-gradient(
+    90deg,
+    rgb(180 100 160 / 80%) 0%,
+    rgb(190 150 60 / 85%) 50%,
+    rgb(130 170 60 / 85%) 100%
+  );
 }
 
 /* can add `.link-highlight-colorful-effect-hover-wrapper` to trigger hover child highlight effect */
