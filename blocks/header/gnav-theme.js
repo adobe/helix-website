@@ -8,11 +8,24 @@ const THEMES = ['system', 'light', 'dark'];
 
 // SVG Icons for each theme state
 const ICONS = {
+  // Sun/moon combo split diagonally - sun top-left, moon bottom-right
   system: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M4 5h16v11H4V5zm18-2H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h7v2H6v2h12v-2h-3v-2h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z"/>
+    <defs>
+      <clipPath id="sun-clip"><path d="M0 0h24L0 24z"/></clipPath>
+      <clipPath id="moon-clip"><path d="M24 0v24L0 24z"/></clipPath>
+    </defs>
+    <g clip-path="url(#sun-clip)">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 5V3M12 21v-2M5 12H3m18 0h-2M6.3 6.3 4.9 4.9m12.8 12.8 1.4 1.4M6.3 17.7l-1.4 1.4M17.7 6.3l1.4-1.4"/>
+      <path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5V3M12 21v-2M5 12H3m18 0h-2M6.3 6.3 4.9 4.9m12.8 12.8 1.4 1.4M6.3 17.7l-1.4 1.4M17.7 6.3l1.4-1.4"/>
+    </g>
+    <g clip-path="url(#moon-clip)">
+      <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+    </g>
   </svg>`,
   light: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1zM3 11a1 1 0 1 1 0 2H1a1 1 0 1 1 0-2h2zm18 0h2a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2zM5.64 4.22a1 1 0 0 1 1.42 1.42L5.64 7.06a1 1 0 0 1-1.42-1.42l1.42-1.42zm12.02 12.02a1 1 0 0 1 1.42 1.42l-1.42 1.42a1 1 0 1 1-1.42-1.42l1.42-1.42zM4.22 18.36a1 1 0 0 1 1.42-1.42l1.42 1.42a1 1 0 1 1-1.42 1.42l-1.42-1.42zm12.02-12.02a1 1 0 0 1 1.42-1.42l1.42 1.42a1 1 0 1 1-1.42 1.42l-1.42-1.42z"/>
+    <circle cx="12" cy="12" r="4"/>
+    <path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5V3M12 21v-2M5 12H3m18 0h-2M6.3 6.3 4.9 4.9m12.8 12.8 1.4 1.4M6.3 17.7l-1.4 1.4M17.7 6.3l1.4-1.4"/>
   </svg>`,
   dark: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
