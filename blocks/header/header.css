@@ -544,12 +544,14 @@ button.gnav-toggle::after {
 .gnav-theme-toggle svg {
   width: 20px;
   height: 20px;
-  fill: var(--color-gray-800);
-  transition: fill 130ms ease-in-out;
+  fill: currentColor;
+  stroke: currentColor;
+  color: var(--color-gray-800);
+  transition: color 130ms ease-in-out;
 }
 
 .gnav-theme-toggle:hover svg {
-  fill: var(--color-info-accent);
+  color: var(--color-info-accent);
 }
 
 /* stylelint-enable no-descending-specificity */
