@@ -812,17 +812,18 @@ button.gnav-toggle::after {
   /* redesign styles */
   .franklin .gnav {
     grid-template-columns: auto 1fr auto auto auto auto;
-    grid-template-areas: "brand navlist navlist theme profile cta";
+    grid-template-areas: "brand navlist navlist profile cta theme";
   }
 
   .franklin .gnav-theme-toggle {
     display: flex;
     grid-area: theme;
-    padding: 0 16px;
+    padding: 0 12px;
     height: 100%;
     border-top: none;
     width: auto;
     justify-content: center;
+    margin-left: auto;
   }
 
   .franklin .gnav-search {
