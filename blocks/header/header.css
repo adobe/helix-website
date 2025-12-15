@@ -554,6 +554,12 @@ button.gnav-toggle::after {
   color: var(--color-info-accent);
 }
 
+.gnav-theme-toggle:focus,
+.gnav-theme-toggle:focus-visible {
+  outline: 2px solid var(--color-info-accent);
+  outline-offset: 2px;
+}
+
 /* stylelint-enable no-descending-specificity */
 
 .gnav-search-field .gnav-search-input {
