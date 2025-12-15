@@ -548,7 +548,7 @@ button.gnav-toggle::after {
   padding: 16px 12px;
   height: auto;
   border-top: 1px solid var(--border-color-light);
-  width: 100%;
+  width: fit-content;
   justify-content: flex-start;
 }
 
@@ -566,10 +566,14 @@ button.gnav-toggle::after {
   color: var(--color-info-accent);
 }
 
-.gnav-theme-toggle:focus,
+/* Only show focus outline for keyboard navigation, not mouse clicks */
 .gnav-theme-toggle:focus-visible {
   outline: 2px solid var(--color-info-accent);
   outline-offset: 2px;
+}
+
+.gnav-theme-toggle:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* stylelint-enable no-descending-specificity */
