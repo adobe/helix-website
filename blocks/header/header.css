@@ -528,6 +528,57 @@ button.gnav-toggle::after {
   display: none;
 }
 
+/* Theme toggle button */
+.gnav-theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 16px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Show theme toggle in mobile menu when open */
+.gnav.is-open .gnav-theme-toggle {
+  display: flex;
+  grid-area: navlist;
+  place-self: end;
+  padding: 16px 12px;
+  height: auto;
+  width: fit-content;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+}
+
+/* stylelint-disable no-descending-specificity */
+.gnav-theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: currentcolor;
+  stroke: currentcolor;
+  color: var(--color-gray-800);
+  transition: color 130ms ease-in-out;
+}
+
+.gnav-theme-toggle:hover svg {
+  color: var(--color-info-accent);
+}
+
+/* Only show focus outline for keyboard navigation, not mouse clicks */
+.gnav-theme-toggle:focus-visible {
+  outline: 2px solid var(--color-info-accent);
+  outline-offset: 2px;
+}
+
+.gnav-theme-toggle:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* stylelint-enable no-descending-specificity */
+
 .gnav-search-field .gnav-search-input {
   display: block;
   width: 100%;
@@ -760,8 +811,19 @@ button.gnav-toggle::after {
 
   /* redesign styles */
   .franklin .gnav {
-    grid-template-columns: auto 1fr auto auto auto;
-    grid-template-areas: "brand navlist navlist profile cta";
+    grid-template-columns: auto 1fr auto auto auto auto;
+    grid-template-areas: "brand navlist navlist profile cta theme";
+  }
+
+  .franklin .gnav-theme-toggle {
+    display: flex;
+    grid-area: theme;
+    padding: 0 24px;
+    height: 100%;
+    border-top: none;
+    width: auto;
+    justify-content: center;
+    margin-left: auto;
   }
 
   .franklin .gnav-search {
@@ -921,3 +983,4 @@ button.gnav-toggle::after {
     max-width: 1440px;
   }
 }
+
