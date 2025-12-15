@@ -15,11 +15,11 @@ const LABELS = {
   dark: 'Theme: Dark (click for System)',
 };
 
-// Shorter tooltips for desktop users
+// Tooltips describing what happens on click
 const TITLES = {
-  system: 'System theme',
-  light: 'Light theme',
-  dark: 'Dark theme',
+  system: 'Switch to light theme',
+  light: 'Switch to dark theme',
+  dark: 'Switch to system theme',
 };
 
 /**
