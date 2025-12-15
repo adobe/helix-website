@@ -544,12 +544,13 @@ button.gnav-toggle::after {
 .gnav.is-open .gnav-theme-toggle {
   display: flex;
   grid-area: navlist;
-  justify-self: start;
+  place-self: end;
   padding: 16px 12px;
   height: auto;
-  border-top: 1px solid var(--border-color-light);
   width: fit-content;
-  justify-content: flex-start;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
 }
 
 /* stylelint-disable no-descending-specificity */
