@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
   <defs>
-    <clipPath id="left-half"><rect x="0" y="0" width="12" height="24"/></clipPath>
-    <clipPath id="right-half"><rect x="12" y="0" width="12" height="24"/></clipPath>
+    <clipPath id="left-half"><rect x="0" y="0" width="11" height="24"/></clipPath>
+    <clipPath id="right-half"><rect x="13" y="0" width="11" height="24"/></clipPath>
   </defs>
   <g clip-path="url(#left-half)" transform="translate(-3, 0)">
     <circle cx="12" cy="12" r="4"/>
