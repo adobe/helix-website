@@ -533,11 +533,23 @@ button.gnav-toggle::after {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0 8px;
-  display: flex;
+  padding: 0 16px;
+  display: none;
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+
+/* Show theme toggle in mobile menu when open */
+.gnav.is-open .gnav-theme-toggle {
+  display: flex;
+  grid-area: navlist;
+  justify-self: start;
+  padding: 16px 12px;
+  height: auto;
+  border-top: 1px solid var(--border-color-light);
+  width: 100%;
+  justify-content: flex-start;
 }
 
 /* stylelint-disable no-descending-specificity */
@@ -794,8 +806,18 @@ button.gnav-toggle::after {
 
   /* redesign styles */
   .franklin .gnav {
-    grid-template-columns: auto 1fr auto auto auto;
-    grid-template-areas: "brand navlist navlist profile cta";
+    grid-template-columns: auto 1fr auto auto auto auto;
+    grid-template-areas: "brand navlist navlist theme profile cta";
+  }
+
+  .franklin .gnav-theme-toggle {
+    display: flex;
+    grid-area: theme;
+    padding: 0 16px;
+    height: 100%;
+    border-top: none;
+    width: auto;
+    justify-content: center;
   }
 
   .franklin .gnav-search {
