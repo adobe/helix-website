@@ -61,7 +61,6 @@ class Gnav {
     // Theme toggle button
     const themeToggle = createTag('button', {
       class: 'gnav-theme-toggle',
-      'aria-label': 'Toggle theme',
     });
     initThemeToggle(themeToggle);
     nav.append(themeToggle);
