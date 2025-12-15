@@ -9,6 +9,8 @@ const THEMES = ['system', 'light', 'dark'];
 // Cache for loaded SVG icons
 const iconsCache = {};
 
+// TODO: Move these labels to /placeholders.json sheet for i18n support
+// Keys: themeSystem, themeLight, themeDark
 const LABELS = {
   system: 'Theme: System (click for Light)',
   light: 'Theme: Light (click for Dark)',
