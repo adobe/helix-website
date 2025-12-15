@@ -33,9 +33,9 @@ const ICONS = {
 };
 
 const LABELS = {
-  system: 'Using system theme. Click for light mode.',
-  light: 'Using light mode. Click for dark mode.',
-  dark: 'Using dark mode. Click for system theme.',
+  system: 'Theme: System (click for Light)',
+  light: 'Theme: Light (click for Dark)',
+  dark: 'Theme: Dark (click for System)',
 };
 
 /**
