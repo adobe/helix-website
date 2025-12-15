@@ -271,6 +271,15 @@
   --circular-1-clip-path-full: circle(120% at 0 50%);
 }
 
+/* Theme override selectors - for manual theme toggle */
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
 @media (width >= 600px) {
   :root {
     /* breadcrumb */

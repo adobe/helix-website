@@ -3,6 +3,7 @@ import { cleanVariations } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';
 import { changeTag, returnLinkTarget } from '../../utils/helpers.js';
+import initThemeToggle from './gnav-theme.js';
 
 const ICON_ROOT = '/img';
 const BRAND_LOGO = '<img loading="lazy" alt="Adobe" width="27" height="27" src="/blocks/header/adobe-franklin-logo.svg">';
@@ -56,6 +57,14 @@ class Gnav {
     if (ctaButtonWrapper) {
       nav.append(ctaButtonWrapper);
     }
+
+    // Theme toggle button
+    const themeToggle = createTag('button', {
+      class: 'gnav-theme-toggle',
+      'aria-label': 'Toggle theme',
+    });
+    initThemeToggle(themeToggle);
+    nav.append(themeToggle);
 
     // TODO: kept this for now as unsure about its purpose
     // tbc implement this in redesign if confirmed as neeede

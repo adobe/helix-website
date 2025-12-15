@@ -528,6 +528,32 @@ button.gnav-toggle::after {
   display: none;
 }
 
+/* Theme toggle button */
+.gnav-theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* stylelint-disable no-descending-specificity */
+.gnav-theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--color-gray-800);
+  transition: fill 130ms ease-in-out;
+}
+
+.gnav-theme-toggle:hover svg {
+  fill: var(--color-info-accent);
+}
+
+/* stylelint-enable no-descending-specificity */
+
 .gnav-search-field .gnav-search-input {
   display: block;
   width: 100%;
@@ -921,3 +947,4 @@ button.gnav-toggle::after {
     max-width: 1440px;
   }
 }
+
