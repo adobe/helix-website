@@ -54,6 +54,16 @@
     main.error .error-number text {
       font-family: monospace;
     }
+
+    main.error .button-container {
+      padding-top: var(--spacing-s);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      main.error .error-number text {
+        fill: var(--color-black);
+      }
+    }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
 </head>
