@@ -78,7 +78,9 @@ export async function fetchSourceDataHTML(index) {
     // parse the html and return array of sections
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    const sections = [...doc.querySelectorAll('h3')].map((h3) => h3.parentElement) || [];
+    // Only search for h3 within main content, excluding header/footer
+    const main = doc.querySelector('main') || doc;
+    const sections = [...main.querySelectorAll('h3')].map((h3) => h3.parentElement) || [];
     window.docs.push(...sections);
     const image = doc.querySelector('meta[property="og:image"]')?.content || '';
     window.faqImage = image;
@@ -261,7 +263,7 @@ function hideResults(container) {
 }
 
 function getIdFromSectionMetadata(section) {
-  const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)').textContent;
+  const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)')?.textContent;
   return sectionId;
 }
 
