@@ -26,19 +26,17 @@
 }
 
 /* Dark theme: darker red for better contrast */
-@media (prefers-color-scheme: dark) {
-  .deprecation {
-    background-color: #7f1d1d;
-    color: var(--color-gray-900);
-  }
-  
-  .deprecation > div > div > p,
-  .deprecation a:any-link,
-  .deprecation code {
-    color: var(--color-gray-900);
-  }
+html[data-theme="dark"] .deprecation {
+  background-color: #7f1d1d;
+  color: var(--color-gray-900);
+}
 
-  .deprecation code {
-    background-color: rgb(255 255 255 / 25%);
-  }
+html[data-theme="dark"] .deprecation > div > div > p,
+html[data-theme="dark"] .deprecation a:any-link,
+html[data-theme="dark"] .deprecation code {
+  color: var(--color-gray-900);
+}
+
+html[data-theme="dark"] .deprecation code {
+  background-color: rgb(255 255 255 / 25%);
 }

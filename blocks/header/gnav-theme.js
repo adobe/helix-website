@@ -5,6 +5,9 @@
 
 const STORAGE_KEY = 'aem-theme-preference';
 const THEMES = ['system', 'light', 'dark'];
+const colorSchemeMedia = window.matchMedia
+  ? window.matchMedia('(prefers-color-scheme: dark)')
+  : null;
 
 // Cache for loaded SVG icons
 const iconsCache = {};
@@ -80,12 +83,19 @@ function storeTheme(theme) {
  * Apply theme to the document
  * @param {string} theme - 'system', 'light', or 'dark'
  */
-function applyTheme(theme) {
+function resolveTheme(theme) {
   if (theme === 'system') {
-    document.documentElement.removeAttribute('data-theme');
-  } else {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (colorSchemeMedia) {
+      return colorSchemeMedia.matches ? 'dark' : 'light';
+    }
+    return 'light';
   }
+  return theme;
+}
+
+function applyTheme(theme) {
+  const resolved = resolveTheme(theme);
+  document.documentElement.setAttribute('data-theme', resolved);
 }
 
 /**
@@ -123,6 +133,19 @@ export default async function initThemeToggle(button) {
   await Promise.all(THEMES.map((theme) => fetchIcon(theme)));
 
   await updateButton(button, currentTheme);
+
+  if (colorSchemeMedia) {
+    const handleSystemChange = () => {
+      if (currentTheme === 'system') {
+        applyTheme(currentTheme);
+      }
+    };
+    if (colorSchemeMedia.addEventListener) {
+      colorSchemeMedia.addEventListener('change', handleSystemChange);
+    } else if (colorSchemeMedia.addListener) {
+      colorSchemeMedia.addListener(handleSystemChange);
+    }
+  }
 
   // Handle click to cycle themes
   button.addEventListener('click', async () => {

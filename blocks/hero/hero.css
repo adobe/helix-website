@@ -66,15 +66,13 @@
   text-shadow: 0 2px 12px var(--shadow-color-50);
 }
 
-@media (prefers-color-scheme: dark) {
-  .hero.colorful-bg .inner-content h3.icon-eyebrow {
-    text-shadow: none;
-    color: var(--color-brand-deep-blue);
-  }
-}
-
 .inner-content h3.icon-eyebrow {
   padding-bottom: 0;
+}
+
+html[data-theme="dark"] .hero.colorful-bg .inner-content h3.icon-eyebrow {
+  text-shadow: none;
+  color: var(--color-brand-deep-blue);
 }
 
 .inner-content h1 {
@@ -84,17 +82,15 @@
   text-shadow: 0 2px 16px var(--shadow-color-60);
 }
 
-@media (prefers-color-scheme: dark) {
-  .inner-content h1 {
-    text-shadow:
-      0 0 8px var(--shadow-color-50),
-      0 0 16px var(--shadow-color-40),
-      0 2px 2px var(--shadow-color-60);
-  }
-}
-
 .inner-content > h1:last-of-type {
   margin-bottom: var(--spacing-s);
+}
+
+html[data-theme="dark"] .inner-content h1 {
+  text-shadow:
+    0 0 8px var(--shadow-color-50),
+    0 0 16px var(--shadow-color-40),
+    0 2px 2px var(--shadow-color-60);
 }
 
 .inner-content p {
@@ -107,15 +103,13 @@
   text-shadow: 0 2px 12px var(--shadow-color-50);
 }
 
-@media (prefers-color-scheme: dark) {
-  .inner-content p {
-    text-shadow: none;
-    color: var(--color-gray-300);
-  }
-}
-
 .inner-content strong {
   background: var(--color-accent-highlight-yellow);
+}
+
+html[data-theme="dark"] .inner-content p {
+  text-shadow: none;
+  color: var(--color-gray-300);
 }
 
 .inner-content a.button:any-link {
