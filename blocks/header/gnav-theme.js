@@ -134,19 +134,6 @@ export default async function initThemeToggle(button) {
 
   await updateButton(button, currentTheme);
 
-  if (colorSchemeMedia) {
-    const handleSystemChange = () => {
-      if (currentTheme === 'system') {
-        applyTheme(currentTheme);
-      }
-    };
-    if (colorSchemeMedia.addEventListener) {
-      colorSchemeMedia.addEventListener('change', handleSystemChange);
-    } else if (colorSchemeMedia.addListener) {
-      colorSchemeMedia.addListener(handleSystemChange);
-    }
-  }
-
   // Handle click to cycle themes
   button.addEventListener('click', async () => {
     currentTheme = getNextTheme(currentTheme);
