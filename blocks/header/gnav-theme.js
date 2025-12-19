@@ -3,11 +3,9 @@
  * Cycles through: System → Light → Dark → System
  */
 
-const STORAGE_KEY = 'aem-theme-preference';
+import { applyTheme, getStoredTheme, storeTheme } from '../../scripts/scripts.js';
+
 const THEMES = ['system', 'light', 'dark'];
-const colorSchemeMedia = window.matchMedia
-  ? window.matchMedia('(prefers-color-scheme: dark)')
-  : null;
 
 // Cache for loaded SVG icons
 const iconsCache = {};
@@ -45,57 +43,6 @@ async function fetchIcon(theme) {
     // Fetch failed, return empty
   }
   return '';
-}
-
-/**
- * Get the current theme preference from localStorage
- * @returns {string} 'system', 'light', or 'dark'
- */
-function getStoredTheme() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && THEMES.includes(stored)) {
-      return stored;
-    }
-  } catch (e) {
-    // localStorage not available
-  }
-  return 'system';
-}
-
-/**
- * Save theme preference to localStorage
- * @param {string} theme - 'system', 'light', or 'dark'
- */
-function storeTheme(theme) {
-  try {
-    if (theme === 'system') {
-      localStorage.removeItem(STORAGE_KEY);
-    } else {
-      localStorage.setItem(STORAGE_KEY, theme);
-    }
-  } catch (e) {
-    // localStorage not available
-  }
-}
-
-/**
- * Apply theme to the document
- * @param {string} theme - 'system', 'light', or 'dark'
- */
-function resolveTheme(theme) {
-  if (theme === 'system') {
-    if (colorSchemeMedia) {
-      return colorSchemeMedia.matches ? 'dark' : 'light';
-    }
-    return 'light';
-  }
-  return theme;
-}
-
-function applyTheme(theme) {
-  const resolved = resolveTheme(theme);
-  document.documentElement.setAttribute('data-theme', resolved);
 }
 
 /**
