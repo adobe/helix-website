@@ -163,7 +163,7 @@ main .key-metrics ul {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-gap: 8px;
+  gap: 8px;
   padding-left: 0;
 }
 
@@ -689,7 +689,7 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-gap: 4px;
+  gap: 4px;
   padding-left: 0;
   margin: 4px 2px;
 }
@@ -699,7 +699,7 @@ fieldset div:first-of-type li:nth-of-type(8)::before {
   grid-template-areas: "check lab" " - cwv";
   grid-template-columns: 20px 1fr;
   align-items: center;
-  grid-gap: 0 16px;
+  gap: 0 16px;
 }
 
 #facets fieldset div ~ div.more-container:last-of-type,
@@ -833,7 +833,7 @@ vitals-facet fieldset label {
   display: grid;
   grid-template-areas: "check lab";
   grid-template-columns: 0 1fr;
-  grid-gap: 0;
+  gap: 0;
 }
 
 #facets vitals-facet fieldset label {
@@ -1211,7 +1211,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   }
 
   main .key-metrics ul {
-    grid-gap: 16px;
+    gap: 16px;
   }
 
   main .key-metrics ul > * {
@@ -1227,7 +1227,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 
   #facets ul.cwv {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    grid-gap: 8px;
+    gap: 8px;
     margin: 8px 4px;
   }
 
@@ -1281,26 +1281,20 @@ footer.footer-wrapper.appear {
 }
 
 /* dark mode */
-@media (prefers-color-scheme: dark) {
-  /* key metrics boxes - use subtle gray, not stark black */
-  .key-metrics > ul > * {
-    background-color: #2c2c2c;
-  }
+html[data-theme="dark"] .key-metrics > ul > * {
+  background-color: #2c2c2c;
+}
 
-  /* quick filter input */
-  .quick-filter input {
-    background-color: #2c2c2c;
-    color: var(--spectrum-gray-100);
-    border-bottom-color: var(--spectrum-gray-600);
-  }
+html[data-theme="dark"] .quick-filter input {
+  background-color: #2c2c2c;
+  color: var(--spectrum-gray-100);
+  border-bottom-color: var(--spectrum-gray-600);
+}
 
-  /* url-selector input */
-  main .title url-selector input {
-    color: var(--spectrum-gray-100);
-  }
+html[data-theme="dark"] main .title url-selector input {
+  color: var(--spectrum-gray-100);
+}
 
-  /* daterange-picker */
-  daterange-picker {
-    color: var(--spectrum-gray-100);
-  }
+html[data-theme="dark"] daterange-picker {
+  color: var(--spectrum-gray-100);
 }

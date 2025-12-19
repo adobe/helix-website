@@ -5,9 +5,12 @@ export default class AbstractChart {
     this.elems = elems;
     this.chart = {};
 
-    // Listen for color scheme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const themeObserver = new MutationObserver(() => {
       this.updateColorScheme();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
     });
   }
 
