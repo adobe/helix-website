@@ -547,9 +547,7 @@
 }
 
 /* Dark mode icon filters (can't use light-dark() for filter property) */
-@media (prefers-color-scheme: dark) {
-  .side-navigation .icon,
-  .side-navigation-overlay-btn-wrapper button .icon {
-    filter: invert(1);
-  }
+html[data-theme="dark"] .side-navigation .icon,
+html[data-theme="dark"] .side-navigation-overlay-btn-wrapper button .icon {
+  filter: invert(1);
 }

@@ -18,6 +18,7 @@ import {
   simpleCWVInterpolationFn,
   INTERPOLATION_THRESHOLD,
   purpleShades,
+  isDarkTheme,
 } from '../utils.js';
 
 const {
@@ -105,7 +106,7 @@ export default class SkylineChart extends AbstractChart {
                 // This case happens on initial chart load
                 return null;
               }
-              const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              const isDark = isDarkTheme();
               // Brighter purples in dark mode with visible gradient
               return isDark
                 ? getGradient(ctx, chartArea, cssVariable('--spectrum-purple-1100'), cssVariable('--spectrum-purple-700'))
@@ -116,7 +117,7 @@ export default class SkylineChart extends AbstractChart {
           {
             label: 'Good LCP',
             // Darker greens in dark mode to match metric indicators
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-green-900')
               : cssVariable('--spectrum-green-600'),
             data: [],
@@ -125,7 +126,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Needs Improvement LCP',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-orange-900')
               : cssVariable('--spectrum-orange-600'),
             data: [],
@@ -134,7 +135,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Poor LCP',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-red-900')
               : cssVariable('--spectrum-red-600'),
             data: [],
@@ -149,7 +150,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Good CLS',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-green-800')
               : cssVariable('--spectrum-green-500'),
             data: [],
@@ -158,7 +159,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Needs Improvement CLS',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-orange-800')
               : cssVariable('--spectrum-orange-500'),
             data: [],
@@ -167,7 +168,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Poor CLS',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-red-800')
               : cssVariable('--spectrum-red-500'),
             data: [],
@@ -182,7 +183,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Good INP',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-green-700')
               : cssVariable('--spectrum-green-400'),
             data: [],
@@ -191,7 +192,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Needs Improvement INP',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-orange-700')
               : cssVariable('--spectrum-orange-400'),
             data: [],
@@ -200,7 +201,7 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Poor INP',
-            backgroundColor: window.matchMedia('(prefers-color-scheme: dark)').matches
+            backgroundColor: isDarkTheme()
               ? cssVariable('--spectrum-red-700')
               : cssVariable('--spectrum-red-400'),
             data: [],
@@ -235,7 +236,7 @@ export default class SkylineChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: window.matchMedia('(prefers-color-scheme: dark)').matches
+            color: isDarkTheme()
               ? '#1e1e1e'
               : 'white',
           },
@@ -310,7 +311,7 @@ export default class SkylineChart extends AbstractChart {
               minRotation: 90,
               maxRotation: 90,
               autoSkip: false,
-              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              color: isDarkTheme()
                 ? '#b3b3b3'
                 : undefined,
             },
@@ -324,7 +325,7 @@ export default class SkylineChart extends AbstractChart {
             ticks: {
               autoSkip: false,
               maxTicksLimit: 16,
-              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              color: isDarkTheme()
                 ? '#b3b3b3'
                 : undefined,
               callback: (value, index, arr) => {
@@ -340,7 +341,7 @@ export default class SkylineChart extends AbstractChart {
             },
             grid: {
               color: (context) => {
-                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = isDarkTheme();
                 if (context.tick.value > 0) return isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
                 return 'rgba(0, 0, 0, 0.0)';
               },
@@ -831,7 +832,7 @@ export default class SkylineChart extends AbstractChart {
   updateColorScheme() {
     if (!this.chart || !this.chart.options) return;
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = isDarkTheme();
 
     // Update canvas background color
     this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';

@@ -53,6 +53,48 @@ window.hlx.plugins.add('time-decorator', {
 
 // -------------  Custom functions ------------- //
 
+const THEME_STORAGE_KEY = 'aem-theme-preference';
+const THEME_VALUES = ['system', 'light', 'dark'];
+
+export function getStoredTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored && THEME_VALUES.includes(stored)) {
+      return stored;
+    }
+  } catch (e) {
+    // localStorage not available
+  }
+  return 'system';
+}
+
+export function storeTheme(theme) {
+  try {
+    if (theme === 'system') {
+      localStorage.removeItem(THEME_STORAGE_KEY);
+    } else {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    }
+  } catch (e) {
+    // localStorage not available
+  }
+}
+
+export function resolveTheme(theme) {
+  if (theme === 'system') {
+    const prefersDark = window.matchMedia
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : false;
+    return prefersDark ? 'dark' : 'light';
+  }
+  return theme;
+}
+
+export function applyTheme(theme) {
+  const resolved = resolveTheme(theme);
+  document.documentElement.setAttribute('data-theme', resolved);
+}
+
 /* set language in html tag for improving SEO accessibility */
 export function setLanguageForAccessibility(lang = 'en') {
   document.documentElement.lang = lang;
@@ -306,6 +348,7 @@ export function customDecorateTemplateAndTheme() {
       element.classList.add(toClassName(c.trim()));
     });
   };
+  applyTheme(getStoredTheme());
   const template = getMetadata('template');
   if (template) addClasses(document.body, `${template.toLowerCase()}-template`);
   const theme = getMetadata('theme');

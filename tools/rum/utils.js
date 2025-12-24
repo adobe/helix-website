@@ -111,6 +111,16 @@ export function cssVariable(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name);
 }
 
+export function isDarkTheme() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  if (theme) {
+    return theme === 'dark';
+  }
+  return window.matchMedia
+    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+    : false;
+}
+
 let gradient;
 let width;
 let height;

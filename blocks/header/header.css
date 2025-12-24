@@ -368,14 +368,12 @@ button.gnav-toggle::after {
   transform: rotate(-180deg);
 }
 
-@media (prefers-color-scheme: dark) {
-  .gnav-navitem.has-menu > a::after {
-    filter: invert(1);
-  }
-}
-
 .gnav-navitem.has-menu.is-open > a::after {
   transform: rotate(0deg);
+}
+
+html[data-theme="dark"] .gnav-navitem.has-menu > a::after {
+  filter: invert(1);
 }
 
 .gnav-navitem.has-menu.is-open {
@@ -983,4 +981,3 @@ button.gnav-toggle::after {
     max-width: 1440px;
   }
 }
-

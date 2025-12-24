@@ -276,7 +276,7 @@ html[data-theme="light"] {
   color-scheme: light;
 }
 
-html[data-theme="dark"] {
+:where(html[data-theme="dark"]) {
   color-scheme: dark;
 }
 
@@ -745,6 +745,7 @@ a.button.primary-cta:any-link:active {
   border-color: var(--color-info-accent-down);
 }
 
+/* stylelint-disable no-descending-specificity */
 a.button.primary:any-link {
   color: #fff;
   background-color: #1473e6;
@@ -793,51 +794,50 @@ a.button.primary:any-link:active {
   border-color: #095aba;
 }
 
-@media (prefers-color-scheme: dark) {
-  a.button.primary:any-link {
-    color: #fff;
-    background-color: #0d66d0;
-    border-color: #0d66d0;
-  }
-
-  a.button.primary:focus,
-  a.button.primary.reverse:focus {
-    background-color: #095aba;
-    border-color: #095aba;
-  }
-
-  a.button.primary:any-link:hover {
-    background-color: #095aba;
-    border-color: #095aba;
-  }
-
-  a.button.primary:any-link:active {
-    background-color: #074a8e;
-    border-color: #074a8e;
-  }
-
-  .redesign a.button.primary:any-link {
-    color: #fff;
-    background-color: #0d66d0;
-    border-color: #0d66d0;
-  }
-
-  .redesign a.button.primary:focus,
-  .redesign a.button.primary.reverse:focus {
-    background-color: #095aba;
-    border-color: #095aba;
-  }
-
-  .redesign a.button.primary:any-link:hover {
-    background-color: #095aba;
-    border-color: #095aba;
-  }
-
-  .redesign a.button.primary:any-link:active {
-    background-color: #074a8e;
-    border-color: #074a8e;
-  }
+:where(html[data-theme="dark"]) a.button.primary:any-link {
+  color: #fff;
+  background-color: #0d66d0;
+  border-color: #0d66d0;
 }
+
+:where(html[data-theme="dark"]) a.button.primary:focus,
+:where(html[data-theme="dark"]) a.button.primary.reverse:focus {
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+:where(html[data-theme="dark"]) a.button.primary:any-link:hover {
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+:where(html[data-theme="dark"]) a.button.primary:any-link:active {
+  background-color: #074a8e;
+  border-color: #074a8e;
+}
+
+:where(html[data-theme="dark"]) .redesign a.button.primary:any-link {
+  color: #fff;
+  background-color: #0d66d0;
+  border-color: #0d66d0;
+}
+
+:where(html[data-theme="dark"]) .redesign a.button.primary:focus,
+:where(html[data-theme="dark"]) .redesign a.button.primary.reverse:focus {
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+:where(html[data-theme="dark"]) .redesign a.button.primary:any-link:hover {
+  background-color: #095aba;
+  border-color: #095aba;
+}
+
+:where(html[data-theme="dark"]) .redesign a.button.primary:any-link:active {
+  background-color: #074a8e;
+  border-color: #074a8e;
+}
+/* stylelint-enable no-descending-specificity */
 
 a.button.secondary:any-link {
   color: var(--color-black);
@@ -1029,13 +1029,11 @@ main .form .button:hover::before {
     );
 }
 
-@media (prefers-color-scheme: dark) {
-  .hero.colorful-bg a.button.black-border:any-link {
-    --color-black: #000;
-    --color-white: #fff;
+:where(html[data-theme="dark"]) .hero.colorful-bg a.button.black-border:any-link {
+  --color-black: #000;
+  --color-white: #fff;
 
-    font-weight: 700;
-  }
+  font-weight: 700;
 }
 
 /* larger size */
@@ -1445,10 +1443,8 @@ body.no-header-template {
   background-color: var(--color-black);
 }
 
-@media (prefers-color-scheme: dark) {
-  .colored-tag.black {
-    background-color: var(--color-gray-200);
-  }
+:where(html[data-theme="dark"]) .colored-tag.black {
+  background-color: var(--color-gray-200);
 }
 
 .colored-tag-description {
@@ -1549,30 +1545,7 @@ use .link-underline-effect for normal case */
 }
 
 /* dark theme: richer tones for better contrast with white text */
-@media (prefers-color-scheme: dark) {
-  .link-highlight-colorful-effect {
-    /* stylelint-disable-next-line declaration-colon-newline-after */
-    background-image: linear-gradient(
-      90deg,
-      rgb(80 82 160 / 70%) 0%,
-      rgb(120 100 140 / 70%) 50%,
-      rgb(140 80 130 / 70%) 100%
-    );
-  }
-
-  .link-highlight-colorful-effect-2 {
-    /* stylelint-disable-next-line declaration-colon-newline-after */
-    background-image: linear-gradient(
-      90deg,
-      rgb(180 100 160 / 80%) 0%,
-      rgb(190 150 60 / 85%) 50%,
-      rgb(130 170 60 / 85%) 100%
-    );
-  }
-}
-
-/* manual theme toggle dark mode support */
-html[data-theme="dark"] .link-highlight-colorful-effect {
+:where(html[data-theme="dark"]) .link-highlight-colorful-effect {
   /* stylelint-disable-next-line declaration-colon-newline-after */
   background-image: linear-gradient(
     90deg,
@@ -1582,7 +1555,7 @@ html[data-theme="dark"] .link-highlight-colorful-effect {
   );
 }
 
-html[data-theme="dark"] .link-highlight-colorful-effect-2 {
+:where(html[data-theme="dark"]) .link-highlight-colorful-effect-2 {
   /* stylelint-disable-next-line declaration-colon-newline-after */
   background-image: linear-gradient(
     90deg,

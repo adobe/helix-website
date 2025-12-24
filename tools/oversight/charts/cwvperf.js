@@ -13,6 +13,7 @@ import {
   cssVariable,
   cwvInterpolationFn,
   INTERPOLATION_THRESHOLD,
+  isDarkTheme,
 } from '../utils.js';
 
 const {
@@ -130,7 +131,7 @@ export default class CWVPerfChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: window.matchMedia('(prefers-color-scheme: dark)').matches
+            color: isDarkTheme()
               ? '#1e1e1e'
               : 'white',
           },
@@ -184,7 +185,7 @@ export default class CWVPerfChart extends AbstractChart {
               minRotation: 90,
               maxRotation: 90,
               autoSkip: false,
-              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              color: isDarkTheme()
                 ? '#b3b3b3'
                 : undefined,
             },
@@ -377,7 +378,7 @@ export default class CWVPerfChart extends AbstractChart {
   updateColorScheme() {
     if (!this.chart || !this.chart.options) return;
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = isDarkTheme();
 
     // Update canvas background color
     this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';

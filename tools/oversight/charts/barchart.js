@@ -5,7 +5,7 @@ import {
 import { utils } from '@adobe/rum-distiller';
 import AbstractChart from './chart.js';
 import {
-  toHumanReadable, cssVariable, cwvInterpolationFn,
+  toHumanReadable, cssVariable, cwvInterpolationFn, isDarkTheme,
 } from '../utils.js';
 
 const { scoreBundle } = utils;
@@ -154,7 +154,7 @@ export default class BarChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: window.matchMedia('(prefers-color-scheme: dark)').matches
+            color: isDarkTheme()
               ? '#1e1e1e'
               : 'white',
           },
@@ -184,12 +184,12 @@ export default class BarChart extends AbstractChart {
             stacked: true,
             ticks: {
               callback: (value) => toHumanReadable(value),
-              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              color: isDarkTheme()
                 ? '#b3b3b3'
                 : undefined,
             },
             grid: {
-              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              color: isDarkTheme()
                 ? 'rgba(255, 255, 255, 0.15)'
                 : undefined,
             },
@@ -200,7 +200,7 @@ export default class BarChart extends AbstractChart {
               display: false,
             },
             ticks: {
-              color: window.matchMedia('(prefers-color-scheme: dark)').matches
+              color: isDarkTheme()
                 ? '#b3b3b3'
                 : undefined,
             },
@@ -216,7 +216,7 @@ export default class BarChart extends AbstractChart {
   updateColorScheme() {
     if (!this.chart || !this.chart.options) return;
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = isDarkTheme();
 
     // Update canvas background color
     this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';
