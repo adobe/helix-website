@@ -2,8 +2,6 @@
  * API Factory - AWS Bedrock Integration
  */
 
-/* eslint-disable no-console */
-
 import { callBedrockAPI, hasBedrockToken, getBedrockToken } from './bedrock-api.js';
 
 export function getApiProvider() {
@@ -15,8 +13,6 @@ export async function callAI(params) {
   if (!hasBedrockToken()) {
     throw new Error('AWS Bedrock token not found. Please configure your token in the settings.');
   }
-
-  console.log('[API Factory] Using: AWS Bedrock');
   return callBedrockAPI(params, getBedrockToken());
 }
 

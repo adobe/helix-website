@@ -1,10 +1,10 @@
 // Import OpTel Detective Report modal functionality
 // eslint-disable-next-line import/no-unresolved, import/no-relative-packages
-import { openReportModal } from '../../../blocks/generate-ai-rum-report/generate-ai-rum-report.js';
+import { openReportModal } from '../../../blocks/ai-optel-report-generator/ai-optel-report-generator.js';
 
 // Import Saved Reports functionality
 // eslint-disable-next-line import/no-unresolved, import/no-relative-packages
-import { initializeSavedReports } from '../../../blocks/generate-ai-rum-report/report-actions.js';
+import { initializeSavedReports } from '../../../blocks/ai-optel-report-generator/report-actions.js';
 
 export default class FacetSidebar extends HTMLElement {
   constructor() {
@@ -58,7 +58,7 @@ export default class FacetSidebar extends HTMLElement {
 
     // Create OpTel Detective Report button
     const generateReportButton = document.createElement('button');
-    generateReportButton.className = 'generate-ai-rum-report-button';
+    generateReportButton.className = 'ai-optel-report-generator-button';
     generateReportButton.title = 'Use Claude to generate OpTel Detective Report';
 
     // Create icon element
@@ -93,7 +93,7 @@ export default class FacetSidebar extends HTMLElement {
     });
     generateReportButton.addEventListener('click', () => {
       // Load the stylesheet dynamically
-      FacetSidebar.loadStylesheet('generate-ai-rum-report-styles', '/blocks/generate-ai-rum-report/generate-ai-rum-report.css');
+      FacetSidebar.loadStylesheet('ai-optel-report-generator-styles', '/blocks/ai-optel-report-generator/ai-optel-report-generator.css');
       // Open the modal
       openReportModal();
     });

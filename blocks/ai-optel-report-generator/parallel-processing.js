@@ -202,6 +202,9 @@ async function processBatch(
           try {
             const result = await toolHandler(toolCall.name, toolCall.input || {}, true);
             console.log(`[${toolName}] ✓ Tool executed:`, result.success ? `${result.totalItems || 0} items` : result.message);
+            if (result.success && result.data) {
+              console.log(`[${toolName}] Tool response data:`, result.data);
+            }
             return {
               type: 'tool_result',
               tool_use_id: toolCall.id,

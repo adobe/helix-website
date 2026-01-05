@@ -4,7 +4,6 @@
 
 /* eslint-disable no-console */
 
-import { addLogIssuesButton } from '../github-issue-agent/github-issue-agent.js';
 import { DA_CONFIG } from '../config.js';
 
 /**
@@ -28,7 +27,7 @@ async function fetchReportContent(reportPath) {
 if (!document.querySelector('link[href*="report-viewer.css"]')) {
   const css = document.createElement('link');
   css.rel = 'stylesheet';
-  css.href = '/blocks/generate-ai-rum-report/report-viewer/report-viewer.css';
+  css.href = '/blocks/ai-optel-report-generator/report-viewer/report-viewer.css';
   document.head.appendChild(css);
 }
 
@@ -317,13 +316,6 @@ const renderReport = (container, htmlContent, reportPath) => {
 
   // Format numbers for better visual distinction
   formatNumbers(container);
-
-  // Add GitHub issue buttons to priority actions
-  const reportDate = new URLSearchParams(window.location.search).get('report') || '';
-  const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
-  const analyzedUrlMeta = doc.querySelector('meta[name="report-analyzed-url"]');
-  const analyzedUrl = analyzedUrlMeta?.content || window.location.origin;
-  addLogIssuesButton(container, reportDate, analyzedUrl);
 
   // New reports have real <a> links baked in from DA upload - no processing needed
   const facetLinks = container.querySelectorAll('a.facet-link');
