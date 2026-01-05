@@ -169,11 +169,20 @@ export async function callBedrockAPI(params, bedrockToken) {
       };
     }
 
-    // Handle rate limits (429)
     // eslint-disable-next-line no-await-in-loop
     const errorText = await response.text();
+
+    // Handle authentication errors (401/403) - don't retry, fail immediately
+    if (response.status === 401 || response.status === 403) {
+      const authError = new Error('Invalid or expired AWS Bedrock token. Please enter valid token to generate the report.');
+      authError.isAuthError = true;
+      authError.statusCode = response.status;
+      throw authError;
+    }
+
     lastError = `Bedrock API error: ${response.status} ${errorText}`;
 
+    // Handle rate limits (429)
     if (response.status === 429 && attempt < maxRetries - 1) {
       const waitTime = (2 ** attempt) * 1000; // Exponential backoff: 1s, 2s, 4s
       console.warn(`[Bedrock] Rate limit hit, retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})`);

@@ -257,6 +257,11 @@ async function processBatch(
       success: true,
     };
   } catch (error) {
+    // Re-throw authentication errors to stop processing immediately
+    if (error.isAuthError) {
+      throw error;
+    }
+
     console.error(`[${toolName}] ✗ Error:`, error.message);
 
     return {
@@ -323,6 +328,10 @@ Provide comprehensive analysis with specific details and actionable insights.`;
 
     return null;
   } catch (error) {
+    // Re-throw authentication errors to stop processing immediately
+    if (error.isAuthError) {
+      throw error;
+    }
     console.error('[Follow-up] Error:', error.message);
     return null;
   }

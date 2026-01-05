@@ -116,12 +116,12 @@ function showReportResults(modalBody, reportContent) {
 
 /**
  * Handle generation error
- * @param {HTMLElement} modalBody
- * @param {HTMLElement} progressContainer
- * @param {HTMLElement} statusDiv
- * @param {HTMLElement} button
- * @param {string} originalText
- * @param {Error} error
+ * @param {HTMLElement} modalBody - Modal body element
+ * @param {HTMLElement} progressContainer - Progress indicator container
+ * @param {HTMLElement} statusDiv - Status message element
+ * @param {HTMLElement} button - Generate button
+ * @param {string} originalText - Original button text
+ * @param {Error} error - The error that occurred
  */
 function handleGenerationError(
   modalBody,
@@ -131,15 +131,29 @@ function handleGenerationError(
   originalText,
   error,
 ) {
-  // Clean up progress indicator
-  progressContainer?.parentNode?.removeChild(progressContainer);
-
-  // Show form again
+  progressContainer?.remove();
   toggleFormVisibility(modalBody, true);
 
-  // Show error status
-  showStatus(statusDiv, 'error', `❌ Error: ${error.message}`);
-  updateButtonState(button, false, originalText);
+  const isAuth = error.isAuthError;
+  if (isAuth) {
+    // Clear invalid token and re-enable input
+    localStorage.removeItem('awsBedrockToken');
+    const tokenInput = modalBody.querySelector('#report-bedrock-token');
+    if (tokenInput) {
+      Object.assign(tokenInput, { disabled: false, value: '' });
+      tokenInput.style.borderColor = '#ff4444';
+      tokenInput.focus();
+    }
+    // Hide the info box since it's no longer relevant
+    const infoBox = modalBody.querySelector('.report-info');
+    if (infoBox) {
+      infoBox.style.display = 'none';
+    }
+  }
+
+  const msg = isAuth ? error.message : `Error: ${error.message}`;
+  showStatus(statusDiv, 'error', `${msg}`);
+  updateButtonState(button, false, isAuth ? 'Save Token & Generate' : originalText);
 }
 
 /**
