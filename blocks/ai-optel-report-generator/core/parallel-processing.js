@@ -5,7 +5,7 @@
 
 /* eslint-disable no-console */
 
-import { API_CONFIG } from './config.js';
+import { API_CONFIG } from '../config.js';
 
 // ============================================================================
 // CONSTANTS
@@ -166,7 +166,7 @@ async function processBatch(
     };
 
     // Use API Factory (AWS Bedrock)
-    const { callAI } = await import('./api/api-factory.js');
+    const { callAI } = await import('../api/api-factory.js');
     const data = await callAI(request);
 
     if (!data?.content?.length) {
@@ -312,7 +312,7 @@ Provide comprehensive analysis with specific details and actionable insights.`;
     };
 
     // Use API Factory (AWS Bedrock)
-    const { callAI } = await import('./api/api-factory.js');
+    const { callAI } = await import('../api/api-factory.js');
     const data = await callAI(request);
 
     if (!data.content?.length) return null;

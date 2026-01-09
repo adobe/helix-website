@@ -1,30 +1,23 @@
-/* CSS Variables from rum-slicer.css */
+/* CSS Variables */
 :root {
-  /* Colors */
   --color-text-primary: #333;
   --color-text-secondary: #666;
   --color-border: #ccc;
   --color-bg-light: #eee;
   --color-bg-lighter: #fafafa;
   --color-overlay: rgb(68 68 68 / 70%);
-  
-  /* Button colors */
-  --color-btn-primary: #49cc93; /* --medium-green */
-  --color-btn-primary-hover: #00653e; /* --dark-green */
+  --color-btn-primary: #49cc93;
+  --color-btn-primary-hover: #00653e;
   --color-btn-disabled: #ccc;
-  
-  /* Status colors */
   --color-success-bg: #adf4ce;
   --color-success-text: #00653e;
   --color-success-border: #49cc93;
   --color-error-bg: #ffddd6;
   --color-error-text: #b40000;
   --color-error-border: #ff7c65;
-  --color-warning-bg: #ffdfad;
-  --color-warning-text: #cb5d00;
-  --color-warning-border: #ffa037;
-  
-  /* Spacing */
+  --color-warning-bg: #fff8e6;
+  --color-warning-text: #8a6d3b;
+  --color-warning-border: #f5a623;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
@@ -32,13 +25,9 @@
   --spacing-xl: 20px;
   --spacing-2xl: 24px;
   --spacing-3xl: 30px;
-  
-  /* Border radius */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  
-  /* Transitions */
   --transition-base: all 0.2s;
 }
 
@@ -115,6 +104,13 @@
   color: var(--color-text-primary);
 }
 
+/* Disable close button during report generation */
+.report-modal:has(#circular-progress-container) .report-modal-close {
+  pointer-events: none;
+  opacity: 0.3;
+  cursor: default;
+}
+
 /* Modal Body */
 .report-modal-body {
   padding: var(--spacing-2xl);
@@ -133,7 +129,7 @@
   color: var(--color-text-primary);
 }
 
-/* Quick filter style input (matches rum-slicer.css) */
+/* Quick filter input */
 .report-quick-filter {
   padding: var(--spacing-md) 0 var(--spacing-sm);
   display: flex;
@@ -142,10 +138,10 @@
 .report-quick-filter input {
   width: 100%;
   border: none;
-  border-bottom: 2px solid #ccc;
+  border-bottom: 2px solid var(--color-border);
   border-radius: 0;
   padding: var(--spacing-md);
-  background-color: #eee;
+  background-color: var(--color-bg-light);
   font-size: 14px;
   font-family: inherit;
   transition: border-color 0.2s;
@@ -215,6 +211,17 @@
   margin: 0;
 }
 
+.report-info.warning {
+  background-color: var(--color-warning-bg);
+  border-left: 3px solid var(--color-warning-border);
+  color: var(--color-warning-text);
+}
+
+.report-info .provider-text {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
 .report-status {
   border-radius: var(--radius-sm);
   font-size: 14px;
@@ -230,12 +237,6 @@
   background-color: var(--color-error-bg);
   color: var(--color-error-text);
   border: 1px solid var(--color-error-border);
-}
-
-.report-status.loading {
-  background-color: var(--color-warning-bg);
-  color: var(--color-warning-text);
-  border: 1px solid var(--color-warning-border);
 }
 
 /* Circular Progress Bar */
@@ -272,7 +273,7 @@
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.5s ease;
-  filter: drop-shadow(0 2px 4px rgb(73 204 147 / 30%)); /* --medium-green with opacity */
+  filter: drop-shadow(0 2px 4px rgb(73 204 147 / 30%));
 }
 
 .circular-progress-text {
@@ -335,13 +336,6 @@
   margin-bottom: var(--spacing-md);
 }
 
-.report-file-label {
-  margin: 0;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-
 .report-meta {
   text-align: center;
   padding: 0 var(--spacing-lg);
@@ -377,29 +371,8 @@
   transition: var(--transition-base);
 }
 
-.report-action-btn.secondary {
-  background: var(--color-bg-light);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-}
-
-.report-action-btn.secondary:hover {
-  background: var(--color-border);
-}
-
 .report-action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
 }
-
-/* Animations */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.circular-progress.animating svg {
-  animation: spin 2s linear infinite;
-}
-

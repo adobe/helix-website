@@ -4,7 +4,7 @@ import { openReportModal } from '../../../blocks/ai-optel-report-generator/ai-op
 
 // Import Saved Reports functionality
 // eslint-disable-next-line import/no-unresolved, import/no-relative-packages
-import { initializeSavedReports } from '../../../blocks/ai-optel-report-generator/report-actions.js';
+import { initializeSavedReports } from '../../../blocks/ai-optel-report-generator/reports/report-actions.js';
 
 export default class FacetSidebar extends HTMLElement {
   constructor() {
@@ -59,7 +59,7 @@ export default class FacetSidebar extends HTMLElement {
     // Create OpTel Detective Report button
     const generateReportButton = document.createElement('button');
     generateReportButton.className = 'ai-optel-report-generator-button';
-    generateReportButton.title = 'Use Claude to generate OpTel Detective Report';
+    generateReportButton.title = 'Use Claude to generate AI Report';
 
     // Create icon element
     const icon = document.createElement('img');

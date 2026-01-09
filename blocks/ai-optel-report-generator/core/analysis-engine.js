@@ -5,7 +5,7 @@
 
 /* eslint-disable no-console */
 
-import { extractDashboardData, generateDashboardHash } from './dashboard-extractor.js';
+import extractDashboardData from './dashboard-extractor.js';
 import {
   extractFacetsFromExplorer,
   initializeDynamicFacets,
@@ -13,8 +13,8 @@ import {
 } from './facet-manager.js';
 import {
   processParallelBatches,
-} from '../parallel-processing.js';
-import { buildFacetInfoSection } from './facet-link-generator.js';
+} from './parallel-processing.js';
+import { buildFacetInfoSection } from '../reports/facet-link-generator.js';
 import { PATHS } from '../config.js';
 
 // Template cache
@@ -127,20 +127,8 @@ ${allInsights.reduce((sum, i) => sum + i.length, 0) > allInsights.length * 1000 
 ${overviewTemplate}`;
 }
 
-/**
- * Call AWS Bedrock API for analysis
- * @param {Object} dashboardData - Dashboard data object
- * @param {string} currentDashboardHash - Dashboard hash for caching
- * @param {Array} facetTools - Array of facet tools
- * @param {Function} progressCallback - Progress callback
- * @returns {Promise<string>} Analysis result
- */
-async function callAnthropicAPI(
-  dashboardData,
-  currentDashboardHash,
-  facetTools,
-  progressCallback,
-) {
+/** Call AWS Bedrock API for analysis */
+async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
   console.log('[Analysis Engine] Starting AI analysis...');
 
   try {
@@ -300,9 +288,6 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
       dateRange: dashboardData.dateRange,
     });
 
-    // Generate hash for cache validation
-    const currentDashboardHash = generateDashboardHash(dashboardData);
-
     // Extract facet tools
     console.log('[Analysis Engine] Extracting facet tools from explorer...');
     const facetTools = extractFacetsFromExplorer();
@@ -329,12 +314,7 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
     }
 
     // Step 3: Run AI analysis
-    const response = await callAnthropicAPI(
-      dashboardData,
-      currentDashboardHash,
-      facetTools,
-      progressCallback,
-    );
+    const response = await callAnthropicAPI(dashboardData, facetTools, progressCallback);
 
     return response;
   } catch (error) {

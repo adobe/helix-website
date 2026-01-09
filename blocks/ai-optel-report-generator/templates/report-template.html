@@ -35,43 +35,6 @@
       font-weight: 700;
     }
     
-    .report-header .logo {
-      color: #007cba;
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
-    
-    .metadata {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-    
-    .metadata-item {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .metadata-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      color: #666;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      margin-bottom: 5px;
-    }
-    
-    .metadata-value {
-      font-size: 15px;
-      color: #333;
-      font-weight: 500;
-    }
-    
     .report-content {
       line-height: 1.8;
       font-size: 15px;
@@ -177,13 +140,6 @@
       line-height: 1.6;
     }
     
-    .footer-logo {
-      color: #007cba;
-      font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    
     .footer-timestamp {
       color: #999;
       font-size: 12px;
@@ -233,19 +189,7 @@
 <body>
   <div class="report-container">
     <header class="report-header">
-      <div class="logo">OpTel Detective</div>
-      <h1>Web Performance Analysis Report</h1>
-      
-      <div class="metadata">
-        <div class="metadata-item">
-          <span class="metadata-label">Analyzed URL:</span>
-          <span class="metadata-value">{{ANALYZED_URL}}</span>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Generated on:</span>
-          <span class="metadata-value">{{GENERATED_DATE}}</span>
-        </div>
-      </div>
+      <h1>{{REPORT_TITLE}}</h1>
     </header>
     
     <main class="report-content">

@@ -1,145 +1,73 @@
 /**
- * Dashboard Data Extractor Module
- * Extracts metrics and segment data from the RUM dashboard DOM
+ * Dashboard Data Extractor - Extracts metrics and segments from RUM dashboard
  */
 
 /* eslint-disable no-console */
 
-/**
- * Extract all dashboard data including metrics and segments
- * @returns {Promise<Object>} Dashboard data with metrics, segments, and date range
- */
-export function extractDashboardData() {
+/** Extract dashboard data including metrics, segments, and date range */
+export default function extractDashboardData() {
   return new Promise((resolve) => {
     const getData = () => {
-      console.log('[Dashboard Data] Starting data extraction...');
-
-      const dashboardData = {
-        metrics: {},
-        segments: {},
-        dateRange: null,
-        startDate: null,
-        endDate: null,
+      const data = {
+        metrics: {}, segments: {}, dateRange: null, startDate: null, endDate: null,
       };
 
-      // Extract date range directly from daterange-picker element
-      const dateRangePicker = document.querySelector('daterange-picker');
-      if (dateRangePicker) {
-        const { value, from, to } = dateRangePicker.value;
-
-        if (value) {
-          dashboardData.dateRange = value;
-          console.log(`[Dashboard Data] ✓ Captured date range: ${dashboardData.dateRange}`);
-        }
-
+      // Extract date range from picker
+      const picker = document.querySelector('daterange-picker');
+      if (picker?.value) {
+        const { value, from, to } = picker.value;
+        if (value) data.dateRange = value;
         if (from && to) {
-          dashboardData.startDate = from;
-          dashboardData.endDate = to;
-          console.log(`[Dashboard Data] ✓ Captured date period: ${dashboardData.startDate} to ${dashboardData.endDate}`);
+          data.startDate = from;
+          data.endDate = to;
         }
       }
 
-      // Extract key metrics (pageviews, visits, conversions, LCP, CLS, INP, etc.)
-      const keyMetricsContainer = document.querySelector('.key-metrics');
-      if (keyMetricsContainer) {
-        const metricItems = keyMetricsContainer.querySelectorAll('li[id]');
+      // Extract key metrics
+      document.querySelectorAll('.key-metrics li[id]').forEach((item) => {
+        const name = item.querySelector('h2')?.textContent?.trim() || item.id;
+        const numFmt = item.querySelector('number-format');
+        const value = numFmt?.getAttribute('title') || numFmt?.textContent?.trim();
+        if (name && value && value !== '0') data.metrics[name] = value;
+      });
 
-        metricItems.forEach((item) => {
-          const metricName = item.querySelector('h2')?.textContent?.trim() || item.id;
-          const numberFormat = item.querySelector('number-format');
-          const metricValue = numberFormat?.textContent?.trim();
-          const metricTitle = numberFormat?.getAttribute('title');
+      // Extract facet segments
+      const sidebar = document.querySelector('facet-sidebar');
+      sidebar?.querySelectorAll('list-facet, link-facet, literal-facet').forEach((facet) => {
+        const facetName = facet.getAttribute('facet');
+        if (!facetName) return;
 
-          if (metricName && metricValue && metricValue !== '0') {
-            dashboardData.metrics[metricName] = metricTitle || metricValue;
-            console.log(`[Dashboard Data] ✓ Captured metric: ${metricName} = ${metricTitle || metricValue}`);
-          }
-        });
+        data.segments[facetName] = Array.from(facet.querySelectorAll('label')).map((label) => {
+          const labelText = label.querySelector('.label')?.textContent?.trim();
+          const valueText = label.querySelector('.value')?.textContent?.trim();
+          const countEl = label.querySelector('number-format.count');
+          const countTitle = countEl?.getAttribute('title') || '0';
 
-        console.log(`[Dashboard Data] ✓ Successfully captured ${Object.keys(dashboardData.metrics).length} metrics`);
-      }
+          // Extract CWV metrics if present
+          const metrics = {};
+          label.nextElementSibling?.querySelector?.('ul.cwv')?.querySelectorAll('li').forEach((li) => {
+            const title = li.getAttribute('title')?.split(' - ')[0];
+            const val = li.querySelector('number-format')?.textContent?.trim();
+            if (title && val) metrics[title] = val;
+          });
 
-      // Extract facet/segment data
-      const facetSidebar = document.querySelector('facet-sidebar');
-      if (facetSidebar) {
-        const facets = facetSidebar.querySelectorAll('list-facet, link-facet, literal-facet');
-        facets.forEach((facet) => {
-          const facetName = facet.getAttribute('facet');
-          if (!facetName) return;
+          return {
+            value: labelText || valueText || label.querySelector('span')?.textContent?.trim(),
+            displayCount: countEl?.textContent?.trim() || '0',
+            count: parseInt(countTitle.split(' ')[0].replace(/\D/g, ''), 10) || 0,
+            metrics,
+          };
+        }).filter((item) => item.value);
+      });
 
-          const labelElements = Array.from(facet.querySelectorAll('label'));
-          const items = labelElements.map((label) => {
-            const labelText = label.querySelector('.label')?.textContent?.trim() || '';
-            const valueText = label.querySelector('.value')?.textContent?.trim() || '';
-            const spanText = label.querySelector('span')?.textContent?.trim() || '';
-            const countElement = label.querySelector('number-format.count');
-            const countTitle = countElement?.getAttribute('title') || '0';
-            const countText = countElement?.textContent?.trim() || '0';
-
-            // Extract numeric count
-            const numericCount = countTitle.split(' ')[0].replace(/[^\d]/g, '');
-
-            // Extract performance metrics
-            const cwvList = label.nextElementSibling?.querySelector?.('ul.cwv');
-            const metrics = {};
-            if (cwvList) {
-              cwvList.querySelectorAll('li').forEach((item) => {
-                const title = item.getAttribute('title') || '';
-                const metricValue = item.querySelector('number-format')?.textContent?.trim();
-                if (title && metricValue) {
-                  const metricName = title.split(' - ')[0];
-                  metrics[metricName] = metricValue;
-                }
-              });
-            }
-
-            return {
-              value: labelText || valueText || spanText,
-              displayCount: countText,
-              count: parseInt(numericCount, 10) || 0,
-              metrics,
-            };
-          }).filter((item) => item.value);
-
-          dashboardData.segments[facetName] = items;
-        });
-
-        console.log(`[Dashboard Data] ✓ Extracted ${Object.keys(dashboardData.segments).length} segments`);
-      }
-
-      resolve(dashboardData);
+      console.log(`[Dashboard] Extracted ${Object.keys(data.metrics).length} metrics, ${Object.keys(data.segments).length} segments`);
+      resolve(data);
     };
 
-    // Ensure DOM is fully loaded
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', getData);
     } else {
       getData();
     }
   });
-}
-
-/**
- * Generate a hash of dashboard data for cache validation
- * @param {Object} dashboardData - Dashboard data object
- * @returns {string} Hash string
- */
-export function generateDashboardHash(dashboardData) {
-  const dataString = JSON.stringify({
-    metrics: dashboardData.metrics,
-    segmentCounts: Object.keys(dashboardData.segments).reduce((acc, key) => {
-      acc[key] = dashboardData.segments[key].length;
-      return acc;
-    }, {}),
-    dateRange: dashboardData.dateRange,
-  });
-
-  // Simple hash function using Math operations instead of bitwise
-  let hash = 0;
-  for (let i = 0; i < dataString.length; i += 1) {
-    const char = dataString.charCodeAt(i);
-    hash = ((hash * 31) + char) % 2147483647;
-  }
-
-  return hash.toString(36);
 }

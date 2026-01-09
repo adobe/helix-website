@@ -1,20 +1,10 @@
 /**
- * Facet Link Generator Module
- * Creates dashboard links with specific facet parameters for report navigation
- *
- * Supports flexible nested facet linking:
- * - Main facets: checkpoint, url, userAgent
- * - Nested facets: parent.source, parent.target (can be used independently or together)
+ * Facet Link Generator - Creates dashboard links with facet parameters for report navigation
  */
 
 /* eslint-disable no-console */
 
-/**
- * Build facet information section for AI prompt
- * Generates instructions for AI about how to create clickable facet links
- * @param {Object} dashboardData - Dashboard data
- * @returns {string} Facet information section for AI prompt
- */
+/** Build facet info section for AI prompt (instructions on creating clickable links) */
 export function buildFacetInfoSection(dashboardData) {
   const facetList = Object.keys(dashboardData.segments);
   const simpleFacets = facetList.filter((f) => !f.includes('.'));
@@ -153,11 +143,7 @@ export function buildFacetInfoSection(dashboardData) {
   return sections.join('\n');
 }
 
-/**
- * Normalize URL values to match dashboard format
- * @param {string} url - URL to normalize
- * @returns {string} Normalized URL that matches dashboard format
- */
+/** Normalize URL values to match dashboard format */
 function normalizeUrl(url) {
   if (!url || typeof url !== 'string') return url;
 
@@ -185,24 +171,7 @@ function normalizeUrl(url) {
   return normalized;
 }
 
-/**
- * Generate a dashboard URL with specific facet parameter(s)
- * Supports flexible nested facet linking:
- * - Main facets: checkpoint, url, userAgent (required)
- * - Nested facets: up to 2 independent nested facets (optional)
- *
- * Always preserves existing url and userAgent filters (checkpoint may be changed/added)
- * Private helper function used by convertSpansToLinks()
- *
- * @param {string|Object} facetName - The facet name or object with multiple facets
- * @param {string} facetValue - The facet value to filter by (ignored if facetName is object)
- * @param {Object} options - Additional options for nested facets
- * @param {string} options.nestedFacet - First nested facet name (e.g., 'error.source')
- * @param {string} options.nestedValue - First nested facet value
- * @param {string} options.nestedFacet2 - Second nested facet name (e.g., 'error.target')
- * @param {string} options.nestedValue2 - Second nested facet value
- * @returns {string} Dashboard URL with facet parameter(s)
- */
+/** Generate dashboard URL with facet params (preserves existing url/userAgent filters) */
 function generateFacetLink(facetName, facetValue, options = {}) {
   const {
     nestedFacet, nestedValue, nestedFacet2, nestedValue2,
@@ -252,86 +221,48 @@ function generateFacetLink(facetName, facetValue, options = {}) {
   return queryString ? `${pathname}?${queryString}` : pathname;
 }
 
-/**
- * Validate if a facet value exists in dashboard data
- * Supports validation for main facet and up to 2 nested facets
- *
- * @param {string} facetName - Main facet name (checkpoint, url, userAgent)
- * @param {string} facetValue - Main facet value
- * @param {Object} options - Optional nested facet options
- * @param {string} options.nestedFacet - First nested facet name
- * @param {string} options.nestedValue - First nested facet value
- * @param {string} options.nestedFacet2 - Second nested facet name
- * @param {string} options.nestedValue2 - Second nested facet value
- * @returns {boolean} True if all values exist in dashboard
- */
-function validateFacetValue(facetName, facetValue, options = {}) {
-  const {
-    nestedFacet, nestedValue, nestedFacet2, nestedValue2,
-  } = options;
+/** Correct display text to actual value (e.g., "Visible" → "visible") */
+function correctValue(facetName, text) {
+  const sidebar = document.querySelector('facet-sidebar');
+  if (!sidebar) return text;
 
-  try {
-    const facets = document.querySelector('facet-sidebar')?.facets;
-    if (!facets) return true; // Can't validate, allow
+  const labels = Array.from(sidebar.querySelectorAll(`label[for^="${facetName}-"], label[for^="${facetName}="]`));
+  const match = labels.find((l) => l.querySelector('.label')?.textContent?.trim().toLowerCase() === text.toLowerCase());
+  const actual = match?.querySelector('.value')?.textContent?.trim();
 
-    const checkExists = (data, value, isUrl) => {
-      if (!data) return false;
-
-      // For URLs, check with and without trailing slash
-      if (isUrl) {
-        return data.some((item) => item.value === value
-          || item.value === `${value}/`
-          || (value.endsWith('/') && item.value === value.slice(0, -1)));
-      }
-
-      // For other facets, exact match
-      return data.some((item) => item.value === value);
-    };
-
-    const isUrlValue = (val) => typeof val === 'string' && val.startsWith('http');
-
-    // Validate main facet value
-    if (!checkExists(facets[facetName], facetValue, facetName === 'url')) {
-      return false;
-    }
-
-    // Validate first nested facet if provided
-    if (nestedFacet && nestedValue) {
-      if (!checkExists(facets[nestedFacet], nestedValue, isUrlValue(nestedValue))) {
-        console.warn(`[Facet Link Generator] Nested facet value not found: ${nestedFacet}="${nestedValue}"`);
-        console.warn('[Facet Link Generator] Available values:', facets[nestedFacet]?.slice(0, 5).map((item) => item.value));
-        return false;
-      }
-    }
-
-    // Validate second nested facet if provided
-    if (nestedFacet2 && nestedValue2) {
-      if (!checkExists(facets[nestedFacet2], nestedValue2, isUrlValue(nestedValue2))) {
-        console.warn(`[Facet Link Generator] Nested facet 2 value not found: ${nestedFacet2}="${nestedValue2}"`);
-        console.warn('[Facet Link Generator] Available values:', facets[nestedFacet2]?.slice(0, 5).map((item) => item.value));
-        return false;
-      }
-    }
-
-    return true;
-  } catch (error) {
-    console.warn('[Facet Link Generator] Validation error:', error);
-    return true;
-  }
+  if (actual && actual !== text) console.log(`[Facet Link] Corrected "${text}" → "${actual}"`);
+  return actual || text;
 }
 
-/**
- * Convert data-attribute spans to actual clickable links in HTML
- * Supports flexible nested facet linking:
- * - Main: data-facet + data-facet-value (required)
- * - Nested 1: data-nested-facet + data-nested-value (optional)
- * - Nested 2: data-nested-facet-2 + data-nested-value-2 (optional)
- *
- * Nested facets are INDEPENDENT - you can use either, both, or neither
- * Validates that facet values exist in dashboard before creating links
- * @param {string} htmlContent - HTML content with data-attribute spans
- * @returns {string} HTML with actual <a> links (only for validated values)
- */
+/** Validate facet value exists in data and checkbox is clickable */
+function isValidFacetValue(facetName, value) {
+  const sidebar = document.querySelector('facet-sidebar');
+  if (!sidebar) return true;
+
+  const { facets } = sidebar;
+  const isUrl = facetName === 'url' || value?.startsWith('http');
+
+  // Check value exists in facets data
+  const data = facets?.[facetName];
+  if (!data) return false;
+  const inData = isUrl
+    ? data.some((i) => i.value === value || i.value === `${value}/` || i.value === value.replace(/\/$/, ''))
+    : data.some((i) => i.value === value);
+  if (!inData) return false;
+
+  // Skip DOM check for checkpoint/nested (only visible with metrics=super)
+  if (facetName === 'checkpoint' || facetName.includes('.')) return true;
+
+  // For url/userAgent: also verify checkbox exists and is enabled
+  const find = (id) => sidebar.querySelector(`input[id="${CSS.escape(id)}"]`);
+  let cb = find(`${facetName}=${value}`);
+  if (!cb && isUrl) {
+    cb = find(`${facetName}=${value}/`) || find(`${facetName}=${value.replace(/\/$/, '')}`);
+  }
+  return cb && !cb.disabled;
+}
+
+/** Convert data-attribute spans to clickable <a> links (validates values exist in dashboard) */
 export function convertSpansToLinks(htmlContent) {
   if (!htmlContent?.includes('data-facet')) return htmlContent;
 
@@ -404,26 +335,28 @@ export function convertSpansToLinks(htmlContent) {
       return;
     }
 
-    // Validate all facet values exist in dashboard
-    const validationOptions = {
-      nestedFacet, nestedValue, nestedFacet2, nestedValue2,
-    };
-    if (!validateFacetValue(facetName, facetValue, validationOptions)) {
-      let errorMsg = `${facetName}="${facetValue}"`;
-      if (nestedFacet) errorMsg += ` + ${nestedFacet}="${nestedValue}"`;
-      if (nestedFacet2) errorMsg += ` + ${nestedFacet2}="${nestedValue2}"`;
-      stats.skippedNonExistent.push(errorMsg);
+    // Correct and validate all values
+    const cv = correctValue(facetName, facetValue);
+    const cn = nestedFacet ? correctValue(nestedFacet, nestedValue) : null;
+    const cn2 = nestedFacet2 ? correctValue(nestedFacet2, nestedValue2) : null;
+
+    const allValid = isValidFacetValue(facetName, cv)
+      && (!nestedFacet || isValidFacetValue(nestedFacet, cn))
+      && (!nestedFacet2 || isValidFacetValue(nestedFacet2, cn2));
+
+    if (!allValid) {
+      stats.skippedNonExistent.push(`${facetName}="${facetValue}"`);
       return;
     }
 
-    // Build title showing the filter path
-    let title = `View ${facetName}: ${facetValue}`;
-    if (nestedFacet) title += ` + ${nestedFacet}: ${nestedValue}`;
-    if (nestedFacet2) title += ` + ${nestedFacet2}: ${nestedValue2}`;
+    // Build link
+    let title = `View ${facetName}: ${cv}`;
+    if (nestedFacet) title += ` + ${nestedFacet}: ${cn}`;
+    if (nestedFacet2) title += ` + ${nestedFacet2}: ${cn2}`;
 
     const anchor = Object.assign(doc.createElement('a'), {
-      href: generateFacetLink(facetName, facetValue, {
-        nestedFacet, nestedValue, nestedFacet2, nestedValue2,
+      href: generateFacetLink(facetName, cv, {
+        nestedFacet, nestedValue: cn, nestedFacet2, nestedValue2: cn2,
       }),
       className: 'facet-link',
       innerHTML: el.innerHTML,

@@ -1,24 +1,15 @@
 /**
- * Facet Manager Module
- * Handles facet tool extraction, initialization, and manipulation
+ * Facet Manager - Handles facet tool extraction and manipulation
  */
 
 /* eslint-disable no-console */
 
-// Cache for facet tools
 let cachedFacetTools = null;
 
-/**
- * Create tool definition for a facet
- * @param {string} facetName - Original facet name
- * @param {string} description - Tool description
- * @returns {Object} Tool definition object
- */
+/** Create tool definition for a facet */
 function createToolDefinition(facetName, description) {
-  const sanitizedName = facetName.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 64);
-
   return {
-    name: sanitizedName,
+    name: facetName.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 64),
     description: `${description}. Use this tool to analyze data based on the ${facetName} facet.`,
     input_schema: {
       type: 'object',
@@ -38,94 +29,54 @@ function createToolDefinition(facetName, description) {
   };
 }
 
-/**
- * Extract facets from DOM and convert to tool definitions
- * @returns {Array} Array of tool definitions
- */
+/** Extract facets from DOM and convert to tool definitions */
 export function extractFacetsFromExplorer() {
-  if (cachedFacetTools) {
-    console.log('[Facet Extraction] Using cached facet tools');
-    return cachedFacetTools;
-  }
+  if (cachedFacetTools) return cachedFacetTools;
 
-  console.log('[Facet Extraction] Starting facet extraction');
-  const facetSidebar = document.querySelector('facet-sidebar');
-  if (!facetSidebar) {
-    console.error('[Facet Extraction] Facet sidebar not found');
+  const sidebar = document.querySelector('facet-sidebar');
+  if (!sidebar) {
+    console.error('[Facet Manager] Sidebar not found');
     return [];
   }
 
-  const { dataChunks } = facetSidebar;
-  console.log('[Facet Extraction] DataChunks available:', !!dataChunks);
-  if (dataChunks?.facets) {
-    console.log('[Facet Extraction] DataChunks.facets keys:', Object.keys(dataChunks.facets));
-  }
-
-  const facetElements = facetSidebar.querySelectorAll('list-facet, link-facet, literal-facet, file-facet, thumbnail-facet');
-  console.log(`[Facet Extraction] Found ${facetElements.length} facet elements in DOM`);
+  const { dataChunks } = sidebar;
+  const facetElements = sidebar.querySelectorAll(
+    'list-facet, link-facet, literal-facet, file-facet, thumbnail-facet',
+  );
 
   const tools = [];
-  const skippedEmptyFacets = [];
+  const skipped = [];
 
-  facetElements.forEach((facetElement, index) => {
-    const facetName = facetElement.getAttribute('facet');
-    if (!facetName) {
-      console.log(`[Facet Extraction] Skipping facet #${index + 1} - no facet name`);
+  facetElements.forEach((el) => {
+    const facetName = el.getAttribute('facet');
+    if (!facetName) return;
+
+    const hasLabels = el.querySelectorAll('label').length > 0;
+    const facetData = dataChunks?.facets?.[facetName];
+
+    // Skip empty facets
+    if (dataChunks?.facets && (!facetData || facetData.length === 0 || !hasLabels)) {
+      skipped.push(facetName);
+      return;
+    }
+    if (!dataChunks?.facets && !hasLabels) {
+      skipped.push(facetName);
       return;
     }
 
-    // Skip empty facets - check both dataChunks and actual DOM labels
-    const labelElements = facetElement.querySelectorAll('label');
-    const hasLabels = labelElements.length > 0;
-
-    if (dataChunks && dataChunks.facets) {
-      const facetData = dataChunks.facets[facetName];
-      if (!facetData || facetData.length === 0 || !hasLabels) {
-        console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no data (dataChunks: ${facetData?.length || 0}, labels: ${labelElements.length})`);
-        skippedEmptyFacets.push(facetName);
-        return;
-      }
-      console.log(`[Facet Extraction] Facet ${facetName} has ${facetData.length} items and ${labelElements.length} labels - including in tools`);
-    } else if (!hasLabels) {
-      // If no dataChunks available, fall back to checking DOM labels
-      console.log(`[Facet Extraction] Skipping facet #${index + 1} (${facetName}) - no labels in DOM`);
-      skippedEmptyFacets.push(facetName);
-      return;
-    }
-
-    // Get description from help link or legend
-    const helpLink = facetElement.querySelector('a.help[title]');
-    const helpTitle = helpLink ? helpLink.getAttribute('title') : null;
-    const legendElement = facetElement.querySelector('legend');
-    const legendText = legendElement ? legendElement.textContent : null;
+    const helpTitle = el.querySelector('a.help[title]')?.getAttribute('title');
+    const legendText = el.querySelector('legend')?.textContent;
     const description = helpTitle || legendText || `Analyze data based on ${facetName}`;
 
-    const tool = createToolDefinition(facetName, description);
-    if (tool) {
-      tools.push(tool);
-      console.log(`[Facet Extraction] ✓ Added tool: ${tool.name} (from facet: ${facetName})`);
-    }
+    tools.push(createToolDefinition(facetName, description));
   });
 
-  console.log('═══════════════════════════════════════════════════════════');
-  console.log('[Facet Extraction] EXTRACTION SUMMARY');
-  console.log('═══════════════════════════════════════════════════════════');
-  console.log(`Total facet elements in DOM: ${facetElements.length}`);
-  console.log(`Skipped empty facets: ${skippedEmptyFacets.length}`);
-  if (skippedEmptyFacets.length > 0) {
-    console.log(`  Empty facets: ${skippedEmptyFacets.join(', ')}`);
-  }
-  console.log(`✓ Created tools: ${tools.length}`);
-  console.log(`  Tool names: ${tools.map((t) => t.name).join(', ')}`);
-  console.log('═══════════════════════════════════════════════════════════');
-
+  console.log(`[Facet Manager] Extracted ${tools.length} tools, skipped ${skipped.length} empty facets`);
   cachedFacetTools = tools;
   return tools;
 }
 
-/**
- * DOM Operation Queue to prevent conflicts during parallel processing
- */
+/** DOM Operation Queue to prevent conflicts during parallel filter operations */
 class DOMOperationQueue {
   constructor() {
     this.queue = [];
@@ -142,7 +93,6 @@ class DOMOperationQueue {
 
   async processQueue() {
     if (this.isProcessing || this.queue.length === 0) return;
-
     this.isProcessing = true;
 
     // eslint-disable-next-line no-await-in-loop
@@ -153,181 +103,113 @@ class DOMOperationQueue {
         const result = await operation();
         resolve(result);
         // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => {
-          setTimeout(r, 500);
-        });
+        await new Promise((r) => { setTimeout(r, 500); });
       } catch (error) {
         reject(error);
       }
     }
-
     this.isProcessing = false;
   }
 }
 
 const domOperationQueue = new DOMOperationQueue();
 
-/**
- * Handle dynamic facet tool calls from AI
- * @param {string} toolName - Tool name
- * @param {Object} input - Tool input parameters
- * @param {boolean} useQueue - Whether to use DOM operation queue
- * @returns {Promise<Object>} Tool execution result
- */
-export async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
-  // Convert tool name back to facet name (underscores to dots)
-  const facetName = toolName.replace(/_/g, '.');
-  const facetElement = document.querySelector(`[facet="${facetName}"]`);
+/** Extract label data from a facet element */
+function extractLabelData(facetEl, includeMetrics = false) {
+  return Array.from(facetEl.querySelectorAll('label')).map((label) => {
+    const text = label.querySelector('.label')?.textContent?.trim()
+      || label.querySelector('.value')?.textContent?.trim()
+      || label.querySelector('span')?.textContent?.trim();
+    if (!text) return null;
 
-  if (!facetElement) {
-    return {
-      success: false,
-      message: `Facet element not found for ${facetName}`,
-    };
+    const countEl = label.querySelector('number-format.count') || label.querySelector('number-format');
+    const countTitle = countEl?.getAttribute('title') || '0';
+    const count = parseInt(countTitle.split(' ')[0].replace(/\D/g, ''), 10) || 0;
+
+    const item = { text, displayCount: countEl?.textContent?.trim() || '0', count };
+
+    if (includeMetrics) {
+      const cwv = label.nextElementSibling?.querySelector?.('ul.cwv');
+      if (cwv) {
+        item.metrics = {};
+        cwv.querySelectorAll('li').forEach((li) => {
+          const title = li.getAttribute('title')?.split(' - ')[0];
+          const val = li.querySelector('number-format')?.textContent?.trim();
+          if (title && val) {
+            item.metrics[title] = { value: val, classes: Array.from(li.classList).join(' ') };
+          }
+        });
+      }
+    }
+    return item;
+  }).filter(Boolean);
+}
+
+/** Handle dynamic facet tool calls from AI */
+export async function handleDynamicFacetToolCall(toolName, input, useQueue = true) {
+  const facetName = toolName.replace(/_/g, '.');
+  const facetEl = document.querySelector(`[facet="${facetName}"]`);
+
+  if (!facetEl) {
+    return { success: false, message: `Facet element not found for ${facetName}` };
   }
 
   const { operation, value } = input;
 
   const performOperation = async () => {
     try {
-      let result;
-
       switch (operation) {
         case 'filter': {
-          if (!value) {
-            result = { success: false, message: 'Filter operation requires a value' };
-            break;
-          }
-          const filterInput = facetElement.querySelector(`input[value="${value}"]`);
-          if (filterInput) {
-            filterInput.click();
-            await new Promise((resolve) => {
-              setTimeout(resolve, 1000);
-            });
-            result = { success: true, message: `Applied filter: ${value}` };
-          } else {
-            result = { success: false, message: `Filter value ${value} not found` };
-          }
-          break;
+          if (!value) return { success: false, message: 'Filter operation requires a value' };
+          const filterInput = facetEl.querySelector(`input[value="${value}"]`);
+          if (!filterInput) return { success: false, message: `Filter value ${value} not found` };
+          filterInput.click();
+          await new Promise((r) => { setTimeout(r, 1000); });
+          return { success: true, message: `Applied filter: ${value}` };
         }
 
         case 'analyze': {
-          const labelElements = facetElement.querySelectorAll('label');
-          const items = [];
-
-          labelElements.forEach((label) => {
-            const labelText = label.querySelector('.label')?.textContent?.trim() || '';
-            const valueText = label.querySelector('.value')?.textContent?.trim() || '';
-            const spanText = label.querySelector('span')?.textContent?.trim() || '';
-            const countElement = label.querySelector('number-format.count') || label.querySelector('number-format');
-            const countText = countElement?.textContent?.trim() || '0';
-            const countTitle = countElement?.getAttribute('title') || '0';
-            const numericCount = countTitle.split(' ')[0].replace(/[^\d]/g, '');
-
-            // Get metrics with HTML context
-            const cwvList = label.nextElementSibling?.querySelector?.('ul.cwv');
-            const metrics = {};
-            if (cwvList) {
-              cwvList.querySelectorAll('li').forEach((item) => {
-                const title = item.getAttribute('title') || '';
-                const metricValue = item.querySelector('number-format')?.textContent?.trim();
-                if (title && metricValue) {
-                  const metricName = title.split(' - ')[0];
-                  const classList = Array.from(item.classList).join(' ');
-                  metrics[metricName] = {
-                    value: metricValue,
-                    classes: classList,
-                  };
-                }
-              });
-            }
-
-            const text = labelText || valueText || spanText;
-            if (text) {
-              items.push({
-                text,
-                displayCount: countText,
-                count: parseInt(numericCount, 10) || 0,
-                metrics,
-              });
-            }
-          });
-
-          result = {
+          const items = extractLabelData(facetEl, true);
+          return {
             success: true,
             facetName,
             totalItems: items.length,
             items: items.slice(0, 5),
             summary: `Found ${items.length} items in ${facetName}`,
           };
-          break;
         }
 
         case 'summarize': {
-          const labelElements = facetElement.querySelectorAll('label');
-          const allItems = [];
-
-          labelElements.forEach((label) => {
-            const labelText = label.querySelector('.label')?.textContent?.trim() || '';
-            const valueText = label.querySelector('.value')?.textContent?.trim() || '';
-            const spanText = label.querySelector('span')?.textContent?.trim() || '';
-            const countElement = label.querySelector('number-format.count') || label.querySelector('number-format');
-            const countTitle = countElement?.getAttribute('title') || '0';
-            const numericCount = countTitle.split(' ')[0].replace(/[^\d]/g, '');
-            const text = labelText || valueText || spanText;
-
-            if (text) {
-              allItems.push({
-                text,
-                count: parseInt(numericCount, 10) || 0,
-              });
-            }
-          });
-
-          const total = allItems.reduce((sum, item) => sum + item.count, 0);
-          result = {
+          const items = extractLabelData(facetEl, false);
+          const total = items.reduce((sum, i) => sum + i.count, 0);
+          return {
             success: true,
             facetName,
-            totalItems: allItems.length,
+            totalItems: items.length,
             totalCount: total,
-            topItems: allItems.slice(0, 3),
-            summary: `${facetName} has ${allItems.length} unique values with ${total} total occurrences`,
+            topItems: items.slice(0, 3),
+            summary: `${facetName} has ${items.length} unique values with ${total} total occurrences`,
           };
-          break;
         }
 
         default:
-          result = { success: false, message: `Unknown operation: ${operation}` };
+          return { success: false, message: `Unknown operation: ${operation}` };
       }
-
-      return result;
     } catch (error) {
-      console.error('[Dynamic Facet] Error:', error);
-      return {
-        success: false,
-        message: `Error processing ${facetName}: ${error.message}`,
-      };
+      console.error('[Facet Manager] Error:', error);
+      return { success: false, message: `Error processing ${facetName}: ${error.message}` };
     }
   };
 
-  // Use queue for filter operations, direct execution for read-only operations
-  if (operation === 'filter' && useQueue) {
-    return domOperationQueue.enqueue(performOperation);
-  }
-  return performOperation();
+  // Use queue for filter operations to prevent DOM conflicts
+  return operation === 'filter' && useQueue
+    ? domOperationQueue.enqueue(performOperation)
+    : performOperation();
 }
 
-/**
- * Initialize dynamic facets monitoring
- */
+/** Initialize dynamic facets monitoring */
 export function initializeDynamicFacets() {
-  console.log('[Dynamic Facets] Initializing dynamic facets');
-
-  const extractFacets = () => {
-    const tools = extractFacetsFromExplorer();
-    console.log(`[Dynamic Facets] Extracted ${tools.length} tools`);
-    return tools;
-  };
+  const extractFacets = () => extractFacetsFromExplorer();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', extractFacets);
@@ -336,46 +218,28 @@ export function initializeDynamicFacets() {
   }
 
   // Monitor for new facets
-  let observerTimeout;
-  const debouncedExtractFacets = () => {
-    clearTimeout(observerTimeout);
-    observerTimeout = setTimeout(extractFacets, 250);
+  let timeout;
+  const debouncedExtract = () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(extractFacets, 250);
   };
 
   const observer = new MutationObserver((mutations) => {
-    if (observerTimeout) return;
-
-    const hasFacetElements = mutations.some((mutation) => {
-      if (mutation.addedNodes.length) {
-        return Array.from(mutation.addedNodes).some((node) => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            return node.tagName && (
-              node.tagName.toLowerCase().includes('facet')
-              || node.querySelector('list-facet, link-facet, literal-facet, file-facet, thumbnail-facet')
-            );
-          }
-          return false;
-        });
-      }
-      return false;
-    });
-
-    if (hasFacetElements) {
-      debouncedExtractFacets();
-    }
+    if (timeout) return;
+    const hasFacets = mutations.some((m) => Array.from(m.addedNodes).some((n) => {
+      if (n.nodeType !== Node.ELEMENT_NODE) return false;
+      const tag = n.tagName?.toLowerCase() || '';
+      return tag.includes('facet')
+        || n.querySelector?.('list-facet, link-facet, literal-facet, file-facet, thumbnail-facet');
+    }));
+    if (hasFacets) debouncedExtract();
   });
 
-  const facetSidebar = document.querySelector('facet-sidebar');
-  if (facetSidebar) {
-    observer.observe(facetSidebar, { childList: true, subtree: true });
-  } else {
-    observer.observe(document.body, { childList: true, subtree: false });
-  }
+  const sidebar = document.querySelector('facet-sidebar');
+  observer.observe(sidebar || document.body, { childList: true, subtree: !!sidebar });
 }
 
-/**
- * Reset cached facet tools
- */
+/** Reset cached facet tools */
 export function resetCachedFacetTools() {
   cachedFacetTools = null;
 }

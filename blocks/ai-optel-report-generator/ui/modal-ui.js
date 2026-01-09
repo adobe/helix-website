@@ -34,7 +34,7 @@ function createModalBody() {
       <p>${hasToken
     ? 'Your API credentials are saved. Click "Generate Report" to start the analysis.'
     : 'Enter your AWS Bedrock token to generate a comprehensive report of your site data.'}</p>
-      ${hasToken ? '<p style="font-size: 12px; opacity: 0.8;">Provider: <span id="provider-name">Checking...</span></p>' : ''}
+      ${hasToken ? '<p class="provider-text">Provider: <span id="provider-name">Checking...</span></p>' : ''}
     </div>
     <div id="report-status" style="display: none;"></div>`;
 

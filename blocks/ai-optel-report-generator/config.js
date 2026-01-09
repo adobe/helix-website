@@ -29,9 +29,9 @@ export const API_CONFIG = {
 
 export const PATHS = {
   BLOCK_BASE: '/blocks/ai-optel-report-generator',
-  SYSTEM_PROMPT: 'system-prompt.txt',
-  OVERVIEW_TEMPLATE: 'overview-analysis-template.html',
-  REPORT_TEMPLATE: 'report-template.html',
+  SYSTEM_PROMPT: 'templates/system-prompt.txt',
+  OVERVIEW_TEMPLATE: 'templates/overview-analysis-template.html',
+  REPORT_TEMPLATE: 'templates/report-template.html',
 };
 
 export const STORAGE_KEYS = {
