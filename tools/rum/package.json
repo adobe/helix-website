@@ -6,6 +6,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@adobe/rum-distiller": "1.20.8"
+    "@adobe/rum-distiller": "1.22.2"
   }
 }
