@@ -258,14 +258,14 @@ function updateDataFacets(filterText, params, checkpoint) {
           .map(reclassifyConsent)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ source }) => source) // filter out empty sources
-          .reduce((acc, { source }) => { acc.add(source); return acc; }, new Set()),
+          .reduce((acc, { source }) => { acc.add(String(source)); return acc; }, new Set()),
       ));
       dataChunks.addFacet(`${cp}.target`, (bundle) => Array.from(
         bundle.events
           .map(reclassifyConsent)
           .filter((evt) => evt.checkpoint === cp)
           .filter(({ target }) => target) // filter out empty targets
-          .reduce((acc, { target }) => { acc.add(target); return acc; }, new Set()),
+          .reduce((acc, { target }) => { acc.add(String(target)); return acc; }, new Set()),
       ));
 
       if (cp === 'loadresource') {
