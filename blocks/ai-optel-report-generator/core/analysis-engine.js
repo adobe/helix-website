@@ -12,8 +12,8 @@ import {
   handleDynamicFacetToolCall,
 } from './facet-manager.js';
 import {
-  processParallelBatches,
-} from './parallel-processing.js';
+  processMetricsBatches,
+} from './metrics-processing.js';
 import { buildFacetInfoSection } from '../reports/facet-link-generator.js';
 import { PATHS } from '../config.js';
 
@@ -132,7 +132,7 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
   console.log('[Analysis Engine] Starting AI analysis...');
 
   try {
-    // Verify API credentials exist (checked in parallel-processing.js)
+    // Verify API credentials exist (checked in metrics-processing.js)
     const { getApiProvider } = await import('../api/api-factory.js');
     const provider = getApiProvider();
     if (!provider.hasToken) {
@@ -142,16 +142,16 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
     // Get system prompt
     const systemPromptText = await getSystemPrompt();
 
-    // Process with parallel batches
+    // Process metrics in sequential batches
     if (progressCallback) {
       progressCallback(2, 'in-progress', 'Starting analysis...');
     }
 
-    const allInsights = await processParallelBatches(
+    const allInsights = await processMetricsBatches(
       facetTools,
       dashboardData,
       systemPromptText,
-      null, // API credentials auto-detected in parallel-processing.js
+      null, // API credentials auto-detected in metrics-processing.js
       'Analyze the RUM data from the dashboard.',
       handleDynamicFacetToolCall,
       progressCallback,
@@ -159,7 +159,7 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
 
     if (allInsights.length > 0) {
       if (progressCallback) {
-        progressCallback(2, 'completed', 'Parallel batch processing completed');
+        progressCallback(2, 'completed', 'Metrics batch processing completed');
         progressCallback(3, 'in-progress', 'Generating streamlined overview report...', 10);
       }
 

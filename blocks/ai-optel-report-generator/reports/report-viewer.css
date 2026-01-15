@@ -2,6 +2,15 @@
  * Report Viewer Styles - Matches facet-sidebar styling
  */
 
+/* Smooth scroll behavior for facet link navigation */
+html,
+facet-sidebar,
+facet-sidebar #facets,
+.report-viewer,
+.report-sections {
+  scroll-behavior: smooth;
+}
+
 /* Base Container */
 .report-viewer {
   --btn-bg: var(--dark-indigo, #3f51b5);
@@ -47,7 +56,7 @@ facet-sidebar.report-view-active > form {
 .report-sections fieldset {
   --section-bg: var(--light-indigo, #e8eaf6);
   --section-color: var(--dark-indigo, #3f51b5);
-
+  
   padding: var(--spacing-sm) 0 0;
   margin-top: var(--spacing-lg);
   color: var(--section-color);
@@ -244,6 +253,21 @@ facet-sidebar.report-view-active > form {
 
 .report-sections .facet-finding:active {
   background-color: rgb(63 81 181 / 15%);
+}
+
+/* Highlight effect when returning to clicked link */
+.report-sections .facet-link.highlight-return {
+  background-color: rgb(0 115 230 / 15%);
+  outline: 2px solid rgb(0 115 230 / 50%);
+  outline-offset: 2px;
+  border-radius: 3px;
+  transition: background-color 0.3s ease, outline 0.3s ease;
+}
+
+/* Highlight effect when scrolling to checked facet in sidebar */
+facet-sidebar fieldset.highlight-checked {
+  background-color: rgb(0 115 230 / 10%) !important;
+  transition: background-color 0.3s ease;
 }
 
 /* Responsive - Match facet-sidebar at 900px */

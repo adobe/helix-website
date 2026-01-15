@@ -30,82 +30,31 @@ const REPORT_STEPS = [
   { name: 'Generating Report', detail: 'Creating insights and recommendations' },
 ];
 
-/** Get actual dates from daterange picker input */
-function getPickerDates() {
-  const picker = document.querySelector('daterange-picker');
-  const input = picker?.shadowRoot?.querySelector('input');
-  if (!input?.value) return null;
-
-  // Parse format like "Dec 31, 2025 - Jan 7, 2026" or "2025-12-31 - 2026-01-07"
-  const parts = input.value.split(/\s*[-–]\s*/);
-  if (parts.length !== 2) return null;
-
-  const parseDate = (str) => {
-    const d = new Date(str);
-    return Number.isNaN(d.getTime()) ? null : d;
-  };
-
-  const start = parseDate(parts[0]);
-  const end = parseDate(parts[1]);
-  return start && end ? { start, end } : null;
+/** Set only endDate (no startDate) to use fetchPrevious31Days with locked date */
+function setEndDateOnly() {
+  const url = new URL(window.location);
+  // Remove startDate so fetchPrevious31Days is used instead of fetchPeriod
+  url.searchParams.delete('startDate');
+  // Set endDate to today if not already set
+  if (!url.searchParams.has('endDate')) {
+    url.searchParams.set('endDate', new Date().toISOString().split('T')[0]);
+  }
+  window.history.replaceState({}, '', url);
 }
 
-/** Ensure date params and metrics=super are in URL, reload dashboard if needed */
-async function ensureMetricsParameter() {
+/** Ensure metrics=super is set for checkpoint data extraction */
+async function ensureMetricsSuper() {
   const url = new URL(window.location);
-  let updated = false;
-  const currentView = url.searchParams.get('view') || 'week';
+  if (url.searchParams.get('metrics') === 'super') return;
 
-  // Get dates - prefer picker values, then URL, then calculate
-  if (!url.searchParams.has('startDate') || !url.searchParams.has('endDate')) {
-    const pickerDates = getPickerDates();
-    const fmt = (d) => d.toISOString().split('T')[0];
-
-    if (pickerDates) {
-      // Use actual dates from picker
-      url.searchParams.set('startDate', fmt(pickerDates.start));
-      url.searchParams.set('endDate', fmt(pickerDates.end));
-      console.log(`[Report Generator] Using picker dates: ${fmt(pickerDates.start)} to ${fmt(pickerDates.end)}`);
-    } else {
-      // Calculate based on view
-      const end = new Date();
-      const start = new Date(end);
-      if (currentView === 'month') start.setDate(end.getDate() - 31);
-      else if (currentView === 'year') start.setMonth(end.getMonth() - 12);
-      else start.setDate(end.getDate() - 7);
-
-      url.searchParams.set('startDate', fmt(start));
-      url.searchParams.set('endDate', fmt(end));
-      console.log(`[Report Generator] Calculated dates for ${currentView}: ${fmt(start)} to ${fmt(end)}`);
-    }
-    updated = true;
-  }
-
-  if (url.searchParams.get('metrics') !== 'super') {
-    url.searchParams.set('metrics', 'super');
-    console.log('[Report Generator] Added metrics=super to URL');
-    updated = true;
-  }
-
-  // Keep original view (don't force custom) - this ensures consistent metrics
-  console.log(`[Report Generator] Keeping view=${currentView}`);
-
-  if (!updated) return false;
-
+  url.searchParams.set('metrics', 'super');
   window.history.replaceState({}, '', url);
 
   if (typeof window.slicerDraw === 'function') {
-    try {
-      await window.slicerDraw();
-      resetCachedFacetTools();
-      await new Promise((r) => { setTimeout(r, 500); });
-      return true;
-    } catch (e) {
-      console.error('[Report Generator] Error reloading dashboard:', e);
-      return false;
-    }
+    await window.slicerDraw();
+    resetCachedFacetTools();
+    await new Promise((r) => { setTimeout(r, 500); });
   }
-  return false;
 }
 
 /** Show report results with action buttons */
@@ -122,6 +71,8 @@ function handleGenerationError(body, progress, status, btn, origText, err) {
   toggleFormVisibility(body, true);
 
   const isAuth = err.isAuthError;
+  const isFatal = err.isFatalError;
+
   if (isAuth) {
     localStorage.removeItem('awsBedrockToken');
     const tokenInput = body.querySelector('#report-bedrock-token');
@@ -135,7 +86,17 @@ function handleGenerationError(body, progress, status, btn, origText, err) {
     if (infoBox) infoBox.style.display = 'none';
   }
 
-  showStatus(status, 'error', isAuth ? err.message : `Error: ${err.message}`);
+  // Display error message with appropriate context
+  let errorMessage;
+  if (isAuth) {
+    errorMessage = err.message;
+  } else if (isFatal) {
+    errorMessage = err.message; // Already includes "Bedrock API error: 503..."
+  } else {
+    errorMessage = `Error: ${err.message}`;
+  }
+
+  showStatus(status, 'error', errorMessage);
   updateButtonState(btn, false, isAuth ? 'Save Token & Generate' : origText);
 }
 
@@ -154,8 +115,11 @@ export default async function generateReport(statusDiv, button, modal) {
     console.log('[Report Generator] Starting...');
     initializeStepProgress(REPORT_STEPS);
 
+    // Set only endDate to use fetchPrevious31Days with locked date
+    setEndDateOnly();
+
     advanceStep(); // 25% - Loading Checkpoints
-    await ensureMetricsParameter();
+    await ensureMetricsSuper();
 
     advanceStep(); // 50% - Extracting Data
     await new Promise((r) => { setTimeout(r, 300); });
@@ -170,6 +134,13 @@ export default async function generateReport(statusDiv, button, modal) {
 
     const analysisResult = await runCompleteRumAnalysis(progressCallback);
     completeProgress('Report Ready', 'Analysis complete');
+
+    // Restore dashboard to original state (remove metrics=super and checkpoints)
+    const url = new URL(window.location);
+    ['metrics', 'checkpoint', ...Array.from(url.searchParams.keys()).filter((k) => k.includes('.'))]
+      .forEach((k) => url.searchParams.delete(k));
+    window.history.replaceState({}, '', url);
+    if (typeof window.slicerDraw === 'function') await window.slicerDraw();
 
     setTimeout(() => {
       showReportResults(modalBody, analysisResult);

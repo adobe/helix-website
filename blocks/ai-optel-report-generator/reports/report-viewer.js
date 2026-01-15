@@ -59,6 +59,12 @@ const toggleView = (show) => {
   }
 };
 
+/** Show/hide Claude button based on report view state */
+const setClaudeButtonVisibility = (visible) => {
+  const btn = document.querySelector('facet-sidebar .ai-optel-report-generator-button');
+  if (btn) btn.style.display = visible ? '' : 'none';
+};
+
 /** Close report viewer and clean URL params */
 export const closeReportViewer = () => {
   ['optel-detective-source-report', 'optel-detective-source-report-path', 'optel-detective-source-report-view']
@@ -67,6 +73,7 @@ export const closeReportViewer = () => {
   ['report', 'metrics', 'startDate', 'endDate', 'view'].forEach((p) => url.searchParams.delete(p));
   window.history.pushState({}, '', url);
   toggleView(false);
+  setClaudeButtonVisibility(true);
 };
 
 window.closeReportViewer = closeReportViewer;
@@ -87,18 +94,19 @@ const addBackToReportButton = () => {
   const claudeBtn = document.querySelector('facet-sidebar .ai-optel-report-generator-button');
   if (!claudeBtn) return;
 
-  claudeBtn.style.display = 'none';
+  setClaudeButtonVisibility(false);
 
-  const cleanup = () => {
+  const removeBackButtons = () => {
     document.querySelectorAll('.back-to-report-btn, .back-to-report-floating').forEach((b) => b.remove());
-    claudeBtn.style.display = '';
   };
 
   const handleClick = async () => {
     const savedView = sessionStorage.getItem('optel-detective-source-report-view') || 'week';
+    // Keep clicked link ID for scroll-back, remove others
     ['optel-detective-source-report', 'optel-detective-source-report-path', 'optel-detective-source-report-view']
       .forEach((k) => sessionStorage.removeItem(k));
-    cleanup();
+    removeBackButtons();
+    // Stay in report view, so keep Claude button hidden
 
     const url = new URL(window.location);
     url.searchParams.set('report', reportDate);
@@ -114,6 +122,9 @@ const addBackToReportButton = () => {
     if (typeof window.slicerDraw === 'function') await window.slicerDraw();
     // eslint-disable-next-line no-use-before-define
     await showReportInline(reportPath, reportDate);
+    // Scroll back to the clicked link after report renders
+    // eslint-disable-next-line no-use-before-define
+    setTimeout(() => scrollToClickedLink(), 300);
   };
 
   // Static button (circular, replaces Claude button)
@@ -154,17 +165,27 @@ const scrollToFirstCheckedFacet = (retries = 5) => {
   const fieldset = checkbox?.closest('fieldset');
 
   if (fieldset) {
-    // Scroll sidebar to show the fieldset
-    const container = sidebar.querySelector('#facets') || sidebar;
-    const offset = fieldset.offsetTop - container.offsetTop - 20;
-    container.scrollTo({ top: offset, behavior: 'smooth' });
-
-    // Brief highlight effect
-    fieldset.style.transition = 'background-color 0.3s ease';
-    fieldset.style.backgroundColor = 'rgba(0, 115, 230, 0.1)';
-    setTimeout(() => { fieldset.style.backgroundColor = ''; }, 1500);
+    fieldset.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    fieldset.classList.add('highlight-checked');
+    setTimeout(() => fieldset.classList.remove('highlight-checked'), 1500);
   } else if (retries > 0) {
     setTimeout(() => scrollToFirstCheckedFacet(retries - 1), 200);
+  }
+};
+
+/** Scroll to clicked facet link in report with highlight */
+const scrollToClickedLink = (retries = 5) => {
+  const linkId = sessionStorage.getItem('optel-clicked-facet-link');
+  if (!linkId) return;
+
+  const link = document.getElementById(linkId);
+  if (link) {
+    link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    link.classList.add('highlight-return');
+    setTimeout(() => link.classList.remove('highlight-return'), 2000);
+    sessionStorage.removeItem('optel-clicked-facet-link');
+  } else if (retries > 0) {
+    setTimeout(() => scrollToClickedLink(retries - 1), 200);
   }
 };
 
@@ -291,8 +312,11 @@ const renderReport = (container, htmlContent, reportPath) => {
   container.innerHTML = `<div class="report-sections">${sections.map(createSection).join('')}</div>`;
   formatNumbers(container);
 
-  // Add click handlers for facet links
-  container.querySelectorAll('a.facet-link').forEach((link) => {
+  // Add unique IDs and click handlers for facet links
+  container.querySelectorAll('a.facet-link').forEach((link, index) => {
+    const linkId = `facet-link-${index}`;
+    link.id = linkId;
+
     link.addEventListener('click', async (e) => {
       e.preventDefault();
 
@@ -302,6 +326,8 @@ const renderReport = (container, htmlContent, reportPath) => {
         sessionStorage.setItem('optel-detective-source-report', currentReportDate);
         sessionStorage.setItem('optel-detective-source-report-path', reportPath);
         sessionStorage.setItem('optel-detective-source-report-view', currentParams.get('view') || 'week');
+        // Store clicked link ID for scroll-back
+        sessionStorage.setItem('optel-clicked-facet-link', linkId);
       }
 
       toggleView(false);
@@ -347,31 +373,36 @@ export async function showReportInline(reportPath, reportDate) {
   try {
     const html = await fetchReportContent(reportPath);
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const startMeta = doc.querySelector('meta[name="report-start-date"]')?.content;
-    const endMeta = doc.querySelector('meta[name="report-end-date"]')?.content;
     const viewMeta = doc.querySelector('meta[name="report-view"]')?.content || 'week';
+    const endMeta = doc.querySelector('meta[name="report-end-date"]')?.content;
 
     const url = new URL(window.location);
-    const [curStart, curEnd, curView] = ['startDate', 'endDate', 'view'].map((p) => url.searchParams.get(p));
+    const curView = url.searchParams.get('view');
+    const curEnd = url.searchParams.get('endDate');
+    const hadStart = url.searchParams.has('startDate');
 
+    // Set report param and clear filters
     url.searchParams.set('report', reportDate);
-    ['metrics', 'checkpoint', 'url', 'userAgent', ...Array.from(url.searchParams.keys()).filter((k) => k.includes('.'))]
+    ['metrics', 'checkpoint', 'url', 'userAgent', 'startDate',
+      ...Array.from(url.searchParams.keys()).filter((k) => k.includes('.'))]
       .forEach((k) => url.searchParams.delete(k));
+
+    // Set view and endDate only (no startDate) for fetchPrevious31Days
+    url.searchParams.set('view', viewMeta);
+    if (endMeta) url.searchParams.set('endDate', endMeta);
 
     document.querySelectorAll('facet-sidebar input[type="checkbox"]:checked')
       .forEach((el) => { el.checked = false; el.indeterminate = false; });
 
-    if (startMeta && endMeta) {
-      url.searchParams.set('startDate', startMeta);
-      url.searchParams.set('endDate', endMeta);
-      url.searchParams.set('view', viewMeta);
+    // Reload if view/endDate changed or had startDate
+    if (curView !== viewMeta || curEnd !== endMeta || hadStart) {
+      console.log(`[Report Viewer] Restoring view=${viewMeta}, endDate=${endMeta}`);
+      window.location.href = url.toString();
+      return;
     }
 
     window.history.pushState({}, '', url);
-
-    const needsRefresh = curStart !== startMeta || curEnd !== endMeta || curView !== viewMeta;
-    if (needsRefresh && typeof window.slicerDraw === 'function') await window.slicerDraw();
-
+    if (typeof window.slicerDraw === 'function') await window.slicerDraw();
     renderReport(viewer, html, reportPath);
   } catch (err) {
     showError(viewer, err.message);
@@ -426,15 +457,32 @@ const initBackToReportButton = () => {
   }
 };
 
+// Hide Claude button when viewing a report
+const hideClaudeButtonInReportView = () => {
+  if (new URLSearchParams(window.location.search).has('report')) {
+    setClaudeButtonVisibility(false);
+  }
+};
+
 // Clean metrics=super on page load (must run before dashboard loads)
 cleanMetricsSuperOnReload();
 
 // Initialize on DOM ready
+const initOnReady = () => { initBackToReportButton(); hideClaudeButtonInReportView(); };
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initBackToReportButton);
+  document.addEventListener('DOMContentLoaded', initOnReady);
 } else {
-  initBackToReportButton();
+  initOnReady();
 }
+
+// Also hide after sidebar loads (it may render after DOM ready)
+const observer = new MutationObserver(() => {
+  if (document.querySelector('facet-sidebar .ai-optel-report-generator-button')) {
+    hideClaudeButtonInReportView();
+    observer.disconnect();
+  }
+});
+observer.observe(document.body, { childList: true, subtree: true });
 
 // Handle browser back/forward
 window.addEventListener('popstate', async () => {
@@ -442,11 +490,13 @@ window.addEventListener('popstate', async () => {
 
   if (!reportParam) {
     toggleView(false);
+    setClaudeButtonVisibility(true);
     const input = document.querySelector('daterange-picker')?.shadowRoot?.querySelector('input');
     if (input?.getAttribute('aria-expanded') === 'true') input.click();
     return;
   }
 
+  setClaudeButtonVisibility(false);
   try {
     // eslint-disable-next-line import/no-cycle
     const { getSavedReports } = await import('./report-actions.js');
@@ -457,3 +507,21 @@ window.addEventListener('popstate', async () => {
     console.error('Failed to open report on popstate:', err);
   }
 });
+
+// Listen for daterange picker changes (when user selects a date range instead of report)
+const watchForDateRangeChange = () => {
+  const picker = document.querySelector('daterange-picker');
+  if (!picker) {
+    setTimeout(watchForDateRangeChange, 500);
+    return;
+  }
+
+  picker.addEventListener('change', () => {
+    const hasReport = new URLSearchParams(window.location.search).has('report');
+    if (!hasReport) {
+      toggleView(false);
+      setClaudeButtonVisibility(true);
+    }
+  });
+};
+watchForDateRangeChange();

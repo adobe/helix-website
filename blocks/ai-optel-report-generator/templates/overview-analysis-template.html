@@ -2,17 +2,17 @@
 
 <h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
 
-<p><b>🚨🚨🚨 PRIORITY ACTIONS FORMAT - READ THIS FIRST 🚨🚨🚨</b></p>
+<p><b>*** PRIORITY ACTIONS FORMAT - READ THIS FIRST*** </b></p>
 <p>In the PRIORITY ACTIONS section, you MUST insert the literal HTML tag <code>&lt;br&gt;</code> between the action and "Expected Impact:"</p>
 <pre>CORRECT: &lt;p&gt;• Fix broken links.&lt;br&gt;Expected Impact: Reduce 404 errors&lt;/p&gt;
 WRONG:   &lt;p&gt;• Fix broken links.Expected Impact: Reduce 404 errors&lt;/p&gt;
 WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p&gt;</pre>
 <p>The literal characters <code>.&lt;br&gt;Expected</code> must appear — period, then br tag, then Expected. No space between period and br tag.</p>
 
-<p><b>🚨 CRITICAL: USE ONLY REAL DATA FROM TOOL RESPONSES</b></p>
+<p><b>[!] CRITICAL: USE ONLY REAL DATA FROM TOOL RESPONSES</b></p>
 <p>This template contains NO actual data - only structure and formatting guidelines. ALL metrics, numbers, percentages, and values MUST come from the tool responses and dashboard data provided in the SOURCE MATERIAL section. DO NOT use any placeholder values, example numbers, or hypothetical data.</p>
 
-<p><b>⚠️ FORMAT REQUIREMENT - USE SEMANTIC HTML:</b></p>
+<p><b>[!] FORMAT REQUIREMENT - USE SEMANTIC HTML:</b></p>
 <ul>
   <li><code>&lt;h4&gt;</code> for main section headings, <code>&lt;b&gt;</code> for subsection labels</li>
   <li>Wrap ALL text in <code>&lt;p&gt;</code> tags, use bullet character (•) for lists</li>
@@ -20,26 +20,26 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>NO emojis or progress bars - keep report easy to scan with clear structure</li>
 </ul>
 
-<p><b>🔗 FACET LINKING REQUIREMENT - MAKE FINDINGS CLICKABLE:</b></p>
+<p><b>FACET LINKING REQUIREMENT - MAKE FINDINGS CLICKABLE:</b></p>
 <ul>
   <li>When mentioning specific facet findings, wrap them in <code>&lt;span&gt;</code> tags with data attributes</li>
   <li><b>Simple facet format:</b> <code>&lt;span data-facet="facetName" data-facet-value="facetValue"&gt;finding text&lt;/span&gt;</code></li>
   <li><b>Nested facet format (REQUIRED for .source/.target facets):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="parentCheckpoint" data-nested-facet="checkpoint.source" data-nested-value="specificValue"&gt;finding text&lt;/span&gt;</code></li>
 </ul>
 
-<p><b>⚠️ CRITICAL: For Any Facet Ending in .source or .target</b></p>
+<p><b>[!] CRITICAL: For Any Facet Ending in .source or .target</b></p>
 <ul>
   <li><b>ALWAYS include BOTH the parent checkpoint AND the nested facet</b></li>
-  <li>❌ WRONG: <code>data-facet="error.source" data-facet-value="focus-loss"</code></li>
-  <li>✅ CORRECT: <code>data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="focus-loss"</code></li>
+  <li>[X] WRONG: <code>data-facet="error.source" data-facet-value="focus-loss"</code></li>
+  <li>[OK] CORRECT: <code>data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="focus-loss"</code></li>
   <li>This generates URL: <code>&amp;checkpoint=error&amp;error.source=focus-loss</code></li>
 </ul>
 
-<p><b>⚠️ CRITICAL: Use ACTUAL Facet Values, NOT Display Text</b></p>
+<p><b>[!] CRITICAL: Use ACTUAL Facet Values, NOT Display Text</b></p>
 <ul>
   <li><b>ALWAYS use the exact facet value from the tool results, not human-readable text</b></li>
-  <li>❌ WRONG: <code>data-nested-value="All paid traffic"</code> (display text)</li>
-  <li>✅ CORRECT: <code>data-nested-value="paid"</code> (actual facet value)</li>
+  <li>[X] WRONG: <code>data-nested-value="All paid traffic"</code> (display text)</li>
+  <li>[OK] CORRECT: <code>data-nested-value="paid"</code> (actual facet value)</li>
   <li>Example: If tool shows <code>{"value": "paid", "count": 1234}</code>, use <code>"paid"</code></li>
   <li>Example: If tool shows <code>{"value": "focus-loss", "count": 567}</code>, use <code>"focus-loss"</code></li>
   <li><b>The display text goes INSIDE the span, the actual value goes in data attributes</b></li>
@@ -47,8 +47,8 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 
 <p><b>Correct vs Incorrect Examples:</b></p>
 <ul>
-  <li>❌ <code>&lt;span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="All paid traffic"&gt;paid traffic&lt;/span&gt;</code></li>
-  <li>✅ <code>&lt;span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid"&gt;All paid traffic&lt;/span&gt;</code></li>
+  <li>[X] <code>&lt;span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="All paid traffic"&gt;paid traffic&lt;/span&gt;</code></li>
+  <li>[OK] <code>&lt;span data-facet="checkpoint" data-facet-value="acquisition" data-nested-facet="acquisition.source" data-nested-value="paid"&gt;All paid traffic&lt;/span&gt;</code></li>
 </ul>
 
 <p><b>Examples by Facet Type:</b></p>
@@ -70,7 +70,7 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>This enables readers to click findings and navigate directly to the relevant dashboard view with correct filters</li>
 </ul>
 
-<p><b>⚠️ CRITICAL: Only Link to VERIFIED Facet Data</b></p>
+<p><b>[!] CRITICAL: Only Link to VERIFIED Facet Data</b></p>
 <ul>
   <li><b>DO NOT create facet links unless the data exists as a selectable checkbox in the sidebar</b></li>
   <li>Before adding a facet link, verify the value appears in the tool results with actual counts</li>
@@ -81,30 +81,140 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>Only wrap text in facet spans when you're CERTAIN the facet value exists in the sidebar data</li>
 </ul>
 
-<p><b>⚠️ CORE STRUCTURE - SYSTEMATIC FACET COVERAGE:</b></p>
+<p><b>[!] CORE STRUCTURE - COMPREHENSIVE DATA COVERAGE:</b></p>
 <ul>
-  <li>You will receive a COMPLETE LIST of all facets that were analyzed (typically 30+ facets)</li>
-  <li>Group related facets into natural categories and cover ALL of them in flowing bullet points</li>
-  <li>Go through the list SYSTEMATICALLY - don't skip any facet</li>
-  <li>Write naturally about multiple related facets together, not mechanically one-by-one</li>
-  <li>Balance positives and improvements in a conversational tone</li>
-  <li>This ensures ALL facets get coverage without mechanical repetition</li>
-  <li>Target report length: 1200-1600 words covering all facets comprehensively</li>
+  <li><b>BE SPECIFIC:</b> Use exact numbers, not vague summaries. "Mobile LCP is 3.2s vs desktop 1.8s" not "performance varies"</li>
+  <li><b>INCLUDE BREAKDOWNS:</b> Show mobile vs desktop, top vs bottom pages, source comparisons</li>
+  <li><b>NAME SPECIFICS:</b> List actual page URLs, error messages, referrer domains</li>
+  <li><b>SHOW THRESHOLDS:</b> Compare to good/poor thresholds (LCP: 2.5s, CLS: 0.1, INP: 200ms)</li>
+  <li><b>NO REPETITION:</b> Each insight appears ONCE in the most relevant section. Don't repeat the same metric/finding across multiple sections.</li>
+  <li><b>Target: 1200-1600 words</b> - concise but specific</li>
 </ul>
 
-<p><b>📊 Number Formatting</b></p>
-<p>Use raw numbers directly in your text. Include specific counts, percentages, and metrics from the tool responses without complex formatting.</p>
+<p><b>NARRATIVE STYLE - TELL A STORY WITH DATA:</b></p>
+<p><b>[!] Your report should read like a story, not a data dump. Lead with what matters, explain why it matters, and connect insights across sections.</b></p>
+
+<p><b>1. HOOK THE READER:</b></p>
+<ul>
+  <li>Open the Executive Summary with the most surprising or important finding</li>
+  <li>Good: "Mobile users are abandoning the checkout page at 3x the rate of desktop—and a 4.2s LCP is the likely culprit."</li>
+  <li>Bad: "This report analyzes the website performance for the last 30 days."</li>
+</ul>
+
+<p><b>2. HIGHLIGHT SURPRISES:</b></p>
+<ul>
+  <li>Call out counterintuitive findings: "Despite strong overall traffic, organic search converts 40% worse than paid."</li>
+  <li>Note unexpected patterns: "The blog drives 60% of traffic but only 5% of conversions."</li>
+  <li>Flag anomalies: "Error rates spiked 300% on mobile Safari specifically."</li>
+</ul>
+
+<p><b>3. CONNECT THE DOTS:</b></p>
+<ul>
+  <li>Link causes to effects: "The slow LCP on mobile (3.2s) likely explains the 65% mobile bounce rate."</li>
+  <li>Show relationships: "Germany shows high traffic but poor engagement—latency issues may be the cause."</li>
+  <li>Build a narrative: Each section should flow into the next, not feel isolated.</li>
+</ul>
+
+<p><b>4. END SECTIONS WITH "SO WHAT":</b></p>
+<ul>
+  <li>After presenting data, explain the implication: "This means roughly 12,000 users per month may be leaving before the page loads."</li>
+  <li>Quantify impact where possible: "Fixing this could recover an estimated $X in conversions."</li>
+</ul>
+
+<p><b>5. BE SPECIFIC BUT ENGAGING:</b></p>
+<ul>
+  <li>Include ALL metrics from tool responses—but weave them into a narrative</li>
+  <li>Use comparisons: "Mobile LCP at 3.2s is nearly double desktop's 1.8s"</li>
+  <li>Add context: "This exceeds Google's 2.5s threshold, hurting SEO rankings"</li>
+</ul>
+
+<p><b>Example of BORING (data dump):</b></p>
+<p style="color:#888"><i>"LCP is 2.3s. CLS is 0.1. INP is 180ms. Mobile is slower. Desktop is faster. Bounce rate is 45%."</i></p>
+
+<p><b>Example of ENGAGING (narrative with same data):</b></p>
+<p style="color:#888"><i>"Here's the story: desktop users enjoy a snappy 1.8s LCP, but mobile users wait nearly twice as long at 3.1s—crossing Google's 2.5s threshold. That extra wait shows up in the numbers: mobile bounce rate hits 58% versus desktop's 32%. The culprit? A hero image on the homepage accounts for 56k slow LCP measurements. Fix that one image, and you're looking at a potential 20% bounce reduction."</i></p>
+
+<p><b>[!] The engaging example: hooks with insight, shows cause-effect, names the specific problem, and quantifies the opportunity. This is the standard.</b></p>
+
+<p><b>6. TEXT FORMATTING - USE SPARINGLY:</b></p>
+<ul>
+  <li><b>Maximum 1 bold phrase per section</b> - use only for the single most critical insight or metric</li>
+  <li><b>Maximum 1 italic phrase per section</b> - use only for emphasis on a surprising finding or key implication</li>
+  <li>Overusing bold/italic dilutes impact - when everything is emphasized, nothing is</li>
+  <li>Let the data speak for itself; formatting should highlight, not decorate</li>
+  <li>Exception: Section headings (h4) use bold as standard</li>
+</ul>
+
+<p><b>Number Formatting - USE &lt;number-format&gt; TAG FOR ALL NUMBERS:</b></p>
+<p><b>[!] CRITICAL: Wrap EVERY number in the report with <code>&lt;number-format&gt;</code> tags.</b> This includes metrics, counts, percentages, durations, error counts, session counts, page views, etc.</p>
+<p><b>Format:</b></p>
+<pre>&lt;number-format title="[raw value] [trend text]" trend="[rising|falling|stable]" sample-size="[count]"&gt;
+  &lt;span class="formatted-value"&gt;[formatted display]&lt;/span&gt;
+&lt;/number-format&gt;</pre>
+<p><b>Attributes:</b></p>
+<ul>
+  <li><code>title</code>: Full raw value with uncertainty and trend if available (e.g., "227129980 ±5123047 and falling"). If no uncertainty/trend data, just use raw value (e.g., "4500")</li>
+  <li><code>trend</code>: One of "rising", "falling", or "stable". Use "stable" if trend is unknown.</li>
+  <li><code>sample-size</code>: Number of samples/sessions used for the metric. If unknown, use approximate or omit the attribute.</li>
+  <li><code>formatted-value</code>: Human-readable shortened version (e.g., "230m", "2.3s", "45%", "4.5k")</li>
+</ul>
 <p><b>Examples:</b></p>
 <ul>
-  <li>"Mobile users experienced 4,900 sessions with an average LCP of 2.3 seconds"</li>
-  <li>"Error rate peaked at 234 incidents affecting 15% of users"</li>
-  <li>"Desktop traffic accounted for 8,100 page views"</li>
+  <li>Large counts: <code>&lt;number-format title="227129980 ±5123047 and falling" trend="falling" sample-size="7551"&gt;&lt;span class="formatted-value"&gt;230m&lt;/span&gt;&lt;/number-format&gt; page views</code></li>
+  <li>Durations: <code>&lt;number-format title="2.34s ±0.12s and rising" trend="rising" sample-size="4500"&gt;&lt;span class="formatted-value"&gt;2.3s&lt;/span&gt;&lt;/number-format&gt; LCP</code></li>
+  <li>Percentages: <code>&lt;number-format title="45.2% ±2.1%" trend="stable" sample-size="890"&gt;&lt;span class="formatted-value"&gt;45%&lt;/span&gt;&lt;/number-format&gt; bounce rate</code></li>
+  <li>Error counts: <code>&lt;number-format title="1234 errors" trend="stable" sample-size="890"&gt;&lt;span class="formatted-value"&gt;1.2k&lt;/span&gt;&lt;/number-format&gt; errors</code></li>
+  <li>Small counts: <code>&lt;number-format title="23 sessions" trend="stable"&gt;&lt;span class="formatted-value"&gt;23&lt;/span&gt;&lt;/number-format&gt; mobile sessions</code></li>
+</ul>
+<p><b>[!] DO NOT write bare numbers:</b></p>
+<ul>
+  <li>[X] WRONG: "Mobile users experienced 4,900 sessions"</li>
+  <li>[OK] CORRECT: "Mobile users experienced <code>&lt;number-format title="4900 sessions" trend="stable"&gt;&lt;span class="formatted-value"&gt;4.9k&lt;/span&gt;&lt;/number-format&gt;</code> sessions"</li>
 </ul>
 
-<p><b>📅 Analysis Period</b></p>
+<p><b>[!] CRITICAL: COMBINING METRICS WITH FACET LINKS</b></p>
+<p>When mentioning Core Web Vitals or other metrics from the dashboard, wrap the ENTIRE metric mention in a facet span so users can click to navigate to that metric in the sidebar. The number-format tag goes INSIDE the facet span.</p>
+
+<p><b>Metric-to-Facet Mapping (use these exact checkpoint values):</b></p>
+<ul>
+  <li><b>LCP:</b> <code>data-facet="checkpoint" data-facet-value="cwv-lcp"</code></li>
+  <li><b>CLS:</b> <code>data-facet="checkpoint" data-facet-value="cwv-cls"</code></li>
+  <li><b>INP:</b> <code>data-facet="checkpoint" data-facet-value="cwv-inp"</code></li>
+  <li><b>TTFB:</b> <code>data-facet="checkpoint" data-facet-value="cwv-ttfb"</code></li>
+  <li><b>Engagement:</b> <code>data-facet="checkpoint" data-facet-value="click"</code> (or specific engagement checkpoint)</li>
+  <li><b>Errors:</b> <code>data-facet="checkpoint" data-facet-value="error"</code></li>
+  <li><b>404s:</b> <code>data-facet="checkpoint" data-facet-value="404"</code></li>
+  <li><b>Acquisition:</b> <code>data-facet="checkpoint" data-facet-value="acquisition"</code></li>
+</ul>
+
+<p><b>Combined Format (facet span wrapping number-format):</b></p>
+<pre>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;
+  LCP at &lt;number-format title="2.34s ±0.12s and rising" trend="rising" sample-size="4500"&gt;
+    &lt;span class="formatted-value"&gt;2.3s&lt;/span&gt;
+  &lt;/number-format&gt;
+&lt;/span&gt;</pre>
+
+<p><b>Complete Examples:</b></p>
+<ul>
+  <li><b>LCP metric:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP of &lt;number-format title="2.34s" trend="rising" sample-size="4500"&gt;&lt;span class="formatted-value"&gt;2.3s&lt;/span&gt;&lt;/number-format&gt;&lt;/span&gt;</code></li>
+  <li><b>CLS metric:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-cls"&gt;CLS at &lt;number-format title="0.12" trend="stable" sample-size="3200"&gt;&lt;span class="formatted-value"&gt;0.12&lt;/span&gt;&lt;/number-format&gt;&lt;/span&gt;</code></li>
+  <li><b>INP metric:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-inp"&gt;INP of &lt;number-format title="180ms" trend="falling" sample-size="2800"&gt;&lt;span class="formatted-value"&gt;180ms&lt;/span&gt;&lt;/number-format&gt;&lt;/span&gt;</code></li>
+  <li><b>Error count:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;&lt;number-format title="1234 errors" trend="stable"&gt;&lt;span class="formatted-value"&gt;1.2k&lt;/span&gt;&lt;/number-format&gt; errors&lt;/span&gt;</code></li>
+  <li><b>404 count:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="404"&gt;&lt;number-format title="567" trend="rising"&gt;&lt;span class="formatted-value"&gt;567&lt;/span&gt;&lt;/number-format&gt; 404 errors&lt;/span&gt;</code></li>
+</ul>
+
+<p><b>With Nested Facets (for source/target breakdown):</b></p>
+<ul>
+  <li><b>LCP from images:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp" data-nested-facet="cwv-lcp.source" data-nested-value="img"&gt;LCP of &lt;number-format title="3.1s" trend="rising"&gt;&lt;span class="formatted-value"&gt;3.1s&lt;/span&gt;&lt;/number-format&gt; from images&lt;/span&gt;</code></li>
+  <li><b>Error from specific source:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="focus-loss"&gt;&lt;number-format title="890" trend="stable"&gt;&lt;span class="formatted-value"&gt;890&lt;/span&gt;&lt;/number-format&gt; focus-loss errors&lt;/span&gt;</code></li>
+</ul>
+
+<p><b>[!] KEY RULE: Every metric value that appears in a selectable checkbox in the facet sidebar MUST be wrapped in a clickable facet span.</b> This includes all Core Web Vitals, error counts, traffic metrics, and any other dashboard metrics. Clicking the metric in the report should filter the dashboard to show that specific data.</p>
+
+<p><b>Analysis Period</b></p>
 <p>This analysis covers data for the selected time period (provided in the DATA TIME PERIOD section above). ALWAYS include the specific date range context in your findings. When presenting insights, clearly state that the data represents the specified time period (e.g., "last 30 days" or "last 7 days").</p>
 
-<p><b>⚠️ Core Web Vitals Interpretation Guidelines</b></p>
+<p><b>[!] Core Web Vitals Interpretation Guidelines</b></p>
 <p>When analyzing LCP, CLS, and INP metrics:</p>
 <ul>
   <li>If metric titles contain "and rising" or "and falling", these indicate TRENDS, not absolute performance</li>
@@ -114,7 +224,7 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>A metric can be "rising" but still within acceptable performance thresholds</li>
 </ul>
 
-<p><b>🔍 Facet Analysis Guidelines</b></p>
+<p><b>Facet Analysis Guidelines</b></p>
 <p>For ALL facets being analyzed:</p>
 <ul>
   <li>ALWAYS check the title field of each facet (found in the help link's title attribute) to understand what it represents and its purpose</li>
@@ -124,7 +234,7 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>Each facet provides unique business value - ensure comprehensive coverage of all data types</li>
 </ul>
 
-<p><b>⚠️ UTM TRACKING - PRIVACY BY DESIGN:</b></p>
+<p><b>[!] UTM TRACKING - PRIVACY BY DESIGN:</b></p>
 <ul>
   <li>UTM data only records <b>parameter names</b> (utm_source, utm_medium, etc.), NOT their values — this is <b>intentional for privacy</b></li>
   <li>DO NOT recommend "capturing UTM values" or suggest this is a limitation to fix</li>
@@ -133,7 +243,7 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>Valid insights: "UTM parameters are present on X% of traffic" or "utm_source is the most commonly used parameter"</li>
 </ul>
 
-<p><b>⚠️ CRITICAL: INTERPRETING CSS CLASSES FOR METRIC SEVERITY</b></p>
+<p><b>[!] CRITICAL: INTERPRETING CSS CLASSES FOR METRIC SEVERITY</b></p>
 <p>When analyzing tool results, metrics include CSS classes that indicate severity levels. You MUST pay special attention to these class indicators:</p>
 
 <p><b>Performance Metrics (LCP, CLS, INP):</b></p>
@@ -151,7 +261,7 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li>Note: Metric values may have <code>&lt;meter&gt;</code> attributes (<code>low</code>, <code>high</code>, <code>optimum</code>) that provide threshold guidance</li>
 </ul>
 
-<p><b>⚠️ MANDATORY: When you see metrics with "score-poor" or critical thresholds, you MUST:</b></p>
+<p><b>[!] MANDATORY: When you see metrics with "score-poor" or critical thresholds, you MUST:</b></p>
 <ul>
   <li>Prominently mention them in the relevant sections with specific values and context</li>
   <li>Include them in "JAVASCRIPT ERRORS THAT NEED ATTENTION" if they relate to technical/performance issues AND errors ≥1% of traffic</li>
@@ -181,7 +291,7 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 
 <!-- ACTUAL REPORT STRUCTURE STARTS HERE -->
 
-<p><b>📋 CONDITIONAL SECTIONS:</b></p>
+<p><b>CONDITIONAL SECTIONS:</b></p>
 <ul>
   <li><b>JavaScript Errors:</b> Only include if errors ≥1% of total traffic. Skip entirely if below threshold.</li>
   <li><b>All Other Sections:</b> Always include (Executive Summary, Performance Impact, User Engagement, Traffic & Acquisition, Business Impact, Priority Actions)</li>
@@ -189,24 +299,27 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 
 
 <h4>EXECUTIVE SUMMARY</h4>
-<p>Create a flowing, readable summary (MAXIMUM 150 words) in this structure:</p>
+<p>Maximum 150 words. Structure:</p>
 
-<p>Start with the analysis period and site context: [This {type of site - e.g., e-commerce, content site, SaaS platform} focused on {primary purpose} was analyzed for the last {date range}.]</p>
+<p><b>1. Context (1-2 sentences):</b> What site, what type, what period.</p>
+<p>Example: "This e-commerce site focused on outdoor gear was analyzed for the last 30 days, covering 45,000 sessions across 12 countries."</p>
 
-<p>Current health status: [The site shows {overall health assessment} with Core Web Vitals at {specific metrics like LCP, CLS, INP values}. {Brief performance summary}.]</p>
+<p><b>2. Hook + Health (1-2 sentences):</b> Lead with the most important finding, then overall health.</p>
+<p>Example: "The headline: mobile users are bouncing at 2x the desktop rate—slow LCP is the likely cause. Overall, Core Web Vitals show mixed results with LCP failing (3.2s) while CLS (0.08) and INP (165ms) pass."</p>
 
-<p><b>Key Findings for Stakeholders:</b></p>
-<p>• [Critical finding or opportunity with specific numbers and business impact]</p>
-<p>• [Critical finding or opportunity with specific numbers and business impact]</p>
-<p>• [Critical finding or opportunity with specific numbers and business impact]</p>
+<p><b>3. Key Findings for Stakeholders (3 bullets with facet links):</b></p>
+<p>• [Most critical issue + specific numbers + business impact + facet link]</p>
+<p>• [Biggest opportunity + data + facet link]</p>
+<p>• [Surprising or counterintuitive insight + facet link]</p>
 
-<p>⚠️ <b>STYLE:</b> First two paragraphs as flowing prose (no bold labels), bullets for Key Findings. Keep readable.</p>
-<p>⚠️ <b>FORMAT:</b> Wrap text in &lt;p&gt; tags, include specific numbers from tool responses. NO EMOJIS.</p>
+<p><b>[!] Each finding MUST include a facet link.</b> Example:</p>
+<p><code>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP at 3.2s&lt;/span&gt; exceeds threshold—mobile bounce rate is 65% vs desktop's 32%.&lt;/p&gt;</code></p>
+<p>[!] <b>FORMAT:</b> Wrap text in &lt;p&gt; tags, include specific numbers from tool responses. NO EMOJIS.</p>
 
 <!-- ====================================================================== -->
 
 <h4>JAVASCRIPT ERRORS THAT NEED ATTENTION</h4>
-<p><b>⚠️ THRESHOLD CHECK:</b> Only include this section if JavaScript errors represent <b>≥1% of total traffic</b>. Calculate: (error count / total page views) × 100. If errors are &lt;1%, <b>SKIP THIS ENTIRE SECTION</b> and move directly to "PERFORMANCE IMPACT".</p>
+<p><b>[!] THRESHOLD CHECK:</b> Only include this section if JavaScript errors represent <b>≥1% of total traffic</b>. Calculate: (error count / total page views) × 100. If errors are &lt;1%, <b>SKIP THIS ENTIRE SECTION</b> and move directly to "PERFORMANCE IMPACT".</p>
 
 <p>Write 2-3 paragraphs analyzing error patterns. Use bullets (•) when listing specific errors or when emphasizing distinct issues that need attention.</p>
 <p>[First paragraph: Describe the overall error landscape, frequency patterns, and which pages or features are most affected. Write as flowing text with specific numbers integrated naturally.]</p>
@@ -217,58 +330,39 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 
 
 <h4>PERFORMANCE IMPACT</h4>
-<p>Write 2-3 paragraphs about Core Web Vitals and performance. Use bullets (•) when presenting multiple metrics or listing distinct optimization opportunities.</p>
-<p>[First paragraph: Overall performance assessment. Discuss LCP, CLS, and INP with specific values, how they compare to thresholds, and which devices/connections are affected. Write as flowing text with metrics integrated naturally.]</p>
-<p><b>If you have 3+ optimization opportunities, use bullets:</b></p>
-<p>• [Optimization 1: Specific action with expected impact on metrics and user experience]</p>
-<p>• [Optimization 2: Specific action with expected impact]</p>
-<p>[Or continue with flowing paragraph if discussing overall page load times, bottlenecks, and performance patterns. Use bullets only when listing makes information clearer and more scannable.]</p>
+<p>100-150 words. Write as flowing narrative with LCP/CLS/INP values, threshold comparisons, mobile vs desktop breakdown. Use bullets only if 3+ distinct metrics need emphasis. End with "so what" - impact on users/SEO. Add facet links.</p>
 
 <!-- ====================================================================== -->
 
 <h4>USER ENGAGEMENT</h4>
-<p>Write 2-3 paragraphs about user interaction patterns. Use bullets (•) when comparing multiple engagement segments or listing key findings that need emphasis.</p>
-<p>[First paragraph: Describe page view patterns, session behavior, and how users navigate through the site. Include metrics like average session duration, pages per session, and bounce rates. Write as flowing text integrating specific numbers naturally.]</p>
-<p>[Second paragraph: Discuss device and browser usage patterns and their correlation with engagement. If you have 3+ distinct device/browser findings or engagement segments to compare, use bullets for clarity. Otherwise, continue with flowing prose discussing content discovery patterns and user behavior insights.]</p>
+<p>100-150 words. Write as flowing narrative covering sessions, page views, bounce rates, device breakdown. Connect engagement patterns to performance issues. Use bullets only to highlight 3+ distinct findings. Add facet links.</p>
 
 <h4>TRAFFIC & ACQUISITION</h4>
-<p>Write 2-3 paragraphs analyzing traffic sources. Use bullets (•) when comparing 3+ distinct channels/sources or when highlighting top performers.</p>
-<p>[First paragraph: Analyze traffic volume by channel (direct, referral, search) with growth trends and percentages. Discuss which channels drive the most volume and quality. Write as flowing text with metrics integrated naturally.]</p>
-<p>[Second paragraph: Discuss referrer effectiveness, partnership performance, and UTM campaign results where available. Use bullets if listing 3+ top referrers/sources with distinct performance characteristics. Otherwise, continue with flowing prose emphasizing which acquisition channels drive the most engaged users and which need optimization.]</p>
+<p>100-150 words. Write as flowing narrative covering traffic sources (organic/paid/direct/referral) with counts and quality. Highlight any surprising patterns - which source converts best/worst? Use bullets only for listing 3+ sources. Add facet links.</p>
 
 <h4>CONTENT EFFECTIVENESS</h4>
-<p>Write 2-3 paragraphs evaluating content performance. Use bullets (•) when listing specific top/bottom pages or when presenting multiple distinct recommendations.</p>
-<p>[First paragraph: Identify top performing pages with engagement metrics. Discuss what makes them successful and which content types or topics resonate most. Use bullets if listing 3+ specific pages with performance data. Otherwise, write as flowing text with URLs and metrics integrated naturally.]</p>
-<p>[Second paragraph: Analyze URL patterns showing high vs low engagement. Discuss content themes and user preferences. Use bullets for 3+ specific optimization recommendations. Otherwise, provide recommendations as flowing prose with expected impact integrated naturally.]</p>
+<p>100-150 words. Write as flowing narrative about which content resonates. Name top pages with view counts, identify underperformers. Use bullets when listing 3+ specific pages. End with content strategy insight. Add facet links.</p>
 
 <h4>CONVERSION FUNNEL</h4>
-<p>Write 2-3 paragraphs analyzing user journey and conversion. Use bullets (•) when listing 3+ specific drop-off points or comparing funnel performance across different segments.</p>
-<p>[First paragraph: Analyze bounce rates across key entry pages and landing pages. Discuss engagement metrics like pages per session, session duration, and conversion rates. Include specific percentages and identify which pages or sources drive quality traffic versus high bounce rates. Write as flowing text with metrics integrated naturally.]</p>
-<p>[Second paragraph: Examine organic traffic patterns and user flow. Discuss navigation from entry to conversion, identifying friction areas. Include form data if available. Use bullets if highlighting 3+ specific drop-off points or funnel stages. Otherwise, continue with flowing prose providing optimization recommendations.]</p>
+<p>100-150 words. Write as flowing narrative about user journey - where they enter, where they drop off. Quantify the leak (sessions lost). Use bullets only for listing 3+ specific drop-off points. End with opportunity size. Add facet links.</p>
 
 <h4>GEOGRAPHIC INSIGHTS</h4>
-<p>Write 2-3 paragraphs about geographic patterns. Use bullets (•) when comparing 3+ regions with distinct characteristics or when listing regional opportunities.</p>
-<p>[First paragraph: Describe traffic distribution by country/region with volume metrics. Highlight regional performance variations and latency patterns affecting user experience. Write as flowing text with geographic data integrated naturally.]</p>
-<p>[Second paragraph: Discuss language preferences, localization opportunities, and geographic user behavior differences. Use bullets if identifying 3+ regions with distinct opportunities/concerns. Otherwise, write as flowing prose identifying growth potential or optimization needs.]</p>
+<p>100-150 words. Write as flowing narrative about where users come from, regional performance variations. Use bullets only when listing 3+ countries. Identify untapped markets or regions needing optimization. Add facet links.</p>
 
 <h4>MARKET OPPORTUNITIES</h4>
-<p>Write 2-3 paragraphs identifying growth opportunities. Use bullets (•) when listing 3+ distinct opportunities with supporting data.</p>
-<p>[First paragraph: Identify underserved markets or regions with high potential based on data. Discuss geographic expansion opportunities considering performance and user behavior patterns. Write as flowing text unless listing multiple distinct opportunities.]</p>
-<p>[Second paragraph: Highlight device/platform optimization opportunities and emerging trends. Identify untapped segments. Use bullets if presenting 3+ specific opportunities with data. Otherwise, provide recommendations as flowing prose with expected impact.]</p>
+<p>100-150 words. Synthesize insights from above sections into actionable opportunities. Focus on quick wins, underserved segments, growth potential. Use bullets if presenting 3+ distinct opportunities. Be specific about expected impact.</p>
 
 <!-- ====================================================================== -->
 
 <h4>BUSINESS IMPACT</h4>
-<p>Write 2-3 paragraphs summarizing business implications. Use bullets (•) when quantifying 3+ distinct cost areas or revenue opportunities.</p>
-<p>[First paragraph: Quantify the revenue impact of performance improvements and UX enhancements. Discuss how technical issues affect business metrics and customer satisfaction. Write as flowing text integrating business impact naturally.]</p>
-<p>[Second paragraph: Summarize cost of current issues and growth potential from identified opportunities. Provide business case for recommended actions with expected ROI. Use bullets if listing 3+ specific cost/opportunity items. Otherwise, write as flowing prose with financial implications integrated naturally.]</p>
+<p>100-150 words. Write as flowing narrative translating technical issues to business outcomes. Quantify what poor performance costs (lost sessions/conversions). Estimate ROI from priority actions. Use bullets only if listing 3+ distinct cost/opportunity areas. Make stakeholders care.</p>
 
 <!-- ====================================================================== -->
 
 <h4>PRIORITY ACTIONS</h4>
 <p>List 4-6 most critical actions — focus on <b>HIGH IMPACT + EASY TO FIX</b> issues (quick wins):</p>
 
-<p><b>🎯 PRIORITIZATION CRITERIA (in order):</b></p>
+<p><b>PRIORITIZATION CRITERIA (in order):</b></p>
 <ul>
   <li><b>Quick wins first:</b> Issues that are easy to fix AND bring significant improvement</li>
   <li><b>High traffic impact:</b> Fixes affecting the most users/page views</li>
@@ -278,9 +372,15 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 </ul>
 <p>DO NOT include complex, long-term projects. Focus on actions that can be done quickly with measurable results.</p>
 
-<p><b>Content Actions</b> = quick fixes by authors/editors (no code): image optimization, broken links, missing alt text, metadata updates</p>
-<p><b>Code Actions</b> = quick fixes by developers: lazy loading, caching, error fixes, performance tweaks</p>
-<p>2-3 actions per category (4-6 total). NO timelines. Use format from top of template: <code>[Action].&lt;br&gt;Expected Impact:</code></p>
+<p><b>Authoring Tasks</b> = quick fixes by authors/editors (no code): image optimization, broken links, missing alt text, metadata updates</p>
+<p><b>Code Tasks</b> = quick fixes by developers: lazy loading, caching, error fixes, performance tweaks</p>
+<p>2-3 actions per category (4-6 total). NO timelines.</p>
+
+<p><b>[!] FORMAT: Use &lt;br&gt; before "Expected Impact:" (new line, same bullet):</b></p>
+<pre>CORRECT: &lt;p&gt;• [Action].&lt;br&gt;Expected Impact: [Impact]&lt;/p&gt;
+WRONG:   &lt;p&gt;• [Action]. Expected Impact: [Impact]&lt;/p&gt;  ← no line break
+WRONG:   &lt;p&gt;• [Action].&lt;/p&gt;&lt;p&gt;Expected Impact:...&lt;/p&gt;  ← separate paragraphs</pre>
+<p>Include facet links + number-format in actions. The literal <code>.&lt;br&gt;Expected</code> must appear (period, br, Expected, no space).</p>
 
 <!-- CRITICAL REQUIREMENTS -->
 
@@ -288,29 +388,11 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 
 <h4>CRITICAL LENGTH & FORMAT REQUIREMENTS</h4>
 <ul>
-  <li><b>ENTIRE REPORT:</b> 1200-1600 words (comprehensive coverage of all facets)</li>
-  <li><b>Executive Summary:</b> Maximum 150 words (2 flowing paragraphs + 3 key findings as bullets)</li>
-  <li><b>ALL OTHER SECTIONS:</b> Each section 100-150 words (adjust based on data richness)
-    <ul>
-      <li>Write primarily as flowing paragraphs with specific metrics and data integrated naturally</li>
-      <li><b>Use bullets (•) strategically when:</b>
-        <ul>
-          <li>Listing 3+ distinct items (errors, pages, regions, opportunities, etc.)</li>
-          <li>Comparing multiple specific data points that benefit from parallel structure</li>
-          <li>Highlighting key recommendations or action items</li>
-          <li>When bullet format improves clarity and scannability</li>
-        </ul>
-      </li>
-      <li><b>Continue with flowing prose when:</b>
-        <ul>
-          <li>Providing context, analysis, or narrative</li>
-          <li>Discussing trends and patterns</li>
-          <li>Explaining causation or implications</li>
-          <li>You have fewer than 3 items to present</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
+  <li><b>ENTIRE REPORT:</b> 1200-1600 words (concise but specific)</li>
+  <li><b>Executive Summary:</b> Maximum 150 words (2 paragraphs + 3 key findings with facet links)</li>
+  <li><b>Each section:</b> 100-150 words - be specific, not verbose. Include key data points with facet links.</li>
+  <li><b>Priority Actions:</b> 4-6 quick wins with facet links</li>
+  <li><b>NO REPETITION:</b> Each insight appears in ONE section only. Don't repeat metrics across sections.</li>
   <li><b>Priority Actions:</b> 4-6 QUICK WINS (high impact + easy fix). Use format from top of template.</li>
   <li>Balance readability with specificity - integrate data naturally into sentences</li>
   <li>Use actionable language and quantify impact wherever possible</li>
@@ -346,10 +428,10 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
       <li>Priority Action item: Use format from top of template</li>
     </ul>
   </li>
-  <li>Do NOT use markdown (**text**) or emojis (🎯, 📊, etc.)</li>
+  <li>Do NOT use markdown (**text**) or emojis</li>
 </ul>
 
-<p><b>🚨 CRITICAL - USE ONLY REAL DATA:</b></p>
+<p><b>[!] CRITICAL - USE ONLY REAL DATA:</b></p>
 <ul>
   <li>ALL metrics MUST come from SOURCE MATERIAL and tool responses - NO placeholder/example values from this template</li>
   <li>Include raw numbers, counts, percentages, and metrics directly from the tool responses</li>

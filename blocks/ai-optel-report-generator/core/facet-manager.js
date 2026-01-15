@@ -76,39 +76,43 @@ export function extractFacetsFromExplorer() {
   return tools;
 }
 
-/** DOM Operation Queue to prevent conflicts during parallel filter operations */
+/** DOM Operation Queue to prevent conflicts during filter operations */
 class DOMOperationQueue {
   constructor() {
     this.queue = [];
     this.isProcessing = false;
   }
 
-  async enqueue(operation) {
+  enqueue(operation) {
     return new Promise((resolve, reject) => {
       this.queue.push({ operation, resolve, reject });
-      // eslint-disable-next-line no-void
-      void this.processQueue();
+      this.processQueue().catch(() => {}); // Trigger processing, errors handled per-item
     });
   }
 
-  async processQueue() {
-    if (this.isProcessing || this.queue.length === 0) return;
-    this.isProcessing = true;
-
-    // eslint-disable-next-line no-await-in-loop
-    while (this.queue.length > 0) {
-      const { operation, resolve, reject } = this.queue.shift();
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const result = await operation();
-        resolve(result);
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise((r) => { setTimeout(r, 500); });
-      } catch (error) {
-        reject(error);
-      }
+  async processNext() {
+    if (this.queue.length === 0) {
+      this.isProcessing = false;
+      return;
     }
-    this.isProcessing = false;
+
+    const { operation, resolve, reject } = this.queue.shift();
+    try {
+      const result = await operation();
+      resolve(result);
+      await new Promise((r) => { setTimeout(r, 500); });
+    } catch (error) {
+      reject(error);
+    }
+
+    // Recursion avoids await-in-loop lint issue
+    await this.processNext();
+  }
+
+  async processQueue() {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
+    await this.processNext();
   }
 }
 

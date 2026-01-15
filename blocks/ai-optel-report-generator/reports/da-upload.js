@@ -135,16 +135,14 @@ async function generateReportHTML(content, url, timestamp) {
     .replace(/{{ANALYSIS_CONTENT}}/g, tableContent)
     .replace(/{{GENERATED_TIMESTAMP}}/g, formattedTimestamp);
 
+  // Save view and endDate for consistent fetchPrevious31Days loading
   const urlParams = new URL(window.location.href).searchParams;
-  const startDate = urlParams.get('startDate');
-  const endDate = urlParams.get('endDate');
   const view = urlParams.get('view') || 'week';
-  if (startDate && endDate) {
-    const metaTags = `<meta name="report-start-date" content="${startDate}">
-    <meta name="report-end-date" content="${endDate}">
-    <meta name="report-view" content="${view}">`;
-    html = html.replace('</head>', `${metaTags}\n</head>`);
-  }
+  const endDate = urlParams.get('endDate') || new Date().toISOString().split('T')[0];
+
+  const metaTags = `<meta name="report-view" content="${view}">
+  <meta name="report-end-date" content="${endDate}">`;
+  html = html.replace('</head>', `${metaTags}\n</head>`);
 
   return html;
 }
@@ -213,15 +211,19 @@ function mapFolderItemsToReports(items, folder, domain = null) {
 
 /** Fetch reports from a specific folder via CF Worker */
 async function fetchReportsFromFolder(folderPath, folder, domain = null) {
-  const response = await fetch(DA_CONFIG.WORKER_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'list', path: folderPath }),
-  });
+  try {
+    const response = await fetch(DA_CONFIG.WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list', path: folderPath }),
+    });
 
-  if (!response.ok) return [];
-  const data = await response.json();
-  return data.success && data.items ? mapFolderItemsToReports(data.items, folder, domain) : [];
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.success && data.items ? mapFolderItemsToReports(data.items, folder, domain) : [];
+  } catch {
+    return [];
+  }
 }
 
 /** Fetch list of reports from DA storage, optionally filtered by domain */

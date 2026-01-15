@@ -122,7 +122,15 @@ export async function callBedrockAPI(params, bedrockToken) {
     }
 
     // eslint-disable-next-line no-await-in-loop
-    lastError = `Bedrock API error: ${response.status} ${await response.text()}`;
+    const errorText = await response.text();
+    lastError = `Bedrock API error: ${response.status} ${errorText}`;
+
+    // Handle service unavailable (503) - should not retry, throw immediately
+    if (response.status === 503) {
+      const serviceError = new Error(lastError);
+      serviceError.isFatalError = true;
+      throw serviceError;
+    }
 
     // Retry on rate limit
     if (response.status === 429 && attempt < MAX_RETRIES - 1) {

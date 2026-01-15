@@ -221,17 +221,30 @@ function generateFacetLink(facetName, facetValue, options = {}) {
   return queryString ? `${pathname}?${queryString}` : pathname;
 }
 
-/** Correct display text to actual value (e.g., "Visible" → "visible") */
+/** Correct display text to actual value (e.g., "OneTrust" → "onetrust") */
 function correctValue(facetName, text) {
   const sidebar = document.querySelector('facet-sidebar');
   if (!sidebar) return text;
 
-  const labels = Array.from(sidebar.querySelectorAll(`label[for^="${facetName}-"], label[for^="${facetName}="]`));
-  const match = labels.find((l) => l.querySelector('.label')?.textContent?.trim().toLowerCase() === text.toLowerCase());
-  const actual = match?.querySelector('.value')?.textContent?.trim();
+  const lc = text.toLowerCase();
+  const log = (v, src) => console.log(`[Facet Link] Corrected "${text}" → "${v}" (${src})`);
 
-  if (actual && actual !== text) console.log(`[Facet Link] Corrected "${text}" → "${actual}"`);
-  return actual || text;
+  // Try DOM labels first
+  const sel = `label[for^="${CSS.escape(facetName)}-"], label[for^="${CSS.escape(facetName)}="]`;
+  const label = Array.from(sidebar.querySelectorAll(sel))
+    .find((l) => l.querySelector('.label')?.textContent?.trim().toLowerCase() === lc);
+  const dom = label?.querySelector('.value')?.textContent?.trim();
+  if (dom && dom !== text) { log(dom, 'DOM'); return dom; }
+
+  // For nested facets, check facets data (not in DOM without metrics=super)
+  if (facetName.includes('.')) {
+    const match = sidebar.facets?.[facetName]?.find(
+      (i) => i.value?.toLowerCase() === lc || (i.text || i.value)?.toLowerCase() === lc,
+    );
+    if (match?.value && match.value !== text) { log(match.value, 'data'); return match.value; }
+  }
+
+  return text;
 }
 
 /** Validate facet value exists in data and checkbox is clickable */
@@ -241,17 +254,20 @@ function isValidFacetValue(facetName, value) {
 
   const { facets } = sidebar;
   const isUrl = facetName === 'url' || value?.startsWith('http');
+  const isNested = facetName.includes('.');
+
+  // For checkpoint/nested: allow if data not loaded (clicking adds metrics=super)
+  const data = facets?.[facetName];
+  if (!data) return facetName === 'checkpoint' || isNested;
 
   // Check value exists in facets data
-  const data = facets?.[facetName];
-  if (!data) return false;
   const inData = isUrl
     ? data.some((i) => i.value === value || i.value === `${value}/` || i.value === value.replace(/\/$/, ''))
     : data.some((i) => i.value === value);
   if (!inData) return false;
 
   // Skip DOM check for checkpoint/nested (only visible with metrics=super)
-  if (facetName === 'checkpoint' || facetName.includes('.')) return true;
+  if (facetName === 'checkpoint' || isNested) return true;
 
   // For url/userAgent: also verify checkbox exists and is enabled
   const find = (id) => sidebar.querySelector(`input[id="${CSS.escape(id)}"]`);
