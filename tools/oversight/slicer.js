@@ -410,6 +410,8 @@ export function updateState() {
   if (searchParams.get('metrics')) url.searchParams.set('metrics', searchParams.get('metrics'));
   const drilldown = new URL(window.location).searchParams.get('drilldown');
   if (drilldown) url.searchParams.set('drilldown', drilldown);
+  const skyline = searchParams.get('skyline');
+  if (skyline) url.searchParams.set('skyline', skyline);
 
   elems.sidebar.querySelectorAll('input').forEach((e) => {
     if (e.indeterminate) {

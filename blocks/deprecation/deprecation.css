@@ -1,8 +1,8 @@
 .deprecation {
   padding: 10px 16px;
   margin-bottom: 16px;
-  background-color: #d31510;
-  color: #fff;
+  background-color: var(--color-brand-red);
+  color: var(--color-white);
   border-radius: var(--image-border-radius-l);
   font-size: var(--type-body-s-size);
   line-height: var(--type-body-s-lh);
@@ -17,10 +17,26 @@
 .deprecation > div > div > p,
 .deprecation a:any-link,
 .deprecation code {
-  color: #fff;
+  color: var(--color-white);
 }
 
 .deprecation code {
   background-color: rgb(255 255 255 / 20%);
   border: none;
+}
+
+/* Dark theme: darker red for better contrast */
+html[data-theme="dark"] .deprecation {
+  background-color: #7f1d1d;
+  color: var(--color-gray-900);
+}
+
+html[data-theme="dark"] .deprecation > div > div > p,
+html[data-theme="dark"] .deprecation a:any-link,
+html[data-theme="dark"] .deprecation code {
+  color: var(--color-gray-900);
+}
+
+html[data-theme="dark"] .deprecation code {
+  background-color: rgb(255 255 255 / 25%);
 }

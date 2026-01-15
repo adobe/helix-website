@@ -17,6 +17,8 @@ import {
   cwvInterpolationFn,
   simpleCWVInterpolationFn,
   INTERPOLATION_THRESHOLD,
+  purpleShades,
+  isDarkTheme,
 } from '../utils.js';
 
 const {
@@ -104,27 +106,38 @@ export default class SkylineChart extends AbstractChart {
                 // This case happens on initial chart load
                 return null;
               }
-              return getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
+              const isDark = isDarkTheme();
+              // Brighter purples in dark mode with visible gradient
+              return isDark
+                ? getGradient(ctx, chartArea, cssVariable('--spectrum-purple-1100'), cssVariable('--spectrum-purple-700'))
+                : getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
             },
             data: [],
           },
           {
             label: 'Good LCP',
-            backgroundColor: cssVariable('--spectrum-green-600'),
+            // Darker greens in dark mode to match metric indicators
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-green-900')
+              : cssVariable('--spectrum-green-600'),
             data: [],
             yAxisID: 'lcp',
             borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement LCP',
-            backgroundColor: cssVariable('--spectrum-orange-600'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-orange-900')
+              : cssVariable('--spectrum-orange-600'),
             data: [],
             yAxisID: 'lcp',
             borderSkipped: true,
           },
           {
             label: 'Poor LCP',
-            backgroundColor: cssVariable('--spectrum-red-600'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-red-900')
+              : cssVariable('--spectrum-red-600'),
             data: [],
             yAxisID: 'lcp',
             borderSkipped: 'bottom',
@@ -137,22 +150,27 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Good CLS',
-            // slightly lighter green than #49cc93 which is the good LCP color
-            backgroundColor: cssVariable('--spectrum-green-500'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-green-800')
+              : cssVariable('--spectrum-green-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement CLS',
-            backgroundColor: cssVariable('--spectrum-orange-500'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-orange-800')
+              : cssVariable('--spectrum-orange-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: true,
           },
           {
             label: 'Poor CLS',
-            backgroundColor: cssVariable('--spectrum-red-500'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-red-800')
+              : cssVariable('--spectrum-red-500'),
             data: [],
             yAxisID: 'cls',
             borderSkipped: 'bottom',
@@ -165,22 +183,27 @@ export default class SkylineChart extends AbstractChart {
           },
           {
             label: 'Good INP',
-            // slightly lighter green than #49cc93 which is the good LCP color
-            backgroundColor: cssVariable('--spectrum-green-400'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-green-700')
+              : cssVariable('--spectrum-green-400'),
             data: [],
             yAxisID: 'inp',
             borderSkipped: 'top',
           },
           {
             label: 'Needs Improvement INP',
-            backgroundColor: cssVariable('--spectrum-orange-400'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-orange-700')
+              : cssVariable('--spectrum-orange-400'),
             data: [],
             yAxisID: 'inp',
             borderSkipped: true,
           },
           {
             label: 'Poor INP',
-            backgroundColor: cssVariable('--spectrum-red-400'),
+            backgroundColor: isDarkTheme()
+              ? cssVariable('--spectrum-red-700')
+              : cssVariable('--spectrum-red-400'),
             data: [],
             yAxisID: 'inp',
             borderSkipped: 'bottom',
@@ -213,7 +236,9 @@ export default class SkylineChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: isDarkTheme()
+              ? '#1e1e1e'
+              : 'white',
           },
           tooltip: {
             callbacks: {
@@ -221,8 +246,14 @@ export default class SkylineChart extends AbstractChart {
                 const value = context.parsed.y;
                 // show page views as human readable
                 if (context.dataset.label === 'Page Views') return `${context.dataset.label}: ${toHumanReadable(value)}`;
-                // hide fake data
+                // show breakdown datasets as page views
+                if (context.dataset.breakdownDataset) {
+                  if (value === 0) return '';
+                  return `${context.dataset.label}: ${toHumanReadable(value)}`;
+                }
+                // hide fake data and hidden datasets
                 if (context.dataset.label.indexOf('Fake') > -1) return '';
+                if (context.dataset.label.indexOf('hidden') > -1) return '';
 
                 const { datasets } = context.chart.data;
                 const i = context.dataIndex;
@@ -280,6 +311,9 @@ export default class SkylineChart extends AbstractChart {
               minRotation: 90,
               maxRotation: 90,
               autoSkip: false,
+              color: isDarkTheme()
+                ? '#b3b3b3'
+                : undefined,
             },
           },
           y: {
@@ -291,6 +325,9 @@ export default class SkylineChart extends AbstractChart {
             ticks: {
               autoSkip: false,
               maxTicksLimit: 16,
+              color: isDarkTheme()
+                ? '#b3b3b3'
+                : undefined,
               callback: (value, index, arr) => {
                 if (value === 0) return '';
                 if (value > 0) {
@@ -304,7 +341,8 @@ export default class SkylineChart extends AbstractChart {
             },
             grid: {
               color: (context) => {
-                if (context.tick.value > 0) return 'rgba(0, 0, 0, 0.1)';
+                const isDark = isDarkTheme();
+                if (context.tick.value > 0) return isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
                 return 'rgba(0, 0, 0, 0.0)';
               },
             },
@@ -453,9 +491,52 @@ export default class SkylineChart extends AbstractChart {
     );
   }
 
+  /**
+   * Get breakdown facet categories based on the skyline parameter
+   * @param {string} skylineParam - The skyline parameter value ('type' or 'userAgent')
+   * @returns {Object|null} Object with facetName (string), extractValue (function),
+   *                        and categories (array), or null if skylineParam is invalid
+   */
+  // eslint-disable-next-line class-methods-use-this
+  getBreakdownConfig(skylineParam) {
+    if (skylineParam === 'type') {
+      return {
+        facetName: 'type',
+        // Extract facet value from bundle - hostType for 'type'
+        extractValue: (bundle) => bundle.hostType || 'unknown',
+        // Only show these categories (in order)
+        categories: ['aemcs', 'helix', 'ams', 'commerce', 'unknown'],
+      };
+    }
+    if (skylineParam === 'userAgent') {
+      return {
+        facetName: 'userAgent',
+        // For userAgent, only use top-level categories (no colon)
+        extractValue: (bundle) => {
+          // Get user agent from bundle - need to determine the top-level type
+          const ua = bundle.userAgent || '';
+          // Only return top-level categories (mobile, desktop, bot, or undefined)
+          if (ua.startsWith('mobile')) return 'mobile';
+          if (ua.startsWith('desktop')) return 'desktop';
+          if (ua.startsWith('bot')) return 'bot';
+          return 'undefined';
+        },
+        categories: ['desktop', 'mobile', 'bot', 'undefined'],
+      };
+    }
+    return null;
+  }
+
   async draw() {
     const params = new URL(window.location).searchParams;
     const view = params.get('view');
+    const domain = params.get('domain');
+    // Default skyline breakdown: 'type' for aem.live:all, 'userAgent' for everything else
+    const defaultSkyline = domain === 'aem.live:all' ? 'type' : 'userAgent';
+    const allowedSkylines = ['type', 'userAgent'];
+    const skylineParam = allowedSkylines.includes(params.get('skyline'))
+      ? params.get('skyline')
+      : defaultSkyline;
 
     // eslint-disable-next-line no-unused-vars
     const startDate = params.get('startDate');
@@ -541,6 +622,9 @@ export default class SkylineChart extends AbstractChart {
     const group = this.dataChunks.group(this.groupBy);
     const chartLabels = Object.keys(group).sort();
 
+    // Check if we need to break down by a facet
+    const breakdownConfig = this.getBreakdownConfig(skylineParam);
+
     const {
       iGoodLCPs,
       iNiLCPs,
@@ -579,20 +663,143 @@ export default class SkylineChart extends AbstractChart {
         allTraffic: [],
       });
 
-    this.chart.data.datasets[0].data = allTraffic;
+    // Handle breakdown datasets for pageviews
+    if (breakdownConfig) {
+      const { categories, extractValue } = breakdownConfig;
+      const colors = purpleShades(categories.length);
 
-    this.chart.data.datasets[1].data = iGoodLCPs;
-    this.chart.data.datasets[2].data = iNiLCPs;
-    this.chart.data.datasets[3].data = iPoorLCPs;
-    // 4 is fake data
-    this.chart.data.datasets[5].data = iGoodCLSs;
-    this.chart.data.datasets[6].data = iNiCLSs;
-    this.chart.data.datasets[7].data = iPoorCLSs;
-    // 8 is fake data
-    this.chart.data.datasets[9].data = iGoodINPs;
-    this.chart.data.datasets[10].data = iNiINPs;
-    this.chart.data.datasets[11].data = iPoorINPs;
-    // 12 is fake data
+      // Calculate breakdown data for each category and time slot
+      const breakdownData = {};
+      categories.forEach((cat) => {
+        breakdownData[cat] = [];
+      });
+
+      // Helper to check if bundle qualifies as a page view (matching rum-distiller pageViews logic)
+      const isPageView = (bundle) => {
+        const isPrerender = bundle.events.find((evt) => evt.checkpoint === 'prerender');
+        const isPrerenderThenNavigate = bundle.events.find(
+          (evt) => evt.checkpoint === 'navigate' && evt.target === 'prerendered',
+        );
+        return !isPrerender || isPrerenderThenNavigate;
+      };
+
+      // For each time slot, calculate pageviews per category
+      chartLabels.forEach((timeSlot) => {
+        const bundles = group[timeSlot] || [];
+        const categoryTotals = {};
+        categories.forEach((cat) => {
+          categoryTotals[cat] = 0;
+        });
+
+        bundles.forEach((bundle) => {
+          // Only count bundles that qualify as page views (skip prerender-only bundles)
+          if (!isPageView(bundle)) return;
+
+          const category = extractValue(bundle);
+          if (categories.includes(category)) {
+            categoryTotals[category] += bundle.weight;
+          } else {
+            // Add uncategorized bundles to the last category (unknown/undefined)
+            const fallbackCategory = categories[categories.length - 1];
+            categoryTotals[fallbackCategory] += bundle.weight;
+          }
+        });
+
+        categories.forEach((cat) => {
+          breakdownData[cat].push(categoryTotals[cat]);
+        });
+      });
+
+      // Remove existing pageviews dataset and add breakdown datasets
+      // Keep only the first dataset slot for now, we'll add breakdown datasets
+      // We need to dynamically adjust the datasets array
+
+      // Clear existing pageviews data in dataset 0
+      this.chart.data.datasets[0].data = [];
+      this.chart.data.datasets[0].backgroundColor = 'transparent';
+      this.chart.data.datasets[0].label = 'Page Views (hidden)';
+
+      // Helper to get border radius for stacked bars
+      // First category (bottom): rounded bottom, Last category (top): rounded top
+      const getBorderRadius = (catIndex, total) => {
+        if (catIndex === 0) {
+          // Bottom of stack - rounded bottom corners only
+          return {
+            topLeft: 0, topRight: 0, bottomLeft: 3, bottomRight: 3,
+          };
+        }
+        if (catIndex === total - 1) {
+          // Top of stack - rounded top corners only
+          return {
+            topLeft: 3, topRight: 3, bottomLeft: 0, bottomRight: 0,
+          };
+        }
+        // Middle - no rounded corners
+        return {
+          topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0,
+        };
+      };
+
+      // Always remove all existing breakdown datasets before inserting new ones
+      // This handles cases where category count changes between different skyline parameters
+      this.chart.data.datasets = this.chart.data.datasets.filter((ds) => !ds.breakdownDataset);
+
+      // Insert breakdown datasets at the beginning (after hidden dataset 0)
+      // We need to insert them in reverse order to maintain stacking order
+      categories.slice().reverse().forEach((cat) => {
+        // Use indexOf to ensure consistent color assignment for each category
+        const colorIndex = categories.indexOf(cat);
+        const catIndex = categories.indexOf(cat);
+        this.chart.data.datasets.splice(1, 0, {
+          label: cat,
+          backgroundColor: colors[colorIndex],
+          data: breakdownData[cat],
+          breakdownDataset: true, // marker to identify breakdown datasets
+          yAxisID: 'y',
+          borderRadius: getBorderRadius(catIndex, categories.length),
+          borderSkipped: false,
+          barPercentage: 1,
+          categoryPercentage: 0.9,
+        });
+      });
+    } else {
+      // No breakdown - use original single dataset
+      // Remove any breakdown datasets if they exist
+      this.chart.data.datasets = this.chart.data.datasets
+        .filter((ds) => !ds.breakdownDataset);
+
+      // Restore original pageviews dataset
+      this.chart.data.datasets[0].data = allTraffic;
+      this.chart.data.datasets[0].label = 'Page Views';
+      this.chart.data.datasets[0].backgroundColor = (context) => {
+        const { chart } = context;
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return null;
+        return getGradient(ctx, chartArea, cssVariable('--spectrum-gray-800'), cssVariable('--spectrum-purple-1200'));
+      };
+    }
+
+    // Helper to find dataset by label
+    const findDataset = (label) => this.chart.data.datasets.find((ds) => ds.label === label);
+
+    // Helper to set dataset data with error checking
+    const setDatasetData = (label, data) => {
+      const dataset = findDataset(label);
+      if (!dataset) {
+        throw new Error(`Dataset with label "${label}" not found.`);
+      }
+      dataset.data = data;
+    };
+
+    setDatasetData('Good LCP', iGoodLCPs);
+    setDatasetData('Needs Improvement LCP', iNiLCPs);
+    setDatasetData('Poor LCP', iPoorLCPs);
+    setDatasetData('Good CLS', iGoodCLSs);
+    setDatasetData('Needs Improvement CLS', iNiCLSs);
+    setDatasetData('Poor CLS', iPoorCLSs);
+    setDatasetData('Good INP', iGoodINPs);
+    setDatasetData('Needs Improvement INP', iNiINPs);
+    setDatasetData('Poor INP', iPoorINPs);
 
     this.chart.data.labels = chartLabels;
     this.chart.options.scales.x.time.unit = config.unit;
@@ -617,5 +824,78 @@ export default class SkylineChart extends AbstractChart {
     document.querySelector('.key-metrics #lcp number-format').setAttribute('trend', iGoodLCPTrend.slope > 0 ? 'rising' : 'falling');
     document.querySelector('.key-metrics #cls number-format').setAttribute('trend', iGoodCLSTrend.slope > 0 ? 'rising' : 'falling');
     document.querySelector('.key-metrics #inp number-format').setAttribute('trend', iGoodINPTrend.slope > 0 ? 'rising' : 'falling');
+  }
+
+  /**
+   * Update chart colors when color scheme changes
+   */
+  updateColorScheme() {
+    if (!this.chart || !this.chart.options) return;
+
+    const isDark = isDarkTheme();
+
+    // Update canvas background color
+    this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';
+
+    // Update axis tick colors
+    const tickColor = isDark ? '#b3b3b3' : undefined;
+    this.chart.options.scales.x.ticks.color = tickColor;
+    this.chart.options.scales.y.ticks.color = tickColor;
+
+    // Update dataset colors - find datasets by label
+    const { datasets } = this.chart.data;
+    datasets.forEach((dataset) => {
+      switch (dataset.label) {
+        case 'Good LCP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-green-900')
+            : cssVariable('--spectrum-green-600');
+          break;
+        case 'Needs Improvement LCP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-orange-900')
+            : cssVariable('--spectrum-orange-600');
+          break;
+        case 'Poor LCP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-red-900')
+            : cssVariable('--spectrum-red-600');
+          break;
+        case 'Good CLS':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-green-800')
+            : cssVariable('--spectrum-green-500');
+          break;
+        case 'Needs Improvement CLS':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-orange-800')
+            : cssVariable('--spectrum-orange-500');
+          break;
+        case 'Poor CLS':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-red-800')
+            : cssVariable('--spectrum-red-500');
+          break;
+        case 'Good INP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-green-700')
+            : cssVariable('--spectrum-green-400');
+          break;
+        case 'Needs Improvement INP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-orange-700')
+            : cssVariable('--spectrum-orange-400');
+          break;
+        case 'Poor INP':
+          dataset.backgroundColor = isDark
+            ? cssVariable('--spectrum-red-700')
+            : cssVariable('--spectrum-red-400');
+          break;
+        default:
+          break;
+      }
+    });
+
+    this.chart.update();
   }
 }

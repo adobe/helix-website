@@ -944,3 +944,22 @@ img.facet-thumbnail {
   aspect-ratio: 1/1;
   object-fit: contain;
 }
+
+/* dark mode */
+html[data-theme="dark"] .key-metrics > ul > * {
+  background-color: #2c2c2c;
+}
+
+html[data-theme="dark"] .quick-filter input {
+  background-color: #2c2c2c;
+  color: var(--spectrum-gray-100);
+  border-bottom-color: var(--spectrum-gray-600);
+}
+
+html[data-theme="dark"] main .title url-selector input {
+  color: var(--spectrum-gray-100);
+}
+
+html[data-theme="dark"] daterange-picker {
+  color: var(--spectrum-gray-100);
+}

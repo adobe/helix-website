@@ -71,7 +71,7 @@
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.04em;
-  color: black;
+  color: var(--color-black);
   text-decoration: none;
 }
 

@@ -1,0 +1,13 @@
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter" fill="none">
+  <defs>
+    <mask id="sun-with-moon-cutout">
+      <rect x="0" y="0" width="24" height="24" fill="white"/>
+      <path d="M15.899 12.899a4 4 0 0 1-4.797-4.797A4.002 4.002 0 0 0 12 16c1.9 0 3.49-1.325 3.899-3.101z" fill="black" stroke="black"/>
+    </mask>
+  </defs>
+  <circle cx="12" cy="12" r="7" mask="url(#sun-with-moon-cutout)"/>
+  <path d="M12 5V3M12 21v-2"/>
+  <path d="M5 12H3M21 12h-3"/>
+  <path d="M16.95 7.05L19.07 4.93M7.05 16.95L4.93 19.07"/>
+  <path d="M16.95 16.95l2.12 2.12M7.05 7.05L4.93 4.93"/>
+</svg>

@@ -215,6 +215,30 @@
   font-family: var(--body-font-family);
 }
 
+/* Dark mode overrides */
+:where(html[data-theme="dark"]) .ue-trial label {
+  color: var(--color-gray-700);
+}
+
+:where(html[data-theme="dark"]) .ue-trial .help-text {
+  color: var(--color-gray-600);
+}
+
+/* trial-info panel */
+:where(html[data-theme="dark"]) .ue-trial .trial-info {
+  background-color: #2c2c2c;
+}
+
+:where(html[data-theme="dark"]) .ue-trial .trial-info > div > div:nth-child(2) h3,
+:where(html[data-theme="dark"]) .ue-trial .trial-info > div > div:nth-child(2) h4,
+:where(html[data-theme="dark"]) .ue-trial .trial-info > div > div:nth-child(2) p {
+  color: var(--spectrum-gray-100);
+}
+
+:where(html[data-theme="dark"]) .ue-trial .trial-info > div > div:nth-child(2) li {
+  color: var(--spectrum-gray-200);
+}
+
 .ue-trial input,
 .ue-trial select {
   padding: 10px;

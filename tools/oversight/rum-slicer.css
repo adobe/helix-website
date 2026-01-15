@@ -1224,6 +1224,7 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
   #facets fieldset div {
     grid-template-areas: "check lab cwv";
     grid-template-columns: 20px 1fr 350px;
+    min-height: 56px;
   }
 
   #facets ul.cwv {
@@ -1279,4 +1280,23 @@ facet-sidebar[aria-disabled="true"] div.quick-filter {
 
 footer.footer-wrapper.appear {
   display: none;
+}
+
+/* dark mode */
+html[data-theme="dark"] .key-metrics > ul > * {
+  background-color: #2c2c2c;
+}
+
+html[data-theme="dark"] .quick-filter input {
+  background-color: #2c2c2c;
+  color: var(--spectrum-gray-100);
+  border-bottom-color: var(--spectrum-gray-600);
+}
+
+html[data-theme="dark"] main .title url-selector input {
+  color: var(--spectrum-gray-100);
+}
+
+html[data-theme="dark"] daterange-picker {
+  color: var(--spectrum-gray-100);
 }

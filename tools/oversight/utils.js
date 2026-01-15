@@ -76,6 +76,16 @@ export function cssVariable(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name);
 }
 
+export function isDarkTheme() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  if (theme) {
+    return theme === 'dark';
+  }
+  return window.matchMedia
+    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+    : false;
+}
+
 let gradient;
 let width;
 let height;
@@ -139,6 +149,35 @@ export function parseConversionSpec() {
 }
 
 export const INTERPOLATION_THRESHOLD = 10;
+
+/**
+ * Returns an array of purple shades for breakdown visualization
+ * @param {number} count - Number of shades needed
+ * @returns {string[]} - Array of CSS color values
+ */
+export function purpleShades(count) {
+  if (count <= 0) return [];
+
+  // Define a range of purple shades from light to dark
+  const shades = [
+    '--spectrum-purple-1300', // darkest
+    '--spectrum-purple-1100',
+    '--spectrum-purple-900',
+    '--spectrum-purple-700',
+    '--spectrum-purple-500',
+    '--spectrum-purple-400', // lightest
+  ];
+  // Select evenly distributed shades based on count
+  const result = [];
+  for (let i = 0; i < count; i += 1) {
+    // Distribute indices evenly across the full range of shades
+    const index = count === 1
+      ? 0
+      : Math.floor((i / (count - 1)) * (shades.length - 1));
+    result.push(cssVariable(shades[index]));
+  }
+  return result;
+}
 
 export function simpleCWVInterpolationFn(metric, threshold) {
   return (cwvs) => {

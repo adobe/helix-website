@@ -50,15 +50,15 @@
 }
 
 .cards.earlyaccess a:any-link::after {
-  border-right-color: #e6118a;
+  border-right-color: var(--color-brand-pink);
 }
 
 .cards.deprecated a:any-link::after {
-  border-right-color: #d31510;
+  border-right-color: var(--color-brand-red);
 }
 
 .cards.removed a:any-link::after {
-  border-right-color: #6a6969;
+  border-right-color: var(--color-gray-600);
 }
 
 .cards a:hover:any-link::after {
@@ -84,7 +84,7 @@
   z-index: -1;
   inset: 0;
   opacity: 0;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+  box-shadow: 0 2px 6px var(--shadow-color-20);
   transition: opacity 0.3s ease-in-out;
 }
 
@@ -111,11 +111,11 @@
 }
 
 .section.dark .cards .cards-card {
-  background-color: #555;
+  background-color: var(--color-gray-600);
 }
 
 .section.light .cards .cards-card {
-  background-color: #ddd;
+  background-color: var(--color-gray-300);
 }
 
 .cards .cards-card-highlight {

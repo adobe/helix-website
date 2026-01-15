@@ -5,7 +5,7 @@ import {
 import { utils } from '@adobe/rum-distiller';
 import AbstractChart from './chart.js';
 import {
-  toHumanReadable, cssVariable, cwvInterpolationFn,
+  toHumanReadable, cssVariable, cwvInterpolationFn, isDarkTheme,
 } from '../utils.js';
 
 const { scoreBundle } = utils;
@@ -154,7 +154,9 @@ export default class BarChart extends AbstractChart {
             display: false,
           },
           customCanvasBackgroundColor: {
-            color: 'white',
+            color: isDarkTheme()
+              ? '#1e1e1e'
+              : 'white',
           },
         },
         interaction: {
@@ -182,6 +184,14 @@ export default class BarChart extends AbstractChart {
             stacked: true,
             ticks: {
               callback: (value) => toHumanReadable(value),
+              color: isDarkTheme()
+                ? '#b3b3b3'
+                : undefined,
+            },
+            grid: {
+              color: isDarkTheme()
+                ? 'rgba(255, 255, 255, 0.15)'
+                : undefined,
             },
           },
           y: {
@@ -189,9 +199,36 @@ export default class BarChart extends AbstractChart {
             grid: {
               display: false,
             },
+            ticks: {
+              color: isDarkTheme()
+                ? '#b3b3b3'
+                : undefined,
+            },
           },
         },
       },
     });
+  }
+
+  /**
+   * Update chart colors when color scheme changes
+   */
+  updateColorScheme() {
+    if (!this.chart || !this.chart.options) return;
+
+    const isDark = isDarkTheme();
+
+    // Update canvas background color
+    this.chart.options.plugins.customCanvasBackgroundColor.color = isDark ? '#1e1e1e' : 'white';
+
+    // Update axis tick colors
+    const tickColor = isDark ? '#b3b3b3' : undefined;
+    this.chart.options.scales.x.ticks.color = tickColor;
+    this.chart.options.scales.y.ticks.color = tickColor;
+
+    // Update grid color
+    this.chart.options.scales.x.grid.color = isDark ? 'rgba(255, 255, 255, 0.15)' : undefined;
+
+    this.chart.update();
   }
 }

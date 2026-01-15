@@ -35,6 +35,7 @@
   font-weight: 700;
   margin: 0 auto var(--spacing-s);
   max-width: 300px;
+  text-shadow: 0 2px 16px var(--shadow-color-60);
 }
 
 .roi-calculator .inner-content a.button:any-link {
@@ -60,4 +61,11 @@
   .roi-calculator .inner-content a.button:any-link {
     margin-bottom: 0;
   }
+}
+
+html[data-theme="dark"] .roi-calculator .upper-content h2 {
+  text-shadow:
+    0 0 8px var(--shadow-color-50),
+    0 0 16px var(--shadow-color-40),
+    0 2px 2px var(--shadow-color-60);
 }
