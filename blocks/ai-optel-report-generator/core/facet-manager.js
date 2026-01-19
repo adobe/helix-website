@@ -70,8 +70,6 @@ export function extractFacetsFromExplorer() {
 
     tools.push(createToolDefinition(facetName, description));
   });
-
-  console.log(`[Facet Manager] Extracted ${tools.length} tools, skipped ${skipped.length} empty facets`);
   cachedFacetTools = tools;
   return tools;
 }

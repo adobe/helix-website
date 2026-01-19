@@ -120,8 +120,6 @@ async function processBatch(batch, message, dashboardData, systemPrompt, apiKey,
     });
 
     if (toolCalls.length > 0) {
-      console.log(`[${toolName}] Executing ${toolCalls.length} tool calls`);
-
       const toolResults = await Promise.all(
         toolCalls.map(async (toolCall) => {
           try {
@@ -159,7 +157,6 @@ async function processBatch(batch, message, dashboardData, systemPrompt, apiKey,
         followUpData.content.forEach((item) => {
           if (item.type === 'text' && item.text.trim()) analysis += `${item.text.trim()}\n`;
         });
-        console.log(`[${toolName}] ✓ Analysis complete: ${analysis.length} chars`);
       }
     } else {
       console.warn(`[${toolName}] ⚠️ Tool not used by AI`);
@@ -179,9 +176,6 @@ async function processBatch(batch, message, dashboardData, systemPrompt, apiKey,
 
 async function performFollowUpAnalysis(analyses, systemPrompt) {
   if (analyses.length === 0) return null;
-
-  console.log('[Follow-up] Generating comprehensive insights...');
-
   const content = `Based on the comprehensive tool execution results from all batches, provide detailed insights analysis:
 
 BATCH RESULTS:
@@ -234,8 +228,6 @@ export async function processMetricsBatches(
   toolHandler,
   progressCallback = null,
 ) {
-  console.log(`[Metrics] Processing ${facetTools.length} tools`);
-
   const batches = createBatches(facetTools);
   let completedBatches = 0;
 
@@ -274,7 +266,7 @@ export async function processMetricsBatches(
     .filter(Boolean);
   const failed = results.filter((r) => !r.success);
 
-  console.log(`[Metrics] ✓ ${successful.length}/${results.length} metrics analyzed`);
+  // console.log(`[Metrics] ✓ ${successful.length}/${results.length} metrics analyzed`);
   if (failed.length > 0) console.warn(`[Metrics] ⚠️ ${failed.length} failed:`, failed.map((f) => f.toolName).join(', '));
 
   let followUp = null;
@@ -286,8 +278,6 @@ export async function processMetricsBatches(
 
   const allAnalyses = [...successful];
   if (followUp) allAnalyses.push(followUp);
-
-  console.log(`[Metrics] ✓ Complete. ${successful.length} metrics, ${allAnalyses.reduce((sum, a) => sum + a.length, 0).toLocaleString()} chars`);
 
   return allAnalyses;
 }

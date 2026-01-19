@@ -18,7 +18,11 @@ export function closeReportModal() {
   }
 }
 
-const canCloseModal = (modal) => !modal.querySelector('#circular-progress-container');
+const canCloseModal = (modal) => {
+  const hasProgress = modal.querySelector('#circular-progress-container');
+  const saveBtn = modal.querySelector('#save-report-btn:not([disabled])');
+  return !hasProgress && !saveBtn;
+};
 
 function setupCloseHandlers(modal) {
   modal.querySelector('.report-modal-close')?.addEventListener('click', () => {
@@ -134,3 +138,5 @@ export default function decorate(block) {
   button.addEventListener('click', openReportModal);
   block.appendChild(button);
 }
+
+window.openReportModal = openReportModal;

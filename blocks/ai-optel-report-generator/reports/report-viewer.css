@@ -4,8 +4,11 @@
 
 /* Smooth scroll behavior for facet link navigation */
 html,
+body,
+main,
 facet-sidebar,
 facet-sidebar #facets,
+facet-sidebar .filters,
 .report-viewer,
 .report-sections {
   scroll-behavior: smooth;
@@ -138,6 +141,12 @@ facet-sidebar.report-view-active > form {
   font-variant-numeric: tabular-nums;
   font-size: 0.92em;
   white-space: nowrap;
+}
+
+/* Expected Impact indentation - aligns with text after bullet */
+.report-sections .expected-impact {
+  display: inline-block;
+  padding-left: 0.85em;
 }
 
 /* Back to Report button - static (in sidebar) */

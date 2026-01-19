@@ -2,15 +2,32 @@
 
 <h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
 
-<p><b>*** PRIORITY ACTIONS FORMAT - READ THIS FIRST*** </b></p>
-<p>In the PRIORITY ACTIONS section, you MUST insert the literal HTML tag <code>&lt;br&gt;</code> between the action and "Expected Impact:"</p>
-<pre>CORRECT: &lt;p&gt;• Fix broken links.&lt;br&gt;Expected Impact: Reduce 404 errors&lt;/p&gt;
-WRONG:   &lt;p&gt;• Fix broken links.Expected Impact: Reduce 404 errors&lt;/p&gt;
-WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p&gt;</pre>
-<p>The literal characters <code>.&lt;br&gt;Expected</code> must appear — period, then br tag, then Expected. No space between period and br tag.</p>
+<p><b>PRIORITY ACTIONS FORMAT:</b></p>
+<p>Each action item has a facet-linked action + unlinked "Expected Impact:"</p>
+<pre>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="..."&gt;[Action].&lt;/span&gt; Expected Impact: [Impact]&lt;/p&gt;</pre>
 
 <p><b>[!] CRITICAL: USE ONLY REAL DATA FROM TOOL RESPONSES</b></p>
 <p>This template contains NO actual data - only structure and formatting guidelines. ALL metrics, numbers, percentages, and values MUST come from the tool responses and dashboard data provided in the SOURCE MATERIAL section. DO NOT use any placeholder values, example numbers, or hypothetical data.</p>
+
+<p><b>[!] FACET LINKING RULE - WRAP ALL KEY INSIGHTS:</b></p>
+<p>Wrap <b>each key data-backed insight</b> in the section with a facet link. Not every sentence is a key insight - use judgment.</p>
+
+<p><b>What IS a key insight (link it):</b></p>
+<ul>
+  <li>Specific findings backed by facet data (metrics, checkpoints, URLs, devices)</li>
+  <li>Data points that readers would want to explore further in the dashboard</li>
+</ul>
+
+<p><b>What is NOT a key insight (don't link):</b></p>
+<ul>
+  <li>General statements, conclusions, or recommendations</li>
+  <li>Context or transition sentences</li>
+  <li>Data that doesn't exist in the facet sidebar</li>
+</ul>
+
+<p><b>Example:</b></p>
+<pre>&lt;p&gt;Performance shows mixed results. &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP at 3.2s exceeds the 2.5s threshold&lt;/span&gt;, while &lt;span data-facet="checkpoint" data-facet-value="cwv-cls"&gt;CLS at 0.08 passes&lt;/span&gt;. This impacts user experience significantly.&lt;/p&gt;</pre>
+<p>Notice: Both LCP and CLS insights are linked (key data), but the intro and conclusion sentences are not.</p>
 
 <p><b>[!] FORMAT REQUIREMENT - USE SEMANTIC HTML:</b></p>
 <ul>
@@ -56,8 +73,9 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
   <li><b>Simple checkpoint:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="click"&gt;click events show strong engagement&lt;/span&gt;</code></li>
   <li><b>Simple URL:</b> <code>&lt;span data-facet="url" data-facet-value="/products"&gt;/products page has high bounce rate&lt;/span&gt;</code></li>
   <li><b>Simple device:</b> <code>&lt;span data-facet="userAgent" data-facet-value="mobile"&gt;mobile users experience slower LCP&lt;/span&gt;</code></li>
-  <li><b>Nested LCP source:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp" data-nested-facet="cwv-lcp.source" data-nested-value="img"&gt;LCP images causing delays&lt;/span&gt;</code></li>
-  <li><b>Nested error source:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="focus-loss"&gt;focus-loss errors&lt;/span&gt;</code></li>
+  <li><b>One nested facet (source):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp" data-nested-facet="cwv-lcp.source" data-nested-value="img"&gt;LCP from images&lt;/span&gt;</code></li>
+  <li><b>One nested facet (target):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.target" data-nested-value="TypeError"&gt;TypeError errors&lt;/span&gt;</code></li>
+  <li><b>TWO nested facets (source + target):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network" data-nested-facet-2="error.target" data-nested-value-2="TypeError"&gt;Network TypeErrors&lt;/span&gt;</code></li>
   <li><b>Nested click target:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="click" data-nested-facet="click.target" data-nested-value="button"&gt;button clicks&lt;/span&gt;</code></li>
 </ul>
 
@@ -65,9 +83,9 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 <ul>
   <li>Use facet names exactly as they appear in the tool results</li>
   <li>For nested facets, ALWAYS set <code>data-facet="checkpoint"</code> with the parent checkpoint name</li>
-  <li>Then add <code>data-nested-facet</code> and <code>data-nested-value</code> for the specific source/target</li>
-  <li>Wrap entire finding statements, not just individual words</li>
-  <li>This enables readers to click findings and navigate directly to the relevant dashboard view with correct filters</li>
+  <li>Add <code>data-nested-facet</code> + <code>data-nested-value</code> for the first nested value (source OR target)</li>
+  <li><b>If BOTH source AND target are relevant</b>, add <code>data-nested-facet-2</code> + <code>data-nested-value-2</code> for the second</li>
+  <li>Both nested facets will be checked in the sidebar when the link is clicked</li>
 </ul>
 
 <p><b>[!] CRITICAL: Only Link to VERIFIED Facet Data</b></p>
@@ -307,14 +325,14 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 <p><b>2. Hook + Health (1-2 sentences):</b> Lead with the most important finding, then overall health.</p>
 <p>Example: "The headline: mobile users are bouncing at 2x the desktop rate—slow LCP is the likely cause. Overall, Core Web Vitals show mixed results with LCP failing (3.2s) while CLS (0.08) and INP (165ms) pass."</p>
 
-<p><b>3. Key Findings for Stakeholders (3 bullets with facet links):</b></p>
-<p>• [Most critical issue + specific numbers + business impact + facet link]</p>
-<p>• [Biggest opportunity + data + facet link]</p>
-<p>• [Surprising or counterintuitive insight + facet link]</p>
+<p><b>3. Key Findings for Stakeholders (3 bullets - EACH with facet links on ALL data points):</b></p>
+<p>• [Most critical issue + specific numbers + business impact]</p>
+<p>• [Biggest opportunity + data]</p>
+<p>• [Surprising or counterintuitive insight]</p>
 
-<p><b>[!] Each finding MUST include a facet link.</b> Example:</p>
-<p><code>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP at 3.2s&lt;/span&gt; exceeds threshold—mobile bounce rate is 65% vs desktop's 32%.&lt;/p&gt;</code></p>
-<p>[!] <b>FORMAT:</b> Wrap text in &lt;p&gt; tags, include specific numbers from tool responses. NO EMOJIS.</p>
+<p><b>[!] Wrap the ENTIRE finding in a facet link (not just individual words).</b> Example:</p>
+<pre>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP at 3.2s exceeds the 2.5s threshold—mobile bounce rate hits 65% compared to desktop's 32%.&lt;/span&gt;&lt;/p&gt;</pre>
+<p>The whole insight about LCP is wrapped, so clicking it filters the dashboard to show LCP data.</p>
 
 <!-- ====================================================================== -->
 
@@ -330,37 +348,33 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 
 
 <h4>PERFORMANCE IMPACT</h4>
-<p>100-150 words. Write as flowing narrative with LCP/CLS/INP values, threshold comparisons, mobile vs desktop breakdown. Use bullets only if 3+ distinct metrics need emphasis. End with "so what" - impact on users/SEO. Add facet links.</p>
-
-<!-- ====================================================================== -->
+<p>100-150 words. LCP/CLS/INP values, threshold comparisons, mobile vs desktop. End with impact on users/SEO. <b>Link each CWV insight</b> (LCP, CLS, INP mentions).</p>
 
 <h4>USER ENGAGEMENT</h4>
-<p>100-150 words. Write as flowing narrative covering sessions, page views, bounce rates, device breakdown. Connect engagement patterns to performance issues. Use bullets only to highlight 3+ distinct findings. Add facet links.</p>
+<p>100-150 words. Sessions, page views, bounce rates, device breakdown. Connect to performance. <b>Link device-specific and engagement insights.</b></p>
 
 <h4>TRAFFIC & ACQUISITION</h4>
-<p>100-150 words. Write as flowing narrative covering traffic sources (organic/paid/direct/referral) with counts and quality. Highlight any surprising patterns - which source converts best/worst? Use bullets only for listing 3+ sources. Add facet links.</p>
+<p>100-150 words. Traffic sources with counts. Which converts best/worst? <b>Link each traffic source insight</b> if data exists.</p>
 
 <h4>CONTENT EFFECTIVENESS</h4>
-<p>100-150 words. Write as flowing narrative about which content resonates. Name top pages with view counts, identify underperformers. Use bullets when listing 3+ specific pages. End with content strategy insight. Add facet links.</p>
+<p>100-150 words. Top pages, underperformers, content strategy insight. <b>Link page URL insights</b> when URLs appear in data.</p>
 
 <h4>CONVERSION FUNNEL</h4>
-<p>100-150 words. Write as flowing narrative about user journey - where they enter, where they drop off. Quantify the leak (sessions lost). Use bullets only for listing 3+ specific drop-off points. End with opportunity size. Add facet links.</p>
+<p>100-150 words. User journey, drop-off points, opportunity size. <b>Link checkpoint/URL insights</b> where data supports.</p>
 
 <h4>GEOGRAPHIC INSIGHTS</h4>
-<p>100-150 words. Write as flowing narrative about where users come from, regional performance variations. Use bullets only when listing 3+ countries. Identify untapped markets or regions needing optimization. Add facet links.</p>
+<p>100-150 words. Where users come from, regional variations. <b>Link geo insights</b> only if geo facet exists in data.</p>
 
 <h4>MARKET OPPORTUNITIES</h4>
-<p>100-150 words. Synthesize insights from above sections into actionable opportunities. Focus on quick wins, underserved segments, growth potential. Use bullets if presenting 3+ distinct opportunities. Be specific about expected impact.</p>
-
-<!-- ====================================================================== -->
+<p>100-150 words. Quick wins, growth potential. This is synthesis - link only if referencing specific facet data.</p>
 
 <h4>BUSINESS IMPACT</h4>
-<p>100-150 words. Write as flowing narrative translating technical issues to business outcomes. Quantify what poor performance costs (lost sessions/conversions). Estimate ROI from priority actions. Use bullets only if listing 3+ distinct cost/opportunity areas. Make stakeholders care.</p>
+<p>100-150 words. Technical issues → business outcomes. Quantify costs. <b>Link key insights</b> that reference facet data.</p>
 
 <!-- ====================================================================== -->
 
 <h4>PRIORITY ACTIONS</h4>
-<p>List 4-6 most critical actions — focus on <b>HIGH IMPACT + EASY TO FIX</b> issues (quick wins):</p>
+<p>List 4-6 most critical actions — focus on <b>HIGH IMPACT + EASY TO FIX</b> issues (quick wins). <b>Wrap each action in a facet link</b> to the relevant checkpoint/metric.</p>
 
 <p><b>PRIORITIZATION CRITERIA (in order):</b></p>
 <ul>
@@ -376,11 +390,8 @@ WRONG:   &lt;p&gt;• Fix broken links. Expected Impact: Reduce 404 errors&lt;/p
 <p><b>Code Tasks</b> = quick fixes by developers: lazy loading, caching, error fixes, performance tweaks</p>
 <p>2-3 actions per category (4-6 total). NO timelines.</p>
 
-<p><b>[!] FORMAT: Use &lt;br&gt; before "Expected Impact:" (new line, same bullet):</b></p>
-<pre>CORRECT: &lt;p&gt;• [Action].&lt;br&gt;Expected Impact: [Impact]&lt;/p&gt;
-WRONG:   &lt;p&gt;• [Action]. Expected Impact: [Impact]&lt;/p&gt;  ← no line break
-WRONG:   &lt;p&gt;• [Action].&lt;/p&gt;&lt;p&gt;Expected Impact:...&lt;/p&gt;  ← separate paragraphs</pre>
-<p>Include facet links + number-format in actions. The literal <code>.&lt;br&gt;Expected</code> must appear (period, br, Expected, no space).</p>
+<p><b>FORMAT:</b> Each action ends with "Expected Impact:" describing the benefit. <b>Wrap only the action in a facet link</b> (not the Expected Impact part).</p>
+<pre>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;Optimize hero image with WebP format.&lt;/span&gt; Expected Impact: Reduce LCP from 3.3s toward 2.5s.&lt;/p&gt;</pre>
 
 <!-- CRITICAL REQUIREMENTS -->
 
@@ -437,6 +448,14 @@ WRONG:   &lt;p&gt;• [Action].&lt;/p&gt;&lt;p&gt;Expected Impact:...&lt;/p&gt; 
   <li>Include raw numbers, counts, percentages, and metrics directly from the tool responses</li>
   <li>DO NOT make up values - only use what exists in source data</li>
   <li>This template provides STRUCTURE ONLY - all data must be real</li>
+</ul>
+
+<p><b>[!] PRE-SUBMISSION CHECKLIST:</b></p>
+<ul>
+  <li>□ All key data-backed insights are wrapped in facet links</li>
+  <li>□ General statements and conclusions are NOT linked</li>
+  <li>□ Links only use values that exist in tool responses</li>
+  <li>□ Priority Actions include "Expected Impact:" for each item</li>
 </ul>
 
 </div>

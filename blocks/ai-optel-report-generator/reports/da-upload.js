@@ -87,15 +87,18 @@ function transformToTableFormat(content) {
   return output || content;
 }
 
-/** Generate filename with timestamp */
-function generateFilename() {
+/** Generate filename with timestamp and date folder */
+function generateFilenameAndDate() {
   const now = new Date();
   const date = now.toISOString().split('T')[0];
   let hours = now.getHours();
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12 || 12;
-  return `optel-analysis-${date}-${hours}-${minutes}${ampm}.html`;
+  return {
+    filename: `optel-analysis-${date}-${hours}-${minutes}${ampm}.html`,
+    dateFolder: date,
+  };
 }
 
 /** Clean URL for folder name */
@@ -114,6 +117,13 @@ function formatDates(timestamp) {
   });
 }
 
+function fixExpectedImpactLineBreaks(html) {
+  return html.replace(
+    /\.(<\/[^>]+>)?\s*Expected Impact:/gi,
+    '.$1<br><span class="expected-impact"><em>Expected Impact:</em>',
+  ).replace(/<\/em>([^<]*?)(<\/p>|<br>|$)/gi, '</em>$1</span>$2');
+}
+
 /** Generate complete HTML report with date range from URL */
 async function generateReportHTML(content, url, timestamp) {
   const template = await loadTemplate();
@@ -129,6 +139,9 @@ async function generateReportHTML(content, url, timestamp) {
   } catch {
     tableContent = transformToTableFormat(content);
   }
+
+  // Ensure "Expected Impact:" always appears on new line
+  tableContent = fixExpectedImpactLineBreaks(tableContent);
 
   let html = template
     .replace(/{{REPORT_TITLE}}/g, `OpTel Analysis - ${url || 'Dashboard'}`)
@@ -154,9 +167,9 @@ export async function uploadToDA(content, options = {}) {
 
   const timestamp = new Date().toISOString();
   const htmlContent = await generateReportHTML(content, url, timestamp);
-  const filename = generateFilename();
+  const { filename, dateFolder } = generateFilenameAndDate();
   const folder = cleanUrlForFolder(url);
-  const daPath = `/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`;
+  const daPath = `/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${dateFolder}/${filename}`;
 
   if (debug) {
     console.log('[DA Upload] Path:', daPath, 'Size:', htmlContent.length);
@@ -194,36 +207,52 @@ export function getCurrentAnalyzedUrl() {
 }
 
 /** Map folder items to report objects */
-function mapFolderItemsToReports(items, folder, domain = null) {
+function mapFolderItemsToReports(items, folder, dateFolder, domain = null) {
   return items
     .filter((item) => item.ext === 'html' || item.name?.endsWith('.html'))
     .map((item) => {
       const filename = item.name.endsWith('.html') ? item.name : `${item.name}.html`;
       const report = {
         filename,
-        path: `${DA_CONFIG.BASE_URL}/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`,
+        path: `${DA_CONFIG.BASE_URL}/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${dateFolder}/${filename}`,
         timestamp: new Date(item.lastModified || item.modified || Date.now()).getTime(),
+        date: dateFolder,
       };
       if (domain) report.domain = domain;
       return report;
     });
 }
 
-/** Fetch reports from a specific folder via CF Worker */
-async function fetchReportsFromFolder(folderPath, folder, domain = null) {
+/** List folder contents via CF Worker */
+async function listFolder(path) {
   try {
-    const response = await fetch(DA_CONFIG.WORKER_URL, {
+    const res = await fetch(DA_CONFIG.WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'list', path: folderPath }),
+      body: JSON.stringify({ action: 'list', path }),
     });
-
-    if (!response.ok) return [];
-    const data = await response.json();
-    return data.success && data.items ? mapFolderItemsToReports(data.items, folder, domain) : [];
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.success && data.items ? data.items : [];
   } catch {
     return [];
   }
+}
+
+/** Fetch reports from a domain folder (traverses date subfolders) */
+async function fetchReportsFromDomainFolder(basePath, folder, domain = null) {
+  const items = await listFolder(basePath);
+  const dateFolders = items
+    .filter((i) => !i.ext && /^\d{4}-\d{2}-\d{2}$/.test(i.name))
+    .map((i) => i.name);
+
+  if (!dateFolders.length) return [];
+
+  const results = await Promise.all(dateFolders.map(async (df) => {
+    const files = await listFolder(`${basePath}/${df}`);
+    return mapFolderItemsToReports(files, folder, df, domain);
+  }));
+  return results.flat();
 }
 
 /** Fetch list of reports from DA storage, optionally filtered by domain */
@@ -233,31 +262,18 @@ export async function fetchReportsFromDA(domainFilter = null) {
 
     if (domainFilter) {
       const folder = cleanUrlForFolder(domainFilter);
-      const reports = await fetchReportsFromFolder(`${basePath}/${folder}`, folder, domainFilter);
+      const reports = await fetchReportsFromDomainFolder(`${basePath}/${folder}`, folder, domainFilter);
       return reports.sort((a, b) => b.timestamp - a.timestamp);
     }
 
-    const response = await fetch(DA_CONFIG.WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'list', path: basePath }),
-    });
-
-    if (!response.ok) return [];
-    const data = await response.json();
-    if (!data.success || !data.items) return [];
-
-    const folders = data.items
-      .filter((item) => item.type === 'folder' || (!item.ext && item.name))
-      .map((item) => item.name);
-
+    const items = await listFolder(basePath);
+    const folders = items.filter((i) => !i.ext && i.name).map((i) => i.name);
     if (!folders.length) return [];
 
-    const reportsArrays = await Promise.all(
-      folders.map((folder) => fetchReportsFromFolder(`${basePath}/${folder}`, folder)),
+    const results = await Promise.all(
+      folders.map((f) => fetchReportsFromDomainFolder(`${basePath}/${f}`, f)),
     );
-
-    return reportsArrays.flat().sort((a, b) => b.timestamp - a.timestamp);
+    return results.flat().sort((a, b) => b.timestamp - a.timestamp);
   } catch (error) {
     console.error('[DA Upload] Error fetching reports:', error);
     return [];

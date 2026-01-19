@@ -1,10 +1,6 @@
-/**
- * Analysis Engine Module
- * Core AI orchestration for RUM dashboard analysis
- */
+/* Analysis Engine Module - Core AI orchestration for RUM dashboard analysis */
 
 /* eslint-disable no-console */
-
 import extractDashboardData from './dashboard-extractor.js';
 import {
   extractFacetsFromExplorer,
@@ -21,11 +17,6 @@ import { PATHS } from '../config.js';
 let systemPromptCache = null;
 let overviewAnalysisTemplateCache = null;
 
-/**
- * Load text file content from parent directory
- * @param {string} filename - File name to load
- * @returns {Promise<string>} File content
- */
 async function loadTextFile(filename) {
   try {
     const response = await fetch(`${PATHS.BLOCK_BASE}/${filename}`);
@@ -39,10 +30,6 @@ async function loadTextFile(filename) {
   }
 }
 
-/**
- * Get system prompt
- * @returns {Promise<string>} System prompt text
- */
 async function getSystemPrompt() {
   if (!systemPromptCache) {
     systemPromptCache = await loadTextFile(PATHS.SYSTEM_PROMPT);
@@ -50,10 +37,6 @@ async function getSystemPrompt() {
   return systemPromptCache || 'You are a RUM data analyst specializing in web performance and user engagement analysis.';
 }
 
-/**
- * Get overview analysis template
- * @returns {Promise<string>} Overview template text
- */
 async function getOverviewAnalysisTemplate() {
   if (!overviewAnalysisTemplateCache) {
     overviewAnalysisTemplateCache = await loadTextFile(PATHS.OVERVIEW_TEMPLATE);
@@ -61,13 +44,6 @@ async function getOverviewAnalysisTemplate() {
   return overviewAnalysisTemplateCache || 'CREATE A CLEAN, PROFESSIONAL REPORT WITH STRUCTURED SECTIONS.';
 }
 
-/**
- * Build final synthesis message for AI
- * @param {Object} dashboardData - Dashboard data
- * @param {Array} allInsights - Collected insights
- * @param {string} overviewTemplate - Overview template
- * @returns {string} Final synthesis message
- */
 function buildFinalSynthesisMessage(dashboardData, allInsights, overviewTemplate) {
   const hasMetrics = Object.keys(dashboardData.metrics).length > 0;
 
@@ -129,8 +105,6 @@ ${overviewTemplate}`;
 
 /** Call AWS Bedrock API for analysis */
 async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
-  console.log('[Analysis Engine] Starting AI analysis...');
-
   try {
     // Verify API credentials exist (checked in metrics-processing.js)
     const { getApiProvider } = await import('../api/api-factory.js');
@@ -203,11 +177,11 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
       const finalData = await callAI(finalRequest);
 
       if (finalData) {
-        console.log('[Analysis Engine] API Response:', {
-          stop_reason: finalData.stop_reason,
-          content_blocks: finalData.content?.length || 0,
-          usage: finalData.usage,
-        });
+        // console.log('[Analysis Engine] API Response:', {
+        //   stop_reason: finalData.stop_reason,
+        //   content_blocks: finalData.content?.length || 0,
+        //   usage: finalData.usage,
+        // });
 
         if (finalData.stop_reason === 'max_tokens') {
           console.error('[Analysis Engine] ⚠️ Response truncated - increase max_tokens');
@@ -227,7 +201,6 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
             }
           });
 
-          console.log(`[Analysis Engine] Report completed, length: ${finalAnalysis.length} characters`);
           if (progressCallback) {
             progressCallback(3, 'completed', 'Streamlined overview report completed successfully', 100);
           }
@@ -252,8 +225,6 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
  * @returns {Promise<string>} Analysis result
  */
 export default async function runCompleteRumAnalysis(progressCallback = null) {
-  console.log('[Analysis Engine] Starting RUM analysis...');
-
   try {
     // Step 1: Initialize analysis environment
     if (progressCallback) {
@@ -262,7 +233,6 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
 
     await new Promise((resolve) => {
       setTimeout(() => {
-        console.log('[Analysis Engine] Initializing facet manipulation...');
         initializeDynamicFacets();
         if (progressCallback) {
           progressCallback(0, 'completed', 'Analysis environment ready');
@@ -280,30 +250,10 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
       setTimeout(resolve, 300);
     });
 
-    console.log('[Analysis Engine] Extracting dashboard data...');
     const dashboardData = await extractDashboardData();
-    console.log('[Analysis Engine] Dashboard data extracted:', {
-      metrics: Object.keys(dashboardData.metrics).length,
-      segments: Object.keys(dashboardData.segments).length,
-      dateRange: dashboardData.dateRange,
-    });
 
     // Extract facet tools
-    console.log('[Analysis Engine] Extracting facet tools from explorer...');
     const facetTools = extractFacetsFromExplorer();
-    console.log('═══════════════════════════════════════════════════════════');
-    console.log('[Analysis Engine] FACET TOOLS EXTRACTION RESULT');
-    console.log('═══════════════════════════════════════════════════════════');
-    console.log(`Total facet tools extracted: ${facetTools.length}`);
-    if (facetTools.length > 0) {
-      console.log('Tool names that will be passed to AI:');
-      facetTools.forEach((tool, idx) => {
-        console.log(`  ${idx + 1}. ${tool.name} - ${tool.description}`);
-      });
-    } else {
-      console.warn('⚠️ WARNING: No facet tools extracted! Analysis will be limited.');
-    }
-    console.log('═══════════════════════════════════════════════════════════');
 
     if (facetTools.length > 0) {
       if (progressCallback) {

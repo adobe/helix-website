@@ -59,8 +59,6 @@ export default function extractDashboardData() {
           };
         }).filter((item) => item.value);
       });
-
-      console.log(`[Dashboard] Extracted ${Object.keys(data.metrics).length} metrics, ${Object.keys(data.segments).length} segments`);
       resolve(data);
     };
 

@@ -1,11 +1,3 @@
-// Import OpTel Detective Report modal functionality
-// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
-import { openReportModal } from '../../../blocks/ai-optel-report-generator/ai-optel-report-generator.js';
-
-// Import Saved Reports functionality
-// eslint-disable-next-line import/no-unresolved, import/no-relative-packages
-import { initializeSavedReports } from '../../../blocks/ai-optel-report-generator/reports/report-actions.js';
-
 export default class FacetSidebar extends HTMLElement {
   constructor() {
     super();
@@ -91,11 +83,10 @@ export default class FacetSidebar extends HTMLElement {
       generateReportButton.style.transform = 'scale(1)';
       generateReportButton.style.boxShadow = 'none';
     });
-    generateReportButton.addEventListener('click', () => {
-      // Load the stylesheet dynamically
+    generateReportButton.addEventListener('click', async () => {
       FacetSidebar.loadStylesheet('ai-optel-report-generator-styles', '/blocks/ai-optel-report-generator/ai-optel-report-generator.css');
-      // Open the modal
-      openReportModal();
+      await FacetSidebar.loadScript('/blocks/ai-optel-report-generator/ai-optel-report-generator.js');
+      if (window.openReportModal) window.openReportModal();
     });
 
     quickFilter.append(filterInput, generateReportButton);
@@ -155,11 +146,11 @@ export default class FacetSidebar extends HTMLElement {
       this.elems.facetsElement.append(facet);
     });
 
-    // Initialize saved reports (check if URL has report param first for fast loading)
-    const hasReportParam = new URLSearchParams(window.location.search).get('report');
-    const delay = hasReportParam ? 100 : 500;
-    setTimeout(() => {
-      initializeSavedReports();
+    // Initialize saved reports lazily
+    const delay = new URLSearchParams(window.location.search).has('report') ? 100 : 500;
+    setTimeout(async () => {
+      await FacetSidebar.loadScript('/blocks/ai-optel-report-generator/reports/report-actions.js');
+      if (window.initializeSavedReports) window.initializeSavedReports();
     }, delay);
   }
 
@@ -198,5 +189,17 @@ export default class FacetSidebar extends HTMLElement {
     if (!document.querySelector(`#${id}`)) {
       document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href, id }));
     }
+  }
+
+  static loadScript(src) {
+    if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
   }
 }

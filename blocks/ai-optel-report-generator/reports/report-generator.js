@@ -112,7 +112,6 @@ export default async function generateReport(statusDiv, button, modal) {
   toggleFormVisibility(modalBody, false);
 
   try {
-    console.log('[Report Generator] Starting...');
     initializeStepProgress(REPORT_STEPS);
 
     // Set only endDate to use fetchPrevious31Days with locked date

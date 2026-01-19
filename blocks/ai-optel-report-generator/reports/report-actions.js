@@ -1,6 +1,5 @@
-/**
- * Report Actions Module - Handles saving reports, tracking viewed state, and dropdown integration
- */
+/* Report Actions Module - Handles saving reports,
+tracking viewed state, and dropdown integration */
 
 /* eslint-disable no-console */
 
@@ -38,7 +37,6 @@ const filterByWeek = (reports) => {
 export async function getSavedReports() {
   try {
     const domain = getCurrentAnalyzedUrl();
-    console.log(`[Report Actions] Fetching reports for: ${domain || 'all domains'}`);
     return await fetchReportsFromDA(domain);
   } catch (err) {
     if (err.message?.includes('Failed to fetch') || err.message?.includes('CORS')) {
@@ -199,3 +197,5 @@ export function setupReportActions(reportContent) {
   document.getElementById('save-report-btn')
     ?.addEventListener('click', (e) => handleSaveReport(e.target, reportContent));
 }
+
+window.initializeSavedReports = initializeSavedReports;

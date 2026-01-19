@@ -44,7 +44,7 @@ loader.apiEndpoint = API_ENDPOINT;
 
 const herochart = new window.slicer.Chart(dataChunks, elems);
 
-window.addEventListener('pageshow', () => elems.canvas && herochart.render());
+window.addEventListener('pageshow', () => !elems.canvas && herochart.render());
 
 // set up metrics for dataChunks
 dataChunks.addSeries('pageViews', pageViews);
@@ -310,9 +310,6 @@ function updateFilter(params, filterText) {
   dataChunks.filter = parseSearchParams(params, filter, transform);
 }
 
-// Yield to main thread to prevent "Page Unresponsive" warnings
-const yieldToMain = () => new Promise((resolve) => { setTimeout(resolve, 0); });
-
 export async function draw() {
   const params = new URL(window.location).searchParams;
   const checkpoint = params.getAll('checkpoint');
@@ -327,9 +324,6 @@ export async function draw() {
   // Skip auto-selection if we're in report view mode (report parameter exists)
   const isReportView = params.has('report');
   if (params.get('metrics') === 'super' && checkpoint.length === 0 && !isReportView) {
-    // Yield to main thread before heavy checkpoint processing
-    await yieldToMain();
-
     // Now that data facets are updated, get all available checkpoint values from the actual data
     const checkpointFacet = dataChunks.facets.checkpoint;
     const allCheckpoints = checkpointFacet ? checkpointFacet.map((f) => f.value) : [];
@@ -342,18 +336,12 @@ export async function draw() {
       });
       window.history.replaceState({}, '', newUrl);
 
-      // Yield again before re-running facets with all checkpoints
-      await yieldToMain();
-
       // Re-run the draw function with the new checkpoints
       const newParams = new URL(window.location).searchParams;
       const newCheckpoint = newParams.getAll('checkpoint');
       updateDataFacets(filterText, newParams, newCheckpoint);
     }
   }
-
-  // Yield before filter update
-  await yieldToMain();
 
   // set up filter from URL parameters
   updateFilter(params, filterText);
@@ -362,9 +350,6 @@ export async function draw() {
   console.log(`filtered to ${dataChunks.filtered.length} bundles in ${new Date() - startTime}ms`);
 
   await herochart.draw();
-
-  // Yield before key metrics update
-  await yieldToMain();
 
   updateKeyMetrics();
 

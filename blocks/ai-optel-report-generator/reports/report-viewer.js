@@ -158,11 +158,14 @@ const showError = (container, message = 'Failed to load report') => {
   container.querySelector('.error-back-btn')?.addEventListener('click', closeReportViewer);
 };
 
-/** Scroll to first checked facet in sidebar with highlight */
-const scrollToFirstCheckedFacet = (retries = 5) => {
-  const sidebar = document.querySelector('facet-sidebar');
-  const checkbox = sidebar?.querySelector('#facets input:checked, #facets [aria-selected="true"]');
-  const fieldset = checkbox?.closest('fieldset');
+/** Scroll to facet matching URL params with highlight */
+const scrollToFirstCheckedFacet = (retries = 10) => {
+  const params = new URLSearchParams(window.location.search);
+  const facet = ['checkpoint', 'url', 'userAgent'].find((f) => params.has(f));
+  const el = facet
+    ? document.querySelector(`[facet="${facet}"]`)
+    : document.querySelector('#facets input:checked, #facets [aria-selected="true"]');
+  const fieldset = el?.closest('fieldset') || el;
 
   if (fieldset) {
     fieldset.scrollIntoView({ behavior: 'smooth', block: 'center' });
