@@ -890,4 +890,8 @@ if (window.location.hostname === 'www.hlx.live') {
 }
 */
 
+if (window.location.hostname === 'www.hlx.page') {
+  window.location.replace('https://www.aem.live');
+}
+
 loadPage(document);
