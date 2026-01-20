@@ -805,6 +805,72 @@ async function loadEager(doc) {
 }
 
 /**
+ * Creates and manages the reading progress bar
+ */
+function createReadingProgressBar() {
+  const progressBar = createTag('div', {
+    class: 'reading-progress-bar',
+    'aria-label': 'Reading progress',
+    role: 'progressbar',
+    'aria-valuenow': '0',
+    'aria-valuemin': '0',
+    'aria-valuemax': '100',
+  });
+
+  document.body.appendChild(progressBar);
+
+  const updateProgress = () => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight - windowHeight;
+    const scrollTop = window.scrollY;
+    const progress = documentHeight > 0 ? (scrollTop / documentHeight) * 100 : 0;
+
+    progressBar.style.width = `${Math.min(Math.max(progress, 0), 100)}%`;
+    progressBar.setAttribute('aria-valuenow', Math.round(progress));
+  };
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress, { passive: true });
+  updateProgress(); // Initial calculation
+}
+
+/**
+ * Creates and manages the back-to-top button
+ */
+function createBackToTopButton() {
+  const button = createTag('button', {
+    class: 'back-to-top',
+    'aria-label': 'Back to top',
+    title: 'Back to top',
+    type: 'button',
+  }, '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 4l6 6-1.41 1.41L11 7.83V16H9V7.83l-3.59 3.58L4 10l6-6z"/></svg>');
+
+  document.body.appendChild(button);
+
+  const toggleVisibility = () => {
+    const scrolled = window.scrollY;
+    const viewportHeight = window.innerHeight;
+
+    if (scrolled > viewportHeight) {
+      button.classList.add('visible');
+    } else {
+      button.classList.remove('visible');
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  button.addEventListener('click', scrollToTop);
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  toggleVisibility(); // Initial check
+}
+
+/**
  * loads everything that doesn't need to be delayed.
  */
 async function loadLazy(doc) {
@@ -834,6 +900,10 @@ async function loadLazy(doc) {
   }
 
   window.hlx.plugins.run('loadLazy');
+
+  // Initialize reading progress bar and back-to-top button
+  createReadingProgressBar();
+  createBackToTopButton();
 
   sampleRUM('lazy');
 

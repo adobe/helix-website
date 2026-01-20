@@ -71,3 +71,74 @@
   font-style: normal;
   font-weight: 900;
 }
+
+/* Reading Progress Bar */
+.reading-progress-bar {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--color-info-accent);
+  z-index: 9998;
+  transition: width 0.1s ease-out;
+  pointer-events: none;
+}
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: var(--spacing-s);
+  right: var(--spacing-s);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--color-info-accent);
+  color: var(--color-white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px var(--shadow-color-20);
+  transition: var(--transition-ease-in-out);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  z-index: 9000;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background-color: var(--color-info-accent-hover);
+  box-shadow: 0 6px 16px var(--shadow-color-30);
+  transform: translateY(-2px);
+}
+
+.back-to-top:active {
+  background-color: var(--color-info-accent-down);
+  transform: translateY(0);
+}
+
+.back-to-top:focus {
+  outline: 2px solid var(--color-info-accent);
+  outline-offset: 2px;
+}
+
+.back-to-top svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+@media (width >= 900px) {
+  .back-to-top {
+    bottom: var(--spacing-m);
+    right: var(--spacing-m);
+  }
+}
