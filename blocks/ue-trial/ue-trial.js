@@ -109,6 +109,79 @@ function formatStepNameForError(stepKey) {
 }
 
 /**
+ * Debounces a function call
+ * @param {Function} func - The function to debounce
+ * @param {number} delay - Delay in milliseconds (default: 800)
+ * @returns {Function} Debounced function
+ */
+function debounce(func, delay = 800) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), delay);
+  };
+}
+
+/**
+ * Validates a GitHub username by checking if it exists
+ * @param {string} username - The GitHub username to validate
+ * @returns {Promise<{valid: boolean|null, message: string}>} Validation result
+ */
+async function validateGitHubId(username) {
+  if (!username.trim()) {
+    return { valid: true, message: '' };
+  }
+
+  try {
+    const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`);
+
+    if (response.status === 200) {
+      return { valid: true, message: 'GitHub user found' };
+    }
+    if (response.status === 404) {
+      return { valid: false, message: 'GitHub user not found' };
+    }
+    if (response.status === 403 || response.status === 429) {
+      return { valid: null, message: 'Rate limit reached. Validation skipped.' };
+    }
+    return { valid: null, message: 'Unable to verify' };
+  } catch (error) {
+    return { valid: null, message: 'Unable to verify' };
+  }
+}
+
+/**
+ * Updates the GitHub ID field UI based on validation state
+ * @param {HTMLInputElement} input - The input element
+ * @param {string} state - Validation state: clear, validating, valid, invalid, warning
+ * @param {string} message - The message to display
+ */
+function updateGitHubValidationUI(input, state, message) {
+  const fieldWrapper = input.closest('.form-field');
+  const existingMsg = fieldWrapper.querySelector('.validation-message');
+
+  fieldWrapper.classList.remove('validating', 'valid', 'invalid');
+  if (existingMsg) existingMsg.remove();
+
+  if (!state || state === 'clear') return;
+
+  if (state === 'validating') {
+    fieldWrapper.classList.add('validating');
+  } else if (state === 'valid' && message) {
+    fieldWrapper.classList.add('valid');
+    const msg = createTag('div', { class: 'validation-message validation-success' }, message);
+    input.after(msg);
+  } else if (state === 'invalid') {
+    fieldWrapper.classList.add('invalid');
+    const msg = createTag('div', { class: 'validation-message validation-error' }, message);
+    input.after(msg);
+  } else if (state === 'warning') {
+    const msg = createTag('div', { class: 'validation-message validation-warning' }, message);
+    input.after(msg);
+  }
+}
+
+/**
  * Creates and shows a custom modal dialog
  * @param {string} message - The error message to display
  * @param {string} title - The modal title (optional, defaults to "Error")
@@ -571,6 +644,31 @@ async function buildForm(block) {
     });
     const githubHelpText = createTag('p', { class: 'help-text' }, 'If you provide your GitHub ID we will also set up a GitHub repo with project files so you can do code and style changes.');
     githubField.append(githubLabel, githubInput, githubHelpText);
+
+    // Add GitHub ID validation
+    const debouncedValidate = debounce(async () => {
+      const username = githubInput.value.trim();
+
+      if (!username) {
+        updateGitHubValidationUI(githubInput, 'clear', '');
+        return;
+      }
+
+      updateGitHubValidationUI(githubInput, 'validating', '');
+      const result = await validateGitHubId(username);
+
+      if (result.valid === true && result.message) {
+        updateGitHubValidationUI(githubInput, 'valid', result.message);
+      } else if (result.valid === false) {
+        updateGitHubValidationUI(githubInput, 'invalid', result.message);
+      } else if (result.valid === null) {
+        updateGitHubValidationUI(githubInput, 'warning', result.message);
+      } else {
+        updateGitHubValidationUI(githubInput, 'clear', '');
+      }
+    }, 800);
+
+    githubInput.addEventListener('input', debouncedValidate);
   }
 
   // Terms and Conditions - extract from block content
@@ -661,6 +759,16 @@ async function buildForm(block) {
   // Add form submission handler
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Check if GitHub ID field is in invalid state
+    const githubFieldEl = form.querySelector('#github-field');
+    if (githubFieldEl && githubFieldEl.classList.contains('invalid')) {
+      const githubInputEl = githubFieldEl.querySelector('input');
+      if (githubInputEl) {
+        githubInputEl.focus();
+      }
+      return;
+    }
 
     // Disable submit button to prevent multiple submissions
     const submitButtonSubmit = form.querySelector('button[type="submit"]');
