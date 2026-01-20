@@ -277,6 +277,39 @@
   line-height: 1.4;
 }
 
+/* GitHub ID validation states */
+.ue-trial .form-field.validating input {
+  border-color: #1473e6;
+}
+
+.ue-trial .form-field.valid input {
+  border-color: #28a745;
+}
+
+.ue-trial .form-field.invalid input {
+  border-color: #dc3545;
+}
+
+.ue-trial .validation-message {
+  font-size: 14px;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+.ue-trial .validation-message.validation-success {
+  color: #28a745;
+}
+
+.ue-trial .validation-message.validation-error {
+  color: #dc3545;
+}
+
+
+.ue-trial .validation-message.validation-warning {
+  color: #f39c12;
+}
+
+
 .ue-trial .agreement {
   margin-top: 15px;
 }
