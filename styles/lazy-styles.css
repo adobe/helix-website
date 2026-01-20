@@ -71,3 +71,67 @@
   font-style: normal;
   font-weight: 900;
 }
+
+/* Reading Progress Bar */
+.reading-progress-bar {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--spectrum-blue), var(--brand-color-purple));
+  width: 0;
+  z-index: 10000;
+  transition: width 0.1s ease-out;
+}
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--color-info-accent);
+  color: var(--color-white);
+  border: 2px solid var(--color-info-accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--shadow-color-25);
+  z-index: 9997;
+}
+
+.back-to-top:hover {
+  background-color: var(--color-info-accent-hover);
+  border-color: var(--color-info-accent-hover);
+  transform: translateY(0) scale(1.05);
+  box-shadow: 0 6px 16px var(--shadow-color-30);
+}
+
+.back-to-top:focus {
+  outline: 2px solid var(--color-info-accent);
+  outline-offset: 4px;
+}
+
+.back-to-top:active {
+  background-color: var(--color-info-accent-down);
+  border-color: var(--color-info-accent-down);
+  transform: translateY(0) scale(0.95);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top svg {
+  width: 24px;
+  height: 24px;
+}
