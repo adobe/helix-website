@@ -1,0 +1,258 @@
+  <div class="report-template-instructions">
+
+  <h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
+
+    <p><b>⚠️ CRITICAL DATA INTEGRITY RULES:</b></p>
+  <ul>
+    <li><b>Use ONLY real data from tool responses</b> - no estimates, extrapolations, or made-up metrics</li>
+    <li><b>Linked numbers must match dashboard exactly</b> - if you link "15k errors", clicking MUST show exactly 15k in filtered dashboard</li>
+    <li><b>NEVER aggregate and link to parent</b> - if you sum multiple error types (15k + 8k = 23k), DO NOT link that sum to parent checkpoint if total is 40k. Link each individually or don't link the aggregate</li>
+    <li><b>Raw values must match</b> - <code>title</code> attribute must contain EXACT value from tool (e.g., <code>title="40123"</code> not <code>title="40000"</code>)</li>
+    <li><b>Nested facet counts</b> - when linking with nested facets, use count FROM THAT FILTERED VIEW, not parent total. If <code>checkpoint=error</code> shows 40k but <code>error.source=network</code> shows 15k, link "15k network errors" NOT "40k"</li>
+    <li><b>Use "count" field from tool</b> - always use the "count" or "value" field, never "weight" or derived values</li>
+    <li><b>Multi-facet links</b> - only link counts if tool provides data for THAT EXACT filter combination. Don't link "8k checkout errors" unless tool shows count for <code>error + /checkout</code> together</li>
+    <li><b>UNITS MATTER:</b> LCP/INP/TTFB in seconds/ms (NEVER "k"), CLS unitless decimal, only counts use "k"</li>
+    <li>[X] WRONG: "2.3k LCP" (means 2,300 not 2.3s) | [OK] CORRECT: "2.3s LCP", "4.9k sessions"</li>
+  </ul>
+
+  <p><b>⚠️ CRITICAL: AGGREGATED SUBSETS MUST NOT BE LINKED TO PARENT:</b></p>
+  <ul>
+    <li><b>Problem:</b> You calculate "top 5 error sources = 5.8m" but link to <code>checkpoint=error</code> which shows 7.6m total → MISMATCH!</li>
+    <li><b>Rule:</b> If your count is a SUBSET (top N, specific pages, filtered group), DO NOT link to parent checkpoint that includes ALL items</li>
+    <li><b>Solutions:</b>
+      <ul>
+        <li><b>Best:</b> Mention aggregate WITHOUT link, then list items individually with nested facet links</li>
+        <li><b>Alternative:</b> Use the TOTAL count from tool and link that (7.6m), then mention subset in separate sentence</li>
+      </ul>
+    </li>
+    <li><b>Examples - WRONG:</b>
+      <ul>
+        <li>"<code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;5.8m errors&lt;/span&gt;</code> across top 5 sources" (dashboard shows 7.6m) ❌</li>
+        <li>"<code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;12k slow LCP&lt;/span&gt;</code> on mobile pages" when total LCP count is 18k ❌</li>
+      </ul>
+    </li>
+    <li><b>Examples - CORRECT:</b>
+      <ul>
+        <li>"The site experiences <code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;7.6m total errors&lt;/span&gt;</code>, with 5.8m concentrated across the top 5 sources: <code>&lt;span data-nested-facet="error.source" data-nested-value="network"&gt;2m network errors&lt;/span&gt;</code>, ..." ✅</li>
+        <li>"JavaScript errors affect 5.8m sessions across the top 5 sources (no link), with <code>&lt;span data-nested-facet="error.source" data-nested-value="serialization"&gt;2.1m from poor serialization&lt;/span&gt;</code> as the leading cause." ✅</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p><b>🚀 EDGE DELIVERY SERVICES (EDS) SITE DETECTION:</b></p>
+  <ul>
+    <li><b>If tool responses include <code>checkpoint=viewblock</code>, this is an Edge Delivery Services site</b></li>
+    <li>EDS sites have built-in automatic optimizations - tailor recommendations accordingly</li>
+    <li><b>DO NOT recommend for EDS sites:</b>
+      <ul>
+        <li>Converting images to WebP format (EDS does this automatically)</li>
+        <li>Image optimization via format conversion (already handled)</li>
+        <li>Manual lazy loading of images (EDS handles this)</li>
+      </ul>
+    </li>
+    <li><b>For EDS sites with ALL Core Web Vitals passing (score-good):</b>
+      <ul>
+        <li>DO NOT invent problems or create unnecessary recommendations</li>
+        <li>It's OKAY to say "Site is performing well" and provide minimal Priority Actions</li>
+        <li>ONLY suggest actions that have REAL impact based on actual data issues (errors ≥1%, poor engagement, high bounce, conversion drops)</li>
+        <li>Focus on business metrics, content effectiveness, user engagement - NOT fake performance tweaks</li>
+        <li>Quality over quantity - 2-3 impactful actions better than 6 made-up ones</li>
+      </ul>
+    </li>
+    <li><b>For EDS sites with CWV issues:</b> Still highlight those issues and provide relevant recommendations (excluding image format conversion)</li>
+  </ul>
+
+  <p><b>FACET LINKING SYNTAX:</b></p>
+  <ul>
+    <li><b>Link each key insight</b> - wrap data-backed findings in facet spans. DON'T link general statements or context</li>
+    <li><b>Use ACTUAL facet values from tool</b>, not display text. If tool shows <code>{"value": "paid"}</code>, use <code>"paid"</code>, not <code>"All paid traffic"</code></li>
+  </ul>
+
+  <p><b>Facet Syntax Patterns:</b></p>
+  <ul>
+    <li><b>Simple:</b> <code>&lt;span data-facet="checkpoint" data-facet-value="click"&gt;...&lt;/span&gt;</code></li>
+    <li><b>One nested (.source OR .target):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network"&gt;15k network errors&lt;/span&gt;</code></li>
+    <li><b>Two nested (.source AND .target):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network" data-nested-facet-2="error.target" data-nested-value-2="TypeError"&gt;3.2k network TypeErrors&lt;/span&gt;</code></li>
+  </ul>
+
+  <p><b>⚠️ TWO-LEVEL NESTED FACETS - ENABLE BOTH CHECKBOXES:</b></p>
+  <ul>
+    <li>When insight involves BOTH source AND target (e.g., "network TypeErrors", "paid mobile traffic"), use BOTH nested facets</li>
+    <li>This ensures clicking the link checks BOTH boxes in dashboard sidebar, showing the exact filtered data</li>
+    <li><b>Example scenarios requiring two nested facets:</b></li>
+    <li>• Error with source+target: "3.2k network TypeErrors" → <code>data-nested-facet="error.source" data-nested-value="network" data-nested-facet-2="error.target" data-nested-value-2="TypeError"</code></li>
+    <li>• Click with source+target: "890 button clicks on /checkout" → <code>data-nested-facet="click.target" data-nested-value="button" data-nested-facet-2="click.source" data-nested-value="/checkout"</code> (if applicable)</li>
+    <li>• LCP with source+device: "4.1s image LCP on mobile" → <code>data-facet="checkpoint" data-facet-value="cwv-lcp" data-nested-facet="cwv-lcp.source" data-nested-value="img"</code> + <code>&lt;span data-facet="userAgent" data-facet-value="mobile"&gt;</code> (separate span for device)</li>
+    <li><b>Count must come from tool data with BOTH filters applied</b> - don't guess combined counts</li>
+  </ul>
+
+  <p><b>NUMBER FORMATTING:</b></p>
+  <p>Wrap ALL numbers: <code>&lt;number-format title="[exact raw from tool] [trend]" trend="[rising|falling|stable]" sample-size="[count]"&gt;&lt;span class="formatted-value"&gt;[display]&lt;/span&gt;&lt;/number-format&gt;</code></p>
+  <ul>
+    <li><b>Counts (use "k"):</b> <code>230m page views</code>, <code>1.2k errors</code>, <code>4.9k sessions</code></li>
+    <li><b>LCP (seconds, NEVER "k"):</b> <code>2.3s LCP</code> NOT <code>2.3k LCP</code></li>
+    <li><b>INP (milliseconds):</b> <code>180ms INP</code> NOT <code>0.18k INP</code></li>
+    <li><b>CLS (unitless decimal):</b> <code>0.12 CLS</code> NOT <code>0.12k CLS</code></li>
+    <li><b>Percentages:</b> <code>45% bounce rate</code></li>
+    <li><b>title must be EXACT raw value:</b> If tool says <code>40123</code>, use <code>title="40123"</code> not <code>title="40000"</code></li>
+  </ul>
+
+  <p><b>COMBINING METRICS + FACET LINKS:</b></p>
+  <p>Wrap metric mentions in facet spans. Checkpoint mappings: LCP=<code>cwv-lcp</code>, CLS=<code>cwv-cls</code>, INP=<code>cwv-inp</code>, TTFB=<code>cwv-ttfb</code>, Errors=<code>error</code>, 404s=<code>404</code>, Click=<code>click</code>, Acquisition=<code>acquisition</code></p>
+  <pre>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP of &lt;number-format title="2340 and rising" trend="rising" sample-size="4500"&gt;&lt;span class="formatted-value"&gt;2.3s&lt;/span&gt;&lt;/number-format&gt;&lt;/span&gt;</pre>
+
+  <p><b>CONTENT REQUIREMENTS:</b></p>
+  <ul>
+    <li><b>BE SPECIFIC:</b> "Mobile LCP 3.2s vs desktop 1.8s" not "performance varies"</li>
+    <li><b>INCLUDE BREAKDOWNS:</b> Mobile vs desktop, top vs bottom pages when data exists</li>
+    <li><b>NAME SPECIFICS:</b> List actual URLs, error messages, referrer domains from tool</li>
+    <li><b>SHOW THRESHOLDS:</b> Compare to standards (LCP: 2.5s, CLS: 0.1, INP: 200ms)</li>
+    <li><b>NO REPETITION:</b> Each insight appears ONCE in most relevant section</li>
+    <li><b>Target: 1200-1600 words</b></li>
+  </ul>
+
+  <p><b>NARRATIVE STYLE:</b></p>
+  <ul>
+    <li><b>Write flowing paragraphs</b> - default to 2-3 narrative paragraphs with metrics woven in. Use bullets when they enhance clarity (3+ distinct items, Priority Actions)</li>
+    <li><b>Hook with surprises</b> - open with most important finding, not "This report analyzes..."</li>
+    <li><b>Connect causes to effects</b> - "The slow LCP (3.2s) likely explains 65% mobile bounce"</li>
+    <li><b>End with implications</b> - "This means ~12k users/month leave before page loads"</li>
+    <li><b>Max 1 bold + 1 italic per section</b> for emphasis only</li>
+  </ul>
+
+  <p><b>ANALYSIS GUIDELINES:</b></p>
+  <ul>
+    <li>Include date range context from DATA TIME PERIOD section</li>
+    <li>"Rising"/"falling" = trends, not absolute performance - focus on actual values vs thresholds</li>
+    <li><b>CSS classes = severity:</b> <code>score-poor</code> = CRITICAL (failing CWV, MUST highlight), <code>score-ni</code> = needs improvement, <code>score-good</code> = passing</li>
+    <li><b>Business thresholds:</b> Engagement/conversion &lt;25% = CRITICAL, bounce &gt;60% = CRITICAL</li>
+    <li>Analyze ALL facets - not just performance. Check facet title attributes for context</li>
+    <li>UTM data captures parameter names only (privacy by design) - don't suggest capturing values</li>
+  </ul>
+
+  <p><b>HTML FORMAT:</b></p>
+  <ul>
+    <li><code>&lt;h4&gt;</code> for section headings, <code>&lt;p&gt;</code> for all text, <code>&lt;b&gt;</code> for subsection labels, bullet character (•) for lists</li>
+    <li>No emojis or markdown syntax in report content</li>
+  </ul>
+
+  </div>
+
+  <!-- ACTUAL REPORT STRUCTURE STARTS HERE -->
+
+  <p><b>CONDITIONAL SECTIONS:</b></p>
+  <ul>
+    <li><b>JavaScript Errors:</b> Only include if errors ≥1% of total traffic (calculate: error count / page views × 100). Skip entirely if below threshold.</li>
+    <li><b>All Other Sections:</b> Always include (Executive Summary, Performance Impact, User Engagement, Traffic & Acquisition, Content Effectiveness, Conversion Funnel, Geographic Insights, Market Opportunities, Business Impact, Priority Actions)</li>
+  </ul>
+
+  <h4>EXECUTIVE SUMMARY</h4>
+  <p>Max 150 words. (1) Context: site type, time period, (2) Hook with most important finding + overall health, (3) Three key findings as bullets with facet links - wrap ENTIRE finding in facet span:</p>
+  <pre>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;LCP at 3.2s exceeds 2.5s threshold—mobile bounce 65% vs desktop 32%.&lt;/span&gt;&lt;/p&gt;</pre>
+
+  <h4>JAVASCRIPT ERRORS THAT NEED ATTENTION</h4>
+  <p><b>Only if errors ≥1% of traffic.</b> Calculate: (error count / page views) × 100</p>
+  <p><b>⚠️ ERROR COUNT ACCURACY:</b></p>
+  <ul>
+    <li><b>Use TOTAL from tool</b> when linking to <code>checkpoint=error</code> - don't link your calculated subset</li>
+    <li><b>If discussing "top N sources":</b> Mention aggregate WITHOUT link, then detail each source with nested facets</li>
+    <li><b>Example structure:</b> "The site experiences <code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;7.6m total errors&lt;/span&gt;</code> (~2.7% of traffic), with 5.8m concentrated in the top 5 sources. Leading issues include <code>&lt;span data-nested-facet="error.source" data-nested-value="serialization"&gt;2.1m serialization errors&lt;/span&gt;</code>, <code>&lt;span data-nested-facet="error.source" data-nested-value="network"&gt;1.8m network errors&lt;/span&gt;</code>, and <code>&lt;span data-nested-facet="error.target" data-nested-value="TypeError"&gt;1.2m TypeErrors&lt;/span&gt;</code>."</li>
+  </ul>
+  <p><b>⚠️ TWO-LEVEL NESTED ERRORS:</b> If discussing errors with BOTH source AND target (e.g., "network TypeErrors"), use BOTH nested facets so both checkboxes enable.</p>
+  <p>2-3 paragraphs analyzing error patterns. Write flowing narrative; use bullets when listing 3+ specific errors. End with UX impact and recommendations.</p>
+
+  <h4>PERFORMANCE IMPACT</h4>
+  <p>100-150 words. LCP/CLS/INP values, threshold comparisons, mobile vs desktop, impact on users/SEO. Link each CWV mention. Flowing narrative; bullets when needed.</p>
+
+  <h4>USER ENGAGEMENT</h4>
+  <p>100-150 words. Sessions, page views, bounce rates, device breakdown. Connect to performance. Link device + engagement insights. Flowing narrative; bullets when needed.</p>
+
+  <h4>TRAFFIC & ACQUISITION</h4>
+  <p>100-150 words. Traffic sources with counts, conversion comparison. Link traffic source insights. Flowing narrative; bullets when needed.</p>
+
+  <h4>CONTENT EFFECTIVENESS</h4>
+  <p>100-150 words. Top pages, underperformers, content strategy. Link page URL insights. Flowing narrative; bullets when needed.</p>
+
+  <h4>CONVERSION FUNNEL</h4>
+  <p>100-150 words. User journey, drop-off points, opportunity size. Link checkpoint/URL insights. Flowing narrative; bullets when needed.</p>
+
+  <h4>GEOGRAPHIC INSIGHTS</h4>
+  <p>100-150 words. User locations, regional variations. Link geo insights if facet exists. Flowing narrative; bullets when needed.</p>
+
+  <h4>MARKET OPPORTUNITIES</h4>
+  <p>100-150 words. Quick wins, growth potential. Link only if referencing specific facet data. Flowing narrative; bullets when needed.</p>
+
+  <h4>BUSINESS IMPACT</h4>
+  <p>100-150 words. Technical issues → business outcomes, quantified costs. Link key insights. Flowing narrative; bullets when needed.</p>
+
+  <h4>PRIORITY ACTIONS</h4>
+  <p><b>Edge Delivery Services SITE HANDLING:</b></p>
+  <ul>
+    <li><b>If this is an EDS site (viewblock checkpoint exists):</b>
+      <ul>
+        <li>DO NOT recommend: WebP conversion, image format optimization, manual lazy loading</li>
+        <li><b>If ALL CWV are green (score-good):</b> Site is already well-optimized. Provide 2-3 high-impact actions ONLY IF real issues exist (errors ≥1%, poor engagement &lt;25%, bounce &gt;60%, conversion problems). If no real issues, say "Site performing well - focus on content/business metrics" with 1-2 content-focused suggestions.</li>
+        <li><b>If ANY CWV failing:</b> Provide relevant technical actions (excluding image format work)</li>
+      </ul>
+    </li>
+    <li><b>If NOT an EDS site:</b> Follow standard recommendations including image optimization</li>
+  </ul>
+
+  <p><b>Standard Priority Actions Structure:</b></p>
+  <p>List 4-6 quick wins (HIGH IMPACT + EASY FIX) when real issues exist. 2-3 high-impact actions when site is performing well. NO long-term projects or timelines.</p>
+  <p><b>Authoring Tasks (2-3 when needed):</b> Broken links, alt text, metadata, content improvements (NOT WebP for EDS sites)</p>
+  <p><b>Code Tasks (2-3 when needed):</b> Caching, error fixes, performance tweaks specific to actual problems (NOT image format for EDS sites)</p>
+  <p><b>Prioritize:</b> (1) Real issues with data backing, (2) Quick wins, (3) High traffic impact, (4) CWV issues (if failing), (5) Revenue-impacting</p>
+  <p><b>Format:</b> Wrap action in facet link, leave "Expected Impact:" unlinked</p>
+  <pre>&lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;Implement responsive images with srcset.&lt;/span&gt; Expected Impact: Reduce LCP from 3.3s toward 2.5s.&lt;/p&gt;</pre>
+
+  <p><b>Example Priority Actions for EDS site with green CWV:</b></p>
+  <pre>&lt;p&gt;&lt;b&gt;Content Actions&lt;/b&gt;&lt;/p&gt;
+  &lt;p&gt;• &lt;span data-facet="url" data-facet-value="/blog"&gt;Improve internal linking from blog posts.&lt;/span&gt; Expected Impact: Increase engagement and reduce 52% bounce rate.&lt;/p&gt;
+  &lt;p&gt;• &lt;span data-facet="checkpoint" data-facet-value="click" data-nested-facet="click.target" data-nested-value="nav"&gt;Simplify navigation structure.&lt;/span&gt; Expected Impact: Improve user journey and increase conversions.&lt;/p&gt;</pre>
+
+  <div class="report-requirements">
+
+  <h4>PRE-SUBMISSION VERIFICATION WORKFLOW</h4>
+  <p><b>Before generating, verify EACH metric using this process:</b></p>
+  <ol>
+    <li><b>Check for EDS site:</b> Does tool response include <code>checkpoint=viewblock</code>?</li>
+    <li><b>Check CWV status:</b> Are ALL CWV metrics score-good? If yes + EDS site, limit recommendations to real issues only</li>
+    <li>Find metric in tool response - locate exact JSON with count/value</li>
+    <li>Copy exact count - use raw number from "count" field</li>
+    <li>Determine facet link - what filter state produces this count?</li>
+    <li>Check nested facets - if using .source/.target, is count from that nested level?</li>
+    <li>For two-level nested - do you have count with BOTH filters applied? Use both nested-facet attributes</li>
+    <li>Write number-format - title="[exact raw]", formatted-value="[rounded]"</li>
+    <li>Mental click test - "If I click this link, will dashboard show this count?"</li>
+  </ol>
+
+  <p><b>FINAL CHECKLIST - Every linked metric must pass ALL checks:</b></p>
+  <ul>
+    <li>□ No aggregated SUBSETS linked to parent checkpoints (5.8m top-5 cannot link to error=7.6m total)</li>
+    <li>□ When mentioning "top N" or filtered subsets, either don't link OR link each item individually</li>
+    <li>□ EDS site detected (viewblock exists)? If yes + all CWV green, avoid unnecessary recommendations</li>
+    <li>□ No WebP/image format recommendations for EDS sites</li>
+    <li>□ Priority Actions based on REAL issues with data backing, not invented problems</li>
+    <li>□ Raw value in <code>title</code> matches tool exactly (40123, not 40000 or 40k)</li>
+    <li>□ Linked count matches FILTERED dashboard view (not parent total)</li>
+    <li>□ Nested facets: count from nested level, not parent</li>
+    <li>□ Two-level nested: count from tool with BOTH filters applied, both nested-facet attrs present</li>
+    <li>□ Multi-facet links: only if tool has combined filter count</li>
+    <li>□ Units: LCP/INP/TTFB/CLS never use "k", only counts use "k"</li>
+    <li>□ No aggregated sums linked unless tool provides exact total</li>
+    <li>□ Every facet value exists as selectable checkbox in dashboard</li>
+    <li>□ No made-up/estimated data - only real tool values</li>
+  </ul>
+
+  <p><b>🎯 GOLD STANDARD TEST:</b></p>
+  <p><i>"User clicks link → dashboard filters apply → dashboard total EXACTLY matches report number (accounting for same rounding: 40123 → 40k in both places). Hover shows same raw value in both."</i></p>
+
+  <h4>LENGTH & FORMAT SUMMARY</h4>
+  <ul>
+    <li><b>Total:</b> 1200-1600 words | <b>Executive Summary:</b> Max 150 words | <b>Each section:</b> 100-150 words | <b>Priority Actions:</b> 2-6 items based on real issues</li>
+    <li>No timelines in Priority Actions, no emojis in content, flowing narrative with selective bullets</li>
+    <li><b>Quality over quantity:</b> Better to have 2 impactful actions than 6 unnecessary ones</li>
+  </ul>
+
+</div>

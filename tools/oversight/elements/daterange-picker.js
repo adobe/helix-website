@@ -43,21 +43,6 @@ const STYLES = `
     cursor: pointer;
   }
 
-  ul.menu li:last-child {
-    position: relative;
-    margin-top: 16px;
-  }
-
-  ul.menu li:last-child::before {
-    content: '';
-    position: absolute;
-    top: calc((-0.5 * 16px) - (2px / 2));
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--gray-200);
-  }
-
   .input-wrapper {
     display: none;
     background-color: white;
@@ -297,11 +282,10 @@ export default class DateRangePicker extends HTMLElement {
   }
 
   get value() {
-    return {
-      value: this.inputElement.dataset.value,
-      from: this.fromElement.value,
-      to: this.toElement.value,
-    };
+    const v = this.inputElement.dataset.value;
+    return v === 'custom'
+      ? { value: v, from: this.fromElement.value, to: this.toElement.value }
+      : { value: v };
   }
 
   set value(config) {
@@ -379,32 +363,20 @@ export default class DateRangePicker extends HTMLElement {
     this.toggleCustomTimeframe(value === 'custom');
 
     if (value === 'week') {
-      if (!fromElement.value) {
-        const lastWeek = now;
-        lastWeek.setHours(-7 * 24, 0, 0, 0);
-        fromElement.value = toDateString(lastWeek);
-      }
-      if (!toElement.value) {
-        toElement.value = toDateString(now);
-      }
+      const lastWeek = new Date(now);
+      lastWeek.setDate(now.getDate() - 7);
+      fromElement.value = toDateString(lastWeek);
+      toElement.value = toDateString(now);
     } else if (value === 'month') {
-      if (!fromElement.value) {
-        const lastMonth = now;
-        lastMonth.setMonth(now.getMonth() - 1);
-        fromElement.value = toDateString(lastMonth);
-      }
-      if (!toElement.value) {
-        toElement.value = toDateString(now);
-      }
+      const lastMonth = new Date(now);
+      lastMonth.setMonth(now.getMonth() - 1);
+      fromElement.value = toDateString(lastMonth);
+      toElement.value = toDateString(now);
     } else if (value === 'year') {
-      if (!fromElement.value) {
-        const lastYear = now;
-        lastYear.setFullYear(now.getFullYear() - 1);
-        fromElement.value = toDateString(lastYear);
-      }
-      if (!toElement.value) {
-        toElement.value = toDateString(now);
-      }
+      const lastYear = new Date(now);
+      lastYear.setFullYear(now.getFullYear() - 1);
+      fromElement.value = toDateString(lastYear);
+      toElement.value = toDateString(now);
     } else if (value === 'custom') {
       [fromElement, toElement].forEach((field) => {
         field.removeAttribute('readonly');

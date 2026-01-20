@@ -19,7 +19,6 @@ export default class FacetSidebar extends HTMLElement {
     // <div class="filters">
     //   <div class="quick-filter">
     //     <input type="text" id="filter" placeholder="Type to filter...">
-    //   </div>
     //   <form id="select-focus">
     //     <input type="radio" name="focus" id="performance">
     //     <label for="performance">Performance</label>
@@ -39,7 +38,49 @@ export default class FacetSidebar extends HTMLElement {
     filterInput.type = 'text';
     filterInput.id = 'filter';
     filterInput.placeholder = 'Type to filter...';
-    quickFilter.append(filterInput);
+
+    // Create OpTel Detective Report button
+    const generateReportButton = document.createElement('button');
+    generateReportButton.className = 'ai-optel-report-generator-button';
+    generateReportButton.title = 'Use Claude to generate AI Report';
+
+    // Create icon element
+    const icon = document.createElement('img');
+    icon.src = '/icons/icon-claude.svg';
+    icon.alt = 'Claude AI';
+    icon.style.cssText = `
+      width: 20px;
+      height: 20px;
+    `;
+    generateReportButton.appendChild(icon);
+
+    generateReportButton.style.cssText = `
+      background: white;
+      border: 2px solid #D97757;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: all 0.2s;
+      margin-left: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    generateReportButton.addEventListener('mouseenter', () => {
+      generateReportButton.style.transform = 'scale(1.05)';
+      generateReportButton.style.boxShadow = '0 2px 8px rgba(217, 119, 87, 0.3)';
+    });
+    generateReportButton.addEventListener('mouseleave', () => {
+      generateReportButton.style.transform = 'scale(1)';
+      generateReportButton.style.boxShadow = 'none';
+    });
+    generateReportButton.addEventListener('click', async () => {
+      FacetSidebar.loadStylesheet('ai-optel-report-generator-styles', '/blocks/ai-optel-report-generator/ai-optel-report-generator.css');
+      await FacetSidebar.loadScript('/blocks/ai-optel-report-generator/ai-optel-report-generator.js');
+      if (window.openReportModal) window.openReportModal();
+    });
+
+    quickFilter.append(filterInput, generateReportButton);
     this.append(quickFilter);
 
     const selectFocus = document.createElement('form');
@@ -90,10 +131,18 @@ export default class FacetSidebar extends HTMLElement {
 
     this.elems.filterInput = filterInput;
     this.elems.facetsElement = facetsElement;
+    this.elems.selectFocus = selectFocus;
 
     predefinedFacets.forEach((facet) => {
       this.elems.facetsElement.append(facet);
     });
+
+    // Initialize saved reports lazily
+    const delay = new URLSearchParams(window.location.search).has('report') ? 100 : 500;
+    setTimeout(async () => {
+      await FacetSidebar.loadScript('/blocks/ai-optel-report-generator/reports/report-actions.js');
+      if (window.initializeSavedReports) window.initializeSavedReports();
+    }, delay);
   }
 
   updateFacets(mode) {
@@ -124,6 +173,24 @@ export default class FacetSidebar extends HTMLElement {
 
       if (facetEl) facetEl.setAttribute('mode', mode || 'default');
       if (facetEl) this.elems.facetsElement.append(facetEl);
+    });
+  }
+
+  static loadStylesheet(id, href) {
+    if (!document.querySelector(`#${id}`)) {
+      document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href, id }));
+    }
+  }
+
+  static loadScript(src) {
+    if (document.querySelector(`script[src="${src}"]`)) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
     });
   }
 }
