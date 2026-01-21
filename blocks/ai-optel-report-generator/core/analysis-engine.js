@@ -1,6 +1,5 @@
 /* Analysis Engine Module - Core AI orchestration for RUM dashboard analysis */
 
-/* eslint-disable no-console */
 import extractDashboardData from './dashboard-extractor.js';
 import {
   extractFacetsFromExplorer,
@@ -11,7 +10,7 @@ import {
   processMetricsBatches,
 } from './metrics-processing.js';
 import { buildFacetInfoSection } from '../reports/facet-link-generator.js';
-import { PATHS } from '../config.js';
+import { PATHS, API_CONFIG } from '../config.js';
 
 // Template cache
 let systemPromptCache = null;
@@ -25,8 +24,7 @@ async function loadTextFile(filename) {
     }
     return await response.text();
   } catch (error) {
-    console.error(`[Template Loader] Error loading ${filename}:`, error);
-    return null;
+    throw new Error(`Error loading ${filename}: ${error.message}`);
   }
 }
 
@@ -51,20 +49,20 @@ function buildFinalSynthesisMessage(dashboardData, allInsights, overviewTemplate
 
 DO NOT include any of the raw batch content in your response. Use it only as source material for your analysis.
 
-==== 📋 REPORT STRUCTURE REQUIREMENTS ====
+==== REPORT STRUCTURE REQUIREMENTS ====
 1. Start with EXECUTIVE SUMMARY section (required, comes first)
 2. Follow with other sections as defined in the template
 3. Ensure all facets are covered across appropriate sections
 
 ==== DATA TIME PERIOD ====
-${dashboardData.dateRange ? `📅 Date Range Selected: ${dashboardData.dateRange}` : '⚠️ Date range not available'}
+${dashboardData.dateRange ? `Date Range Selected: ${dashboardData.dateRange}` : 'WARNING: Date range not available'}
 ${dashboardData.dateRange ? `(Found in: <daterange-wrapper><input data-value="${dashboardData.dateRange}">)` : ''}
 
 IMPORTANT: All insights and metrics in this report are for the ${dashboardData.dateRange || 'specified'} time period.
 Convert the data-value to readable format in your report (e.g., "month" → "Last 30 Days", "week" → "Last 7 Days").
 ==== END TIME PERIOD ====
-==== ✅ FACET COVERAGE CHECKLIST ====
-⚠️ The following facets MUST ALL be covered in the "Key Metrics & Findings" section.
+==== FACET COVERAGE CHECKLIST ====
+WARNING: The following facets MUST ALL be covered in the "Key Metrics & Findings" section.
 Each facet needs 1 positive + 1 improvement observation:
 
 ${Object.keys(dashboardData.segments)
@@ -78,11 +76,11 @@ ${hasMetrics
     ? Object.entries(dashboardData.metrics)
       .map(([metric, value]) => `${metric}: ${value}`)
       .join('\n')
-    : '⚠️ WARNING: Dashboard metrics not available - focus analysis on segment data from tool results'}
+    : 'WARNING: Dashboard metrics not available - focus analysis on segment data from tool results'}
 
 TOTAL SEGMENTS: ${Object.keys(dashboardData.segments).length} facets analyzed
 
-⚠️ COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED:
+COMPLETE LIST OF ALL FACETS THAT MUST BE COVERED:
 ${Object.keys(dashboardData.segments).join(', ')}
 
 Each of these facets MUST get 1 positive + 1 improvement mention in the "Key Metrics & Findings" section.
@@ -160,7 +158,7 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
         max_tokens: maxTokens,
         messages: [{ role: 'user', content: finalSynthesisMessage }],
         system: enhancedSystemPrompt,
-        temperature: 0.35,
+        temperature: API_CONFIG.BATCH_TEMPERATURE,
       };
 
       if (progressCallback) {
@@ -176,14 +174,8 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
       const finalData = await callAI(finalRequest);
 
       if (finalData) {
-        // console.log('[Analysis Engine] API Response:', {
-        //   stop_reason: finalData.stop_reason,
-        //   content_blocks: finalData.content?.length || 0,
-        //   usage: finalData.usage,
-        // });
-
         if (finalData.stop_reason === 'max_tokens') {
-          console.error('[Analysis Engine] ⚠️ Response truncated - increase max_tokens');
+          throw new Error('AI response truncated. Please try again or increase max_tokens configuration.');
         }
 
         if (finalData.content && finalData.content.length > 0) {
@@ -213,8 +205,7 @@ async function callAnthropicAPI(dashboardData, facetTools, progressCallback) {
     const result = 'Analysis completed successfully. Multiple insights were discovered across different data facets.';
     return result;
   } catch (error) {
-    console.error('[Analysis Engine] Error in API call:', error);
-    throw error;
+    throw new Error(`Analysis Engine error: ${error.message}`);
   }
 }
 
@@ -267,7 +258,6 @@ export default async function runCompleteRumAnalysis(progressCallback = null) {
 
     return response;
   } catch (error) {
-    console.error('[Analysis Engine] Error:', error);
-    throw error;
+    throw new Error(`RUM Analysis failed: ${error.message}`);
   }
 }

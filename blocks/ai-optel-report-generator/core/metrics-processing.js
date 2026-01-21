@@ -2,8 +2,6 @@
  * Metrics Processing Module - Sequential batch processing of metrics analysis
  */
 
-/* eslint-disable no-console */
-
 import { API_CONFIG } from '../config.js';
 
 const BATCH_CONFIG = {
@@ -51,8 +49,8 @@ function createBatchMessage(batch, baseMessage, dashboardData, isFirstBatch) {
 
   if (isFirstBatch) {
     const dateRange = dashboardData.dateRange
-      ? `📅 This data covers: ${dashboardData.dateRange.toUpperCase()}`
-      : '⚠️ Date range not specified';
+      ? `This data covers: ${dashboardData.dateRange.toUpperCase()}`
+      : 'WARNING: Date range not specified';
 
     return `${baseMessage}
 
@@ -70,9 +68,9 @@ INSTRUCTIONS:
 2. Examine the results for patterns, outliers, and valuable insights
 3. Provide concise analysis with EXACT numbers from the tool results
 
-⚠️ DATA INTEGRITY: ONLY report findings based on actual tool results. DO NOT estimate or invent metrics.
+DATA INTEGRITY: ONLY report findings based on actual tool results. DO NOT estimate or invent metrics.
 
-⚠️ FOCUS ON VALUE:
+FOCUS ON VALUE:
 - If data is unremarkable/expected: Note it briefly (1-2 sentences)
 - If data reveals issues/patterns: Provide detailed analysis with specific metrics
 
@@ -86,7 +84,7 @@ INSTRUCTIONS:
 2. Analyze the results with EXACT numbers
 3. Provide concise findings (detailed if valuable, brief if unremarkable)
 
-⚠️ DATA INTEGRITY: Use ONLY actual tool results, never estimates.
+DATA INTEGRITY: Use ONLY actual tool results, never estimates.
 
 Start your analysis.`;
 }
@@ -158,8 +156,6 @@ async function processBatch(batch, message, dashboardData, systemPrompt, apiKey,
           if (item.type === 'text' && item.text.trim()) analysis += `${item.text.trim()}\n`;
         });
       }
-    } else {
-      console.warn(`[${toolName}] ⚠️ Tool not used by AI`);
     }
 
     return {
@@ -167,7 +163,6 @@ async function processBatch(batch, message, dashboardData, systemPrompt, apiKey,
     };
   } catch (error) {
     if (error.isAuthError || error.isFatalError) throw error;
-    console.error(`[${toolName}] ✗ Error:`, error.message);
     return {
       batchId: batch.id, toolName, analysis: `${toolName} skipped.`, success: false, error: error.message,
     };
@@ -207,14 +202,9 @@ Provide comprehensive analysis with specific details and actionable insights.`;
       if (item.type === 'text' && item.text.trim()) synthesis += `${item.text.trim()}\n`;
     });
 
-    if (synthesis) {
-      console.log('[Follow-up] ✓ Complete');
-      return synthesis;
-    }
-    return null;
+    return synthesis || null;
   } catch (error) {
     if (error.isAuthError) throw error;
-    console.error('[Follow-up] Error:', error.message);
     return null;
   }
 }
@@ -264,10 +254,6 @@ export async function processMetricsBatches(
     .filter((r) => r.success)
     .map((r) => r.analysis?.trim())
     .filter(Boolean);
-  const failed = results.filter((r) => !r.success);
-
-  // console.log(`[Metrics] ✓ ${successful.length}/${results.length} metrics analyzed`);
-  if (failed.length > 0) console.warn(`[Metrics] ⚠️ ${failed.length} failed:`, failed.map((f) => f.toolName).join(', '));
 
   let followUp = null;
   if (successful.length > 0) {

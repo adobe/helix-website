@@ -2,8 +2,6 @@
  * Facet Manager - Handles facet tool extraction and manipulation
  */
 
-/* eslint-disable no-console */
-
 let cachedFacetTools = null;
 
 /** Create tool definition for a facet */
@@ -35,8 +33,7 @@ export function extractFacetsFromExplorer() {
 
   const sidebar = document.querySelector('facet-sidebar');
   if (!sidebar) {
-    console.error('[Facet Manager] Sidebar not found');
-    return [];
+    throw new Error('Facet sidebar not found');
   }
 
   const { dataChunks } = sidebar;
@@ -198,8 +195,7 @@ export async function handleDynamicFacetToolCall(toolName, input, useQueue = tru
           return { success: false, message: `Unknown operation: ${operation}` };
       }
     } catch (error) {
-      console.error('[Facet Manager] Error:', error);
-      return { success: false, message: `Error processing ${facetName}: ${error.message}` };
+      throw new Error(`Error processing ${facetName}: ${error.message}`);
     }
   };
 

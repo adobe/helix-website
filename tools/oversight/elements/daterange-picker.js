@@ -167,6 +167,61 @@ const STYLES = `
   :host-context(html[data-theme="dark"]) input ~ ul li:hover {
     background-color: #3e3e3e;
   }
+
+  /* Saved Reports Dropdown Entries */
+  .saved-reports-header {
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 2px solid var(--gray-300);
+    font-weight: 600;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .saved-report-entry {
+    cursor: pointer;
+  }
+
+  .saved-report-entry.unviewed {
+    color: #147af3;
+  }
+
+  .saved-report-entry.viewed {
+    color: #5a1ba3;
+  }
+
+  :host-context(html[data-theme="dark"]) .saved-reports-header {
+    border-top-color: #4a4a4a;
+  }
+
+  :host-context(html[data-theme="dark"]) .saved-report-entry.unviewed {
+    color: #78bbfa;
+  }
+
+  :host-context(html[data-theme="dark"]) .saved-report-entry.viewed {
+    color: #cca4fd;
+  }
+
+  /* Notification Badge */
+  .report-notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b40000;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 1000;
+  }
 `;
 
 const TEMPLATE = `

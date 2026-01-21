@@ -2,8 +2,6 @@
  * Facet Link Generator - Creates dashboard links with facet parameters for report navigation
  */
 
-/* eslint-disable no-console */
-
 /** Build facet info section for AI prompt (instructions on creating clickable links) */
 export function buildFacetInfoSection(dashboardData) {
   const facetList = Object.keys(dashboardData.segments);
@@ -28,7 +26,7 @@ export function buildFacetInfoSection(dashboardData) {
     '\n\n==== AVAILABLE FACETS FOR LINKING ====',
     'When creating your report, wrap findings in <span> tags with data attributes to make them clickable.',
     '',
-    '⚠️ CRITICAL: All links PRESERVE existing url and userAgent filters in the URL',
+    'CRITICAL: All links PRESERVE existing url and userAgent filters in the URL',
     '   Checkpoint may be changed/added based on the link, but url/userAgent context is never lost.',
     '',
     'FACET LINKING STRUCTURE:',
@@ -38,7 +36,7 @@ export function buildFacetInfoSection(dashboardData) {
     'MAIN FACETS (required for all links):',
     ...simpleFacets.filter((f) => ['checkpoint', 'url', 'userAgent'].includes(f)).map((f) => formatFacet(f)),
     '',
-    '⚠️ NESTED FACETS - ONLY USE THESE EXACT NAMES (can be combined independently):',
+    'NESTED FACETS - ONLY USE THESE EXACT NAMES (can be combined independently):',
     ...nestedFacets.map((f) => {
       const parent = f.split('.')[0];
       const values = dashboardData.segments[f]?.slice(0, 2).map((item) => item.value).join('", "') || '';
@@ -63,14 +61,14 @@ export function buildFacetInfoSection(dashboardData) {
       })
       .filter(Boolean),
     '',
-    '⚠️ CRITICAL: ONLY use nested facet names from the list above. DO NOT invent nested facet names!',
+    'CRITICAL: ONLY use nested facet names from the list above. DO NOT invent nested facet names!',
   ];
 
   sections.push(
     '\nCORRECT USAGE EXAMPLES:',
     '',
-    '⚠️ IMPORTANT: Include relevant metrics/numbers INSIDE the data-facet span so they become part of the clickable link!',
-    '⚠️ Use <number-format> tags with proper attributes for all numbers (see Number Formatting section).',
+    'IMPORTANT: Include relevant metrics/numbers INSIDE the data-facet span so they become part of the clickable link!',
+    'Use <number-format> tags with proper attributes for all numbers (see Number Formatting section).',
     '',
     '1. SIMPLE LINK (Main facet only - Checkpoint):',
     '<p>• <span data-facet="checkpoint" data-facet-value="lcp">LCP events show <number-format title="2.3s ±0.4s" sample-size="1234"><span class="formatted-value">2.3s</span></number-format> average load time</span>.</p>',
@@ -84,7 +82,7 @@ export function buildFacetInfoSection(dashboardData) {
     'Tool returns: {"text": "All Mobile", "value": "mobile", "count": 8100}',
     'CORRECT: <span data-facet="userAgent" data-facet-value="mobile">Mobile users have <number-format sample-size="8100"><span class="formatted-value">8.1k</span></number-format> page views</span>',
     'WRONG: <span data-facet-value="All Mobile">... (uses "text" field - will NOT work)',
-    '⚠️ ALWAYS use the "value" field from tool response, NEVER use "text" or "label"',
+    'ALWAYS use the "value" field from tool response, NEVER use "text" or "label"',
     '',
     '4. NESTED LINK (One nested facet - error.source):',
     '<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network">Network errors affect <number-format sample-size="456"><span class="formatted-value">456</span></number-format> users</span>.</p>',
@@ -93,7 +91,7 @@ export function buildFacetInfoSection(dashboardData) {
     '5. NESTED LINK (One nested facet - error.target directly, without source):',
     '<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.target" data-nested-value="TypeError: Cannot read property">This TypeError affects <number-format sample-size="89"><span class="formatted-value">89</span></number-format> users</span>.</p>',
     'URL: ?checkpoint=error&error.target=TypeError: Cannot read property',
-    '⚠️ You can link directly to error.target WITHOUT specifying error.source!',
+    'You can link directly to error.target WITHOUT specifying error.source!',
     '',
     '6. NESTED LINK (Two nested facets - both source and target):',
     '<p>• <span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network" data-nested-facet-2="error.target" data-nested-value-2="TypeError: Cannot read property">This specific TypeError from network: <number-format sample-size="45"><span class="formatted-value">45</span></number-format></span>.</p>',
@@ -103,13 +101,13 @@ export function buildFacetInfoSection(dashboardData) {
     'Tool returns: {"facet": "click.target", "value": "https://example.com/watch-collection.html", "count": 123}',
     'CORRECT: <span data-facet="checkpoint" data-facet-value="click" data-nested-facet="click.target" data-nested-value="https://example.com/watch-collection.html">Watch collection clicks</span>',
     'WRONG: data-nested-value="https://example.com/watches.html" (different URL - will NOT work!)',
-    '⚠️ For nested facets with URLs: Use the EXACT full URL from tool response',
+    'For nested facets with URLs: Use the EXACT full URL from tool response',
     '',
     'WHEN TO USE NESTED FACETS:',
     '  • Use one nested facet when you have data for that specific dimension',
     '  • Use two nested facets when you have data for both and want precise filtering',
     '  • You can use .target WITHOUT .source - they are independent filters!',
-    '  ⚠️ ONLY create nested links if you called a tool for that nested facet!',
+    '  ONLY create nested links if you called a tool for that nested facet!',
   );
 
   sections.push(
@@ -119,7 +117,7 @@ export function buildFacetInfoSection(dashboardData) {
     '• <span data-nested-facet="error.source" data-nested-value="network">...</span> - Missing parent checkpoint!',
     '• <span data-facet="url" data-facet-value="/checkout">The page</span> has 3.2s LCP - Metric outside span!',
     '',
-    '⚠️ CRITICAL RULES:',
+    'CRITICAL RULES:',
     '  1. MAIN FACET REQUIRED: Every link needs data-facet and data-facet-value',
     '  2. NESTED FACETS ARE OPTIONAL: Add them when you have specific drill-down data',
     '  3. NESTED FACETS ARE INDEPENDENT: You can use .source, .target, or both',
@@ -215,7 +213,6 @@ function correctValue(facetName, text) {
   if (!sidebar) return text;
 
   const lc = text.toLowerCase();
-  // const log = (v, src) => console.log(`[Facet Link] Corrected "${text}" → "${v}" (${src})`);
 
   const sel = `label[for^="${CSS.escape(facetName)}-"], label[for^="${CSS.escape(facetName)}="]`;
   const label = Array.from(sidebar.querySelectorAll(sel))
@@ -269,6 +266,7 @@ export function convertSpansToLinks(htmlContent) {
 
   const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
   if (doc.querySelector('parsererror')) {
+    // eslint-disable-next-line no-console
     console.error('[Facet Link Generator] Parser error');
     return htmlContent;
   }
@@ -314,11 +312,13 @@ export function convertSpansToLinks(htmlContent) {
     const facets = document.querySelector('facet-sidebar')?.facets;
     if (nestedFacet && facets && !facets[nestedFacet]) {
       stats.skippedNested.push(`${nestedFacet}="${nestedValue}" (nested facet "${nestedFacet}" does not exist)`);
+      // eslint-disable-next-line no-console
       console.error(`[Facet Link Generator] AI generated invalid nested facet: "${nestedFacet}". This facet does not exist!`);
       return;
     }
     if (nestedFacet2 && facets && !facets[nestedFacet2]) {
       stats.skippedNested.push(`${nestedFacet2}="${nestedValue2}" (nested facet "${nestedFacet2}" does not exist)`);
+      // eslint-disable-next-line no-console
       console.error(`[Facet Link Generator] AI generated invalid nested facet: "${nestedFacet2}". This facet does not exist!`);
       return;
     }
@@ -366,24 +366,6 @@ export function convertSpansToLinks(htmlContent) {
       stats.simpleLinks += 1;
     }
   });
-
-  console.log(`[Facet Link Validation] ${stats.converted} valid links created (simple: ${stats.simpleLinks}, 1 nested: ${stats.oneNested}, 2 nested: ${stats.twoNested})`);
-  if (stats.skippedNested.length) {
-    console.warn(`[Facet Link Validation] ${stats.skippedNested.length} invalid nested facet links:`, stats.skippedNested);
-  }
-  if (stats.skippedInvalidFacet.length) {
-    console.warn(`[Facet Link Validation] ${stats.skippedInvalidFacet.length} invalid facet names:`, stats.skippedInvalidFacet);
-  }
-  if (stats.skippedNonExistent.length) {
-    console.warn(`[Facet Link Validation] ${stats.skippedNonExistent.length} non-existent values:`, stats.skippedNonExistent);
-  }
-
-  const totalSkipped = stats.skippedNested.length
-    + stats.skippedInvalidFacet.length
-    + stats.skippedNonExistent.length;
-  if (totalSkipped === 0) {
-    console.log('[Facet Link Validation] All AI-generated links are valid!');
-  }
 
   return doc.body.innerHTML;
 }

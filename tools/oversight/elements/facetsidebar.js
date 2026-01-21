@@ -44,36 +44,11 @@ export default class FacetSidebar extends HTMLElement {
     generateReportButton.className = 'ai-optel-report-generator-button';
     generateReportButton.title = 'Use Claude to generate AI Report';
 
-    // Create icon element
     const icon = document.createElement('img');
     icon.src = '/icons/icon-claude.svg';
     icon.alt = 'Claude AI';
-    icon.style.cssText = `
-      width: 20px;
-      height: 20px;
-    `;
     generateReportButton.appendChild(icon);
 
-    generateReportButton.style.cssText = `
-      background: white;
-      border: 2px solid #D97757;
-      border-radius: 6px;
-      cursor: pointer;
-      padding: 8px 12px;
-      transition: all 0.2s;
-      margin-left: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    `;
-    generateReportButton.addEventListener('mouseenter', () => {
-      generateReportButton.style.transform = 'scale(1.05)';
-      generateReportButton.style.boxShadow = '0 2px 8px rgba(217, 119, 87, 0.3)';
-    });
-    generateReportButton.addEventListener('mouseleave', () => {
-      generateReportButton.style.transform = 'scale(1)';
-      generateReportButton.style.boxShadow = 'none';
-    });
     generateReportButton.addEventListener('click', async () => {
       FacetSidebar.loadStylesheet('ai-optel-report-generator-styles', '/blocks/ai-optel-report-generator/ai-optel-report-generator.css');
       await FacetSidebar.loadScript('/blocks/ai-optel-report-generator/ai-optel-report-generator.js');

@@ -5,7 +5,6 @@
 import { fetchReportsFromDA, getCurrentAnalyzedUrl } from './da-upload.js';
 
 const VIEWED_KEY = 'optel-detective-viewed-reports';
-const BADGE_STYLE = 'position: absolute; top: -4px; right: -4px; min-width: 20px; width: 20px; height: 20px; background: #ff7c65; border-radius: 50%; z-index: 1000; pointer-events: none; color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1;';
 
 export const getViewedReports = () => {
   try { return JSON.parse(localStorage.getItem(VIEWED_KEY) || '[]'); } catch { return []; }
@@ -74,7 +73,6 @@ export async function updateNotificationBadge() {
     title: 'unviewed OpTel reports',
     textContent: String(unviewed.length),
   });
-  badge.style.cssText = BADGE_STYLE;
   wrapper.style.position = 'relative';
   wrapper.style.display = 'inline-block';
   wrapper.appendChild(badge);

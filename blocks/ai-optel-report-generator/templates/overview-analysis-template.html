@@ -2,7 +2,7 @@
 
   <h4>INSTRUCTIONS FOR AI REPORT GENERATION</h4>
 
-    <p><b>⚠️ CRITICAL DATA INTEGRITY RULES:</b></p>
+    <p><b>CRITICAL DATA INTEGRITY RULES:</b></p>
   <ul>
     <li><b>Use ONLY real data from tool responses</b> - no estimates, extrapolations, or made-up metrics</li>
     <li><b>Linked numbers must match dashboard exactly</b> - if you link "15k errors", clicking MUST show exactly 15k in filtered dashboard</li>
@@ -15,7 +15,7 @@
     <li>[X] WRONG: "2.3k LCP" (means 2,300 not 2.3s) | [OK] CORRECT: "2.3s LCP", "4.9k sessions"</li>
   </ul>
 
-  <p><b>⚠️ CRITICAL: AGGREGATED SUBSETS MUST NOT BE LINKED TO PARENT:</b></p>
+  <p><b>CRITICAL: AGGREGATED SUBSETS MUST NOT BE LINKED TO PARENT:</b></p>
   <ul>
     <li><b>Problem:</b> You calculate "top 5 error sources = 5.8m" but link to <code>checkpoint=error</code> which shows 7.6m total → MISMATCH!</li>
     <li><b>Rule:</b> If your count is a SUBSET (top N, specific pages, filtered group), DO NOT link to parent checkpoint that includes ALL items</li>
@@ -27,19 +27,19 @@
     </li>
     <li><b>Examples - WRONG:</b>
       <ul>
-        <li>"<code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;5.8m errors&lt;/span&gt;</code> across top 5 sources" (dashboard shows 7.6m) ❌</li>
-        <li>"<code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;12k slow LCP&lt;/span&gt;</code> on mobile pages" when total LCP count is 18k ❌</li>
+        <li>"<code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;5.8m errors&lt;/span&gt;</code> across top 5 sources" (dashboard shows 7.6m) [WRONG]</li>
+        <li>"<code>&lt;span data-facet="checkpoint" data-facet-value="cwv-lcp"&gt;12k slow LCP&lt;/span&gt;</code> on mobile pages" when total LCP count is 18k [WRONG]</li>
       </ul>
     </li>
     <li><b>Examples - CORRECT:</b>
       <ul>
-        <li>"The site experiences <code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;7.6m total errors&lt;/span&gt;</code>, with 5.8m concentrated across the top 5 sources: <code>&lt;span data-nested-facet="error.source" data-nested-value="network"&gt;2m network errors&lt;/span&gt;</code>, ..." ✅</li>
-        <li>"JavaScript errors affect 5.8m sessions across the top 5 sources (no link), with <code>&lt;span data-nested-facet="error.source" data-nested-value="serialization"&gt;2.1m from poor serialization&lt;/span&gt;</code> as the leading cause." ✅</li>
+        <li>"The site experiences <code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;7.6m total errors&lt;/span&gt;</code>, with 5.8m concentrated across the top 5 sources: <code>&lt;span data-nested-facet="error.source" data-nested-value="network"&gt;2m network errors&lt;/span&gt;</code>, ..." [CORRECT]</li>
+        <li>"JavaScript errors affect 5.8m sessions across the top 5 sources (no link), with <code>&lt;span data-nested-facet="error.source" data-nested-value="serialization"&gt;2.1m from poor serialization&lt;/span&gt;</code> as the leading cause." [CORRECT]</li>
       </ul>
     </li>
   </ul>
 
-  <p><b>🚀 EDGE DELIVERY SERVICES (EDS) SITE DETECTION:</b></p>
+  <p><b>EDGE DELIVERY SERVICES (EDS) SITE DETECTION:</b></p>
   <ul>
     <li><b>If tool responses include <code>checkpoint=viewblock</code>, this is an Edge Delivery Services site</b></li>
     <li>EDS sites have built-in automatic optimizations - tailor recommendations accordingly</li>
@@ -75,7 +75,7 @@
     <li><b>Two nested (.source AND .target):</b> <code>&lt;span data-facet="checkpoint" data-facet-value="error" data-nested-facet="error.source" data-nested-value="network" data-nested-facet-2="error.target" data-nested-value-2="TypeError"&gt;3.2k network TypeErrors&lt;/span&gt;</code></li>
   </ul>
 
-  <p><b>⚠️ TWO-LEVEL NESTED FACETS - ENABLE BOTH CHECKBOXES:</b></p>
+  <p><b>TWO-LEVEL NESTED FACETS - ENABLE BOTH CHECKBOXES:</b></p>
   <ul>
     <li>When insight involves BOTH source AND target (e.g., "network TypeErrors", "paid mobile traffic"), use BOTH nested facets</li>
     <li>This ensures clicking the link checks BOTH boxes in dashboard sidebar, showing the exact filtered data</li>
@@ -152,13 +152,13 @@
 
   <h4>JAVASCRIPT ERRORS THAT NEED ATTENTION</h4>
   <p><b>Only if errors ≥1% of traffic.</b> Calculate: (error count / page views) × 100</p>
-  <p><b>⚠️ ERROR COUNT ACCURACY:</b></p>
+  <p><b>ERROR COUNT ACCURACY:</b></p>
   <ul>
     <li><b>Use TOTAL from tool</b> when linking to <code>checkpoint=error</code> - don't link your calculated subset</li>
     <li><b>If discussing "top N sources":</b> Mention aggregate WITHOUT link, then detail each source with nested facets</li>
     <li><b>Example structure:</b> "The site experiences <code>&lt;span data-facet="checkpoint" data-facet-value="error"&gt;7.6m total errors&lt;/span&gt;</code> (~2.7% of traffic), with 5.8m concentrated in the top 5 sources. Leading issues include <code>&lt;span data-nested-facet="error.source" data-nested-value="serialization"&gt;2.1m serialization errors&lt;/span&gt;</code>, <code>&lt;span data-nested-facet="error.source" data-nested-value="network"&gt;1.8m network errors&lt;/span&gt;</code>, and <code>&lt;span data-nested-facet="error.target" data-nested-value="TypeError"&gt;1.2m TypeErrors&lt;/span&gt;</code>."</li>
   </ul>
-  <p><b>⚠️ TWO-LEVEL NESTED ERRORS:</b> If discussing errors with BOTH source AND target (e.g., "network TypeErrors"), use BOTH nested facets so both checkboxes enable.</p>
+  <p><b>TWO-LEVEL NESTED ERRORS:</b> If discussing errors with BOTH source AND target (e.g., "network TypeErrors"), use BOTH nested facets so both checkboxes enable.</p>
   <p>2-3 paragraphs analyzing error patterns. Write flowing narrative; use bullets when listing 3+ specific errors. End with UX impact and recommendations.</p>
 
   <h4>PERFORMANCE IMPACT</h4>
@@ -245,7 +245,7 @@
     <li>□ No made-up/estimated data - only real tool values</li>
   </ul>
 
-  <p><b>🎯 GOLD STANDARD TEST:</b></p>
+  <p><b>GOLD STANDARD TEST:</b></p>
   <p><i>"User clicks link → dashboard filters apply → dashboard total EXACTLY matches report number (accounting for same rounding: 40123 → 40k in both places). Hover shows same raw value in both."</i></p>
 
   <h4>LENGTH & FORMAT SUMMARY</h4>

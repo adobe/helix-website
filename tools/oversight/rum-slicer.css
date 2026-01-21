@@ -32,6 +32,8 @@
   --gray-500: #8f8f8f;
   --gray-600: #717171;
   --gray-700: #505050;
+  --ai-claude-orange-rgb: 217, 119, 87;
+  --ai-claude-orange: rgb(var(--ai-claude-orange-rgb));
 }
 
 body {
@@ -1299,4 +1301,33 @@ html[data-theme="dark"] main .title url-selector input {
 
 html[data-theme="dark"] daterange-picker {
   color: var(--spectrum-gray-100);
+}
+
+/* AI OpTel Report Generator Button */
+.ai-optel-report-generator-button {
+  background: white;
+  border: 2px solid var(--ai-claude-orange);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: all 0.2s;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-optel-report-generator-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgb(var(--ai-claude-orange-rgb) / 30%);
+}
+
+.ai-optel-report-generator-button img {
+  width: 20px;
+  height: 20px;
+}
+
+html[data-theme="dark"] .ai-optel-report-generator-button {
+  background: var(--spectrum-gray-800);
+  border-color: var(--ai-claude-orange);
 }

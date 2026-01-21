@@ -2,8 +2,6 @@
  * Dashboard Data Extractor - Extracts metrics and segments from RUM dashboard
  */
 
-/* eslint-disable no-console */
-
 /** Extract dashboard data including metrics, segments, and date range */
 export default function extractDashboardData() {
   return new Promise((resolve) => {

@@ -10,12 +10,6 @@ import {
   getViewedReports,
 } from './report-state.js';
 
-const STYLES = {
-  HEADER: 'font-weight: 600; color: #333; padding-top: 12px; margin-top: 12px; border-top: 2px solid #ccc; cursor: default; pointer-events: none; font-size: var(--type-body-l-size);',
-  UNVIEWED: 'color: #147af3; padding-left: 2rem; cursor: pointer; font-size: var(--type-body-l-size); line-height: 1.6; font-weight: normal; border: none;',
-  VIEWED: 'color: #7326d3; padding-left: 2rem; cursor: pointer; font-size: var(--type-body-l-size); line-height: 1.6; font-weight: normal; border: none;',
-};
-
 const getWeekId = (ts) => {
   const d = new Date(ts);
   const yearStart = new Date(d.getFullYear(), 0, 1);
@@ -44,7 +38,6 @@ function addReportToDropdown(result) {
       className: 'saved-reports-header',
       textContent: 'Saved Reports',
     });
-    header.style.cssText = STYLES.HEADER;
     dropdown.appendChild(header);
   }
 
@@ -52,15 +45,15 @@ function addReportToDropdown(result) {
   const isViewed = getViewedReports().includes(result.path);
 
   const entry = Object.assign(document.createElement('li'), {
-    className: 'saved-report-entry',
+    className: `saved-report-entry ${isViewed ? 'viewed' : 'unviewed'}`,
     textContent: displayName,
   });
   entry.dataset.reportPath = result.path;
-  entry.style.cssText = isViewed ? STYLES.VIEWED : STYLES.UNVIEWED;
 
   entry.onclick = async () => {
     markReportAsViewed(result.path);
-    entry.style.cssText = STYLES.VIEWED;
+    entry.classList.remove('unviewed');
+    entry.classList.add('viewed');
     await new Promise((r) => { setTimeout(r, 50); });
     await updateNotificationBadge();
 

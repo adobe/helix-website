@@ -2,8 +2,6 @@
  * DA Upload Module - Uploads analysis reports to Document Authoring (DA) storage
  */
 
-/* eslint-disable no-console */
-
 import { convertSpansToLinks } from './facet-link-generator.js';
 import { DA_CONFIG, PATHS } from '../config.js';
 
@@ -38,8 +36,7 @@ async function loadTemplate() {
     if (!response.ok) throw new Error(`Template load failed: ${response.status}`);
     templateCache = await response.text();
     return templateCache;
-  } catch (error) {
-    console.error('[DA Upload] Template error:', error);
+  } catch {
     return getFallbackTemplate();
   }
 }
@@ -158,7 +155,7 @@ async function generateReportHTML(content, url, timestamp) {
 
 /** Upload analysis report to DA storage via Cloudflare Worker */
 export async function uploadToDA(content, options = {}) {
-  const { url = '', debug = false } = options;
+  const { url = '' } = options;
   if (!content?.trim()) throw new Error('No content to upload');
 
   const timestamp = new Date().toISOString();
@@ -166,10 +163,6 @@ export async function uploadToDA(content, options = {}) {
   const filename = generateFilename();
   const folder = cleanUrlForFolder(url);
   const daPath = `/${DA_CONFIG.ORG}/${DA_CONFIG.REPO}/${DA_CONFIG.UPLOAD_PATH}/${folder}/${filename}`;
-
-  if (debug) {
-    console.log('[DA Upload] Path:', daPath, 'Size:', htmlContent.length);
-  }
 
   const rumToken = localStorage.getItem('rum-bundler-token') || localStorage.getItem('rum-admin-token');
   if (!rumToken) throw new Error('No RUM token found. Please authenticate first.');
@@ -264,8 +257,7 @@ export async function fetchReportsFromDA(domainFilter = null) {
       folders.map((f) => fetchReportsFromDomainFolder(`${basePath}/${f}`, f)),
     );
     return results.flat().sort((a, b) => b.timestamp - a.timestamp);
-  } catch (error) {
-    console.error('[DA Upload] Error fetching reports:', error);
+  } catch {
     return [];
   }
 }

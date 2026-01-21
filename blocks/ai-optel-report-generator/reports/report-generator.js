@@ -2,8 +2,6 @@
  * Report Generator Module - Handles core report generation logic with OpTel analysis
  */
 
-/* eslint-disable no-console */
-
 import runCompleteRumAnalysis from '../core/analysis-engine.js';
 import { resetCachedFacetTools } from '../core/facet-manager.js';
 import {
@@ -145,9 +143,8 @@ export default async function generateReport(statusDiv, button, modal) {
       showReportResults(modalBody, analysisResult);
       updateButtonState(button, true, 'Report Generated Successfully!');
     }, RESULTS_DISPLAY_DELAY);
-
-    console.log('[Report Generator] Completed');
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('[Report Generator] Error:', error);
     handleGenerationError(modalBody, progressContainer, statusDiv, button, originalText, error);
   }
