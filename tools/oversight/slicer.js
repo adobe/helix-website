@@ -319,6 +319,27 @@ export async function draw() {
 
   updateDataFacets(filterText, params, checkpoint);
 
+  const isReportView = params.has('report');
+  if (params.get('metrics') === 'super' && checkpoint.length === 0 && !isReportView) {
+    // Now that data facets are updated, get all available checkpoint values from the actual data
+    const checkpointFacet = dataChunks.facets.checkpoint;
+    const allCheckpoints = checkpointFacet ? checkpointFacet.map((f) => f.value) : [];
+
+    if (allCheckpoints.length > 0) {
+      // Update the URL to reflect the new checkpoint selections
+      const newUrl = new URL(window.location);
+      allCheckpoints.forEach((cp) => {
+        newUrl.searchParams.append('checkpoint', cp);
+      });
+      window.history.replaceState({}, '', newUrl);
+
+      // Re-run the draw function with the new checkpoints
+      const newParams = new URL(window.location).searchParams;
+      const newCheckpoint = newParams.getAll('checkpoint');
+      updateDataFacets(filterText, newParams, newCheckpoint);
+    }
+  }
+
   // set up filter from URL parameters
   updateFilter(params, filterText);
 
@@ -330,7 +351,9 @@ export async function draw() {
   updateKeyMetrics();
 
   const mode = params.get('metrics');
-  elems.sidebar.updateFacets(mode);
+  // If metrics=super, show all facets including hidden checkpoints
+  const showAllFacets = mode === 'super';
+  elems.sidebar.updateFacets(showAllFacets ? 'all' : mode);
 
   // eslint-disable-next-line no-console
   console.log(`full ui updated in ${new Date() - startTime}ms`);
@@ -361,7 +384,7 @@ export function updateState() {
 
   const viewConfig = elems.viewSelect.value;
   url.searchParams.set('view', viewConfig.value);
-  if (viewConfig.value === 'custom') {
+  if (viewConfig.from && viewConfig.to) {
     url.searchParams.set('startDate', viewConfig.from);
     url.searchParams.set('endDate', viewConfig.to);
   }
@@ -501,3 +524,5 @@ const io = new IntersectionObserver((entries) => {
 });
 
 io.observe(section);
+
+window.slicerDraw = draw;

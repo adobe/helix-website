@@ -43,21 +43,6 @@ const STYLES = `
     cursor: pointer;
   }
 
-  ul.menu li:last-child {
-    position: relative;
-    margin-top: 16px;
-  }
-
-  ul.menu li:last-child::before {
-    content: '';
-    position: absolute;
-    top: calc((-0.5 * 16px) - (2px / 2));
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--gray-200);
-  }
-
   .input-wrapper {
     display: none;
     background-color: white;
@@ -182,6 +167,61 @@ const STYLES = `
   :host-context(html[data-theme="dark"]) input ~ ul li:hover {
     background-color: #3e3e3e;
   }
+
+  /* Saved Reports Dropdown Entries */
+  .saved-reports-header {
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 2px solid var(--gray-300);
+    font-weight: 600;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .saved-report-entry {
+    cursor: pointer;
+  }
+
+  .saved-report-entry.unviewed {
+    color: #147af3;
+  }
+
+  .saved-report-entry.viewed {
+    color: #5a1ba3;
+  }
+
+  :host-context(html[data-theme="dark"]) .saved-reports-header {
+    border-top-color: #4a4a4a;
+  }
+
+  :host-context(html[data-theme="dark"]) .saved-report-entry.unviewed {
+    color: #78bbfa;
+  }
+
+  :host-context(html[data-theme="dark"]) .saved-report-entry.viewed {
+    color: #cca4fd;
+  }
+
+  /* Notification Badge */
+  .report-notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b40000;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 1000;
+  }
 `;
 
 const TEMPLATE = `
@@ -297,11 +337,10 @@ export default class DateRangePicker extends HTMLElement {
   }
 
   get value() {
-    return {
-      value: this.inputElement.dataset.value,
-      from: this.fromElement.value,
-      to: this.toElement.value,
-    };
+    const v = this.inputElement.dataset.value;
+    return v === 'custom'
+      ? { value: v, from: this.fromElement.value, to: this.toElement.value }
+      : { value: v };
   }
 
   set value(config) {
@@ -379,32 +418,20 @@ export default class DateRangePicker extends HTMLElement {
     this.toggleCustomTimeframe(value === 'custom');
 
     if (value === 'week') {
-      if (!fromElement.value) {
-        const lastWeek = now;
-        lastWeek.setHours(-7 * 24, 0, 0, 0);
-        fromElement.value = toDateString(lastWeek);
-      }
-      if (!toElement.value) {
-        toElement.value = toDateString(now);
-      }
+      const lastWeek = new Date(now);
+      lastWeek.setDate(now.getDate() - 7);
+      fromElement.value = toDateString(lastWeek);
+      toElement.value = toDateString(now);
     } else if (value === 'month') {
-      if (!fromElement.value) {
-        const lastMonth = now;
-        lastMonth.setMonth(now.getMonth() - 1);
-        fromElement.value = toDateString(lastMonth);
-      }
-      if (!toElement.value) {
-        toElement.value = toDateString(now);
-      }
+      const lastMonth = new Date(now);
+      lastMonth.setMonth(now.getMonth() - 1);
+      fromElement.value = toDateString(lastMonth);
+      toElement.value = toDateString(now);
     } else if (value === 'year') {
-      if (!fromElement.value) {
-        const lastYear = now;
-        lastYear.setFullYear(now.getFullYear() - 1);
-        fromElement.value = toDateString(lastYear);
-      }
-      if (!toElement.value) {
-        toElement.value = toDateString(now);
-      }
+      const lastYear = new Date(now);
+      lastYear.setFullYear(now.getFullYear() - 1);
+      fromElement.value = toDateString(lastYear);
+      toElement.value = toDateString(now);
     } else if (value === 'custom') {
       [fromElement, toElement].forEach((field) => {
         field.removeAttribute('readonly');
