@@ -197,7 +197,124 @@ If preview URLs provided, check:
 
 ---
 
-### Step 5: Content & Authoring Review
+### Step 5: Visual Validation with Screenshots
+
+**Purpose:** Capture screenshots of the "After" preview URL to provide visual evidence in the PR review comment. This helps reviewers quickly identify visual regressions or broken layouts.
+
+**When to capture screenshots:**
+- Always capture at least one screenshot of the primary changed page/component
+- For responsive changes, capture mobile (375px), tablet (768px), and desktop (1200px)
+- For visual changes (styling, layout), capture before AND after for comparison
+- For block changes, capture the specific block area
+
+**How to capture screenshots:**
+
+**Option 1: Playwright (Recommended for automation)**
+
+```javascript
+// capture-screenshots.js
+import { chromium } from 'playwright';
+
+async function captureScreenshots(afterUrl, outputDir = './screenshots') {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+
+  // Desktop screenshot
+  await page.setViewportSize({ width: 1200, height: 800 });
+  await page.goto(afterUrl, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1000); // Wait for animations
+  await page.screenshot({
+    path: `${outputDir}/desktop.png`,
+    fullPage: true
+  });
+
+  // Tablet screenshot
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.screenshot({
+    path: `${outputDir}/tablet.png`,
+    fullPage: true
+  });
+
+  // Mobile screenshot
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.screenshot({
+    path: `${outputDir}/mobile.png`,
+    fullPage: true
+  });
+
+  // Optional: Capture specific block/element
+  const block = page.locator('.my-block');
+  if (await block.count() > 0) {
+    await block.screenshot({ path: `${outputDir}/block.png` });
+  }
+
+  await browser.close();
+
+  return {
+    desktop: `${outputDir}/desktop.png`,
+    tablet: `${outputDir}/tablet.png`,
+    mobile: `${outputDir}/mobile.png`
+  };
+}
+
+// Usage
+captureScreenshots('https://branch--repo--owner.aem.page/path');
+```
+
+**Option 2: Using MCP Browser Tools**
+
+If you have MCP browser or Playwright tools available:
+1. Navigate to the After preview URL
+2. Take screenshots at different viewport sizes
+3. Optionally take element-specific screenshots of changed blocks
+
+**Option 3: Manual capture with guidance**
+
+Instruct the reviewer or PR author to:
+1. Open the After preview URL
+2. Use browser DevTools to set viewport sizes
+3. Take screenshots and attach to PR
+
+**Uploading screenshots to GitHub:**
+
+```bash
+# Upload screenshot as PR comment with image
+# First, upload to a hosting service or use GitHub's image upload
+
+# Option A: Embed in PR comment (drag & drop in GitHub UI)
+gh pr comment <PR-number> --body "## Visual Preview
+
+### Desktop (1200px)
+![Desktop Screenshot](screenshot-url-or-drag-drop)
+
+### Mobile (375px)
+![Mobile Screenshot](screenshot-url-or-drag-drop)
+"
+
+# Option B: Use GitHub's attachment API (for automation)
+# Screenshots can be uploaded as part of the comment body
+```
+
+**Screenshot checklist:**
+- [ ] Primary page/component captured at desktop width
+- [ ] Mobile viewport captured (if responsive changes)
+- [ ] Specific block/component captured (if block changes)
+- [ ] Before/After comparison (if significant visual changes)
+- [ ] No sensitive data visible in screenshots
+- [ ] Screenshots uploaded and embedded in PR comment
+
+**Visual issues to look for:**
+- Layout breaks or misalignment
+- Text overflow or truncation
+- Image sizing or aspect ratio issues
+- Color/contrast problems (especially in dark mode)
+- Missing or broken icons
+- Responsive layout issues at breakpoints
+- Unexpected visual differences from main branch
+
+---
+
+### Step 6: Content & Authoring Review
 
 **Content Model (if applicable):**
 - [ ] Content structure author-friendly
@@ -212,7 +329,7 @@ If preview URLs provided, check:
 
 ---
 
-### Step 6: Security Review
+### Step 7: Security Review
 
 - [ ] No sensitive data committed (API keys, passwords, secrets)
 - [ ] No XSS vulnerabilities (unsafe innerHTML, unsanitized user input)
@@ -222,7 +339,7 @@ If preview URLs provided, check:
 
 ---
 
-### Step 7: Generate Review Summary
+### Step 8: Generate Review Summary
 
 **Structure your review as:**
 
@@ -235,6 +352,31 @@ If preview URLs provided, check:
 ### Preview URLs Validated
 - [ ] Before: [URL]
 - [ ] After: [URL]
+
+### Visual Preview
+
+#### Desktop (1200px)
+![Desktop Screenshot](url-or-embedded-image)
+
+#### Mobile (375px)
+![Mobile Screenshot](url-or-embedded-image)
+
+<details>
+<summary>Additional Screenshots</summary>
+
+#### Tablet (768px)
+![Tablet Screenshot](url-or-embedded-image)
+
+#### Block Detail
+![Block Screenshot](url-or-embedded-image)
+
+</details>
+
+### Visual Assessment
+- [ ] Layout renders correctly across viewports
+- [ ] No visual regressions from main branch
+- [ ] Colors and typography consistent
+- [ ] Images and icons display properly
 
 ### Checklist Results
 
@@ -323,11 +465,22 @@ Based on actual PR reviews, watch for these patterns:
 
 Preview URLs verified and changes look good.
 
+### Visual Preview
+![Desktop Screenshot](url-or-embedded-image)
+
+<details>
+<summary>Mobile View</summary>
+
+![Mobile Screenshot](url-or-embedded-image)
+
+</details>
+
 **Verified:**
-- [ ] Code quality and linting
-- [ ] Performance (Lighthouse scores)
-- [ ] Responsive behavior
-- [ ] Accessibility basics
+- [x] Code quality and linting
+- [x] Performance (Lighthouse scores)
+- [x] Visual appearance (screenshots captured)
+- [x] Responsive behavior
+- [x] Accessibility basics
 
 [Any additional notes]
 ```
@@ -387,7 +540,10 @@ A complete PR review should:
 - [ ] Validate all PR structure requirements
 - [ ] Check code against all quality criteria
 - [ ] Verify performance requirements
+- [ ] Capture and include visual screenshots of After preview URL
+- [ ] Assess visual appearance for regressions
 - [ ] Assess content/authoring impact
 - [ ] Identify security concerns
 - [ ] Provide actionable feedback with specific references
+- [ ] Include screenshots in PR review comment
 - [ ] Use appropriate review status (approve/request-changes/comment)
