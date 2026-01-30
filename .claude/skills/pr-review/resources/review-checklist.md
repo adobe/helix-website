@@ -285,6 +285,82 @@ const url = `https://api.example.com?q=${encodeURIComponent(userInput)}`;
 
 ---
 
+## Visual Validation Checklist
+
+### Screenshot Capture
+
+| Check | Severity | Notes |
+|-------|----------|-------|
+| Desktop screenshot captured | HIGH | 1200px viewport |
+| Mobile screenshot captured | HIGH | 375px viewport |
+| Tablet screenshot captured | MEDIUM | 768px viewport |
+| Block-specific screenshot | MEDIUM | If block changes |
+| Before/After comparison | MEDIUM | For visual changes |
+
+### Visual Assessment
+
+| Check | Severity | Notes |
+|-------|----------|-------|
+| Layout correct across viewports | HIGH | No broken layouts |
+| No visual regressions | HIGH | Compare to main branch |
+| Colors consistent | MEDIUM | With design system |
+| Typography correct | MEDIUM | Font sizes, weights |
+| Images display properly | HIGH | Size, aspect ratio |
+| Icons visible | HIGH | All icons render |
+| Dark mode works | MEDIUM | If applicable |
+| Animations smooth | LOW | If applicable |
+
+### Common Visual Issues
+
+| Issue | What to Look For |
+|-------|------------------|
+| Layout breaks | Elements overlapping, overflowing, misaligned |
+| Text issues | Truncation, overflow, wrong font, poor contrast |
+| Image problems | Wrong size, aspect ratio, missing, broken |
+| Responsive failures | Layout not adapting to viewport |
+| Spacing issues | Inconsistent margins, padding |
+| Color problems | Wrong colors, poor contrast, dark mode issues |
+| Icon issues | Missing, wrong size, wrong color |
+
+### Screenshot Commands
+
+```bash
+# Using the capture-screenshots.js utility
+cd .claude/skills/pr-review/scripts
+npm install
+node capture-screenshots.js <after-url> [before-url] [output-dir] [block-selector]
+
+# Examples
+node capture-screenshots.js https://branch--repo--owner.aem.page/path
+node capture-screenshots.js https://branch--repo--owner.aem.page/path https://main--repo--owner.aem.page/path
+node capture-screenshots.js https://branch--repo--owner.aem.page/path "" ./screenshots ".hero"
+```
+
+### Embedding Screenshots in PR Comment
+
+```markdown
+## Visual Preview
+
+### Desktop (1200px)
+![Desktop Screenshot](path/to/desktop.png)
+
+### Mobile (375px)
+![Mobile Screenshot](path/to/mobile.png)
+
+<details>
+<summary>Additional Screenshots</summary>
+
+### Tablet (768px)
+![Tablet Screenshot](path/to/tablet.png)
+
+### Block Detail
+![Block Screenshot](path/to/block.png)
+
+</details>
+```
+
+---
+
 ## Accessibility Checklist
 
 | Check | Severity | Notes |
