@@ -12,7 +12,7 @@ Two skills serve as primary entry points for common workflows:
 
 **page-import** - Start here when importing or migrating webpages from any URL to AEM Edge Delivery Services. This skill orchestrates the complete import workflow including scraping, analysis, structure identification, and HTML generation.
 
-**pr-review** - Use this skill to review pull requests for EDS projects. Validates code quality, performance, accessibility, and adherence to EDS best practices. Can be invoked manually with `/pr-review <PR-number>` or triggered automatically via GitHub workflow.
+**code-review** - Use this skill to review pull requests for EDS projects. Validates code quality, performance, accessibility, and adherence to EDS best practices. Can be invoked manually with `/code-review <PR-number>` or triggered automatically via GitHub workflow.
 
 All other skills are either invoked by these primary skills or used for specific standalone tasks (e.g., searching platform documentation, finding reference implementations). Let skill descriptions guide you to the right tool for your task.
 
