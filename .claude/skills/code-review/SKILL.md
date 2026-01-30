@@ -1,29 +1,81 @@
 ---
 name: Code Review
-description: Review pull requests for AEM Edge Delivery Services projects. Validates code quality, performance, accessibility, and adherence to EDS best practices. Provides actionable feedback with specific line references and suggestions.
+description: Review code for AEM Edge Delivery Services projects. Use at the end of development (before PR) for self-review, or to review pull requests. Validates code quality, performance, accessibility, and adherence to EDS best practices.
 ---
 
 # Code Review
 
-Review pull requests for AEM Edge Delivery Services (EDS) projects following established coding standards, performance requirements, and best practices.
+Review code for AEM Edge Delivery Services (EDS) projects following established coding standards, performance requirements, and best practices.
 
 ## When to Use This Skill
 
-Use this skill when:
-- Reviewing a pull request for an EDS project
-- Validating code changes before merge
-- Checking adherence to EDS coding standards
-- Verifying performance and accessibility requirements
+This skill supports **two modes** of operation:
 
-This skill can be triggered:
-- Manually by invoking `/code-review <PR-URL-or-number>`
-- Automatically via GitHub workflow (when configured)
+### Mode 1: Self-Review (End of Development)
+
+Use this mode when you've finished writing code and want to review it before committing or opening a PR. This is the recommended workflow integration point.
+
+**When to invoke:**
+- After completing implementation in the **content-driven-development** workflow (between Step 5 and Step 6)
+- Before running `git add` and `git commit`
+- When you want to catch issues early, before they reach PR review
+
+**How to invoke:**
+- Automatically: CDD workflow invokes this skill after implementation
+- Manually: `/code-review` (reviews uncommitted changes in working directory)
+
+**What it does:**
+- Reviews all modified/new files in working directory
+- Checks code quality, patterns, and best practices
+- Validates against EDS standards
+- Identifies issues to fix before committing
+- Captures visual screenshots for validation
+
+### Mode 2: PR Review
+
+Use this mode to review an existing pull request (your own or someone else's).
+
+**When to invoke:**
+- Reviewing a PR before merge
+- Automated review via GitHub Actions workflow
+- Manual review of a specific PR
+
+**How to invoke:**
+- Manually: `/code-review <PR-number>` or `/code-review <PR-URL>`
+- Automated: Via GitHub workflow on `pull_request` event
+
+**What it does:**
+- Fetches PR diff and changed files
+- Validates PR structure (preview URLs, description)
+- Reviews code quality
+- Posts review comment with findings and screenshots
+
+---
 
 ## Review Workflow
 
-### Step 1: Gather PR Context
+### Step 1: Identify Review Mode and Gather Context
 
-**Fetch PR information:**
+**For Self-Review (no PR number provided):**
+
+```bash
+# See what files have been modified
+git status
+
+# See the actual changes
+git diff
+
+# For staged changes
+git diff --staged
+```
+
+**Understand the scope:**
+- What files were modified?
+- What type of change is this? (new block, bug fix, feature, styling, refactor)
+- What is the test content URL? (from CDD workflow)
+
+**For PR Review (PR number provided):**
+
 ```bash
 # Get PR details
 gh pr view <PR-number> --json title,body,author,baseRefName,headRefName,files,additions,deletions
@@ -44,9 +96,11 @@ gh api repos/{owner}/{repo}/pulls/<PR-number>/reviews
 
 ---
 
-### Step 2: Validate PR Structure
+### Step 2: Validate Structure (PR Review Mode Only)
 
-**Required elements (MUST HAVE):**
+**Skip this step for Self-Review mode.**
+
+**Required elements for PRs (MUST HAVE):**
 
 | Element | Requirement | Check |
 |---------|-------------|-------|
@@ -199,7 +253,7 @@ If preview URLs provided, check:
 
 ### Step 5: Visual Validation with Screenshots
 
-**Purpose:** Capture screenshots of the "After" preview URL to provide visual evidence in the PR review comment. This helps reviewers quickly identify visual regressions or broken layouts.
+**Purpose:** Capture screenshots of the preview URL to validate visual appearance. For self-review, this confirms your changes look correct before committing. For PR review, this provides visual evidence in the review comment.
 
 **When to capture screenshots:**
 - Always capture at least one screenshot of the primary changed page/component
@@ -341,7 +395,46 @@ gh pr comment <PR-number> --body "## Visual Preview
 
 ### Step 8: Generate Review Summary
 
-**Structure your review as:**
+**Output depends on the review mode:**
+
+#### For Self-Review Mode (End of Development)
+
+Report findings directly to continue the development workflow:
+
+```markdown
+## Code Review Summary
+
+### Files Reviewed
+- `blocks/my-block/my-block.js` (new)
+- `blocks/my-block/my-block.css` (new)
+
+### Visual Validation
+![Desktop Screenshot](path/to/screenshot.png)
+
+✅ Layout renders correctly across viewports
+✅ No console errors
+✅ Responsive behavior verified
+
+### Issues Found
+
+#### Must Fix Before Committing
+- [ ] `blocks/my-block/my-block.js:45` - Remove console.log debug statement
+- [ ] `blocks/my-block/my-block.css:12` - Selector `.title` needs block scoping
+
+#### Recommendations
+- [ ] Consider using `loadScript()` for the external library
+
+### Ready to Commit?
+- [ ] All "Must Fix" issues resolved
+- [ ] Linting passes: `npm run lint`
+- [ ] Visual validation complete
+```
+
+**After self-review:** Fix any issues found, then proceed with committing and opening a PR.
+
+#### For PR Review Mode
+
+Structure the review comment for GitHub:
 
 ```markdown
 ## PR Review Summary
@@ -536,14 +629,62 @@ When triggered via GitHub Actions, the skill should:
 
 ## Success Criteria
 
+### For Self-Review Mode
+
+A complete self-review should:
+- [ ] Review all modified/new files
+- [ ] Check code against all quality criteria
+- [ ] Run linting and fix issues
+- [ ] Capture visual screenshots of test content
+- [ ] Verify responsive behavior across viewports
+- [ ] Identify issues to fix before committing
+- [ ] Confirm code is ready for commit and PR
+
+### For PR Review Mode
+
 A complete PR review should:
-- [ ] Validate all PR structure requirements
+- [ ] Validate all PR structure requirements (preview URLs, description)
 - [ ] Check code against all quality criteria
 - [ ] Verify performance requirements
-- [ ] Capture and include visual screenshots of After preview URL
+- [ ] Capture and include visual screenshots
 - [ ] Assess visual appearance for regressions
 - [ ] Assess content/authoring impact
 - [ ] Identify security concerns
 - [ ] Provide actionable feedback with specific references
 - [ ] Include screenshots in PR review comment
 - [ ] Use appropriate review status (approve/request-changes/comment)
+
+---
+
+## Integration with Content-Driven Development
+
+This skill integrates with the **content-driven-development** workflow:
+
+```
+CDD Workflow:
+Step 1: Start dev server
+Step 2: Analyze & plan
+Step 3: Design content model
+Step 4: Identify/create test content
+Step 5: Implement (building-blocks skill)
+    └── testing-blocks skill (browser testing)
+        └── **code-review skill (self-review)** ← Invoke here
+Step 6: Lint & test
+Step 7: Final validation
+Step 8: Ship it (commit & PR)
+```
+
+**Recommended invocation point:** After implementation and testing-blocks skill complete, before final linting and committing.
+
+**What this catches before PR:**
+- Code quality issues
+- EDS pattern violations
+- Security concerns
+- Performance problems
+- Visual regressions
+
+**Benefits of self-review:**
+- Catch issues early (cheaper to fix)
+- Cleaner PRs with fewer review cycles
+- Learn from immediate feedback
+- Consistent code quality
