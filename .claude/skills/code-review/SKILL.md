@@ -1,9 +1,9 @@
 ---
-name: PR Review
+name: Code Review
 description: Review pull requests for AEM Edge Delivery Services projects. Validates code quality, performance, accessibility, and adherence to EDS best practices. Provides actionable feedback with specific line references and suggestions.
 ---
 
-# PR Review
+# Code Review
 
 Review pull requests for AEM Edge Delivery Services (EDS) projects following established coding standards, performance requirements, and best practices.
 
@@ -16,7 +16,7 @@ Use this skill when:
 - Verifying performance and accessibility requirements
 
 This skill can be triggered:
-- Manually by invoking `/pr-review <PR-URL-or-number>`
+- Manually by invoking `/code-review <PR-URL-or-number>`
 - Automatically via GitHub workflow (when configured)
 
 ## Review Workflow
