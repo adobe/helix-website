@@ -4,11 +4,11 @@ This project is a website built with Edge Delivery Services in Adobe Experience 
 
 ## Skills
 
+**For ALL development work involving blocks, core scripts, or functionality, you MUST start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
+
 Two skills serve as primary entry points for common workflows:
 
 **content-driven-development** - Start here for ALL code changes including: new blocks, block modifications, CSS styling, bug fixes, core functionality (scripts.js, styles.css, delayed.js), auto-blocking changes, or any JavaScript/CSS work. This skill orchestrates the complete development workflow from content modeling through implementation and testing.
-
-⚠️ IMPORTANT: Even "simple" changes like CSS tweaks or small bug fixes should use CDD. The workflow ensures you have test content and validation, both required for PR approval and automated checks.
 
 **page-import** - Start here when importing or migrating webpages from any URL to AEM Edge Delivery Services. This skill orchestrates the complete import workflow including scraping, analysis, structure identification, and HTML generation.
 
