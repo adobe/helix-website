@@ -1,0 +1,145 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    # Optional: limit to specific paths
+    # paths:
+    #   - 'blocks/**'
+    #   - 'scripts/**'
+    #   - 'styles/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-code-review:
+    name: AI Code Review with GitHub Suggestions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for better context
+
+      - name: Checkout PR head
+        run: |
+          git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-${{ github.event.pull_request.number }}
+          git checkout pr-${{ github.event.pull_request.number }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Install AI review script dependencies
+        working-directory: .github/workflows/scripts
+        run: npm install
+
+      - name: Run linting
+        id: lint
+        continue-on-error: true
+        run: |
+          npm run lint > lint-output.txt 2>&1 || echo "Linting found issues"
+          cat lint-output.txt
+
+      - name: Get PR diff
+        id: pr-diff
+        run: |
+          gh pr diff ${{ github.event.pull_request.number }} > pr-diff.txt
+          echo "diff-size=$(wc -l < pr-diff.txt)" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Post review start comment
+        id: review-start
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `## 🤖 AI Code Review Started
+
+            Analyzing PR #${pr.number}: **${pr.title}**
+
+            📊 **Statistics:**
+            - Changed files: ${pr.changed_files || 0}
+            - Additions: +${pr.additions || 0}
+            - Deletions: -${pr.deletions || 0}
+
+            ⏳ Comprehensive review with GitHub Suggestions will be posted shortly...
+
+            *Powered by the code-review skill*`
+            });
+
+      - name: Run AI Code Review
+        id: ai-review
+        env:
+          # AI Provider configuration (anthropic, openai, azure, or gemini)
+          AI_PROVIDER: ${{ secrets.AI_PROVIDER || 'anthropic' }}
+
+          # Anthropic Claude
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514' }}
+
+          # OpenAI ChatGPT
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL || 'gpt-4-turbo-preview' }}
+
+          # Azure OpenAI
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT }}
+
+          # Google Gemini
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-1.5-pro' }}
+
+          # GitHub configuration
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node .github/workflows/scripts/ai-code-review.js
+
+      - name: Post review summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `## ✅ AI Code Review Complete
+
+            Review has been posted with actionable GitHub Suggestions.
+
+            📍 **How to Apply Fixes:**
+            1. Go to the **Files changed** tab
+            2. Look for inline comments with suggestions
+            3. Click **"Commit suggestion"** to apply individually
+            4. Or use **"Add suggestion to batch"** to apply multiple fixes at once
+
+            🔍 **What was checked:**
+            - Code quality and EDS best practices
+            - Performance considerations
+            - Security concerns
+            - Accessibility standards
+            - Linting and style compliance
+
+            *This automated review follows the [code-review skill](.claude/skills/code-review/SKILL.md)*`
+            });

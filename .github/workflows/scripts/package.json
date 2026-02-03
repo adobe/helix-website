@@ -1,0 +1,14 @@
+{
+  "name": "ai-code-review-scripts",
+  "version": "1.0.0",
+  "description": "AI Code Review automation scripts with multi-provider support",
+  "type": "module",
+  "scripts": {
+    "review": "node ai-code-review.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "openai": "^4.77.0",
+    "@google/generative-ai": "^0.21.0"
+  }
+}
