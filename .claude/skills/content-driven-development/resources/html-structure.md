@@ -73,7 +73,7 @@ aem up --html-folder drafts
 **Preview URLs:**
 - File: `drafts/hero-test.plain.html` → URL: `http://localhost:3000/drafts/hero-test`
 - File: `drafts/blocks/cards.plain.html` → URL: `http://localhost:3000/drafts/blocks/cards`
-- **Special case:** `drafts/index.plain.html` → URL: `http://localhost:3000/drafts/index` (NOT `/drafts/`)
+- **Special case:** `drafts/blog/index.plain.html` → URL: `http://localhost:3000/drafts/blog/` (NOT `/drafts/`)
 
 ## Section Structure
 

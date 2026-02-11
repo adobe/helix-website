@@ -32,14 +32,29 @@ From previous skills, you need:
 
 ## Preview Workflow
 
-### Step 1: Start Development Server
+### Step 1: Start Development Server with HTML Folder Flag
+
+**Determine the folder from metadata.json:**
+- Look at `paths.dirPath` from metadata.json (e.g., `/us`)
+- This is the root folder containing your imported HTML file
 
 **Command:**
 ```bash
-aem up
+aem up --html-folder {dirPath}
 ```
 
-This starts the local AEM proxy server at `http://localhost:3000`
+**Examples based on imported content location:**
+
+| HTML File Location | Command | Preview URL |
+|-------------------|---------|-------------|
+| `us/en.plain.html` | `aem up --html-folder us` | `http://localhost:3000/us/en` |
+| `products/widget.plain.html` | `aem up --html-folder products` | `http://localhost:3000/products/widget` |
+| `blog/2024/post.plain.html` | `aem up --html-folder blog` | `http://localhost:3000/blog/2024/post` |
+
+**Why this is required:**
+- Without `--html-folder`, AEM CLI proxies requests to the remote server
+- The remote server doesn't have your locally imported content
+- Result: 404 "Page not found" errors
 
 ---
 
@@ -54,11 +69,11 @@ Example:
 - HTML file: `us/en/about.plain.html`
 - URL: `http://localhost:3000/us/en/about`
 
-**IMPORTANT: For index files, use `/index` instead of `/`:**
+**IMPORTANT: For index files, use `/` instead of `/index`:**
 ```
 If file is: index.plain.html
-Preview at: http://localhost:3000/index
-NOT: http://localhost:3000/
+Preview at: http://localhost:3000/
+NOT: http://localhost:3000/index
 ```
 
 **Note:** If you used `--html-folder` flag (e.g., `aem up --html-folder drafts`), prepend that folder to the URL:
@@ -67,7 +82,7 @@ File: drafts/test.plain.html
 URL: http://localhost:3000/drafts/test
 ```
 
-Use `paths.documentPath` from metadata.json, but for index files ensure the path is `/index` not `/`
+Use `paths.documentPath` from metadata.json, but for index files ensure the path is `/` not `/index`
 
 ---
 
@@ -122,10 +137,11 @@ Use `paths.documentPath` from metadata.json, but for index files ensure the path
 - Verify you're in correct project directory
 
 **Page not found (404):**
+- **Most common cause:** Missing `--html-folder` flag - restart server with `aem up --html-folder {dirPath}`
 - Verify HTML file exists at expected path
 - Check documentPath from metadata.json matches URL
 - For index files, use `/index` not `/`
-- If using `--html-folder`, include folder in URL
+- Check terminal output confirms "Serving HTML files from folder: {folder}"
 
 ---
 
