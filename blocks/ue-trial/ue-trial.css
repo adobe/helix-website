@@ -825,6 +825,8 @@
   outline-offset: 2px;
 }
 
+/* stylelint-disable no-descending-specificity */
+
 /* Dark mode: Status Container */
 :where(html[data-theme="dark"]) .status-container {
   background: var(--color-gray-100);
@@ -870,11 +872,11 @@
   border-color: #5a2d2d;
 }
 
-:where(html[data-theme="dark"]) .error-message p {
+:where(html[data-theme="dark"]) .error-container .error-message p {
   color: #f5a0a0;
 }
 
-:where(html[data-theme="dark"]) .error-message a {
+:where(html[data-theme="dark"]) .error-container .error-message a {
   color: #4a9eff;
 }
 
@@ -888,11 +890,11 @@
   border-bottom-color: var(--color-gray-200);
 }
 
-:where(html[data-theme="dark"]) .modal-header h3 {
+:where(html[data-theme="dark"]) .modal-container .modal-header h3 {
   color: var(--color-gray-900);
 }
 
-:where(html[data-theme="dark"]) .modal-body p {
+:where(html[data-theme="dark"]) .modal-container .modal-body p {
   color: var(--color-gray-800);
 }
 
@@ -900,14 +902,16 @@
   border-top-color: var(--color-gray-200);
 }
 
-:where(html[data-theme="dark"]) .modal-close {
+:where(html[data-theme="dark"]) .modal-container .modal-close {
   color: var(--color-gray-600);
 }
 
-:where(html[data-theme="dark"]) .modal-close:hover {
+:where(html[data-theme="dark"]) .modal-container .modal-close:hover {
   background-color: var(--color-gray-200);
   color: var(--color-gray-900);
 }
+
+/* stylelint-enable no-descending-specificity */
 
 /* Mobile responsive styles for modal */
 @media (width <= 768px) {
