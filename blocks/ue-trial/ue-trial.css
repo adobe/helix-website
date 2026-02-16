@@ -239,6 +239,12 @@
   color: var(--spectrum-gray-200);
 }
 
+:where(html[data-theme="dark"]) .ue-trial .success-message {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
 .ue-trial input,
 .ue-trial select {
   padding: 10px;
