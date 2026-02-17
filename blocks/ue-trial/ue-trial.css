@@ -526,6 +526,12 @@
   color: #333;
 }
 
+:where(html[data-theme="dark"]) .ue-trial .success-message {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
 /* Status Container Styles */
 .status-container {
   background: #fff;
@@ -825,27 +831,115 @@
   outline-offset: 2px;
 }
 
+/* stylelint-disable no-descending-specificity */
+
+/* Dark mode: Status Container */
+:where(html[data-theme="dark"]) .status-container {
+  background: var(--color-gray-100);
+  border-color: var(--color-gray-200);
+  box-shadow: 0 2px 16px rgb(0 0 0 / 30%);
+}
+
+:where(html[data-theme="dark"]) .status-header h2 {
+  color: var(--color-gray-900);
+}
+
+:where(html[data-theme="dark"]) .step-item {
+  background: var(--color-gray-200);
+  border-color: var(--color-gray-300);
+}
+
+:where(html[data-theme="dark"]) .step-item.completed {
+  background: #1a3a1a;
+  border-color: #2d5a2d;
+}
+
+:where(html[data-theme="dark"]) .step-item.error {
+  background: #3a1a1a;
+  border-color: #5a2d2d;
+}
+
+:where(html[data-theme="dark"]) .step-label {
+  color: var(--color-gray-900);
+}
+
+:where(html[data-theme="dark"]) .spinner {
+  border-color: var(--color-gray-300);
+  border-top-color: #1473e6;
+}
+
+:where(html[data-theme="dark"]) .spinner.stopped {
+  border-color: var(--color-gray-300);
+  border-top-color: var(--color-gray-300);
+}
+
+:where(html[data-theme="dark"]) .error-container {
+  background: #3a1a1a;
+  border-color: #5a2d2d;
+}
+
+:where(html[data-theme="dark"]) .error-container .error-message p {
+  color: #f5a0a0;
+}
+
+:where(html[data-theme="dark"]) .error-container .error-message a {
+  color: #4a9eff;
+}
+
+/* Dark mode: Modal Dialog */
+:where(html[data-theme="dark"]) .modal-container {
+  background: var(--color-gray-100);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 50%);
+}
+
+:where(html[data-theme="dark"]) .modal-header {
+  border-bottom-color: var(--color-gray-200);
+}
+
+:where(html[data-theme="dark"]) .modal-container .modal-header h3 {
+  color: var(--color-gray-900);
+}
+
+:where(html[data-theme="dark"]) .modal-container .modal-body p {
+  color: var(--color-gray-800);
+}
+
+:where(html[data-theme="dark"]) .modal-footer {
+  border-top-color: var(--color-gray-200);
+}
+
+:where(html[data-theme="dark"]) .modal-container .modal-close {
+  color: var(--color-gray-600);
+}
+
+:where(html[data-theme="dark"]) .modal-container .modal-close:hover {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-900);
+}
+
+/* stylelint-enable no-descending-specificity */
+
 /* Mobile responsive styles for modal */
 @media (width <= 768px) {
   .modal-overlay {
     padding: 10px;
   }
-  
+
   .modal-container {
     max-width: 100%;
   }
-  
+
   .modal-header,
   .modal-body,
   .modal-footer {
     padding-left: 20px;
     padding-right: 20px;
   }
-  
+
   .modal-header h3 {
     font-size: 18px;
   }
-  
+
   .modal-body p {
     font-size: 15px;
   }
