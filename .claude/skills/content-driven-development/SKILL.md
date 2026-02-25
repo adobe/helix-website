@@ -1,294 +1,443 @@
 ---
-name: Using Content Driven Development
-description: Apply a Content Driven Development process to AEM Edge Delivery Services development. Use for all development tasks, including building new blocks, modifying existing blocks, making changes to core decoration functionality, etc.
+name: content-driven-development
+description: Apply a Content Driven Development process to AEM Edge Delivery Services development. Use for ALL code changes - new blocks, block modifications, CSS styling, bug fixes, core functionality (scripts.js, styles, etc.), or any JavaScript/CSS work that needs validation.
 ---
 
-# Using Content Driven Development (CDD)
+# Content Driven Development (CDD)
 
-Content Driven Development is a mandatory process for AEM Edge Delivery Services development that prioritizes content and author needs over developer convenience. This skill orchestrates the development workflow to ensure code is built against real content with author-friendly content models.
+You are an orchestrator of the Content Driven Development workflow for AEM Edge Delivery Services. This workflow ensures code is built against real content with author-friendly content models.
 
-## Why Content-First Matters
+**CRITICAL: Never start writing or modifying code without first identifying or creating the content you will use to test your changes.**
 
-**Author needs come before developer needs.** When building for AEM Edge Delivery, authors are the primary users of the structures we create. Content models must be intuitive and easy to work with, even if that means more complex decoration code.
+## When to Use This Skill
 
-**Efficiency through preparation.** Creating or identifying test content before coding provides:
-- **Immediate testing capability**: No need to stop development to create test content
-- **Better PR workflows**: Test content doubles as PR validation links for PSI checks
-- **Living documentation**: Test content often serves as author documentation and examples
-- **Fewer assumptions**: Real content reveals edge cases code-first approaches miss
-
-**NEVER start writing or modifying code without first identifying or creating the content you will use to test your changes.**
-
-## When to Apply This Skill
-
-Apply Content Driven Development principles to ALL AEM development tasks:
-
+Use CDD for ALL AEM development tasks:
 - ✅ Creating new blocks
 - ✅ Modifying existing blocks (structural or functional changes)
 - ✅ Changes to core decoration functionality
 - ✅ Bug fixes that require validation
 - ✅ Any code that affects how authors create or structure content
 
-Skip CDD only for:
-- ⚠️ Trivial CSS-only styling tweaks (but still identify test content for validation)
-- ⚠️ Configuration changes that don't affect authoring
+Do NOT use for:
+- Documentation-only changes
+- Configuration changes that don't affect authoring
+- Research tasks that don't require making any code changes yet
 
-When in doubt, follow the CDD process. The time invested pays dividends in quality and efficiency.
+## Philosophy
 
-## Related Skills
+Content Driven Development prioritizes creating or identifying test content before writing code. This ensures:
+- Code is built against real content
+- Author-friendly content models
+- Validation throughout development
 
-This skill orchestrates other skills at the appropriate stages:
+**Optional: Understanding CDD Principles**
 
-- **content-modeling**: Invoked when new content models need to be designed or existing models modified
-- **building-blocks**: Invoked during implementation phase for block creation or modification
-- **testing-blocks**: Referenced during validation phase for comprehensive testing
-- **block-collection-and-party**: Used to find similar blocks and reference implementations
+Read `resources/cdd-philosophy.md` if:
+- User asks "why" questions about content-first approach
+- You need to understand reasoning behind CDD decisions
+- You're unsure whether to prioritize author vs developer experience
 
-## The Content-First Process
+Otherwise: Follow the workflow steps below
 
-Follow these phases in order. Do not skip steps.
+## Step 0: Create TodoList
 
-### Phase 1: Content Discovery and Modeling
+**FIRST STEP:** Use the TodoWrite tool to create a todo list with the following 8 tasks:
 
-The first phase establishes what content you're working with and ensures the content model is author-friendly.
+1. **Start dev server** (if not running)
+   - Success: Dev server running, can access http://localhost:3000
 
-#### Step 1.1: Determine Content Availability
+2. **Analyze & plan**
+   - Success: Clear understanding documented + acceptance criteria defined
 
-**For new blocks:**
+3. **Design content model**
+   - Success: Content structure documented and validated
 
-Skip to Step 1.2 (Content Model Design). Searching for content that doesn't exist is a waste of time.
+4. **Identify/create test content**
+   - Success: Test content accessible covering all scenarios
 
-**For modifications to existing blocks:**
+5. **Implement**
+   - Success: Functionality works across all viewports
 
-Ask the user: "Does content using this block already exist that we can use for testing?"
+6. **Lint & test**
+   - Success: All checks pass
 
-- **YES** → Identify existing content to test against
-  - Use the `scripts/find-block-content.js` script to search for pages containing the block
-  - Or ask the user: "What are the path(s) to page(s) with this block?"
-  - Validate the content loads correctly in your local dev environment
-  - Proceed to Phase 2 (skip content modeling if structure isn't changing)
+7. **Final validation**
+   - Success: All acceptance criteria met, everything works
 
-- **NO existing content** → Proceed to Step 1.2
+8. **Ship it**
+   - Success: PR created with preview link for validation
 
-#### Step 1.2: Content Model Design
+**Mark todo complete when:** Todo list created with all 8 tasks
 
-**REQUIRED for:**
-- All new blocks
-- Structural changes to existing blocks (adding/removing/modifying sections, variants, or the authoring structure)
+---
 
-**Ask the user:**
-"This requires a new content model. Would you like me to use the content-modeling skill to design an author-friendly content model now?"
+## Step 1: Start Dev Server
 
-- **YES** → Invoke the **content-modeling** skill
-  - Follow the content modeling process completely
-  - Return to this skill when content model is defined
-  - Proceed to Step 1.3
+**Check if dev server is running:**
 
-- **NO** → The user may want to define it themselves
-  - Ask: "Please describe the content structure authors will use"
-  - Document their description for reference
-  - Proceed to Step 1.3
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+```
 
-#### Step 1.3: Content Creation
+Expected: `200` (server running) or connection error (server not running)
 
-Once the content model is defined (from Step 1.2), you need test content.
+**If not running, start it:**
 
-**Ask the user:**
-"We need test content for development and validation. This content will serve multiple purposes:
-- Testing during development
-- PR validation link for PSI checks
-- Author documentation and examples
+```bash
+aem up --no-open --forward-browser-logs
+```
 
-Would you like to:
-1. Create this content in the CMS now (Google Drive/SharePoint/DA/Universal Editor)
-2. Create temporary local HTML files for testing (will need CMS content before PR)"
+**Notes:**
+- Run in background if possible (dev server needs to stay running)
+- Requires AEM CLI installed globally: `npm install -g @adobe/aem-cli`
+- Alternative: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs`
 
-**Option 1: CMS Content (Recommended)**
-- Guide the user through creating content in their CMS
-- Wait for user confirmation that content is created and published
-- Get the content URL(s) from the user
-- Validate content loads in local dev environment
-- Proceed to Phase 2
+**IMPORTANT:** Check the command output for errors. Common issues:
+- Port 3000 already in use
+- AEM CLI not installed
+- Configuration errors
 
-**Option 2: Local HTML Files (Temporary)**
-- Create HTML file(s) in `drafts/` folder matching the content model structure
-- Reference the [HTML Structure Guide](resources/html-structure.md) for proper file format
-- Remind user: "Restart your dev server with: `aem up --html-folder drafts`"
-- Note: "You will need to create actual CMS content before raising a PR"
-- Proceed to Phase 2
+**After starting, verify it's running:**
 
-##### Making Test Content Serve as Author Documentation
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+```
 
-Test content can often double as author-facing documentation, saving time and keeping documentation current. Consider this when creating test content:
+Expected: `200`
 
-**When test content IS sufficient as author documentation:**
-- The block is straightforward with clear patterns
-- Test content shows all variants and use cases
-- Content demonstrates best practices authors should follow
-- Examples are realistic and relatable to actual use cases
+**Success criteria:**
+- ✅ Dev server running
+- ✅ http://localhost:3000 returns 200
+- ✅ No errors in server startup output
 
-**When separate author documentation is needed:**
-- Block has complex configuration or many variants requiring explanation
-- There are edge cases or gotchas authors need to understand
-- Project standards require formal documentation in a specific location/format
-- Block behavior isn't self-evident from examples alone
+**Mark todo complete when:** Dev server confirmed running and accessible
 
-**Structuring test content to serve both purposes:**
-1. **Create comprehensive examples**: Show all variants, edge cases, and common patterns
-2. **Use realistic content**: Avoid "lorem ipsum" or technical placeholders
-3. **Demonstrate best practices**: Structure content the way authors should
-4. **Consider location**: Place content where it can serve as documentation
-   - Sidekick Library projects: Consider creating in `/tools/sidekick/library/` or appropriate library location
-   - Document Authoring: Place in DA Library structure
-   - Simple documentation: Use `/drafts/docs/` or `/drafts/library/`
-   - Universal Editor: Follow project-specific documentation patterns
+---
 
-**Ask the user about documentation approach:**
-"Should this test content also serve as author documentation? If so, we can structure it accordingly and place it in an appropriate location (e.g., `/drafts/library/{block-name}` or your project's library system)."
+## Step 2: Analyze & Plan
 
-If yes, guide content creation with documentation in mind. If no, proceed with test-focused content and note that author documentation will be needed later.
+**Invoke:** analyze-and-plan skill
 
-### Phase 2: Implementation
+**Provide:**
+- Task description from user
+- Screenshots, design files, or existing URLs to match design from (if available)
 
-**CRITICAL: Do not begin Phase 2 until you have confirmed test content exists and is accessible.**
+**The analyze-and-plan skill will:**
+- Guide you through task-specific analysis
+- Help define acceptance criteria
+- Optionally analyze visual designs/mockups if provided
+- Create documented analysis for reference
 
-Now that test content exists, proceed with implementation:
+**Success criteria:**
+- ✅ Requirements analyzed
+- ✅ Acceptance criteria defined
+- ✅ Analysis documented to file for later steps
 
-#### For Block Development
+**Mark todo complete when:** Analysis documented and acceptance criteria defined
 
-Invoke the **building-blocks** skill:
-- Provide the skill with the content model and test content URL(s)
-- Follow the building-blocks process for implementation
-- Return to this skill when implementation is complete
-- Proceed to Phase 3
+---
 
-#### For Core Functionality Changes
+## Step 3: Design Content Model
 
-Follow standard development practices:
-- Make changes to scripts, styles, or configuration
-- Test against the identified content throughout development
-- Ensure changes don't break existing blocks or content models
-- Proceed to Phase 3
+**Skip if:** CSS-only changes that don't affect content structure
 
-### Phase 3: Validation
+**Invoke:** content-modeling skill
 
-The final phase ensures the implementation works correctly with real content.
+**Provide:**
+- Analysis from Step 2 (content requirements, author inputs)
+- Block name and purpose
 
-#### Step 3.1: Test with Real Content
+**The content-modeling skill will:**
+- Design table structure (rows, columns, semantic formatting)
+- Validate against best practices (4 cells/row, semantic formatting)
+- Document content model for authors
 
-**Mandatory testing:**
-- ✅ View test content in local dev environment
-- ✅ Verify all variants render correctly
-- ✅ Check responsive behavior (mobile, tablet, desktop)
-- ✅ Test edge cases revealed by the actual content
-- ✅ Validate accessibility basics (keyboard navigation, screen reader friendly)
+**Success criteria:**
+- ✅ Content model designed (table structure defined)
+- ✅ Validated against best practices
+- ✅ Content model documented
 
-#### Step 3.2: Run Quality Checks
+**Mark todo complete when:** Content model designed and documented
 
-**Required before considering implementation complete:**
+---
+
+## Step 4: Identify/Create Test Content
+
+**Goal:** End this step with accessible test content URL(s) covering all test scenarios
+
+**Choose the best ath based on your situation:**
+
+---
+
+### Option A: User Provided Test URL(s)
+
+**When to use:** User already has content and provided URL(s)
+
+**What to do:**
+1. Validate URL loads: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/path`
+2. Expected: `200` status
+3. Document URL(s)
+4. Mark complete
+
+---
+
+### Option B: New Block (No Existing Content)
+
+**When to use:** Building a brand new block that doesn't exist yet
+
+**What to do:**
+1. Skip search (nothing exists yet to find)
+2. Create test content using one of these approaches:
+
+**Approach 1: CMS Content (Recommended)**
+1. Ask user to create content in their CMS (Google Drive/SharePoint/DA/Universal Editor)
+2. Provide content model from Step 3 as reference
+3. Wait for user to provide URL(s)
+4. Validate: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/path`
+5. Expected: `200` status
+
+**Approach 2: Local HTML (Temporary)**
+1. Create HTML file in `drafts/tmp/{block-name}.plain.html`
+2. Follow structure from Step 3 content model
+3. Read `resources/html-structure.md` for local HTML file format guidance
+4. Restart dev server: `aem up --html-folder drafts --no-open --forward-browser-logs`
+5. Validate: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/drafts/tmp/{block-name}`
+6. Expected: `200` status
+7. **Note:** User must create CMS content before PR (required for preview link)
+
+---
+
+### Option C: Existing Block
+
+**When to use:** Modifying, fixing, or styling an existing block
+
+**What to do:**
+
+**First: Search for existing content**
+1. Invoke find-test-content skill
+2. Provide: block name, dev server URL (optional, defaults to localhost:3000)
+
+**What find-test-content will do:**
+- Search for existing content pages containing the block
+- Automatically detect and report all variants found
+- Report: URLs with instance counts and variant info
+
+**Then: Assess search results**
+
+**If sufficient content found:**
+1. Document URL(s)
+2. Validate URLs load: `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/path`
+3. Expected: `200` status
+4. Mark complete
+
+**If no content found OR insufficient coverage:**
+1. Create additional test content using approaches from Option B
+2. Validate URLs load
+3. Mark complete
+
+---
+
+**Success criteria:**
+- ✅ Test content accessible at known URL(s)
+- ✅ Content covers all test scenarios (variants, edge cases)
+- ✅ URLs validated (return 200)
+
+**Mark todo complete when:** Test content identified/created and validated
+
+---
+
+## Step 5: Implement
+
+**Invoke:** building-blocks skill
+
+**Provide:**
+- Content model from Step 3 (if applicable)
+- Test content URL(s) from Step 4
+- Analysis/requirements from Step 2
+- Type of changes: new block, existing block modification, CSS-only, etc.
+
+**The building-blocks skill will:**
+- Guide implementation approach based on change type
+- Handle JavaScript decoration (if needed)
+- Handle CSS styling (mobile-first, responsive)
+- Ensure iterative testing in browser throughout development
+
+**Success criteria:**
+- ✅ Code implementation complete
+- ✅ Functionality works across all viewports (mobile, tablet, desktop)
+- ✅ No console errors
+
+**Mark todo complete when:** building-blocks skill reports implementation complete and working across viewports
+
+---
+
+## Step 6: Lint & Test
+
+**What to do:**
 
 ```bash
 npm run lint
 ```
 
-If linting fails, fix issues with:
+**If lint errors:**
+1. Fix issues (use `npm run lint:fix` for auto-fixable problems)
+2. Re-run lint until clean
+
+**Run existing tests:**
 ```bash
-npm run lint:fix
+npm test
 ```
 
-#### Step 3.3: Comprehensive Testing
+**Note:** Unit tests are optional and only needed for logic-heavy utilities. The testing-blocks skill (invoked by building-blocks in Step 5) handles browser testing. This step catches any remaining lint issues and runs the project's test suite.
 
-**The testing-blocks skill is automatically invoked by building-blocks** for block development.
+**Success criteria:**
+- ✅ `npm run lint` passes with no errors
+- ✅ `npm test` passes (if tests exist)
 
-For other code changes, or for additional testing guidance, invoke the **testing-blocks** skill which provides:
-- Unit testing strategies for logic-heavy utilities
-- Browser testing with Playwright/Puppeteer
-- Linting and code quality checks
-- Performance validation with GitHub checks
-- Guidance on keeper vs throwaway tests
+**Mark todo complete when:** All lint and test checks pass
 
-#### Step 3.4: PR Preparation
+---
 
-**Before raising a PR, ensure:**
-- ✅ Test content exists in the CMS (not just local HTML)
-- ✅ Test content URL is accessible for PSI checks
-- ✅ All linting passes
-- ✅ Author documentation is updated (if applicable)
+## Step 7: Final Validation
 
-The test content URL will be used as the PR validation link.
+**What to do:**
+
+1. **Review acceptance criteria from Step 2**
+   - Read the analysis document created in Step 2
+   - Check each acceptance criterion is met
+
+2. **Final browser sanity check**
+   - Load test content URL(s) in browser
+   - Check mobile, tablet, and desktop viewports
+   - Verify no console errors
+   - Confirm no visual regressions
+
+3. **Verify no regressions**
+   - If modifying existing block: test existing variants still work
+   - If modifying core functionality: spot-check a few pages
+
+**Success criteria:**
+- ✅ All acceptance criteria from Step 2 met
+- ✅ Works across all viewports
+- ✅ No console errors
+- ✅ No regressions on existing functionality
+
+**Mark todo complete when:** All acceptance criteria verified and no regressions found
+
+---
+
+## Step 8: Ship It
+
+**What to do:**
+
+1. **Create feature branch (if not already on one):**
+   ```bash
+   git checkout -b block-name
+   ```
+
+2. **Stage specific files only:**
+   ```bash
+   git add blocks/{block-name}/{block-name}.js blocks/{block-name}/{block-name}.css
+   # Add only files you worked on - NEVER use `git add .`
+   ```
+
+3. **Commit with conventional commit format:**
+   ```bash
+   git commit -m "feat(block-name): add new block"
+   ```
+   Include revelevant details in commit message and agent attribution in footer (agent adds `Co-authored-by: cursor <noreply@cursor.com>`)
+
+4. **Push to feature branch:**
+   ```bash
+   git push origin HEAD
+   ```
+
+5. **Create PR with preview link:**
+   - Branch preview URL format: `https://{branch}--{repo}--{owner}.aem.page/{path}`
+   - Example: `https://carousel--aem-skills-demo--shsteimer.aem.page/`
+   - **REQUIRED:** Include preview link in PR description (used for automated PSI checks)
+   - Add multiple preview links if needed (e.g., different variants, edge cases)
+
+   **Determining if you need a draft PR:**
+
+   Create a **draft PR** when:
+   - ✅ Only local test content exists for NEW functionality/variants
+   - ✅ Test content demonstrates new features not yet in CMS
+   - ✅ You need user to create CMS content before final validation
+
+   Create a **regular PR** when:
+   - ✅ All test content exists in CMS and is previewable
+   - ✅ Changes only affect existing content (regressions can be tested with existing CMS content)
+
+   **Workflow for draft PRs:**
+   1. Create the PR as a draft using `gh pr create --draft`
+   2. Include existing content preview links (for regression testing if applicable)
+   3. Include next steps in PR description (see template below):
+      - Describe the test content used locally and what scenarios it covered
+      - Suggest that same/similar content be created and previewed, and links added to PR
+      - Keep steps brief but actionable for any reviewer
+   4. Instruct the user to create CMS content following the steps:
+      - Open local test content in browser: `http://localhost:3000/drafts/tmp/[test-file]`
+      - Right-click AEM Sidekick extension
+      - Click "View document source" option
+      - Use the copy button to copy the document content
+      - Paste into Word/Google Docs/Document Authoring (for UE: use as guide, copy/paste won't work directly)
+      - Preview the CMS content
+   5. User adds preview URL(s) to PR description and marks PR ready for review (or agent does with user's input)
+
+**PR Description Template:**
+
+Use this template for all PRs, including all relevant preview links and adapting as needed:
+
+```markdown
+## Description
+Brief description of changes
+
+[If an issue exists]
+Fix #<gh-issue-id>
+
+Test URLs:
+
+[Repeat for all relevant test urls]
+- Before: https://main--{repo}--{owner}.aem.page/{path}
+- After: https://{branch}--{repo}--{owner}.aem.page/{path} 
+
+[If only local test content (draft PR):]
+
+This PR is currently a **draft** pending creation of CMS test content.
+
+### Next Steps to Complete PR:
+
+[add relevant steps here]
+```
+
+**Success criteria:**
+- ✅ Changes committed with proper message format and attribution
+- ✅ Pushed to feature branch (not main)
+- ✅ PR created with preview link in description
+
+**Mark todo complete when:** PR created and ready for review
+
+---
+
+## Related Skills
+
+- **analyze-and-plan**: Invoked in Step 2 for requirements analysis and acceptance criteria
+- **content-modeling**: Invoked in Step 3 for designing content models
+- **find-test-content**: Invoked in Step 4, Option C for finding existing content
+- **building-blocks**: Invoked in Step 5 for implementation
+- **testing-blocks**: Invoked by building-blocks for browser testing
+- **block-collection-and-party**: Used to find similar blocks and reference implementations
 
 ## Anti-Patterns to Avoid
 
-**Common mistakes:**
+Common mistakes that violate CDD principles:
 - ❌ Starting with code before understanding the content model
 - ❌ Making assumptions about content structure without seeing real examples
 - ❌ Creating developer-friendly but author-hostile content models
 - ❌ Skipping content creation "to save time" (costs more time later)
-- ❌ Testing against imagined content instead of real content
-- ❌ Treating test content creation as separate from development workflow
 
-## Workflow Summary
+## Resources
 
-**Quick reference for the CDD process:**
-
-```
-1. CONTENT DISCOVERY
-   └─ Existing content? → Use it
-   └─ New block/structure? → Design content model → Create test content
-
-2. IMPLEMENTATION
-   └─ Build code against the real content model
-   └─ Test continuously with actual content
-
-3. VALIDATION
-   └─ Comprehensive testing with test content
-   └─ Quality checks (linting, accessibility)
-   └─ PR preparation with test URL
-
-KEY RULE: Never proceed to implementation without test content
-```
-
-## Scripts and Tools
-
-### Finding Existing Block Content
-
-Use the provided script to search for pages containing a specific block:
-
-```bash
-# Search on localhost (default)
-node .claude/skills/content-driven-development/scripts/find-block-content.js <block-name>
-
-# Search for specific variant
-node .claude/skills/content-driven-development/scripts/find-block-content.js <block-name> localhost:3000 <variant>
-
-# Search on live site
-node .claude/skills/content-driven-development/scripts/find-block-content.js <block-name> main--repo--owner.aem.live
-
-# Search on preview with variant
-node .claude/skills/content-driven-development/scripts/find-block-content.js <block-name> main--repo--owner.aem.page <variant>
-```
-
-**Examples:**
-```bash
-node .claude/skills/content-driven-development/scripts/find-block-content.js hero
-node .claude/skills/content-driven-development/scripts/find-block-content.js hero localhost:3000 dark
-node .claude/skills/content-driven-development/scripts/find-block-content.js cards main--site--owner.aem.live three-up
-```
-
-This script queries the site's query-index to find all pages containing the specified block (and optional variant) and returns their URLs. The script uses proper DOM parsing to accurately identify blocks.
-
-## Integration with Other Skills
-
-This skill acts as the orchestrator for AEM development workflows:
-
-**At Content Modeling stage:**
-→ Invoke **content-modeling** skill for author-friendly design
-
-**At Implementation stage:**
-→ Invoke **building-blocks** skill for block development
-→ Reference **block-collection-and-party** skill for patterns
-
-**At Validation stage:**
-→ Reference **testing-blocks** skill for comprehensive testing
-
-Following this orchestration ensures all development follows content-first principles.
+- **Philosophy:** `resources/cdd-philosophy.md` - Why content-first matters
+- **HTML Structure:** `resources/html-structure.md` - Guide for creating local HTML test files

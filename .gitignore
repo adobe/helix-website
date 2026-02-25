@@ -45,6 +45,10 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Skill dependencies and cache
+.claude/skills/**/node_modules
+.claude/skills/**/.cache
+
 # TypeScript v1 declaration files
 typings/
 
@@ -114,3 +118,6 @@ dist
 junit.xml
 # jetbrains files
 .idea/
+
+# Playwright MCP
+.playwright-mcp/

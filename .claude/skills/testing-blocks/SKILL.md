@@ -1,16 +1,18 @@
 ---
 name: Testing Blocks
-description: Guide for testing code changes in AEM Edge Delivery projects including blocks, scripts, and styles. Use this skill after making code changes and before opening a pull request to validate functionality. Covers unit testing for utilities and logic, browser testing with Playwright/Puppeteer, linting, performance validation, and guidance on which tests to maintain vs use as throwaway validation.
+description: Guide for testing code changes in AEM Edge Delivery projects including blocks, scripts, and styles. Use this skill after making code changes and before opening a pull request to validate functionality. Covers unit testing for utilities and logic, browser testing with Playwright, linting, and guidance on what to test and how
 ---
 
 # Testing Blocks
 
 This skill guides you through testing code changes in AEM Edge Delivery Services projects. Testing follows a value-versus-cost philosophy: create and maintain tests when the value they bring exceeds the cost of creation and maintenance.
 
+**CRITICAL: Browser validation is MANDATORY. You cannot complete this skill without providing proof of functional testing in a real browser environment.**
+
 ## Related Skills
 
 - **content-driven-development**: Test content created during CDD serves as the basis for testing
-- **building-blocks**: This skill is automatically invoked after block implementation
+- **building-blocks**: Invokes this skill during Step 5 for comprehensive testing
 - **block-collection-and-party**: May provide reference test patterns from similar blocks
 
 ## When to Use This Skill
@@ -22,61 +24,179 @@ Use this skill:
 - ✅ After configuration changes that affect functionality
 - ✅ Before opening any pull request with code changes
 
-This skill should be automatically invoked by the **building-blocks** skill after implementation is complete.
+This skill is typically invoked by the **building-blocks** skill during Step 5 (Test Implementation).
 
-## Testing Philosophy: Value vs Cost
+## Testing Workflow
 
-**The Principle:** Create and maintain tests when the value they bring exceeds the cost of creation and maintenance.
+Track your progress:
 
-### Keeper Tests (High Value, Worth Maintaining)
+- [ ] Step 1: Run linting and fix issues
+- [ ] Step 2: Perform browser validation (MANDATORY)
+- [ ] Step 3: Determine if unit tests are needed (optional)
+- [ ] Step 4: Run existing tests and verify they pass
 
-✅ **Write unit tests for:**
-- Logic-heavy utility functions used across multiple blocks
-- Data processing and transformation logic
-- API integrations and external service interactions
-- Complex algorithms or business logic
-- Shared libraries and helper functions
+## Step 1: Run Linting
 
-These tests provide lasting value because they catch regressions in reused code, serve as living documentation, and are fast and easy to maintain.
+**Run linting first to catch code quality issues:**
 
-### Throwaway Tests (Lower Value, Use Once)
+```bash
+npm run lint
+```
 
-⚠️ **Use browser tests for:**
-- Block decoration logic (DOM transformations)
-- Specific DOM structures or UI layouts
-- Visual appearance validation
-- Block-specific rendering behavior
+**If linting fails:**
+```bash
+npm run lint:fix
+```
 
-These tests are better done in a browser because DOM structures change frequently, visual validation requires human judgment, and maintaining UI tests is expensive relative to their value.
+**Manually fix remaining issues** that auto-fix couldn't handle.
 
-**Important:** Even throwaway tests have value! Use them to:
-1. Validate your implementation works correctly
-2. Take screenshots to evaluate visual correctness
-3. Show screenshots to humans for feedback
-4. Include screenshots in PRs to aid review
+**Success criteria:**
+- ✅ Linting passes with no errors
+- ✅ Code follows project standards
 
-**Organization:** Keep throwaway tests in `test/tmp/` and test content in `drafts/tmp/`. Both directories should be gitignored so temporary test artifacts aren't committed.
+**Mark complete when:** `npm run lint` passes with no errors
 
-## Testing Checklist
+---
 
-Before opening a pull request, complete ALL of the following:
+## Step 2: Browser Validation (MANDATORY)
 
-- [ ] **Existing tests pass** - All keeper tests still pass with your changes
-- [ ] **Unit tests written** - New keeper tests for any logic-heavy utilities or data processing
-- [ ] **Browser validation** - Feature tested in local dev server, screenshots captured
-- [ ] **All variants tested** - Each variant/configuration of blocks validated
-- [ ] **Responsive behavior** - Tested on mobile, tablet, desktop viewports
-- [ ] **Linting passes** - `npm run lint` completes without errors
-- [ ] **Branch pushed** - Code committed and pushed to feature branch
-- [ ] **GitHub checks verified** - Use `gh checks` to confirm all CI checks pass
+**CRITICAL: You must test in a real browser and provide proof.**
 
-## Testing Methods Overview
+### What to Test
 
-### 1. Unit Tests (KEEPER TESTS)
+Load test content URL(s) in browser and validate:
+- ✅ Block/functionality renders correctly
+- ✅ Responsive behavior (mobile, tablet, desktop viewports)
+- ✅ No console errors
+- ✅ Visual appearance matches requirements/acceptance criteria
+- ✅ Interactive behavior works (if applicable)
+- ✅ All variants render correctly (if applicable)
 
-**When to use:** Logic-heavy functions, utilities, data processing, API integrations
+### How to Test
 
-**Quick start:**
+**Choose the method that makes most sense given your available tools:**
+
+**Option 1: Browser/Playwright MCP (Recommended)**
+
+If you have MCP browser or Playwright tools available, use them directly:
+- Navigate to test content URL
+- Take accessibility snapshots to inspect rendered content (preferred for interaction)
+- Take screenshots at different viewports for visual validation
+  - Consider both full-page screenshots and element-specific screenshots of the block being tested
+- Interact with elements as needed
+- Most efficient for agents with tool access
+
+**Option 2: Playwright automation**
+
+Write one (or more) temporary test scripts to validate functionality with playwright and capture snapshots/screenshots for inspection and validation.
+
+```javascript
+// test-my-block.js (temporary - don't commit)
+import { chromium } from 'playwright';
+
+async function test() {
+  const browser = await chromium.launch({ headless: false });
+  const page = await browser.newPage();
+
+  // Navigate and wait for block
+  await page.goto('http://localhost:3000/path/to/test');
+  await page.waitForSelector('.my-block');
+
+  // Inspect accessibility tree (useful for validating structure)
+  const accessibilityTree = await page.accessibility.snapshot();
+  console.log('Accessibility tree:', JSON.stringify(accessibilityTree, null, 2));
+  
+  // Optionally save to file for easier analysis
+  await require('fs').promises.writeFile(
+    'accessibility-tree.json',
+    JSON.stringify(accessibilityTree, null, 2)
+  );
+
+  // Test viewports and take screenshots
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.screenshot({ path: 'mobile.png', fullPage: true });
+  await page.locator('.my-block').screenshot({ path: 'mobile-block.png' });
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.screenshot({ path: 'tablet.png', fullPage: true });
+  await page.locator('.my-block').screenshot({ path: 'tablet-block.png' });
+
+  await page.setViewportSize({ width: 1200, height: 800 });
+  await page.screenshot({ path: 'desktop.png', fullPage: true });
+  await page.locator('.my-block').screenshot({ path: 'desktop-block.png' });
+
+  // Check for console errors
+  page.on('console', msg => console.log('Browser:', msg.text()));
+
+  await browser.close();
+}
+
+test().catch(console.error);
+```
+
+Run: `node test-my-block.js` then delete the script and analyze the resulting artifacts.
+
+**Option 3: Manual browser testing**
+
+Use a standard web browser with dev tools:
+1. Navigate to test content: `http://localhost:3000/path/to/test/content`
+2. Use browser dev tools responsive mode to test viewports:
+   - Mobile: <600px (e.g., 375px)
+   - Tablet: 600-900px (e.g., 768px)
+   - Desktop: >900px (e.g., 1200px)
+3. Check console for errors at each viewport
+4. Take screenshots as proof (browser screenshot tool or dev tools)
+
+### Validation Against Acceptance Criteria
+
+**If acceptance criteria provided (from CDD Step 2):**
+- Review each criterion
+- Test specific scenarios mentioned
+- Verify all criteria are met
+
+**If design/mockup screenshots provided:**
+- Compare implementation to design
+- Verify visual alignment
+- Note any intentional deviations
+
+### Proof of Testing
+
+**You must provide:**
+- ✅ Screenshots of test content in browser (at least one viewport)
+- ✅ Confirmation no console errors
+- ✅ Confirmation acceptance criteria met (if provided)
+
+**Success criteria:**
+- ✅ All test content loads and renders correctly
+- ✅ Responsive behavior validated across viewports
+- ✅ No console errors
+- ✅ Screenshots captured as proof
+- ✅ Acceptance criteria validated (if provided)
+
+**Mark complete when:** Browser testing complete with screenshots as proof
+
+---
+
+## Step 3: Unit Tests (Optional)
+
+**Determine if unit tests are needed for this change.**
+
+**Write unit tests when:**
+- ✅ Logic-heavy functions (calculations, transformations)
+- ✅ Utility functions used across multiple blocks
+- ✅ Data processing or API integrations
+- ✅ Complex business logic
+
+**Skip unit tests when:**
+- ❌ Simple DOM manipulation
+- ❌ CSS-only changes
+- ❌ Straightforward decoration logic
+- ❌ Changes easily validated in browser
+
+**For guidance on what to test:** See `resources/testing-philosophy.md`
+
+**If unit tests needed:**
+
 ```bash
 # Verify test setup (see resources/vitest-setup.md if not configured)
 npm test
@@ -91,130 +211,38 @@ describe('myUtility', () => {
     expect(myUtility('input')).toBe('OUTPUT');
   });
 });
-
-# Run tests during development
-npm run test:watch
 ```
 
-**Detailed guide:** See `resources/unit-testing.md`
+**For detailed unit testing guidance:** See `resources/unit-testing.md`
 
-### 2. Browser Testing (THROWAWAY TESTS)
+**Success criteria:**
+- ✅ Unit tests written for logic-heavy code
+- ✅ Tests pass: `npm test`
+- ✅ OR determined unit tests not needed
 
-**When to use:** Block decoration, visual validation, DOM structure, responsive design
+**Mark complete when:** Unit tests written and passing, or determined not needed
 
-**Organization:**
-- Test scripts: `test/tmp/test-{block}-browser.js`
-- Test content: `drafts/tmp/{block}.html`
-- Screenshots: `test/tmp/screenshots/`
-- Both `test/tmp/` and `drafts/tmp/` should be gitignored
+---
 
-**Quick start:**
+## Step 4: Run Existing Tests
+
+**Verify your changes don't break existing functionality:**
+
 ```bash
-# Install Playwright
-npm install --save-dev playwright
-npx playwright install chromium
-
-# Create test content
-# drafts/tmp/my-block.html (copy head.html content, add test markup)
-
-# Start dev server with drafts folder
-aem up --html-folder drafts
-
-# Create throwaway test script in test/tmp/
-# test/tmp/test-my-block.js
-import { chromium } from 'playwright';
-import { mkdir } from 'fs/promises';
-
-async function test() {
-  await mkdir('./test/tmp/screenshots', { recursive: true });
-  const browser = await chromium.launch({ headless: false });
-  const page = await browser.newPage();
-
-  await page.goto('http://localhost:3000/drafts/tmp/my-block');
-  await page.waitForSelector('.my-block');
-  await page.screenshot({ 
-    path: './test/tmp/screenshots/my-block.png',
-    fullPage: true 
-  });
-
-  await browser.close();
-}
-
-test().catch(console.error);
-
-# Run the test
-node test/tmp/test-my-block.js
-
-# Clean up when done (optional - gitignored either way)
-rm -rf test/tmp/*
+npm test
 ```
 
-**Detailed guide:** See `resources/browser-testing.md`
+**If tests fail:**
+1. Read error message carefully
+2. Run single test to isolate: `npm test -- path/to/test.js`
+3. Fix code or update test if expectations changed
+4. Re-run full test suite
 
-### 3. Linting (ALWAYS)
+**Success criteria:**
+- ✅ All existing tests pass
+- ✅ No regressions introduced
 
-**When to use:** Before every commit
-
-**Quick start:**
-```bash
-# Run linting
-npm run lint
-
-# Auto-fix issues
-npm run lint:fix
-```
-
-**Linting MUST pass before opening a PR.** Non-negotiable.
-
-### 4. Performance Testing (AUTOMATED)
-
-**When to use:** After pushing branch, automatically via GitHub checks
-
-**Quick start:**
-```bash
-# Push branch
-git push -u origin your-branch
-
-# Create PR with test link
-# PR description MUST include:
-# Preview: https://branch--repo--owner.aem.page/path/to/test
-
-# Monitor checks
-gh pr checks --watch
-```
-
-Performance tests run automatically when you include a test link in your PR description.
-
-## Complete Workflow
-
-For detailed step-by-step workflow, see `resources/testing-workflow.md`.
-
-**Quick summary:**
-
-### During Development
-1. Write unit tests for new utilities
-2. Run `npm run test:watch`
-3. Manually test in browser
-
-### Before Committing
-4. Run `npm test` - all tests pass
-5. Run `npm run lint` - linting passes
-6. Write throwaway browser test in `test/tmp/`
-7. Create test content in `drafts/tmp/`
-8. Review screenshots from `test/tmp/screenshots/`
-9. Manual validation in browser
-
-### Before Opening PR
-10. Commit and push to feature branch (test/tmp/ won't be included)
-11. Verify branch preview loads
-12. Run `gh checks`
-13. Create PR with test link
-14. Monitor `gh pr checks`
-
-### After PR Review
-15. Address feedback
-16. Re-test
-17. Verify checks pass
+**Mark complete when:** `npm test` passes with no failures
 
 ## Troubleshooting
 
@@ -231,11 +259,6 @@ For detailed troubleshooting guide, see `resources/troubleshooting.md`.
 - Run `npm run lint:fix`
 - Manually fix remaining issues
 
-### GitHub checks fail
-- Ensure PR has test link
-- Check `gh pr checks` for details
-- Fix performance issues if PSI fails
-
 ### Browser tests fail
 - Verify dev server running: `aem up --html-folder drafts`
 - Check test content exists in `drafts/tmp/`
@@ -245,51 +268,24 @@ For detailed troubleshooting guide, see `resources/troubleshooting.md`.
 ## Resources
 
 - **Unit Testing:** `resources/unit-testing.md` - Complete guide to writing and maintaining unit tests
-- **Browser Testing:** `resources/browser-testing.md` - Playwright/Puppeteer workflows and best practices
-- **Testing Workflow:** `resources/testing-workflow.md` - Step-by-step workflow from dev to PR
 - **Troubleshooting:** `resources/troubleshooting.md` - Solutions to common testing issues
 - **Vitest Setup:** `resources/vitest-setup.md` - One-time configuration guide
+- **Testing Philosophy:** `resources/testing-philosophy.md` - Guide on what and how to test
 
 ## Integration with Building Blocks Skill
 
-The **building-blocks** skill automatically invokes this skill after implementation.
+The **building-blocks** skill invokes this skill during Step 5 (Test Implementation).
 
-**Expected flow:**
-1. Building blocks completes implementation
-2. Invokes **testing-blocks** skill
-3. This skill guides testing process
-4. Returns control when testing complete
-
-**Building blocks provides:**
+**Inputs received from building-blocks:**
 - Block name being tested
-- Test content URL from CDD process
+- Test content URL(s) (from CDD Step 4)
 - Any variants that need testing
+- Screenshots of existing implementation/design/mockup to verify against (if provided)
+- Acceptance criteria to verify (from CDD Step 2)
 
-**This skill returns:**
-- Confirmation all tests pass
-- Screenshots from browser testing (if requested)
-- Any issues discovered during testing
-
-## Summary
-
-Testing in AEM Edge Delivery follows a pragmatic value-versus-cost approach:
-
-**Create keeper tests for:**
-- Logic-heavy utilities
-- Data processing and transformations
-- API integrations
-- Shared libraries
-
-**Use throwaway browser tests for:**
-- Block decoration validation
-- Visual appearance
-- DOM structure
-- Interactive behavior
-
-**Always do:**
-- Run linting before commits
-- Test manually in browser
-- Verify GitHub checks pass
-- Include test links in PRs
-
-**Remember:** The goal is confidence that your code works correctly, not achieving 100% test coverage. Write tests that provide value, and validate everything else in a browser.
+**Expected outputs to return to building-blocks:**
+- ✅ Confirmation all testing steps complete
+- ✅ Screenshots from browser testing as proof
+- ✅ Confirmation linting passes
+- ✅ Confirmation tests pass
+- ✅ Any issues discovered and resolved

@@ -5,230 +5,164 @@ description: Create effective content models for your blocks that are easy for a
 
 # Content Modeling for AEM Edge Delivery Blocks
 
-This skill guides you through designing content models for AEM Edge Delivery Services blocks. A content model defines the HTML table structure that authors work with when creating content in their CMS (Google Docs, SharePoint, etc.).
+This skill guides you through designing content models for AEM Edge Delivery Services blocks. A content model defines the table structure that authors work with when creating content
 
 ## Related Skills
 
-- **content-driven-development**: This skill is typically invoked FROM the CDD skill during Phase 1 (Content Model Design)
+- **content-driven-development**: This skill is typically invoked FROM the CDD skill during Step 3 (Design Content Model)
 - **building-blocks**: After content modeling is complete, this skill handles implementation
 - **block-collection-and-party**: Use to find similar blocks and their content models for reference
 
 ## When to Use This Skill
 
-Use this skill when:
-- Creating new blocks and need to design the author-facing content structure
-- Modifying existing blocks in ways that change what authors work with
-- Reviewing content models for conformance to best practices
-- Migrating or refactoring content models
+✅ **Use this skill when:**
+- Creating new blocks (usually invoked by CDD at Step 3)
+- Modifying existing blocks in ways that change author-facing structure
+- Reviewing content models for best practices conformance
+- User explicitly asks about content modeling
 
-**Note:** This skill is usually invoked automatically by the **content-driven-development** skill at Step 1.2. If you're not already in a CDD workflow and are creating a new block, consider invoking the CDD skill first.
+❌ **Skip this skill when:**
+- Block already has a well-defined content model
+- You're only changing decoration code or styles (not structure)
+- Making minor tweaks that don't affect what authors create
+
+## Content Modeling Checklist
+
+Track your progress through content model design:
+
+- [ ] Step 1: Understand content requirements. See "Step 1: Understand Content Requirements" below
+- [ ] Step 2: Design block structure. See "Step 2: Design Block Structure" below
+- [ ] Step 3: Validate against best practices. See "Step 3: Validate Against Best Practices" below
+- [ ] Step 4: Document and return content model. See "Step 4: Document and Return" below
 
 ## Core Principles
 
 A good content model is:
-
 - **Semantic**: Structure carries meaning on its own without decoration
 - **Predictable**: Authors, developers, and agents all know what to expect
 - **Reusable**: Works across authoring surfaces and projects
 
-## Prerequisites
+## Step 1: Understand Content Requirements
 
-Before designing a content model, ensure you understand:
+Before designing a content model, understand what the block needs to accomplish and what content it requires.
 
-1. **Block Purpose**: What is this block meant to accomplish?
-2. **Content Requirements**: What content elements are needed (images, text, links, etc.)?
-3. **User Experience**: How should this block appear and function on the page?
+**Ask these questions:**
+- **What is the block's purpose?** What problem does it solve for users?
+- **What content elements are needed?** (images, text, headings, links, etc.)
+- **What is the visual layout?** How should content be arranged on the page?
+- **Is this content unique or repeating?** One hero, or multiple cards?
+- **Where does the content come from?** Authored by users, or fetched from an API?
+- **How complex is the authoring experience?** Can authors create this easily, or does it need simplification?
 
-## The Content Modeling Process
+**Use canonical models as reference patterns:**
 
-### Step 1: Identify the Canonical Model Type(s)
+AEM Edge Delivery has 4 canonical block models that serve as proven patterns:
 
-AEM Edge Delivery has 4 canonical block models. While these cover the most common cases, sometimes the best approach is to support multiple models for the same block to accommodate different authoring workflows and content complexity.
+| Model | Best For | Examples |
+|-------|----------|----------|
+| **Standalone** | Unique visual elements, one-off structures | Hero, Blockquote |
+| **Collection** | Repeating semi-structured items | Cards, Carousel |
+| **Configuration** | API-driven content ONLY (not static content) | Blog Listing, Search Results |
+| **Auto-Blocked** | Simplify complex authoring, pattern detection | Tabs, YouTube Embed |
 
-Review the descriptions in `resources/canonical-models.md` and identify which model(s) fit best:
+Use these patterns to inform your design in Step 2, but focus first on understanding the content requirements.
 
-- **Standalone**: Best for distinct visual or narrative elements (Hero, Blockquote)
-- **Collection**: Ideal for repeating semi-structured content (Cards, Carousel)
-- **Configuration**: Use ONLY for API-driven or dynamic content where config controls display (Blog Listing, Search Results)
-- **Auto-Blocked**: Good for simplifying authoring of complex structures and block nesting (Tabs, YouTube Embed)
+**Detailed resources:**
+- Read `resources/canonical-models.md` for detailed examples and guidance on the 4 canonical models
+- If your content model is particularly complex or combines multiple models, see `resources/advanced-scenarios.md`
 
-**Consider these questions as a starting point** (note: content modeling is an art, not a science - use these as guidelines, not strict rules):
-- Is this a unique, one-off element? → Often Standalone
-- Is this a repeating list of similar items? → Often Collection
-- Does this pull data from an API or require behavior configuration? → Likely Configuration
-- Does this block require nesting other blocks, or use a complex structure that authors could more easily create as sections or default content that gets transformed into the block? → Consider Auto-Blocked
+## Step 2: Design Block Structure
 
-**Important:** Consider if multiple models should be supported. For example:
-- Simple cases might work best as Collection
-- Complex cases (with nested blocks) might need Auto-Blocked
-- Both can be equally valid - let decoration code handle the variations
+Design the structure your block will follow in a document, using these key guidelines:
 
-See `resources/advanced-scenarios.md` for patterns on supporting multiple models for one block.
+**Essential rules:**
+- Maximum 4 cells per row
+- Use semantic formatting (headings, bold, italic) to define meaning
+- Prefer block variants over config cells (use `| Hero (Dark) |` not `| style | dark |`)
+- Infer from context and use smart defaults to minimize author input
+- Be flexible with input structure - your decoration code can handle variations
 
-### Step 2: Design the Table Structure
+**Common patterns to reference:**
 
-Design your table structure following these key guidelines:
+These patterns align with the canonical models and can inform your design:
 
-**Key Guidelines:**
-- Limit to maximum 4 cells per row - group like elements into cells
-- Apply semantic formatting (headings, bold, italic) to define meaning
-- Prefer block variants over config cells
-- Infer from context and use smart defaults to limit what authors must input
-- Follow Postel's Law: "be conservative in what you do, be liberal in what you accept from others"
-  - Be flexible about the input structure authors provide. For example, in a hero block, all elements could be in one cell, split across 2 cells in one row, or in 2 separate rows - any of these can work with proper decoration code (it's just query selectors)
-  - Don't be overly prescriptive about structure when flexibility makes sense
-  - The goal is to make authoring easier, not to enforce rigid structures for developer convenience
+- **Standalone blocks:** Use rows/columns as needed for unique structures. Be flexible about how authors organize content. Example: Hero where image and text can be in separate rows, columns, or combined.
 
-**For each canonical model:**
+- **Collection blocks:** Each row = one item, columns = parts of each item. Keep columns consistent. Example: Cards with columns for [image] [heading, description, CTA].
 
-**Standalone blocks:**
-- Use rows or columns as needed for the unique structure
-- Be flexible about how authors organize content - your decoration code can handle variations
-- Use semantic formatting to identify elements (bold for headings, etc.) rather than rigid cell positions
-- Example: Hero block where image and text could be in separate rows, separate columns, or even combined - decoration code uses query selectors to find what it needs
+- **Configuration blocks:** Two-column key/value pairs for settings. Keep minimal - only true behavioral settings. Example: Blog Listing with `limit | 10`, `sort | date-desc`.
 
-**Collection blocks:**
-- Each row represents an item
-- Columns define the parts of each item
-- Keep columns consistent across all rows
-- Example: Cards with columns for image, heading, description
+- **Auto-Blocked content:** Design for simplest possible authoring. Often uses sections and section metadata. Example: Tabs auto-blocked from sections with H2 headings.
 
-**Configuration blocks:**
-- Two-column key/value pairs for settings or parameters
-- Keys in left column, values in right column
-- Keep configuration minimal - only true behavioral settings
-- Example: Blog Listing with keys like `limit | 10`, `sort | date-desc`, `tags | technology,news`
+**Detailed resources:**
+- Read `resources/canonical-models.md` for examples of good vs. bad block structures
+- If dealing with complex scenarios (nested blocks, lists, forms), see `resources/advanced-scenarios.md`
 
-**Auto-Blocked:**
-- Design for the simplest possible authoring experience
-- Often uses sections and section metadata to provide context
-- The pattern detection should feel "magical" to authors
-- Example: Tabs block that auto-blocks from a section containing multiple H2 headings with content, using section metadata for styling options
-
-### Step 3: Validate Against Best Practices
+## Step 3: Validate Against Best Practices
 
 Use this checklist to validate your content model:
 
-- [ ] Uses the appropriate canonical model type
 - [ ] Maximum 4 cells per row
 - [ ] Semantic formatting defines meaning (not just visual styling)
-- [ ] Model is predictable (clear what goes where)
-- [ ] Model is reusable (works across different authoring tools)
+- [ ] Structure is predictable (clear what goes where)
+- [ ] Structure is reusable (works across different authoring tools)
 - [ ] Smart defaults minimize required author input
 - [ ] Avoids configuration cells unless truly needed for dynamic content
-- [ ] Cell names/purposes are clear and meaningful
-- [ ] Consider edge cases (empty cells, optional content, etc.)
+- [ ] Considers edge cases (empty cells, optional content, etc.)
 
-**Common Anti-Patterns to Avoid:**
+**Common anti-patterns to avoid:**
 - ❌ Too many columns (>4 per row)
-- ❌ Using Configuration model when Standalone or Collection would work
-- ❌ Non-semantic cell content (e.g., "column1", "column2")
-- ❌ Requiring authors to input data that could be inferred or defaulted
+- ❌ Using configuration structure when simpler patterns would work
+- ❌ Header rows with cell names in collection blocks (making them spreadsheet-like)
+- ❌ Non-semantic cell content (splitting related content unnecessarily)
+- ❌ Requiring authors to input data that could be inferred
 - ❌ Complex nested structures that confuse authors
-- ❌ Models that only work in one specific authoring tool
+- ❌ Structures that only work in one specific authoring tool
 
-### Step 4: Document the Content Model
+## Step 4: Document and Return
 
 Provide the content model back to the calling skill (or user) in this format:
 
 ```markdown
 ## Content Model: [Block Name]
 
-### Block Type
-[Standalone | Collection | Configuration | Auto-Blocked]
-
-### Table Structure
+### Block Structure
 
 | Block Name |
 |------------|
-| [Cell description] |
+| [Cell description] | [Cell description] |
 | [Cell description] | [Cell description] |
 
 ### How It Works
-[Explain what authors create and how the table structure works. Describe the purpose of each row/column and any semantic formatting used.]
+[Explain what authors create and how the block structure works. Describe the
+purpose of each row/column and any semantic formatting used.]
 
 ### Key Points
 - [Important authoring guidelines]
-- [Examples of semantic formatting (e.g., "bold text indicates the heading")]
+- [Examples of semantic formatting (e.g., "h2 indicates the heading")]
 - [Any flexibility in structure (e.g., "content can be in one cell or split across two")]
 - [Common variants if applicable]
 ```
 
-**Important:** This skill focuses on designing the content model. The calling skill (content-driven-development or building-blocks) will handle what to do with it next, such as creating test content or implementing the block.
+**Important:** This skill focuses on designing the content model. After documenting the model, return this to the calling skill (content-driven-development or building-blocks), which will handle what to do next, such as creating test content or implementing the block.
 
 ## Resources
 
-- `resources/canonical-models.md` - The 4 canonical model types with detailed examples and best practices
-- `resources/advanced-scenarios.md` - Supporting multiple models, progressive enhancement, and complex patterns
+### `resources/canonical-models.md`
+Detailed guide to the 4 canonical block models (Standalone, Collection, Configuration, Auto-Blocked) with comprehensive examples showing both good and bad implementations. Includes "why this works" and "why this fails" explanations for each pattern, multiple variations, and anti-patterns to avoid.
 
-## Example Workflow
+### `resources/advanced-scenarios.md`
+Solutions for complex content modeling challenges including nested blocks, item-level configurations in collections, handling lists (with important guidance on not requiring authors to create lists), and form patterns.
 
-**Scenario:** User needs to create a hero block with an image, heading, and call-to-action
+## Key Principles Revisited
 
-**Process:**
+When in doubt, remember:
 
-1. **Identify Model Type**:
-   - This is likely a Standalone block (distinct visual element, typically appears once)
-   - Could also work as a simple Collection if multiple heroes are needed, but Standalone is more common
+1. **Understand content requirements first** - What does the block need to accomplish? What content elements are required? This understanding drives everything else.
+2. **Use canonical models as reference patterns** - The 4 canonical models (Standalone, Collection, Configuration, Auto-Blocked) are proven patterns to inform your design, not rigid templates to follow.
+3. **Keep it simple** - Authors should understand the structure intuitively. If it feels complex to explain, it's probably too complex to author.
+4. **Use semantic formatting** - Let the structure carry meaning through headings, bold, italic, etc. - not through cell positions or complex configurations.
+5. **Be flexible** - Your decoration code can handle variations in author input. Don't force authors into rigid structures for developer convenience.
+6. **Validate against best practices** - Check your design against guidelines (4 cells per row, avoid spreadsheet-like structures, etc.) to inform a better design and surface potential concerns.
 
-2. **Design Structure**:
-   - Start with a flexible approach that uses semantic formatting
-   - Authors could structure this multiple ways - decoration code will handle variations
-
-3. **Validate**:
-   - ✅ Standalone model (appropriate for hero)
-   - ✅ Semantic formatting will identify elements (H1 for heading, links for CTA)
-   - ✅ Flexible structure - can work with different layouts
-   - ✅ Reusable (works in any authoring tool)
-   - ✅ Under 4 cells per row
-
-4. **Document and Return to Calling Skill**:
-   ```markdown
-   ## Content Model: Hero
-
-   ### Block Type
-   Standalone
-
-   ### Table Structure
-   | Hero |
-   |------|
-   | [Image] |
-   | [Heading, description, and CTA] |
-
-   ### How It Works
-   Authors create a hero block using a simple table. The structure is flexible:
-   - Image can be in its own row or column
-   - Text content (heading, description, CTA) can be together or separated
-   - Decoration code uses semantic formatting to identify elements:
-     - H1 or bold text → heading
-     - Regular paragraphs → description
-     - Links → call-to-action
-
-   ### Key Points
-   - Use H1 or bold formatting for the main heading
-   - Structure is flexible - all content in one row, split across two rows, or in columns all work
-   - Image should be high-resolution (minimum 2000px wide for full-width heroes)
-   - Variants available: `Hero (Dark)`, `Hero (Centered)`, etc.
-   ```
-
-   *Skill returns this content model to CDD or building-blocks skill for next steps.*
-
-## Integration with Other Skills
-
-**Called from content-driven-development:**
-- CDD invokes this skill at Step 1.2 when new content models are needed
-- After completing this skill, return to CDD to continue with content creation
-
-**Calls to other skills:**
-- May reference **block-collection-and-party** to find similar blocks for pattern inspiration
-- Completed models are used by **building-blocks** during implementation
-
-## Key Takeaways
-
-1. **Choose the right canonical model first** - this drives everything else
-2. **Keep it simple** - authors should understand the model intuitively
-3. **Use semantic formatting** - let the structure carry meaning
-4. **Validate ruthlessly** - check against all best practices before finalizing
-5. **Document clearly** - both the structure and the reasoning behind it
-
-Content models are the foundation of author experience. Invest time here to create intuitive, maintainable structures that serve authors well.
+Content models are the foundation of author experience. Invest time in understanding requirements and designing thoughtful structures.

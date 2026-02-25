@@ -7,20 +7,18 @@
  * helping developers identify existing content for testing during development.
  *
  * Usage:
- *   node find-block-content.js <block-name> [host] [variant]
+ *   node find-block-content.js <block-name> [host]
  *
  * Examples:
  *   node find-block-content.js hero
  *   node find-block-content.js hero localhost:3000
  *   node find-block-content.js hero main--mysite--owner.aem.live
  *   node find-block-content.js hero main--mysite--owner.aem.page
- *   node find-block-content.js hero localhost:3000 dark
- *   node find-block-content.js cards main--mysite--owner.aem.live three-up
  *
  * The script will:
  * 1. Query the site's query-index for all pages
- * 2. Check each page for the specified block (and variant if provided)
- * 3. Report all pages containing the block with their URLs
+ * 2. Check each page for the specified block
+ * 3. Report all pages containing the block with their URLs and variant info
  *
  * Defaults to localhost:3000 if no host specified
  */
@@ -42,8 +40,6 @@ async function fetchQueryIndex(host) {
   let offset = 0;
   const paths = [];
   let more = true;
-
-  console.log(`Fetching query index from ${host}...\n`);
 
   do {
     try {
@@ -67,29 +63,23 @@ async function fetchQueryIndex(host) {
 
       more = data.length === limit;
       offset += limit;
-
-      if (more) {
-        console.log(`Fetched ${paths.length} pages so far...`);
-      }
     } catch (err) {
       console.error(`Error fetching query index: ${err.message}`);
       more = false;
     }
   } while (more);
 
-  console.log(`\nTotal pages found: ${paths.length}\n`);
   return paths;
 }
 
 /**
- * Check if a page contains the specified block (and optional variant)
+ * Check if a page contains the specified block and extract variant info
  * @param {string} host - The host to query
  * @param {string} path - The page path
  * @param {string} blockName - Name of block to find
- * @param {string} variant - Optional variant name to match
- * @returns {Promise<boolean>} True if block is found
+ * @returns {Promise<Object|null>} Object with count and variants, or null if not found
  */
-async function pageContainsBlock(host, path, blockName, variant = null) {
+async function pageContainsBlock(host, path, blockName) {
   try {
     // Use http for localhost, https for everything else
     const protocol = host.startsWith('localhost') ? 'http' : 'https';
@@ -97,7 +87,7 @@ async function pageContainsBlock(host, path, blockName, variant = null) {
     const res = await fetch(url);
 
     if (!res.ok) {
-      return false;
+      return null;
     }
 
     const html = await res.text();
@@ -112,20 +102,26 @@ async function pageContainsBlock(host, path, blockName, variant = null) {
     const blockElements = document.querySelectorAll(selector);
 
     if (blockElements.length === 0) {
-      return false;
+      return null;
     }
 
-    // If no variant specified, any instance of the block counts
-    if (!variant) {
-      return true;
-    }
+    // Extract variants from all block instances
+    const variants = new Set();
+    Array.from(blockElements).forEach((element) => {
+      // Get all classes except the block name itself
+      Array.from(element.classList).forEach((className) => {
+        if (className !== blockName && className !== 'block') {
+          variants.add(className);
+        }
+      });
+    });
 
-    // Check if any block instance has the specified variant
-    return Array.from(blockElements).some((element) =>
-      element.classList.contains(variant)
-    );
+    return {
+      count: blockElements.length,
+      variants: Array.from(variants).sort(),
+    };
   } catch (err) {
-    return false;
+    return null;
   }
 }
 
@@ -134,24 +130,23 @@ async function pageContainsBlock(host, path, blockName, variant = null) {
  * @param {string} host - The host to query
  * @param {string[]} paths - Array of page paths
  * @param {string} blockName - Name of block to find
- * @param {string} variant - Optional variant name
  * @param {number} concurrency - Number of concurrent requests
- * @returns {Promise<string[]>} Array of paths containing the block
+ * @returns {Promise<Array>} Array of objects with path, count, and variants
  */
-async function findBlockInPages(host, paths, blockName, variant = null, concurrency = 10) {
+async function findBlockInPages(host, paths, blockName, concurrency = 10) {
   const matches = [];
   const inFlight = new Set();
-
-  const searchTerm = variant ? `"${blockName}" block with "${variant}" variant` : `"${blockName}" block`;
-  console.log(`Searching ${paths.length} pages for ${searchTerm}...\n`);
 
   for (let i = 0; i < paths.length; i += 1) {
     const path = paths[i];
 
-    const promise = pageContainsBlock(host, path, blockName, variant).then((found) => {
-      if (found) {
-        matches.push(path);
-        console.log(`✓ Found: ${path}`);
+    const promise = pageContainsBlock(host, path, blockName).then((result) => {
+      if (result) {
+        matches.push({
+          path,
+          count: result.count,
+          variants: result.variants,
+        });
       }
       inFlight.delete(promise);
     });
@@ -190,25 +185,19 @@ function getHost(host) {
 async function main() {
   const blockName = process.argv[2];
   const hostArg = process.argv[3];
-  const variantArg = process.argv[4];
 
   if (!blockName) {
     console.error('Error: Block name is required');
-    console.error('\nUsage: node find-block-content.js <block-name> [host] [variant]');
+    console.error('\nUsage: node find-block-content.js <block-name> [host]');
     console.error('\nExamples:');
     console.error('  node find-block-content.js hero');
     console.error('  node find-block-content.js hero localhost:3000');
     console.error('  node find-block-content.js hero main--mysite--owner.aem.live');
-    console.error('  node find-block-content.js hero localhost:3000 dark');
-    console.error('  node find-block-content.js cards main--mysite--owner.aem.live three-up');
+    console.error('  node find-block-content.js cards main--mysite--owner.aem.page');
     process.exit(1);
   }
 
   const host = getHost(hostArg);
-  const searchTerm = variantArg ? `"${blockName}" block with "${variantArg}" variant` : `"${blockName}" block`;
-  console.log(`Searching for ${searchTerm} on ${host}\n`);
-  console.log('─'.repeat(60));
-  console.log();
 
   // Fetch all pages from query index
   const paths = await fetchQueryIndex(host);
@@ -222,37 +211,24 @@ async function main() {
   }
 
   // Search for block in pages
-  const matches = await findBlockInPages(host, paths, blockName, variantArg);
-
-  console.log();
-  console.log('─'.repeat(60));
-  console.log();
+  const matches = await findBlockInPages(host, paths, blockName);
 
   // Report results
   if (matches.length === 0) {
-    const notFoundMsg = variantArg
-      ? `No pages found containing the "${blockName}" block with "${variantArg}" variant.`
-      : `No pages found containing the "${blockName}" block.`;
-    console.log(notFoundMsg);
+    console.log(`No pages found containing the "${blockName}" block.`);
     console.log('\nThis might mean:');
     console.log('- The block is new and no content exists yet');
     console.log('- The block name is spelled differently');
-    if (variantArg) {
-      console.log('- The variant name is spelled differently');
-      console.log(`- The block exists but not with the "${variantArg}" variant`);
-    }
     console.log('- Content exists but hasn\'t been published');
   } else {
-    const resultMsg = variantArg
-      ? `✓ Found ${matches.length} page(s) containing the "${blockName}" block with "${variantArg}" variant:\n`
-      : `✓ Found ${matches.length} page(s) containing the "${blockName}" block:\n`;
-    console.log(resultMsg);
+    console.log(`Found ${matches.length} page(s) containing the "${blockName}" block:\n`);
 
-    matches.forEach((path, index) => {
-      console.log(`${index + 1}. https://${host}${path}`);
+    matches.forEach((match, index) => {
+      const protocol = host.startsWith('localhost') ? 'http' : 'https';
+      const countInfo = match.count > 1 ? ` (${match.count} instances)` : '';
+      const variantInfo = match.variants.length > 0 ? ` - variants: ${match.variants.join(', ')}` : '';
+      console.log(`${index + 1}. ${protocol}://${host}${match.path}${countInfo}${variantInfo}`);
     });
-
-    console.log('\nYou can use these pages for testing during development.');
   }
 }
 
