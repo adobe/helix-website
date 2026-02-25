@@ -283,6 +283,12 @@ export function decorateGuideTemplateHero(main) {
 export function decorateGuideTemplateLinks(main) {
   const links = main.querySelectorAll('.content a');
   links.forEach((link) => {
+    const url = new URL(link.href);
+    if (url.pathname.startsWith('/block-collection/')) {
+      // Links on a different aem.live domain are made relative to current domain.
+      // Restore for block collection links.
+      link.href = `https://main--aem-block-collection--adobe.aem.live${url.pathname}`;
+    }
     link.setAttribute('target', returnLinkTarget(link.href));
   });
 }
