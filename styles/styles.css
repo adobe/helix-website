@@ -184,16 +184,16 @@
   --color-search-highlight: light-dark(rgb(255 208 0 / 30%), rgb(255 208 0 / 75%));
 
   /* Release tag colors */
-  --color-release-blue: #d4e8ff;
-  --color-release-pink: #ffd4f1;
-  --color-release-green: #d1ffed;
-  --color-release-gray: #e8e8e8;
-  --color-release-lime: #e4e8bf;
-  --color-release-yellow: #f4f8cf;
-  --color-release-orange: #ffebd4;
-  --color-release-cyan: #cfebf8;
-  --color-release-purple: #edd1ff;
-  --color-release-peach: #ffe4d4;
+  --color-release-blue: light-dark(#d4e8ff, #1a3352);
+  --color-release-pink: light-dark(#ffd4f1, #3d1a33);
+  --color-release-green: light-dark(#d1ffed, #1a3d2e);
+  --color-release-gray: light-dark(#e8e8e8, #3a3a3a);
+  --color-release-lime: light-dark(#e4e8bf, #2e3318);
+  --color-release-yellow: light-dark(#f4f8cf, #33301a);
+  --color-release-orange: light-dark(#ffebd4, #3d2a1a);
+  --color-release-cyan: light-dark(#cfebf8, #1a2e3d);
+  --color-release-purple: light-dark(#edd1ff, #2e1a3d);
+  --color-release-peach: light-dark(#ffe4d4, #3d261a);
 
   /* Grid / container width -- 600px, 900px */
   --grid-mobile-container-width: 88%;
