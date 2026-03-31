@@ -134,7 +134,7 @@ export default class DataLoader {
     const promises = [];
     for (let i = 0; i < months; i += 1) {
       promises.push(this.fetchUTCMonth(date.toISOString()));
-      date.setMonth(date.getMonth() - 1);
+      date.setUTCMonth(date.getUTCMonth() - 1, 1);
     }
     const chunks = Promise.all(promises);
     return chunks;
@@ -181,7 +181,7 @@ export default class DataLoader {
 
       for (let i = 0; i < months; i += 1) {
         promises.push(this.fetchUTCMonth(start.toISOString(), originalStart, end));
-        start.setMonth(start.getMonth() + 1);
+        start.setUTCMonth(start.getUTCMonth() + 1, 1);
       }
     }
 
