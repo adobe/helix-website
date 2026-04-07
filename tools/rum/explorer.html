@@ -3,8 +3,17 @@
 <head>
   <title>Operational Telemetry (OpTel) Explorer | AEM Live</title>
   <script>
-    if (window.location.hostname === 'www.aem.live') {
-      const url = new URL('https://tools.aem.live/tools/optel/explorer/explorer.html');
+    const { hostname } = window.location;
+    let target;
+    if (hostname === 'www.aem.live') {
+      target = 'https://tools.aem.live/tools/optel/explorer/explorer.html';
+    } else if (hostname.endsWith('--helix-website--adobe.aem.live')) {
+      target = 'https://main--helix-tools-website--adobe.aem.live/tools/optel/explorer/explorer.html';
+    } else if (hostname.endsWith('--helix-website--adobe.aem.page')) {
+      target = 'https://main--helix-tools-website--adobe.aem.page/tools/optel/explorer/explorer.html';
+    }
+    if (target) {
+      const url = new URL(target);
       url.search = window.location.search;
       window.location.replace(url.href);
     }
