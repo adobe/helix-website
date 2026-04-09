@@ -2,6 +2,20 @@
 
 <head>
   <title>Operational Telemetry Explorer | AEM Live</title>
+  <script>
+    (() => {
+      const { hostname } = window.location;
+      if (hostname === 'localhost') return;
+      const path = '/tools/optel/oversight/explorer.html';
+      const match = hostname.match(/^.+--helix-website--adobe\.aem\.(page|live)$/);
+      const target = match
+        ? `https://main--helix-tools-website--adobe.aem.${match[1]}${path}`
+        : `https://tools.aem.live${path}`;
+      const url = new URL(target);
+      url.search = window.location.search;
+      window.location.replace(url.href);
+    })();
+  </script>
   <script type="importmap">{"imports": {
     "chartjs": "https://esm.sh/chart.js@4.4.8",
     "chartjs-adapter-luxon": "https://esm.sh/chartjs-adapter-luxon@1.3.1?deps=chart.js@4.4.8",
