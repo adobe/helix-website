@@ -719,7 +719,7 @@ async function buildForm(block) {
   });
   // Try to load Altcha script dynamically
   const altchaScript = createTag('script', {
-    src: 'https://cdn.jsdelivr.net/gh/altcha-org/altcha@main/dist/altcha.min.js',
+    src: 'https://cdn.jsdelivr.net/gh/altcha-org/altcha/dist/altcha.min.js',
     async: 'true',
     defer: 'true',
     nonce: 'aem',
