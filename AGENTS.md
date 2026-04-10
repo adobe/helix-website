@@ -2,13 +2,12 @@
 
 This project is a website built with Edge Delivery Services in Adobe Experience Manager Sites as a Cloud Service. As an agent, follow the instructions in this file to deliver code based on Adobe's standards for fast, easy-to-author, and maintainable web experiences.
 
+<!-- upskill:skills:start -->
 ## Skills
 
-You have access to a set of skills in .claude/skills. Each skill consists of a SKILL.md file, and other files such as scripts and resources, which are referenced from there.
+You have access to a set of skills in .claude/skills. Each skill consists of a SKILL.md file that may reference other files such as scripts and resources. When asked to perform a task, check if any of the available skills can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge, so you should trust them and follow their instructions. **Your job is to match tasks to skills and then follow the expanded skill instructions.**
 
-**YOU ARE REQUIRED TO USE THESE SKILLS TO ACCOMPLISH DEVELOPMENT TASKS. FAILING TO DO SO WILL RESULT IN WASTED TIME AND CYCLES.**
-
-### How Skills Work
+### Skill Structure
 
 Each skill is a directory in `.claude/skills/` with the following structure:
 
@@ -26,30 +25,75 @@ The SKILL.md file contains detailed instructions that you must follow exactly as
 - Reduce errors by codifying expert knowledge
 - Chain together when tasks require multiple skill applications
 
-### Skill Discovery and Execution Process
+Always use the following process for finding and using skills:
 
-Always use the following process:
+1. Discover Skills
+2. Select Skills to Use
+3. Execute Skill Instructions
 
-1. **Discovery**: When a new conversation starts, discover available skills by running `./.agents/discover-skills`. This script will show you all available skills with their names, paths, and descriptions without loading everything into context.
+### 1. Discover Skills
 
-2. **Selection**: Use each skill based on its name and description when it feels appropriate to do so. Think carefully about all the skills available to you and choose the best ones to use. Note that some skills may reference other skills, so you may need to apply more than one skill to get things done.
+When a new conversation starts, discover available skills by running `./.agents/discover-skills`. This script shows you all available skills with their names, paths, and descriptions and ensures you know what tools are available before starting work.
 
-3. **Execution**: When you need to use a skill:
-   - Read the full SKILL.md file
-   - Announce you are doing so by saying "Using Skill: {Skill Name}"
-   - Follow the skill's instructions exactly as written
-   - Read any referenced resources or scripts as needed
-   - Complete all steps in the skill before moving to the next task
+### 2. Select Skills to Use 
 
-### Available Skills
+When the user asks you to perform a task, match the task to available skills using these criteria:
 
-Skills will be added to `.claude/skills/` as needed for this project. Check the `.claude/skills/` directory or run `./.agents/discover-skills` for the current list of available skills.
+**Matching Process:**
 
-**For ALL development work involving blocks, core scripts, or functionality, you MUST start with the content-driven-development skill.** It will orchestrate other skills as needed throughout the development workflow.
+  - Identify the task type (development, research, testing, documentation)
+  - Compare task keywords to skill descriptions (e.g., "carousel" → look for "block" or "component" skills)
+  - Let skill descriptions be your guide. The description tells you when/how to use each skill
+  - If multiple skills seem applicable, prefer the one with the most specific description matching your task
+
+**Multiple Skills:**
+     
+  Some tasks require multiple skills in sequence. For example:
+
+  - Research references (`block-collection-and-party`) → Build block (`content-driven-development`) → Test (`testing-blocks`)
+  - Skills may reference other skills internally - follow those references
+
+**Skill Constraints:**
+
+  - Only use skills listed by the discover-skills script
+  - Don't use skills that are already running
+
+### 3. Execute Skill Instructions
+
+When you need to use a skill:
+  - Announce you are doing so by saying "Using Skill: {Skill Name}"
+  - Read the full SKILL.md file
+  - Follow the skill's instructions exactly as written
+  - Read any referenced resources or scripts as needed
+  - Complete all steps in the skill before moving to the next task
+
+**Tool Mapping:**
+
+When skills reference tools you don't have, substitute your equivalent tools. Some examples:
+  - `TodoWrite` → Use your planning/task tracking tool
+  - `Skill` → Follow these instructions for executing skills
+  - `WebFetch` → Use your Bash/Shell tool and execute curl to retrieve the page mentioned
+  - `Read`, `Write`, `Edit`, `Bash` → Use your native tools with similar functions
+  
+  When in doubt, try your best to follow the instructions as written using the tools you have available.
+
+### Important Skills
+
+Two skills serve as primary entry points for common workflows:
+
+**content-driven-development** - Start here for ALL code changes including: new blocks, block modifications, CSS styling, bug fixes, core functionality (scripts.js, styles.css, delayed.js), auto-blocking changes, or any JavaScript/CSS work. This skill orchestrates the complete development workflow from content modeling through implementation and testing.
+
+⚠️ IMPORTANT: Even "simple" changes like CSS tweaks or small bug fixes should use CDD. The workflow ensures you have test content and validation, both required for PR approval and automated checks.
+
+**page-import** - Start here when importing or migrating webpages from any URL to AEM Edge Delivery Services. This skill orchestrates the complete import workflow including scraping, analysis, structure identification, and HTML generation.
+
+All other skills are either invoked by these primary skills or used for specific standalone tasks (e.g., searching platform documentation, finding reference implementations). Let skill descriptions guide you to the right tool for your task.
+
+<!-- upskill:skills:end -->
 
 ## Project Overview
 
-This project is based on the https://github.com/adobe/aem-boilerplate/ project and set up as a new project. You are expected to follow the coding style and practices established in the boilerplate, but add functionality according to the needs of the site currently developed.
+This project is based on the https://github.com/adobe/aem-boilerplate/ project. You are expected to follow the coding style and practices established in the boilerplate, adding functionality according to the needs of the site being developed.
 
 The repository provides the basic structure, blocks, and configuration needed to run a complete site with `*.aem.live` as the backend.
 
@@ -63,8 +107,7 @@ The repository provides the basic structure, blocks, and configuration needed to
 ## Setup Commands
 
 - Install dependencies: `npm install`
-- Start local development: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs` (run in background, if possible)
-  - Install the AEM CLI globally by running `npm install -g @adobe/aem-cli` then `aem up` is equivalent to the command above
+- Start local dev server, See "Local development" below
 - Run linting: `npm run lint`
 - Fix linting issues: `npm run lint:fix`
 
@@ -119,9 +162,9 @@ CMS authored content is a key part of every AEM Website. The content of a page i
 **For development workflow:** Use the **content-driven-development** skill for all development tasks. This skill ensures you identify or create test content before writing code, following AEM best practices.
 
 **Quick tips:**
-- Inspect page structure: `curl http://localhost:3000/path/to/page`
+- Inspect initial page structure: `curl http://localhost:3000/path/to/page`
 - View source markdown: `curl http://localhost:3000/path/to/page.md`
-- Local test content: Use `--html-folder drafts` flag when starting dev server
+- Local test content: Use `--html-folder drafts` flag when starting dev server. Note: the folder is still part of the path when using this option. Ex: a file at `drafts/test.plain.html` would be accessed at `http://localhost:3000/drafts/test`
 
 ### Blocks
 
@@ -129,11 +172,7 @@ Blocks are the re-usable building blocks of AEM. Blocks add styling and function
 
 **Key principle:** The initial content structure is the contract between authors and developers. Design this structure before writing any code, and be careful when making changes that could break existing pages.
 
-**For creating or modifying blocks:** Use the **building-blocks** skill which guides you through:
-- Content model design (via content-driven-development)
-- JavaScript decoration patterns
-- CSS styling conventions
-- Testing and validation
+**For creating or modifying blocks:** Use the **content-driven-development** skill which orchestrates the complete workflow from content modeling through implementation and testing.
 
 **Tip:** Use `curl http://localhost:3000/path/to/page` to inspect the HTML delivered by the backend before making assumptions.
 
@@ -157,8 +196,11 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 3. Validation and testing (invokes testing-blocks skill)
 
 ### Local Development
-1. Run `npx -y @adobe/aem-cli up --no-open` to start the AEM Proxy server
-2. Open `http://localhost:3000` in your browser, puppeteer, playwright, or other tools. If none of those are available, instruct the human to open the URL in the browser and give feedback
+1. Run `aem up --no-open --forward-browser-logs` to start the AEM Proxy server
+  - Run in background if possible
+  - Requires AEM CLI installed globally: `npm install -g @adobe/aem-cli`
+  - Alternative: `npx -y @adobe/aem-cli up --no-open --forward-browser-logs
+2. Open `http://localhost:3000` in your browser, playwright, or other tools. If none of those are available, instruct the human to open the URL in the browser and give feedback
 3. Make changes to files - they will auto-reload
 4. Use browser dev tools to test responsive design
 
@@ -172,7 +214,7 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 
 **For comprehensive testing guidance:** Use the **testing-blocks** skill which covers:
 - Unit testing for logic-heavy utilities
-- Browser testing with Playwright/Puppeteer
+- Browser testing with Playwright
 - Linting and code quality
 - Performance validation
 - PR preparation
@@ -192,15 +234,15 @@ For all other environments, you need to know the GitHub owner and repository nam
 
 With this information, you can construct URLs for the preview environment (same content as `localhost:3000`) and the production environment (same content as the live website, approved by authors)
 
-- **Production Preview**: `https://main--{repo}--{owner}.aem.page/`
-- **Production Live**: `https://main--{repo}--{owner}.aem.live/`
-- **Feature Preview**: `https://{branch}--{repo}--{owner}.aem.page/`
+- **Production Preview**: `https://main--helix-website--adobe.aem.page/`
+- **Production Live**: `https://main--helix-website--adobe.aem.live/`
+- **Feature Preview**: `https://{branch}--helix-website--adobe.aem.page/`
 
 ### Publishing Process
 1. Push changes to a feature branch
 2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
 3. Open a pull request to merge changes to `main`
-   - **REQUIRED:** Include preview link in PR description: `https://{branch}--{repo}--{owner}.aem.page/{path}`
+   - **REQUIRED:** Include preview link in PR description: `https://{branch}--helix-website--adobe.aem.page/{path}`
    - This link is used for automated performance testing (PSI checks)
    - Without this link, your PR will be rejected
 4. Verify checks pass: `gh checks` or `gh pr checks --watch`
