@@ -83,6 +83,16 @@ dataChunks.addSeries('contentEngagement', (bundle) => {
   return viewEvents.length;
 });
 
+// Extract redirect duration (ms) from redirect checkpoint target
+// Format: "<count>:<duration>" (internal) or "<estimate>~<duration>" (external)
+dataChunks.addSeries('redirectDuration', (bundle) => {
+  const evt = bundle.events.find((e) => e.checkpoint === 'redirect' && typeof e.target === 'string');
+  if (!evt) return undefined;
+  const m = evt.target.match(/^(\d+)([:~])(\d+)$/);
+  if (!m) return undefined;
+  return Number.parseInt(m[3], 10);
+});
+
 function setDomain(domain, key) {
   DOMAIN = domain;
   loader.domain = domain;
@@ -294,6 +304,42 @@ function updateDataFacets(filterText, params, checkpoint) {
       if (cp === 'enter') {
         dataChunks.addFacet('enter.source', enterSource);
       }
+
+      // special handling for redirect checkpoint: the target is encoded as
+      // "<count>:<duration>" (internal) or "<estimate>~<duration>" (external)
+      // Override the default redirect.target facet to show only the hop count,
+      // and add a redirect.type facet for internal/external.
+      if (cp === 'redirect') {
+        const redirectTargetRe = /^(\d+)([:~])(\d+)$/;
+        // Override redirect.target to show clean hop counts instead of raw values
+        dataChunks.addFacet('redirect.target', (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'redirect')
+            .reduce((acc, evt) => {
+              const m = typeof evt.target === 'string' && evt.target.match(redirectTargetRe);
+              if (m) acc.add(m[1]);
+              return acc;
+            }, new Set()),
+        ));
+        dataChunks.addFacet('redirect.count', (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'redirect')
+            .reduce((acc, evt) => {
+              const m = typeof evt.target === 'string' && evt.target.match(redirectTargetRe);
+              if (m) acc.add(m[1]);
+              return acc;
+            }, new Set()),
+        ));
+        dataChunks.addFacet('redirect.type', (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'redirect')
+            .reduce((acc, evt) => {
+              const m = typeof evt.target === 'string' && evt.target.match(redirectTargetRe);
+              if (m) acc.add(m[2] === '~' ? 'external' : 'internal');
+              return acc;
+            }, new Set()),
+        ));
+      }
     });
 
   if (typeof herochart.updateDataFacets === 'function') {
@@ -304,6 +350,9 @@ function updateDataFacets(filterText, params, checkpoint) {
 function updateFilter(params, filterText) {
   const filter = ([key]) => false // TODO: find a better way to filter out non-facet keys
     || (isKnownFacet(key) && !key.endsWith('~'))
+    // also accept dynamically registered facets (e.g. redirect.type, redirect.count)
+    // exclude 'filter' which has its own special condition below
+    || (key !== 'filter' && key in dataChunks.facetFns && !key.endsWith('~'))
     || (key === 'filter' && filterText.length > 2);
   const transform = ([key, value]) => [key, value];
   dataChunks.filter = parseSearchParams(params, filter, transform);
