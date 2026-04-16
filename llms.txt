@@ -47,7 +47,7 @@ Build blazingly fast websites using tools content creators and developers alread
 
 ## Optional
 
-- [Sidekick Chrome Extension](https://chromewebstore.google.com/detail/aem-sidekick/igkmdomcgoebiipaifhbjccggml)
+- [Sidekick Chrome Extension](https://chromewebstore.google.com/detail/aem-sidekick/igkmdomcgoebiipaifhmpfjhbjccggml)
 - [Github Bot](https://github.com/apps/aem-code-sync)
 - [AEM Tools](https://tools.aem.live/)
 - [AEM Labs](https://labs.aem.live/)
