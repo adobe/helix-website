@@ -16,6 +16,8 @@ Build blazingly fast websites using tools content creators and developers alread
 - [Favicon](https://www.aem.live/developer/favicon.md)
 - [Custom Headers](https://www.aem.live/docs/custom-headers.md)
 - [Best Practices for Developers](https://www.aem.live/docs/dev-collab-and-good-practices.md)
+- [AI Coding Agents](https://www.aem.live/developer/ai-coding-agents.md)
+- [Document Authoring](https://docs.da.live)
 - [Where to Author](https://www.aem.live/docs/authoring-guide.md)
 - [Authoring](https://www.aem.live/docs/authoring.md)
 - [Authoring with AEM](https://www.aem.live/docs/aem-authoring.md)
@@ -39,6 +41,8 @@ Build blazingly fast websites using tools content creators and developers alread
 ## API
 
 - [Admin API](https://www.aem.live/docs/admin.html)
+- [DA Admin API Reference](https://opensource.adobe.com/da-admin/)
+- [DA MCP Server](https://docs.da.live/about/early-access/da-mcp)
 - [aem CLI Reference](https://www.aem.live/developer/cli-reference.md)
 
 ## Optional
