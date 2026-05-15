@@ -10,3 +10,9 @@
 .video video {
   width: 100%;
 }
+
+body.blog-template .video-wrapper {
+  max-width: var(--blog-content-width, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}

@@ -404,8 +404,12 @@ aside {
     margin-right: 0;
   }
 
+  body.blog-template {
+    --blog-content-width: 70%;
+  }
+
   .blog-template .default-content-wrapper {
-    max-width: 70%;
+    max-width: var(--blog-content-width);
   }
 }
 
@@ -422,8 +426,12 @@ aside {
     max-width: var(--grid-desktop-container-width);
   }
 
+  body.blog-template {
+    --blog-content-width: 60%;
+  }
+
   .blog-template .default-content-wrapper {
-    max-width: 60%;
+    max-width: var(--blog-content-width);
     height: 50%;
   }
 }
