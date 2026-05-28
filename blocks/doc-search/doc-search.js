@@ -265,13 +265,8 @@ function hideResults(container) {
   if (aside) aside.classList.remove('expand');
 }
 
-function getIdFromSectionMetadata(section) {
-  const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)')?.textContent;
-  return sectionId;
-}
-
 function createSearchResultObject(doc, terms, source) {
-  const id = doc.querySelector('h3')?.id || getIdFromSectionMetadata(doc);
+  const id = doc.id || doc.querySelector('h3')?.id;
   return {
     title: doc.querySelector('h3')?.textContent || '',
     description: doc.querySelector('p')?.textContent || '',
