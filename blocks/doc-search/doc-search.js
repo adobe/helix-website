@@ -271,7 +271,7 @@ function getIdFromSectionMetadata(section) {
 }
 
 function createSearchResultObject(doc, terms, source) {
-  const id = getIdFromSectionMetadata(doc);
+  const id = doc.querySelector('h3')?.id || getIdFromSectionMetadata(doc);
   return {
     title: doc.querySelector('h3')?.textContent || '',
     description: doc.querySelector('p')?.textContent || '',
