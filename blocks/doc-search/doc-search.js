@@ -265,17 +265,11 @@ function hideResults(container) {
   if (aside) aside.classList.remove('expand');
 }
 
-function getIdFromSectionMetadata(section) {
-  const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)')?.textContent;
-  return sectionId;
-}
-
 function createSearchResultObject(doc, terms, source) {
-  const id = getIdFromSectionMetadata(doc);
   return {
     title: doc.querySelector('h3')?.textContent || '',
     description: doc.querySelector('p')?.textContent || '',
-    path: `/docs/faq#${id}` || '',
+    path: doc.id ? `/docs/faq#${doc.id}` : '/docs/faq',
     image: window.faqImage || '/default-meta-image.jpg',
     content: doc.innerHTML,
     terms,
