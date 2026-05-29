@@ -573,7 +573,13 @@ export default async function decorate(block) {
 
   // build search bar
   const form = createTag('form');
-  const search = createTag('input', { type: 'search', 'aria-label': 'Search the documentation', placeholder: 'Search the documentation' });
+  const search = createTag('input', {
+    type: 'search',
+    'aria-label': 'Search',
+    placeholder: 'Search the documentation',
+    name: 'search',
+  });
+
   const clear = createTag('button', { type: 'reset' }, '✕');
   const icon = buildSearchIcon();
   form.append(icon, search, clear);

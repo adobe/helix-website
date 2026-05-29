@@ -30,6 +30,11 @@
   display: none;
 }
 
+/* remove doc-search block padding when it sits directly in the aside (mobile) */
+.side-navigation-wrapper > .doc-search {
+  padding: 0;
+}
+
 .side-navigation {
   width: 300px;
   border-radius: 16px;
@@ -53,30 +58,11 @@
   background: light-dark(var(--color-white), #1e1e1e);
 }
 
-.side-navigation.overlay .search-input-wrapper {
-  display: none;
-}
-
-@media screen and (width <= 899px) {
-  .guides-template .without-full-width-hero .search-input-wrapper {
+/* hide desktop search block from mobile overlay */
+@media screen and (width < 900px) {
+  .side-navigation .doc-search {
     display: none;
   }
-}
-
-.side-navigation-wrapper input[type="text"] {
-  width: 100%;
-  border: solid 1px light-dark(lightgray, #505050);
-  padding: var(--spacing-xxs) var(--spacing-xs);
-  box-sizing: border-box;
-  border-radius: 8px;
-  font-family: var(--body-font-family);
-  font-size: var(--type-body-xs-size);
-  background: light-dark(var(--color-white), #2c2c2c);
-  color: light-dark(var(--color-black), #e8e8e8);
-}
-
-.side-navigation-wrapper input[type="text"]::placeholder {
-  color: light-dark(var(--color-gray-700), #8a8a8a);
 }
 
 .side-navigation a {
@@ -338,6 +324,7 @@
   padding: unset;
 }
 
+/* combined header search result styles here for consistency */
 .results-wrapper {
   list-style: none;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -488,7 +475,8 @@
     align-items: flex-start;
   }
 
-  .side-navigation-wrapper > .search-input-wrapper {
+  /* hide mobile search block on desktop — it lives inside the sidebar there */
+  .side-navigation-wrapper > .doc-search {
     display: none;
   }
 
