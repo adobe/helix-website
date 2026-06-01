@@ -49,29 +49,35 @@ export default async function decorate(block) {
   const backBtnInner = '<button class="back-btn">Back</button>';
   const backBtn = createTag('div', { class: 'side-navigation-overlay-btn-wrapper' }, backBtnInner);
 
-  const searchInputInner = '<input type="text" name="search" placeholder="Search...">';
-  const searchInput = createTag('div', { class: 'search-input-wrapper' }, searchInputInner);
-  const searchInputOuter = searchInput.cloneNode(true);
+  const skipLink = createTag('a', { class: 'skip-link', href: '#search-results' }, 'Skip to results');
+
+  // Desktop: doc-search inside side-nav overlay, results expand alongside nav (hidden on mobile)
   const resultsContainer = createTag('div', { class: 'results-wrapper', id: 'search-results' });
   aside.append(resultsContainer);
-
-  const skipLink = createTag('a', { class: 'skip-link', href: '#search-results' }, 'Skip to results');
   const searchBlock = buildBlock('doc-search', [[
     '<a href="/docpages-index.json">Search</a>',
     '<a href="/docs/faq">FAQ</a>',
   ]]);
   searchBlock.dataset.resultsContainerClass = 'results-wrapper';
-  aside.prepend(docButton);
-  aside.prepend(searchInputOuter);
-  block.prepend(skipLink);
 
+  // Mobile: doc-search directly in aside, shares results-wrapper with desktop block
+  const mobileSearchBlock = buildBlock('doc-search', [[
+    '<a href="/docpages-index.json">Search</a>',
+    '<a href="/docs/faq">FAQ</a>',
+  ]]);
+  mobileSearchBlock.dataset.resultsContainerClass = 'results-wrapper';
+
+  aside.prepend(docButton);
+  aside.prepend(mobileSearchBlock);
+
+  block.prepend(skipLink);
   block.prepend(backBtn);
-  // block.prepend(searchInput);
   block.prepend(searchBlock);
+
+  decorateBlock(mobileSearchBlock);
+  await loadBlock(mobileSearchBlock);
   decorateBlock(searchBlock);
   await loadBlock(searchBlock);
-
-  // loadSearch([searchInput, searchInputOuter], resultsContainer);
   // add backdrop overlay
   const backdropCurtain = createTag('div', { class: 'side-navigation-curtain' }, '');
   aside.append(backdropCurtain);

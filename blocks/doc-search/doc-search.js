@@ -260,19 +260,16 @@ export function displayResults(matches, terms, container, isHomepage) {
  */
 function hideResults(container) {
   container.setAttribute('aria-hidden', true);
-}
-
-function getIdFromSectionMetadata(section) {
-  const sectionId = section.parentElement?.querySelector('.section-metadata div div:nth-child(2)')?.textContent;
-  return sectionId;
+  container.classList.remove('open');
+  const aside = container.closest('aside');
+  if (aside) aside.classList.remove('expand');
 }
 
 function createSearchResultObject(doc, terms, source) {
-  const id = getIdFromSectionMetadata(doc);
   return {
     title: doc.querySelector('h3')?.textContent || '',
     description: doc.querySelector('p')?.textContent || '',
-    path: `/docs/faq#${id}` || '',
+    path: doc.id ? `/docs/faq#${doc.id}` : '/docs/faq',
     image: window.faqImage || '/default-meta-image.jpg',
     content: doc.innerHTML,
     terms,
@@ -576,7 +573,13 @@ export default async function decorate(block) {
 
   // build search bar
   const form = createTag('form');
-  const search = createTag('input', { type: 'search', 'aria-label': 'Search the documentation' });
+  const search = createTag('input', {
+    type: 'search',
+    'aria-label': 'Search',
+    placeholder: 'Search the documentation',
+    name: 'search',
+  });
+
   const clear = createTag('button', { type: 'reset' }, '✕');
   const icon = buildSearchIcon();
   form.append(icon, search, clear);

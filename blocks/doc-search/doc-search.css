@@ -9,7 +9,7 @@
 
 .doc-search form {
   margin: 0 auto;
-  padding: 0 12px;
+  padding: 0;
   font: inherit;
 }
 
@@ -32,7 +32,7 @@
   border: 1px solid;
   border-color: var(--border-color-medium);
   border-radius: 4px;
-  padding: 0 0 0 30px;
+  padding: 0 0 0 48px;
   font: inherit;
   font-size: 14px;
   transition: border-color 130ms ease-in-out, box-shadow 130ms ease-in-out;
@@ -58,7 +58,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: 13px;
+  right: 4px;
   outline: none;
   border: none;
   border-radius: 3px;
