@@ -33,13 +33,12 @@ export default async function decorate(block) {
   const sideNavbar = sideNavbarContent.querySelector('.side-navigation div');
   block.append(sideNavbar);
 
-  const sideNavRoot = getMetadata('side-nav')
-    ? `/${window.location.pathname.split('/')[1]}/`
-    : '/docs/';
+  const { pathname } = window.location;
+  const sideNavRoot = pathname.substring(0, pathname.lastIndexOf('/') + 1);
+  const isLandingPage = pathname.endsWith('/');
 
   const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
   const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper in-doc-page' }, docBtnInner);
-  const isLandingPage = window.location.pathname === sideNavRoot;
   if (!isLandingPage) {
     const backDocPageBtn = createTag('div', { class: 'guides-back-btn' }, `
       <span class="icon icon-icon-arrow"></span>

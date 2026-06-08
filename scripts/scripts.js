@@ -563,10 +563,12 @@ function decorateBreadcrumb(main) {
   wrapper.append(breadcrumb);
   main.prepend(wrapper);
 
-  const sideNavRoot = getMetadata('side-nav')
-    ? `/${window.location.pathname.split('/')[1]}/`
+  const { pathname } = window.location;
+  const hasSideNav = !!getMetadata('side-nav');
+  const sideNavRoot = hasSideNav
+    ? pathname.substring(0, pathname.lastIndexOf('/') + 1)
     : '/docs/';
-  const isDocumentationLanding = window.location.pathname === sideNavRoot;
+  const isDocumentationLanding = hasSideNav ? pathname.endsWith('/') : pathname === '/docs/';
   const blogTemplate = document.body.classList.contains('blog-template');
 
   const list = createTag('ul');
