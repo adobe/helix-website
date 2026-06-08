@@ -442,6 +442,32 @@ html[data-theme="dark"] .gnav-navitem.has-menu > a::after {
   padding-left: 24px;
 }
 
+/* Title row wrapper when a "new" pill is present — takes the title grid area */
+.submenu-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  grid-area: title;
+}
+
+/* "New" pill badge on nav items */
+.nav-new-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  margin-left: 6px;
+  background: var(--color-accent-lightgreen-bg);
+  color: var(--color-accent-lightgreen-content);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 20px;
+  vertical-align: middle;
+  line-height: 1.6;
+}
+
 /* curtain */
 .gnav-curtain {
   position: fixed;

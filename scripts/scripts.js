@@ -563,7 +563,10 @@ function decorateBreadcrumb(main) {
   wrapper.append(breadcrumb);
   main.prepend(wrapper);
 
-  const isDocumentationLanding = window.location.pathname === '/docs/';
+  const sideNavRoot = getMetadata('side-nav')
+    ? `/${window.location.pathname.split('/')[1]}/`
+    : '/docs/';
+  const isDocumentationLanding = window.location.pathname === sideNavRoot;
   const blogTemplate = document.body.classList.contains('blog-template');
 
   const list = createTag('ul');
@@ -607,7 +610,7 @@ function decorateBreadcrumb(main) {
     if (!blogTemplate) {
       const backBtn = createTag('div', { class: 'guides-back-btn desktop' }, `
           <span class="icon icon-icon-arrow"></span>
-          <a href="/docs/" class="link-underline-effect">
+          <a href="${sideNavRoot}" class="link-underline-effect">
               Back
           </a>
       `);

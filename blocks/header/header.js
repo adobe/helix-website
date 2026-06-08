@@ -162,6 +162,9 @@ class Gnav {
     mainNavLinkWrappers.forEach((linkWrapper, index) => {
       const navItem = createTag('div', { class: 'gnav-navitem' });
       const navMainLink = linkWrapper.querySelector('a');
+      const rawLinkText = navMainLink.textContent.trim();
+      const isNew = rawLinkText.endsWith('(NEW)');
+      if (isNew) navMainLink.textContent = rawLinkText.replace(/\s*\(NEW\)\s*$/, '').trim();
       const navMainLinkText = navMainLink.textContent ? navMainLink.textContent : '';
 
       const subMenuWrapper = createTag('div', { class: 'submenu-wrapper' });
@@ -202,6 +205,7 @@ class Gnav {
         subMenuWrapper.append(decoratedSubMenu);
       }
 
+      if (isNew) navMainLink.append(createTag('span', { class: 'nav-new-pill' }, 'New'));
       navItem.append(navMainLink, subMenuWrapper);
       mainNav.append(navItem);
     });
@@ -244,7 +248,9 @@ class Gnav {
     const subMenuListItems = subMenuList.querySelectorAll(':scope > li');
     subMenuListItems.forEach((item, idx) => {
       const submenuLink = item.querySelector('a');
-      const submenuTitleText = submenuLink.textContent;
+      const rawSubmenuText = submenuLink.textContent.trim();
+      const isSubmenuNew = rawSubmenuText.endsWith('(NEW)');
+      const submenuTitleText = isSubmenuNew ? rawSubmenuText.replace(/\s*\(NEW\)\s*$/, '').trim() : rawSubmenuText;
       submenuLink.classList.add('submenu', 'link-highlight-colorful-effect-hover-wrapper', 'bounce-item-effect-hover-wrapper');
       submenuLink.innerHTML = '';
       submenuLink.setAttribute('target', returnLinkTarget(submenuLink.href));
@@ -260,7 +266,13 @@ class Gnav {
       }
 
       const title = createTag('h3', { class: 'link-highlight-colorful-effect submenu-title' }, submenuTitleText);
-      submenuLink.append(title);
+      if (isSubmenuNew) {
+        const titleRow = createTag('div', { class: 'submenu-title-row' });
+        titleRow.append(title, createTag('span', { class: 'nav-new-pill' }, 'New'));
+        submenuLink.append(titleRow);
+      } else {
+        submenuLink.append(title);
+      }
 
       const submenuDescription = item.querySelector('li');
       if (submenuDescription) {
@@ -519,8 +531,8 @@ async function fetchGnav(url) {
 }
 
 export default async function init(blockEl) {
-  // OLD CODE: const url = getMetadata('gnav') || '/gnav';
-  const url = '/new-nav';
+  const navMeta = getMetadata('nav');
+  const url = navMeta ? new URL(navMeta, window.location).pathname : '/new-nav';
   const header = blockEl.parentElement;
   const inlined = header.firstElementChild !== blockEl;
   let html = '';

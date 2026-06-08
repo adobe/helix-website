@@ -1,6 +1,6 @@
 import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
-import { buildBlock, loadBlock, decorateBlock } from '../../scripts/lib-franklin.js';
+import { buildBlock, loadBlock, decorateBlock, getMetadata } from '../../scripts/lib-franklin.js';
 
 const MOBILE_BREAKPOINT = 900;
 
@@ -24,7 +24,8 @@ export default async function decorate(block) {
     return;
   }
 
-  const sideNavPath = '/side-navigation';
+  const sideNavMeta = getMetadata('side-nav');
+  const sideNavPath = sideNavMeta ? new URL(sideNavMeta, window.location).pathname : '/side-navigation';
   const resp = await fetch(`${sideNavPath}.plain.html`);
   const html = await resp.text();
   const sideNavbarContent = document.createElement('div');
@@ -32,13 +33,17 @@ export default async function decorate(block) {
   const sideNavbar = sideNavbarContent.querySelector('.side-navigation div');
   block.append(sideNavbar);
 
+  const sideNavRoot = getMetadata('side-nav')
+    ? `/${window.location.pathname.split('/')[1]}/`
+    : '/docs/';
+
   const docBtnInner = '<button class="documentation-btn"><span class="icon icon-icon-caret-down"></span>Menu</button>';
   const docButton = createTag('div', { class: 'side-navigation-overlay-btn-wrapper in-doc-page' }, docBtnInner);
-  const isDocumentationLanding = window.location.pathname === '/docs/';
-  if (!isDocumentationLanding) {
+  const isLandingPage = window.location.pathname === sideNavRoot;
+  if (!isLandingPage) {
     const backDocPageBtn = createTag('div', { class: 'guides-back-btn' }, `
       <span class="icon icon-icon-arrow"></span>
-      <a href="/docs/" class="link-underline-effect">
+      <a href="${sideNavRoot}" class="link-underline-effect">
           Back
       </a>
     `);
@@ -51,18 +56,23 @@ export default async function decorate(block) {
 
   const skipLink = createTag('a', { class: 'skip-link', href: '#search-results' }, 'Skip to results');
 
+  const searchIndexMeta = getMetadata('side-nav-index');
+  const searchIndex = searchIndexMeta
+    ? new URL(searchIndexMeta, window.location).pathname
+    : '/docpages-index.json';
+
   // Desktop: doc-search inside side-nav overlay, results expand alongside nav (hidden on mobile)
   const resultsContainer = createTag('div', { class: 'results-wrapper', id: 'search-results' });
   aside.append(resultsContainer);
   const searchBlock = buildBlock('doc-search', [[
-    '<a href="/docpages-index.json">Search</a>',
+    `<a href="${searchIndex}">Search</a>`,
     '<a href="/docs/faq">FAQ</a>',
   ]]);
   searchBlock.dataset.resultsContainerClass = 'results-wrapper';
 
   // Mobile: doc-search directly in aside, shares results-wrapper with desktop block
   const mobileSearchBlock = buildBlock('doc-search', [[
-    '<a href="/docpages-index.json">Search</a>',
+    `<a href="${searchIndex}">Search</a>`,
     '<a href="/docs/faq">FAQ</a>',
   ]]);
   mobileSearchBlock.dataset.resultsContainerClass = 'results-wrapper';
@@ -100,7 +110,7 @@ export default async function decorate(block) {
       e.target.classList.toggle('closed');
     });
 
-    list.querySelector(':scope > a').classList.add('heading');
+    list.querySelector(':scope > a')?.classList.add('heading');
     list.querySelectorAll(':scope > ul').forEach((listInner) => {
       listInner.classList.add('list-section-inner');
 
