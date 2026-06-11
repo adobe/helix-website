@@ -1883,6 +1883,15 @@ body.skills-template main h2 {
   padding-top: var(--spacing-xs);
 }
 
+body.blog-template main h2 {
+  font-size: var(--type-heading-xl-size);
+  line-height: var(--type-heading-xl-lh);
+}
+
+body.blog-template main h2:first-of-type {
+  padding-bottom: 20px;
+}
+
 body.guides-template main p,
 body.guides-template main li,
 body.guides-template main a,
