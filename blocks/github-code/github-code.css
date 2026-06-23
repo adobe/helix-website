@@ -1,0 +1,43 @@
+main .github-code {
+  margin-block: 1.5rem;
+}
+
+main .github-code .github-code-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-gray-200);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background-color: var(--code-bg-color);
+  font-family: var(--code-font-family);
+  font-size: 13px;
+}
+
+main .github-code .github-code-path {
+  overflow-wrap: anywhere;
+  color: var(--text-color);
+}
+
+main .github-code .github-code-link:any-link {
+  flex: none;
+  color: var(--spectrum-blue);
+  text-decoration: none;
+}
+
+main .github-code .github-code-link:hover {
+  text-decoration: underline;
+}
+
+main .github-code pre {
+  margin-block: 0;
+  border-radius: 0 0 6px 6px;
+}
+
+main .github-code .github-code-fallback:any-link {
+  display: inline-block;
+  color: var(--spectrum-blue);
+}
