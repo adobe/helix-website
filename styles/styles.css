@@ -362,7 +362,7 @@ body.appear {
 .feed.recent,
 .feed.compact,
 .feed.blog,
-.z-pattern.events {
+.event-list {
   max-width: var(--grid-mobile-container-width);
   margin-left: auto;
   margin-right: auto;
@@ -381,7 +381,7 @@ aside {
   .feed.recent,
   .feed.compact,
   .feed.blog,
-  .z-pattern.events {
+  .event-list {
     max-width: var(--grid-tablet-container-width);
   }
 }
@@ -394,7 +394,7 @@ aside {
   .feed.recent,
   .feed.compact,
   .feed.blog,
-  .z-pattern.events {
+  .event-list {
     max-width: 90%;
   }
 
@@ -430,7 +430,7 @@ aside {
   .feed.recent,
   .feed.compact,
   .feed.blog,
-  .z-pattern.events {
+  .event-list {
     max-width: var(--grid-desktop-container-width);
   }
 
