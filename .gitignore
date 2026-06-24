@@ -114,6 +114,3 @@ dist
 junit.xml
 # jetbrains files
 .idea/
-
-# Local community redesign reference (not for commit)
-drafts/community-draft/
