@@ -53,6 +53,7 @@ export async function renderFeed(block) {
 }
 
 const CATEGORY_ORDER = ['Thursday Frequency', 'Developers Live', 'AEM Releases', 'Web Currents'];
+const COMPACT_PAGE_SIZE = 24;
 
 function inferCategory(item) {
   const title = (item.Title || '').toLowerCase();
@@ -85,6 +86,36 @@ function formatFeedDate(serial) {
   return `${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+function createFeedCard(item) {
+  const videoId = getYouTubeId(item.URL);
+  const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
+
+  const card = createTag('a', {
+    class: 'feed-card',
+    href: item.URL,
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  });
+
+  const thumb = createTag('div', { class: 'feed-card-thumb' });
+  if (thumbUrl) {
+    thumb.appendChild(createTag('img', { src: thumbUrl, alt: '', loading: 'lazy' }));
+  }
+  card.appendChild(thumb);
+
+  const info = createTag('div', { class: 'feed-card-info' });
+  info.appendChild(createTag('strong', {}, item.Title));
+  info.appendChild(createTag('span', { class: 'feed-card-date' }, formatFeedDate(item.Date)));
+  card.appendChild(info);
+
+  return card;
+}
+
+function getCompactItems(data, filter) {
+  if (filter === 'all') return data;
+  return data.filter((item) => inferCategory(item) === filter);
+}
+
 export async function renderFeedCompact(block) {
   if (!block) {
     return;
@@ -100,14 +131,9 @@ export async function renderFeedCompact(block) {
     return;
   }
 
-  const categories = {};
-  data.forEach((item) => {
-    const cat = inferCategory(item);
-    if (!categories[cat]) categories[cat] = [];
-    categories[cat].push(item);
-  });
-
-  const activeCats = CATEGORY_ORDER.filter((c) => categories[c]?.length > 0);
+  const activeCats = CATEGORY_ORDER.filter(
+    (cat) => data.some((item) => inferCategory(item) === cat),
+  );
 
   const filterBar = createTag('div', { class: 'feed-filter' });
   const allChip = createTag('button', { class: 'feed-filter-chip active', 'data-filter': 'all' }, 'All');
@@ -119,57 +145,55 @@ export async function renderFeedCompact(block) {
   });
   block.appendChild(filterBar);
 
-  const groupsContainer = createTag('div', { class: 'feed-groups' });
+  const contentArea = createTag('div', { class: 'feed-view' });
+  block.appendChild(contentArea);
 
-  activeCats.forEach((cat) => {
-    const group = createTag('div', { class: 'feed-group', 'data-category': cat });
-    group.appendChild(createTag('h3', { class: 'feed-group-heading' }, cat));
+  const viewState = { filter: 'all', visibleCount: COMPACT_PAGE_SIZE };
+
+  const renderView = () => {
+    contentArea.textContent = '';
+    const items = getCompactItems(data, viewState.filter);
+    const visibleItems = viewState.filter === 'all'
+      ? items.slice(0, viewState.visibleCount)
+      : items;
+
+    if (viewState.filter !== 'all') {
+      contentArea.appendChild(
+        createTag('h3', { class: 'feed-group-heading' }, viewState.filter),
+      );
+    }
 
     const grid = createTag('div', { class: 'feed-grid' });
+    visibleItems.forEach((item) => grid.appendChild(createFeedCard(item)));
+    contentArea.appendChild(grid);
 
-    categories[cat].forEach((item) => {
-      const videoId = getYouTubeId(item.URL);
-      const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
-
-      const card = createTag('a', {
-        class: 'feed-card',
-        href: item.URL,
-        target: '_blank',
-        rel: 'noopener noreferrer',
+    if (viewState.filter === 'all' && viewState.visibleCount < items.length) {
+      const loadMoreWrap = createTag('div', { class: 'feed-load-more-wrap' });
+      const loadMore = createTag('button', {
+        type: 'button',
+        class: 'feed-load-more',
+      }, 'Load more');
+      loadMore.addEventListener('click', () => {
+        viewState.visibleCount += COMPACT_PAGE_SIZE;
+        renderView();
       });
-
-      const thumb = createTag('div', { class: 'feed-card-thumb' });
-      if (thumbUrl) {
-        thumb.appendChild(createTag('img', { src: thumbUrl, alt: '', loading: 'lazy' }));
-      }
-      card.appendChild(thumb);
-
-      const info = createTag('div', { class: 'feed-card-info' });
-      info.appendChild(createTag('strong', {}, item.Title));
-      info.appendChild(createTag('span', { class: 'feed-card-date' }, formatFeedDate(item.Date)));
-      card.appendChild(info);
-
-      grid.appendChild(card);
-    });
-
-    group.appendChild(grid);
-    groupsContainer.appendChild(group);
-  });
-
-  block.appendChild(groupsContainer);
+      loadMoreWrap.appendChild(loadMore);
+      contentArea.appendChild(loadMoreWrap);
+    }
+  };
 
   filterBar.addEventListener('click', (e) => {
     const chip = e.target.closest('.feed-filter-chip');
-    if (!chip) return;
+    if (!chip || chip.dataset.filter === viewState.filter) return;
 
     filterBar.querySelectorAll('.feed-filter-chip').forEach((c) => c.classList.remove('active'));
     chip.classList.add('active');
-
-    const { filter } = chip.dataset;
-    groupsContainer.querySelectorAll('.feed-group').forEach((g) => {
-      g.style.display = (filter === 'all' || g.dataset.category === filter) ? '' : 'none';
-    });
+    viewState.filter = chip.dataset.filter;
+    viewState.visibleCount = COMPACT_PAGE_SIZE;
+    renderView();
   });
+
+  renderView();
 }
 
 function isImgUrl(url) {

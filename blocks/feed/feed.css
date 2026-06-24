@@ -360,6 +360,34 @@ main .section:has(.feed.compact) > .default-content-wrapper {
   margin-bottom: var(--spacing-xl);
 }
 
+.feed.compact .feed-view {
+  margin-top: var(--spacing-s);
+}
+
+.feed.compact .feed-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-l);
+}
+
+.feed.compact .feed-load-more {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--type-body-s-size);
+  font-weight: 400;
+  color: var(--color-accent-blue);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.feed.compact .feed-load-more:hover {
+  color: var(--spectrum-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .feed.compact .feed-group-heading {
   font-size: var(--type-body-s-size);
   font-weight: 700;
