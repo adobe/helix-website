@@ -496,7 +496,7 @@ function buildEmbeds(main) {
     ...main.querySelectorAll(
       'a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]',
     ),
-  ];
+  ].filter((embed) => !embed.closest('.z-pattern.events'));
   embeds.forEach((embed) => {
     embed.replaceWith(buildBlock('embed', embed.outerHTML));
   });

@@ -21,24 +21,6 @@ const animationConfig = {
 
 function isOdd(num) { return num % 2 ? 'z-row-odd' : 'z-row-even'; }
 
-function linkEventDates(row) {
-  const imageLink = row.querySelector('.image-side a[href]');
-  const dateStrong = row.querySelector('.content-side p:last-child strong');
-  if (!imageLink || !dateStrong || dateStrong.querySelector('a')) return;
-
-  const link = document.createElement('a');
-  link.href = imageLink.href;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = dateStrong.textContent.trim();
-  dateStrong.textContent = '';
-  dateStrong.append(link);
-}
-
-function decorateEvents(el) {
-  el.querySelectorAll(':scope > div.z-row-odd, :scope > div.z-row-even').forEach(linkEventDates);
-}
-
 const animateValueProps = (el) => {
   // heading animation
   const heading = el.querySelector('.z-pattern-heading h2');
@@ -107,8 +89,4 @@ export default function init(el) {
       }
     }
   });
-
-  if (el.classList.contains('events')) {
-    decorateEvents(el);
-  }
 }
