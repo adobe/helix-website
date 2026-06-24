@@ -25,6 +25,7 @@ main .github-code .github-code-path {
 main .github-code .github-code-link:any-link {
   flex: none;
   color: var(--spectrum-blue);
+  font-size: inherit;
   text-decoration: none;
 }
 

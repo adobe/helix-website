@@ -361,7 +361,7 @@ export function customDecorateTemplateAndTheme() {
   if (theme) addClasses(document.body, `${theme.toLowerCase()}-theme`);
 }
 
-function addCopyButtonsToCodeBlocks() {
+export function addCopyButtonsToCodeBlocks() {
   const codeBlocks = document.querySelectorAll('pre code');
   codeBlocks.forEach((codeBlock) => {
     const pre = codeBlock.parentElement;

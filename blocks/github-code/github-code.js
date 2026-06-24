@@ -1,4 +1,4 @@
-import { createTag } from '../../scripts/scripts.js';
+import { createTag, addCopyButtonsToCodeBlocks } from '../../scripts/scripts.js';
 import { loadCSS, loadScript } from '../../scripts/lib-franklin.js';
 
 const HIGHLIGHT_JS = '/libs/highlight/highlight.min.js';
@@ -22,15 +22,6 @@ const EXT_TO_LANG = {
   html: 'xml',
   svg: 'xml',
 };
-
-const COPY_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-  <path d="M4 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z"/>
-  <path d="M2 6V2h4v1H2.5v3H2z"/>
-</svg>`;
-
-const COPIED_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-  <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-</svg>`;
 
 /**
  * Parse a GitHub blob URL into its parts plus an optional line range.
@@ -99,41 +90,6 @@ function sliceLines(text, start, end) {
 }
 
 /**
- * Add a copy-to-clipboard button to a code block, matching the project's
- * guide-template code block pattern.
- * @param {HTMLPreElement} pre the pre element wrapping the code
- * @param {HTMLElement} codeEl the code element holding the source
- */
-function addCopyButton(pre, codeEl) {
-  pre.classList.add('code-block-wrapper');
-  const button = createTag('button', {
-    class: 'code-copy-button',
-    type: 'button',
-    'aria-label': 'Copy code to clipboard',
-    title: 'Copy code',
-  }, COPY_ICON);
-
-  button.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(codeEl.textContent);
-      button.classList.add('copied');
-      button.setAttribute('aria-label', 'Code copied!');
-      button.innerHTML = COPIED_ICON;
-      setTimeout(() => {
-        button.classList.remove('copied');
-        button.setAttribute('aria-label', 'Copy code to clipboard');
-        button.innerHTML = COPY_ICON;
-      }, 2000);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to copy code:', err);
-    }
-  });
-
-  pre.append(button);
-}
-
-/**
  * Lazily load the highlight.js library and highlight a single code element.
  * The bundled library only registers a subset of languages, so the `hljs`
  * theme class is always applied for a consistent background, while the
@@ -170,7 +126,7 @@ async function renderCode(block, info, blobUrl) {
     const text = await response.text();
     codeEl.textContent = sliceLines(text, info.start, info.end);
     block.append(pre);
-    addCopyButton(pre, codeEl);
+    addCopyButtonsToCodeBlocks();
     await highlightCode(codeEl, lang);
   } catch (err) {
     // eslint-disable-next-line no-console
