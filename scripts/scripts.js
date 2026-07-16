@@ -15,6 +15,7 @@ import {
   getAllMetadata,
   getMetadata,
   decorateBlock,
+  createOptimizedPicture,
 } from './lib-franklin.js';
 import {
   addInViewAnimationToSingleElement,
@@ -534,6 +535,15 @@ function addBlockLevelInViewAnimation(main) {
   });
 }
 
+function decorateImageLinks(main) {
+  console.log('decorateImageLinks');
+  const imageLinks = main.querySelectorAll('a[href*="/media_"]');
+  imageLinks.forEach((link) => {
+    const picture = createOptimizedPicture(link.href);
+    link.replaceWith(picture);
+  });
+}
+
 function decorateBreadcrumb(main) {
   if (!document.body.classList.contains('guides-template') && !document.body.classList.contains('blog-template')) {
     return;
@@ -740,6 +750,7 @@ export function loadBlogData() {
  * @param {Element} main The main element
  */
 export function decorateMain(main) {
+  decorateImageLinks(main)
   buildAutoBlocks(main);
   decorateIcons(main);
   decorateSections(main);
