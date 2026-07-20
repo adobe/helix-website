@@ -502,6 +502,30 @@ function buildEmbeds(main) {
   });
 }
 
+function buildCodeBlocks(main) {
+  const blobLinks = [
+    ...main.querySelectorAll('a[href^="https://github.com/"]'),
+  ].filter((a) => /^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/.+/.test(a.href));
+  blobLinks.forEach((a) => {
+    const p = a.parentElement;
+    if (!p || p.tagName !== 'P') return;
+    // only paragraphs in default content, i.e. directly inside a section-level
+    // div (which may carry section-metadata classes): anywhere deeper is an
+    // authored block cell or li/blockquote, where a synthetic block would be
+    // wrong or never decorated
+    if (!p.parentElement || p.parentElement.tagName !== 'DIV') return;
+    if (p.parentElement.parentElement !== main) return;
+    if (p.childElementCount !== 1) return;
+    if (p.textContent.trim() !== a.textContent.trim()) return;
+    try {
+      if (new URL(a.href).href !== new URL(a.textContent.trim(), window.location.href).href) return;
+    } catch (error) {
+      return;
+    }
+    p.replaceWith(buildBlock('github-code', a.outerHTML));
+  });
+}
+
 function updateGuideTemplateStyleBasedOnHero() {
   const isHeroContentExist = document.querySelector(
     '.guides-template .section.heading',
@@ -697,6 +721,7 @@ export function buildAutoBlocks(main) {
       buildAuthorBox(main);
     }
     buildEmbeds(main);
+    buildCodeBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
