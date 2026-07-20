@@ -52,6 +52,150 @@ export async function renderFeed(block) {
   block.appendChild(parentDiv);
 }
 
+const CATEGORY_ORDER = ['Thursday Frequency', 'Developers Live', 'AEM Releases', 'Web Currents'];
+const COMPACT_PAGE_SIZE = 24;
+
+function inferCategory(item) {
+  const title = (item.Title || '').toLowerCase();
+  const description = (item.Description || '').toLowerCase();
+
+  if (title.includes('release 202') || title.includes('cloud service release')) return 'AEM Releases';
+  if (title.includes('web currents') || description.includes('web currents')) return 'Web Currents';
+  if (title.includes('developers live') || title.includes('devlive')) return 'Developers Live';
+  if (title.includes('frequency')) return 'Thursday Frequency';
+  if (description.includes('adobe developers live') || description.includes('developers live 202')) {
+    return 'Developers Live';
+  }
+
+  return 'Thursday Frequency';
+}
+
+function getYouTubeId(url) {
+  try {
+    const u = new URL(url);
+    return u.searchParams.get('v') || u.pathname.split('/').pop();
+  } catch {
+    return null;
+  }
+}
+
+function formatFeedDate(serial) {
+  const epoch = new Date(1899, 11, 30);
+  const d = new Date(epoch.getTime() + parseFloat(serial) * 86400000);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function createFeedCard(item) {
+  const videoId = getYouTubeId(item.URL);
+  const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
+
+  const card = createTag('a', {
+    class: 'feed-card',
+    href: item.URL,
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  });
+
+  const thumb = createTag('div', { class: 'feed-card-thumb' });
+  if (thumbUrl) {
+    thumb.appendChild(createTag('img', { src: thumbUrl, alt: '', loading: 'lazy' }));
+  }
+  card.appendChild(thumb);
+
+  const info = createTag('div', { class: 'feed-card-info' });
+  info.appendChild(createTag('strong', {}, item.Title));
+  info.appendChild(createTag('span', { class: 'feed-card-date' }, formatFeedDate(item.Date)));
+  card.appendChild(info);
+
+  return card;
+}
+
+function getCompactItems(data, filter) {
+  if (filter === 'all') return data;
+  return data.filter((item) => inferCategory(item) === filter);
+}
+
+export async function renderFeedCompact(block) {
+  if (!block) {
+    return;
+  }
+
+  const data = [...(window.siteindex?.archive?.data || [])]
+    .sort((a, b) => parseFloat(b.Date) - parseFloat(a.Date));
+
+  block.textContent = '';
+
+  if (!data.length) {
+    block.textContent = 'Unable to load recordings.';
+    return;
+  }
+
+  const activeCats = CATEGORY_ORDER.filter(
+    (cat) => data.some((item) => inferCategory(item) === cat),
+  );
+
+  const filterBar = createTag('div', { class: 'feed-filter' });
+  const allChip = createTag('button', { class: 'feed-filter-chip active', 'data-filter': 'all' }, 'All');
+  filterBar.appendChild(allChip);
+
+  activeCats.forEach((cat) => {
+    const chip = createTag('button', { class: 'feed-filter-chip', 'data-filter': cat }, cat);
+    filterBar.appendChild(chip);
+  });
+  block.appendChild(filterBar);
+
+  const contentArea = createTag('div', { class: 'feed-view' });
+  block.appendChild(contentArea);
+
+  const viewState = { filter: 'all', visibleCount: COMPACT_PAGE_SIZE };
+
+  const renderView = () => {
+    contentArea.textContent = '';
+    const items = getCompactItems(data, viewState.filter);
+    const visibleItems = viewState.filter === 'all'
+      ? items.slice(0, viewState.visibleCount)
+      : items;
+
+    if (viewState.filter !== 'all') {
+      contentArea.appendChild(
+        createTag('h3', { class: 'feed-group-heading' }, viewState.filter),
+      );
+    }
+
+    const grid = createTag('div', { class: 'feed-grid' });
+    visibleItems.forEach((item) => grid.appendChild(createFeedCard(item)));
+    contentArea.appendChild(grid);
+
+    if (viewState.filter === 'all' && viewState.visibleCount < items.length) {
+      const loadMoreWrap = createTag('div', { class: 'feed-load-more-wrap' });
+      const loadMore = createTag('button', {
+        type: 'button',
+        class: 'feed-load-more',
+      }, 'Load more');
+      loadMore.addEventListener('click', () => {
+        viewState.visibleCount += COMPACT_PAGE_SIZE;
+        renderView();
+      });
+      loadMoreWrap.appendChild(loadMore);
+      contentArea.appendChild(loadMoreWrap);
+    }
+  };
+
+  filterBar.addEventListener('click', (e) => {
+    const chip = e.target.closest('.feed-filter-chip');
+    if (!chip || chip.dataset.filter === viewState.filter) return;
+
+    filterBar.querySelectorAll('.feed-filter-chip').forEach((c) => c.classList.remove('active'));
+    chip.classList.add('active');
+    viewState.filter = chip.dataset.filter;
+    viewState.visibleCount = COMPACT_PAGE_SIZE;
+    renderView();
+  });
+
+  renderView();
+}
+
 function isImgUrl(url) {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
@@ -207,6 +351,7 @@ export async function renderBlog(block) {
 
 export default async function decorate(block) {
   const isBlog = block.classList.contains('blog');
+  const isCompact = block.classList.contains('compact');
 
   if (isBlog) {
     loadBlogData();
@@ -221,7 +366,12 @@ export default async function decorate(block) {
     return window?.siteindex?.loaded;
   };
 
-  const renderFunction = isBlog ? renderBlog : renderFeed;
+  let renderFunction = renderFeed;
+  if (isBlog) {
+    renderFunction = renderBlog;
+  } else if (isCompact) {
+    renderFunction = renderFeedCompact;
+  }
 
   if (!block.dataset.rendered) {
     if (checkDataLoaded()) {

@@ -1,0 +1,32 @@
+.community-rail {
+  margin: var(--spacing-s) 0 0;
+  padding: 0;
+}
+
+.community-rail-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  width: 100%;
+  max-width: 220px;
+  margin-inline: auto;
+}
+
+.community-rail .button-container {
+  margin: 0;
+}
+
+.community-rail .button-container > a.button:any-link {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@media (width >= 900px) {
+  main .section.hero-split .community-rail {
+    margin-top: 0;
+    padding-top: var(--spacing-m);
+  }
+}
