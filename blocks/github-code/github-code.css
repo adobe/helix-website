@@ -49,6 +49,16 @@ main .github-code .github-code-link:hover {
 main .github-code pre {
   margin-block: 0;
   border-radius: 0 0 6px 6px;
+  overflow-x: hidden;
+}
+
+/* wrap long lines instead of scrolling horizontally: white-space keeps the
+   code's newlines and indentation while letting rows wrap, and overflow-wrap
+   breaks a token with no break point (a long URL or minified line) so it never
+   forces a horizontal scrollbar */
+main .github-code pre code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* limit layout shift while the code is loading (no pre/code exists yet) */
@@ -56,9 +66,9 @@ main .github-code:not(.is-loaded) {
   min-height: 96px;
 }
 
-/* cap on the code element (the hljs scroll container), not the pre: 1em hljs
-   padding + 40 lines at 14px and 1.8 line height, so the clip lands on a line
-   boundary and the horizontal scrollbar stays reachable */
+/* cap on the code element, not the pre: 1em hljs padding + 40 lines at 14px
+   and 1.8 line height. Lines wrap, so a collapsed block may show fewer than 40
+   logical lines; the toggle still reveals the whole file */
 main .github-code.is-collapsible:not(.is-expanded) pre code {
   display: block;
   max-height: 1036px;
