@@ -218,7 +218,7 @@ export default async function decorate(block) {
     return;
   }
 
-  // Header: file path, ref, optional line range, and a link to the source.
+  // Header: file path, optional line range, and a link to the source.
   const header = createTag('div', { class: 'github-code-header' });
 
   const pathEl = createTag('span', { class: 'github-code-path' });
@@ -229,10 +229,6 @@ export default async function decorate(block) {
     pathEl.textContent = info.path;
   }
   header.append(pathEl);
-
-  const refEl = createTag('span', { class: 'github-code-ref' });
-  refEl.textContent = /^[0-9a-f]{40}$/.test(info.ref) ? info.ref.slice(0, 7) : info.ref;
-  header.append(refEl);
 
   if (info.start) {
     const rangeText = info.end !== info.start ? `Lines ${info.start}–${info.end}` : `Line ${info.start}`;
