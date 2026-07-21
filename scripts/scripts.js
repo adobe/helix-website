@@ -361,7 +361,7 @@ export function customDecorateTemplateAndTheme() {
   if (theme) addClasses(document.body, `${theme.toLowerCase()}-theme`);
 }
 
-function addCopyButtonsToCodeBlocks() {
+export function addCopyButtonsToCodeBlocks() {
   const codeBlocks = document.querySelectorAll('pre code');
   codeBlocks.forEach((codeBlock) => {
     const pre = codeBlock.parentElement;
@@ -499,6 +499,30 @@ function buildEmbeds(main) {
   ].filter((embed) => !embed.closest('.event-list'));
   embeds.forEach((embed) => {
     embed.replaceWith(buildBlock('embed', embed.outerHTML));
+  });
+}
+
+function buildCodeBlocks(main) {
+  const blobLinks = [
+    ...main.querySelectorAll('a[href^="https://github.com/"]'),
+  ].filter((a) => /^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/.+/.test(a.href));
+  blobLinks.forEach((a) => {
+    const p = a.parentElement;
+    if (!p || p.tagName !== 'P') return;
+    // only paragraphs in default content, i.e. directly inside a section-level
+    // div (which may carry section-metadata classes): anywhere deeper is an
+    // authored block cell or li/blockquote, where a synthetic block would be
+    // wrong or never decorated
+    if (!p.parentElement || p.parentElement.tagName !== 'DIV') return;
+    if (p.parentElement.parentElement !== main) return;
+    if (p.childElementCount !== 1) return;
+    if (p.textContent.trim() !== a.textContent.trim()) return;
+    try {
+      if (new URL(a.href).href !== new URL(a.textContent.trim(), window.location.href).href) return;
+    } catch (error) {
+      return;
+    }
+    p.replaceWith(buildBlock('github-code', a.outerHTML));
   });
 }
 
@@ -697,6 +721,7 @@ export function buildAutoBlocks(main) {
       buildAuthorBox(main);
     }
     buildEmbeds(main);
+    buildCodeBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);

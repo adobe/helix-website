@@ -1,0 +1,103 @@
+main .github-code {
+  margin-block: 1.5rem;
+}
+
+main .github-code .github-code-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xxs) var(--spacing-xs);
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-gray-200);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background-color: var(--code-bg-color);
+  font-family: var(--code-font-family);
+  font-size: 13px;
+}
+
+main .github-code .github-code-path {
+  overflow-wrap: anywhere;
+  color: var(--color-gray-800);
+}
+
+main .github-code .github-code-lines {
+  color: var(--color-gray-600);
+}
+
+main .github-code .github-code-link:any-link {
+  flex: none;
+  margin-left: auto;
+  color: var(--spectrum-blue);
+  font-size: inherit;
+  text-decoration: none;
+}
+
+main .github-code .github-code-link:hover {
+  text-decoration: underline;
+}
+
+main .github-code pre {
+  margin-block: 0;
+  border-radius: 0 0 6px 6px;
+  overflow-x: hidden;
+}
+
+/* wrap long lines instead of scrolling horizontally: white-space keeps the
+   code's newlines and indentation while letting rows wrap, and overflow-wrap
+   breaks a token with no break point (a long URL or minified line) so it never
+   forces a horizontal scrollbar */
+main .github-code pre code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* limit layout shift while the code is loading (no pre/code exists yet) */
+main .github-code:not(.is-loaded) {
+  min-height: 96px;
+}
+
+/* cap on the code element, not the pre: 1em hljs padding + 40 lines at 14px
+   and 1.8 line height. Lines wrap, so a collapsed block may show fewer than 40
+   logical lines; the toggle still reveals the whole file */
+main .github-code.is-collapsible:not(.is-expanded) pre code {
+  display: block;
+  max-height: 1036px;
+  overflow-y: hidden;
+}
+
+@media (width >= 600px) {
+  main .github-code.is-collapsible:not(.is-expanded) pre code {
+    /* 1em hljs padding + 40 lines at 16px and 1.8 line height */
+    max-height: 1184px;
+  }
+}
+
+main .github-code .github-code-toggle {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-gray-200);
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+  background-color: var(--code-bg-color);
+  color: var(--color-gray-700);
+  font-family: var(--code-font-family);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+main .github-code .github-code-error {
+  padding: 0.75rem;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 0 0 6px 6px;
+  color: var(--color-gray-700);
+
+  /* the error links to the full blob URL; break it rather than overflow */
+  overflow-wrap: anywhere;
+}
+
+main .github-code .github-code-fallback:any-link {
+  display: inline-block;
+  color: var(--spectrum-blue);
+}
