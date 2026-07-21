@@ -2044,7 +2044,7 @@ main {
   margin-top: 0;
 }
 
-body.guides-template main .default-content-wrapper > :first-of-type:not(.guides-back-btn) {
+body.guides-template main .default-content-wrapper > :is(h1, h2, h3, h4, h5, h6):first-of-type {
   margin-top: 0;
 }
 
