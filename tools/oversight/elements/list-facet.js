@@ -266,6 +266,30 @@ export default class ListFacet extends HTMLElement {
           countspan.setAttribute('total', this.dataChunks.totals.pageViews.sum);
           countspan.setAttribute('fuzzy', 'false');
           const valuespan = this.createValueSpan(entry, prefix, filteredKeys.length === 1);
+          // For redirect facets, show "N (internal|external – Xms)"
+          if (facetName === 'redirect.target') {
+            const [count, type] = (entry.value || '').split(':');
+            if (count) {
+              valuespan.textContent = count;
+            }
+            const durMetrics = entry.getMetrics(['redirectDuration']);
+            const hasDur = durMetrics.redirectDuration
+              && Number.isFinite(durMetrics.redirectDuration.percentile(50));
+            const suffix = document.createElement('span');
+            suffix.className = 'duration-suffix';
+            if (type && hasDur) {
+              const median = Math.round(durMetrics.redirectDuration.percentile(50));
+              suffix.textContent = ` (${type} – ${median}ms)`;
+              valuespan.append(suffix);
+            } else if (type) {
+              suffix.textContent = ` (${type})`;
+              valuespan.append(suffix);
+            } else if (hasDur) {
+              const median = Math.round(durMetrics.redirectDuration.percentile(50));
+              suffix.textContent = ` (${median}ms)`;
+              valuespan.append(suffix);
+            }
+          }
 
           label.append(valuespan, countspan);
 
