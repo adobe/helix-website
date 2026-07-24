@@ -1,7 +1,10 @@
-on: 
+on:
   repository_dispatch:
     types:
       - resource-published-native
+
+permissions: {}
+
 jobs:
   print:
     runs-on: ubuntu-latest
