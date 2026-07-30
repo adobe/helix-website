@@ -3,19 +3,24 @@ import {
   buildBlock,
   loadHeader,
   loadFooter,
-  decorateIcons,
   toClassName,
-  decorateSections,
+  toCamelCase,
   decorateBlocks,
-  waitForLCP,
-  loadBlocks,
   loadBlock,
   loadCSS,
   loadScript,
-  getAllMetadata,
   getMetadata,
   decorateBlock,
+  createOptimizedPicture,
+} from './aem.js';
+import {
+  decorateIcons,
+  decorateSections,
+  waitForLCP,
+  loadBlocks,
 } from './lib-franklin.js';
+import PluginsRegistry from './plugins.js';
+import TemplatesRegistry from './templates.js';
 import {
   addInViewAnimationToSingleElement,
   addInViewAnimationToMultipleElements,
@@ -30,6 +35,41 @@ const AUDIENCES = {
   desktop: () => window.innerWidth >= 600,
   // define your custom audiences here as needed
 };
+
+/**
+ * Gets all the metadata elements that are in the given scope.
+ * @param {String} scope The scope/prefix for the metadata
+ * @returns an array of HTMLElement nodes that match the given scope
+ */
+function getAllMetadata(scope) {
+  return [...document.head.querySelectorAll(`meta[property^="${scope}:"],meta[name^="${scope}-"]`)]
+    .reduce((res, meta) => {
+      const id = toClassName(meta.name
+        ? meta.name.substring(scope.length + 1)
+        : meta.getAttribute('property').split(':')[1]);
+      res[id] = meta.getAttribute('content');
+      return res;
+    }, {});
+}
+
+// Execution context passed to plugins — includes site-local functions
+// (getAllMetadata, decorateIcons) alongside the aem.js core helpers.
+const executionContext = {
+  createOptimizedPicture,
+  getAllMetadata,
+  getMetadata,
+  decorateBlock,
+  decorateIcons,
+  loadBlock,
+  loadCSS,
+  loadScript,
+  sampleRUM,
+  toCamelCase,
+  toClassName,
+};
+
+window.hlx.plugins = new PluginsRegistry(executionContext);
+window.hlx.templates = new TemplatesRegistry();
 
 window.hlx.plugins.add('performance', {
   condition: () => window.name.includes('performance'),
