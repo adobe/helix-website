@@ -585,67 +585,6 @@ export async function serveAudience(document, options, context) {
   }
 }
 
-window.hlx.patchBlockConfig?.push((config) => {
-  const { experiment } = window.hlx;
-
-  // No experiment is running
-  if (!experiment || !experiment.run) {
-    return config;
-  }
-
-  // The current experiment does not modify the block
-  if (experiment.selectedVariant === experiment.variantNames[0]
-    || !experiment.variants[experiment.variantNames[0]].blocks
-    || !experiment.variants[experiment.variantNames[0]].blocks.includes(config.blockName)) {
-    return config;
-  }
-
-  // The current experiment does not modify the block code
-  const variant = experiment.variants[experiment.selectedVariant];
-  if (!variant.blocks.length) {
-    return config;
-  }
-
-  let index = experiment.variants[experiment.variantNames[0]].blocks.indexOf('');
-  if (index < 0) {
-    index = experiment.variants[experiment.variantNames[0]].blocks.indexOf(config.blockName);
-  }
-  if (index < 0) {
-    index = experiment.variants[experiment.variantNames[0]].blocks.indexOf(`/blocks/${config.blockName}`);
-  }
-  if (index < 0) {
-    return config;
-  }
-
-  let origin = '';
-  let path;
-  if (/^https?:\/\//.test(variant.blocks[index])) {
-    const url = new URL(variant.blocks[index]);
-    // Experimenting from a different branch
-    if (url.origin !== window.location.origin) {
-      origin = url.origin;
-    }
-    // Experimenting from a block path
-    if (url.pathname !== '/') {
-      path = url.pathname;
-    } else {
-      path = `/blocks/${config.blockName}`;
-    }
-  } else { // Experimenting from a different branch on the same branch
-    path = `/blocks/${variant.blocks[index]}`;
-  }
-  if (!origin && !path) {
-    return config;
-  }
-
-  const { codeBasePath } = window.hlx;
-  return {
-    ...config,
-    cssPath: `${origin}${codeBasePath}${path}/${config.blockName}.css`,
-    jsPath: `${origin}${codeBasePath}${path}/${config.blockName}.js`,
-  };
-});
-
 let isAdjusted = false;
 function adjustedRumSamplingRate(checkpoint, options, context) {
   const pluginOptions = { ...DEFAULT_OPTIONS, ...(options || {}) };
