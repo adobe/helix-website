@@ -912,6 +912,19 @@ export function loadBlogData() {
 }
 
 /**
+ * Decorates .embed blocks that decorateBlocks' `div.section > div > div` selector
+ * misses. buildEmbeds() replaces a bare <a> (not its wrapping <p>), so the block
+ * lands one level deeper than a normal top-level block when the link is authored
+ * as its own paragraph.
+ * @param {Element} main The container element
+ */
+function decorateEmbeds(main) {
+  main.querySelectorAll('.embed').forEach((embed) => {
+    if (!embed.dataset.blockStatus) decorateBlock(embed);
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -925,6 +938,7 @@ export function decorateMain(main) {
   decorateGuideTemplate(main);
   decoratesSkillTemplate(main);
   decorateBlocks(main);
+  decorateEmbeds(main);
   decorateTitleSection(main);
   decorateSVGs(main);
 }
