@@ -134,7 +134,7 @@ async function decorateIcons(element) {
  * Ported from lib-franklin.js's decorateSections.
  * @param {Element} main The container element
  */
-function decorateSectionMetadata(main) {
+export function decorateSectionMetadata(main) {
   main.querySelectorAll(':scope > div.section').forEach((section) => {
     const sectionMeta = section.querySelector('div.section-metadata');
     if (sectionMeta) {
