@@ -83,7 +83,7 @@ async function decorateCardListByUrl(block) {
     const cardsRow = [];
     const categories = [];
     blockPartyJson.data
-      .filter((row) => row.approved === 'true')
+      .filter((row) => row.approved?.toLowerCase() === 'true')
       .reverse() // sort newest entries first, unless highlighted
       .sort((a, b) => {
         if (a.highlight && !b.highlight) return -1;
@@ -91,7 +91,7 @@ async function decorateCardListByUrl(block) {
         return 0;
       }).forEach((row) => {
         let githubName = '';
-        if (row.githubProfile && (row.permission === 'on' || row.permission === 'Yes')) {
+        if (row.githubProfile && (row.permission?.toLowerCase() === 'on' || row.permission?.toLowerCase() === 'yes')) {
           const ghProfile = stripTags(row.githubProfile).split('/');
           const ghUsername = ghProfile[ghProfile.length - 1];
           if (ghUsername) {
