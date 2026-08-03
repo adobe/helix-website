@@ -8,6 +8,9 @@ import {
   decorateBlocks,
   decorateSections,
   loadBlock,
+  loadSection,
+  loadSections,
+  waitForFirstImage,
   loadCSS,
   loadScript,
   getMetadata,
@@ -15,10 +18,6 @@ import {
   createOptimizedPicture,
   readBlockConfig,
 } from './aem.js';
-import {
-  waitForLCP,
-  loadBlocks,
-} from './lib-franklin.js';
 import PluginsRegistry from './plugins.js';
 import TemplatesRegistry from './templates.js';
 import {
@@ -28,8 +27,6 @@ import {
 } from '../utils/helpers.js';
 
 // Constants here
-const LCP_BLOCKS = ['hero', 'logo-wall']; // add your LCP blocks to the list
-
 const AUDIENCES = {
   mobile: () => window.innerWidth < 600,
   desktop: () => window.innerWidth >= 600,
@@ -991,7 +988,7 @@ async function loadEager(doc) {
     decorateBreadcrumb(main);
     prepareSideNav(main);
     document.body.classList.add('appear');
-    await waitForLCP(LCP_BLOCKS);
+    await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
 }
 
@@ -1004,7 +1001,7 @@ async function loadLazy(doc) {
   // NOTE:'.redesign' class is needed for the redesign styles, keep this
   document.body.classList.add('redesign');
 
-  await loadBlocks(main);
+  await loadSections(main);
   addBlockLevelInViewAnimation(main);
 
   loadHeader(doc.querySelector('header'));
