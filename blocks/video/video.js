@@ -1,4 +1,4 @@
-import { sampleRUM } from '../../scripts/lib-franklin.js';
+import { sampleRUM } from '../../scripts/aem.js';
 
 function decorateVideoBlock($block, videoURL) {
   if (videoURL.endsWith('.mp4')) {

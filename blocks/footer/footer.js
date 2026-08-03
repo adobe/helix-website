@@ -1,4 +1,4 @@
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 

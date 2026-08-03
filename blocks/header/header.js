@@ -1,4 +1,4 @@
-import { loadScript, getMetadata } from '../../scripts/lib-franklin.js';
+import { loadScript, getMetadata } from '../../scripts/aem.js';
 import { cleanVariations } from '../../scripts/scripts.js';
 import { getEnv } from '../../utils/env.js';
 import createTag from '../../utils/tag.js';

@@ -1,5 +1,5 @@
 import { createTag } from '../../scripts/scripts.js';
-import { toClassName, readBlockConfig } from '../../scripts/lib-franklin.js';
+import { toClassName, readBlockConfig } from '../../scripts/aem.js';
 
 function toCamelCase(string) {
   return toClassName(string).replace(/-([a-z])/g, (s) => s[1].toUpperCase());

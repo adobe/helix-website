@@ -1,6 +1,6 @@
 import createTag from '../../utils/tag.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
-import { buildBlock, loadBlock, decorateBlock } from '../../scripts/lib-franklin.js';
+import { buildBlock, loadBlock, decorateBlock } from '../../scripts/aem.js';
 
 const MOBILE_BREAKPOINT = 900;
 
