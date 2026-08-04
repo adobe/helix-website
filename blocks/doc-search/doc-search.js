@@ -1,4 +1,4 @@
-import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
+import { createOptimizedPicture } from '../../scripts/aem.js';
 import createTag from '../../utils/tag.js';
 
 const CURSOR_BLINK = 580; // in milliseconds

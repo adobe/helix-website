@@ -12,7 +12,7 @@ document.head.innerHTML = await readFile({ path: './head.html' });
 
 describe('Core Helix features', () => {
   before(async () => {
-    const mod = await import('../../scripts/lib-franklin.js');
+    const mod = await import('../../scripts/aem.js');
     Object.keys(mod).forEach((func) => {
       scripts[func] = mod[func];
     });
@@ -21,25 +21,20 @@ describe('Core Helix features', () => {
 
   it('Initializes window.hlx', async () => {
     // simulate code base path and turn on lighthouse
-    const testScript = document.createElement('script');
-    testScript.src = '../../scripts/lib-franklin.js';
-    testScript.type = 'module';
-    document.head.appendChild(testScript);
     window.history.pushState({}, '', `${window.location.href}&lighthouse=on`);
 
-    scripts.init();
+    scripts.setup();
     expect(window.hlx.codeBasePath).to.equal('');
     expect(window.hlx.lighthouse).to.equal(true);
 
     // test error handling
     const url = sinon.stub(window, 'URL');
-    scripts.init();
+    scripts.setup();
 
     // cleanup
     url.restore();
     window.hlx.codeBasePath = '';
     window.hlx.lighthouse = false;
-    Array.from(document.querySelectorAll('script')).pop().remove();
   });
 
   it('Sanitizes class name', async () => {
@@ -57,7 +52,7 @@ describe('Core Helix features', () => {
   it('Loads CSS', async () => {
     // loads a css file and calls callback
     // Import the loadCSS function dynamically
-    const { loadCSS } = await import('../../scripts/lib-franklin.js');
+    const { loadCSS } = await import('../../scripts/aem.js');
     const load = await loadCSS('/tests/scripts/test.css');
     expect(load).to.be.ok;
     expect(getComputedStyle(document.body).color).to.equal('rgb(255, 0, 0)');
@@ -109,32 +104,6 @@ describe('Core Helix features', () => {
       'format=png&optimize=medium',
     ); // default
   });
-
-  // todo: no longer needed since breaking2022_05 ?
-  it.skip('Decorates pictures', async () => {
-    // add styling to picture and test its removal
-    document
-      .querySelector('main picture')
-      .parentElement.appendChild(document.createElement('strong'))
-      .appendChild(document.querySelector('main picture'));
-    scripts.decoratePictures(document.querySelector('main'));
-    expect(document.querySelectorAll('strong > picture').length).to.equal(0);
-  });
-
-  it('Normalizes headings', async () => {
-    const numHeadings = document.querySelectorAll(
-      'h1, h2, h3, h4, h5, h6',
-    ).length;
-    scripts.normalizeHeadings(document.querySelector('main'), [
-      'h1',
-      'h2',
-      'h3',
-    ]);
-    expect(document.querySelectorAll('h1, h2, h3, h4, h5, h6').length).to.equal(
-      numHeadings,
-    );
-    expect(document.querySelectorAll('h4, h5, h6').length).to.equal(0);
-  });
 });
 
 describe('Sections and blocks', () => {
@@ -145,29 +114,21 @@ describe('Sections and blocks', () => {
 
   it('Decorates blocks', async () => {
     scripts.decorateBlocks(document.querySelector('main'));
-    expect(document.querySelectorAll('main .block').length).to.equal(7);
+    // aem.js's decorateSections doesn't strip Section Metadata blocks (that's
+    // handled by scripts.js's own decorateSectionMetadata in production), so
+    // the leftover .section-metadata div here is correctly counted as an
+    // 8th block by decorateBlocks
+    expect(document.querySelectorAll('main .block').length).to.equal(8);
   });
 
-  it('Loads blocks', async () => {
-    scripts.init();
-    await scripts.loadBlocks(document.querySelector('main'));
+  it('Loads sections', async () => {
+    // the RUM test above deletes window.hlx entirely; restore codeBasePath
+    // so block/css module paths resolve correctly again
+    scripts.setup();
+    await scripts.loadSections(document.querySelector('main'));
     document.querySelectorAll('main .block').forEach(($block) => {
       expect($block.dataset.blockStatus).to.equal('loaded');
     });
-  });
-
-  it('Updates section status', async () => {
-    scripts.updateSectionsStatus(document.querySelector('main'));
-    document.querySelectorAll('main .section').forEach(($section) => {
-      expect($section.dataset.sectionStatus).to.equal('loaded');
-    });
-
-    // test section with block still loading
-    const $section = document.querySelector('main .section');
-    delete $section.dataset.sectionStatus;
-    $section.querySelector(':scope .block').dataset.blockStatus = 'loading';
-    scripts.updateSectionsStatus(document.querySelector('main'));
-    expect($section.dataset.sectionStatus).to.equal('loading');
   });
 
   it('Reads block config', async () => {

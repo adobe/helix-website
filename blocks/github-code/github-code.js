@@ -1,5 +1,5 @@
 import { createTag, addCopyButtonsToCodeBlocks } from '../../scripts/scripts.js';
-import { loadCSS, loadScript } from '../../scripts/lib-franklin.js';
+import { loadCSS, loadScript } from '../../scripts/aem.js';
 
 const HIGHLIGHT_JS = '/libs/highlight/highlight.min.js';
 const HIGHLIGHT_CSS = '/libs/highlight/atom-one-dark.min.css';
@@ -86,9 +86,9 @@ function langFromPath(path) {
 }
 
 // Multiple blocks on the same page can become visible in the same tick, each
-// calling loadScript(HIGHLIGHT_JS) independently. lib-franklin's loadScript
-// resolves immediately if it merely finds an existing <script> tag, even one
-// still loading - so without this shared promise, later blocks would resolve
+// calling loadScript(HIGHLIGHT_JS) independently. loadScript resolves
+// immediately if it merely finds an existing <script> tag, even one still
+// loading - so without this shared promise, later blocks would resolve
 // before hljs is actually defined and silently skip highlighting.
 let highlightLibraryPromise;
 function loadHighlightLibrary() {

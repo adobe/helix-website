@@ -2,7 +2,7 @@
 //  note can be removed after approval
 import {
   createOptimizedPicture, loadBlock, buildBlock, decorateBlock,
-} from '../../scripts/lib-franklin.js';
+} from '../../scripts/aem.js';
 import { createTag } from '../../scripts/scripts.js';
 import { returnLinkTarget } from '../../utils/helpers.js';
 

@@ -1,5 +1,5 @@
 import { createTag } from '../../scripts/scripts.js';
-import { loadCSS, toClassName } from '../../scripts/lib-franklin.js';
+import { loadCSS, toClassName } from '../../scripts/aem.js';
 import { createForm } from '../form/form.js';
 import W3color from './w3color.js';
 
