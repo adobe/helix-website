@@ -163,6 +163,13 @@ With this information, you can construct URLs for the preview environment (same 
 - **Production Live**: `https://main--{repo}--{owner}.aem.live/`
 - **Feature Preview**: `https://{branch}--{repo}--{owner}.aem.page/`
 
+**⚠️ Site alias warning:** The GitHub repo is `helix-website`, but the site's active Document Authoring (DA) project is registered under a different name, `aem-website`. This means the URL pattern above is misleading if you substitute `{repo}` with the actual GitHub repo name:
+
+- `{branch}--helix-website--adobe.aem.page` points at **stale, pre-DA content**. It does not reflect what authors are actually editing today, and does not match `www.aem.live`.
+- `{branch}--aem-website--adobe.aem.page` is the alias actually wired to current DA content, and is what you must use to verify anything DA-authored or data-dependent (e.g. content fetched from `.json` endpoints backed by DA sheets).
+
+**Before treating any preview link as proof a fix works — especially for data parsing/formatting bugs — fetch and test against the real production data directly** (e.g. `curl https://www.aem.live/...json`), not just a preview URL. A preview environment can silently be looking at different underlying data than production, even when running the exact same code.
+
 ### Publishing Process
 1. Push changes to a feature branch
 2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch

@@ -877,8 +877,7 @@ export function loadFeedData() {
   fetch(`/community-feeds.json?offset=${offset}`)
     .then((response) => response.json())
     .then((responseJson) => {
-      window.siteindex.archive.data = (responseJson.archive && responseJson.archive.data)
-        ?? (responseJson.youtube && responseJson.youtube.data);
+      window.siteindex.archive.data = responseJson?.youtube?.data;
       window.siteindex.loaded = true;
       const event = new Event('dataset-ready');
       document.dispatchEvent(event);

@@ -79,18 +79,16 @@ function getYouTubeId(url) {
   }
 }
 
-function parseFeedDate(serial) {
-  // Excel-style serial (archive sheet) vs. literal timestamp string (youtube sheet)
-  const isSerial = /^\d+(\.\d+)?$/.test(String(serial).trim());
-  return isSerial
-    ? new Date(new Date(1899, 11, 30).getTime() + parseFloat(serial) * 86400000)
-    : new Date(serial.replace(' ', 'T'));
+function parseFeedDate(value) {
+  // DA sheet date format: M/D/YY, e.g. "6/18/26"
+  const [month, day, year] = String(value).split('/').map(Number);
+  return new Date(2000 + year, month - 1, day);
 }
 
-function formatFeedDate(serial) {
-  const d = parseFeedDate(serial);
+function formatFeedDate(value) {
+  const d = parseFeedDate(value);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+  return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function createFeedCard(item) {
