@@ -79,9 +79,16 @@ function getYouTubeId(url) {
   }
 }
 
+function parseFeedDate(serial) {
+  // Excel-style serial (archive sheet) vs. literal timestamp string (youtube sheet)
+  const isSerial = /^\d+(\.\d+)?$/.test(String(serial).trim());
+  return isSerial
+    ? new Date(new Date(1899, 11, 30).getTime() + parseFloat(serial) * 86400000)
+    : new Date(serial.replace(' ', 'T'));
+}
+
 function formatFeedDate(serial) {
-  const epoch = new Date(1899, 11, 30);
-  const d = new Date(epoch.getTime() + parseFloat(serial) * 86400000);
+  const d = parseFeedDate(serial);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${months[d.getMonth()]} ${d.getFullYear()}`;
 }
@@ -122,7 +129,7 @@ export async function renderFeedCompact(block) {
   }
 
   const data = [...(window.siteindex?.archive?.data || [])]
-    .sort((a, b) => parseFloat(b.Date) - parseFloat(a.Date));
+    .sort((a, b) => parseFeedDate(b.Date) - parseFeedDate(a.Date));
 
   block.textContent = '';
 
