@@ -11,7 +11,7 @@
 /* Base Event Banner Block */
 .event-banner {
   position: relative;
-  color: var(--color-white);
+  color: #fff;
   padding: 0;
   text-align: center;
   overflow: hidden;
@@ -43,7 +43,7 @@
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 20px;
-  color: var(--color-white);
+  color: #fff;
 }
 
 /* Subtitle */
@@ -53,7 +53,7 @@
   font-size: 24px;
   font-weight: 400;
   margin: 0 0 20px;
-  color: var(--color-white);
+  color: #fff;
   opacity: 0.9;
 }
 
@@ -129,7 +129,7 @@
   font-weight: 700;
   line-height: 1;
   margin: 0 0 8px;
-  color: var(--color-white);
+  color: #fff;
   letter-spacing: -0.02em;
 }
 
