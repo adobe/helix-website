@@ -14,7 +14,9 @@ export default function decorate(block) {
 
   // Add Adobe logo at the top
   const logoImg = document.createElement('img');
-  logoImg.src = '/blocks/event-banner/adobe-logo.svg';
+  logoImg.src = block.classList.contains('devlive-redlogo')
+    ? '/blocks/event-banner/adobe-logo-red.svg'
+    : '/blocks/event-banner/adobe-logo.svg';
   logoImg.alt = 'Adobe';
   logoImg.className = 'adobe-logo';
   content.insertBefore(logoImg, content.firstChild);
