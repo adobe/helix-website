@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: oklch(0.975 0.002 45); }
+  a { color: oklch(0.5 0.19 31); }
+  a:hover { color: oklch(0.4 0.16 31); }
+</style>
+</helmet>
+<div style="width: 1160px; box-sizing: border-box; padding: 72px 80px 64px; background: oklch(0.975 0.002 45); font-family: 'Adobe Clean', system-ui, sans-serif; color: oklch(0.24 0.004 45);">
+
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; padding-bottom: 24px; border-bottom: 1px solid oklch(0.885 0.003 45);">
+    <h1 style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.022em; line-height: 1.05;">Public Site Delivery</h1>
+    <div style="display: flex; gap: 22px; padding-bottom: 4px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 11px; height: 11px; border-radius: 2px; background: oklch(0.983 0.014 31); border: 1px solid oklch(0.79 0.115 31);"></div>
+        <span style="font-family: 'Source Code Pro', monospace; font-size: 11.5px; color: oklch(0.48 0.004 45);">Adobe</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 11px; height: 11px; border-radius: 2px; background: oklch(1 0 0); border: 1px solid oklch(0.86 0.003 45);"></div>
+        <span style="font-family: 'Source Code Pro', monospace; font-size: 11.5px; color: oklch(0.48 0.004 45);">Customer</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; padding-top: 40px;">
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 18px;">
+      <span style="font-family: 'Source Code Pro', monospace; font-size: 12px; padding: 5px 11px; border: 1px solid oklch(0.885 0.003 45); border-radius: 3px; background: oklch(1 0 0); color: oklch(0.4 0.004 45);">Chrome</span>
+      <span style="font-family: 'Source Code Pro', monospace; font-size: 12px; padding: 5px 11px; border: 1px solid oklch(0.885 0.003 45); border-radius: 3px; background: oklch(1 0 0); color: oklch(0.4 0.004 45);">Safari</span>
+      <span style="font-family: 'Source Code Pro', monospace; font-size: 12px; padding: 5px 11px; border: 1px solid oklch(0.885 0.003 45); border-radius: 3px; background: oklch(1 0 0); color: oklch(0.4 0.004 45);">Edge</span>
+      <span style="font-family: 'Source Code Pro', monospace; font-size: 12px; padding: 5px 11px; border: 1px solid oklch(0.885 0.003 45); border-radius: 3px; background: oklch(1 0 0); color: oklch(0.4 0.004 45);">Firefox</span>
+      <span style="font-family: 'Source Code Pro', monospace; font-size: 12px; padding: 5px 11px; border: 1px solid oklch(0.885 0.003 45); border-radius: 3px; background: oklch(1 0 0); color: oklch(0.4 0.004 45);">App Store</span>
+      <span style="font-family: 'Source Code Pro', monospace; font-size: 12px; padding: 5px 11px; border: 1px solid oklch(0.885 0.003 45); border-radius: 3px; background: oklch(1 0 0); color: oklch(0.4 0.004 45);">Google Play</span>
+    </div>
+
+    <div style="background: oklch(1 0 0); border: 1px solid oklch(0.895 0.003 45); border-radius: 6px; padding: 28px 30px; display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.012em;">Adobe-managed or Existing Customer Web Infrastructure</div>
+        <div style="font-size: 14px; color: oklch(0.52 0.004 45);">CDN, DNS, etc.</div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <span style="font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 3px; background: oklch(0.955 0.003 45); color: oklch(0.34 0.004 45);">Cloudflare</span>
+        <span style="font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 3px; background: oklch(0.955 0.003 45); color: oklch(0.34 0.004 45);">Akamai</span>
+        <span style="font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 3px; background: oklch(0.955 0.003 45); color: oklch(0.34 0.004 45);">Fastly</span>
+        <span style="font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 3px; background: oklch(0.955 0.003 45); color: oklch(0.34 0.004 45);">CloudFront</span>
+        <span style="font-size: 14px; font-weight: 500; padding: 8px 16px; border-radius: 3px; background: oklch(0.945 0.028 31); color: oklch(0.34 0.004 45);">Adobe-managed CDN</span>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px; padding-left: 40px;">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 1px; height: 38px; background: oklch(0.72 0.003 45);"></div>
+        <div style="width: 0; height: 0; border-left: 4.5px solid transparent; border-right: 4.5px solid transparent; border-top: 7px solid oklch(0.72 0.003 45);"></div>
+      </div>
+      <div style="font-family: 'Source Code Pro', monospace; font-size: 12px; color: oklch(0.5 0.004 45); padding-top: 6px;">origin request</div>
+    </div>
+
+    <div style="background: oklch(0.983 0.014 31); border: 1px solid oklch(0.79 0.115 31); border-radius: 6px; padding: 28px 30px; display: flex; align-items: center; justify-content: space-between; gap: 28px;">
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.012em;">Edge Delivery Services</div>
+        <div style="font-family: 'Source Code Pro', monospace; font-size: 13.5px; color: oklch(0.5 0.004 45);">*.aem.live</div>
+      </div>
+      <div style="font-family: 'Source Code Pro', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.565 0.225 31); white-space: nowrap;">Adobe</div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>
