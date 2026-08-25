@@ -52,9 +52,8 @@ export default function decorate(block) {
     const info = document.createElement('div');
     info.className = 'event-sessions-card-info';
 
-    // Content model is positional: title, then speaker name (shown on the
-    // banner image itself, not repeated in the card body), then description.
-    const [titlePara, , ...descriptionParas] = [...contentCell.querySelectorAll('p')];
+    // Content model is positional: title, then description.
+    const [titlePara, ...descriptionParas] = [...contentCell.querySelectorAll('p')];
 
     if (titlePara) {
       const heading = document.createElement('h3');
