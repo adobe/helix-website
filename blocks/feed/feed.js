@@ -6,68 +6,6 @@ import {
   decorateGuideTemplateCodeBlock,
 } from '../../scripts/scripts.js';
 
-// Convert timestamp to seconds
-function timeToSeconds(time) {
-  const parts = time.split(':').map(Number);
-  if (parts.length === 3) {
-    return parts[0] * 3600 + parts[1] * 60 + parts[2];
-  }
-  return parts[0] * 60 + parts[1];
-}
-
-// Parse timestamps from video description
-function parseChapterTimestamps(description, videoUrl) {
-  if (!description) return [];
-
-  // Match timestamps like 00:00, 0:00, 01:23, 1:23:45
-  const timestampRegex = /(?:^|\n)(\d{1,2}:\d{1,2}:\d{2}|\d{1,2}:\d{2})\s+([^\n]+)/g;
-  const chapters = [];
-  let match = timestampRegex.exec(description);
-
-  while (match !== null) {
-    const [, time, title] = match;
-    const seconds = timeToSeconds(time);
-    chapters.push({
-      timestamp: time,
-      title: title.trim(),
-      seconds,
-      url: `${videoUrl}&t=${seconds}s`,
-    });
-    match = timestampRegex.exec(description);
-  }
-
-  return chapters;
-}
-
-// Create chapter markers UI
-function createChapterMarkers(chapters) {
-  if (!chapters || chapters.length === 0) return null;
-
-  const chaptersContainer = createTag('div', { class: 'chapter-markers' });
-  const chaptersTitle = createTag('h4', { class: 'chapters-title' }, 'Chapters');
-  chaptersContainer.appendChild(chaptersTitle);
-
-  const chaptersList = createTag('ul', { class: 'chapters-list' });
-  chapters.forEach((chapter) => {
-    const listItem = createTag('li', { class: 'chapter-item' });
-    const link = createTag('a', {
-      href: chapter.url,
-      target: '_blank',
-      class: 'chapter-link',
-    });
-    const timestamp = createTag('span', { class: 'chapter-timestamp' }, chapter.timestamp);
-    const title = createTag('span', { class: 'chapter-title' }, chapter.title);
-
-    link.appendChild(timestamp);
-    link.appendChild(title);
-    listItem.appendChild(link);
-    chaptersList.appendChild(listItem);
-  });
-
-  chaptersContainer.appendChild(chaptersList);
-  return chaptersContainer;
-}
-
 // logic for rendering the community feed
 export async function renderFeed(block) {
   if (!block) {
@@ -105,13 +43,6 @@ export async function renderFeed(block) {
     const img = createTag('img', { src: `https://img.youtube.com/vi/${id}/0.jpg` });
     image.appendChild(img);
     div.appendChild(image);
-
-    // Add chapter markers if timestamps are found in description
-    const chapters = parseChapterTimestamps(page.Description, page.URL);
-    const chapterMarkers = createChapterMarkers(chapters);
-    if (chapterMarkers) {
-      div.appendChild(chapterMarkers);
-    }
 
     gridDiv.appendChild(div);
     if (index % 3 === 2 || index === archivePageIndex.length - 1) {
@@ -160,7 +91,81 @@ function formatFeedDate(value) {
   return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function createFeedCard(item) {
+// One chapter per line, as `MM:SS Title`, written into the sheet's Chapters column by
+// the Sync YouTube Chapters workflow. Authors can also fill the column in by hand.
+const CHAPTER_LINE = /^\s*(\d{1,3}:\d{2}(?::\d{2})?)\s+(\S.*?)\s*$/;
+
+function timeToSeconds(time) {
+  return time.split(':').map(Number).reduce((total, part) => total * 60 + part, 0);
+}
+
+function parseChapters(value, videoUrl) {
+  if (!value) return [];
+
+  let base;
+  try {
+    base = new URL(videoUrl);
+  } catch {
+    return [];
+  }
+
+  return value.split('\n').reduce((chapters, line) => {
+    const match = line.match(CHAPTER_LINE);
+    if (match) {
+      const [, time, title] = match;
+      const href = new URL(base);
+      href.searchParams.set('t', `${timeToSeconds(time)}s`);
+      chapters.push({ time, title, href: href.href });
+    }
+    return chapters;
+  }, []);
+}
+
+/** A collapsed list of deep links into the video, or null when it has no chapters. */
+function createChapters(item, id) {
+  const chapters = parseChapters(item.Chapters, item.URL);
+  if (!chapters.length) return null;
+
+  const listId = `feed-chapters-${id}`;
+  const toggle = createTag('button', {
+    type: 'button',
+    class: 'feed-chapters-toggle',
+    'aria-expanded': 'false',
+    'aria-controls': listId,
+  }, `${chapters.length} chapters`);
+
+  const list = createTag('ul', { class: 'feed-chapters-list', id: listId, hidden: 'until-found' });
+  chapters.forEach(({ time, title, href }) => {
+    const link = createTag('a', {
+      class: 'feed-chapter-link', href, target: '_blank', rel: 'noopener noreferrer',
+    });
+    const timeEl = createTag('span', { class: 'feed-chapter-time' });
+    // Chapter text originates from the video description, so keep it out of the HTML parser.
+    timeEl.textContent = time;
+    const titleEl = createTag('span', { class: 'feed-chapter-title' });
+    titleEl.textContent = title;
+    link.append(timeEl, titleEl);
+    list.appendChild(createTag('li', {}, link));
+  });
+
+  const setExpanded = (expanded) => {
+    toggle.setAttribute('aria-expanded', String(expanded));
+    if (expanded) list.removeAttribute('hidden');
+    else list.setAttribute('hidden', 'until-found');
+  };
+
+  toggle.addEventListener('click', () => {
+    setExpanded(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+  // Find-in-page can reveal the list on its own; keep the toggle honest about it.
+  list.addEventListener('beforematch', () => setExpanded(true));
+
+  const wrapper = createTag('div', { class: 'feed-card-chapters' });
+  wrapper.append(toggle, list);
+  return wrapper;
+}
+
+function createFeedCard(item, index) {
   const videoId = getYouTubeId(item.URL);
   const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
 
@@ -182,7 +187,15 @@ function createFeedCard(item) {
   info.appendChild(createTag('span', { class: 'feed-card-date' }, formatFeedDate(item.Date)));
   card.appendChild(info);
 
-  return card;
+  // The chapter links have to live outside the card's own anchor, so the card chrome moves
+  // to this wrapper and the anchor is left holding only the thumbnail and title.
+  const wrapper = createTag('div', { class: 'feed-card-wrap' });
+  wrapper.appendChild(card);
+
+  const chapters = createChapters(item, videoId || index);
+  if (chapters) wrapper.appendChild(chapters);
+
+  return wrapper;
 }
 
 function getCompactItems(data, filter) {
@@ -238,7 +251,7 @@ export async function renderFeedCompact(block) {
     }
 
     const grid = createTag('div', { class: 'feed-grid' });
-    visibleItems.forEach((item) => grid.appendChild(createFeedCard(item)));
+    visibleItems.forEach((item, i) => grid.appendChild(createFeedCard(item, i)));
     contentArea.appendChild(grid);
 
     if (viewState.filter === 'all' && viewState.visibleCount < items.length) {
