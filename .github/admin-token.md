@@ -13,10 +13,25 @@ The steps below take about two minutes. Everything happens against
 `org=adobe`, `site=aem-website` — note that the site is *not* named after this GitHub repo;
 see the site alias warning in `CLAUDE.md`.
 
+## 0. Check you have the `admin` role
+
+API keys can only be minted by a request that already holds the `admin` role on
+`adobe`, and that is a different, higher bar than being able to publish. If you can preview
+and publish the site, or even read its config, that is *not* enough. A mint attempt without
+it fails with:
+
+```
+HTTP/2 403
+x-error: [admin] not authorized
+```
+
+Role mapping for this site lives in the org config (`adobe`), not the site config — the
+site's own `access` block is empty — so ask whoever administers the `adobe` org to grant it,
+or to mint the key for you with the request in step 2.
+
 ## 1. Get a browser auth token
 
-API keys can only be minted by a request that is already authenticated with the `admin`
-role, so start from a normal browser login.
+Start from a normal browser login.
 
 1. Open <https://api.aem.live/auth/adobe> and sign in. (For the full list of identity
    providers, open <https://api.aem.live/login> and pick one.)
@@ -30,8 +45,9 @@ makes to `api.aem.live` — grab it from the **Network** tab instead.
 export AUTH_TOKEN='<the auth_token cookie value>'
 ```
 
-Check it worked. This prints your email and the token's remaining lifetime in seconds —
-it is short-lived, which is exactly why it is not what goes into the repository secret:
+Check it worked. This prints your email and the token's remaining lifetime in seconds
+(about a day) — short-lived, which is exactly why it is not what goes into the repository
+secret:
 
 ```sh
 curl -s https://api.aem.live/profile -H "cookie: auth_token=$AUTH_TOKEN"
@@ -65,8 +81,10 @@ curl -s -o /dev/null -w '%{http_code}\n' \
   -H "authorization: token $API_KEY"
 ```
 
-`200` means you are done. If it returns `403`, the `publish` role was not enough: delete
-the key and mint a new one with `"roles":["admin"]`.
+`200` means you are done. If it returns `403`, the roles you asked for were not enough:
+delete the key and mint a new one with a broader set. The chapter sync in
+`tools/youtube-chapters/` additionally writes to `/{org}/sites/{site}/source/{path}`, so
+check that too if you are minting one key for both workflows.
 
 ```sh
 # only if you need to start over
