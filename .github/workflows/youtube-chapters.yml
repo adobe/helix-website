@@ -15,9 +15,9 @@ permissions:
   contents: read
 
 env:
-  DA_ORG: adobe
-  # The DA project is registered as `aem-website`, not as the GitHub repo name.
-  DA_SITE: aem-website
+  AEM_ORG: adobe
+  # The site is registered as `aem-website`, not after the GitHub repo. See CLAUDE.md.
+  AEM_SITE: aem-website
   SHEET_PATH: /community-feeds.json
   SHEET_NAME: youtube
 
@@ -33,11 +33,10 @@ jobs:
 
       - name: Check for required secrets
         env:
-          DA_TOKEN: ${{ secrets.DA_TOKEN }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           AEM_ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
         run: |
-          for name in DA_TOKEN YOUTUBE_API_KEY AEM_ADMIN_TOKEN; do
+          for name in YOUTUBE_API_KEY AEM_ADMIN_TOKEN; do
             if [[ -z "${!name}" ]]; then
               echo "::error::The $name secret is not configured. See tools/youtube-chapters/README.md."
               exit 1
@@ -46,7 +45,6 @@ jobs:
 
       - name: Sync chapters into the community feed sheet
         env:
-          DA_TOKEN: ${{ secrets.DA_TOKEN }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           AEM_ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
           DRY_RUN: ${{ inputs.dry-run }}

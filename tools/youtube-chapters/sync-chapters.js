@@ -1,16 +1,18 @@
 /*
- * Syncs YouTube chapter markers into the community feed sheet in Document Authoring.
+ * Syncs YouTube chapter markers into the community feed sheet.
  *
  * Videos in the feed sheet are looked up via the YouTube Data API, their descriptions
  * are scanned for a chapter list, and the result is written back to a `Chapters` column
  * so the feed block can render deep links without calling YouTube at runtime.
  *
+ * Reading and writing the sheet, previewing and publishing all go through the AEM Admin
+ * API, so one admin API key covers the whole run.
+ *
  * Run with `node tools/youtube-chapters/sync-chapters.js`; see the workflow of the same name
  * for the environment it expects.
  */
 
-const DA_ORIGIN = 'https://admin.da.live';
-const ADMIN_ORIGIN = 'https://admin.hlx.page';
+const AEM_ORIGIN = 'https://api.aem.live';
 const YT_ORIGIN = 'https://www.googleapis.com/youtube/v3';
 
 // YouTube looks up at most 50 video ids per videos.list call.
@@ -99,41 +101,43 @@ function required(name) {
   return value;
 }
 
-async function fetchSheet({
-  origin, org, site, path, token,
-}) {
-  const url = `${origin}/source/${org}/${site}${path}`;
-  const resp = await fetch(url, { headers: { authorization: `Bearer ${token}` } });
-  if (!resp.ok) throw new Error(`Could not read ${url}: ${resp.status} ${resp.statusText}`);
-  return resp.json();
+/** `https://api.aem.live/{org}/sites/{site}/{route}{path}` */
+function adminUrl({ org, site, route }, path) {
+  return `${AEM_ORIGIN}/${org}/sites/${site}/${route}${path}`;
 }
 
-async function saveSheet({
-  origin, org, site, path, token, json,
-}) {
-  const url = `${origin}/source/${org}/${site}${path}`;
+async function adminFetch(target, route, path, init = {}) {
+  const url = adminUrl({ ...target, route }, path);
   const resp = await fetch(url, {
+    ...init,
+    headers: { ...init.headers, authorization: `token ${target.token}` },
+  });
+  if (!resp.ok) {
+    throw new Error(`${init.method || 'GET'} ${url} failed: ${resp.status} ${resp.statusText}`);
+  }
+  return resp;
+}
+
+async function fetchSheet(target, path) {
+  return (await adminFetch(target, 'source', path)).json();
+}
+
+async function saveSheet(target, path, json) {
+  await adminFetch(target, 'source', path, {
     method: 'PUT',
-    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify(json),
   });
-  if (!resp.ok) throw new Error(`Could not write ${url}: ${resp.status} ${resp.statusText}`);
 }
 
 /** Preview and publish the sheet so the change reaches the site. */
-async function publish({
-  origin, org, site, ref, path, token,
-}) {
-  const results = [];
+async function publish(target, path) {
   // Sequential: publishing a resource that has not been previewed yet is a no-op.
   for (const route of ['preview', 'live']) {
-    const url = `${origin}/${route}/${org}/${site}/${ref}${path}`;
     // eslint-disable-next-line no-await-in-loop
-    const resp = await fetch(url, { method: 'POST', headers: { authorization: `token ${token}` } });
-    if (!resp.ok) throw new Error(`Could not ${route} ${url}: ${resp.status} ${resp.statusText}`);
-    results.push(route);
+    await adminFetch(target, route, path, { method: 'POST' });
   }
-  return results;
+  return ['preview', 'live'];
 }
 
 /** Descriptions for `ids`, keyed by video id. Ids YouTube does not return are simply absent. */
@@ -190,17 +194,17 @@ function padColWidths(sheet) {
 }
 
 async function main() {
-  const daToken = required('DA_TOKEN');
   const apiKey = required('YOUTUBE_API_KEY');
-  const daOrg = required('DA_ORG');
-  const daSite = required('DA_SITE');
+  const target = {
+    org: required('AEM_ORG'),
+    site: required('AEM_SITE'),
+    token: required('AEM_ADMIN_TOKEN'),
+  };
   const sheetPath = required('SHEET_PATH');
   const sheetName = required('SHEET_NAME');
   const dryRun = process.env.DRY_RUN === 'true';
 
-  const json = await fetchSheet({
-    origin: DA_ORIGIN, org: daOrg, site: daSite, path: sheetPath, token: daToken,
-  });
+  const json = await fetchSheet(target, sheetPath);
 
   const sheet = json[':type'] === 'multi-sheet' ? json[sheetName] : json;
   const rows = sheet?.data;
@@ -230,19 +234,10 @@ async function main() {
   }
 
   padColWidths(sheet);
-  await saveSheet({
-    origin: DA_ORIGIN, org: daOrg, site: daSite, path: sheetPath, token: daToken, json,
-  });
-  console.log(`Saved ${sheetPath} to Document Authoring`);
+  await saveSheet(target, sheetPath, json);
+  console.log(`Saved ${sheetPath} to the source bus`);
 
-  const routes = await publish({
-    origin: ADMIN_ORIGIN,
-    org: process.env.AEM_ORG || daOrg,
-    site: process.env.AEM_SITE || daSite,
-    ref: process.env.AEM_REF || 'main',
-    path: sheetPath,
-    token: required('AEM_ADMIN_TOKEN'),
-  });
+  const routes = await publish(target, sheetPath);
   console.log(`Published ${sheetPath} (${routes.join(', ')})`);
 }
 
