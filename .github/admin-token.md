@@ -70,7 +70,35 @@ retrieved again** — copy it now.
 export API_KEY='<the value from the response>'
 ```
 
-## 3. Check the key actually works
+## 3. Enable the key on the site
+
+**A new key does not work until its id is on the site's allow-list**, despite what
+[the API key docs](https://www.aem.live/docs/admin-apikeys) say about keys being enabled
+automatically. Until you do this every call returns:
+
+```
+HTTP/2 401
+x-error: [AWS] Unauthorized
+```
+
+Read the current allow-list, append the `id` the mint returned — do not replace the list,
+other keys depend on it — and post it back:
+
+```sh
+curl -s https://api.aem.live/adobe/sites/aem-website/config/access/admin.json \
+  -H "cookie: auth_token=$AUTH_TOKEN" > access-admin.json
+
+# add the new id to the apiKeyId array in access-admin.json, then:
+curl -s -X POST \
+  https://api.aem.live/adobe/sites/aem-website/config/access/admin.json \
+  -H "cookie: auth_token=$AUTH_TOKEN" \
+  -H 'content-type: application/json' \
+  --data-binary @access-admin.json
+```
+
+Re-read it afterwards and check that `requireAuth` and the `role` block came back unchanged.
+
+## 4. Check the key actually works
 
 The role a given endpoint needs is not documented yet, so verify rather than assume. This
 is the exact call **Track Publishes** makes:
@@ -81,10 +109,15 @@ curl -s -o /dev/null -w '%{http_code}\n' \
   -H "authorization: token $API_KEY"
 ```
 
-`200` means you are done. If it returns `403`, the roles you asked for were not enough:
-delete the key and mint a new one with a broader set. The chapter sync in
-`tools/youtube-chapters/` additionally writes to `/{org}/sites/{site}/source/{path}`, so
-check that too if you are minting one key for both workflows.
+`200` means you are done. `401` means step 3 has not taken effect. `403` means the roles
+you asked for were not enough — delete the key and mint a new one with a broader set.
+
+The chapter sync in `tools/youtube-chapters/` also writes to
+`/{org}/sites/{site}/source/{path}`, so if one key serves both workflows, check that the
+key can `PUT` a scratch document and `DELETE` it again.
+
+A key minted this way is deliberately *not* able to manage configuration — a `POST` to any
+`config/` path returns `403 [admin] not authorized`, so it cannot widen its own access.
 
 ```sh
 # only if you need to start over
@@ -93,7 +126,10 @@ curl -s -X DELETE \
   -H "cookie: auth_token=$AUTH_TOKEN"
 ```
 
-## 4. Store it
+Note that key ids may contain `/`, which the config stores as `_`. Use the id exactly as
+the listing shows it, not the raw `jti` from the mint response, or the delete returns `400`.
+
+## 5. Store it
 
 Settings → Secrets and variables → Actions → `AEM_LIVE_ADMIN_TOKEN` → **Update secret**.
 
