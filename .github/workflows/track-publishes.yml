@@ -14,51 +14,69 @@ env:
   REPOSITORY_DISPATCH_EVENT: "resource-published-native" # default value for all triggers, this is a compatibility fix for older workflows
   WORKFLOW_CALL_USE: "example" # if REPOSITORY_DISPATCH_EVENT is unset, this is the workflow file that will be called
   ROUTE_FILTER: "live" # filter for the route field in the logs, can be 'live' or 'preview'
+  AEM_API: "https://api.aem.live" # Helix 6 admin API; replaces admin.hlx.page
+  AEM_ORG: "adobe"
+  # The GitHub repo is helix-website, but the site serving www.aem.live - and therefore the
+  # one publishes are logged against - is registered as aem-website. See CLAUDE.md.
+  AEM_SITE: "aem-website"
 
 jobs:
   check-token-expiry:
     runs-on: ubuntu-latest
     steps:
       - name: Check JWT token expiration
+        env:
+          TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
         run: |
-          # Function to decode JWT token part
+          set -euo pipefail
+
+          RUNBOOK="https://github.com/${{ github.repository }}/blob/main/.github/admin-token.md"
+
+          if [[ -z "$TOKEN" ]]; then
+            echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. See $RUNBOOK"
+            exit 1
+          fi
+
+          # Admin API keys are JWTs, so the expiry can be read without calling the API.
           decode_base64_url() {
-            local len=$((${#1} % 4))
             local result="$1"
-            if [ $len -eq 2 ]; then result="$1"'=='
-            elif [ $len -eq 3 ]; then result="$1"'='
-            fi
+            case $((${#1} % 4)) in
+              2) result="$1==" ;;
+              3) result="$1=" ;;
+            esac
             echo "$result" | tr '_-' '/+' | base64 -d
           }
-          
-          # Get the token
-          TOKEN="${{ secrets.AEM_LIVE_ADMIN_TOKEN }}"
-          
-          # Extract the payload (second part of the JWT)
-          PAYLOAD=$(echo -n $TOKEN | cut -d '.' -f 2)
-          
-          # Decode the payload
-          DECODED_PAYLOAD=$(decode_base64_url $PAYLOAD)
-          
-          # Extract expiration timestamp
-          EXPIRY=$(echo $DECODED_PAYLOAD | jq -r .exp)
+
+          PAYLOAD=$(printf '%s' "$TOKEN" | cut -d '.' -f 2)
+          EXPIRY=$(decode_base64_url "$PAYLOAD" 2>/dev/null | jq -r '.exp // empty' 2>/dev/null || true)
+
+          if [[ -z "$EXPIRY" ]]; then
+            echo "::error::AEM_LIVE_ADMIN_TOKEN is not a JWT with an exp claim. Mint an admin API key as described in $RUNBOOK"
+            exit 1
+          fi
+
           CURRENT_TIME=$(date +%s)
           ONE_WEEK_FROM_NOW=$((CURRENT_TIME + 7*24*60*60))
-          
-          echo "Token expires at: $(date -d @$EXPIRY)"
-          echo "Current time: $(date -d @$CURRENT_TIME)"
-          echo "One week from now: $(date -d @$ONE_WEEK_FROM_NOW)"
-          
-          if [ $EXPIRY -lt $ONE_WEEK_FROM_NOW ]; then
-            echo "::warning::AEM_LIVE_ADMIN_TOKEN will expire in less than a week (on $(date -d @$EXPIRY)). Please renew the token soon."
-            echo "Token expiration is approaching" >> $GITHUB_STEP_SUMMARY
-            echo "The AEM_LIVE_ADMIN_TOKEN will expire on $(date -d @$EXPIRY)" >> $GITHUB_STEP_SUMMARY
-            echo "Please generate a new token and update the repository secret." >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ $EXPIRY -lt $CURRENT_TIME ]; then
-            echo "::error::AEM_LIVE_ADMIN_TOKEN has expired on $(date -d @$EXPIRY)"
+
+          echo "Token expires at: $(date -d "@$EXPIRY")"
+          echo "Current time:     $(date -d "@$CURRENT_TIME")"
+
+          if [[ "$EXPIRY" -lt "$CURRENT_TIME" ]]; then
+            {
+              echo "### AEM_LIVE_ADMIN_TOKEN has expired"
+              echo "It expired on $(date -d "@$EXPIRY"). Every run of this workflow will fail with a 401 until it is rotated."
+              echo "Rotate it by following $RUNBOOK"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::AEM_LIVE_ADMIN_TOKEN expired on $(date -d "@$EXPIRY"). Rotate it: $RUNBOOK"
             exit 1
+          fi
+
+          if [[ "$EXPIRY" -lt "$ONE_WEEK_FROM_NOW" ]]; then
+            {
+              echo "### AEM_LIVE_ADMIN_TOKEN expires soon"
+              echo "It expires on $(date -d "@$EXPIRY"). Rotate it by following $RUNBOOK"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::AEM_LIVE_ADMIN_TOKEN expires on $(date -d "@$EXPIRY"). Rotate it: $RUNBOOK"
           fi
   check-last-run:
     runs-on: ubuntu-latest
@@ -191,7 +209,7 @@ jobs:
       - name: Check for required secrets
         run: |
           if [[ -z "${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" ]]; then
-            echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. Please add this secret to your repository settings."
+            echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. See https://github.com/${{ github.repository }}/blob/main/.github/admin-token.md"
             exit 1
           fi
       - name: Get Logs
@@ -204,7 +222,7 @@ jobs:
           echo "Debug: URL encoded from parameter: $FROM_PARAM"
           
           # Construct and echo the full URL for debugging
-          FULL_URL="https://admin.hlx.page/log/adobe/helix-website/main?from=$FROM_PARAM"
+          FULL_URL="${{ env.AEM_API }}/${{ env.AEM_ORG }}/sites/${{ env.AEM_SITE }}/log?from=$FROM_PARAM"
           echo "Debug: Full URL: $FULL_URL"
           
           # Make the API request
