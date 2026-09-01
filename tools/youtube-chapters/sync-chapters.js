@@ -163,26 +163,51 @@ async function fetchDescriptions(ids, apiKey) {
 }
 
 /**
- * Writes a `Chapters` cell onto every row of `rows`, and reports which ones changed.
- * Rows whose video has no chapter list get an empty cell so the column stays uniform.
+ * Where a row's existing chapters came from. Only `youtube` chapters are ours to replace:
+ * `generated` ones were derived from the video's transcript and `manual` ones were typed by
+ * an author, and neither should be cleared just because the description has no Topics block.
  */
-function applyChapters(rows, descriptions) {
+const OWNED_SOURCE = 'youtube';
+
+/**
+ * Writes `Chapters` and `ChaptersSource` onto the rows whose chapters we own, and reports
+ * which ones changed. Rows sourced elsewhere, and rows YouTube did not answer for, are left
+ * exactly as they are.
+ */
+export function applyChapters(rows, descriptions) {
   const changed = [];
 
   rows.forEach((row) => {
     const id = getVideoId(row.URL);
     const description = id ? descriptions.get(id) : undefined;
-    // Leave rows alone when YouTube did not answer for them - a deleted or private video
-    // should not silently wipe chapters an author entered by hand.
-    const chapters = description === undefined
-      ? row.Chapters || ''
-      : formatChapters(parseChapters(description));
+    const existing = row.Chapters || '';
+    const source = row.ChaptersSource || '';
 
-    if (chapters !== (row.Chapters || '')) changed.push({ title: row.Title, chapters });
+    // A deleted or private video should not wipe whatever the sheet already holds.
+    if (description === undefined) return;
+
+    const chapters = formatChapters(parseChapters(description));
+
+    // The author's own Topics block always wins - it is the most direct statement of intent.
+    if (!chapters && source && source !== OWNED_SOURCE) return;
+
+    const nextSource = chapters ? OWNED_SOURCE : '';
+    if (chapters === existing && nextSource === source) return;
+
+    changed.push({ title: row.Title, chapters, from: source || 'none' });
     row.Chapters = chapters;
+    row.ChaptersSource = nextSource;
   });
 
   return changed;
+}
+
+/** Every row carries both columns, so the sheet keeps a rectangular shape. */
+export function ensureColumns(rows) {
+  rows.forEach((row) => {
+    if (row.Chapters === undefined) row.Chapters = '';
+    if (row.ChaptersSource === undefined) row.ChaptersSource = '';
+  });
 }
 
 /** Keeps DA's stored column widths aligned with the columns actually present. */
@@ -217,11 +242,13 @@ async function main() {
   const missing = ids.filter((id) => !descriptions.has(id));
   if (missing.length) console.log(`YouTube returned nothing for ${missing.length} video(s): ${missing.join(', ')}`);
 
+  ensureColumns(rows);
   const changed = applyChapters(rows, descriptions);
   const withChapters = rows.filter((row) => row.Chapters).length;
   console.log(`${withChapters} of ${rows.length} videos have chapters; ${changed.length} row(s) changed`);
-  changed.forEach(({ title, chapters }) => {
-    console.log(`  ${title}: ${chapters ? `${chapters.split('\n').length} chapters` : 'cleared'}`);
+  changed.forEach(({ title, chapters, from }) => {
+    const what = chapters ? `${chapters.split('\n').length} chapters` : 'cleared';
+    console.log(`  ${title}: ${what} (was ${from})`);
   });
 
   if (!changed.length) {

@@ -14,10 +14,27 @@ Each run:
 
 Nothing is written when no chapter list changed, so a quiet run is a no-op.
 
+## Where a row's chapters came from
+
+A second column, `ChaptersSource`, records the provenance of each `Chapters` cell, and it
+decides what a run is allowed to overwrite:
+
+| `ChaptersSource` | Meaning | What a run does |
+| --- | --- | --- |
+| `youtube` | Lifted from the video's own description | Kept in sync, and cleared if the author removes the Topics block |
+| `generated` | Derived from the video transcript | Left alone, unless the description gains a Topics block |
+| `manual` | Typed into the sheet by an author | Left alone, unless the description gains a Topics block |
+| empty | No chapters | Filled in if the description gains a Topics block |
+
+Without this the sync would be destructive: most recordings have no Topics block, so a run
+would write an empty cell over chapters that came from anywhere else. The author's own
+description always wins when it has chapters - it is the most direct statement of intent -
+but silence in a description is not an instruction to delete someone else's work.
+
 The `feed` block reads the same column at render time — it never calls YouTube — and shows
 the chapters as a collapsible list of deep links under each recording card. Authors can
-fill the column in by hand too; the format is one `MM:SS Title` line per chapter, and a
-manual edit survives until the video's own description gains a chapter list.
+fill the column in by hand too; the format is one `MM:SS Title` line per chapter. Set
+`ChaptersSource` to `manual` when you do, so a later run does not clear it.
 
 ## What counts as a chapter list
 
