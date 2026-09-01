@@ -30,11 +30,12 @@ const gist = (element) => {
   });
 };
 
-const youtube = (element) => {
+const youtube = (element, autoplay) => {
   const url = new URL(element.href);
-  const vid = url.searchParams.get('v');
+  const vid = url.searchParams.get('v') || url.pathname.slice(1);
+  const params = autoplay ? '?autoplay=1&mute=1' : '';
   const html = `<div class="youtube-wrapper">
-          <iframe src="https://www.youtube.com/embed/${vid}" style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;" allowfullscreen="" scrolling="no" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" title="Content from Youtube" loading="lazy"></iframe>
+          <iframe src="https://www.youtube.com/embed/${vid}${params}" style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;" allowfullscreen="" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" title="Content from Youtube" loading="lazy"></iframe>
       </div>`;
   element.parentElement.insertAdjacentHTML('afterend', html);
   element.parentElement.remove();
@@ -68,9 +69,10 @@ const initObserver = (callback) => new IntersectionObserver((entries) => {
 export default function decorate(block) {
   const a = block.querySelector('a');
   const { hostname } = new URL(a.href);
+  const autoplay = block.classList.contains('autoplay');
   if (hostname.includes('youtu')) {
     initObserver(() => {
-      youtube(a);
+      youtube(a, autoplay);
     }).observe(a);
   } else if (hostname.includes('gist')) {
     initObserver(() => {

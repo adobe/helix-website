@@ -638,7 +638,7 @@ function buildEmbeds(main) {
     ...main.querySelectorAll(
       'a[href^="https://www.youtube.com"], a[href^="https://gist.github.com"]',
     ),
-  ].filter((embed) => !embed.closest('.event-list'));
+  ].filter((embed) => !embed.closest('.event-list') && !embed.closest('.embed'));
   embeds.forEach((embed) => {
     embed.replaceWith(buildBlock('embed', embed.outerHTML));
   });
