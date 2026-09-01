@@ -199,7 +199,6 @@
 
 /* with arrow toggle list layer */
 .side-navigation .list-section:last-of-type .list-section-inner > li.side-navigation-nested-target {
-  padding: 2px var(--nav-sidebar-indent-spacing);
   width: 100%;
   cursor: pointer;
   transition: var(--nav-sidebar-transition);
@@ -223,7 +222,6 @@
 .side-navigation-nested-target.active,
 .side-navigation-nested-target.closed {
   background: var(--bg-color-grey);
-  padding: 4px 4px 0;
   border-radius: var(--nav-sidebar-link-border-radius);
 }
 
@@ -276,9 +274,10 @@
   background: none;
   justify-content: space-between;
   align-items: center;
-  padding: 0;
+  padding: 2px var(--nav-sidebar-indent-spacing);
   font: var(--body-font-family);
   color: var(--color-nav-sidebar-subtitle);
+    
 }
 
 .side-navigation .list-section .side-navigation-nested-target button {
