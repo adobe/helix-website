@@ -4,9 +4,9 @@ import { createTag } from '../../scripts/scripts.js';
  * Event List — Collection block for community upcoming events.
  *
  * | Event List |
- * | **Upcoming Events** | |
- * | **Title** ¶ Description ¶ **[Date](youtube-url)** on *Show* | https://youtube.com/watch?v=... |
- * | **Title 2** ¶ Description ¶ **Date** on *Show* | |
+ * | ## Upcoming Events | |
+ * | ### Title ¶ Description ¶ **[Date](youtube-url)** on *Show* | https://youtube.com/watch?v=... |
+ * | ### Title 2 ¶ Description ¶ **Date** on *Show* | |
  *
  * Right column: YouTube URL → poster thumbnail + link; empty → default placeholder (no link).
  */
@@ -45,6 +45,8 @@ function buildMedia(cell) {
         href: youtubeUrl,
         target: '_blank',
         rel: 'noopener noreferrer',
+        class: 'event-list-play-link',
+        'aria-label': 'Play video',
       });
       link.append(createTag('img', {
         src: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
