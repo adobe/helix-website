@@ -5,12 +5,9 @@
  * This turns that into a sentence naming who published, and who wrote it when that is
  * somebody else - a routine split here, where one person authors and another publishes.
  *
- * Slack only notifies on the `<@U012AB3CD>` id form, so emails are resolved to ids when a
- * bot token is available; without one the message still reads correctly, it just does not
- * ping anyone.
+ * Publishers are named by the handle Slack links from their email's local part.
  */
 
-const SLACK_API = 'https://slack.com/api';
 const AEM_ORIGIN = 'https://api.aem.live';
 
 /** Extensions that represent a page rather than a data or media file. */
@@ -29,15 +26,15 @@ export function toSourcePath(path) {
   return page ? `${page}.html` : path;
 }
 
-/** `msagolj@adobe.com` -> `msagolj`, the readable fallback when there is no Slack id. */
+/** `msagolj@adobe.com` -> `@msagolj`, which Slack links and notifies on. */
 export function toHandle(email) {
-  return `@${String(email || '').split('@')[0]}`;
+  if (!email || email === 'unknown') return null;
+  return `@${String(email).split('@')[0]}`;
 }
 
 /**
- * Renders the message. `publisher` and `author` are already-formatted mentions or handles;
- * `author` is only mentioned when it differs from the publisher, since the common case is
- * one person doing both and repeating them reads like noise.
+ * Renders the message. `author` is only named when it differs from the publisher, since the
+ * common case is one person doing both and repeating them reads like noise.
  */
 export function formatMessage({
   publisher, author, path, url,
@@ -46,28 +43,6 @@ export function formatMessage({
   const who = publisher ? `${publisher} published` : 'Just published:';
   const by = author && author !== publisher ? `, authored by ${author}` : '';
   return `${who} ${what}${by}`;
-}
-
-/** The Slack id for an email, or null when it cannot be resolved. */
-async function slackIdForEmail(email, token) {
-  if (!token || !email) return null;
-  try {
-    const resp = await fetch(`${SLACK_API}/users.lookupByEmail?email=${encodeURIComponent(email)}`, {
-      headers: { authorization: `Bearer ${token}` },
-    });
-    const body = await resp.json();
-    return body.ok ? body.user.id : null;
-  } catch {
-    // A lookup failure must not cost us the notification.
-    return null;
-  }
-}
-
-/** A Slack mention when the id resolves, otherwise a plain readable handle. */
-async function mention(email, token) {
-  if (!email || email === 'unknown') return null;
-  const id = await slackIdForEmail(email, token);
-  return id ? `<@${id}>` : toHandle(email);
 }
 
 /** Who last edited the document, per the source bus version history. */
@@ -91,8 +66,6 @@ async function main() {
   const path = process.env.PUBLISH_PATH;
   if (!path) throw new Error('Missing PUBLISH_PATH');
 
-  const slackToken = process.env.SLACK_BOT_TOKEN;
-  const publisherEmail = process.env.PUBLISHER;
   const authorEmail = await lookupAuthor({
     org: process.env.AEM_ORG,
     site: process.env.AEM_SITE,
@@ -102,8 +75,8 @@ async function main() {
 
   const page = toPagePath(path);
   const text = formatMessage({
-    publisher: await mention(publisherEmail, slackToken),
-    author: await mention(authorEmail, slackToken),
+    publisher: toHandle(process.env.PUBLISHER),
+    author: toHandle(authorEmail),
     path,
     url: page ? `${process.env.SITE_URL || 'https://www.aem.live'}${page}` : null,
   });

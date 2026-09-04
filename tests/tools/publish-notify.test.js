@@ -31,9 +31,13 @@ describe('Publish notification paths', () => {
     expect(toSourcePath('/community-feeds.json')).to.equal('/community-feeds.json');
   });
 
-  it('derives a readable handle from an email', () => {
+  it('derives a Slack handle from an email', () => {
     expect(toHandle('msagolj@adobe.com')).to.equal('@msagolj');
-    expect(toHandle(undefined)).to.equal('@');
+  });
+
+  it('has no handle for an unknown publisher', () => {
+    expect(toHandle(undefined)).to.equal(null);
+    expect(toHandle('unknown')).to.equal(null);
   });
 });
 
@@ -41,23 +45,18 @@ describe('Publish notification message', () => {
   const page = { path: '/docs/foo.md', url: 'https://www.aem.live/docs/foo' };
 
   it('names the publisher and links the page', () => {
-    expect(formatMessage({ ...page, publisher: '<@U1>' }))
-      .to.equal('<@U1> published <https://www.aem.live/docs/foo|/docs/foo>');
+    expect(formatMessage({ ...page, publisher: '@bohnert' }))
+      .to.equal('@bohnert published <https://www.aem.live/docs/foo|/docs/foo>');
   });
 
   it('credits the author when it is someone else', () => {
-    expect(formatMessage({ ...page, publisher: '<@U1>', author: '<@U2>' }))
-      .to.equal('<@U1> published <https://www.aem.live/docs/foo|/docs/foo>, authored by <@U2>');
+    expect(formatMessage({ ...page, publisher: '@bohnert', author: '@msagolj' }))
+      .to.equal('@bohnert published <https://www.aem.live/docs/foo|/docs/foo>, authored by @msagolj');
   });
 
   it('does not repeat one person as both publisher and author', () => {
-    expect(formatMessage({ ...page, publisher: '<@U1>', author: '<@U1>' }))
-      .to.equal('<@U1> published <https://www.aem.live/docs/foo|/docs/foo>');
-  });
-
-  it('falls back to a plain handle when no Slack id resolved', () => {
-    expect(formatMessage({ ...page, publisher: '@msagolj', author: '@bohnert' }))
-      .to.equal('@msagolj published <https://www.aem.live/docs/foo|/docs/foo>, authored by @bohnert');
+    expect(formatMessage({ ...page, publisher: '@msagolj', author: '@msagolj' }))
+      .to.equal('@msagolj published <https://www.aem.live/docs/foo|/docs/foo>');
   });
 
   it('still says something useful when the publisher is unknown', () => {
@@ -66,9 +65,9 @@ describe('Publish notification message', () => {
   });
 
   it('announces data and media files that have no page URL', () => {
-    expect(formatMessage({ path: '/community-feeds.json', url: null, publisher: '<@U1>' }))
-      .to.equal('<@U1> published `/community-feeds.json`');
-    expect(formatMessage({ path: '/media/diagram.png', url: null, publisher: '<@U1>' }))
-      .to.equal('<@U1> published `/media/diagram.png`');
+    expect(formatMessage({ path: '/community-feeds.json', url: null, publisher: '@bohnert' }))
+      .to.equal('@bohnert published `/community-feeds.json`');
+    expect(formatMessage({ path: '/media/diagram.png', url: null, publisher: '@bohnert' }))
+      .to.equal('@bohnert published `/media/diagram.png`');
   });
 });
