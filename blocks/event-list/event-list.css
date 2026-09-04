@@ -41,7 +41,7 @@
 }
 
 .event-list .event-list-content p {
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-m-size);
   line-height: 1.6;
   color: var(--color-gray-700);
   margin-bottom: 12px;
