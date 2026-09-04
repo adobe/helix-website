@@ -1,6 +1,6 @@
 /* Community upcoming events — fixed two-column rows */
 .event-list {
-  padding: var(--spacing-xl) var(--spacing-m);
+  padding: var(--spacing-s) var(--spacing-m);
   box-sizing: border-box;
 }
 
@@ -41,33 +41,33 @@
 }
 
 .event-list .event-list-content p {
-  font-size: var(--type-body-s-size);
+  font-size: var(--type-body-m-size);
   line-height: 1.6;
   color: var(--color-gray-700);
   margin-bottom: 12px;
 }
 
-.event-list .event-list-content p:last-child {
+.event-list .event-list-content p:not(:first-of-type) {
   font-size: var(--type-body-xs-size);
   color: var(--color-gray-600);
   margin-bottom: 0;
 }
 
-.event-list .event-list-content p:last-child strong {
+.event-list .event-list-content p:not(:first-of-type) strong {
   font-weight: 600;
   color: var(--color-accent-blue);
 }
 
-.event-list .event-list-content p:last-child strong a:any-link {
+.event-list .event-list-content p:not(:first-of-type) strong a:any-link {
   color: inherit;
   text-decoration: none;
 }
 
-.event-list .event-list-content p:last-child strong a:any-link:hover {
+.event-list .event-list-content p:not(:first-of-type) strong a:any-link:hover {
   text-decoration: underline;
 }
 
-.event-list .event-list-content p:last-child em {
+.event-list .event-list-content p:not(:first-of-type) em {
   font-style: italic;
 }
 
