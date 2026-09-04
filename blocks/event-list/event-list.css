@@ -1,6 +1,6 @@
 /* Community upcoming events — fixed two-column rows */
 .event-list {
-  padding: var(--spacing-xl) var(--spacing-m);
+  padding: var(--spacing-s) var(--spacing-m);
   box-sizing: border-box;
 }
 
