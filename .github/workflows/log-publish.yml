@@ -1,47 +1,47 @@
-on: 
+name: Log Publish
+
+on:
   repository_dispatch:
     types:
       - resource-published-native
+
+permissions:
+  contents: read
+
+env:
+  AEM_ORG: adobe
+  # The site serving www.aem.live is registered as aem-website, not after this repo.
+  AEM_SITE: aem-website
+  SITE_URL: https://www.aem.live
+
 jobs:
-  print:
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo "Status: ${{ github.event.client_payload.status }}"
-        echo "Path: ${{ github.event.client_payload.path }}"
   slack:
     runs-on: ubuntu-latest
     steps:
-      - name: Format path
-        id: format
-        uses: frabert/replace-string-action@v2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          pattern: '\.md'
-          string: ${{ github.event.client_payload.path }}
-          replace-with: ''
-      - name: Notify Slack (JSON)
-        if: ${{ endsWith(github.event.client_payload.path, '.json') }}
+          node-version: 22
+
+      - name: Build the message
+        id: message
+        env:
+          PUBLISH_PATH: ${{ github.event.client_payload.path }}
+          PUBLISHER: ${{ github.event.client_payload.user }}
+          # Reads the version history to find who last edited the document. Without it the
+          # message still names the publisher, it just cannot credit a separate author.
+          AEM_ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
+        run: node tools/publish-notify/build-message.js
+
+      - name: Notify Slack
         uses: slackapi/slack-github-action@v2.1.1
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
-          # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "Just published: `${{ github.event.client_payload.path }}`"
-            }
-          webhook-type: webhook-trigger
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-      - name: Notify Slack (Markdown)
-        if: ${{ endsWith(github.event.client_payload.path, '.md') }}
-        uses: slackapi/slack-github-action@v2.1.1
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "Just published: https://www.aem.live${{ steps.format.outputs.replaced }}"
+              "text": ${{ toJSON(steps.message.outputs.text) }}
             }
           webhook-type: webhook-trigger
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
