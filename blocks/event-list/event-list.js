@@ -9,6 +9,14 @@ import { createTag } from '../../scripts/scripts.js';
  * | ### Title 2 ¶ Description ¶ **Date** on *Show* | |
  *
  * Right column: YouTube URL → poster thumbnail + link; empty → default placeholder (no link).
+ *
+ * `Event List (compact)` variant: same content model, rendered as a tight card
+ * grid (thumbnail, title, date only — description text is not shown).
+ * | ### Title ¶ Date | https://youtube.com/watch?v=... |
+ * | ### Title 2 ¶ Date | |
+ *
+ * Right column empty → placeholder thumbnail, non-clickable card (for
+ * sessions that haven't happened yet).
  */
 
 const DEFAULT_PLACEHOLDER = '/blocks/event-list/thursday-frequency-default.png';
@@ -77,10 +85,52 @@ function buildMedia(cell) {
   return media;
 }
 
+function getThumbnailSrc(cell) {
+  const youtubeUrl = getYouTubeUrl(cell);
+  if (youtubeUrl) {
+    const videoId = getYouTubeId(youtubeUrl);
+    if (videoId) return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+  }
+
+  const img = cell?.querySelector('img');
+  if (img) return img.src;
+
+  return DEFAULT_PLACEHOLDER;
+}
+
+function buildCompactCard(cells) {
+  const title = cells[0].querySelector('h3');
+  const date = cells[0].querySelector('p');
+  const href = getYouTubeUrl(cells[1]);
+
+  const card = createTag(href ? 'a' : 'div', {
+    class: 'event-list-card',
+    ...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {}),
+  });
+
+  const thumb = createTag('div', { class: 'event-list-card-thumb' });
+  thumb.append(createTag('img', {
+    src: getThumbnailSrc(cells[1]),
+    alt: '',
+    loading: 'lazy',
+  }));
+  card.append(thumb);
+
+  const info = createTag('div', { class: 'event-list-card-info' });
+  if (title) info.append(createTag('strong', {}, title.textContent));
+  if (date) info.append(createTag('span', { class: 'event-list-card-date' }, date.textContent));
+  card.append(info);
+
+  return card;
+}
+
 export default function decorate(block) {
+  const isCompact = block.classList.contains('compact');
   const rows = [...block.querySelectorAll(':scope > div')];
 
   block.textContent = '';
+
+  const grid = isCompact ? createTag('div', { class: 'event-list-grid' }) : null;
 
   rows.forEach((row) => {
     const cells = [...row.children].filter((cell) => cell.tagName === 'DIV');
@@ -96,10 +146,17 @@ export default function decorate(block) {
 
     if (cells.length < 2 || !cells[0].querySelector('h3')) return;
 
+    if (isCompact) {
+      grid.append(buildCompactCard(cells));
+      return;
+    }
+
     const item = createTag('div', { class: 'event-list-item' });
     const content = createTag('div', { class: 'event-list-content' });
     content.innerHTML = cells[0].innerHTML;
     item.append(content, buildMedia(cells[1]));
     block.append(item);
   });
+
+  if (isCompact) block.append(grid);
 }
