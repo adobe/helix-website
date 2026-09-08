@@ -1,36 +1,61 @@
 name: Track Publishes
 on:
   schedule:
-    - cron: "0/5 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
-
+    inputs:
+      override_start_time:
+        description: "ISO 8601 start of the window, e.g. 2026-09-08T07:00:00Z. Use to recover after an outage long enough that no successful run remains in the last 100."
+        required: false
+        type: string
 
 permissions:
-  actions: read # required to access workflow runs
-  contents: write # required to access the repository, for the dispatch event
+  actions: read # required to read this workflow's own run history
+  contents: write # required for the repository dispatch event
+
+# A scheduling backlog has to COLLAPSE, not drain.
+#
+# Actions capacity pressure at the org level regularly leaves this workflow queued for
+# hours (measured: runs created 2026-09-07T23:25Z did not execute until 2026-09-08T11:48Z,
+# a 12h delay). Every backlogged run resolves the same watermark, so draining N of them
+# announces the same publish N times - which is exactly how one publish at 07:19Z became
+# three Slack messages at 11:53Z, 12:46Z and 12:51Z.
+#
+# Keeping only the newest run costs nothing, because the watermark only advances on a
+# successful run: the survivor's window still reaches back over the whole gap.
+concurrency:
+  group: track-publishes-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  ADD_MD_SUFFIX: "true" # default value for all triggers, this is a compatibility fix for older workflows
-  REPOSITORY_DISPATCH_EVENT: "resource-published-native" # default value for all triggers, this is a compatibility fix for older workflows
-  WORKFLOW_CALL_USE: "example" # if REPOSITORY_DISPATCH_EVENT is unset, this is the workflow file that will be called
-  ROUTE_FILTER: "live" # filter for the route field in the logs, can be 'live' or 'preview'
+  ADD_MD_SUFFIX: "true" # append .md to extensionless paths, for compatibility with older consumers
+  REPOSITORY_DISPATCH_EVENT: "resource-published-native"
+  ROUTE_FILTER: "live" # 'live' or 'preview'
   AEM_API: "https://api.aem.live" # Helix 6 admin API; replaces admin.hlx.page
   AEM_ORG: "adobe"
   # The GitHub repo is helix-website, but the site serving www.aem.live - and therefore the
   # one publishes are logged against - is registered as aem-website. See CLAUDE.md.
   AEM_SITE: "aem-website"
+  OVERLAP_SECONDS: "60" # re-read this much before the watermark so a boundary publish is never lost
+  WIDE_WINDOW_HOURS: "6" # warn above this, rather than silently narrowing the window
 
+# One job, not three. The three former jobs each paid their own queue wait, which under
+# backlog pulled them minutes to hours apart: run 34221704920 resolved its watermark at
+# 12:50:30Z and read the log at 13:28:13Z, 38 minutes later, so the window it reported on
+# was not the window it had computed. Serial steps in one job cannot drift, and the job is
+# billed once instead of three times.
 jobs:
-  check-token-expiry:
+  track:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Check JWT token expiration
+      - name: Verify the admin token
         env:
           TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
         run: |
           set -euo pipefail
 
-          RUNBOOK="https://github.com/${{ github.repository }}/blob/main/.github/admin-token.md"
+          RUNBOOK="https://github.com/${GITHUB_REPOSITORY}/blob/main/.github/admin-token.md"
 
           if [[ -z "$TOKEN" ]]; then
             echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. See $RUNBOOK"
@@ -55,13 +80,10 @@ jobs:
             exit 1
           fi
 
-          CURRENT_TIME=$(date +%s)
-          ONE_WEEK_FROM_NOW=$((CURRENT_TIME + 7*24*60*60))
-
+          NOW=$(date +%s)
           echo "Token expires at: $(date -d "@$EXPIRY")"
-          echo "Current time:     $(date -d "@$CURRENT_TIME")"
 
-          if [[ "$EXPIRY" -lt "$CURRENT_TIME" ]]; then
+          if [[ "$EXPIRY" -lt "$NOW" ]]; then
             {
               echo "### AEM_LIVE_ADMIN_TOKEN has expired"
               echo "It expired on $(date -d "@$EXPIRY"). Every run of this workflow will fail with a 401 until it is rotated."
@@ -71,243 +93,175 @@ jobs:
             exit 1
           fi
 
-          if [[ "$EXPIRY" -lt "$ONE_WEEK_FROM_NOW" ]]; then
+          if [[ "$EXPIRY" -lt "$((NOW + 7 * 24 * 60 * 60))" ]]; then
             {
               echo "### AEM_LIVE_ADMIN_TOKEN expires soon"
               echo "It expires on $(date -d "@$EXPIRY"). Rotate it by following $RUNBOOK"
             } >> "$GITHUB_STEP_SUMMARY"
             echo "::warning::AEM_LIVE_ADMIN_TOKEN expires on $(date -d "@$EXPIRY"). Rotate it: $RUNBOOK"
           fi
-  check-last-run:
-    runs-on: ubuntu-latest
-    outputs:
-      workflow-id: ${{ steps.workflow-id.outputs.WORKFLOW_ID }}
-      last-run-iso: ${{ steps.last-run.outputs.LAST_CREATED_AT_ISO }} # ISO 8601
-      last-run-unix: ${{ steps.last-run.outputs.LAST_CREATED_AT_UNIX }} # Unix timestamp
-      branch-name: ${{ steps.branch-name.outputs.BRANCH_NAME }}
-    steps:
-      - name: Get branch name
-        id: branch-name
-        shell: bash
+
+      # The watermark is the creation time of the last successful run before this one.
+      #
+      # It is resolved from the UNFILTERED run list, filtered locally. Server-side
+      # filtering of this endpoint is not reliable at this workflow's scale (35,600+ runs):
+      # in 13 consecutive identical calls to ?status=completed&branch=main, one returned
+      # total_count=29346 with a newest run of 2026-08-17 - three weeks stale - and zero
+      # successful runs anywhere on the page. The unfiltered list was stable and correctly
+      # ordered in 8/8 calls. A poisoned response used to send `from` hours off in either
+      # direction, which both duplicated and DROPPED publishes: the run created at
+      # 07:59:23Z resolved from=11:58:54Z and skipped four hours of log outright.
+      #
+      # Same finding, same fix as adobe/aem-certificate-rotation#43.
+      - name: Resolve the window
+        id: window
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OVERRIDE_START_TIME: ${{ inputs.override_start_time }}
         run: |
-          if [[ ${GITHUB_EVENT_NAME} == "pull_request" ]]
-          then
-             echo "BRANCH_NAME=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          WORKFLOW_FILE=$(basename "${GITHUB_WORKFLOW_REF%%@*}")
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "Workflow file: $WORKFLOW_FILE (branch $BRANCH)"
+
+          # No status= or branch= here, deliberately. Both are filtered locally below.
+          RUNS=$(gh api "/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_FILE}/runs?per_page=100")
+
+          LAST_SUCCESS=$(printf '%s' "$RUNS" | jq -r \
+            --arg branch "$BRANCH" \
+            --argjson self "${GITHUB_RUN_ID}" '
+              [ .workflow_runs[]
+                | select(.head_branch == $branch)
+                | select(.conclusion == "success")
+                | select(.id != $self)
+                | .created_at ]
+              | max // empty')
+
+          if [[ -n "$OVERRIDE_START_TIME" ]]; then
+            echo "::notice::Using override_start_time=$OVERRIDE_START_TIME"
+            WINDOW_START="$OVERRIDE_START_TIME"
+          elif [[ -n "$LAST_SUCCESS" ]]; then
+            WINDOW_START="$LAST_SUCCESS"
+            echo "Last successful run: $LAST_SUCCESS"
           else
-             echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-          fi
-      - name: Get workflow id
-        id: workflow-id
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          WORKFLOW_ID=$(gh api /repos/${{ github.repository }}/actions/runs/${{ github.run_id }} | jq -r .workflow_id)
-          echo "WORKFLOW_ID=$WORKFLOW_ID" >> $GITHUB_OUTPUT
-          echo "Workflow id: ${WORKFLOW_ID}"
-      - name: Get previous build status
-        shell: bash
-        id: last-run
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MAX_PAGES: "5" # Maximum number of pages to check before giving up
-          MAX_AGE_MINUTES: "60" # Maximum age for a valid timestamp (workflow runs every 5 min, so 60 min = 12 intervals)
-        run: |
-          LAST_CREATED_AT_ISO=""
-          FOUND_RUN_ID=""
-          page=1
-
-          while [[ $page -le $MAX_PAGES ]]; do
-            echo "Checking page $page for successful runs..."
-
-            # Get workflow runs for current page
-            WORKFLOW_RUNS=$(gh api "/repos/${{ github.repository }}/actions/workflows/${{ steps.workflow-id.outputs.WORKFLOW_ID }}/runs?status=completed&branch=${{ steps.branch-name.outputs.BRANCH_NAME }}&page=$page&per_page=100")
-
-            # Check if we got any runs
-            TOTAL_COUNT=$(echo "$WORKFLOW_RUNS" | jq '.total_count')
-            if [[ $TOTAL_COUNT -eq 0 || $(echo "$WORKFLOW_RUNS" | jq '.workflow_runs | length') -eq 0 ]]; then
-              echo "No more workflow runs found."
-              break
-            fi
-
-            # Try to find a successful run on this page
-            LAST_CREATED_AT_ISO=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[] | select(.conclusion == \"success\") | .created_at][0]")
-            FOUND_RUN_ID=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[] | select(.conclusion == \"success\") | .id][0]")
-
-            if [[ "$LAST_CREATED_AT_ISO" != "null" ]]; then
-              echo "Found successful run on page $page"
-              break
-            fi
-
-            # Store first run's timestamp as fallback if we haven't stored one yet
-            if [[ $page -eq 1 ]]; then
-              FALLBACK_TIMESTAMP=$(echo "$WORKFLOW_RUNS" | jq -r "[.workflow_runs[].created_at][0]")
-              if [[ "$FALLBACK_TIMESTAMP" != "null" ]]; then
-                echo "Storing fallback timestamp from first page: $FALLBACK_TIMESTAMP"
-                FIRST_RUN_ISO=$FALLBACK_TIMESTAMP
-              fi
-            fi
-
-            ((page++))
-          done
-
-          # Validate timestamp age if we found one
-          CURRENT_TIME=$(date +%s)
-          if [[ "$LAST_CREATED_AT_ISO" != "null" && -n "$LAST_CREATED_AT_ISO" ]]; then
-            FOUND_TIME=$(date -d "$LAST_CREATED_AT_ISO" +%s)
-            AGE_SECONDS=$((CURRENT_TIME - FOUND_TIME))
-            AGE_MINUTES=$((AGE_SECONDS / 60))
-
-            if [[ $AGE_MINUTES -gt $MAX_AGE_MINUTES ]]; then
-              echo "::warning::Found timestamp is too old: $LAST_CREATED_AT_ISO (${AGE_MINUTES} minutes ago, run ID: ${FOUND_RUN_ID})"
-              echo "Timestamp validation failed - found run is ${AGE_MINUTES} minutes old (threshold: ${MAX_AGE_MINUTES} minutes)" >> $GITHUB_STEP_SUMMARY
-              echo "Found run ID: ${FOUND_RUN_ID}" >> $GITHUB_STEP_SUMMARY
-              echo "Found timestamp: ${LAST_CREATED_AT_ISO}" >> $GITHUB_STEP_SUMMARY
-              echo "Using safer fallback instead." >> $GITHUB_STEP_SUMMARY
-              # Reset to trigger fallback logic
-              LAST_CREATED_AT_ISO=""
-            fi
-          fi
-
-          # If we didn't find a successful run or validation failed, use fallback strategies
-          if [[ "$LAST_CREATED_AT_ISO" == "null" || -z "$LAST_CREATED_AT_ISO" ]]; then
-            echo "::warning::No valid workflow runs found in the last $MAX_PAGES pages."
-
-            if [[ -n "$FIRST_RUN_ISO" ]]; then
-              FIRST_RUN_TIME=$(date -d "$FIRST_RUN_ISO" +%s)
-              FIRST_RUN_AGE_MINUTES=$(( (CURRENT_TIME - FIRST_RUN_TIME) / 60 ))
-
-              # Only use FIRST_RUN_ISO if it's not too old
-              if [[ $FIRST_RUN_AGE_MINUTES -le $MAX_AGE_MINUTES ]]; then
-                echo "Using timestamp from earliest found run as fallback"
-                LAST_CREATED_AT_ISO=$FIRST_RUN_ISO
-
-                # Add information about recent failures to the job summary
-                echo "Recent workflow run history:" >> $GITHUB_STEP_SUMMARY
-                echo "$WORKFLOW_RUNS" | jq -r '.workflow_runs | map({conclusion, created_at, html_url}) | .[:5]' >> $GITHUB_STEP_SUMMARY
-              else
-                echo "::warning::First run timestamp is also too old (${FIRST_RUN_AGE_MINUTES} minutes). Using 5 minutes ago as fallback."
-                echo "First run was ${FIRST_RUN_AGE_MINUTES} minutes old (threshold: ${MAX_AGE_MINUTES} minutes)" >> $GITHUB_STEP_SUMMARY
-                LAST_CREATED_AT_ISO=$(date -u -d "5 minutes ago" "+%Y-%m-%dT%H:%M:%SZ")
-              fi
-            else
-              echo "::warning::No previous runs found at all. Using a timestamp from 5 minutes ago as fallback."
-              LAST_CREATED_AT_ISO=$(date -u -d "5 minutes ago" "+%Y-%m-%dT%H:%M:%SZ")
-            fi
-          fi
-
-          LAST_CREATED_AT_UNIX=$(date -d "$LAST_CREATED_AT_ISO" +%s)
-          echo "LAST_CREATED_AT_ISO=$LAST_CREATED_AT_ISO" >> $GITHUB_OUTPUT
-          echo "LAST_CREATED_AT_UNIX=$LAST_CREATED_AT_UNIX" >> $GITHUB_OUTPUT
-          echo "Previous build created at: $LAST_CREATED_AT_ISO"
-  poll-log:
-    runs-on: ubuntu-latest
-    needs: check-last-run
-    steps:
-      - name: Check for required secrets
-        run: |
-          if [[ -z "${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" ]]; then
-            echo "::error::The AEM_LIVE_ADMIN_TOKEN secret is not configured. See https://github.com/${{ github.repository }}/blob/main/.github/admin-token.md"
+            # Fail closed. The previous version fell back to "5 minutes ago", which turns a
+            # lost watermark into silently unannounced publishes - a wrong answer that looks
+            # like a clean run. An operator can widen the window deliberately with
+            # override_start_time.
+            {
+              echo "### Track Publishes could not resolve a watermark"
+              echo "No successful run of \`$WORKFLOW_FILE\` on \`$BRANCH\` in the last 100 runs."
+              echo "Re-run this workflow manually with \`override_start_time\` set to the ISO 8601 time"
+              echo "publishes should be announced from, e.g. \`$(date -u -d '2 hours ago' +%Y-%m-%dT%H:%M:%SZ)\`."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::No successful run found in the last 100; refusing to guess a window. Re-run with override_start_time."
             exit 1
           fi
-      - name: Get Logs
-        id: get-logs
+
+          START_EPOCH=$(date -u -d "$WINDOW_START" +%s)
+          FROM_EPOCH=$((START_EPOCH - OVERLAP_SECONDS))
+          FROM=$(date -u -d "@$FROM_EPOCH" +%Y-%m-%dT%H:%M:%SZ)
+
+          AGE_HOURS=$(( ($(date +%s) - START_EPOCH) / 3600 ))
+          if [[ "$AGE_HOURS" -ge "$WIDE_WINDOW_HOURS" ]]; then
+            echo "::warning::Window is ${AGE_HOURS}h wide (from $FROM). Expected ~5min - this run is catching up after a gap."
+          fi
+
+          {
+            echo "from=$FROM"
+            echo "from-ms=$((FROM_EPOCH * 1000))"
+          } >> "$GITHUB_OUTPUT"
+          echo "Window: $FROM -> now"
+
+      - name: Read the publish log
+        id: log
+        env:
+          ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
+          FROM: ${{ steps.window.outputs.from }}
+          FROM_MS: ${{ steps.window.outputs.from-ms }}
         run: |
-          echo "Debug: Last run ISO: ${{ needs.check-last-run.outputs.last-run-iso }}"
-          
-          # URL encode the from parameter (using tr to remove newlines)
-          FROM_PARAM=$(echo -n "${{ needs.check-last-run.outputs.last-run-iso }}" | tr -d '\n' | jq -sRr @uri)
-          echo "Debug: URL encoded from parameter: $FROM_PARAM"
-          
-          # Construct and echo the full URL for debugging
-          FULL_URL="${{ env.AEM_API }}/${{ env.AEM_ORG }}/sites/${{ env.AEM_SITE }}/log?from=$FROM_PARAM"
-          echo "Debug: Full URL: $FULL_URL"
-          
-          # Make the API request
-          RESPONSE=$(curl --http1.1 -s -w "\n%{http_code}" \
-            -H "Authorization: token $(echo -n "${{ secrets.AEM_LIVE_ADMIN_TOKEN }}" | tr -d '\n')" \
+          set -euo pipefail
+
+          FROM_PARAM=$(printf '%s' "$FROM" | jq -sRr @uri)
+          URL="${AEM_API}/${AEM_ORG}/sites/${AEM_SITE}/log?from=${FROM_PARAM}"
+          echo "GET $URL"
+
+          HTTP_STATUS=$(curl --http1.1 -sS -o body.json -w '%{http_code}' \
+            -H "Authorization: token $(printf '%s' "$ADMIN_TOKEN" | tr -d '\n')" \
             -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
             -H "User-Agent: GitHub-Actions-Workflow" \
-            "$FULL_URL")
-          
-          # Extract status code from last line
-          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
-          # Extract response body (everything except the last line)
-          BODY=$(echo "$RESPONSE" | sed '$ d')
-          
-          echo "Debug: HTTP Status: $HTTP_STATUS"
-          
-          # Check if status code is not 2xx
-          if [[ $HTTP_STATUS -lt 200 ]] || [[ $HTTP_STATUS -gt 299 ]]; then
-            echo "Error: API request failed with status $HTTP_STATUS"
-            echo "Response body: $BODY"
+            "$URL")
+
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -gt 299 ]]; then
+            echo "::error::Admin log request failed with HTTP $HTTP_STATUS"
+            head -c 2000 body.json
             exit 1
           fi
-          
-          # Process the response if status was ok
-          LOGS=$(echo "$BODY" | jq -R --arg route "${{ env.ROUTE_FILTER }}" 'fromjson | .entries | sort_by(.timestamp) | map(select(.route == $route))' | base64 -w 0)
-          
-          echo "Debug: LOGS value length: ${#LOGS}"
-          echo "Debug: First few characters: ${LOGS:0:100}"
-          echo "logs=$LOGS" >> $GITHUB_OUTPUT
-      - name: Check for publishes
-        id: check-publishes
-        if: steps.get-logs.outputs.logs != 'W10K'
+
+          # The window is enforced HERE, not by trusting the query. An admin API that ignored
+          # `from` would otherwise replay its whole retention window as "just published".
+          # This is a warning rather than a hard failure precisely because the local filter
+          # already makes the result correct either way.
+          STALE=$(jq --argjson floor "$FROM_MS" '[ .entries[]? | select((.timestamp // 0) < $floor) ] | length' body.json)
+          if [[ "$STALE" -gt 0 ]]; then
+            echo "::warning::The admin API returned $STALE entries older than from=$FROM; it may be ignoring the parameter. They are being filtered out locally."
+          fi
+
+          # Flatten .path + .paths[], drop anything outside the window or off-route, and
+          # collapse duplicates. unique_by is a second line of defence behind the
+          # concurrency group: a run cancelled mid-dispatch does not advance the watermark,
+          # so its successor re-reads the same entries.
+          jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '
+            [ .entries[]?
+              | select(.route == $route)
+              | select((.timestamp // 0) >= $floor)
+              | { user: (.user // "unknown"), timestamp: .timestamp, status: .status,
+                  paths: ([ .path ] + (.paths // [])) }
+              | . as $entry
+              | $entry.paths[]
+              | select(. != null and . != "")
+              | { path: ., user: $entry.user, timestamp: $entry.timestamp, status: $entry.status } ]
+            | unique_by([ .path, .timestamp ])
+            | sort_by(.timestamp)
+            | .[]' body.json > publishes.ndjson
+
+          COUNT=$(wc -l < publishes.ndjson | tr -d ' ')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Publishes to announce: $COUNT"
+          cat publishes.ndjson
+
+      - name: Announce publishes
+        if: steps.log.outputs.count != '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LOGS="${{ steps.get-logs.outputs.logs }}"
-          
-          echo "$LOGS" | base64 -d | jq -c '.[]' | while read -r log; do
-            user=$(echo "$log" | jq -r '.user // "unknown"')
-            status=$(echo "$log" | jq -r '.status')
-            timestamp=$(echo "$log" | jq -r '.timestamp')
-            
-            # Get all paths (combine path and paths, filter out empty strings)
-            paths=$(echo "$log" | jq -r '[ .path, (.paths[]?) ] | map(select(length > 0))[]')
-            
-            echo "$paths" | while read -r path; do
-              # Add .md extension if configured and path has no extension
-              if [[ "${{ env.ADD_MD_SUFFIX }}" == "true" ]] && [[ "$path" != *.* ]]; then
-                path="${path}.md"
-              fi
-              
-              # Handle repository dispatch or workflow call
-              if [[ -n "${{ env.REPOSITORY_DISPATCH_EVENT }}" ]]; then
-                payload=$(jq -n \
-                  --arg type "${{ env.REPOSITORY_DISPATCH_EVENT }}" \
-                  --arg path "$path" \
-                  --arg user "$user" \
-                  --arg timestamp "$timestamp" \
-                  --arg status "$status" \
-                  '{
-                    event_type: $type,
-                    client_payload: {
-                      path: $path,
-                      user: $user,
-                      timestamp: $timestamp,
-                      status: $status
-                    }
-                  }')
-                
-                echo "Triggering dispatch for $path with event type: ${{ env.REPOSITORY_DISPATCH_EVENT }}"
-                gh api \
-                  --method POST \
-                  --header "Accept: application/vnd.github.v3+json" \
-                  "/repos/${{ github.repository }}/dispatches" \
-                  --input - <<< "$payload"
-              elif [[ -n "${{ env.WORKFLOW_CALL_USE }}" ]]; then
-                echo "Triggering workflow ${{ env.WORKFLOW_CALL_USE }} for $path"
-                gh workflow run "${{ env.WORKFLOW_CALL_USE }}" \
-                  -f path="$path" \
-                  -f user="$user" \
-                  -f timestamp="$timestamp" \
-                  -f status="$status"
-              else
-                echo "Skipping triggers for $path (neither REPOSITORY_DISPATCH_EVENT nor WORKFLOW_CALL_USE is set)"
-              fi
-            done
-          done
+          set -euo pipefail
+
+          while IFS= read -r entry; do
+            [[ -n "$entry" ]] || continue
+
+            path=$(printf '%s' "$entry" | jq -r '.path')
+
+            # Only extensionless paths get .md; a published .png keeps its own extension.
+            if [[ "$ADD_MD_SUFFIX" == "true" && "$path" != *.* ]]; then
+              path="${path}.md"
+            fi
+
+            payload=$(printf '%s' "$entry" | jq \
+              --arg type "$REPOSITORY_DISPATCH_EVENT" \
+              --arg path "$path" '
+                { event_type: $type,
+                  client_payload: {
+                    path: $path,
+                    user: .user,
+                    timestamp: .timestamp,
+                    status: .status } }')
+
+            echo "Dispatching $REPOSITORY_DISPATCH_EVENT for $path"
+            printf '%s' "$payload" | gh api \
+              --method POST \
+              --header "Accept: application/vnd.github.v3+json" \
+              "/repos/${GITHUB_REPOSITORY}/dispatches" \
+              --input -
+          done < publishes.ndjson
