@@ -206,6 +206,11 @@
   gap: 3px;
 }
 
+/* Mutually exclusive with the default variant, so there is no cascade to order:
+   decorate() branches on isCompact, and .event-list-card-info is only built by
+   buildCompactCard() while .event-list-content is only built by the non-compact
+   branch. No <strong> can match both this and the .event-list-content rule above. */
+/* stylelint-disable-next-line no-descending-specificity */
 .event-list.compact .event-list-card-info strong {
   font-size: var(--type-body-xs-size);
   font-weight: 600;
