@@ -206,8 +206,8 @@
   z-index: 2;
   padding: 2px 8px;
   border-radius: 4px;
-  background: var(--color-accent-blue);
-  color: var(--color-white);
+  background: var(--color-white);
+  color: var(--color-black);
   font-size: var(--type-body-xxs-size);
   font-weight: 600;
   line-height: 1.4;
