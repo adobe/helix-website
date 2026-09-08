@@ -29,6 +29,9 @@ jobs:
         env:
           PUBLISH_PATH: ${{ github.event.client_payload.path }}
           PUBLISHER: ${{ github.event.client_payload.user }}
+          # When the publish actually happened. A backlogged dispatch can arrive hours late,
+          # and the message says so rather than implying it just happened.
+          PUBLISH_TIMESTAMP: ${{ github.event.client_payload.timestamp }}
           # Reads the version history to find who last edited the document. Without it the
           # message still names the publisher, it just cannot credit a separate author.
           AEM_ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
