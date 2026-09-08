@@ -98,6 +98,25 @@ function getThumbnailSrc(cell) {
   return DEFAULT_PLACEHOLDER;
 }
 
+const NEW_BADGE_WINDOW_DAYS = 5;
+
+function parseEventDate(text) {
+  const match = text?.match(/(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})/);
+  if (!match) return null;
+  const [, day, month, year] = match;
+  const date = new Date(`${month} ${day}, ${year}`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isWithinNewBadgeWindow(date) {
+  if (!date) return false;
+  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const end = new Date(start);
+  end.setDate(end.getDate() + NEW_BADGE_WINDOW_DAYS);
+  const now = new Date();
+  return now >= start && now < end;
+}
+
 function buildCompactCard(cells) {
   const title = cells[0].querySelector('h3');
   const date = cells[0].querySelector('p');
@@ -114,6 +133,9 @@ function buildCompactCard(cells) {
     alt: '',
     loading: 'lazy',
   }));
+  if (isWithinNewBadgeWindow(parseEventDate(date?.textContent))) {
+    thumb.append(createTag('span', { class: 'event-list-card-badge' }, 'New'));
+  }
   card.append(thumb);
 
   const info = createTag('div', { class: 'event-list-card-info' });
