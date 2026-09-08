@@ -7,6 +7,9 @@ import {
   toSourcePath,
   toHandle,
   formatMessage,
+  toEpochMs,
+  formatDelay,
+  formatWhen,
 } from '../../tools/publish-notify/build-message.js';
 
 describe('Publish notification paths', () => {
@@ -69,5 +72,56 @@ describe('Publish notification message', () => {
       .to.equal('@bohnert published `/community-feeds.json`');
     expect(formatMessage({ path: '/media/diagram.png', url: null, publisher: '@bohnert' }))
       .to.equal('@bohnert published `/media/diagram.png`');
+  });
+});
+
+describe('Publish notification timing', () => {
+  // The real incident: /docs/special-metadata-properties was published once, at
+  // 2026-09-08T07:19:21.771Z, and announced three times - 11:53Z, 12:46Z and 12:51Z -
+  // because backlogged Track Publishes runs all resolved the same watermark. Nothing in
+  // the message said so, so it read as three fresh publishes that had not happened.
+  const PUBLISHED = 1788851961771;
+  const ANNOUNCED = 1788871888167;
+
+  it('reads the log timestamp, in milliseconds or seconds', () => {
+    expect(toEpochMs(PUBLISHED)).to.equal(PUBLISHED);
+    expect(toEpochMs(Math.floor(PUBLISHED / 1000))).to.equal(1788851961000);
+    expect(toEpochMs('1788851961771')).to.equal(PUBLISHED);
+  });
+
+  it('has no timestamp to report when the payload carries none', () => {
+    expect(toEpochMs(undefined)).to.equal(null);
+    expect(toEpochMs('')).to.equal(null);
+    expect(toEpochMs('not-a-number')).to.equal(null);
+    expect(toEpochMs(0)).to.equal(null);
+    expect(toEpochMs(-1)).to.equal(null);
+  });
+
+  it('spells a delay in hours and minutes', () => {
+    expect(formatDelay(12 * 60 * 1000)).to.equal('12m');
+    expect(formatDelay(ANNOUNCED - PUBLISHED)).to.equal('5h 32m');
+  });
+
+  it('says nothing about timing when the announcement is prompt', () => {
+    expect(formatWhen(PUBLISHED, PUBLISHED + 30 * 1000)).to.equal(null);
+    expect(formatWhen(PUBLISHED, PUBLISHED + 9 * 60 * 1000)).to.equal(null);
+  });
+
+  it('names the real publish time once the announcement is late', () => {
+    expect(formatWhen(PUBLISHED, ANNOUNCED)).to.equal(
+      '_(delayed 5h 32m - published <!date^1788851961^{date_short_pretty} at {time}|2026-09-08 07:19 UTC>)_',
+    );
+  });
+
+  it('does not report a delay for a timestamp in the future', () => {
+    expect(formatWhen(PUBLISHED, PUBLISHED - 60 * 60 * 1000)).to.equal(null);
+  });
+
+  it('appends the timing to the message, and omits it when prompt', () => {
+    const page = { path: '/docs/foo.md', url: 'https://www.aem.live/docs/foo', publisher: '@rofe' };
+    expect(formatMessage({ ...page, when: formatWhen(PUBLISHED, ANNOUNCED) }))
+      .to.equal('@rofe published <https://www.aem.live/docs/foo|/docs/foo> _(delayed 5h 32m - published <!date^1788851961^{date_short_pretty} at {time}|2026-09-08 07:19 UTC>)_');
+    expect(formatMessage({ ...page, when: formatWhen(PUBLISHED, PUBLISHED) }))
+      .to.equal('@rofe published <https://www.aem.live/docs/foo|/docs/foo>');
   });
 });
