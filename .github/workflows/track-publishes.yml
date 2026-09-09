@@ -239,19 +239,11 @@ jobs:
             | sort_by(.timestamp)
             | .[]' body.json > all.ndjson
 
-          jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" \
-            --argjson collapse_ms "$(( COLLAPSE_SECONDS * 1000 ))" '
-            [ .entries[]?
-              | select(.route == $route)
-              | select((.timestamp // 0) >= $floor)
-              | { user: (.user // "unknown"), timestamp: .timestamp, status: .status,
-                  paths: ([ .path ] + (.paths // [])) }
-              | . as $entry
-              | $entry.paths[]
-              | select(. != null and . != "")
-              | { path: ., user: $entry.user, timestamp: $entry.timestamp, status: $entry.status } ]
-            | unique_by([ .path, .timestamp ])
-            | group_by(.path)
+          # Collapse a burst of the same path into its newest entry. This reads all.ndjson so
+          # the extraction filter above stays the single source of truth for both files: there
+          # is no second copy to drift out of step with it.
+          jq -c -s --argjson collapse_ms "$(( COLLAPSE_SECONDS * 1000 ))" '
+            group_by(.path)
             | map(
                 sort_by(.timestamp)
                 | reverse
@@ -262,7 +254,7 @@ jobs:
               )
             | flatten
             | sort_by(.timestamp)
-            | .[]' body.json > publishes.ndjson
+            | .[]' all.ndjson > publishes.ndjson
 
           ALL_COUNT=$(wc -l < all.ndjson | tr -d ' ')
           COUNT=$(wc -l < publishes.ndjson | tr -d ' ')
