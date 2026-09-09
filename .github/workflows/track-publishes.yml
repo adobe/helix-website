@@ -220,8 +220,8 @@ jobs:
           # concurrency group: a run cancelled mid-dispatch does not advance the watermark,
           # so its successor re-reads the same entries.
           #
-          # The collapse step groups by path, then within each group keeps only entries
-          # whose timestamps are more than COLLAPSE_SECONDS apart. This handles the
+          # The collapse step groups by path, user and status, then within each group keeps
+          # only entries whose timestamps are more than COLLAPSE_SECONDS apart. This handles the
           # admin log recording a single logical publish multiple times seconds apart
           # (see the COLLAPSE_SECONDS comment above). The pre-collapse result is written
           # to all.ndjson so that dropped entries remain visible in the run log.
@@ -239,11 +239,13 @@ jobs:
             | sort_by(.timestamp)
             | .[]' body.json > all.ndjson
 
-          # Collapse a burst of the same path into its newest entry. This reads all.ndjson so
-          # the extraction filter above stays the single source of truth for both files: there
-          # is no second copy to drift out of step with it.
+          # Collapse a burst of identical entries into the newest one. The key is path + user
+          # + status, not path alone: two people publishing the same path inside the window are
+          # two real announcements, and a success followed by a failure must not be masked.
+          # Reads all.ndjson so the extraction filter above stays the single source of truth for
+          # both files, with no second copy to drift out of step with it.
           jq -c -s --argjson collapse_ms "$(( COLLAPSE_SECONDS * 1000 ))" '
-            group_by(.path)
+            group_by([ .path, .user, .status ])
             | map(
                 sort_by(.timestamp)
                 | reverse
@@ -262,7 +264,7 @@ jobs:
           echo "Publishes to announce: $COUNT"
           if [[ "$ALL_COUNT" -ne "$COUNT" ]]; then
             COLLAPSED=$((ALL_COUNT - COUNT))
-            echo "Collapsed $COLLAPSED same-path duplicate(s) within ${COLLAPSE_SECONDS}s"
+            echo "Collapsed $COLLAPSED duplicate entr(y|ies) with the same path, user and status within ${COLLAPSE_SECONDS}s"
             echo "Pre-collapse entries:"
             cat all.ndjson
           fi
