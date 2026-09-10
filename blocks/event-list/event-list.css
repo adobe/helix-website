@@ -199,6 +199,20 @@
   background: rgb(0 0 0 / 80%);
 }
 
+.event-list.compact .event-list-card-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--color-white);
+  color: var(--color-black);
+  font-size: var(--type-body-xxs-size);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .event-list.compact .event-list-card-info {
   padding: 10px 12px;
   display: flex;
