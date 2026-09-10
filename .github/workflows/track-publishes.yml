@@ -38,6 +38,13 @@ env:
   AEM_SITE: "aem-website"
   OVERLAP_SECONDS: "60" # re-read this much before the watermark so a boundary publish is never lost
   WIDE_WINDOW_HOURS: "6" # warn above this, rather than silently narrowing the window
+  # One logical publish can hit the admin log more than once seconds apart. Observed:
+  # /docs/global.json appeared twice in run 34345742857 (timestamps 1788952659491 and
+  # 1788952676113, 16.6s apart, same user and status 200). unique_by([ .path, .timestamp ])
+  # cannot collapse them because the timestamps differ, so the channel got two identical
+  # messages. A 120s window collapses a burst while preserving a deliberate re-publish
+  # minutes later. The newest entry wins so the announcement reflects the final state.
+  COLLAPSE_SECONDS: "120"
 
 # One job, not three. The three former jobs each paid their own queue wait, which under
 # backlog pulled them minutes to hours apart: run 34221704920 resolved its watermark at
@@ -212,6 +219,12 @@ jobs:
           # collapse duplicates. unique_by is a second line of defence behind the
           # concurrency group: a run cancelled mid-dispatch does not advance the watermark,
           # so its successor re-reads the same entries.
+          #
+          # The collapse step groups by path, user and status, then within each group keeps
+          # only entries whose timestamps are more than COLLAPSE_SECONDS apart. This handles the
+          # admin log recording a single logical publish multiple times seconds apart
+          # (see the COLLAPSE_SECONDS comment above). The pre-collapse result is written
+          # to all.ndjson so that dropped entries remain visible in the run log.
           jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '
             [ .entries[]?
               | select(.route == $route)
@@ -224,11 +237,37 @@ jobs:
               | { path: ., user: $entry.user, timestamp: $entry.timestamp, status: $entry.status } ]
             | unique_by([ .path, .timestamp ])
             | sort_by(.timestamp)
-            | .[]' body.json > publishes.ndjson
+            | .[]' body.json > all.ndjson
 
+          # Collapse a burst of identical entries into the newest one. The key is path + user
+          # + status, not path alone: two people publishing the same path inside the window are
+          # two real announcements, and a success followed by a failure must not be masked.
+          # Reads all.ndjson so the extraction filter above stays the single source of truth for
+          # both files, with no second copy to drift out of step with it.
+          jq -c -s --argjson collapse_ms "$(( COLLAPSE_SECONDS * 1000 ))" '
+            group_by([ .path, .user, .status ])
+            | map(
+                sort_by(.timestamp)
+                | reverse
+                | reduce .[] as $e ([];
+                    if (length == 0) or ((.[-1].timestamp - $e.timestamp) > $collapse_ms)
+                    then . + [$e]
+                    else . end)
+              )
+            | flatten
+            | sort_by(.timestamp)
+            | .[]' all.ndjson > publishes.ndjson
+
+          ALL_COUNT=$(wc -l < all.ndjson | tr -d ' ')
           COUNT=$(wc -l < publishes.ndjson | tr -d ' ')
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Publishes to announce: $COUNT"
+          if [[ "$ALL_COUNT" -ne "$COUNT" ]]; then
+            COLLAPSED=$((ALL_COUNT - COUNT))
+            echo "Collapsed $COLLAPSED duplicate entr(y|ies) with the same path, user and status within ${COLLAPSE_SECONDS}s"
+            echo "Pre-collapse entries:"
+            cat all.ndjson
+          fi
           cat publishes.ndjson
 
       - name: Announce publishes
