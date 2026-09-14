@@ -32,8 +32,17 @@ export function toHandle(email) {
   return `@${String(email).split('@')[0]}`;
 }
 
-/** Beyond this, an announcement names its own publish time instead of implying "now". */
-export const STALE_AFTER_MS = 10 * 60 * 1000;
+/**
+ * Beyond this, an announcement names its own publish time instead of implying "now".
+ *
+ * An hour, not ten minutes. The polling schedule behind this fires every 20 minutes, and the
+ * dispatching run then waits for Actions capacity - run 34869217036 sat in the queue for
+ * 11m44s and executed in 10 seconds - so a perfectly healthy announcement lands 20 to 40
+ * minutes after the publish. At ten minutes every single message carried the parenthetical,
+ * which is the one thing it must not do: it exists to mark an announcement as unusually late,
+ * and a note on every line marks nothing.
+ */
+export const STALE_AFTER_MS = 60 * 60 * 1000;
 
 /** The publish log stamps milliseconds. Tolerate seconds rather than mis-read them as 1970. */
 export function toEpochMs(timestamp) {

@@ -102,12 +102,19 @@ describe('Publish notification timing', () => {
     expect(formatDelay(ANNOUNCED - PUBLISHED)).to.equal('5h 32m');
   });
 
-  it('says nothing about timing when the announcement is prompt', () => {
+  it('says nothing about timing for a delay under an hour', () => {
     expect(formatWhen(PUBLISHED, PUBLISHED + 30 * 1000)).to.equal(null);
     expect(formatWhen(PUBLISHED, PUBLISHED + 9 * 60 * 1000)).to.equal(null);
+    // A 20-minute polling interval plus a wait for Actions capacity puts a perfectly healthy
+    // announcement here. Observed after the change to that schedule: 27m, 40m and 52m.
+    expect(formatWhen(PUBLISHED, PUBLISHED + 40 * 60 * 1000)).to.equal(null);
+    expect(formatWhen(PUBLISHED, PUBLISHED + 59 * 60 * 1000)).to.equal(null);
   });
 
   it('names the real publish time once the announcement is late', () => {
+    expect(formatWhen(PUBLISHED, PUBLISHED + 60 * 60 * 1000)).to.equal(
+      '_(delayed 1h 0m - published <!date^1788851961^{date_short_pretty} at {time}|2026-09-08 07:19 UTC>)_',
+    );
     expect(formatWhen(PUBLISHED, ANNOUNCED)).to.equal(
       '_(delayed 5h 32m - published <!date^1788851961^{date_short_pretty} at {time}|2026-09-08 07:19 UTC>)_',
     );
