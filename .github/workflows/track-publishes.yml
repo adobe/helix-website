@@ -1,7 +1,16 @@
 name: Track Publishes
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    # */5 was aspirational, not real. GitHub does not honour a 5-minute schedule on a busy
+    # org: the gaps between consecutive runs on 2026-09-14 were 11, 8, 7, 17, 26 and 16
+    # minutes. Asking for every 5 minutes and getting every 7-26 made the cadence
+    # unpredictable while still paying for ~12 runs an hour, most of which announced nothing.
+    #
+    # A 20-minute schedule is closer to what the scheduler actually delivers, and it shrinks
+    # the boundary zone where a publish can land in two consecutive windows from 60s in every
+    # 300s (~20% of publishes) to 60s in every 1200s (~5%). It does not fix that overlap -
+    # the announced history below does - it just makes it rarer.
+    - cron: "*/20 * * * *"
   workflow_dispatch:
     inputs:
       override_start_time:
@@ -36,14 +45,29 @@ env:
   # The GitHub repo is helix-website, but the site serving www.aem.live - and therefore the
   # one publishes are logged against - is registered as aem-website. See CLAUDE.md.
   AEM_SITE: "aem-website"
-  OVERLAP_SECONDS: "60" # re-read this much before the watermark so a boundary publish is never lost
+  # Re-read this much before the watermark so a boundary publish is never lost. The admin log
+  # is eventually consistent: an entry timestamped T only becomes visible some seconds later,
+  # so a window starting exactly at the previous run's start would miss anything still in
+  # flight. The cost is that the re-read window is announced twice - see ANNOUNCED_HISTORY_HOURS.
+  OVERLAP_SECONDS: "60"
   WIDE_WINDOW_HOURS: "6" # warn above this, rather than silently narrowing the window
+  # How long to remember what was already announced, so the re-read above cannot announce it
+  # again. Must comfortably exceed WIDE_WINDOW_HOURS, or a run catching up after a gap will
+  # re-announce everything it re-reads. Roughly 70 entries per 12h on this site, so the file
+  # this produces stays a few KB.
+  ANNOUNCED_HISTORY_HOURS: "12"
+  # Refuse to read more than this many pages of admin log in one run. The log is paginated
+  # with nextToken; a runaway loop is worse than a loud failure.
+  MAX_LOG_PAGES: "20"
   # One logical publish can hit the admin log more than once seconds apart. Observed:
   # /docs/global.json appeared twice in run 34345742857 (timestamps 1788952659491 and
   # 1788952676113, 16.6s apart, same user and status 200). unique_by([ .path, .timestamp ])
   # cannot collapse them because the timestamps differ, so the channel got two identical
   # messages. A 120s window collapses a burst while preserving a deliberate re-publish
   # minutes later. The newest entry wins so the announcement reflects the final state.
+  #
+  # The same window is applied a second time against the announced history, so a burst split
+  # across two runs collapses exactly like a burst seen within one run.
   COLLAPSE_SECONDS: "120"
 
 # One job, not three. The three former jobs each paid their own queue wait, which under
@@ -172,7 +196,7 @@ jobs:
 
           AGE_HOURS=$(( ($(date +%s) - START_EPOCH) / 3600 ))
           if [[ "$AGE_HOURS" -ge "$WIDE_WINDOW_HOURS" ]]; then
-            echo "::warning::Window is ${AGE_HOURS}h wide (from $FROM). Expected ~5min - this run is catching up after a gap."
+            echo "::warning::Window is ${AGE_HOURS}h wide (from $FROM). Expected ~20min - this run is catching up after a gap."
           fi
 
           {
@@ -180,6 +204,19 @@ jobs:
             echo "from-ms=$((FROM_EPOCH * 1000))"
           } >> "$GITHUB_OUTPUT"
           echo "Window: $FROM -> now"
+
+      # Carried between runs so the OVERLAP_SECONDS re-read cannot announce a publish twice.
+      # restore-keys is a prefix match that returns the most recently created matching cache,
+      # so every run picks up its predecessor's file. The exact key is unique per run and is
+      # therefore always a miss on restore, which is precisely what makes the save at the end
+      # of the job valid - actions/cache refuses to overwrite an existing key.
+      - name: Restore the announced history
+        uses: actions/cache/restore@v4
+        with:
+          path: announced-history.ndjson
+          key: track-publishes-announced-${{ github.run_id }}
+          restore-keys: |
+            track-publishes-announced-
 
       - name: Read the publish log
         id: log
@@ -191,20 +228,56 @@ jobs:
           set -euo pipefail
 
           FROM_PARAM=$(printf '%s' "$FROM" | jq -sRr @uri)
-          URL="${AEM_API}/${AEM_ORG}/sites/${AEM_SITE}/log?from=${FROM_PARAM}"
-          echo "GET $URL"
+          BASE_URL="${AEM_API}/${AEM_ORG}/sites/${AEM_SITE}/log?from=${FROM_PARAM}"
 
-          HTTP_STATUS=$(curl --http1.1 -sS -o body.json -w '%{http_code}' \
-            -H "Authorization: token $(printf '%s' "$ADMIN_TOKEN" | tr -d '\n')" \
-            -H "Accept: application/json" \
-            -H "User-Agent: GitHub-Actions-Workflow" \
-            "$URL")
+          # The admin log is paginated: getLogs returns a nextToken when the window does not
+          # fit in one response. Reading only the first page silently drops the remainder,
+          # which is the worst failure mode this workflow has - a quiet channel is
+          # indistinguishable from a healthy one. Not currently triggered at this site's
+          # volume (a 24h window returns ~142 entries and no token), but a bulk publish or a
+          # WIDE_WINDOW_HOURS catch-up can reach it, and the 20-minute schedule makes each
+          # window wider than it used to be.
+          : > pages.ndjson
+          NEXT=""
+          PAGE=1
+          while :; do
+            if [[ -n "$NEXT" ]]; then
+              URL="${BASE_URL}&nextToken=$(printf '%s' "$NEXT" | jq -sRr @uri)"
+            else
+              URL="$BASE_URL"
+            fi
+            echo "GET $URL"
 
-          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -gt 299 ]]; then
-            echo "::error::Admin log request failed with HTTP $HTTP_STATUS"
-            head -c 2000 body.json
-            exit 1
+            HTTP_STATUS=$(curl --http1.1 -sS -o page.json -w '%{http_code}' \
+              -H "Authorization: token $(printf '%s' "$ADMIN_TOKEN" | tr -d '\n')" \
+              -H "Accept: application/json" \
+              -H "User-Agent: GitHub-Actions-Workflow" \
+              "$URL")
+
+            if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -gt 299 ]]; then
+              echo "::error::Admin log request failed with HTTP $HTTP_STATUS on page $PAGE"
+              head -c 2000 page.json
+              exit 1
+            fi
+
+            jq -c '.entries[]?' page.json >> pages.ndjson
+
+            NEXT=$(jq -r '.nextToken // empty' page.json)
+            [[ -n "$NEXT" ]] || break
+
+            PAGE=$((PAGE + 1))
+            if [[ "$PAGE" -gt "$MAX_LOG_PAGES" ]]; then
+              echo "::error::Admin log still paginating after $MAX_LOG_PAGES pages; refusing to loop further. Narrow the window with override_start_time."
+              exit 1
+            fi
+          done
+
+          if [[ "$PAGE" -gt 1 ]]; then
+            echo "Read $PAGE pages of admin log"
           fi
+
+          # Reassembled into the single-response shape so every filter below is unchanged.
+          jq -c -s '{ entries: . }' pages.ndjson > body.json
 
           # The window is enforced HERE, not by trusting the query. An admin API that ignored
           # `from` would otherwise replay its whole retention window as "just published".
@@ -258,17 +331,57 @@ jobs:
             | sort_by(.timestamp)
             | .[]' all.ndjson > publishes.ndjson
 
+          # Everything above dedupes within one run's batch, which cannot help when two runs
+          # read the same publish. On 2026-09-14 the publish of /developer/github-actions at
+          # 11:54:20Z was announced by run 34840599014 (window from 11:46:26Z) and announced
+          # again by run 34842067703, whose window opened at 11:53:48Z - the previous run's
+          # start minus OVERLAP_SECONDS. The publish had landed 28s before that earlier run
+          # started, so the later run's 60s re-read reached back over it. The two messages were
+          # 16m47s apart in separate processes, so no amount of in-batch grouping could see it.
+          #
+          # announced-history.ndjson holds what earlier runs actually dispatched, restored from
+          # cache. A candidate is dropped if the history already holds that exact log entry, or
+          # one for the same path, user and status within COLLAPSE_SECONDS - the same rule the
+          # in-batch collapse uses, so a burst split across two runs behaves like a burst inside
+          # one. A cache miss degrades to the old duplicate-announcing behaviour rather than to
+          # silence, which is the right direction for this to fail in.
+          touch announced-history.ndjson
+          jq -c -s --argjson collapse_ms "$(( COLLAPSE_SECONDS * 1000 ))" \
+            --slurpfile history announced-history.ndjson '
+            ( $history | map(select(type == "object")) ) as $h
+            | .[]
+            | . as $candidate
+            | ( $h
+                | map(select(
+                    .path == $candidate.path
+                    and .user == $candidate.user
+                    and .status == $candidate.status
+                    and ( .timestamp == $candidate.timestamp
+                          or ( ($candidate.timestamp - .timestamp)
+                               | if . < 0 then - . else . end ) <= $collapse_ms )))
+                | length ) as $already
+            | select($already == 0)' publishes.ndjson > announce.ndjson
+
           ALL_COUNT=$(wc -l < all.ndjson | tr -d ' ')
-          COUNT=$(wc -l < publishes.ndjson | tr -d ' ')
+          COLLAPSED_COUNT=$(wc -l < publishes.ndjson | tr -d ' ')
+          HISTORY_COUNT=$(wc -l < announced-history.ndjson | tr -d ' ')
+          COUNT=$(wc -l < announce.ndjson | tr -d ' ')
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Announced history holds $HISTORY_COUNT entr(y|ies)"
           echo "Publishes to announce: $COUNT"
-          if [[ "$ALL_COUNT" -ne "$COUNT" ]]; then
-            COLLAPSED=$((ALL_COUNT - COUNT))
+          if [[ "$ALL_COUNT" -ne "$COLLAPSED_COUNT" ]]; then
+            COLLAPSED=$((ALL_COUNT - COLLAPSED_COUNT))
             echo "Collapsed $COLLAPSED duplicate entr(y|ies) with the same path, user and status within ${COLLAPSE_SECONDS}s"
             echo "Pre-collapse entries:"
             cat all.ndjson
           fi
-          cat publishes.ndjson
+          if [[ "$COLLAPSED_COUNT" -ne "$COUNT" ]]; then
+            SUPPRESSED=$((COLLAPSED_COUNT - COUNT))
+            echo "Suppressed $SUPPRESSED entr(y|ies) already announced by an earlier run"
+            echo "Candidates before suppression:"
+            cat publishes.ndjson
+          fi
+          cat announce.ndjson
 
       - name: Announce publishes
         if: steps.log.outputs.count != '0'
@@ -276,6 +389,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+
+          : > dispatched.ndjson
 
           while IFS= read -r entry; do
             [[ -n "$entry" ]] || continue
@@ -303,4 +418,46 @@ jobs:
               --header "Accept: application/vnd.github.v3+json" \
               "/repos/${GITHUB_REPOSITORY}/dispatches" \
               --input -
-          done < publishes.ndjson
+
+            # Recorded only after the dispatch returns. If the loop dies part way through the
+            # list, the entries that did go out are remembered and the rest stay eligible.
+            printf '%s\n' "$entry" >> dispatched.ndjson
+          done < announce.ndjson
+
+      # Written even when an earlier step failed: anything already dispatched has reached Slack
+      # and must never be announced again. Skipped only when the log step never produced a
+      # history file to update.
+      - name: Update the announced history
+        if: always() && steps.log.outcome == 'success'
+        run: |
+          set -euo pipefail
+
+          touch announced-history.ndjson dispatched.ndjson
+
+          # Pruned to ANNOUNCED_HISTORY_HOURS so the file cannot grow without bound. The cutoff
+          # has to stay wider than WIDE_WINDOW_HOURS, or a run catching up after a long gap
+          # would re-read entries the history has already forgotten and announce them again.
+          CUTOFF_MS=$(( ( $(date -u +%s) - ANNOUNCED_HISTORY_HOURS * 3600 ) * 1000 ))
+
+          cat announced-history.ndjson dispatched.ndjson \
+            | jq -c -s --argjson cutoff "$CUTOFF_MS" '
+                map(select(type == "object" and (.timestamp // 0) >= $cutoff))
+                | unique_by([ .path, .user, .status, .timestamp ])
+                | sort_by(.timestamp)
+                | .[]' > announced-history.next.ndjson
+
+          mv announced-history.next.ndjson announced-history.ndjson
+
+          ADDED=$(wc -l < dispatched.ndjson | tr -d ' ')
+          KEPT=$(wc -l < announced-history.ndjson | tr -d ' ')
+          echo "Recorded $ADDED newly announced entr(y|ies); history now holds $KEPT within ${ANNOUNCED_HISTORY_HOURS}h"
+
+      # Saved on every run, not only when something was announced, so the newest cache key stays
+      # recent. Caches are evicted after 7 days without a hit, and restore-keys resolves to the
+      # most recent match, so a quiet week must not be allowed to age the history out.
+      - name: Save the announced history
+        if: always() && steps.log.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: announced-history.ndjson
+          key: track-publishes-announced-${{ github.run_id }}
