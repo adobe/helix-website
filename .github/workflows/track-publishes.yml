@@ -207,14 +207,19 @@ jobs:
 
       # Carried between runs so the OVERLAP_SECONDS re-read cannot announce a publish twice.
       # restore-keys is a prefix match that returns the most recently created matching cache,
-      # so every run picks up its predecessor's file. The exact key is unique per run and is
-      # therefore always a miss on restore, which is precisely what makes the save at the end
-      # of the job valid - actions/cache refuses to overwrite an existing key.
+      # so every run picks up its predecessor's file.
+      #
+      # The key includes run_attempt, not just run_id. run_id is unchanged when a run is
+      # re-run, and cache keys are immutable: keyed on run_id alone, a retried attempt would
+      # restore its own first attempt's partial history by exact-key hit and then fail to save
+      # its completed one, leaving the next scheduled run to restore the partial file and
+      # re-announce whatever the retry dispatched. With run_attempt in the key every attempt
+      # misses on the exact key, falls back to the prefix, and saves under a fresh key.
       - name: Restore the announced history
         uses: actions/cache/restore@v4
         with:
           path: announced-history.ndjson
-          key: track-publishes-announced-${{ github.run_id }}
+          key: track-publishes-announced-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             track-publishes-announced-
 
@@ -434,15 +439,29 @@ jobs:
 
           touch announced-history.ndjson dispatched.ndjson
 
-          # Pruned to ANNOUNCED_HISTORY_HOURS so the file cannot grow without bound. The cutoff
-          # has to stay wider than WIDE_WINDOW_HOURS, or a run catching up after a long gap
-          # would re-read entries the history has already forgotten and announce them again.
-          CUTOFF_MS=$(( ( $(date -u +%s) - ANNOUNCED_HISTORY_HOURS * 3600 ) * 1000 ))
+          # Pruned to ANNOUNCED_HISTORY_HOURS so the file cannot grow without bound.
+          #
+          # Retention is measured from when we ANNOUNCED an entry, not from when the content was
+          # published, because the two come apart exactly when it matters. A run catching up
+          # after a long backlog - runs created 2026-09-07T23:25Z did not execute until
+          # 2026-09-08T11:48Z - announces publishes that are already older than this cutoff. Aged
+          # out on their publish timestamp they would be forgotten the instant they were
+          # announced, and since a failed run does not advance the watermark, its successor would
+          # re-read that same wide window and announce them all over again. announcedAt is what
+          # this file is actually about: what this workflow has already said.
+          NOW_MS=$(( $(date -u +%s) * 1000 ))
+          CUTOFF_MS=$(( NOW_MS - ANNOUNCED_HISTORY_HOURS * 3600 * 1000 ))
 
-          cat announced-history.ndjson dispatched.ndjson \
+          jq -c --argjson at "$NOW_MS" '. + { announcedAt: $at }' \
+            dispatched.ndjson > dispatched-stamped.ndjson
+
+          # Where the same entry appears twice the newest announcedAt wins, so re-reading an
+          # entry extends how long it is remembered rather than shortening it.
+          cat announced-history.ndjson dispatched-stamped.ndjson \
             | jq -c -s --argjson cutoff "$CUTOFF_MS" '
-                map(select(type == "object" and (.timestamp // 0) >= $cutoff))
-                | unique_by([ .path, .user, .status, .timestamp ])
+                map(select(type == "object" and ((.announcedAt // .timestamp // 0) >= $cutoff)))
+                | group_by([ .path, .user, .status, .timestamp ])
+                | map(sort_by(.announcedAt // 0) | last)
                 | sort_by(.timestamp)
                 | .[]' > announced-history.next.ndjson
 
@@ -460,4 +479,4 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: announced-history.ndjson
-          key: track-publishes-announced-${{ github.run_id }}
+          key: track-publishes-announced-${{ github.run_id }}-${{ github.run_attempt }}
