@@ -132,78 +132,48 @@ jobs:
             echo "::warning::AEM_LIVE_ADMIN_TOKEN expires on $(date -d "@$EXPIRY"). Rotate it: $RUNBOOK"
           fi
 
-      # The watermark is the creation time of the last successful run before this one.
+      # The watermark is the creation time of the last successful run before this one, and it
+      # comes from a shared action now: adobe-rnd/resolve-window, factored out of THIS step and
+      # the equivalent one in aem-certificate-rotation. Same algorithm - newest successful run of
+      # this workflow on this branch, excluding this run, minus OVERLAP_SECONDS - and the same
+      # refusal to guess when there is no watermark.
       #
-      # It is resolved from the UNFILTERED run list, filtered locally. Server-side
-      # filtering of this endpoint is not reliable at this workflow's scale (35,600+ runs):
-      # in 13 consecutive identical calls to ?status=completed&branch=main, one returned
-      # total_count=29346 with a newest run of 2026-08-17 - three weeks stale - and zero
-      # successful runs anywhere on the page. The unfiltered list was stable and correctly
-      # ordered in 8/8 calls. A poisoned response used to send `from` hours off in either
-      # direction, which both duplicated and DROPPED publishes: the run created at
-      # 07:59:23Z resolved from=11:58:54Z and skipped four hours of log outright.
+      # The action keeps the property this step existed to preserve: it reads the UNFILTERED run
+      # list and filters locally, because server-side filtering of that endpoint is not reliable
+      # at this workflow's scale (35,600+ runs). In 13 consecutive identical calls to
+      # ?status=completed&branch=main, one returned total_count=29346 with a newest run three
+      # weeks stale and no successful run anywhere on the page. A poisoned response used to send
+      # `from` hours off in either direction, which both duplicated and DROPPED publishes: the
+      # run created at 07:59:23Z resolved from=11:58:54Z and skipped four hours of log outright.
+      # Same finding, same fix as adobe/aem-certificate-rotation#43. The action's README records
+      # this, and its test suite pins it.
       #
-      # Same finding, same fix as adobe/aem-certificate-rotation#43.
+      # One behavioural gain: it PAGES the run history. The code this replaces read a single page
+      # of 100 runs, which at */20 covers about 1.4 days, and every run cancelled by
+      # cancel-in-progress consumes that budget without ever succeeding. Past the end of that
+      # page it could not tell "no successful run in living memory" from "no successful run in
+      # the last 100", and failed closed for the wrong reason. The action pages to max-pages
+      # (10 by default, so 1000 runs) and still fails closed if it runs out, which is the only
+      # safe answer - a guessed window silently skips everything older than the guess.
       - name: Resolve the window
         id: window
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OVERRIDE_START_TIME: ${{ inputs.override_start_time }}
+        uses: adobe-rnd/resolve-window@v1
+        with:
+          overlap-seconds: ${{ env.OVERLAP_SECONDS }}
+          wide-window-hours: ${{ env.WIDE_WINDOW_HOURS }}
+          override-start-time: ${{ inputs.override_start_time }}
+
+      # The action's failure names its own input, override-start-time, which is not the name an
+      # operator has to type here. This restores the recovery hint in the workflow's own terms.
+      - name: Explain how to recover
+        if: failure() && steps.window.outcome == 'failure'
         run: |
-          set -euo pipefail
-
-          WORKFLOW_FILE=$(basename "${GITHUB_WORKFLOW_REF%%@*}")
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          echo "Workflow file: $WORKFLOW_FILE (branch $BRANCH)"
-
-          # No status= or branch= here, deliberately. Both are filtered locally below.
-          RUNS=$(gh api "/repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW_FILE}/runs?per_page=100")
-
-          LAST_SUCCESS=$(printf '%s' "$RUNS" | jq -r \
-            --arg branch "$BRANCH" \
-            --argjson self "${GITHUB_RUN_ID}" '
-              [ .workflow_runs[]
-                | select(.head_branch == $branch)
-                | select(.conclusion == "success")
-                | select(.id != $self)
-                | .created_at ]
-              | max // empty')
-
-          if [[ -n "$OVERRIDE_START_TIME" ]]; then
-            echo "::notice::Using override_start_time=$OVERRIDE_START_TIME"
-            WINDOW_START="$OVERRIDE_START_TIME"
-          elif [[ -n "$LAST_SUCCESS" ]]; then
-            WINDOW_START="$LAST_SUCCESS"
-            echo "Last successful run: $LAST_SUCCESS"
-          else
-            # Fail closed. The previous version fell back to "5 minutes ago", which turns a
-            # lost watermark into silently unannounced publishes - a wrong answer that looks
-            # like a clean run. An operator can widen the window deliberately with
-            # override_start_time.
-            {
-              echo "### Track Publishes could not resolve a watermark"
-              echo "No successful run of \`$WORKFLOW_FILE\` on \`$BRANCH\` in the last 100 runs."
-              echo "Re-run this workflow manually with \`override_start_time\` set to the ISO 8601 time"
-              echo "publishes should be announced from, e.g. \`$(date -u -d '2 hours ago' +%Y-%m-%dT%H:%M:%SZ)\`."
-            } >> "$GITHUB_STEP_SUMMARY"
-            echo "::error::No successful run found in the last 100; refusing to guess a window. Re-run with override_start_time."
-            exit 1
-          fi
-
-          START_EPOCH=$(date -u -d "$WINDOW_START" +%s)
-          FROM_EPOCH=$((START_EPOCH - OVERLAP_SECONDS))
-          FROM=$(date -u -d "@$FROM_EPOCH" +%Y-%m-%dT%H:%M:%SZ)
-
-          AGE_HOURS=$(( ($(date +%s) - START_EPOCH) / 3600 ))
-          if [[ "$AGE_HOURS" -ge "$WIDE_WINDOW_HOURS" ]]; then
-            echo "::warning::Window is ${AGE_HOURS}h wide (from $FROM). Expected ~20min - this run is catching up after a gap."
-          fi
-
           {
-            echo "from=$FROM"
-            echo "from-ms=$((FROM_EPOCH * 1000))"
-          } >> "$GITHUB_OUTPUT"
-          echo "Window: $FROM -> now"
+            echo "### Track Publishes could not resolve a watermark"
+            echo ""
+            echo "Re-run this workflow manually with \`override_start_time\` set to the ISO 8601"
+            echo "time publishes should be announced from, e.g. \`$(date -u -d '2 hours ago' +%Y-%m-%dT%H:%M:%SZ)\`."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # Carried between runs so the OVERLAP_SECONDS re-read cannot announce a publish twice.
       # restore-keys is a prefix match that returns the most recently created matching cache,
