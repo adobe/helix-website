@@ -1,0 +1,54 @@
+name: Sync YouTube Chapters
+
+on:
+  schedule:
+    # Well after the weekly sessions are published, so chapters land the morning after.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Report what would change without writing to Document Authoring"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  AEM_ORG: adobe
+  # The site is registered as `aem-website`, not after the GitHub repo. See CLAUDE.md.
+  AEM_SITE: aem-website
+  SHEET_PATH: /community-feeds.json
+  SHEET_NAME: youtube
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check for required secrets
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          AEM_ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
+        run: |
+          for name in YOUTUBE_API_KEY AEM_ADMIN_TOKEN; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::The $name secret is not configured. See tools/youtube-chapters/README.md."
+              exit 1
+            fi
+          done
+
+      - name: Sync chapters into the community feed sheet
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          AEM_ADMIN_TOKEN: ${{ secrets.AEM_LIVE_ADMIN_TOKEN }}
+          DRY_RUN: ${{ inputs.dry-run }}
+        run: |
+          # Without pipefail the exit code would come from tee, hiding a failed sync.
+          set -o pipefail
+          node tools/youtube-chapters/sync-chapters.js | tee -a "$GITHUB_STEP_SUMMARY"
