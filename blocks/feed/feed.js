@@ -121,6 +121,13 @@ function getCompactItems(data, filter) {
   return data.filter((item) => inferCategory(item) === filter);
 }
 
+function getYearsForCategory(data, category) {
+  const years = new Set(
+    getCompactItems(data, category).map((item) => parseFeedDate(item.Date).getFullYear()),
+  );
+  return [...years].sort((a, b) => b - a);
+}
+
 export async function renderFeedCompact(block) {
   if (!block) {
     return;
@@ -153,19 +160,44 @@ export async function renderFeedCompact(block) {
   const contentArea = createTag('div', { class: 'feed-view' });
   block.appendChild(contentArea);
 
-  const viewState = { filter: 'all', visibleCount: COMPACT_PAGE_SIZE };
+  const viewState = { filter: 'all', year: 'all', visibleCount: COMPACT_PAGE_SIZE };
 
   const renderView = () => {
     contentArea.textContent = '';
-    const items = getCompactItems(data, viewState.filter);
+    let items = getCompactItems(data, viewState.filter);
+    if (viewState.filter !== 'all' && viewState.year !== 'all') {
+      items = items.filter(
+        (item) => parseFeedDate(item.Date).getFullYear() === Number(viewState.year),
+      );
+    }
     const visibleItems = viewState.filter === 'all'
       ? items.slice(0, viewState.visibleCount)
       : items;
 
     if (viewState.filter !== 'all') {
-      contentArea.appendChild(
+      const header = createTag('div', { class: 'feed-group-header' });
+      header.appendChild(
         createTag('h3', { class: 'feed-group-heading' }, viewState.filter),
       );
+
+      const years = getYearsForCategory(data, viewState.filter);
+      const yearLinks = createTag('div', { class: 'feed-year-filter' });
+      const allYearsLink = createTag('button', {
+        class: `feed-year-link${viewState.year === 'all' ? ' active' : ''}`,
+        'data-year': 'all',
+      }, 'All');
+      yearLinks.appendChild(allYearsLink);
+
+      years.forEach((year) => {
+        const link = createTag('button', {
+          class: `feed-year-link${viewState.year === String(year) ? ' active' : ''}`,
+          'data-year': String(year),
+        }, String(year));
+        yearLinks.appendChild(link);
+      });
+      header.appendChild(yearLinks);
+
+      contentArea.appendChild(header);
     }
 
     const grid = createTag('div', { class: 'feed-grid' });
@@ -194,7 +226,16 @@ export async function renderFeedCompact(block) {
     filterBar.querySelectorAll('.feed-filter-chip').forEach((c) => c.classList.remove('active'));
     chip.classList.add('active');
     viewState.filter = chip.dataset.filter;
+    viewState.year = 'all';
     viewState.visibleCount = COMPACT_PAGE_SIZE;
+    renderView();
+  });
+
+  contentArea.addEventListener('click', (e) => {
+    const link = e.target.closest('.feed-year-link');
+    if (!link || link.dataset.year === viewState.year) return;
+
+    viewState.year = link.dataset.year;
     renderView();
   });
 

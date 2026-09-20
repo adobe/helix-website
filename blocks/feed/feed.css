@@ -356,6 +356,49 @@ main .section:has(.feed.compact) > .default-content-wrapper {
   color: var(--color-white);
 }
 
+.feed.compact .feed-group-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+  margin-bottom: var(--spacing-s);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-gray-200);
+}
+
+.feed.compact .feed-group-header .feed-group-heading {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.feed.compact .feed-year-filter {
+  display: flex;
+  gap: var(--spacing-s);
+}
+
+.feed.compact .feed-year-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--type-body-xs-size);
+  font-weight: 400;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.feed.compact .feed-year-link:hover {
+  color: var(--color-accent-blue);
+}
+
+.feed.compact .feed-year-link.active {
+  color: var(--color-accent-blue);
+  font-weight: 700;
+}
+
 .feed.compact .feed-group {
   margin-bottom: var(--spacing-xl);
 }
