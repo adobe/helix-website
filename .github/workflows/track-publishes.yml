@@ -301,16 +301,16 @@ jobs:
           # counted; a method that is neither POST nor DELETE means the admin API has grown a
           # new operation this filter has never seen, which is a warning because it might be a
           # publish we are now failing to announce.
-          UNPUBLISHED=$(jq --arg route "$ROUTE_FILTER" '[ .entries[]? | select(.route == $route) | select(.method == "DELETE") ] | length' body.json)
+          UNPUBLISHED=$(jq --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '[ .entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method == "DELETE") ] | length' body.json)
           if [[ "$UNPUBLISHED" -gt 0 ]]; then
             echo "Ignored $UNPUBLISHED unpublish (DELETE) entr(y|ies) on the $ROUTE_FILTER route; this workflow announces publishes only"
-            jq -c --arg route "$ROUTE_FILTER" '.entries[]? | select(.route == $route) | select(.method == "DELETE") | { path, user, timestamp, status }' body.json
+            jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '.entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method == "DELETE") | { path, user, timestamp, status }' body.json
           fi
 
-          UNKNOWN_METHOD=$(jq --arg route "$ROUTE_FILTER" '[ .entries[]? | select(.route == $route) | select(.method != "POST" and .method != "DELETE") ] | length' body.json)
+          UNKNOWN_METHOD=$(jq --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '[ .entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method != "POST" and .method != "DELETE") ] | length' body.json)
           if [[ "$UNKNOWN_METHOD" -gt 0 ]]; then
             echo "::warning::$UNKNOWN_METHOD $ROUTE_FILTER-route entr(y|ies) used a method other than POST or DELETE and were not announced. If the admin API introduced a new publish method, this filter needs updating."
-            jq -c --arg route "$ROUTE_FILTER" '.entries[]? | select(.route == $route) | select(.method != "POST" and .method != "DELETE") | { method, path, user, timestamp, status }' body.json
+            jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '.entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method != "POST" and .method != "DELETE") | { method, path, user, timestamp, status }' body.json
           fi
 
           # Collapse a burst of identical entries into the newest one. The key is path + user
