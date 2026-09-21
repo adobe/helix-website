@@ -366,6 +366,17 @@ main .section:has(.feed.compact) > .default-content-wrapper {
   border-bottom: 2px solid var(--color-gray-200);
 }
 
+.feed.compact .feed-group-heading {
+  font-size: var(--type-body-s-size);
+  font-weight: 700;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-s);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-gray-200);
+}
+
 .feed.compact .feed-group-header .feed-group-heading {
   margin-bottom: 0;
   padding-bottom: 0;
@@ -429,17 +440,6 @@ main .section:has(.feed.compact) > .default-content-wrapper {
   color: var(--spectrum-blue);
   text-decoration: underline;
   text-underline-offset: 2px;
-}
-
-.feed.compact .feed-group-heading {
-  font-size: var(--type-body-s-size);
-  font-weight: 700;
-  color: var(--color-gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: var(--spacing-s);
-  padding-bottom: var(--spacing-xs);
-  border-bottom: 2px solid var(--color-gray-200);
 }
 
 .feed.compact .feed-grid {
