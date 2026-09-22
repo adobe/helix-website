@@ -276,6 +276,15 @@ jobs:
           jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '
             [ .entries[]?
               | select(.route == $route)
+              # A live-route entry is a PUBLISH only when the method is POST. An UNPUBLISH is a
+              # DELETE on the same route, and this filter used to select it, so the workflow
+              # announced an unpublish as a publish: DELETE /examples/gated-content at
+              # 2026-09-17T15:13:22Z was announced as "@murugull published
+              # /examples/gated-content" at 15:18:57Z, and the publisher had to correct it by
+              # hand in #aem-live-website. The dispatched payload even carried status 204.
+              # Measured over 2026-09-11..21 on this site: 30 POST and 1 DELETE on the live
+              # route, so it is rare and real rather than hypothetical.
+              | select(.method == "POST")
               | select((.timestamp // 0) >= $floor)
               | { user: (.user // "unknown"), timestamp: .timestamp, status: .status,
                   paths: ([ .path ] + (.paths // [])) }
@@ -286,6 +295,23 @@ jobs:
             | unique_by([ .path, .timestamp ])
             | sort_by(.timestamp)
             | .[]' body.json > all.ndjson
+
+          # Silence is this workflow's worst failure mode, so neither an unpublish nor an
+          # unrecognised method is dropped without trace. Unpublishes are expected and merely
+          # counted; a method that is neither POST nor DELETE means the admin API has grown a
+          # new operation this filter has never seen, which is a warning because it might be a
+          # publish we are now failing to announce.
+          UNPUBLISHED=$(jq --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '[ .entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method == "DELETE") ] | length' body.json)
+          if [[ "$UNPUBLISHED" -gt 0 ]]; then
+            echo "Ignored $UNPUBLISHED unpublish (DELETE) entr(y|ies) on the $ROUTE_FILTER route; this workflow announces publishes only"
+            jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '.entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method == "DELETE") | { path, user, timestamp, status }' body.json
+          fi
+
+          UNKNOWN_METHOD=$(jq --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '[ .entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method != "POST" and .method != "DELETE") ] | length' body.json)
+          if [[ "$UNKNOWN_METHOD" -gt 0 ]]; then
+            echo "::warning::$UNKNOWN_METHOD $ROUTE_FILTER-route entr(y|ies) used a method other than POST or DELETE and were not announced. If the admin API introduced a new publish method, this filter needs updating."
+            jq -c --arg route "$ROUTE_FILTER" --argjson floor "$FROM_MS" '.entries[]? | select(.route == $route) | select((.timestamp // 0) >= $floor) | select(.method != "POST" and .method != "DELETE") | { method, path, user, timestamp, status }' body.json
+          fi
 
           # Collapse a burst of identical entries into the newest one. The key is path + user
           # + status, not path alone: two people publishing the same path inside the window are
