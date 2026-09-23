@@ -157,19 +157,20 @@ export default async function decorate(block) {
     }
   });
 
-  // Extract API URL
+  // Extract API URL (the developerevents.adobe.com link whose path starts with /api/)
   let apiUrl = '';
   const links = content.querySelectorAll('a');
   links.forEach((link) => {
-    if (new URL(link.href).host === 'developerevents.adobe.com') {
+    const linkUrl = new URL(link.href);
+    if (linkUrl.host === 'developerevents.adobe.com' && linkUrl.pathname.startsWith('/api/')) {
       apiUrl = link.href;
     }
   });
 
-  // Extract CTA link (any link that's not the API URL)
+  // Extract CTA link (any link that isn't the API URL)
   let ctaHtml = '';
   links.forEach((link) => {
-    if (!link.href.includes('developerevents.adobe.com')) {
+    if (link.href !== apiUrl) {
       const ctaText = link.textContent.trim();
       const ctaHref = link.href;
       ctaHtml = `<p class="button-container"><a href="${ctaHref}" class="button black-border">${ctaText}</a></p>`;
