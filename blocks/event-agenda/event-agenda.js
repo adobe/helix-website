@@ -1,26 +1,5 @@
 const DEFAULT_ENDPOINT = '/event-agenda.json';
 
-// Maps the event tool's raw category values to the visitor-facing filter groups.
-const CATEGORY_GROUPS = {
-  session: 'Keynote & Sessions',
-  preconference: 'Keynote & Sessions',
-  certification: 'Free Certification',
-  break: 'Breaks & Social',
-  'hands-on lab': 'Hands-on Labs',
-};
-
-const GROUP_ORDER = [
-  'Keynote & Sessions',
-  'Hands-on Labs',
-  'Free Certification',
-  'Breaks & Social',
-];
-
-function toGroup(category) {
-  const key = (category || '').trim().toLowerCase();
-  return CATEGORY_GROUPS[key] || category?.trim() || 'Other';
-}
-
 function isFeatured(row) {
   // Sheet column casing has varied ("featured" vs "Featured"); match case-insensitively.
   const key = Object.keys(row).find((k) => k.toLowerCase() === 'featured');
@@ -248,7 +227,6 @@ function createItem(row, index, speakerLookup) {
   const li = document.createElement('li');
   li.className = 'event-agenda-item';
   li.dataset.day = row.date;
-  li.dataset.group = toGroup(row.category);
   if (isFeatured(row)) li.classList.add('featured');
 
   const panelId = `event-agenda-panel-${index}`;
@@ -321,7 +299,7 @@ function createItem(row, index, speakerLookup) {
   return li;
 }
 
-function createDayTabs(days, activeDay, preconferenceDays, onSelect) {
+function createDayTabs(days, activeDay, onSelect) {
   const nav = document.createElement('div');
   nav.className = 'event-agenda-days';
   nav.setAttribute('role', 'tablist');
@@ -331,21 +309,11 @@ function createDayTabs(days, activeDay, preconferenceDays, onSelect) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'event-agenda-day';
+    button.textContent = formatDayLabel(day);
     button.dataset.day = day;
     button.setAttribute('role', 'tab');
     button.setAttribute('aria-selected', String(isActive));
     if (isActive) button.classList.add('active');
-
-    if (preconferenceDays.has(day)) {
-      const chip = document.createElement('span');
-      chip.className = 'event-agenda-day-chip';
-      chip.textContent = 'Pre-conference';
-      button.append(chip);
-    }
-
-    const label = document.createElement('span');
-    label.textContent = formatDayLabel(day);
-    button.append(label);
 
     button.addEventListener('click', () => {
       nav.querySelectorAll('.event-agenda-day').forEach((tab) => {
@@ -358,30 +326,6 @@ function createDayTabs(days, activeDay, preconferenceDays, onSelect) {
   });
 
   return nav;
-}
-
-function createCategoryFilters(groups, onSelect) {
-  const nav = document.createElement('div');
-  nav.className = 'event-agenda-filters';
-
-  const buttons = groups.map((group, index) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'event-agenda-filter';
-    button.textContent = group === 'all' ? 'All' : group;
-    button.dataset.group = group;
-    if (index === 0) button.classList.add('active');
-    button.addEventListener('click', () => {
-      nav.querySelectorAll('.event-agenda-filter').forEach((filter) => {
-        filter.classList.toggle('active', filter === button);
-      });
-      onSelect(group);
-    });
-    nav.append(button);
-    return button;
-  });
-
-  return { nav, buttons };
 }
 
 export default async function decorate(block) {
@@ -428,15 +372,6 @@ export default async function decorate(block) {
   }
 
   const days = [...new Set(validRows.map((row) => row.date))].sort();
-  const presentGroups = new Set(validRows.map((row) => toGroup(row.category)));
-  const groups = ['all', ...GROUP_ORDER.filter((group) => presentGroups.has(group)),
-    ...[...presentGroups].filter((group) => !GROUP_ORDER.includes(group))];
-
-  // Days containing a "Preconference" category row get a chip on their tab.
-  const preconferenceDays = new Set(
-    validRows.filter((row) => (row.category || '').trim().toLowerCase() === 'preconference')
-      .map((row) => row.date),
-  );
 
   // Default to the day with the featured keynote (the main conference day),
   // falling back to the first day if no row is flagged as featured.
@@ -450,32 +385,23 @@ export default async function decorate(block) {
   validRows.forEach((row, index) => list.append(createItem(row, index, speakerLookup)));
 
   let activeDay = defaultDay;
-  let activeGroup = 'all';
 
   function applyFilters() {
     list.querySelectorAll(':scope > .event-agenda-item').forEach((item) => {
-      const matchesDay = item.dataset.day === activeDay;
-      const matchesGroup = activeGroup === 'all' || item.dataset.group === activeGroup;
-      item.classList.toggle('is-hidden', !(matchesDay && matchesGroup));
+      item.classList.toggle('is-hidden', item.dataset.day !== activeDay);
     });
   }
 
-  const controls = document.createElement('div');
-  controls.className = 'event-agenda-controls';
-
   if (days.length > 1) {
-    controls.append(createDayTabs(days, activeDay, preconferenceDays, (day) => {
+    const controls = document.createElement('div');
+    controls.className = 'event-agenda-controls';
+    controls.append(createDayTabs(days, activeDay, (day) => {
       activeDay = day;
       applyFilters();
     }));
+    block.append(controls);
   }
 
-  const { nav: filtersNav } = createCategoryFilters(groups, (group) => {
-    activeGroup = group;
-    applyFilters();
-  });
-  controls.append(filtersNav);
-
-  block.append(controls, list);
+  block.append(list);
   applyFilters();
 }

@@ -10,8 +10,6 @@ main .event-agenda-controls {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  padding-block-end: var(--spacing-s);
-  border-block-end: 1px solid var(--border-color-light);
 }
 
 main .event-agenda-days {
@@ -24,11 +22,6 @@ main .event-agenda-days {
 }
 
 main .event-agenda-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 2px;
   padding: var(--spacing-xxs) var(--spacing-xs);
   border: 0;
   border-radius: var(--input-border-radius);
@@ -46,44 +39,6 @@ main .event-agenda-day.active {
   background-color: var(--color-gray-50);
   color: var(--color-gray-900);
   font-weight: 700;
-}
-
-main .event-agenda-day-chip {
-  color: var(--color-gray-500);
-  font-size: var(--type-body-xxs-size);
-  line-height: var(--type-body-xxs-lh);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-main .event-agenda-day.active .event-agenda-day-chip {
-  color: var(--color-eyebrow-highlight);
-}
-
-main .event-agenda-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xxs);
-}
-
-main .event-agenda-filter {
-  padding: var(--spacing-xxxs) var(--spacing-xs);
-  border: 1px solid var(--border-color-medium);
-  border-radius: 100px;
-  background: transparent;
-  color: var(--color-gray-600);
-  font-family: var(--body-font-family);
-  font-size: var(--type-body-xxs-size);
-  line-height: var(--type-body-xxs-lh);
-  font-weight: 500;
-  cursor: pointer;
-}
-
-main .event-agenda-filter.active {
-  background-color: var(--color-gray-900);
-  border-color: var(--color-gray-900);
-  color: var(--color-white);
 }
 
 /* ---- schedule list ---- */
@@ -264,12 +219,6 @@ main .event-agenda-error {
 }
 
 @media (width >= 600px) {
-  main .event-agenda-controls {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
   main .event-agenda-item-time {
     gap: 0;
   }
