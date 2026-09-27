@@ -36,6 +36,7 @@ main .event-agenda-day {
   color: var(--color-gray-600);
   font-family: var(--body-font-family);
   font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
   font-weight: 500;
   text-align: center;
   cursor: pointer;
@@ -50,6 +51,7 @@ main .event-agenda-day.active {
 main .event-agenda-day-chip {
   color: var(--color-gray-500);
   font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
   font-weight: 500;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -73,6 +75,7 @@ main .event-agenda-filter {
   color: var(--color-gray-600);
   font-family: var(--body-font-family);
   font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
   font-weight: 500;
   cursor: pointer;
 }
@@ -144,6 +147,7 @@ main .event-agenda-item-badge {
   background-color: var(--bg-color-lightgrey);
   color: var(--color-gray-700);
   font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -169,6 +173,7 @@ main .event-agenda-item-speakers {
   gap: var(--spacing-xs);
   margin-block-start: var(--spacing-xxs);
   font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
   color: var(--color-gray-600);
 }
 
@@ -209,7 +214,7 @@ main .event-agenda-item-toggle[aria-expanded="true"] .event-agenda-item-chevron 
 }
 
 main .event-agenda-item-panel {
-  padding: 0 var(--spacing-xs) var(--spacing-s);
+  padding-block-end: var(--spacing-s);
   border-block-start: 1px solid var(--border-color-light);
   margin-inline: var(--spacing-xs);
 }
@@ -218,12 +223,15 @@ main .event-agenda-item-panel[hidden] {
   display: none;
 }
 
+main .event-agenda-item-panel-body {
+  padding-block-start: var(--spacing-xs);
+}
+
 main .event-agenda-panel-speakers {
   display: none;
 }
 
 main .event-agenda-item-description {
-  padding-block-start: var(--spacing-xs);
   font-size: var(--type-body-xs-size);
   line-height: var(--type-body-xs-lh);
   color: var(--color-gray-700);
@@ -275,20 +283,34 @@ main .event-agenda-error {
     flex: 0 0 auto;
   }
 
-  main .event-agenda-panel-speakers {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-m);
-    padding-block-start: var(--spacing-xs);
+  /*
+   * Matches the button's own time (8.5rem) + gap (--spacing-xs) split, so
+   * the description's left edge lines up exactly with the title above it.
+   */
+  main .event-agenda-item-panel-body {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: var(--spacing-xs);
   }
 
-  main .event-agenda-panel-speaker {
-    flex: 0 0 140px;
+  /* Avoid showing the speaker twice: the large photo card below covers it. */
+  main .event-agenda-item-toggle[aria-expanded="true"] .event-agenda-item-speakers {
+    display: none;
+  }
+
+  main .event-agenda-item-description {
+    min-width: 0;
+  }
+
+  main .event-agenda-panel-speakers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
   }
 
   main .event-agenda-panel-speaker-photo {
-    width: 140px;
-    height: 175px;
+    width: 110px;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
     display: block;
     border-radius: var(--image-border-radius-m);
@@ -296,8 +318,9 @@ main .event-agenda-error {
   }
 
   main .event-agenda-panel-speaker-name {
-    margin: var(--spacing-xs) 0 var(--spacing-xxxs);
-    font-size: var(--type-body-s-size);
+    margin: var(--spacing-xxs) 0 0;
+    font-size: var(--type-body-m-size);
+    line-height: var(--type-heading-s-lh);
     font-weight: 700;
     color: var(--color-gray-900);
   }
@@ -306,6 +329,7 @@ main .event-agenda-error {
   main .event-agenda-panel-speaker-company {
     margin: 0;
     font-size: var(--type-body-xs-size);
+    line-height: var(--type-body-xs-lh);
     color: var(--color-gray-700);
   }
 }

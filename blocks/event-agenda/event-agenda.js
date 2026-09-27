@@ -303,8 +303,13 @@ function createItem(row, index, speakerLookup) {
   panel.id = panelId;
   panel.hidden = true;
 
-  if (row.speakers) panel.append(renderSpeakerCards(row.speakers, speakerLookup));
-  if (row.description) panel.append(renderDescription(row.description));
+  if (row.speakers || row.description) {
+    const panelBody = document.createElement('div');
+    panelBody.className = 'event-agenda-item-panel-body';
+    if (row.speakers) panelBody.append(renderSpeakerCards(row.speakers, speakerLookup));
+    if (row.description) panelBody.append(renderDescription(row.description));
+    panel.append(panelBody);
+  }
 
   button.addEventListener('click', () => {
     const expanded = button.getAttribute('aria-expanded') === 'true';
