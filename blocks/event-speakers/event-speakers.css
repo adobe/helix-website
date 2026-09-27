@@ -5,11 +5,7 @@
 }
 
 .event-speakers h2 {
-  font-size: 3rem;
-  font-weight: 900;
-  color: inherit;
   margin: 0 0 40px;
-  line-height: 1.1;
 }
 
 .event-speakers .speakers-carousel-wrapper {
@@ -157,10 +153,6 @@
 }
 
 @media (width <= 768px) {
-  .event-speakers h2 {
-    font-size: 2rem;
-  }
-
   .event-speakers .speaker-card {
     flex: 0 0 180px;
   }
