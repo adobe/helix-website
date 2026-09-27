@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aem-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "@adobe/aem-cli", "up", "--no-open", "--url", "https://main--aem-website--adobe.aem.page/"],
+      "port": 3000
+    },
+    {
+      "name": "aem-dev-drafts",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "@adobe/aem-cli", "up", "--no-open", "--html-folder", "drafts", "--url", "https://main--aem-website--adobe.aem.page/"],
+      "port": 3001
+    }
+  ]
+}

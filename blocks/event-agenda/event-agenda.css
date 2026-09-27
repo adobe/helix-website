@@ -1,0 +1,284 @@
+main .event-agenda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+/* ---- controls: day tabs + category filters ---- */
+
+main .event-agenda-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+main .event-agenda-days {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background-color: var(--bg-color-lightgrey);
+  border-radius: var(--input-border-radius);
+  width: fit-content;
+}
+
+main .event-agenda-day {
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  border: 0;
+  border-radius: var(--input-border-radius);
+  background: transparent;
+  color: var(--color-gray-600);
+  font-family: var(--body-font-family);
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+}
+
+main .event-agenda-day.active {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
+  font-weight: 700;
+}
+
+/* ---- schedule list ---- */
+
+main .event-agenda-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+main .event-agenda-item {
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--image-border-radius-m);
+}
+
+main .event-agenda-item.is-hidden {
+  display: none;
+}
+
+main .event-agenda-item-toggle {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  border: 0;
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+  font-family: var(--body-font-family);
+  color: inherit;
+}
+
+main .event-agenda-item-time {
+  flex: 0 0 auto;
+  width: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-s);
+}
+
+main .event-agenda-item-time-range {
+  font-size: var(--type-body-xxs-size);
+  font-weight: 700;
+  color: var(--color-gray-900);
+  white-space: nowrap;
+}
+
+main .event-agenda-item-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+main .event-agenda-item-badge {
+  padding: 2px var(--spacing-xxs);
+  border-radius: 4px;
+  background-color: var(--bg-color-lightgrey);
+  color: var(--color-gray-700);
+  font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+main .event-agenda-item-badge-desktop {
+  display: none;
+}
+
+main .event-agenda-item.featured .event-agenda-item-badge {
+  background-color: var(--color-brand-red);
+  color: var(--color-white);
+}
+
+main .event-agenda-item.featured .event-agenda-item-time-range {
+  color: var(--color-brand-red);
+}
+
+main .event-agenda-item-speakers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-block-start: var(--spacing-xxs);
+  font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
+  color: var(--color-gray-600);
+}
+
+main .event-agenda-speaker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxxs);
+}
+
+main .event-agenda-speaker-photo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+main .event-agenda-item-title {
+  margin: 0;
+  font-size: var(--type-body-m-size);
+  line-height: var(--type-heading-s-lh);
+  overflow-wrap: break-word;
+}
+
+main .event-agenda-item-chevron {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin-block-start: 6px;
+  border-inline-end: 2px solid var(--color-gray-400);
+  border-block-end: 2px solid var(--color-gray-400);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+main .event-agenda-item-toggle[aria-expanded="true"] .event-agenda-item-chevron {
+  transform: rotate(225deg);
+  margin-block-start: 10px;
+}
+
+main .event-agenda-item-panel {
+  padding-block-end: var(--spacing-s);
+  border-block-start: 1px solid var(--border-color-light);
+  margin-inline: var(--spacing-xs);
+}
+
+main .event-agenda-item-panel[hidden] {
+  display: none;
+}
+
+main .event-agenda-item-panel-body {
+  padding-block-start: var(--spacing-xs);
+}
+
+main .event-agenda-panel-speakers {
+  display: none;
+}
+
+main .event-agenda-item-description {
+  font-size: var(--type-body-xs-size);
+  line-height: var(--type-body-xs-lh);
+  color: var(--color-gray-700);
+}
+
+main .event-agenda-item-description p {
+  margin: 0 0 var(--spacing-xxs);
+}
+
+main .event-agenda-item-description-heading {
+  font-weight: 700;
+  font-size: var(--type-body-xxs-size);
+  line-height: var(--type-body-xxs-lh);
+  letter-spacing: 0.02em;
+}
+
+main .event-agenda-item-description ul {
+  margin: 0 0 var(--spacing-xxs);
+  padding-inline-start: 1.2em;
+}
+
+main .event-agenda-item-description li {
+  margin-bottom: var(--spacing-xxxs);
+}
+
+main .event-agenda-error {
+  padding: var(--spacing-s);
+  text-align: center;
+  color: var(--color-gray-600);
+}
+
+@media (width >= 600px) {
+  main .event-agenda-item-time {
+    gap: 0;
+  }
+
+  main .event-agenda-item-badge-mobile {
+    display: none;
+  }
+
+  main .event-agenda-item-badge-desktop {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  /*
+   * Matches the button's own time (8.5rem) + gap (--spacing-xs) split, so
+   * the description's left edge lines up exactly with the title above it.
+   */
+  main .event-agenda-item-panel-body {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: var(--spacing-xs);
+  }
+
+  /* Avoid showing the speaker twice: the large photo card below covers it. */
+  main .event-agenda-item-toggle[aria-expanded="true"] .event-agenda-item-speakers {
+    display: none;
+  }
+
+  main .event-agenda-item-description {
+    min-width: 0;
+  }
+
+  main .event-agenda-panel-speakers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
+  }
+
+  main .event-agenda-panel-speaker-photo {
+    width: 110px;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--image-border-radius-m);
+    box-shadow: 0 4px 12px var(--shadow-color-10);
+  }
+
+  main .event-agenda-panel-speaker-name {
+    margin: var(--spacing-xxs) 0 0;
+    font-size: var(--type-body-m-size);
+    line-height: var(--type-heading-s-lh);
+    font-weight: 700;
+    color: var(--color-gray-900);
+  }
+
+  main .event-agenda-panel-speaker-title,
+  main .event-agenda-panel-speaker-company {
+    margin: 0;
+    font-size: var(--type-body-xs-size);
+    line-height: var(--type-body-xs-lh);
+    color: var(--color-gray-700);
+  }
+}
