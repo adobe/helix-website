@@ -18,4 +18,15 @@ module.exports = {
       js: 'always',
     }],
   },
+  overrides: [
+    {
+      // CI-only scripts run in Node, not in the browser.
+      files: ['tools/youtube-chapters/**/*.js'],
+      env: { browser: false, node: true },
+      rules: {
+        'no-console': 'off',
+        'no-restricted-syntax': ['error', 'WithStatement'],
+      },
+    },
+  ],
 };
