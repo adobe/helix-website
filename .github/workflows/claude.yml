@@ -35,8 +35,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         env:
           # Amazon Bedrock API key; replaces the Claude Code OAuth token.
-          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
-          AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEDROCK_TOKEN }}
+          AWS_REGION: ${{ vars.AWS_REGION || 'us-west-2' }}
         with:
           use_bedrock: 'true'
 
