@@ -41,7 +41,7 @@ jobs:
         with:
           use_bedrock: 'true'
           claude_args: |
-            --model ${{ vars.CLAUDE_BEDROCK_MODEL || 'global.anthropic.claude-sonnet-4-6' }}
+            --model ${{ vars.CLAUDE_BEDROCK_MODEL || 'global.anthropic.claude-opus-5-5' }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: |
