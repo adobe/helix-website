@@ -51,5 +51,5 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           claude_args: |
-            --model ${{ vars.CLAUDE_BEDROCK_MODEL || 'global.anthropic.claude-sonnet-4-6' }}
+            --model ${{ vars.CLAUDE_BEDROCK_MODEL || 'global.anthropic.claude-opus-5-5' }}
 
