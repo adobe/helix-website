@@ -42,6 +42,10 @@
   background-color: var(--color-release-peach);
 }
 
+.releases .release-da-authoring {
+  background-color: var(--color-release-red);
+}
+
 .releases .release {
   padding: 16px 32px 32px;
   margin: 16px 0;
@@ -85,6 +89,7 @@
 .releases .aem-lib .release-aem-lib,
 .releases .franklin-sidekick-library .release-franklin-sidekick-library,
 .releases .aem-certificate-rotation .release-aem-certificate-rotation,
-.releases .helix-reviews .release-helix-reviews {
+.releases .helix-reviews .release-helix-reviews,
+.releases .da-authoring .release-da-authoring {
   display: block;
 }
