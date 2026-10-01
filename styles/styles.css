@@ -802,7 +802,6 @@ a.button.primary:any-link:active {
 .redesign a.button.primary:any-link:hover {
   background-color: #0d66d0;
   border-color: #0d66d0;
-  color: #fff;
 }
 
 .redesign a.button.primary:any-link:active {
@@ -847,6 +846,7 @@ a.button.primary:any-link:active {
 :where(html[data-theme="dark"]) .redesign a.button.primary:any-link:hover {
   background-color: #095aba;
   border-color: #095aba;
+  color: #fff;
 }
 
 :where(html[data-theme="dark"]) .redesign a.button.primary:any-link:active {
