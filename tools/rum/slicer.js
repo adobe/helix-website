@@ -204,6 +204,63 @@ function updateDataFacets(filterText, params, checkpoint) {
             },
           );
         }
+
+        if (cp === 'redirect') {
+          // Parsing redirect.target to create separate facets
+          // It is encoded as "count:duration" (internal) or "count~duration" (external)
+          dataChunks.addFacet(`${cp}.type`, (bundle) => Array.from(
+            bundle.events
+              .filter((evt) => evt.checkpoint === cp)
+              .filter(({ target }) => target && typeof target === 'string')
+              .reduce((acc, { target }) => {
+                let type = null;
+                if (target.includes(':')) {
+                  type = 'internal';
+                } else if (target.includes('~')) {
+                  type = 'external';
+                }
+                if (type) acc.add(type);
+                return acc;
+              }, new Set()),
+          ));
+
+          dataChunks.addFacet(`${cp}.count`, (bundle) => Array.from(
+            bundle.events
+              .filter((evt) => evt.checkpoint === cp)
+              .filter(({ target }) => target && typeof target === 'string')
+              .reduce((acc, { target }) => {
+                const match = target.match(/^(\d+)[~:]/);
+                if (match) {
+                  const count = parseInt(match[1], 10);
+                  if (!Number.isNaN(count)) acc.add(count);
+                }
+                return acc;
+              }, new Set()),
+          ));
+
+          dataChunks.addFacet(`${cp}.duration`, (bundle) => Array.from(
+            bundle.events
+              .filter((evt) => evt.checkpoint === cp)
+              .filter(({ target }) => target && typeof target === 'string')
+              .reduce((acc, { target }) => {
+                const match = target.match(/[~:](\d+)$/);
+                if (match) {
+                  const duration = parseInt(match[1], 10);
+                  if (!Number.isNaN(duration)) acc.add(duration);
+                }
+                return acc;
+              }, new Set()),
+          ));
+
+          // redirect.duration is a continuous value, so create a histogram
+          dataChunks.addHistogramFacet(
+            'redirect.histogram',
+            'redirect.duration',
+            {
+              count: 10, min: 0, max: 1000, steps: 'quantiles',
+            },
+          );
+        }
       } else if (params.has('utm.source')) {
         params.getAll('utm.source').forEach((utmsource) => {
           dataChunks.addFacet(`utm.${utmsource}.target`, (bundle) => Array.from(
