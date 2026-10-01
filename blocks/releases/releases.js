@@ -24,7 +24,16 @@ const displayNames = {
   'aem-certificate-rotation': 'Infrastructure Updates',
   'helix-reviews': 'Reviews',
   'helix-config-service': 'Config Service',
+  'da-authoring': 'Authoring',
 };
+
+// repos grouped under a shared category (repos not listed are their own category)
+const repoCategory = {
+  'da-nx': 'da-authoring',
+  'da-live': 'da-authoring',
+};
+
+const categoryOf = (repo) => repoCategory[repo] || repo;
 
 function createRelease(release) {
   const div = document.createElement('div');
@@ -60,7 +69,8 @@ function createRelease(release) {
     return (relativeTime);
   };
 
-  div.classList.add('release', `release-${release.repo}`);
+  const category = categoryOf(release.repo);
+  div.classList.add('release', `release-${category}`);
   const readableDate = dateToReadable(new Date(release.published));
   const fullDate = readableDate ? `${readableDate} (${release.published})` : release.published;
   const releaseBody = document.createElement('p');
@@ -73,7 +83,7 @@ function createRelease(release) {
     const ul = li.previousElementSibling;
     ul.append(li);
   });
-  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[release.repo] || release.repo} <a href="${release.url}">${release.tag}</a></h2>`;
+  div.innerHTML = `<p class="releases-date">${fullDate}</p><h2 id="${release.repo}-${release.tag}">${displayNames[category] || release.repo} <a href="${release.url}">${release.tag}</a></h2>`;
   addAnchorLink(div.querySelector('h2'));
 
   div.append(releaseBody);
