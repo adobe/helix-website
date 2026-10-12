@@ -946,41 +946,47 @@ function prepareSideNav(main) {
 }
 
 /**
+ * Decorates the feature lifecycle badge from lifecycle metadata.
+ */
+async function decorateFeatureLifecycle() {
+  const authored = document.querySelector('main .labs, main .deprecation');
+  if (authored) return;
+  const hasMetadata = ['feature-lifecycle', 'labs', 'deprecation']
+    .some((name) => getMetadata(name).trim());
+  if (!hasMetadata) return;
+  const { getFeatureLifecycleMetadata } = await import('../blocks/feature-lifecycle/feature-lifecycle.js');
+  const { stage, notice } = getFeatureLifecycleMetadata();
+  if (stage) {
+    // buildBlock puts string cells in via innerHTML, so pass metadata as text-only elements
+    const cell = (text) => {
+      const el = document.createElement('p');
+      el.textContent = text;
+      return el;
+    };
+    const badge = buildBlock('feature-lifecycle', [
+      [cell(stage)],
+      [cell(notice)],
+    ]);
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      // insert above title; the block floats to the top right
+      h1.parentElement.insertBefore(badge, h1);
+    } else {
+      // insert at top of page
+      document.querySelector('main > div').append(badge);
+    }
+  }
+}
+
+/**
  * loads everything needed to get to LCP.
  */
 async function loadEager(doc) {
   setLanguageForAccessibility('en');
   customDecorateTemplateAndTheme();
+  await decorateFeatureLifecycle();
 
   await window.hlx.plugins.run('loadEager');
-
-  // labs banner
-  const labs = getMetadata('labs');
-  if (labs) {
-    const labsBanner = buildBlock('labs', labs);
-    const h1 = document.querySelector('h1');
-    if (h1) {
-      // insert above title
-      h1.parentElement.insertBefore(labsBanner, h1);
-    } else {
-      // insert at top of page
-      document.querySelector('main > div').append(labsBanner);
-    }
-  }
-
-  // deprecation banner
-  const deprecation = getMetadata('deprecation');
-  if (deprecation) {
-    const deprecationBanner = buildBlock('deprecation', deprecation);
-    const h1 = document.querySelector('h1');
-    if (h1) {
-      // insert above title
-      h1.parentElement.insertBefore(deprecationBanner, h1);
-    } else {
-      // insert at top of page
-      document.querySelector('main > div').append(deprecationBanner);
-    }
-  }
 
   const main = doc.querySelector('main');
   if (main) {
