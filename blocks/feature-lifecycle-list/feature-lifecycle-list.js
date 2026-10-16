@@ -1,4 +1,6 @@
-import { buildBlock, decorateBlock, loadBlock } from '../../scripts/aem.js';
+import {
+  buildBlock, decorateBlock, loadBlock, loadCSS,
+} from '../../scripts/aem.js';
 
 function createAutoBlock(pages, stage) {
   const rows = [];
@@ -36,6 +38,8 @@ export default async function decorate(block) {
     && page['feature-lifecycle'].toLowerCase().trim() === stage
   ));
   const cards = createAutoBlock(pages, stage);
+  // stage colors live with the feature-lifecycle block
+  await loadCSS(`${window.hlx.codeBasePath}/blocks/feature-lifecycle/feature-lifecycle.css`);
   block.replaceWith(cards);
   decorateBlock(cards);
   await loadBlock(cards);

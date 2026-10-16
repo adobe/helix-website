@@ -12,7 +12,7 @@
  */
 import { getMetadata, loadCSS } from '../../scripts/aem.js';
 
-// Keep in sync with PHASES in generate.py. The key is the `feature-lifecycle` metadata value.
+// The key is the `feature-lifecycle` metadata value.
 const STAGES = {
   1: { label: 'Interest' },
   2: { label: 'Repeatable' },
