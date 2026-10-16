@@ -54,6 +54,10 @@ indices:
         select: head > meta[name="description"]
         value: |
           attribute(el, 'content')
+      labs:
+        select: head > meta[name="labs"]
+        value: |
+          attribute(el, 'content')
       lastModified:
         select: none
         value: |
@@ -66,21 +70,3 @@ indices:
         select: main
         value: |
           textContent(el)
-  feature_lifecycle:
-    target: /docs/feature-lifecycle.json
-    include:
-      - /docs/**
-      - /developer/**
-    properties:
-      title:
-        select: head > meta[property="og:title"]
-        value: |
-          attribute(el, 'content')
-      description:
-        select: head > meta[name="description"]
-        value: |
-          attribute(el, 'content')
-      feature-lifecycle:
-        select: head > meta[name="feature-lifecycle"]
-        value: |
-          attribute(el, 'content')

@@ -10,13 +10,13 @@
   --lc-7: light-dark(#8a5a34, #c58b5a);
 }
 
-.feature-lifecycle-seed { --stage: var(--lc-1); }
-.feature-lifecycle-sprout { --stage: var(--lc-2); }
-.feature-lifecycle-sapling { --stage: var(--lc-3); }
-.feature-lifecycle-rooted { --stage: var(--lc-4); }
-.feature-lifecycle-wilting { --stage: var(--lc-5); }
-.feature-lifecycle-spent { --stage: var(--lc-6); }
-.feature-lifecycle-uprooted { --stage: var(--lc-7); }
+.feature-lifecycle-stage1 { --stage: var(--lc-1); }
+.feature-lifecycle-stage2 { --stage: var(--lc-2); }
+.feature-lifecycle-stage3 { --stage: var(--lc-3); }
+.feature-lifecycle-stage4 { --stage: var(--lc-4); }
+.feature-lifecycle-stage5 { --stage: var(--lc-5); }
+.feature-lifecycle-stage6 { --stage: var(--lc-6); }
+.feature-lifecycle-stage7 { --stage: var(--lc-7); }
 
 /* badge: inline with the title on small screens */
 .feature-lifecycle {

@@ -57,7 +57,7 @@ describe('Feature lifecycle block', () => {
     clearMetadata();
   });
 
-  it('fetches and inlines the matching badge icon for the Discouraged / Spent stage', async () => {
+  it('fetches and inlines the matching badge icon for stage 6', async () => {
     document.body.innerHTML = mock;
     const block = document.querySelector('.feature-lifecycle');
     const originalFetch = window.fetch;
@@ -66,7 +66,7 @@ describe('Feature lifecycle block', () => {
       requestedURL = url;
       return {
         ok: true,
-        text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><title>Discouraged (Spent)</title><rect /><text>Discouraged</text><text>Spent</text></svg>',
+        text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><title>Feature lifecycle stage 6 of 7: Discouraged</title><rect /><text>Discouraged</text><text>6</text></svg>',
       };
     };
 
@@ -78,40 +78,43 @@ describe('Feature lifecycle block', () => {
 
     const badge = block.querySelector('a.badge');
     const icon = badge.querySelector('svg.feature-lifecycle-icon');
-    expect(requestedURL).to.equal('/icons/feature-lifecycle-spent.svg');
-    expect(block.classList.contains('feature-lifecycle-spent')).to.equal(true);
+    expect(requestedURL).to.equal('/icons/feature-lifecycle-stage6.svg');
+    expect(block.classList.contains('feature-lifecycle-stage6')).to.equal(true);
     expect(badge.getAttribute('href')).to.equal('/docs/lifecycle#discouraged');
-    expect(badge.getAttribute('aria-label')).to.equal('Feature lifecycle: Discouraged (Spent). Read about the feature lifecycle.');
+    expect(badge.getAttribute('aria-label')).to.equal(icon.querySelector('title').textContent);
+    expect(badge.hasAttribute('title')).to.equal(false);
     expect(icon).to.exist;
     expect(icon.querySelector('rect')).to.exist;
-    expect(icon.querySelector('title').textContent).to.equal('Discouraged (Spent)');
-    expect([...icon.querySelectorAll('text')].map((text) => text.textContent)).to.deep.equal(['Discouraged', 'Spent']);
+    expect(icon.querySelector('title').textContent).to.equal('Feature lifecycle stage 6 of 7: Discouraged');
+    expect([...icon.querySelectorAll('text')].map((text) => text.textContent)).to.deep.equal(['Discouraged', '6']);
     expect(icon.getAttribute('aria-hidden')).to.equal('true');
     expect(document.querySelector('.feature-lifecycle-notice').textContent).to.equal('Reach out if you need help.');
   });
 
   it('maps each stage number to its matching badge', async () => {
-    const stages = ['seed', 'sprout', 'sapling', 'rooted', 'wilting', 'spent', 'uprooted'];
+    const stageCount = 7;
     const originalFetch = window.fetch;
     let requestedURL;
     window.fetch = async (url) => {
       requestedURL = url;
       return {
         ok: true,
-        text: async () => '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+        text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><title>Stage badge</title></svg>',
       };
     };
 
     try {
-      for (let i = 0; i < stages.length; i += 1) {
+      for (let i = 0; i < stageCount; i += 1) {
         document.body.innerHTML = mock;
         const block = document.querySelector('.feature-lifecycle');
         block.children[0].textContent = String(i + 1);
         // eslint-disable-next-line no-await-in-loop
         await decorate(block);
 
-        expect(requestedURL).to.equal(`/icons/feature-lifecycle-${stages[i]}.svg`);
-        expect(block.classList.contains(`feature-lifecycle-${stages[i]}`)).to.equal(true);
+        expect(requestedURL).to.equal(`/icons/feature-lifecycle-stage${i + 1}.svg`);
+        expect(block.classList.contains(`feature-lifecycle-stage${i + 1}`)).to.equal(true);
+        expect(document.querySelector('.feature-lifecycle-notice').classList
+          .contains(`feature-lifecycle-stage${i + 1}`)).to.equal(true);
       }
     } finally {
       window.fetch = originalFetch;
@@ -125,7 +128,7 @@ describe('Feature lifecycle block', () => {
     const originalFetch = window.fetch;
     window.fetch = async () => ({
       ok: true,
-      text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><title>Discouraged (Spent)</title></svg>',
+      text: async () => '<svg xmlns="http://www.w3.org/2000/svg"><title>Feature lifecycle stage 6 of 7: Discouraged</title></svg>',
     });
 
     try {
@@ -134,7 +137,7 @@ describe('Feature lifecycle block', () => {
       window.fetch = originalFetch;
     }
 
-    expect(block.classList.contains('feature-lifecycle-spent')).to.equal(true);
+    expect(block.classList.contains('feature-lifecycle-stage6')).to.equal(true);
     expect(block.querySelector('a.badge')).to.exist;
     expect(document.querySelector('.feature-lifecycle-notice')).to.not.exist;
   });
@@ -165,7 +168,7 @@ describe('Feature lifecycle block', () => {
 
       await decorateLegacyFeatureLifecycle(block, kind);
 
-      expect(block.classList.contains(`feature-lifecycle-${stage}`)).to.equal(true);
+      expect(block.classList.contains(`feature-lifecycle-stage${stage}`)).to.equal(true);
       expect(block.querySelector('a.badge')).to.exist;
       expect(document.querySelector('.feature-lifecycle-notice').textContent).to.equal('Legacy notice.');
     };
@@ -188,9 +191,9 @@ describe('Feature lifecycle block', () => {
     };
 
     try {
-      await expectLegacyStage('labs', 'sapling');
+      await expectLegacyStage('labs', '3');
       await expectLegacyLabsDefaultNotice();
-      await expectLegacyStage('deprecation', 'spent');
+      await expectLegacyStage('deprecation', '6');
     } finally {
       window.fetch = originalFetch;
       window.hlx = originalHlx;

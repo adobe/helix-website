@@ -12,16 +12,15 @@
  */
 import { getMetadata, loadCSS } from '../../scripts/aem.js';
 
-// Keep in sync with PHASES in generate.py. `label` is the descriptive term that leads;
-// `name` is the garden nickname; `number` is the value used in `feature-lifecycle` metadata.
+// Keep in sync with PHASES in generate.py. The key is the `feature-lifecycle` metadata value.
 const STAGES = {
-  seed: { number: '1', name: 'Seed', label: 'Interest' },
-  sprout: { number: '2', name: 'Sprout', label: 'Repeatable' },
-  sapling: { number: '3', name: 'Sapling', label: 'Increasing use' },
-  rooted: { number: '4', name: 'Rooted', label: 'Mainstream' },
-  wilting: { number: '5', name: 'Wilting', label: 'Decreasing use' },
-  spent: { number: '6', name: 'Spent', label: 'Discouraged' },
-  uprooted: { number: '7', name: 'Uprooted', label: 'Removed' },
+  1: { label: 'Interest' },
+  2: { label: 'Repeatable' },
+  3: { label: 'Increasing use' },
+  4: { label: 'Mainstream' },
+  5: { label: 'Decreasing use' },
+  6: { label: 'Discouraged' },
+  7: { label: 'Removed' },
 };
 
 function formatLegacyLabsNotice(lab) {
@@ -33,8 +32,8 @@ export function getFeatureLifecycleMetadata() {
   const labs = getMetadata('labs').trim();
   const deprecation = getMetadata('deprecation').trim();
   let inferredStage = '';
-  if (labs) inferredStage = STAGES.sapling.number;
-  else if (deprecation) inferredStage = STAGES.spent.number;
+  if (labs) inferredStage = '3';
+  else if (deprecation) inferredStage = '6';
   const stage = explicitStage || inferredStage;
   let notice = getMetadata('feature-lifecycle-notice').trim();
   if (!notice && labs) {
@@ -47,15 +46,14 @@ export function getFeatureLifecycleMetadata() {
   return { stage, notice };
 }
 
-/** Resolve a stage number from metadata to a key of STAGES, or null. Allowlist only. */
+/** Resolve a stage number from metadata to a STAGES key, or null. Allowlist only. */
 function resolveStage(value) {
   const v = (value || '').trim();
-  if (!v) return null;
-  return Object.keys(STAGES).find((key) => STAGES[key].number === v) || null;
+  return Object.hasOwn(STAGES, v) ? v : null;
 }
 
 async function loadBadgeIcon(stage) {
-  const response = await fetch(`/icons/feature-lifecycle-${stage}.svg`);
+  const response = await fetch(`/icons/feature-lifecycle-stage${stage}.svg`);
   if (!response.ok) {
     throw new Error(`Failed to fetch feature lifecycle badge icon: ${response.status}`);
   }
@@ -65,12 +63,16 @@ async function loadBadgeIcon(stage) {
   if (svg.localName !== 'svg' || svgDocument.querySelector('parsererror')) {
     throw new Error(`Invalid feature lifecycle badge SVG for stage "${stage}".`);
   }
+  const title = svg.querySelector('title')?.textContent.trim();
+  if (!title) {
+    throw new Error(`Feature lifecycle badge SVG for stage "${stage}" must have a title.`);
+  }
 
   const icon = document.importNode(svg, true);
   icon.classList.add('feature-lifecycle-icon');
   icon.setAttribute('aria-hidden', 'true');
   icon.setAttribute('focusable', 'false');
-  return icon;
+  return { icon, title };
 }
 
 /**
@@ -90,46 +92,46 @@ function place(block, note) {
 
 /**
  * Turns `block` into the badge (and creates the notice). `notice` is a string, or an array of
- * nodes taken from authored content. Returns the stage slug, or null if there is nothing to show.
+ * nodes taken from authored content. Returns the stage number, or null if there is nothing to show.
  */
 async function render(block, { stage, notice }) {
   // allowlist: an unknown value never reaches the DOM or a URL
-  const slug = resolveStage(stage);
-  if (stage?.trim() && !slug) {
-    const numbers = Object.values(STAGES).map(({ number }) => number);
+  const stageNumber = resolveStage(stage);
+  if (stage?.trim() && !stageNumber) {
+    const numbers = Object.keys(STAGES);
     // eslint-disable-next-line no-console
     console.warn(`feature-lifecycle: unknown stage "${stage.trim()}", valid: ${numbers.join(', ')}`);
   }
-  if (!slug) {
+  if (!stageNumber) {
     block.remove();
     return null;
   }
-  const { name, label } = STAGES[slug];
+  const { label } = STAGES[stageNumber];
   // headings on /docs/lifecycle are the descriptive labels, e.g. #increasing-use
   const anchor = label.toLowerCase().replace(/\s+/g, '-');
-  const icon = await loadBadgeIcon(slug);
+  const { icon, title } = await loadBadgeIcon(stageNumber);
 
   block.textContent = '';
-  block.classList.add(`feature-lifecycle-${slug}`);
+  const stageClass = `feature-lifecycle-stage${stageNumber}`;
+  block.classList.add(stageClass);
 
   const badge = document.createElement('a');
   badge.className = 'badge';
   badge.href = `/docs/lifecycle#${anchor}`;
-  badge.title = 'Where this feature stands in the feature lifecycle';
-  badge.setAttribute('aria-label', `Feature lifecycle: ${label} (${name}). Read about the feature lifecycle.`);
+  badge.setAttribute('aria-label', title);
   badge.append(icon);
   block.append(badge);
 
   let note = null;
   if (typeof notice === 'string' ? notice : notice?.length) {
     note = document.createElement('div');
-    note.className = `feature-lifecycle-notice feature-lifecycle-${slug}`;
+    note.className = `feature-lifecycle-notice ${stageClass}`;
     note.setAttribute('role', 'note');
     if (typeof notice === 'string') note.textContent = notice;
     else note.append(...notice);
   }
   place(block, note);
-  return slug;
+  return stageNumber;
 }
 
 export default async function decorate(block) {
@@ -175,8 +177,8 @@ export async function decorateLegacyFeatureLifecycle(block, kind) {
   if (metadataNotice) notice = metadataNotice;
 
   await render(block, {
-    stage: STAGES[resolveStage(getMetadata('feature-lifecycle'))]?.number
-      || (kind === 'labs' ? STAGES.sapling.number : STAGES.spent.number),
+    stage: resolveStage(getMetadata('feature-lifecycle'))
+      || (kind === 'labs' ? '3' : '6'),
     notice,
   });
 }
