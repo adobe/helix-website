@@ -74,7 +74,7 @@ describe('Feature lifecycle list block', () => {
     }
 
     const cards = document.querySelector('.cards');
-    expect(requestedURL).to.equal('/docs/feature-lifecycle.json');
+    expect(requestedURL).to.equal('/docs/lifecycle.json');
     expect(document.querySelector('.feature-lifecycle-list')).to.not.exist;
     expect(cards.classList.contains('alternate')).to.equal(true);
     expect(cards.classList.contains('three')).to.equal(true);

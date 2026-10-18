@@ -26,9 +26,11 @@ function createAutoBlock(pages, stage) {
 
 export default async function decorate(block) {
   const stage = block.textContent.toLowerCase().trim();
-  const response = await fetch('/docs/feature-lifecycle.json');
+  const response = await fetch('/docs/lifecycle.json');
   if (!response.ok) {
-    throw new Error(`Failed to fetch feature lifecycle index: ${response.status}`);
+    // eslint-disable-next-line no-console
+    console.log(`Failed to fetch feature lifecycle index: ${response.status}`);
+    return;
   }
 
   const { data } = await response.json();
