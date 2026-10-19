@@ -86,8 +86,11 @@ export default function decorate(block) {
       // colored icons
       removeOuterElementLayer(cell, '.icon');
       if (block.classList.contains('colored-icon')) {
-        const colorIconPatternIndex = getColorPatternIndex(ColorIconPattern, index);
-        cell.querySelector('.icon').classList.add('colored-tag', 'circle', colorIconPatternIndex);
+        const icon = cell.querySelector('.icon');
+        if (icon) {
+          const colorIconPatternIndex = getColorPatternIndex(ColorIconPattern, index);
+          icon.classList.add('colored-tag', 'circle', colorIconPatternIndex);
+        }
       }
     }
 
