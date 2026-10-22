@@ -46,6 +46,7 @@ body main .table td p {
   color: var(--color-black);
 }
 
-.table thead + tbody tr:first-of-type td {
+.table thead + tbody tr:first-of-type td,
+.table.nocaps tr:first-of-type td {
   text-transform: none;
 }
