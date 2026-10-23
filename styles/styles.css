@@ -277,7 +277,7 @@ html[data-theme="light"] {
   color-scheme: light;
 }
 
-:where(html[data-theme="dark"]) {
+html[data-theme="dark"] {
   color-scheme: dark;
 }
 
