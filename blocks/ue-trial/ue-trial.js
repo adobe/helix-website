@@ -71,6 +71,110 @@ function generatePlaceholderSVG(text, index, options = {}) {
 }
 
 // Define the steps for the trial setup process
+/**
+ * "Your own site" path: authors enable it by adding a template row whose value is `own-site`.
+ * The registration API does not accept a site URL yet, so submitting this path is switched
+ * off; flip this once the backend supports `siteUrl`.
+ */
+const OWN_SITE_VALUE = 'own-site';
+const OWN_SITE_ENABLED = false;
+
+/**
+ * Normalizes what a visitor typed into an absolute http(s) URL.
+ * @param {string} value - e.g. "example.com", "https://www.example.com/en"
+ * @returns {string|null} the normalized URL, or null if it isn't a usable website address
+ */
+function normalizeSiteUrl(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) return null;
+  const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    const url = new URL(withScheme);
+    const host = url.hostname;
+    if (!['http:', 'https:'].includes(url.protocol) || !host.includes('.') || host.endsWith('.')) return null;
+    return url.href;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Builds the "Start with" switch (sample site or your own site) and the URL panel.
+ * @param {Object} ownSite - the authored own-site row ({ text, description })
+ * @param {HTMLElement} templateGrid - the sample-site template cards
+ * @returns {{ switcher: HTMLElement, panel: HTMLElement }}
+ */
+function buildOwnSitePath(ownSite, templateGrid) {
+  const switcher = createTag('div', { class: 'start-switch', role: 'radiogroup', 'aria-label': 'Start with' });
+  const options = [
+    { value: 'template', label: 'Sample site' },
+    { value: OWN_SITE_VALUE, label: ownSite.text },
+  ];
+  options.forEach(({ value, label }, index) => {
+    const id = `start-${value}`;
+    const input = createTag('input', {
+      type: 'radio', name: 'start', id, value,
+    });
+    if (index === 0) input.checked = true;
+    const optionLabel = createTag('label', { for: id });
+    optionLabel.textContent = label;
+    switcher.append(input, optionLabel);
+  });
+
+  const panel = createTag('div', { class: 'own-site-panel', hidden: '' });
+  const urlInput = createTag('input', {
+    type: 'text',
+    id: 'site-url',
+    name: 'siteUrl',
+    inputmode: 'url',
+    autocomplete: 'url',
+    placeholder: 'www.example.com',
+    'aria-describedby': 'site-url-help',
+  });
+  const help = createTag('p', { class: 'help-text', id: 'site-url-help' });
+  help.textContent = ownSite.description;
+  panel.append(createTag('label', { for: 'site-url' }, 'Your website'), urlInput, help);
+  urlInput.addEventListener('input', () => urlInput.setCustomValidity(''));
+
+  switcher.addEventListener('change', () => {
+    const ownSiteSelected = switcher.querySelector('input:checked')?.value === OWN_SITE_VALUE;
+    templateGrid.hidden = ownSiteSelected;
+    panel.hidden = !ownSiteSelected;
+    urlInput.required = ownSiteSelected;
+    switcher.closest('form')?.querySelector('.own-site-note')?.remove();
+    if (ownSiteSelected) urlInput.focus();
+  });
+
+  return { switcher, panel };
+}
+
+/**
+ * Own-site submissions are not supported by the backend yet: say so next to Continue.
+ * @param {HTMLFormElement} form
+ */
+function showOwnSiteComingSoon(form) {
+  if (form.querySelector('.own-site-note')) return;
+  const note = createTag('p', { class: 'own-site-note', role: 'status' }, 'Starting from your own site is coming soon. Choose "Sample site" to get your workspace today.');
+  form.querySelector('.button-container')?.before(note);
+}
+
+/**
+ * Building from a customer site takes a while, so confirm and promise an email
+ * instead of polling the setup steps.
+ * @param {HTMLFormElement} form
+ * @param {string} siteUrl
+ * @param {string} email
+ */
+function showOwnSiteConfirmation(form, siteUrl, email) {
+  const message = createTag('div', { class: 'success-message own-site-confirmation', role: 'status' });
+  const host = new URL(siteUrl).hostname;
+  // visitor input: set as text, never as HTML
+  const body = createTag('p');
+  body.textContent = `We're creating your Experience Workspace from ${host}. This can take a while, so there's no need to wait here: we'll email you at ${email} when it's ready.`;
+  message.append(createTag('h3', {}, 'We\'re building your workspace'), body);
+  form.replaceChildren(message);
+}
+
 const TRIAL_STEPS = [
   { key: 'createUser', label: 'Creating user account' },
   { key: 'quicksite', label: 'Creating site' },
@@ -476,6 +580,10 @@ function processFormData(form) {
 // Extract form submission logic into a separate function
 async function submitFormData(form) {
   const data = processFormData(form);
+  const ownSite = data.start === OWN_SITE_VALUE;
+  if (ownSite) data.template = OWN_SITE_VALUE;
+  else delete data.siteUrl;
+  delete data.start;
   const submitConfig = await fetchConfig();
 
   fetch(`${submitConfig.xwalktrial.webApi}/registration`, {
@@ -488,7 +596,8 @@ async function submitFormData(form) {
     .then(async (response) => {
       if (response.ok) {
         const { processId } = await response.json();
-        checkStatus(form, processId);
+        if (ownSite) showOwnSiteConfirmation(form, data.siteUrl, data.email);
+        else checkStatus(form, processId);
       } else {
         const err = await response.json();
         throw new Error(err.error ? `${err.error}\nThere was an error submitting your request. Please try again.` : 'There was an error submitting your request. Please try again.');
@@ -522,7 +631,9 @@ async function buildForm(block) {
 
   const termsAndConditions = extractTermsAndConditionsFromBlock(block);
   // Extract templates from the merged template-selection-data within this block
-  const templates = extractTemplatesFromBlock(block);
+  const allTemplates = extractTemplatesFromBlock(block);
+  const ownSite = allTemplates.find((t) => t.value === OWN_SITE_VALUE);
+  const templates = allTemplates.filter((t) => t !== ownSite);
 
   const templateGrid = createTag('div', { class: 'template-grid' });
 
@@ -630,7 +741,16 @@ async function buildForm(block) {
     templateGrid.append(templateCard);
   });
 
-  templateField.append(templateLabel, templateGrid);
+  if (ownSite) {
+    const { switcher, panel } = buildOwnSitePath(ownSite, templateGrid);
+    templateLabel.textContent = 'Start with';
+    templateLabel.id = 'start-with-label';
+    switcher.setAttribute('aria-labelledby', 'start-with-label');
+    switcher.removeAttribute('aria-label');
+    templateField.append(templateLabel, switcher, templateGrid, panel);
+  } else {
+    templateField.append(templateLabel, templateGrid);
+  }
   const isAgenticPlaygournd = block.classList.contains('agentic-playground');
   let githubField = null;
   if (!isAgenticPlaygournd) {
@@ -768,6 +888,22 @@ async function buildForm(block) {
         githubInputEl.focus();
       }
       return;
+    }
+
+    // Your own site: the URL must be a real website address
+    if (form.querySelector('input[name="start"]:checked')?.value === OWN_SITE_VALUE) {
+      const urlInput = form.querySelector('#site-url');
+      const siteUrl = normalizeSiteUrl(urlInput.value);
+      if (!siteUrl) {
+        urlInput.setCustomValidity('Enter your website address, like www.example.com');
+        urlInput.reportValidity();
+        return;
+      }
+      urlInput.value = siteUrl;
+      if (!OWN_SITE_ENABLED) {
+        showOwnSiteComingSoon(form);
+        return;
+      }
     }
 
     // Disable submit button to prevent multiple submissions
