@@ -399,6 +399,28 @@
   outline-offset: 2px;
 }
 
+.ue-trial .start-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d7d46;
+}
+
+.ue-trial .start-hint::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.ue-trial .start-hint.slow {
+  color: #6e6e6e;
+}
+
 .ue-trial .template-grid[hidden],
 .ue-trial .own-site-panel[hidden] {
   display: none;
