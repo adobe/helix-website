@@ -1,0 +1,533 @@
+/* stylelint-disable no-descending-specificity -- overrides are grouped by page region, not specificity */
+
+/*
+ * Landing template: standalone, chrome-free page (header, footer, breadcrumb and
+ * side navigation are suppressed in scripts.js). Design system: DESIGN.md.
+ * Lays out a section containing a ue-trial block as: lockup + pitch + agent itinerary
+ * on the left, sign-up card on a terrazzo panel on the right.
+ */
+body.landing-template {
+  --landing-paper: oklch(99.6% 0.002 265deg);
+  --landing-ink: oklch(22% 0.01 265deg);
+  --landing-ink-soft: oklch(41% 0.015 265deg);
+  --landing-ink-quiet: oklch(52% 0.015 265deg);
+  --landing-blue: oklch(55.5% 0.19 256deg);
+  --landing-blue-deep: oklch(52% 0.19 256deg);
+  --landing-blue-wash: oklch(97% 0.02 255deg);
+  --landing-slate: oklch(95.5% 0.008 260deg);
+  --landing-field: oklch(62% 0.02 260deg);
+  --landing-route: oklch(70% 0.02 260deg);
+  --landing-stop-1: oklch(94% 0.09 115deg);
+  --landing-stop-2: oklch(86% 0.08 335deg);
+  --landing-stop-3: oklch(83% 0.08 280deg);
+  --landing-stop-4: oklch(86% 0.08 60deg);
+  --landing-stop-5: oklch(88% 0.05 255deg);
+  --landing-shadow-lift:
+    0 24px 48px -16px oklch(25% 0.03 260deg / 22%),
+    0 2px 6px oklch(25% 0.03 260deg / 8%);
+  --landing-ring: 0 0 0 3px oklch(55.5% 0.19 256deg / 45%);
+  --landing-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --landing-gutter: 16px;
+
+  background: var(--landing-paper);
+  color: var(--landing-ink);
+}
+
+.landing-template main {
+  min-height: 100vh;
+}
+
+/* ---------- section grid ---------- */
+.landing-template main .section.ue-trial-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "lockup"
+    "pitch"
+    "signup"
+    "itinerary";
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.landing-template main .ue-trial-container > .ue-trial-wrapper,
+.landing-template main .ue-trial-container .ue-trial,
+.landing-template main .ue-trial-container .ue-trial .trial-info,
+.landing-template main .ue-trial-container .ue-trial .trial-info > div {
+  display: contents;
+}
+
+/* terrazzo panel behind the sign-up card */
+.landing-template main .section.ue-trial-container::before {
+  content: "";
+  grid-area: signup;
+  background: url("terrazzo.svg") center / cover no-repeat, var(--landing-slate);
+}
+
+/* ---------- lockup (block row 1, cell 1: the Adobe mark) ---------- */
+.landing-template main .ue-trial .trial-info > div > div:first-child {
+  grid-area: lockup;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 32px var(--landing-gutter) 0;
+}
+
+.landing-template main .ue-trial .trial-info > div > div:first-child picture {
+  width: 36px;
+  height: 36px;
+}
+
+.landing-template main .ue-trial .trial-info > div > div:first-child img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.landing-template main .ue-trial .trial-info > div > div:first-child::after {
+  content: "Adobe Experience Manager";
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .trial-info > div > div:nth-child(3) {
+  display: none;
+}
+
+/* ---------- pitch (default content) ---------- */
+.landing-template main .ue-trial-container > .default-content-wrapper {
+  grid-area: pitch;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--landing-gutter) 24px;
+}
+
+.landing-template main .ue-trial-container > .default-content-wrapper > p:first-child:has(+ h1) {
+  margin: 48px 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--landing-blue-deep);
+}
+
+.landing-template main .ue-trial-container > .default-content-wrapper > h1 {
+  margin: 48px 0 0;
+  max-width: 13ch;
+  font-size: clamp(39px, 4.2vw, 61px);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--landing-ink);
+  text-wrap: balance;
+}
+
+.landing-template main .ue-trial-container > .default-content-wrapper > p:first-child + h1 {
+  margin-top: 0;
+}
+
+.landing-template main .ue-trial-container > .default-content-wrapper > h1 + p {
+  margin: 24px 0 0;
+  max-width: 54ch;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--landing-ink-soft);
+  text-wrap: pretty;
+}
+
+/* ---------- itinerary (block row 1, cell 2) ---------- */
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
+  grid-area: itinerary;
+  padding: 48px var(--landing-gutter) 64px;
+}
+
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > p:first-child,
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p ~ p,
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > p:has(+ ul) {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) ul {
+  position: relative;
+  max-width: 560px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: stop;
+}
+
+/* the route connecting the stops */
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) ul::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: 21px;
+  border-left: 1px dashed var(--landing-route);
+}
+
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--landing-ink);
+  counter-increment: stop;
+}
+
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) li::before {
+  content: counter(stop, decimal-leading-zero);
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--stop, var(--landing-stop-1));
+  box-shadow: 0 0 0 4px var(--landing-paper);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .trial-info li:nth-child(5n + 2) { --stop: var(--landing-stop-2); }
+.landing-template main .ue-trial .trial-info li:nth-child(5n + 3) { --stop: var(--landing-stop-3); }
+.landing-template main .ue-trial .trial-info li:nth-child(5n + 4) { --stop: var(--landing-stop-4); }
+.landing-template main .ue-trial .trial-info li:nth-child(5n + 5) { --stop: var(--landing-stop-5); }
+
+/* closing note (the paragraph after the list) */
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 32px 0 0;
+  padding: 10px 16px 10px 14px;
+  border-radius: 999px;
+  background: var(--landing-slate);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1.6px solid var(--landing-ink-soft);
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--landing-ink-soft), var(--landing-ink-soft)) 7px 3px / 1.6px 6px no-repeat,
+    linear-gradient(var(--landing-ink-soft), var(--landing-ink-soft)) 7px 7.5px / 4px 1.6px no-repeat;
+}
+
+/* ---------- sign-up card (the form section) ---------- */
+.landing-template main .ue-trial .form-section {
+  grid-area: signup;
+  place-self: start center;
+  width: min(500px, 100% - 32px);
+  margin: 32px 0;
+  padding: 32px 24px;
+  border-radius: 24px;
+  background: var(--landing-paper);
+  box-shadow: var(--landing-shadow-lift);
+}
+
+.landing-template main .ue-trial .form-heading {
+  margin: 0 0 24px;
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--landing-ink);
+  text-wrap: balance;
+}
+
+.landing-template main .ue-trial form {
+  gap: 20px;
+}
+
+.landing-template main .ue-trial .form-field {
+  gap: 6px;
+}
+
+.landing-template main .ue-trial .form-field > label,
+.landing-template main .ue-trial .template-selector-field > label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--landing-ink-soft);
+}
+
+.landing-template main .ue-trial input[type="email"],
+.landing-template main .ue-trial input[type="text"] {
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--landing-field);
+  border-radius: 8px;
+  background: var(--landing-paper);
+  font-size: 17px;
+  color: var(--landing-ink);
+  transition: border-color 160ms var(--landing-ease), box-shadow 160ms var(--landing-ease);
+}
+
+.landing-template main .ue-trial input[type="email"]:hover,
+.landing-template main .ue-trial input[type="text"]:hover {
+  border-color: var(--landing-ink-soft);
+}
+
+.landing-template main .ue-trial input[type="email"]:focus-visible,
+.landing-template main .ue-trial input[type="text"]:focus-visible {
+  outline: none;
+  border-color: var(--landing-blue);
+  box-shadow: var(--landing-ring);
+}
+
+/* template choice */
+.landing-template main .ue-trial .template-selector-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.landing-template main .ue-trial .template-grid {
+  gap: 10px;
+  margin: 0;
+}
+
+.landing-template main .ue-trial .template-card {
+  padding: 10px;
+  border: 1px solid var(--landing-field);
+  border-radius: 8px;
+  background: var(--landing-paper);
+  box-shadow: none;
+  transition: border-color 160ms var(--landing-ease), background-color 160ms var(--landing-ease);
+}
+
+.landing-template main .ue-trial .template-card:hover {
+  border-color: var(--landing-blue);
+  box-shadow: none;
+}
+
+.landing-template main .ue-trial .template-card.selected {
+  padding: 9px;
+  border: 2px solid var(--landing-blue);
+  background: var(--landing-blue-wash);
+  box-shadow: none;
+}
+
+.landing-template main .ue-trial .template-card:has(input:focus-visible) {
+  box-shadow: var(--landing-ring);
+}
+
+.landing-template main .ue-trial .template-card-label {
+  align-items: center;
+  gap: 14px;
+}
+
+.landing-template main .ue-trial .template-thumbnail {
+  width: 112px;
+  height: 74px;
+  border: 0;
+}
+
+.landing-template main .ue-trial .template-thumbnail img {
+  object-position: top left;
+}
+
+.landing-template main .ue-trial .template-info {
+  gap: 2px;
+}
+
+.landing-template main .ue-trial .template-info h4,
+.landing-template main .ue-trial .template-card.selected .template-info h4 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--landing-blue-deep);
+}
+
+.landing-template main .ue-trial .template-info p {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--landing-ink-soft);
+}
+
+/* agreement: the terms checkbox sits above the button; the consent copy follows it */
+.landing-template main .ue-trial .agreement,
+.landing-template main .ue-trial .agreement > div {
+  display: contents;
+}
+
+.landing-template main .ue-trial .agreement p {
+  order: 4;
+  margin: -12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--landing-ink-quiet);
+}
+
+.landing-template main .ue-trial .agreement p:last-child {
+  order: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .agreement p:last-child label {
+  font-size: inherit;
+  color: inherit;
+}
+
+.landing-template main .ue-trial .agreement input[type="checkbox"] {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--landing-blue);
+}
+
+.landing-template main .ue-trial .agreement a {
+  color: var(--landing-blue-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.landing-template main .ue-trial .agreement a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.landing-template main .ue-trial .altcha-container {
+  order: 2;
+  justify-content: stretch;
+  margin: 0;
+}
+
+.landing-template main .ue-trial .altcha-container altcha-widget {
+  --altcha-max-width: 100%;
+  --altcha-primary-color: var(--landing-blue);
+  --altcha-border-color: var(--landing-field);
+  --altcha-border-radius: 8px;
+
+  width: 100%;
+}
+
+.landing-template main .ue-trial .button-container {
+  order: 3;
+  margin: 0;
+}
+
+.landing-template main .ue-trial button.continue {
+  width: 100%;
+  height: 52px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--landing-blue);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--landing-paper);
+  transition: background-color 160ms var(--landing-ease), transform 160ms var(--landing-ease);
+}
+
+.landing-template main .ue-trial button.continue::before {
+  content: none;
+}
+
+.landing-template main .ue-trial button.continue:hover {
+  background: var(--landing-blue-deep);
+  color: var(--landing-paper);
+}
+
+.landing-template main .ue-trial button.continue:active {
+  transform: translateY(1px);
+}
+
+.landing-template main .ue-trial button.continue:focus-visible {
+  outline: none;
+  box-shadow: var(--landing-ring);
+}
+
+.landing-template main .ue-trial button.continue:disabled {
+  background: var(--landing-ink-quiet);
+  cursor: progress;
+}
+
+/* ---------- ≥900: two columns ---------- */
+@media (width >= 900px) {
+  body.landing-template {
+    --landing-gutter: clamp(32px, 6vw, 112px);
+  }
+
+  .landing-template main .section.ue-trial-container {
+    grid-template: "lockup signup" auto "pitch signup" auto "itinerary signup" 1fr / minmax(0, 6fr) minmax(0, 6fr);
+    min-height: 100vh;
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:first-child {
+    padding-top: 48px;
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper {
+    padding-right: 48px;
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
+    padding-right: 48px;
+  }
+
+  .landing-template main .ue-trial .form-section {
+    position: sticky;
+    top: 32px;
+    width: min(500px, 100% - 2 * clamp(24px, 3vw, 56px));
+    margin: 40px 0;
+    padding: 32px;
+  }
+}
+
+@media (width >= 1200px) {
+  .landing-template main .section.ue-trial-container {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+/* ---------- entrance ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .landing-template main .ue-trial .form-section {
+    animation: landing-rise 520ms var(--landing-ease) both 80ms;
+  }
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

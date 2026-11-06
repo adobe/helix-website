@@ -193,6 +193,18 @@ window.hlx.plugins.add('time-decorator', {
   url: '/plugins/time-decorator.js',
 });
 
+// page templates: loads /templates/<name>/<name>.{js,css} when the template metadata matches
+window.hlx.templates.add('/templates/landing');
+
+/**
+ * Whether the page renders without site chrome (header, footer, side navigation).
+ * Opt in per page with `supressframe` metadata; the landing template is always frameless.
+ * @returns {boolean}
+ */
+function isFrameless() {
+  return !!getMetadata('supressframe') || toClassName(getMetadata('template')) === 'landing';
+}
+
 // -------------  Custom functions ------------- //
 
 const THEME_STORAGE_KEY = 'aem-theme-preference';
@@ -941,6 +953,7 @@ export function decorateMain(main) {
 }
 
 function prepareSideNav(main) {
+  if (isFrameless()) return;
   const aside = createTag('aside');
   main.insertBefore(aside, main.querySelector('.section.content'));
 }
@@ -1010,14 +1023,17 @@ async function loadLazy(doc) {
   await loadSections(main);
   addBlockLevelInViewAnimation(main);
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  const frameless = isFrameless();
+  if (!frameless) {
+    loadHeader(doc.querySelector('header'));
+    loadFooter(doc.querySelector('footer'));
+  }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
 
-  if (getMetadata('supressframe')) {
-    doc.querySelector('header').remove();
-    doc.querySelector('footer').remove();
+  if (frameless) {
+    doc.querySelector('header')?.remove();
+    doc.querySelector('footer')?.remove();
   } else {
     // breadcrumb setup
     // loadBreadcrumb(main);
