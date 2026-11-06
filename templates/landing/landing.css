@@ -341,12 +341,6 @@ body.landing-template {
   margin: 0;
 }
 
-.landing-template main .ue-trial .own-site-panel > label {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--landing-ink-soft);
-}
-
 .landing-template main .ue-trial .own-site-panel .help-text {
   color: var(--landing-ink-quiet);
 }
