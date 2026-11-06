@@ -797,6 +797,15 @@ export default async function decorate(block) {
     trialInfo.append(infoContent.cloneNode(true));
   }
 
+  // Landing template: the info column's first heading leads the sign-up card instead
+  if (document.body.classList.contains('landing-template')) {
+    const heading = trialInfo.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading) {
+      heading.classList.add('form-heading');
+      formSection.prepend(heading);
+    }
+  }
+
   // Clear the block and add the new layout
   block.textContent = '';
   block.append(formSection, trialInfo);
