@@ -85,8 +85,7 @@ body.landing-template {
   object-fit: contain;
 }
 
-.landing-template main .ue-trial .trial-info > div > div:first-child::after {
-  content: "Adobe Experience Manager";
+.landing-template main .ue-trial .trial-info .lockup-name {
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.005em;
@@ -487,7 +486,7 @@ body.landing-template {
   }
 
   .landing-template main .ue-trial .trial-info > div > div:first-child {
-    padding-top: 48px;
+    padding-top: 40px;
   }
 
   .landing-template main .ue-trial-container > .default-content-wrapper {
@@ -495,7 +494,32 @@ body.landing-template {
   }
 
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
-    padding-right: 48px;
+    padding: 24px 48px 40px var(--landing-gutter);
+  }
+
+  /* tighter vertical rhythm so the whole left column fits a 900px-tall viewport */
+  .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
+    margin-top: 32px;
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child:has(+ h1) {
+    margin: 32px 0 12px;
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child + h1 {
+    margin-top: 0;
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) > p:has(+ ul) {
+    margin-bottom: 12px;
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) li {
+    padding: 4px 0;
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p {
+    margin-top: 20px;
   }
 
   .landing-template main .ue-trial .form-section {
@@ -504,6 +528,13 @@ body.landing-template {
     width: min(500px, 100% - 2 * clamp(24px, 3vw, 56px));
     margin: 40px 0;
     padding: 32px;
+  }
+}
+
+/* tall viewports: center the card in the panel instead of leaving the lower half empty */
+@media (width >= 900px) and (height >= 1000px) {
+  .landing-template main .ue-trial .form-section {
+    align-self: center;
   }
 }
 
