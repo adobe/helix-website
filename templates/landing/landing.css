@@ -22,10 +22,10 @@ body.landing-template {
   --landing-ring: 0 0 0 3px oklch(55.5% 0.19 256deg / 45%);
   --landing-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --landing-gutter: 16px;
-  --landing-stage: oklch(19% 0.035 268deg);
-  --landing-on-stage: oklch(98% 0.005 265deg);
-  --landing-on-stage-soft: oklch(84% 0.02 265deg);
-  --landing-on-stage-accent: oklch(80% 0.1 250deg);
+  --landing-stage: oklch(17% 0.004 20deg);
+  --landing-on-stage: oklch(98.5% 0.003 20deg);
+  --landing-on-stage-soft: oklch(84% 0.006 20deg);
+  --landing-on-stage-accent: oklch(78% 0.11 25deg);
   --landing-rule: oklch(90% 0.01 260deg);
 
   background: var(--landing-paper);
@@ -66,9 +66,9 @@ body.landing-template {
   grid-column: 1 / -1;
   grid-row: 1 / 4;
   background:
-    radial-gradient(55% 90% at 88% 0%, oklch(55% 0.19 256deg / 55%), transparent 70%),
-    radial-gradient(35% 70% at 100% 100%, oklch(57% 0.21 25deg / 32%), transparent 70%),
-    radial-gradient(40% 60% at 0% 100%, oklch(50% 0.16 290deg / 30%), transparent 70%),
+    radial-gradient(55% 95% at 92% 0%, oklch(57% 0.23 29deg / 55%), transparent 70%),
+    radial-gradient(40% 75% at 100% 100%, oklch(50% 0.2 355deg / 40%), transparent 70%),
+    radial-gradient(35% 60% at 0% 100%, oklch(42% 0.14 15deg / 25%), transparent 70%),
     var(--landing-stage);
 }
 
@@ -247,7 +247,9 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial form {
-  gap: 20px;
+  --landing-form-gap: 20px;
+
+  gap: var(--landing-form-gap);
 }
 
 .landing-template main .ue-trial .form-field {
@@ -361,12 +363,17 @@ body.landing-template {
   display: contents;
 }
 
+/* consent copy: 14px below Continue, 6px between its paragraphs */
 .landing-template main .ue-trial .agreement p {
   order: 4;
-  margin: -12px 0 0;
+  margin: calc(6px - var(--landing-form-gap)) 0 0;
   font-size: 13px;
   line-height: 1.5;
   color: var(--landing-ink-quiet);
+}
+
+.landing-template main .ue-trial .agreement p:first-child {
+  margin-top: calc(14px - var(--landing-form-gap));
 }
 
 .landing-template main .ue-trial .agreement p:last-child {
@@ -520,7 +527,7 @@ body.landing-template {
 
   /* compact form rhythm so Continue stays in the first screen below the title */
   .landing-template main .ue-trial form {
-    gap: 16px;
+    --landing-form-gap: 16px;
   }
 
   .landing-template main .ue-trial .form-heading {
@@ -585,7 +592,7 @@ body.landing-template {
   }
 
   .landing-template main .ue-trial form {
-    gap: 10px;
+    --landing-form-gap: 10px;
   }
 
   .landing-template main .ue-trial .template-card img,
