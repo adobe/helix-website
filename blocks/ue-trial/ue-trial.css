@@ -354,6 +354,82 @@
   margin-top: 20px;
 }
 
+/* "Start with" switch (shown when an own-site template row is authored) */
+.ue-trial .start-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 4px;
+  border-radius: 999px;
+  background-color: #eef0f3;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- different elements than the earlier rule */
+.ue-trial .start-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.ue-trial .start-switch label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4b4b4b;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ue-trial .start-switch input:checked + label {
+  background-color: #fff;
+  color: #1473e6;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
+}
+
+.ue-trial .start-switch input:focus-visible + label {
+  outline: 2px solid #1473e6;
+  outline-offset: 2px;
+}
+
+.ue-trial .template-grid[hidden],
+.ue-trial .own-site-panel[hidden] {
+  display: none;
+}
+
+.ue-trial .own-site-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ue-trial .own-site-panel .help-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #6e6e6e;
+}
+
+.ue-trial .own-site-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #4b4b4b;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- different elements than the earlier rule */
+.ue-trial .own-site-confirmation h3 {
+  margin: 0 0 8px;
+}
+
 /* Template Selector Styles */
 .ue-trial .template-selector-field {
   margin: 20px 0;

@@ -296,6 +296,73 @@ body.landing-template {
   margin: 0;
 }
 
+/* start-with switch (sample site or your own site); the switch names itself, so its label is for screen readers only */
+.landing-template main .ue-trial .template-selector-field > label:has(+ .start-switch) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.landing-template main .ue-trial .start-switch {
+  margin: 0 0 4px;
+  background: oklch(95.5% 0.008 260deg);
+}
+
+.landing-template main .ue-trial .start-switch label {
+  min-height: 40px;
+  font-size: 15px;
+  color: var(--landing-ink-soft);
+}
+
+.landing-template main .ue-trial .start-switch input:checked + label {
+  background: var(--landing-paper);
+  color: var(--landing-blue-deep);
+  box-shadow: 0 1px 2px oklch(25% 0.03 260deg / 12%), 0 2px 8px oklch(25% 0.03 260deg / 8%);
+}
+
+.landing-template main .ue-trial .start-switch input:focus-visible + label {
+  outline: none;
+  box-shadow: var(--landing-ring);
+}
+
+.landing-template main .ue-trial .own-site-panel {
+  margin: 0;
+}
+
+.landing-template main .ue-trial .own-site-panel > label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--landing-ink-soft);
+}
+
+.landing-template main .ue-trial .own-site-panel .help-text {
+  color: var(--landing-ink-quiet);
+}
+
+.landing-template main .ue-trial .own-site-note {
+  order: 3;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--landing-blue-wash);
+  font-size: 14px;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .own-site-confirmation h3 {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--landing-ink);
+}
+
+.landing-template main .ue-trial .own-site-confirmation p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--landing-ink-soft);
+}
+
 .landing-template main .ue-trial .template-card {
   padding: 10px;
   border: 1px solid var(--landing-field);
