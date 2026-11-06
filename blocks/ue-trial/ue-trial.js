@@ -820,6 +820,8 @@ export default async function decorate(block) {
       notice.classList.add('form-notice');
       buttonContainer.before(notice);
     }
+    // a compact captcha: the "Protected by ALTCHA" footer adds a second row to the box
+    formSection.querySelector('altcha-widget')?.setAttribute('hidefooter', '');
   }
 
   // Clear the block and add the new layout
