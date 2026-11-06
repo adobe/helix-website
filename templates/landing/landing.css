@@ -50,6 +50,13 @@ body.landing-template {
   max-width: none;
   margin: 0;
   padding: 0;
+
+  /* the dark stage behind the whole page, lit with Adobe red and magenta */
+  background:
+    radial-gradient(900px 640px at 96% 0%, oklch(57% 0.23 29deg / 55%), transparent 70%),
+    radial-gradient(760px 720px at 100% 85%, oklch(50% 0.2 355deg / 38%), transparent 70%),
+    radial-gradient(720px 620px at 0% 100%, oklch(42% 0.14 15deg / 28%), transparent 70%),
+    var(--landing-stage);
 }
 
 .landing-template main .ue-trial-container > .default-content-wrapper,
@@ -58,18 +65,6 @@ body.landing-template {
 .landing-template main .ue-trial-container .ue-trial .trial-info,
 .landing-template main .ue-trial-container .ue-trial .trial-info > div {
   display: contents;
-}
-
-/* the dark stage behind the whole page, lit with Adobe red and magenta */
-.landing-template main .section.ue-trial-container::before {
-  content: "";
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
-  background:
-    radial-gradient(900px 640px at 96% 0%, oklch(57% 0.23 29deg / 55%), transparent 70%),
-    radial-gradient(760px 720px at 100% 85%, oklch(50% 0.2 355deg / 38%), transparent 70%),
-    radial-gradient(720px 620px at 0% 100%, oklch(42% 0.14 15deg / 28%), transparent 70%),
-    var(--landing-stage);
 }
 
 /* ---------- lockup (block row 1, cell 1: the Adobe mark) ---------- */
@@ -471,7 +466,7 @@ body.landing-template {
 /* ---------- ≥900: two columns ---------- */
 @media (width >= 900px) {
   body.landing-template {
-    --landing-gutter: clamp(32px, 6vw, 112px);
+    --landing-gutter: clamp(32px, 6vw, 88px);
   }
 
   .landing-template main .section.ue-trial-container {
@@ -483,6 +478,9 @@ body.landing-template {
       "signup itinerary" 1fr
       / minmax(0, 6fr) minmax(0, 6fr);
     min-height: 100vh;
+
+    /* the background stays full-bleed; the content stops at 1440px, centered */
+    padding-inline: max(0px, (100% - 1440px) / 2);
   }
 
   /* the right column's text starts a comfortable distance from the panel */
