@@ -3,9 +3,9 @@
 /*
  * Landing template: standalone, chrome-free page (header, footer, breadcrumb and
  * side navigation are suppressed in scripts.js). Design system: DESIGN.md.
- * Lays out a section containing a ue-trial block as a dark stage (lockup, eyebrow,
- * title and intro) with the sign-up card overlapping its lower edge on the left, and
- * the agent list as a grid on paper to the right.
+ * Lays out a section containing a ue-trial block on a full-page dark stage: lockup,
+ * eyebrow and title across the top, the sign-up card on the left, and the intro and
+ * agent list as a grid on the right.
  */
 body.landing-template {
   --landing-paper: oklch(99.6% 0.002 265deg);
@@ -26,10 +26,10 @@ body.landing-template {
   --landing-on-stage: oklch(98.5% 0.003 20deg);
   --landing-on-stage-soft: oklch(84% 0.006 20deg);
   --landing-on-stage-accent: oklch(78% 0.11 25deg);
-  --landing-rule: oklch(90% 0.01 260deg);
+  --landing-rule: oklch(98% 0.003 20deg / 16%);
 
-  background: var(--landing-paper);
-  color: var(--landing-ink);
+  background: var(--landing-stage);
+  color: var(--landing-on-stage);
 }
 
 .landing-template main {
@@ -60,15 +60,15 @@ body.landing-template {
   display: contents;
 }
 
-/* the dark stage: runs from the top through the title (and the intro on wide screens) */
+/* the dark stage behind the whole page, lit with Adobe red and magenta */
 .landing-template main .section.ue-trial-container::before {
   content: "";
   grid-column: 1 / -1;
-  grid-row: 1 / 4;
+  grid-row: 1 / -1;
   background:
-    radial-gradient(55% 95% at 92% 0%, oklch(57% 0.23 29deg / 55%), transparent 70%),
-    radial-gradient(40% 75% at 100% 100%, oklch(50% 0.2 355deg / 40%), transparent 70%),
-    radial-gradient(35% 60% at 0% 100%, oklch(42% 0.14 15deg / 25%), transparent 70%),
+    radial-gradient(900px 640px at 96% 0%, oklch(57% 0.23 29deg / 55%), transparent 70%),
+    radial-gradient(760px 720px at 100% 85%, oklch(50% 0.2 355deg / 38%), transparent 70%),
+    radial-gradient(720px 620px at 0% 100%, oklch(42% 0.14 15deg / 28%), transparent 70%),
     var(--landing-stage);
 }
 
@@ -122,7 +122,7 @@ body.landing-template {
 .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
   grid-area: title;
   margin: 48px 0 0;
-  padding-bottom: 88px;
+  padding-bottom: 32px;
   max-width: calc(13ch + 2 * var(--landing-gutter));
   font-size: clamp(39px, 4.2vw, 61px);
   font-weight: 900;
@@ -142,7 +142,7 @@ body.landing-template {
   max-width: calc(54ch + 2 * var(--landing-gutter));
   font-size: 20px;
   line-height: 1.5;
-  color: var(--landing-ink-soft);
+  color: var(--landing-on-stage-soft);
   text-wrap: pretty;
 }
 
@@ -159,7 +159,7 @@ body.landing-template {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--landing-ink);
+  color: var(--landing-on-stage);
 }
 
 .landing-template main .ue-trial .trial-info > div > div:nth-child(2) ul {
@@ -182,7 +182,7 @@ body.landing-template {
   border-top: 1px solid var(--landing-rule);
   font-size: 17px;
   line-height: 1.45;
-  color: var(--landing-ink);
+  color: var(--landing-on-stage);
   counter-increment: stop;
 }
 
@@ -191,7 +191,7 @@ body.landing-template {
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.04em;
-  color: var(--landing-blue-deep);
+  color: var(--landing-on-stage-accent);
   font-variant-numeric: tabular-nums;
 }
 
@@ -229,11 +229,12 @@ body.landing-template {
   grid-area: signup;
   place-self: start center;
   width: min(500px, 100% - 32px);
-  margin: -56px 0 32px;
+  margin: 0 0 32px;
   padding: 32px 24px;
   border-radius: 24px;
   background: var(--landing-paper);
   box-shadow: var(--landing-shadow-lift);
+  color: var(--landing-ink);
 }
 
 .landing-template main .ue-trial .form-heading {
@@ -484,11 +485,6 @@ body.landing-template {
     min-height: 100vh;
   }
 
-  /* on wide screens the stage also holds the intro, so the card overlaps its lower edge */
-  .landing-template main .section.ue-trial-container::before {
-    grid-row: 1 / 5;
-  }
-
   /* the right column's text starts a comfortable distance from the panel */
   .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p,
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
@@ -499,7 +495,7 @@ body.landing-template {
   .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p {
     margin: 0;
     padding-top: 4px;
-    padding-bottom: 72px;
+    padding-bottom: 8px;
     max-width: calc(54ch + clamp(32px, 4vw, 72px) + var(--landing-gutter));
     color: var(--landing-on-stage-soft);
   }
