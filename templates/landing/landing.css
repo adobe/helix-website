@@ -3,9 +3,9 @@
 /*
  * Landing template: standalone, chrome-free page (header, footer, breadcrumb and
  * side navigation are suppressed in scripts.js). Design system: DESIGN.md.
- * Lays out a section containing a ue-trial block as: lockup, eyebrow and title across
- * the top; below them the sign-up card on a terrazzo panel (left) and the pitch and
- * agent itinerary (right).
+ * Lays out a section containing a ue-trial block as a dark stage (lockup, eyebrow,
+ * title and intro) with the sign-up card overlapping its lower edge on the left, and
+ * the agent list as a grid on paper to the right.
  */
 body.landing-template {
   --landing-paper: oklch(99.6% 0.002 265deg);
@@ -15,20 +15,18 @@ body.landing-template {
   --landing-blue: oklch(55.5% 0.19 256deg);
   --landing-blue-deep: oklch(52% 0.19 256deg);
   --landing-blue-wash: oklch(97% 0.02 255deg);
-  --landing-slate: oklch(95.5% 0.008 260deg);
   --landing-field: oklch(62% 0.02 260deg);
-  --landing-route: oklch(70% 0.02 260deg);
-  --landing-stop-1: oklch(94% 0.09 115deg);
-  --landing-stop-2: oklch(86% 0.08 335deg);
-  --landing-stop-3: oklch(83% 0.08 280deg);
-  --landing-stop-4: oklch(86% 0.08 60deg);
-  --landing-stop-5: oklch(88% 0.05 255deg);
   --landing-shadow-lift:
     0 24px 48px -16px oklch(25% 0.03 260deg / 22%),
     0 2px 6px oklch(25% 0.03 260deg / 8%);
   --landing-ring: 0 0 0 3px oklch(55.5% 0.19 256deg / 45%);
   --landing-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --landing-gutter: 16px;
+  --landing-stage: oklch(19% 0.035 268deg);
+  --landing-on-stage: oklch(98% 0.005 265deg);
+  --landing-on-stage-soft: oklch(84% 0.02 265deg);
+  --landing-on-stage-accent: oklch(80% 0.1 250deg);
+  --landing-rule: oklch(90% 0.01 260deg);
 
   background: var(--landing-paper);
   color: var(--landing-ink);
@@ -62,11 +60,16 @@ body.landing-template {
   display: contents;
 }
 
-/* terrazzo panel behind the sign-up card */
+/* the dark stage: runs from the top through the title (and the intro on wide screens) */
 .landing-template main .section.ue-trial-container::before {
   content: "";
-  grid-area: signup;
-  background: url("terrazzo.svg") center / cover no-repeat, var(--landing-slate);
+  grid-column: 1 / -1;
+  grid-row: 1 / 4;
+  background:
+    radial-gradient(55% 90% at 88% 0%, oklch(55% 0.19 256deg / 55%), transparent 70%),
+    radial-gradient(35% 70% at 100% 100%, oklch(57% 0.21 25deg / 32%), transparent 70%),
+    radial-gradient(40% 60% at 0% 100%, oklch(50% 0.16 290deg / 30%), transparent 70%),
+    var(--landing-stage);
 }
 
 /* ---------- lockup (block row 1, cell 1: the Adobe mark) ---------- */
@@ -93,7 +96,7 @@ body.landing-template {
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.005em;
-  color: var(--landing-ink);
+  color: var(--landing-on-stage);
 }
 
 .landing-template main .ue-trial .trial-info > div > div:nth-child(3) {
@@ -113,18 +116,19 @@ body.landing-template {
   line-height: 1.2;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--landing-blue-deep);
+  color: var(--landing-on-stage-accent);
 }
 
 .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
   grid-area: title;
-  margin: 48px 0 32px;
+  margin: 48px 0 0;
+  padding-bottom: 88px;
   max-width: calc(13ch + 2 * var(--landing-gutter));
   font-size: clamp(39px, 4.2vw, 61px);
   font-weight: 900;
   line-height: 1.02;
   letter-spacing: -0.025em;
-  color: var(--landing-ink);
+  color: var(--landing-on-stage);
   text-wrap: balance;
 }
 
@@ -159,61 +163,37 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial .trial-info > div > div:nth-child(2) ul {
-  position: relative;
-  max-width: 560px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 40px;
   margin: 0;
   padding: 0;
   list-style: none;
   counter-reset: stop;
 }
 
-/* the route connecting the stops */
-.landing-template main .ue-trial .trial-info > div > div:nth-child(2) ul::before {
-  content: "";
-  position: absolute;
-  top: 22px;
-  bottom: 22px;
-  left: 21px;
-  border-left: 1px dashed var(--landing-route);
-}
-
 .landing-template main .ue-trial .trial-info > div > div:nth-child(2) li {
-  position: relative;
   display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 16px;
-  align-items: center;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: baseline;
   margin: 0;
-  padding: 10px 0;
-  font-size: 18px;
-  line-height: 1.4;
+  padding: 18px 0;
+  border-top: 1px solid var(--landing-rule);
+  font-size: 17px;
+  line-height: 1.45;
   color: var(--landing-ink);
   counter-increment: stop;
 }
 
 .landing-template main .ue-trial .trial-info > div > div:nth-child(2) li::before {
   content: counter(stop, decimal-leading-zero);
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  border-radius: 50%;
-  background: var(--stop, var(--landing-stop-1));
-  box-shadow: 0 0 0 4px var(--landing-paper);
   font-size: 14px;
   font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  color: var(--landing-ink);
+  letter-spacing: 0.04em;
+  color: var(--landing-blue-deep);
+  font-variant-numeric: tabular-nums;
 }
-
-.landing-template main .ue-trial .trial-info li:nth-child(5n + 2) { --stop: var(--landing-stop-2); }
-.landing-template main .ue-trial .trial-info li:nth-child(5n + 3) { --stop: var(--landing-stop-3); }
-.landing-template main .ue-trial .trial-info li:nth-child(5n + 4) { --stop: var(--landing-stop-4); }
-.landing-template main .ue-trial .trial-info li:nth-child(5n + 5) { --stop: var(--landing-stop-5); }
 
 /* sign-up condition (the paragraph after the agent list, moved next to Continue by ue-trial.js) */
 .landing-template main .ue-trial .form-notice {
@@ -245,10 +225,11 @@ body.landing-template {
 
 /* ---------- sign-up card (the form section) ---------- */
 .landing-template main .ue-trial .form-section {
+  position: relative;
   grid-area: signup;
   place-self: start center;
   width: min(500px, 100% - 32px);
-  margin: 32px 0;
+  margin: -56px 0 32px;
   padding: 32px 24px;
   border-radius: 24px;
   background: var(--landing-paper);
@@ -496,6 +477,11 @@ body.landing-template {
     min-height: 100vh;
   }
 
+  /* on wide screens the stage also holds the intro, so the card overlaps its lower edge */
+  .landing-template main .section.ue-trial-container::before {
+    grid-row: 1 / 5;
+  }
+
   /* the right column's text starts a comfortable distance from the panel */
   .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p,
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
@@ -504,19 +490,23 @@ body.landing-template {
   }
 
   .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p {
-    margin-top: 48px;
+    margin: 0;
+    padding-top: 4px;
+    padding-bottom: 72px;
     max-width: calc(54ch + clamp(32px, 4vw, 72px) + var(--landing-gutter));
+    color: var(--landing-on-stage-soft);
   }
 
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
-    padding-top: 32px;
-    padding-bottom: 48px;
+    padding-top: 48px;
+    padding-bottom: 64px;
   }
 
   /* the title runs across the page on one line where it fits */
   .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
     max-width: none;
-    margin: 24px 0 32px;
+    margin: 24px 0 0;
+    padding-bottom: 48px;
     font-size: clamp(42px, 4vw, 58px);
   }
 
@@ -542,11 +532,8 @@ body.landing-template {
   }
 
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) > p:has(+ ul) {
-    margin-bottom: 12px;
-  }
-
-  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) li {
-    padding: 4px 0;
+    max-width: 46ch;
+    margin-bottom: 20px;
   }
 
   .landing-template main .ue-trial .form-section {
@@ -554,15 +541,8 @@ body.landing-template {
     top: 32px;
     justify-self: start;
     width: min(500px, 100% - var(--landing-gutter) - 32px);
-    margin: 32px 0 40px var(--landing-gutter);
+    margin: 0 0 48px var(--landing-gutter);
     padding: 28px 32px 32px;
-  }
-}
-
-/* tall viewports: center the card in the panel instead of leaving the lower half empty */
-@media (width >= 900px) and (height >= 1000px) {
-  .landing-template main .ue-trial .form-section {
-    align-self: center;
   }
 }
 
@@ -573,6 +553,51 @@ body.landing-template {
 
   .landing-template main .ue-trial .form-section {
     width: min(540px, 100% - var(--landing-gutter) - 40px);
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* short laptop screens: a tighter stage and form so Continue stays in the first screen */
+@media (width >= 900px) and (height < 880px) {
+  .landing-template main .ue-trial .trial-info > div > div:first-child {
+    padding-top: 16px;
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child:has(+ h1) {
+    margin: 16px 0 8px;
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
+    padding-bottom: 32px;
+    font-size: clamp(34px, 3vw, 42px);
+  }
+
+  .landing-template main .ue-trial .form-section {
+    padding: 24px 28px 28px;
+  }
+
+  .landing-template main .ue-trial .form-heading {
+    margin-bottom: 16px;
+    font-size: 22px;
+  }
+
+  .landing-template main .ue-trial form {
+    gap: 10px;
+  }
+
+  .landing-template main .ue-trial .template-card img,
+  .landing-template main .ue-trial .template-card picture {
+    max-height: 64px;
+  }
+
+  .landing-template main .ue-trial .template-info p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 
