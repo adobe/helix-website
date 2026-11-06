@@ -3,8 +3,9 @@
 /*
  * Landing template: standalone, chrome-free page (header, footer, breadcrumb and
  * side navigation are suppressed in scripts.js). Design system: DESIGN.md.
- * Lays out a section containing a ue-trial block as: lockup + pitch + agent itinerary
- * on the left, sign-up card on a terrazzo panel on the right.
+ * Lays out a section containing a ue-trial block as: lockup, eyebrow and title across
+ * the top; below them the sign-up card on a terrazzo panel (left) and the pitch and
+ * agent itinerary (right).
  */
 body.landing-template {
   --landing-paper: oklch(99.6% 0.002 265deg);
@@ -43,14 +44,17 @@ body.landing-template {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "lockup"
-    "pitch"
+    "eyebrow"
+    "title"
     "signup"
+    "intro"
     "itinerary";
   max-width: none;
   margin: 0;
   padding: 0;
 }
 
+.landing-template main .ue-trial-container > .default-content-wrapper,
 .landing-template main .ue-trial-container > .ue-trial-wrapper,
 .landing-template main .ue-trial-container .ue-trial,
 .landing-template main .ue-trial-container .ue-trial .trial-info,
@@ -96,15 +100,13 @@ body.landing-template {
   display: none;
 }
 
-/* ---------- pitch (default content) ---------- */
-.landing-template main .ue-trial-container > .default-content-wrapper {
-  grid-area: pitch;
-  max-width: none;
-  margin: 0;
-  padding: 0 var(--landing-gutter) 24px;
+/* ---------- eyebrow, title and intro (default content; the wrapper is display: contents) ---------- */
+.landing-template main .ue-trial-container > .default-content-wrapper > * {
+  padding-inline: var(--landing-gutter);
 }
 
 .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child:has(+ h1) {
+  grid-area: eyebrow;
   margin: 48px 0 16px;
   font-size: 13px;
   font-weight: 700;
@@ -115,8 +117,9 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
-  margin: 48px 0 0;
-  max-width: 13ch;
+  grid-area: title;
+  margin: 48px 0 32px;
+  max-width: calc(13ch + 2 * var(--landing-gutter));
   font-size: clamp(39px, 4.2vw, 61px);
   font-weight: 900;
   line-height: 1.02;
@@ -130,8 +133,9 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p {
-  margin: 24px 0 0;
-  max-width: 54ch;
+  grid-area: intro;
+  margin: 40px 0 0;
+  max-width: calc(54ch + 2 * var(--landing-gutter));
   font-size: 20px;
   line-height: 1.5;
   color: var(--landing-ink-soft);
@@ -141,7 +145,7 @@ body.landing-template {
 /* ---------- itinerary (block row 1, cell 2) ---------- */
 .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
   grid-area: itinerary;
-  padding: 48px var(--landing-gutter) 64px;
+  padding: 40px var(--landing-gutter) 64px;
 }
 
 .landing-template main .ue-trial .trial-info > div > div:nth-child(2) > p:first-child,
@@ -482,29 +486,55 @@ body.landing-template {
   }
 
   .landing-template main .section.ue-trial-container {
-    grid-template: "lockup signup" auto "pitch signup" auto "itinerary signup" 1fr / minmax(0, 6fr) minmax(0, 6fr);
+    grid-template:
+      "lockup lockup" auto
+      "eyebrow eyebrow" auto
+      "title title" auto
+      "signup intro" auto
+      "signup itinerary" 1fr
+      / minmax(0, 6fr) minmax(0, 6fr);
     min-height: 100vh;
   }
 
-  .landing-template main .ue-trial .trial-info > div > div:first-child {
-    padding-top: 40px;
+  /* the right column's text starts a comfortable distance from the panel */
+  .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p,
+  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
+    padding-left: clamp(32px, 4vw, 72px);
+    padding-right: var(--landing-gutter);
   }
 
-  .landing-template main .ue-trial-container > .default-content-wrapper {
-    padding-right: 48px;
+  .landing-template main .ue-trial-container > .default-content-wrapper > h1 + p {
+    margin-top: 48px;
+    max-width: calc(54ch + clamp(32px, 4vw, 72px) + var(--landing-gutter));
   }
 
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) {
-    padding: 24px 48px 40px var(--landing-gutter);
+    padding-top: 32px;
+    padding-bottom: 48px;
   }
 
-  /* tighter vertical rhythm so the whole left column fits a 900px-tall viewport */
+  /* the title runs across the page on one line where it fits */
   .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
-    margin-top: 32px;
+    max-width: none;
+    margin: 24px 0 32px;
+    font-size: clamp(42px, 4vw, 58px);
   }
 
   .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child:has(+ h1) {
-    margin: 32px 0 12px;
+    margin: 24px 0 10px;
+  }
+
+  .landing-template main .ue-trial .trial-info > div > div:first-child {
+    padding-top: 24px;
+  }
+
+  /* compact form rhythm so Continue stays in the first screen below the title */
+  .landing-template main .ue-trial form {
+    gap: 16px;
+  }
+
+  .landing-template main .ue-trial .form-heading {
+    margin-bottom: 20px;
   }
 
   .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child + h1 {
@@ -522,9 +552,10 @@ body.landing-template {
   .landing-template main .ue-trial .form-section {
     position: sticky;
     top: 32px;
-    width: min(500px, 100% - 2 * clamp(24px, 3vw, 56px));
-    margin: 40px 0;
-    padding: 32px;
+    justify-self: start;
+    width: min(500px, 100% - var(--landing-gutter) - 32px);
+    margin: 32px 0 40px var(--landing-gutter);
+    padding: 28px 32px 32px;
   }
 }
 
@@ -537,7 +568,11 @@ body.landing-template {
 
 @media (width >= 1200px) {
   .landing-template main .section.ue-trial-container {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-columns: minmax(0, 11fr) minmax(0, 13fr);
+  }
+
+  .landing-template main .ue-trial .form-section {
+    width: min(540px, 100% - var(--landing-gutter) - 40px);
   }
 }
 
