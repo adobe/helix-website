@@ -813,6 +813,13 @@ export default async function decorate(block) {
       mark.querySelectorAll('img').forEach((img) => { img.alt = ''; });
       mark.append(createTag('span', { class: 'lockup-name' }, 'Adobe Experience Manager'));
     }
+    // the note after the agent list is a sign-up condition: show it next to Continue
+    const notice = trialInfo.querySelector(':scope > div > div > ul + p');
+    const buttonContainer = formSection.querySelector('form .button-container');
+    if (notice && buttonContainer) {
+      notice.classList.add('form-notice');
+      buttonContainer.before(notice);
+    }
   }
 
   // Clear the block and add the new layout
