@@ -16,7 +16,7 @@ Run it in this repo:
 
 While site preview is authenticated, run below command for local development:
 
-    npx @adobe/aem-cli up --url https://main--helix-website--adobe.aem.live/
+    npx @adobe/aem-cli up --url https://main--aem-new--martinbuergi.aem.live/
 
     
 ## Testing
