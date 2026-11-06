@@ -211,31 +211,32 @@ body.landing-template {
 .landing-template main .ue-trial .trial-info li:nth-child(5n + 4) { --stop: var(--landing-stop-4); }
 .landing-template main .ue-trial .trial-info li:nth-child(5n + 5) { --stop: var(--landing-stop-5); }
 
-/* closing note (the paragraph after the list) */
-.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p {
-  display: inline-flex;
+/* sign-up condition (the paragraph after the agent list, moved next to Continue by ue-trial.js) */
+.landing-template main .ue-trial .form-notice {
+  order: 3;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 32px 0 0;
-  padding: 10px 16px 10px 14px;
-  border-radius: 999px;
-  background: var(--landing-slate);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--landing-ink);
+  gap: 8px;
+  margin: 0 0 -8px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--landing-ink-soft);
 }
 
-.landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p::before {
+.landing-template main .ue-trial .form-notice strong {
+  font-weight: 600;
+}
+
+.landing-template main .ue-trial .form-notice::before {
   content: "";
   flex: none;
-  width: 18px;
-  height: 18px;
-  border: 1.6px solid var(--landing-ink-soft);
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid currentcolor;
   border-radius: 50%;
   background:
-    linear-gradient(var(--landing-ink-soft), var(--landing-ink-soft)) 7px 3px / 1.6px 6px no-repeat,
-    linear-gradient(var(--landing-ink-soft), var(--landing-ink-soft)) 7px 7.5px / 4px 1.6px no-repeat;
+    linear-gradient(currentcolor, currentcolor) 6px 2.5px / 1.5px 5.5px no-repeat,
+    linear-gradient(currentcolor, currentcolor) 6px 6.5px / 3.5px 1.5px no-repeat;
 }
 
 /* ---------- sign-up card (the form section) ---------- */
@@ -516,10 +517,6 @@ body.landing-template {
 
   .landing-template main .ue-trial .trial-info > div > div:nth-child(2) li {
     padding: 4px 0;
-  }
-
-  .landing-template main .ue-trial .trial-info > div > div:nth-child(2) > ul + p {
-    margin-top: 20px;
   }
 
   .landing-template main .ue-trial .form-section {
