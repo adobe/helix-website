@@ -797,12 +797,21 @@ export default async function decorate(block) {
     trialInfo.append(infoContent.cloneNode(true));
   }
 
-  // Landing template: the info column's first heading leads the sign-up card instead
+  // Landing template: the info column's first heading leads the sign-up card instead,
+  // as the section's h2 (directly below the page h1), and the mark gets a brand name
   if (document.body.classList.contains('landing-template')) {
     const heading = trialInfo.querySelector('h1, h2, h3, h4, h5, h6');
     if (heading) {
-      heading.classList.add('form-heading');
-      formSection.prepend(heading);
+      const cardHeading = createTag('h2', { class: 'form-heading' });
+      if (heading.id) cardHeading.id = heading.id;
+      cardHeading.append(...heading.childNodes);
+      heading.remove();
+      formSection.prepend(cardHeading);
+    }
+    const mark = trialInfo.querySelector(':scope > div > div:first-child');
+    if (mark) {
+      mark.querySelectorAll('img').forEach((img) => { img.alt = ''; });
+      mark.append(createTag('span', { class: 'lockup-name' }, 'Adobe Experience Manager'));
     }
   }
 
