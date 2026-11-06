@@ -79,6 +79,12 @@ function generatePlaceholderSVG(text, index, options = {}) {
 const OWN_SITE_VALUE = 'own-site';
 const OWN_SITE_ENABLED = false;
 
+/** How long each start path takes, shown under the "Start with" switch */
+const START_HINTS = {
+  template: 'Ready in seconds',
+  [OWN_SITE_VALUE]: 'Takes a while: we\'ll email you when it\'s ready',
+};
+
 /**
  * Normalizes what a visitor typed into an absolute http(s) URL.
  * @param {string} value - e.g. "example.com", "https://www.example.com/en"
@@ -102,7 +108,7 @@ function normalizeSiteUrl(value) {
  * Builds the "Start with" switch (sample site or your own site) and the URL panel.
  * @param {Object} ownSite - the authored own-site row ({ text, description })
  * @param {HTMLElement} templateGrid - the sample-site template cards
- * @returns {{ switcher: HTMLElement, panel: HTMLElement }}
+ * @returns {{ switcher: HTMLElement, panel: HTMLElement, hint: HTMLElement }}
  */
 function buildOwnSitePath(ownSite, templateGrid) {
   const switcher = createTag('div', { class: 'start-switch', role: 'radiogroup', 'aria-label': 'Start with' });
@@ -136,8 +142,14 @@ function buildOwnSitePath(ownSite, templateGrid) {
   panel.append(createTag('label', { for: 'site-url' }, 'Your website'), urlInput, help);
   urlInput.addEventListener('input', () => urlInput.setCustomValidity(''));
 
+  const hint = createTag('p', { class: 'start-hint', 'aria-live': 'polite' });
+  hint.textContent = START_HINTS.template;
+
   switcher.addEventListener('change', () => {
-    const ownSiteSelected = switcher.querySelector('input:checked')?.value === OWN_SITE_VALUE;
+    const start = switcher.querySelector('input:checked')?.value;
+    const ownSiteSelected = start === OWN_SITE_VALUE;
+    hint.textContent = START_HINTS[start] || '';
+    hint.classList.toggle('slow', ownSiteSelected);
     templateGrid.hidden = ownSiteSelected;
     panel.hidden = !ownSiteSelected;
     urlInput.required = ownSiteSelected;
@@ -145,7 +157,7 @@ function buildOwnSitePath(ownSite, templateGrid) {
     if (ownSiteSelected) urlInput.focus();
   });
 
-  return { switcher, panel };
+  return { switcher, panel, hint };
 }
 
 /**
@@ -742,12 +754,12 @@ async function buildForm(block) {
   });
 
   if (ownSite) {
-    const { switcher, panel } = buildOwnSitePath(ownSite, templateGrid);
+    const { switcher, panel, hint } = buildOwnSitePath(ownSite, templateGrid);
     templateLabel.textContent = 'Start with';
     templateLabel.id = 'start-with-label';
     switcher.setAttribute('aria-labelledby', 'start-with-label');
     switcher.removeAttribute('aria-label');
-    templateField.append(templateLabel, switcher, templateGrid, panel);
+    templateField.append(templateLabel, switcher, hint, templateGrid, panel);
   } else {
     templateField.append(templateLabel, templateGrid);
   }

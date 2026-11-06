@@ -328,6 +328,15 @@ body.landing-template {
   box-shadow: var(--landing-ring);
 }
 
+.landing-template main .ue-trial .start-hint {
+  margin: -2px 0 2px;
+  color: oklch(48% 0.12 150deg);
+}
+
+.landing-template main .ue-trial .start-hint.slow {
+  color: var(--landing-ink-quiet);
+}
+
 .landing-template main .ue-trial .own-site-panel {
   margin: 0;
 }
