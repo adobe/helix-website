@@ -195,6 +195,7 @@
   border-color: transparent transparent transparent white;
 }
 
+.event-list.compact .event-list-card-video-link:hover .event-list-card-thumb::after,
 .event-list.compact a.event-list-card:hover .event-list-card-thumb::after {
   background: rgb(0 0 0 / 80%);
 }
@@ -242,6 +243,49 @@
   font-size: var(--type-body-xxs-size);
   color: var(--color-gray-600);
   font-weight: 400;
+}
+
+.event-list.download-link .event-list-date,
+.event-list.download-link .event-list-download {
+  margin: 0 0 12px;
+  font-size: var(--type-body-xxs-size);
+  line-height: 1.4;
+}
+
+.event-list.download-link .event-list-date {
+  color: var(--color-gray-600);
+}
+
+.event-list.download-link .event-list-download-link:any-link {
+  color: var(--color-accent-blue);
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
+.event-list.download-link .event-list-download-link:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 3px;
+}
+
+.event-list.compact.download-link .event-list-card-info {
+  gap: 10px;
+}
+
+.event-list.compact.download-link .event-list-card-info > p {
+  margin: 0;
+  font-size: var(--type-body-xs-size);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.event-list.compact.download-link .event-list-download {
+  margin: 0;
+}
+
+.event-list.compact .event-list-card-video-link {
+  display: block;
 }
 
 @media screen and (width < 900px) {

@@ -17,6 +17,14 @@ import { createTag } from '../../scripts/scripts.js';
  *
  * Right column empty → placeholder thumbnail, non-clickable card (for
  * sessions that haven't happened yet).
+ *
+ * `Event List (download-link)` variant: put an optional presentation link
+ * in its own paragraph after the date in the first column.
+ * | ### Title ¶ Date ¶ [Download presentation](slides-url) ¶ Description | youtube-url |
+ * Dates and presentation links are optional. Existing dates at the end of
+ * the cell are moved below the title when this variant is enabled.
+ * Combine with `compact` to show the presentation and description in cards;
+ * the video thumbnail and presentation remain separate links.
  */
 
 const DEFAULT_PLACEHOLDER = '/blocks/event-list/thursday-frequency-default.png';
@@ -117,14 +125,53 @@ function isWithinNewBadgeWindow(date) {
   return now >= start && now < end;
 }
 
-function buildCompactCard(cells) {
-  const title = cells[0].querySelector('h3');
-  const date = cells[0].querySelector('p');
-  const href = getYouTubeUrl(cells[1]);
+function getDownloadLink(paragraph) {
+  if (paragraph?.tagName !== 'P') return null;
 
-  const card = createTag(href ? 'a' : 'div', {
+  const links = paragraph.querySelectorAll('a[href]');
+  const link = links[0];
+  if (links.length !== 1 || !link.getAttribute('href')?.trim()
+    || paragraph.textContent.trim() !== link.textContent.trim()) return null;
+
+  return link;
+}
+
+function decorateDownloadLink(content) {
+  const title = content.querySelector('h3');
+  const paragraphs = [...content.querySelectorAll(':scope > p')];
+  const date = paragraphs.find((p) => parseEventDate(p.textContent))
+    || (getDownloadLink(paragraphs[1]) && !getDownloadLink(paragraphs[0])
+      ? paragraphs[0] : null);
+
+  if (date) {
+    const dateWrap = createTag('div', { class: 'event-list-date' });
+    dateWrap.append(...date.childNodes);
+    date.replaceWith(dateWrap);
+    title.after(dateWrap);
+  }
+
+  const paragraph = date
+    ? title.nextElementSibling.nextElementSibling : title.nextElementSibling;
+  const link = getDownloadLink(paragraph);
+  if (!link) return;
+  link.classList.remove('button');
+  link.classList.add('event-list-download-link');
+  const download = createTag('div', { class: 'event-list-download' });
+  download.append(link);
+  paragraph.replaceWith(download);
+}
+
+function buildCompactCard(cells, hasDownloadLink) {
+  const title = cells[0].querySelector('h3');
+  const date = hasDownloadLink
+    ? cells[0].querySelector('.event-list-date')
+    : cells[0].querySelector('p');
+  const href = getYouTubeUrl(cells[1]);
+  const isLinkedCard = href && !hasDownloadLink;
+
+  const card = createTag(isLinkedCard ? 'a' : 'div', {
     class: 'event-list-card',
-    ...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {}),
+    ...(isLinkedCard ? { href, target: '_blank', rel: 'noopener noreferrer' } : {}),
   });
 
   const thumb = createTag('div', { class: 'event-list-card-thumb' });
@@ -136,11 +183,26 @@ function buildCompactCard(cells) {
   if (isWithinNewBadgeWindow(parseEventDate(date?.textContent))) {
     thumb.append(createTag('span', { class: 'event-list-card-badge' }, 'New'));
   }
-  card.append(thumb);
+  if (href && hasDownloadLink) {
+    const videoLink = createTag('a', {
+      class: 'event-list-card-video-link',
+      href,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      'aria-label': `Play video: ${title.textContent}`,
+    });
+    videoLink.append(thumb);
+    card.append(videoLink);
+  } else {
+    card.append(thumb);
+  }
 
   const info = createTag('div', { class: 'event-list-card-info' });
   if (title) info.append(createTag('strong', {}, title.textContent));
   if (date) info.append(createTag('span', { class: 'event-list-card-date' }, date.textContent));
+  if (hasDownloadLink) {
+    info.append(...[...cells[0].childNodes].filter((node) => node !== title && node !== date));
+  }
   card.append(info);
 
   return card;
@@ -148,6 +210,7 @@ function buildCompactCard(cells) {
 
 export default function decorate(block) {
   const isCompact = block.classList.contains('compact');
+  const hasDownloadLink = block.classList.contains('download-link');
   const rows = [...block.querySelectorAll(':scope > div')];
 
   block.textContent = '';
@@ -168,8 +231,10 @@ export default function decorate(block) {
 
     if (cells.length < 2 || !cells[0].querySelector('h3')) return;
 
+    if (hasDownloadLink) decorateDownloadLink(cells[0]);
+
     if (isCompact) {
-      grid.append(buildCompactCard(cells));
+      grid.append(buildCompactCard(cells, hasDownloadLink));
       return;
     }
 
