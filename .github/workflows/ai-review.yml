@@ -1,0 +1,32 @@
+name: AI Review
+
+on:
+  pull_request:
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  ai-review:
+    uses: adobe/helix-shared-workflows/.github/workflows/ai-review.yml@v1
+    secrets:
+      AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEDROCK_TOKEN }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      statuses: write
+    with:
+      setup: npm install
+      # web-test-runner in Chrome for Testing (CHROME_PATH, on the virtual display)
+      test: npm test
+      browsers: true
+      base-url: https://main--helix-website--adobe.aem.page/
+      review-prompt: >-
+        helix-website is www.aem.live, an AEM Edge Delivery Services site. Apply the
+        EDS-specific review criteria in .claude/skills/code-review/SKILL.md (its criteria,
+        not its instructions for posting). `npm run lint` lints JS and CSS. A pushed branch
+        is previewed at https://<branch>--helix-website--adobe.aem.page/, where <branch> is
+        the head branch in pr.json, lowercased, with every character other than a-z, 0-9 and
+        - replaced by -; it may not be available yet. Compare pages there with the base.
