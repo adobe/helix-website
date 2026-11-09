@@ -947,10 +947,11 @@ function prepareSideNav(main) {
 
 /**
  * Decorates the feature lifecycle badge from lifecycle metadata.
+ * Skipped if the page already has an authored feature-lifecycle (or legacy labs/deprecation) block.
  */
 async function decorateFeatureLifecycle() {
-  const authored = document.querySelector('main .labs, main .deprecation');
-  if (authored) return;
+  const existing = document.querySelector('main .feature-lifecycle, main .labs, main .deprecation');
+  if (existing) return;
   const hasMetadata = ['feature-lifecycle', 'labs', 'deprecation']
     .some((name) => getMetadata(name).trim());
   if (!hasMetadata) return;
