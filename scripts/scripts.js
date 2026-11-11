@@ -668,18 +668,19 @@ function buildCodeBlocks(main) {
   });
 }
 
-function updateGuideTemplateStyleBasedOnHero() {
-  const isHeroContentExist = document.querySelector(
-    '.guides-template .section.heading',
-  );
+function hasGuideTemplateHero() {
+  return !!document.querySelector('.guides-template .section.heading');
+}
 
-  if (isHeroContentExist) {
-    document.querySelector('main').classList.add('has-full-width-hero');
+function decorateMainHeroClass(main) {
+  main.classList.add(hasGuideTemplateHero() ? 'has-full-width-hero' : 'without-full-width-hero');
+}
+
+function updateGuideTemplateStyleBasedOnHero() {
+  if (hasGuideTemplateHero()) {
     const cardListBlocks = document.querySelectorAll('.block.card-list');
     // make card list in main category page has '.image-card-listing' class
     cardListBlocks.forEach((block) => block.classList.add('image-card-listing'));
-  } else {
-    document.querySelector('main').classList.add('without-full-width-hero');
   }
 }
 
@@ -994,6 +995,7 @@ async function loadEager(doc) {
     decorateMain(main);
     decorateBreadcrumb(main);
     prepareSideNav(main);
+    if (!getMetadata('supressframe')) decorateMainHeroClass(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }

@@ -323,6 +323,10 @@
   padding: unset;
 }
 
+.side-navigation-wrapper > .doc-search:not([data-block-status="loaded"]) {
+  display: none;
+}
+
 /* combined header search result styles here for consistency */
 .results-wrapper {
   list-style: none;

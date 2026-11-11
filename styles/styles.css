@@ -1838,14 +1838,28 @@ body.skills-template main h3.icon-eyebrow svg {
 }
 
 /* Layout for Guide Template pages  */
-body.guides-template,
-body.skills-template {
+body.guides-template.appear,
+body.skills-template.appear {
   display: block;
 }
 
 body.guides-template main.without-full-width-hero,
 body.skills-template main.without-full-width-hero {
   min-height: 900px;
+}
+
+@media screen and (width < 900px) {
+  body.guides-template main > aside {
+    min-height: 83px;
+    margin-bottom: var(--spacing-xxs);
+  }
+}
+
+@media screen and (600px <= width < 900px) {
+  body.guides-template main > aside {
+    min-height: 87px;
+    margin-bottom: var(--spacing-xs);
+  }
 }
 
 body.guides-template main .section,
@@ -2208,6 +2222,10 @@ body.guides-template .guides-back-btn span.icon {
     max-width: 900px;
   }
 
+  body.guides-template main > aside {
+    width: 300px;
+  }
+
   body.guides-template main .default-content-wrapper > p,
   body.skills-template main .default-content-wrapper > p {
     margin-bottom: var(--spacing-s);
@@ -2297,7 +2315,7 @@ body.bumper-template main .section p {
 }
 
 /* Layout for Contact template */
-body.contact-template {
+body.contact-template.appear {
   display: block;
 }
 
@@ -2485,7 +2503,7 @@ body.contact-template main .default-content-wrapper img {
   body.faq-theme main {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(16px, 1fr) 300px auto minmax(16px, 1fr);
+    grid-template-columns: minmax(16px, 1fr) 300px minmax(0, 900px) minmax(16px, 1fr);
   }
 
   body.faq-theme main .breadcrumb-wrapper {
@@ -2493,7 +2511,7 @@ body.contact-template main .default-content-wrapper img {
     grid-column: 1 / span 4;
   }
 
-  body.faq-theme main aside.side-navigation-wrapper {
+  body.faq-theme main > aside {
     grid-column-start: 2;
     grid-row: 2 / span 10;
     width: 300px;
