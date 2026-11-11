@@ -186,7 +186,7 @@ jobs:
       # re-announce whatever the retry dispatched. With run_attempt in the key every attempt
       # misses on the exact key, falls back to the prefix, and saves under a fresh key.
       - name: Restore the announced history
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: announced-history.ndjson
           key: track-publishes-announced-${{ github.run_id }}-${{ github.run_attempt }}
@@ -472,7 +472,7 @@ jobs:
       # most recent match, so a quiet week must not be allowed to age the history out.
       - name: Save the announced history
         if: always() && steps.log.outcome == 'success'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: announced-history.ndjson
           key: track-publishes-announced-${{ github.run_id }}-${{ github.run_attempt }}
