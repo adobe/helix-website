@@ -5,8 +5,8 @@
 `playwright-cli` exports it to PNG. Use it for hero images, `og:image`s and slides for
 www.aem.live pages. The repo skill `.claude/skills/hero-images` wraps this workflow.
 
-All commands below run from `tools/slides/`. The gallery is also published at
-https://www.aem.live/tools/slides/index.html (it reads `manifest.json`, which `export.mjs` rewrites).
+All commands below run from `tools/slides/`. This is a local tool: it is listed in the repo's
+`.hlxignore`, so nothing in here is published to www.aem.live.
 
 PNGs are content, not code. Hand them to the author (or upload them to the page in the CMS);
 never commit them. `exports/` is git-ignored.

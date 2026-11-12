@@ -34,7 +34,7 @@ export async function listSlides(dir = 'slides') {
   return out;
 }
 
-/** Write manifest.json ({ slides, reference }) so the gallery also works on a static host. */
+/** Write manifest.json ({ slides, reference }) so the gallery also works without this server. */
 export async function writeManifest() {
   const out = {};
   for (const dir of ['slides', 'reference']) out[dir] = await listSlides(dir).catch(() => []);

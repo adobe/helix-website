@@ -34,7 +34,7 @@
     }
     let manifest;
     for (const dir of ['slides', 'reference']) {
-      // live listing from scripts/serve.mjs, else the committed manifest.json (static hosting, e.g. www.aem.live/tools/slides/)
+      // live listing from scripts/serve.mjs, else the committed manifest.json (any other static server)
       let list;
       try {
         const res = await fetch(`/api/slides?dir=${dir}`);

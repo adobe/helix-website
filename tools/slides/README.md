@@ -16,8 +16,8 @@ node scripts/lint.mjs           # fails on any raster content
 
 There are no dependencies beyond Node ≥ 20 and `playwright-cli` on PATH (or set `PLAYWRIGHT_CLI`).
 Run the commands from `tools/slides/`. *Adobe Clean* and *Source Code Pro* come from the site's
-`/fonts` folder. The gallery is static-host friendly (it falls back to `manifest.json`), so it also
-works at https://www.aem.live/tools/slides/index.html.
+`/fonts` folder. This is a local tool and is excluded from the website via `.hlxignore`.
+The gallery falls back to `manifest.json` when it is opened without `serve.mjs`.
 
 ## Layout
 
@@ -27,7 +27,7 @@ lib/aem-live.js       custom elements (<aem-slide>, <aem-tile>, <aem-badge>, …
 lib/icons.js          vector paths extracted from the deck (generated)
 lib/icons-custom.js   hand-drawn icons in the same style
 slides/               your slides (_template.html is the starting point)
-manifest.json         slide list for the gallery on static hosts (written by export.mjs)
+manifest.json         slide list for the gallery when not served by serve.mjs (written by export.mjs)
 reference/            57 deck pages recreated in code, named pNNN-… after the deck page
 scripts/              serve.mjs · export.mjs (playwright-cli) · lint.mjs
 tools/extract/        the PDF → SVG → icon extraction and comparison tooling
