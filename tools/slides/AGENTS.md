@@ -6,7 +6,7 @@
 www.aem.live pages. The repo skill `.claude/skills/hero-images` wraps this workflow.
 
 All commands below run from `tools/slides/`. The gallery is also published at
-https://www.aem.live/tools/slides/ (it reads `manifest.json`, which `export.mjs` rewrites).
+https://www.aem.live/tools/slides/index.html (it reads `manifest.json`, which `export.mjs` rewrites).
 
 PNGs are content, not code. Hand them to the author (or upload them to the page in the CMS);
 never commit them. `exports/` is git-ignored.

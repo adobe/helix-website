@@ -17,7 +17,7 @@ node scripts/lint.mjs           # fails on any raster content
 There are no dependencies beyond Node ≥ 20 and `playwright-cli` on PATH (or set `PLAYWRIGHT_CLI`).
 Run the commands from `tools/slides/`. *Adobe Clean* and *Source Code Pro* come from the site's
 `/fonts` folder. The gallery is static-host friendly (it falls back to `manifest.json`), so it also
-works at https://www.aem.live/tools/slides/.
+works at https://www.aem.live/tools/slides/index.html.
 
 ## Layout
 
