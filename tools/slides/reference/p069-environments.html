@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Environments vs. branches</title>
+  <link rel="stylesheet" href="../lib/aem-live.css">
+  <script type="module" src="../lib/aem-live.js"></script>
+</head>
+<body>
+  <aem-slide bg="periwinkle" grid="large">
+    <aem-card flat style="--x:288px; --y:381px; --w:246px; --h:389px; --r:40px; --gap:36px; --pad:32px; --fill:linear-gradient(180deg,#fff24a,#ffd33c); --card-shadow:var(--shadow-soft)">
+      <div class="aem-label" style="background:#f5f200; width:100%; padding:20px 0; border-radius:8px; font-weight:400; font-size:23px">Production</div>
+      <div class="aem-label" style="background:#f5f200; width:100%; padding:20px 0; border-radius:8px; font-weight:400; font-size:23px">Stage</div>
+      <div class="aem-label" style="background:#f5f200; width:100%; padding:20px 0; border-radius:8px; font-weight:400; font-size:23px">Development</div>
+    </aem-card>
+    <aem-card flat style="--x:744px; --y:381px; --w:246px; --h:389px; --r:40px; --gap:36px; --pad:32px; --fill:linear-gradient(180deg,#6af4f0,#0db39a); --card-shadow:var(--shadow-soft)">
+      <div class="aem-mono" style="background:#16e5cf; width:100%; padding:20px 0; border-radius:8px; color:#3a7a6f; font-size:23px; box-shadow:0 0 0 1px #0fb7a5">main</div>
+      <div class="aem-mono" style="background:#16e5cf; width:100%; padding:20px 0; border-radius:8px; color:#3a7a6f; font-size:23px; box-shadow:0 0 0 1px #0fb7a5">stage</div>
+      <div class="aem-mono" style="background:#16e5cf; width:100%; padding:20px 0; border-radius:8px; color:#3a7a6f; font-size:23px; box-shadow:0 0 0 1px #0fb7a5">dev</div>
+      <aem-badge at="tr" tone="solid-lime" icon="github" style="--size:99px; --icon:80%; --badge-ink:#111; --inset:0px"></aem-badge>
+    </aem-card>
+    <aem-appicon kind="aem" style="--size:96px; --x:168px; --y:576px"></aem-appicon>
+  </aem-slide>
+</body>
+</html>

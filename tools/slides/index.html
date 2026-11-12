@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AEM Live slides</title>
+  <style>
+    :root { color-scheme: dark; font-family: "Adobe Clean", system-ui, sans-serif; }
+    body { margin: 0; padding: 28px 32px 60px; background: #1f1f26; color: #eee; }
+    h1 { font-weight: 900; margin: 0 0 4px; }
+    h2 { margin: 36px 0 12px; font-weight: 700; }
+    p { color: #aaa; margin: 0 0 8px; }
+    a { color: #b9bdff; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
+    figure { margin: 0; }
+    .thumb { display: block; position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 8px; background: #000; }
+    .thumb iframe { position: absolute; left: 0; top: 0; width: 1024px; height: 768px; border: 0; transform-origin: 0 0; pointer-events: none; }
+    figcaption { font-size: 13px; margin-top: 6px; display: flex; justify-content: space-between; gap: 8px; }
+    figcaption code { color: #ddd; }
+    figcaption span { color: #999; text-align: right; }
+  </style>
+</head>
+<body>
+  <h1>AEM Live slides</h1>
+  <p>Run <code>node scripts/serve.mjs</code> in <code>tools/slides</code> and open this page. <a href="catalog.html">Catalog of backgrounds, tones and icons →</a></p>
+  <h2>slides/</h2>
+  <p>Your slides. Export with <code>node scripts/export.mjs</code>.</p>
+  <div class="grid" id="slides"></div>
+  <h2>reference/</h2>
+  <p>Vector re-creations of pages from the original Keynote deck (<code>pNNN</code> = deck page). Copy from these.</p>
+  <div class="grid" id="reference"></div>
+  <script type="module">
+    function fit() {
+      for (const t of document.querySelectorAll('.thumb')) t.querySelector('iframe').style.transform = `scale(${t.clientWidth / 1024})`;
+    }
+    let manifest;
+    for (const dir of ['slides', 'reference']) {
+      // live listing from scripts/serve.mjs, else the committed manifest.json (static hosting, e.g. www.aem.live/tools/slides/)
+      let list;
+      try {
+        const res = await fetch(`/api/slides?dir=${dir}`);
+        if (!res.ok) throw new Error(res.status);
+        list = await res.json();
+      } catch {
+        manifest ??= await (await fetch('manifest.json')).json();
+        list = manifest[dir] ?? [];
+      }
+      const host = document.getElementById(dir);
+      for (const s of list) {
+        const fig = document.createElement('figure');
+        fig.innerHTML = `<a class="thumb" href="${s.file}?preview"><iframe loading="lazy" src="${s.file}" tabindex="-1"></iframe></a>
+          <figcaption><code>${s.name}</code><span>${s.title}</span></figcaption>`;
+        host.append(fig);
+      }
+    }
+    fit();
+    addEventListener('resize', fit);
+  </script>
+</body>
+</html>
