@@ -28,7 +28,7 @@
     "@babel/eslint-parser": "7.28.5",
     "@esm-bundle/chai": "4.3.4-fix.0",
     "@web/test-runner": "1.0.1",
-    "@web/test-runner-commands": "1.0.2",
+    "@web/test-runner-commands": "1.0.3",
     "eslint": "8.57.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.32.0",
