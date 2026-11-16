@@ -46,5 +46,10 @@ jobs:
             {
               "text": ${{ toJSON(steps.message.outputs.text) }}
             }
-          webhook-type: webhook-trigger
+          # incoming-webhook, not webhook-trigger: SLACK_WEBHOOK_URL is a classic Incoming Webhook
+          # (hooks.slack.com/services/..., posts as "incoming-webhook"), which answers with the
+          # plain-text body "ok". Since v3.0.4 the webhook-trigger client calls response.json() on
+          # success, so that "ok" throws, is treated as a network error, and is retried 5 times over
+          # 5 minutes - every attempt already delivered, so each publish became 6 Slack messages.
+          webhook-type: incoming-webhook
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
