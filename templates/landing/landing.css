@@ -38,6 +38,7 @@ body.landing-template {
 
 .landing-template main {
   min-height: 100vh;
+  overflow-x: clip;
 }
 
 /* ---------- section grid ---------- */
@@ -179,58 +180,30 @@ body.landing-template {
   margin: 0;
   padding: 0;
   list-style: none;
-  counter-reset: stop;
 }
 
+/* a capability, not a step: one plain sentence in one colour */
 .landing-template main .landing-explore li {
-  display: grid;
-  grid-template-columns: 36px 1fr;
-  gap: 12px;
-  align-items: baseline;
   margin: 0;
   padding: 18px 0;
   border-top: 1px solid var(--landing-rule);
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.45;
   color: var(--landing-on-stage);
-  counter-increment: stop;
+  text-wrap: pretty;
 }
 
-.landing-template main .landing-explore li::before {
-  content: counter(stop, decimal-leading-zero);
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  color: var(--landing-on-stage-accent);
-  font-variant-numeric: tabular-nums;
-}
-
-/* sign-up condition (the bold note, moved next to Continue by ue-trial.js) */
+/* sign-up condition (the bold note, moved under Continue by ue-trial.js): one reassuring line */
 .landing-template main .ue-trial .form-notice {
   order: 3;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 -8px;
+  margin: calc(16px - var(--landing-form-gap)) 0 0;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
   color: var(--landing-ink-soft);
 }
 
 .landing-template main .ue-trial .form-notice strong {
-  font-weight: 600;
-}
-
-.landing-template main .ue-trial .form-notice::before {
-  content: "";
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid currentcolor;
-  border-radius: 50%;
-  background:
-    linear-gradient(currentcolor, currentcolor) 6px 2.5px / 1.5px 5.5px no-repeat,
-    linear-gradient(currentcolor, currentcolor) 6px 6.5px / 3.5px 1.5px no-repeat;
+  font-weight: 400;
 }
 
 /* ---------- sign-up card (the form section) ---------- */
@@ -248,8 +221,8 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial .form-heading {
-  margin: 0 0 24px;
-  font-size: 25px;
+  margin: 0 0 16px;
+  font-size: 22px;
   font-weight: 900;
   line-height: 1.15;
   letter-spacing: -0.015em;
@@ -286,6 +259,11 @@ body.landing-template {
   transition: border-color 160ms var(--landing-ease), box-shadow 160ms var(--landing-ease);
 }
 
+.landing-template main .ue-trial input::placeholder {
+  color: #6d6d6d;
+  opacity: 1;
+}
+
 .landing-template main .ue-trial input[type="email"]:hover,
 .landing-template main .ue-trial input[type="text"]:hover {
   border-color: var(--landing-ink-soft);
@@ -307,8 +285,27 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial .template-grid {
-  gap: 10px;
+  gap: 6px;
   margin: 0;
+}
+
+.landing-template main .ue-trial .template-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.landing-template main .ue-trial .template-head-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--landing-ink-soft);
+}
+
+.landing-template main .ue-trial .template-head .start-hint {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 /* start-with switch (sample site or your own site); the switch names itself, so its label is for screen readers only */
@@ -321,9 +318,14 @@ body.landing-template {
   white-space: nowrap;
 }
 
+/* the switch stays for the form's logic; the website field and one quiet action replace it on screen */
 .landing-template main .ue-trial .start-switch {
-  margin: 0 0 4px;
-  background: oklch(95.5% 0.008 260deg);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .landing-template main .ue-trial .start-switch label {
@@ -359,9 +361,23 @@ body.landing-template {
 
 .landing-template main .ue-trial .site-field .start-hint {
   margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* the label row now holds the other path; "while you wait" already says it takes time, so the
+   timing stays for screen readers only */
+.landing-template main .ue-trial .start-slot .site-field .start-hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .landing-template main .ue-trial .while-you-wait {
+  padding-left: 14px;
   border-color: oklch(90% 0.01 260deg);
   background: var(--landing-paper);
 }
@@ -371,12 +387,15 @@ body.landing-template {
   background: var(--landing-blue-wash);
 }
 
-.landing-template main .ue-trial .while-you-wait-text strong {
-  color: var(--landing-ink);
+.landing-template main .ue-trial .while-you-wait-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
-.landing-template main .ue-trial .while-you-wait-sub {
-  color: oklch(48% 0.12 150deg);
+.landing-template main .ue-trial .while-you-wait-text strong {
+  color: var(--landing-ink);
 }
 
 .landing-template main .ue-trial .switch-input:checked ~ .switch-track {
@@ -440,8 +459,8 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial .template-thumbnail {
-  width: 112px;
-  height: 74px;
+  width: 40px;
+  height: 40px;
   border: 0;
 }
 
@@ -454,10 +473,11 @@ body.landing-template {
 }
 
 .landing-template main .ue-trial .template-info h4,
-.landing-template main .ue-trial .template-card.selected .template-info h4 {
-  font-size: 17px;
+.landing-template main .ue-trial .template-card.selected .template-info h4,
+.landing-template main .ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail + .template-info h4 {
+  font-size: 16px;
   font-weight: 700;
-  color: var(--landing-blue-deep);
+  color: var(--landing-ink);
 }
 
 .landing-template main .ue-trial .template-info p {
@@ -476,21 +496,21 @@ body.landing-template {
 .landing-template main .ue-trial .agreement p {
   order: 4;
   margin: calc(6px - var(--landing-form-gap)) 0 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--landing-ink-quiet);
 }
 
 .landing-template main .ue-trial .agreement p:first-child:not(.agreement-check),
 .landing-template main .ue-trial .agreement .agreement-check:first-child + p {
-  margin-top: calc(14px - var(--landing-form-gap));
+  margin-top: calc(4px - var(--landing-form-gap));
 }
 
 .landing-template main .ue-trial .agreement p.agreement-check {
   order: 1;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   margin: 0;
   font-size: 15px;
   line-height: 1.4;
@@ -504,9 +524,9 @@ body.landing-template {
 
 .landing-template main .ue-trial .agreement input[type="checkbox"] {
   flex: none;
-  width: 18px;
-  height: 18px;
-  margin: 1px 0 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
   accent-color: var(--landing-blue);
 }
 
@@ -521,17 +541,19 @@ body.landing-template {
   text-decoration-thickness: 2px;
 }
 
+/* the two checks read as one group; the room under them holds the captcha's message */
 .landing-template main .ue-trial .altcha-container {
   order: 2;
   justify-content: stretch;
-  margin: 0;
+  margin: calc(14px - var(--landing-form-gap)) 0 calc(28px - var(--landing-form-gap));
 }
 
 .landing-template main .ue-trial .altcha-container altcha-widget {
   --altcha-max-width: 100%;
   --altcha-primary-color: var(--landing-blue);
   --altcha-border-color: var(--landing-field);
-  --altcha-border-radius: 8px;
+  --altcha-border-radius: 0;
+  --altcha-border-width: 0;
 
   width: 100%;
 }
@@ -698,6 +720,18 @@ body.landing-template {
   margin-bottom: 20px;
 }
 
+/* the section's eyebrow: the same voice as the hero's, above its title */
+.landing-template main .landing-lead > .landing-kicker {
+  grid-column: 1 / -1;
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--landing-on-stage-accent);
+}
+
 .landing-template main .landing-lead > h3 {
   margin: 0 0 6px;
   padding-top: 18px;
@@ -718,11 +752,6 @@ body.landing-template {
   padding-block: 12px 32px;
   padding-inline: var(--landing-gutter);
   list-style: none;
-
-  /* same band as the two paths */
-  background: var(--landing-band);
-  box-shadow: 0 0 0 100vmax var(--landing-band);
-  clip-path: inset(0 -100vmax);
 }
 
 .landing-template main .ue-trial-container .availability-item {
@@ -878,10 +907,7 @@ body.landing-template {
 
   /* the right column's text starts a comfortable distance from the panel */
   .landing-template main .ue-trial-container > .landing-lead {
-    padding-top: 0;
-    padding-left: clamp(32px, 4vw, 72px);
-    padding-right: var(--landing-gutter);
-    padding-bottom: 48px;
+    padding: 0 var(--landing-gutter) 48px clamp(32px, 4vw, 72px);
   }
 
   /* below the form: the intro and the list's lead-in side by side, on the columns above; the list runs full width */
@@ -973,7 +999,7 @@ body.landing-template {
     grid-template-columns: none;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
-    gap: 40px;
+    gap: 32px;
     padding-block: 40px 64px;
   }
 
@@ -1084,4 +1110,834 @@ body.landing-template {
 .landing-template main .ue-trial .migration-banner {
   background: var(--landing-blue-wash);
   color: var(--landing-ink);
+}
+
+/* ---------- hero: the pitch and the audiences beside the sign-up card, no product screens ---------- */
+
+/* both sign-up paths share one slot, so the card keeps its height when the visitor switches */
+.landing-template main .ue-trial .start-slot {
+  display: grid;
+}
+
+.landing-template main .ue-trial .start-slot > * {
+  grid-area: 1 / 1;
+}
+
+.landing-template main .ue-trial .start-slot > [hidden] {
+  display: flex;
+  visibility: hidden;
+  transition: visibility 0s linear 320ms;
+}
+
+.landing-template main .ue-trial .start-slot > .template-grid {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* switching paths is one morph, not a cut: the "while you wait" row grows up into the sample
+   card, carrying its icon, while the website field fades; going back runs it in reverse. The
+   card starts as an exact copy of the row underneath it, so the hand-over is invisible. */
+.landing-template main .ue-trial .start-slot .site-field,
+.landing-template main .ue-trial .start-slot .while-you-wait,
+.landing-template main .ue-trial .start-slot .template-head,
+.landing-template main .ue-trial .start-alt {
+  transition: opacity 200ms var(--landing-ease);
+}
+
+.landing-template main .ue-trial .start-slot > :not([hidden]) .template-head {
+  transition-delay: 60ms;
+}
+
+/* the field comes back only once the card has folded off it */
+.landing-template main .ue-trial .start-slot > :not([hidden]) .site-field {
+  transition: opacity 280ms ease-in-out 160ms;
+}
+
+.landing-template main .ue-trial .start-slot > [hidden] :is(.site-field, .template-head) {
+  opacity: 0;
+  transition-duration: 100ms;
+}
+
+/* the row goes as soon as the card covers it, and comes back only once the card has shrunk */
+.landing-template main .ue-trial .start-slot > [hidden] .while-you-wait {
+  opacity: 0;
+  transition-duration: 60ms;
+  transition-delay: 0s;
+}
+
+.landing-template main .ue-trial .start-slot > :not([hidden]) .while-you-wait {
+  transition-duration: 160ms;
+  transition-delay: 140ms;
+}
+
+.landing-template main .ue-trial .start-slot > .template-grid[hidden] {
+  transition-delay: 320ms;
+}
+
+/* the sample card fills the room the website field and its toggle take, so nothing moves */
+.landing-template main .ue-trial .start-slot .template-head {
+  align-items: center;
+  min-height: 30px;
+}
+
+.landing-template main .ue-trial .start-slot .template-card {
+  display: flex;
+  flex: 1 1 var(--wait-row-h, 50px);
+  align-items: center;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: flex-grow 320ms var(--landing-ease);
+}
+
+.landing-template main .ue-trial .start-slot .template-thumbnail {
+  transform-origin: 0 50%;
+  transition: transform 320ms var(--landing-ease);
+}
+
+.landing-template main .ue-trial .start-slot .template-info {
+  transition: opacity 200ms var(--landing-ease) 120ms;
+}
+
+/* folded: the card is the row's twin, same box, same icon, no words; only its height and the
+   icon's scale change, so nothing slides sideways and the text never re-wraps */
+.landing-template main .ue-trial .start-slot > .template-grid[hidden] .template-card {
+  flex-grow: 0;
+  visibility: visible;
+  pointer-events: none;
+}
+
+.landing-template main .ue-trial .start-slot > [hidden] .template-thumbnail {
+  transform: scale(0.8);
+}
+
+/* the folded card is the row's box and icon, so there is only ever one box: the row lays just
+   its words and switch over it, and nothing is handed over at the end of the fold */
+.landing-template main .ue-trial .start-slot > .own-site-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-template main .ue-trial .start-slot > .template-grid[hidden] .template-card input {
+  visibility: hidden;
+}
+
+.landing-template main .ue-trial .start-slot .while-you-wait,
+.landing-template main .ue-trial .start-slot .while-you-wait:has(.switch-input:checked) {
+  border-color: transparent;
+  background: transparent;
+}
+
+.landing-template main .ue-trial .start-slot .while-you-wait-thumb {
+  visibility: hidden;
+}
+
+.landing-template main .ue-trial .start-slot > [hidden] .template-info {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 120ms var(--landing-ease),
+    visibility 0s linear 120ms;
+}
+
+/* the card's own ring shows focus; the icon inside gets none of its own */
+.landing-template main .ue-trial .template-card-label input[type="radio"]:focus + .template-thumbnail {
+  outline: 0;
+}
+
+.landing-template main .ue-trial .start-slot .template-card > * {
+  flex: 1;
+}
+
+.landing-template main .ue-trial .template-grid .template-card,
+.landing-template main .ue-trial .template-grid .template-card.selected,
+.landing-template main .ue-trial .template-grid .template-card:hover {
+  padding: 12px 14px;
+  border: 1px solid oklch(90% 0.01 260deg);
+  background: var(--landing-paper);
+}
+
+/* the only sample is a fact, not a pick: it reads like the "while you wait" row, no check or blue */
+.landing-template main .ue-trial .template-grid .template-card-label {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  height: auto;
+}
+
+.landing-template main .ue-trial .template-grid .template-thumbnail {
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.landing-template main .ue-trial .template-grid .template-thumbnail picture,
+.landing-template main .ue-trial .template-grid .template-thumbnail img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  object-position: top left;
+}
+
+/* the sample row says "ready in seconds" itself; the hint stays for screen readers */
+.landing-template main .ue-trial .template-selector-field > .start-hint[aria-live] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* the capabilities fill the grey band the paths used to */
+.landing-template main .landing-explore > p,
+.landing-template main .landing-explore ul {
+  background: var(--landing-band);
+  box-shadow: 0 0 0 100vmax var(--landing-band);
+  clip-path: inset(0 -100vmax);
+}
+
+/* the checkbox and the captcha line up: the captcha loses its own frame */
+.landing-template main .ue-trial .altcha-container .altcha,
+.landing-template main .ue-trial .altcha-container .altcha-main {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-main {
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 0;
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-checkbox {
+  flex: none;
+  justify-content: flex-start;
+  width: 20px;
+  height: 20px;
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-checkbox input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--landing-blue);
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-label {
+  padding: 0;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-logo {
+  display: none;
+}
+
+/* the captcha's message reads as the label's second line, not a separate alert; it sits in
+   space kept free below the row, so Continue never moves */
+.landing-template main .ue-trial .altcha-container .altcha {
+  position: relative;
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-error {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  gap: 0;
+  margin: 4px 0 0;
+  padding: 0 0 0 32px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: oklch(78% 0.13 25deg);
+  animation: lp-fade 200ms var(--landing-ease) both;
+}
+
+.landing-template main .ue-trial .altcha-container .altcha-error svg {
+  display: none;
+}
+
+@media (width >= 900px) {
+  /* the pitch and one product visual on the left, the sign-up card on the right */
+  .landing-template main .section.ue-trial-container {
+    grid-template:
+      "lockup ." auto
+      "top ." 0
+      "eyebrow ." auto
+      "title signup" auto
+      "sub signup" auto
+      "preview signup" auto
+      "fill signup" 1fr
+      "lead lead" auto
+      "pair pair" auto
+      "explore explore" auto
+      "itinerary itinerary" auto
+      "status status" auto
+      / minmax(0, 13fr) minmax(0, 11fr);
+
+    /* the section holds the whole page, so it never stretches to the viewport: a tall window would pour into "fill" */
+    min-height: 0;
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper > h1 {
+    padding-bottom: 20px;
+    font-size: clamp(44px, 4.2vw, 60px);
+  }
+
+  .landing-template main .ue-trial-container > .default-content-wrapper > p:first-child:has(+ h1) {
+    margin-top: 76px;
+  }
+
+  .landing-template main .ue-trial-container > .landing-intro {
+    grid-area: sub;
+    margin: 0;
+    padding: 0 var(--landing-gutter) 32px;
+    max-width: calc(60ch + 2 * var(--landing-gutter));
+    font-size: 19px;
+  }
+
+  /* the sign-up sits flat on the same dark stage as the pitch: no panel, no card */
+  .landing-template main .ue-trial .form-section {
+    --landing-paper: oklch(21% 0.005 20deg);
+    --landing-ink: var(--landing-on-stage);
+    --landing-ink-soft: var(--landing-on-stage-soft);
+    --landing-ink-quiet: oklch(80% 0.006 20deg);
+    --landing-field: oklch(98% 0.003 20deg / 38%);
+    --landing-blue-wash: oklch(98% 0.003 20deg / 7%);
+    --landing-blue-deep: oklch(76% 0.12 256deg);
+
+    place-self: stretch stretch;
+    width: auto;
+    margin: 0;
+    display: grid;
+
+    /* one top line: the form starts level with the headline, so the whole form, Continue
+       included, stays above the fold on a 768px-tall laptop */
+    align-content: start;
+    padding: 0 var(--landing-gutter) 72px 56px;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .landing-template main .ue-trial .start-switch {
+    background: oklch(98% 0.003 20deg / 9%);
+  }
+
+  .landing-template main .ue-trial .start-switch input:checked + label {
+    background: oklch(99.6% 0.002 265deg);
+    color: oklch(48% 0.19 256deg);
+  }
+
+  /* the fields are the light surfaces on the dark stage: the eye lands where the visitor types */
+  .landing-template main .ue-trial input[type="email"],
+  .landing-template main .ue-trial input[type="text"] {
+    border-color: transparent;
+    background: oklch(99.6% 0.002 265deg);
+    color: oklch(22% 0.01 265deg);
+  }
+
+  .landing-template main .ue-trial .while-you-wait,
+  .landing-template main .ue-trial .while-you-wait:has(.switch-input:checked),
+  .landing-template main .ue-trial .template-grid .template-card,
+  .landing-template main .ue-trial .template-grid .template-card.selected,
+  .landing-template main .ue-trial .template-grid .template-card:hover {
+    border-color: var(--landing-rule);
+    background: var(--landing-band);
+  }
+
+  .landing-template main .ue-trial .start-hint {
+    color: var(--landing-live);
+  }
+
+  .landing-template main .ue-trial .altcha-container altcha-widget {
+    --altcha-color-text: var(--landing-on-stage);
+    --altcha-color-base: transparent;
+    --altcha-color-border: var(--landing-field);
+  }
+
+  .landing-template main .ue-trial .altcha-container .altcha-label {
+    color: var(--landing-on-stage);
+  }
+
+  .landing-template main .ue-trial button.continue,
+  .landing-template main .ue-trial button.continue:hover {
+    color: oklch(100% 0 0deg);
+  }
+
+  /* the availability strip closes the page as a compact footer */
+  .landing-template main .ue-trial-container .availability {
+    grid-area: status;
+    margin: 0;
+    padding-block: 28px 32px;
+    border-top: 1px solid var(--landing-rule);
+    clip-path: inset(0 -100vmax);
+  }
+
+  .landing-template main .ue-trial-container .availability-item {
+    gap: 4px;
+  }
+
+  .landing-template main .ue-trial-container .availability-name {
+    font-size: 18px;
+  }
+
+  .landing-template main .ue-trial-container .availability-cta {
+    font-size: 14px;
+  }
+
+  /* the audiences run as three columns under the hero */
+  .landing-template main .ue-trial-container > .landing-lead {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    align-content: start;
+    padding: 24px var(--landing-gutter);
+  }
+
+  /* one quiet section header: the title on the left, its text beside it, so only the page title is large */
+  .landing-template main .landing-lead > h2 {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    font-size: 26px;
+  }
+
+  .landing-template main .landing-lead > h2 + p {
+    grid-column: 2 / 4;
+    grid-row: 1;
+    max-width: 62ch;
+    margin: 0 0 32px;
+    font-size: 18px;
+  }
+
+  .landing-template main .landing-lead > .landing-kicker {
+    grid-row: 1;
+    margin: 0 0 -20px;
+  }
+
+  .landing-template main .landing-lead > .landing-kicker + h2 {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-bottom: 8px;
+  }
+
+  .landing-template main .landing-explore > p {
+    padding-left: var(--landing-gutter);
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    max-width: 58ch;
+  }
+
+  .landing-template main .landing-explore ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 32px;
+    padding: 28px var(--landing-gutter) 56px;
+  }
+}
+
+/* an audience: a hairline, the title, the text; no box */
+.landing-template main .landing-aud {
+  padding-top: 18px;
+  border-top: 1px solid var(--landing-rule);
+}
+
+.landing-template main .landing-aud > h3 {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.landing-template main .landing-aud > p {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+/* ---------- one question: the website field leads, the sample is one quiet action away ---------- */
+.landing-template main .ue-trial .start-alt {
+  z-index: 2;
+  place-self: start end;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  line-height: 30px;
+  font-weight: 700;
+  color: var(--landing-blue-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.landing-template main .ue-trial .start-alt::before {
+  content: "or ";
+  font-weight: 400;
+  color: var(--landing-ink-soft);
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 0.3em;
+}
+
+.landing-template main .ue-trial .start-alt:hover {
+  text-decoration-thickness: 2px;
+}
+
+.landing-template main .ue-trial .start-alt:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: var(--landing-ring);
+}
+
+@property --lp-ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --lp-wash-a {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --lp-wash-b {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --lp-cta {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+/* ---------- what the visitor lands in: their site in front, the workspace behind; no product UI ---------- */
+.landing-template main .landing-preview {
+  display: none;
+}
+
+@media (width >= 900px) {
+  .landing-template main .landing-preview {
+    --lp-line: oklch(98% 0.003 20deg / 14%);
+    --lp-fill: oklch(98% 0.003 20deg / 8%);
+    --lp-chrome: oklch(14% 0.004 20deg);
+    --lp-tab: oklch(24% 0.005 20deg);
+    --lp-tab-idle: oklch(19% 0.004 20deg);
+    --lp-tab-on: oklch(31% 0.005 20deg);
+
+    position: relative;
+    display: block;
+    grid-area: preview;
+    width: min(100% - 2 * var(--landing-gutter), 620px);
+    aspect-ratio: 16 / 11;
+    margin: 8px var(--landing-gutter) 72px;
+
+    /* an illustration, not content: nothing in it can be selected or dragged out */
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .landing-template main .landing-preview .lp-win {
+    position: absolute;
+    display: grid;
+    grid-template-rows: 34px minmax(0, 1fr);
+    overflow: hidden;
+    border: 1px solid var(--lp-line);
+    border-radius: 10px;
+    background: var(--lp-chrome);
+    box-shadow: 0 24px 60px -20px oklch(0% 0 0deg / 70%);
+  }
+
+  /* the workspace stays put at the back; the visitor's browser sits in front of it */
+  .landing-template main .landing-preview .lp-back {
+    top: 0;
+    right: 0;
+    width: 78%;
+    height: 80%;
+  }
+
+  /* the visitor's browser tucks in at the middle of the assistant's first message: border 1px, tab bar 34px,
+     rail padding 14px, half the 30px message */
+  .landing-template main .landing-preview .lp-front {
+    top: calc(1px + 34px + 14px + 15px);
+    left: 0;
+    width: 84%;
+    height: 78%;
+  }
+
+  .landing-template main .landing-preview .lp-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 0 10px;
+  }
+
+  /* tabs open and close the way a browser's do: the width grows from nothing as the title fades
+     in, and shrinks back as it fades out */
+  .landing-template main .landing-preview .lp-tab {
+    display: inline-flex;
+    flex: 0 1 200px;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    max-width: 200px;
+    height: 28px;
+    padding: 0 14px 0 10px;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+    background: var(--lp-tab-idle);
+    font-size: 13px;
+    line-height: 1;
+    color: var(--landing-on-stage-soft);
+    transition:
+      max-width 240ms var(--landing-ease),
+      padding 240ms var(--landing-ease),
+      opacity 160ms var(--landing-ease) 80ms,
+      background-color 200ms var(--landing-ease),
+      color 200ms var(--landing-ease);
+  }
+
+  .landing-template main .landing-preview .lp-tab[data-active="true"] {
+    background: var(--lp-tab-on);
+    color: var(--landing-on-stage);
+  }
+
+  .landing-template main .landing-preview .lp-tab[data-open="false"] {
+    max-width: 0;
+    padding-inline: 0;
+    opacity: 0;
+    transition:
+      max-width 240ms var(--landing-ease),
+      padding 240ms var(--landing-ease),
+      opacity 120ms var(--landing-ease),
+      background-color 200ms var(--landing-ease),
+      color 200ms var(--landing-ease);
+  }
+
+  .landing-template main .landing-preview .lp-icon,
+  .landing-template main .landing-preview .lp-fav,
+  .landing-template main .landing-preview .lp-icon img,
+  .landing-template main .landing-preview .lp-icon svg {
+    flex: none;
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+  }
+
+  .landing-template main .landing-preview .lp-icon svg {
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 1.25;
+  }
+
+  .landing-template main .landing-preview .lp-host {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .landing-template main .landing-preview .lp-view {
+    display: grid;
+    min-height: 0;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    overflow: hidden;
+    background: var(--lp-tab);
+  }
+
+  .landing-template main .landing-preview .lp-back .lp-view {
+    grid-template-columns: minmax(0, 1fr) 30%;
+  }
+
+  .landing-template main .landing-preview .lp-page {
+    margin: 10px 0 0 10px;
+    border-radius: 6px 6px 0 0;
+    background: oklch(30% 0.005 20deg);
+  }
+
+  .landing-template main .landing-preview .lp-site {
+    --lp-paper: oklch(98.5% 0.003 265deg);
+    --lp-ink: oklch(30% 0.01 265deg);
+    --lp-soft: oklch(92% 0.006 265deg);
+    --lp-cta: oklch(55.5% 0.19 256deg);
+    --lp-wash-a: oklch(92% 0.03 256deg);
+    --lp-wash-b: oklch(95% 0.012 20deg);
+
+    display: grid;
+    grid-template-rows: 20px minmax(96px, 1fr) minmax(0, 48px);
+    gap: 14px;
+    padding: 16px;
+    min-height: 0;
+    background: var(--lp-paper);
+
+    /* the page takes on the visitor's site in place: same shapes, only the greys warm into colour */
+    transition:
+      --lp-ink 320ms var(--landing-ease),
+      --lp-cta 320ms var(--landing-ease),
+      --lp-wash-a 320ms var(--landing-ease),
+      --lp-wash-b 320ms var(--landing-ease);
+  }
+
+  /* before there is a site: the same page in neutral greys, crisp but unclaimed */
+  .landing-template main .landing-preview[data-state="idle"] .lp-site {
+    --lp-ink: oklch(70% 0.006 265deg);
+    --lp-cta: oklch(80% 0.006 265deg);
+    --lp-wash-a: oklch(94% 0.004 265deg);
+    --lp-wash-b: oklch(96% 0.003 265deg);
+  }
+
+  .landing-template main .landing-preview .lp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .landing-template main .landing-preview .lp-logo {
+    line-height: 20px;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    color: var(--lp-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .landing-template main .landing-preview .lp-logo:empty {
+    width: 72px;
+    height: 10px;
+    border-radius: 4px;
+    background: var(--lp-ink);
+  }
+
+  .landing-template main .landing-preview .lp-links {
+    width: 40%;
+    height: 8px;
+    background: repeating-linear-gradient(90deg, var(--lp-soft) 0 18%, transparent 18% 26%);
+    border-radius: 4px;
+  }
+
+  .landing-template main .landing-preview .lp-hero {
+    border-radius: 8px;
+    background:
+      linear-gradient(var(--lp-ink), var(--lp-ink)) 24px 24px / 48% 14px no-repeat,
+      linear-gradient(var(--lp-ink), var(--lp-ink)) 24px 46px / 34% 14px no-repeat,
+      linear-gradient(var(--lp-cta), var(--lp-cta)) 24px 72px / 88px 22px no-repeat,
+      linear-gradient(120deg, var(--lp-wash-a), var(--lp-wash-b));
+  }
+
+  .landing-template main .landing-preview .lp-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .landing-template main .landing-preview .lp-cards span {
+    height: 100%;
+    border-radius: 6px;
+    background: var(--lp-soft);
+  }
+
+  .landing-template main .landing-preview .lp-shot {
+    display: block;
+    min-height: 0;
+  }
+
+  /* the open tab's page shows; the other waits underneath, so switching is a quick cross-fade */
+  .landing-template main .landing-preview .lp-front .lp-view > * {
+    grid-area: 1 / 1;
+    transition:
+      opacity 200ms var(--landing-ease),
+      visibility 0s linear 200ms;
+  }
+
+  .landing-template main .landing-preview .lp-front .lp-view:not([data-active="own"]) > [data-tab="own"],
+  .landing-template main .landing-preview .lp-front .lp-view:not([data-active="sample"]) > [data-tab="sample"] {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .landing-template main .landing-preview .lp-front .lp-view[data-active="own"] > [data-tab="own"],
+  .landing-template main .landing-preview .lp-front .lp-view[data-active="sample"] > [data-tab="sample"] {
+    z-index: 1;
+    transition: opacity 200ms var(--landing-ease);
+  }
+
+  .landing-template main .landing-preview .lp-shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+
+  /* the assistant beside the site in the workspace: shapes only, no words */
+  .landing-template main .landing-preview .lp-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 12px;
+  }
+
+  .landing-template main .landing-preview .lp-msg {
+    width: 86%;
+    height: 30px;
+    border-radius: 10px 10px 10px 2px;
+    background: var(--lp-fill);
+  }
+
+  .landing-template main .landing-preview .lp-msg-me {
+    align-self: flex-end;
+    width: 62%;
+    height: 20px;
+    border-radius: 10px 10px 2px;
+    background: oklch(55.5% 0.19 256deg / 60%);
+  }
+
+  .landing-template main .landing-preview .lp-ask {
+    margin-top: auto;
+    height: 26px;
+    border: 1px solid var(--lp-line);
+    border-radius: 999px;
+  }
+}
+
+@keyframes lp-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-template main .landing-preview :is(.lp-tab, .lp-tab[data-open="false"], .lp-front .lp-view > *, .lp-site),
+  .landing-template main .ue-trial .start-slot :is(*, [hidden], [hidden] *) {
+    transition: none;
+  }
+
+  .landing-template main .ue-trial .altcha-container .altcha-error {
+    animation: none;
+  }
 }

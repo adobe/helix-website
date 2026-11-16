@@ -186,8 +186,8 @@ function buildOwnSitePath(ownSite, templateGrid) {
   });
   const waitThumb = createTag('img', { class: 'while-you-wait-thumb', alt: '' });
   const waitText = createTag('span', { class: 'while-you-wait-text' });
-  const waitSub = createTag('span', { class: 'while-you-wait-sub' });
-  waitText.append(createTag('strong', {}, 'Play with a sample site while you wait'), waitSub);
+  const waitTitle = createTag('strong');
+  waitText.append(waitTitle);
   waitRow.append(waitThumb, waitText, waitToggle, createTag('span', { class: 'switch-track', 'aria-hidden': 'true' }));
   panel.append(siteField, waitRow);
 
@@ -209,7 +209,8 @@ function buildOwnSitePath(ownSite, templateGrid) {
     const img = card?.querySelector('img');
     waitThumb.hidden = !img;
     if (img) waitThumb.src = img.currentSrc || img.src;
-    waitSub.textContent = `${card?.querySelector('h4')?.textContent || 'Sample site'}, ready in seconds`;
+    const sampleName = card?.querySelector('h4')?.textContent;
+    waitTitle.textContent = `Also explore the ${sampleName ? `${sampleName} ` : ''}sample site while yours migrates`;
     switcher.closest('form')?.querySelector('.own-site-note')?.remove();
   };
   switcher.addEventListener('change', update);
@@ -1217,6 +1218,298 @@ function decorateAvailability(block, formSection) {
   paragraph.remove();
 }
 
+const SAMPLE_SITE = {
+  host: 'frescopa.coffee',
+  favicon: '/img/frescopa-favicon.png',
+  shot: '/img/frescopa-home',
+};
+
+const GLOBE_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M1.75 8h12.5M8 1.75c1.8 1.9 2.6 4 2.6 6.25S9.8 12.35 8 14.25C6.2 12.35 5.4 10.25 5.4 8S6.2 3.65 8 1.75z"/></svg>';
+
+/**
+ * A browser-like window with a tab strip and no window controls.
+ * @param {string} className
+ * @returns {{ win: HTMLElement, bar: HTMLElement, view: HTMLElement }}
+ */
+function buildPreviewWindow(className) {
+  const win = createTag('div', { class: `lp-win ${className}` });
+  const bar = createTag('div', { class: 'lp-bar' });
+  const view = createTag('div', { class: 'lp-view' });
+  win.append(bar, view);
+  return { win, bar, view };
+}
+
+/**
+ * One tab: an icon and a title.
+ * @param {HTMLElement} icon
+ * @param {HTMLElement|string} title
+ * @returns {HTMLElement}
+ */
+function buildPreviewTab(icon, title) {
+  const tab = createTag('span', { class: 'lp-tab' });
+  tab.append(icon, typeof title === 'string' ? createTag('span', { class: 'lp-host' }, title) : title);
+  return tab;
+}
+
+const TAB_MOTION_MS = 240;
+
+/**
+ * Builds what the visitor lands in: the workspace with its assistant at the back, and in front
+ * one browser holding their site and, while they wait, the sample site as a second tab. Tabs
+ * open and close like a browser's; a reopened tab joins at the end of the strip. No product UI
+ * words.
+ * @param {HTMLElement} trialInfo - to borrow the Adobe mark and name for the workspace tab
+ * @returns {{ preview: HTMLElement, host: HTMLElement, logo: HTMLElement,
+ *   setTabs: (open: {own: boolean, sample: boolean}, active: string) => void }}
+ */
+function buildWorkspacePreview(trialInfo) {
+  const preview = createTag('figure', { class: 'landing-preview', 'aria-hidden': 'true', 'data-state': 'idle' });
+
+  const back = buildPreviewWindow('lp-back');
+  const mark = trialInfo?.querySelector('picture img')?.src;
+  back.bar.append(buildPreviewTab(
+    mark ? createTag('img', { class: 'lp-fav', src: mark, alt: '' }) : createTag('span'),
+    trialInfo?.querySelector('.lockup-name')?.textContent || '',
+  ));
+  back.bar.firstElementChild.dataset.open = 'true';
+  back.bar.firstElementChild.dataset.active = 'true';
+  const rail = createTag('div', { class: 'lp-rail' });
+  rail.append(createTag('span', { class: 'lp-msg' }), createTag('span', { class: 'lp-msg lp-msg-me' }), createTag('span', { class: 'lp-msg' }), createTag('span', { class: 'lp-ask' }));
+  back.view.append(createTag('div', { class: 'lp-page' }), rail);
+
+  const front = buildPreviewWindow('lp-front');
+  const icon = createTag('span', { class: 'lp-icon' });
+  icon.innerHTML = GLOBE_ICON;
+  const host = createTag('span', { class: 'lp-host' });
+  const tabs = {
+    own: buildPreviewTab(icon, host),
+    sample: buildPreviewTab(createTag('img', { class: 'lp-fav', src: SAMPLE_SITE.favicon, alt: '' }), SAMPLE_SITE.host),
+  };
+  front.bar.append(tabs.own, tabs.sample);
+
+  const site = createTag('div', { class: 'lp-site', 'data-tab': 'own' });
+  const logo = createTag('span', { class: 'lp-logo' });
+  const nav = createTag('div', { class: 'lp-nav' });
+  nav.append(logo, createTag('span', { class: 'lp-links' }));
+  const cards = createTag('div', { class: 'lp-cards' });
+  cards.append(createTag('span'), createTag('span'), createTag('span'));
+  site.append(nav, createTag('div', { class: 'lp-hero' }), cards);
+  const shot = createTag('picture', { class: 'lp-shot', 'data-tab': 'sample' });
+  shot.append(
+    createTag('source', { type: 'image/webp', srcset: `${SAMPLE_SITE.shot}.webp` }),
+    createTag('img', {
+      src: `${SAMPLE_SITE.shot}.jpg`, alt: '', width: '1600', height: '1000', decoding: 'async',
+    }),
+  );
+  front.view.append(site, shot);
+  preview.append(back.win, front.win);
+
+  // a tab that has fully closed leaves its place in the strip; one caught mid-close reverses in
+  // place, so a quick back-and-forth never makes it jump sides
+  let order = 0;
+  const parked = new Set(Object.keys(tabs));
+  const timers = {};
+  const setTabs = (open, active) => {
+    Object.entries(tabs).forEach(([key, tab]) => {
+      const isOpen = Boolean(open[key]);
+      if (isOpen && tab.dataset.open !== 'true') {
+        clearTimeout(timers[key]);
+        if (parked.has(key)) {
+          order += 1;
+          tab.style.order = order;
+          parked.delete(key);
+        }
+      } else if (!isOpen && tab.dataset.open !== 'false') {
+        timers[key] = setTimeout(() => parked.add(key), preview.isConnected ? TAB_MOTION_MS : 0);
+      }
+      tab.dataset.open = String(isOpen);
+      tab.dataset.active = String(key === active);
+    });
+    front.view.dataset.active = active;
+  };
+
+  return {
+    preview, host, logo, setTabs,
+  };
+}
+
+/**
+ * Landing template: one question instead of a two-way switch. The website field leads; a quiet
+ * action swaps it for the sample site and back. A preview beside the pitch shows the site the
+ * visitor works on and the workspace behind it, with their own domain as they type it.
+ * @param {HTMLElement} section
+ * @param {HTMLElement} formSection
+ * @param {HTMLElement} slot - the fixed-height slot holding both paths
+ * @param {HTMLElement} trialInfo
+ */
+function decorateStart(section, formSection, slot, trialInfo) {
+  const ownRadio = formSection.querySelector(`#start-${OWN_SITE_VALUE}`);
+  const sampleRadio = formSection.querySelector('#start-template');
+  const siteInput = formSection.querySelector('#site-url');
+  if (!ownRadio || !sampleRadio || !siteInput) return;
+
+  const labelOf = (radio) => formSection.querySelector(`label[for="${radio.id}"]`)?.textContent || '';
+  // the other path sits on the field's own label row, one level with it and never in its way
+  const swap = createTag('button', { type: 'button', class: 'start-alt' });
+  slot.prepend(swap);
+  const waitToggle = formSection.querySelector('#sample-too');
+  const siteLabel = formSection.querySelector('label[for="site-url"]')?.textContent || '';
+
+  // the sample site is recognised by its own icon, not a shrunken screenshot
+  formSection.querySelectorAll('.template-thumbnail img, .while-you-wait-thumb').forEach((img) => {
+    img.closest('picture')?.querySelectorAll('source').forEach((source) => source.remove());
+    img.src = SAMPLE_SITE.favicon;
+    img.width = 64;
+    img.height = 64;
+  });
+
+  // the sample path reads like the website field it replaces: a label, then the site
+  const grid = slot.querySelector('.template-grid');
+  if (grid) {
+    const head = createTag('div', { class: 'template-head', 'aria-hidden': 'true' });
+    head.append(createTag('span', { class: 'template-head-label' }, 'Sample site'));
+    grid.prepend(head);
+  }
+
+  const {
+    preview, host, logo, setTabs,
+  } = buildWorkspacePreview(trialInfo);
+
+  // the folded sample card is the "while you wait" row's twin, at whatever height the row wraps to
+  const waitRow = slot.querySelector('.while-you-wait');
+  if (waitRow && window.ResizeObserver) {
+    new ResizeObserver(([entry]) => {
+      slot.style.setProperty('--wait-row-h', `${entry.borderBoxSize?.[0]?.blockSize ?? waitRow.offsetHeight}px`);
+    }).observe(waitRow);
+  }
+  section.append(preview);
+
+  const update = () => {
+    const sampleSelected = sampleRadio.checked;
+    const swapText = labelOf(sampleSelected ? ownRadio : sampleRadio);
+    // the link's words fade out, change, and fade back in, so they never pop
+    if (swap.textContent && swap.textContent !== swapText
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      swap.getAnimations().forEach((a) => a.cancel());
+      const fadeOut = swap.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: 'ease-in', fill: 'forwards' });
+      fadeOut.finished.then(() => {
+        swap.textContent = swapText;
+        swap.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: 'ease-out' });
+        fadeOut.cancel();
+      }).catch(() => {});
+    } else {
+      swap.textContent = swapText;
+    }
+    // the preview follows from the first keystroke, as typed, not only once it is a valid domain
+    const own = siteInput.value.trim().toLowerCase()
+      .replace(/^[a-z]+:\/\//, '').replace(/^www\./, '')
+      .split(/[/?#\s]/)[0];
+    let state = own ? 'own' : 'idle';
+    if (sampleSelected) state = 'sample';
+
+    // before a site is typed, the window says what goes there rather than inventing a domain
+    host.textContent = own || siteLabel;
+    logo.textContent = own;
+    preview.dataset.state = state;
+    // the sample opens beside their site while they wait, or alone when it is the start
+    setTabs(
+      { own: !sampleSelected, sample: sampleSelected || Boolean(waitToggle?.checked) },
+      sampleSelected ? 'sample' : 'own',
+    );
+  };
+
+  swap.addEventListener('click', () => {
+    const next = sampleRadio.checked ? ownRadio : sampleRadio;
+    next.checked = true;
+    next.dispatchEvent(new Event('change', { bubbles: true }));
+    (next === ownRadio ? siteInput : formSection.querySelector('.template-card input'))?.focus();
+  });
+  formSection.addEventListener('change', update);
+  siteInput.addEventListener('input', update);
+  update();
+}
+
+/**
+ * Trims authored copy in place, inside text nodes only, so inline links survive. When the
+ * authored text no longer matches, nothing changes.
+ * @param {HTMLElement} el
+ * @param {RegExp} pattern
+ * @param {string} replacement
+ */
+function trimCopy(el, pattern, replacement = '') {
+  if (!el) return;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (pattern.test(node.nodeValue)) {
+      node.nodeValue = node.nodeValue.replace(pattern, replacement);
+      return;
+    }
+  }
+}
+
+/**
+ * The landing page made each point three or four times; each now has one home. The hero intro
+ * pitches and invites; the audiences explain seen, found and chosen; the form offers both paths.
+ * @param {HTMLElement} section
+ * @param {HTMLElement} formSection
+ */
+function dedupeLandingCopy(section, formSection) {
+  trimCopy(section.querySelector('.landing-explore > p'), /^Explore it hands-on with a sample brand or your own site, and see/, 'See');
+  // the audience cards say what the lead paragraph said; its opening line becomes the section's
+  // eyebrow, the same pattern as the hero's
+  const lead = section.querySelector('.landing-lead > h2 + p');
+  const opening = lead?.textContent.match(/^[^.]+\./)?.[0];
+  if (opening) {
+    lead.replaceChildren(opening);
+    lead.classList.add('landing-kicker');
+    lead.previousElementSibling.before(lead);
+  }
+  trimCopy(formSection.querySelector('.form-heading'), / on your own website(?= in just a few clicks)/);
+  trimCopy(formSection.querySelector('.form-notice'), /, so you can explore at your own pace\./, '.');
+}
+
+/**
+ * Landing template: both sign-up paths stacked in one slot so switching between them never
+ * moves the page, the two paths band dropped (the switch already offers both), and the consent
+ * paragraphs read as one.
+ * @param {HTMLElement} block
+ * @param {HTMLElement} formSection
+ * @param {HTMLElement} trialInfo
+ */
+function decorateHero(block, formSection, trialInfo) {
+  const section = block.closest('.section');
+  if (!section) return;
+  const panel = formSection.querySelector('.own-site-panel');
+  const grid = formSection.querySelector('.template-grid');
+  if (panel && grid && panel.parentElement === grid.parentElement) {
+    const slot = createTag('div', { class: 'start-slot' });
+    panel.before(slot);
+    slot.append(panel, grid);
+    decorateStart(section, formSection, slot, trialInfo);
+  }
+
+  // each audience (title and text) becomes one card
+  section.querySelectorAll('.landing-lead > h3').forEach((title) => {
+    const text = title.nextElementSibling?.tagName === 'P' ? title.nextElementSibling : null;
+    const card = createTag('div', { class: 'landing-aud' });
+    title.before(card);
+    card.append(...[title, text].filter(Boolean));
+  });
+
+  // the two paths repeat what the switch above the form already offers
+  section.querySelectorAll('.landing-path').forEach((path) => path.remove());
+  section.querySelectorAll('.landing-paths:empty').forEach((wrapper) => wrapper.remove());
+
+  dedupeLandingCopy(section, formSection);
+
+  // one small print paragraph: the consent and where to opt out
+  const consent = [...formSection.querySelectorAll('.agreement p:not(.agreement-check)')];
+  consent.slice(1).forEach((p) => {
+    consent[0].append(' ', ...p.childNodes);
+    p.remove();
+  });
+}
+
 export default async function decorate(block) {
   // Get the original content from the block (excluding template-selection-data)
   const infoContent = block.querySelector(':scope > div:first-child');
@@ -1248,7 +1541,7 @@ export default async function decorate(block) {
       mark.querySelectorAll('img').forEach((img) => { img.alt = ''; });
       mark.append(createTag('span', { class: 'lockup-name' }, 'Adobe Experience Manager'));
     }
-    // the bold note is a sign-up condition: show it next to Continue. Authors write it in the
+    // the bold note is a sign-up condition: show it right under Continue. Authors write it in the
     // terms cell after the checkbox line; older content has it after the agent list.
     const isNote = (p) => {
       const bold = p.querySelector(':scope > strong');
@@ -1261,14 +1554,20 @@ export default async function decorate(block) {
     const buttonContainer = formSection.querySelector('form .button-container');
     if (notice && buttonContainer) {
       notice.classList.add('form-notice');
-      buttonContainer.before(notice);
+      buttonContainer.after(notice);
     }
-    // a compact captcha: the "Protected by ALTCHA" footer adds a second row to the box
-    formSection.querySelector('altcha-widget')?.setAttribute('hidefooter', '');
+    // a compact captcha: the "Protected by ALTCHA" footer adds a second row to the box, and its
+    // logo floats away from the checkbox it belongs to
+    const captcha = formSection.querySelector('altcha-widget');
+    captcha?.setAttribute('hidefooter', '');
+    captcha?.setAttribute('hidelogo', '');
+    const email = formSection.querySelector('#business-email');
+    if (email && !email.placeholder) email.placeholder = 'name@company.com';
     decorateAvailability(block, formSection);
     decorateLead(block);
     decoratePaths(block, formSection);
     decorateIntro(block, trialInfo);
+    decorateHero(block, formSection, trialInfo);
   }
 
   // Clear the block and add the new layout
