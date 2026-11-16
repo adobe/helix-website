@@ -1,0 +1,1195 @@
+/* stylelint-disable no-descending-specificity -- components are grouped by element, not by specificity */
+
+/*
+ * AEM Live slide system — design tokens, backgrounds, patterns and components.
+ *
+ * Reverse-engineered from "AEM Live Backgrounds Megadeck" (Keynote, 4096×3072).
+ * Everything here is CSS or SVG. No raster images, ever.
+ *
+ * Coordinate system: a slide is 1024×768 CSS px (4:3). Export scales it up with
+ * CSS zoom (scale=4 → 4096×3072, identical to the original deck).
+ * 1 px here = 4 pt in the original Keynote file.
+ */
+
+/* ------------------------------------------------------------------ fonts
+ * Adobe Clean + Source Code Pro from the site's /fonts (www.aem.live/fonts, or the
+ * repo's fonts/ folder when running scripts/serve.mjs). If they can't be loaded,
+ * a locally installed "Adobe Clean" is used, then Source Sans / Helvetica.
+ */
+@font-face { font-family: "AEM Slides Clean"; src: url("/fonts/adobe-clean-300.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: block; }
+
+@font-face { font-family: "AEM Slides Clean"; src: url("/fonts/adobe-clean-300-italic.woff2") format("woff2"); font-weight: 300; font-style: italic; font-display: block; }
+
+@font-face { font-family: "AEM Slides Clean"; src: url("/fonts/adobe-clean-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
+
+@font-face { font-family: "AEM Slides Clean"; src: url("/fonts/adobe-clean-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
+
+@font-face { font-family: "AEM Slides Clean"; src: url("/fonts/adobe-clean-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
+
+@font-face { font-family: "AEM Slides Clean"; src: url("/fonts/adobe-clean-900.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: block; }
+
+@font-face { font-family: "AEM Slides Code"; src: url("/fonts/source-code-pro-400.otf.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
+
+@font-face { font-family: "AEM Slides Code"; src: url("/fonts/source-code-pro-700.otf.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
+
+/* ------------------------------------------------------------------ tokens */
+:root {
+  /* core palette (sampled from the deck's vector fills) */
+  --lime: #e1fa82;
+  --lime-pale: #effbbf;
+  --lime-ink: #97bd0b;        /* gear glyph inside lime badges */
+  --lime-line: #ddf681;       /* hairline around lime badges / glass */
+  --olive: #788850;           /* dark checker cell on lime */
+  --olive-ink: #879068;       /* calendar glyph inside lime badges */
+  --pink: #f0b2f2;
+  --pink-pale: #f6d7f7;
+  --blush: #fff5ff;
+  --mauve: #806488;           /* dark checker cell on pink */
+  --magenta: #a8489b;
+  --periwinkle: #6870ec;
+  --periwinkle-ink: #6970e4;
+  --lavender: #e8eaff;
+  --lavender-mid: #d4d7ff;
+  --violet: #565086;          /* dark checker cell on lilac */
+  --violet-pale: #ccc3f5;
+  --plum: #662d91;
+  --yellow: #f5e66b;
+  --grey: #d4d4d4;
+  --graphite: #5e5e5e;        /* default text + tile colour */
+  --ink: #000;
+  --white: #fff;
+  --red: #ee220c;             /* prohibition sign */
+  --adobe-red: #fa0f00;
+  --discord: #5865f2;
+  --github: #1b1f23;
+  --fastly: #ff282d;
+
+  /* geometry (1024×768 slide) */
+  --slide-w: 1024px;
+  --slide-h: 768px;
+  --slide-radius: 22.3px;     /* the deck's slides themselves have rounded corners */
+  --tile: 351.5px;            /* app-icon tile edge */
+  --card-w: 709px;
+  --card-h: 351.5px;
+  --corner: 85.5px;           /* continuous ("squircle") corner extent of tiles & cards */
+  --corner-shape: superellipse(1.71); /* fitted to Keynote's continuous corners */
+  --badge: 154px;
+  --shadow: 2px 5px 16px rgb(0 0 0 / 32%);
+  --shadow-soft: 1px 3px 10px rgb(0 0 0 / 22%);
+  --drop: drop-shadow(2px 5px 8px rgb(0 0 0 / 32%));
+
+  /* type */
+  --font: "AEM Slides Clean", "Adobe Clean", "Source Sans 3", "Source Sans Pro", "Helvetica Neue", helvetica, arial, sans-serif;
+  --font-mono: "AEM Slides Code", "Source Code Pro", "Source Code Variable", "Andale Mono", menlo, monospace;
+  --font-display: "AEM Slides Clean", "Adobe Clean", "Source Sans 3", "Helvetica Neue", arial, sans-serif;
+  --text: var(--graphite);
+}
+
+/* Component-local knobs must NOT inherit, otherwise a tile's --size would leak
+ * into the badge sitting on it. Registering them with inherits:false fixes that. */
+@property --x      { syntax: "*"; inherits: false; }
+
+@property --y      { syntax: "*"; inherits: false; }
+
+@property --size   { syntax: "*"; inherits: false; }
+
+@property --w      { syntax: "*"; inherits: false; }
+
+@property --h      { syntax: "*"; inherits: false; }
+
+@property --r      { syntax: "*"; inherits: false; }
+
+@property --fill   { syntax: "*"; inherits: false; }
+
+@property --ring   { syntax: "*"; inherits: false; }
+
+@property --pad    { syntax: "*"; inherits: false; }
+
+@property --gap    { syntax: "*"; inherits: false; }
+
+@property --rotate { syntax: "*"; inherits: false; }
+
+@property --inset  { syntax: "*"; inherits: false; }
+
+@property --icon   { syntax: "*"; inherits: false; }
+
+@property --ink    { syntax: "*"; inherits: false; }
+
+@property --color  { syntax: "*"; inherits: false; }
+
+@property --ratio  { syntax: "*"; inherits: false; }
+
+/* ------------------------------------------------------------------ base */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricprecision;
+}
+body { width: max-content; }
+
+html.aem-preview body {
+  padding: 24px;
+  background: #2b2b33;
+}
+img, picture, canvas, video { display: none !important; } /* raster is not part of this system */
+
+aem-slide {
+  display: block;
+  position: relative;
+  width: var(--slide-w);
+  height: var(--slide-h);
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--slide-radius);
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg, var(--lavender));
+  contain: layout paint;
+}
+aem-slide[corners="square"] { border-radius: 0; }
+
+/* every direct child is a layer; objects are centred on (--x, --y) */
+aem-slide > * {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+aem-slide > :where(:not(aem-checker, aem-bolts, aem-wordwall, aem-backtext, aem-blob, aem-layer)) {
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  translate: -50% -50%;
+  rotate: var(--rotate, 0deg);
+}
+aem-slide * { box-sizing: border-box; }
+
+/* ------------------------------------------------------------------ backgrounds
+ * <aem-slide bg="NAME">. Gradients are tuned against renders of the deck.
+ */
+aem-slide[bg="aurora"] {          /* periwinkle ↖ · pink ↗↙ · lime ↘ · white centre (deck p1–3, 6) */
+  --bg:
+    radial-gradient(42% 48% at 48% 34%, #fff 0%, #fffc 35%, #fff0 100%),
+    radial-gradient(70% 80% at 0% 0%, #979bf2 0%, #b8b9f5 30%, #d9d4f8 55%, #f4eef900 85%),
+    radial-gradient(60% 65% at 100% 0%, #f0b8ea 0%, #f2cdeb 40%, #f2e3f100 85%),
+    radial-gradient(60% 60% at 0% 100%, #edbdf2 0%, #efcdee 45%, #f1dfeb00 90%),
+    radial-gradient(75% 75% at 100% 100%, #e3f78f 0%, #ebf3b6 40%, #f4f0dc00 85%),
+    #f5ece9;
+}
+
+aem-slide[bg="sorbet"] {          /* pink ↖ → lime ↘, warm glow (deck p13–16, 25, 27–29, 37–40) */
+  --bg:
+    radial-gradient(36% 44% at 52% 50%, #fdf8ef 0%, #fbf3e8d0 40%, #f9eee300 100%),
+    linear-gradient(128deg, #f0b2f2 0%, #efb7ed 12%, #eecbdc 38%, #e9e5b2 62%, #e3f48f 80%, #e1fa82 100%);
+}
+
+aem-slide[bg="twilight"] {        /* pink glow ↗ fading to periwinkle (deck p9, 11, 26, 120) */
+  --bg: radial-gradient(105% 110% at 74% 10%, #f2bdf4 0%, #ecb8f3 12%, #d8b0f2 30%, #b6a1f1 50%, #9b97f0 68%, #8a90ee 85%, #858def 100%);
+
+  /* the deck's grids pick up the hue of the slide */
+  --grid-line: rgb(80 60 230 / 26%);
+  --seam-line: rgb(60 40 120 / 55%);
+}
+
+aem-slide[bg="lavender"] {        /* pale lavender with periwinkle pooling ↘ (deck p22–24, 66, 67) */
+  --bg:
+    radial-gradient(80% 95% at 92% 100%, #7d84ee 0%, #9298f1 22%, #b7bbf6 45%, #d9dbfc 65%, #e8eaff00 85%),
+    var(--lavender);
+}
+
+aem-slide[bg="night"] {           /* black ↑ → periwinkle ↓ (deck p17, 18, 30–32) */
+  --bg: linear-gradient(180deg, #0a0a0a 0%, #121214 14%, #24254a 38%, #3f4290 60%, #5b61d6 78%, #6870ec 88%, #6870ec 100%);
+}
+
+aem-slide[bg="periwinkle"] {      /* periwinkle, slightly lighter at the top (deck p7, 69, 153) */
+  --bg: linear-gradient(180deg, #8a90f1 0%, #7d84ef 40%, #6870ec 85%);
+}
+
+aem-slide[bg="meadow"] {          /* periwinkle ↑ → lime ↓ (deck p33, 43) */
+  --bg: linear-gradient(180deg, #858cf0 0%, #a2acd9 30%, #c3d3ae 60%, #dcf191 85%, #e3f79a 100%);
+}
+
+aem-slide[bg="dawn"] {            /* white ↖ → lime ↘ (deck p35, 44, 101–103) */
+  --bg: linear-gradient(135deg, #fff 0%, #fff 22%, #f6fcdc 50%, #edfbb5 75%, #e3f991 100%);
+}
+
+aem-slide[bg="blush"] {           /* barely-pink ↑ → pink ↓ (deck p21, 80–88) */
+  --bg: linear-gradient(160deg, #fff5ff 0%, #fde8fd 35%, #f6cff7 70%, #f0b2f2 100%);
+}
+
+aem-slide[bg="candy"] {           /* pale pink top band, pink bottom (deck p83–88: light top, pink below) */
+  --bg: linear-gradient(180deg, #fee3ff 0%, #fee3ff 20%, #f8cdf9 50%, #f0b2f2 100%);
+}
+
+aem-slide[bg="pink"] {            /* flat pink, lighter at top (deck p36, 41, 42) */
+  --bg: linear-gradient(180deg, #f3c4f4 0%, #f0b2f2 70%);
+}
+
+/* deck p46–53, 70, 71, 90–100 */
+aem-slide[bg="lime"] {
+  --bg: var(--lime);
+  --grid-line: rgb(110 130 40 / 20%);
+}
+aem-slide[bg="yellow"] { --bg: linear-gradient(180deg, #f7ec8c 0%, #f5e66b 75%); } /* deck p8, 45 */
+aem-slide[bg="grey"]   { --bg: linear-gradient(180deg, #dcdcdc 0%, #d4d4d4 70%); } /* deck p19, 20, 54–58 */
+aem-slide[bg="iris"] {            /* violet ↙ → lilac → pink ↗ (deck p59–64) */
+  --bg:
+    radial-gradient(70% 70% at 100% 0%, #eeb0f1 0%, #eeb0f100 100%),
+    linear-gradient(40deg, #6d71ea 0%, #8a7fe8 30%, #b597ef 60%, #d3a5f1 85%);
+}
+
+aem-slide[bg="prism"] {           /* lilac ↖, white glow ↗, lime ↘, glass checker fade (deck p104–110) */
+  --bg:
+    radial-gradient(45% 40% at 78% 16%, #fff 0%, #fffe 25%, #fff0 100%),
+    radial-gradient(60% 60% at 0% 0%, #cdb3ff 0%, #dcc4ff 30%, #e8dcff00 85%),
+    radial-gradient(55% 55% at 0% 45%, #ffc2f8 0%, #ffd0f800 100%),
+    radial-gradient(80% 70% at 100% 100%, #dbff4a 0%, #e8fb6e 35%, #f3fbb000 85%),
+    linear-gradient(90deg, #ffe0f0 0%, #fff6d3 50%, #f6ffc0 100%);
+}
+
+aem-slide[bg="ember"] {           /* coral → raspberry, halftone dots (deck p10) */
+  --bg:
+    repeating-conic-gradient(rgb(255 175 150 / 22%) 0 25%, rgb(90 20 20 / 6%) 0 50%) 0 0 / 4px 4px,
+    linear-gradient(90deg, #c66654 0%, #c45a60 45%, #c24671 100%);
+}
+
+aem-slide[bg="tide"] {            /* pink ↖, white centre, teal ↘ (deck p39) */
+  --bg:
+    radial-gradient(45% 45% at 50% 52%, #f2f2f8 0%, #eef0f600 100%),
+    linear-gradient(135deg, #e3b3ea 0%, #c8bfe0 38%, #b5c3da 62%, #94cbcd 100%);
+}
+
+aem-slide[bg="dusk"] {            /* muted mauve ↖ → olive ↘ (deck p38) */
+  --bg:
+    radial-gradient(40% 45% at 52% 45%, #8d8a76 0%, #8d8a7600 100%),
+    linear-gradient(128deg, #7d5f80 0%, #7f6a78 35%, #7c7b5c 65%, #78884a 100%);
+}
+aem-slide[bg="white"] { --bg: #fff; }
+aem-slide[bg="ink"]   { --bg: #000; }
+
+/* ------------------------------------------------------------------ grid overlay
+ * <aem-slide grid="fine|medium|large" [grid-tone="dark|light|ink"] [seams]>
+ * Hairline grid drawn above the background, below every object.
+ */
+aem-slide[grid]::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+
+  --g: 36.6px;
+  --gl: var(--grid-line, rgb(30 30 110 / 22%));
+  --gw: var(--grid-width, .8px);
+
+  background:
+    repeating-linear-gradient(90deg, var(--gl) 0 var(--gw), transparent var(--gw) var(--g)),
+    repeating-linear-gradient(180deg, var(--gl) 0 var(--gw), transparent var(--gw) var(--g));
+  mix-blend-mode: multiply;
+}
+aem-slide[grid="fine"]::before   { --g: 21.1px; }
+aem-slide[grid="medium"]::before { --g: 31.4px; }
+aem-slide[grid="large"]::before  { --g: 36.6px; }
+aem-slide[grid-tone="light"]::before { --gl: var(--grid-line, rgb(0 0 0 / 10%)); }
+
+aem-slide[grid-tone="ink"]::before {
+  --gl: var(--grid-line, rgb(0 0 0 / 45%));
+
+  mix-blend-mode: normal;
+}
+
+aem-slide[grid-tone="glow"]::before {
+  --gl: var(--grid-line, rgb(255 255 255 / 12%));
+
+  mix-blend-mode: screen;
+}
+
+/* the long "seam" lines that cross many grid slides in the deck */
+aem-slide[seams]::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent calc(var(--seam-x, 66%) - .5px), var(--seam-line, rgb(20 20 70 / 55%)) calc(var(--seam-x, 66%) - .5px) calc(var(--seam-x, 66%) + .5px), transparent calc(var(--seam-x, 66%) + .5px)),
+    linear-gradient(180deg, transparent calc(var(--seam-y, 79.6%) - .5px), var(--seam-line, rgb(20 20 70 / 55%)) calc(var(--seam-y, 79.6%) - .5px) calc(var(--seam-y, 79.6%) + .5px), transparent calc(var(--seam-y, 79.6%) + .5px));
+}
+
+/* ------------------------------------------------------------------ pattern layers
+ * Layers are positioned with inset/left/top/width/height (not centred).
+ */
+aem-layer {
+  inset: 0;
+  z-index: 1;
+}
+
+/* Tall-cell checkerboard. <aem-checker tone="olive|violet|mauve|graphite|glass" cell="s|l"> */
+aem-checker {
+  z-index: 1;
+
+  --cw: 11.15px; --ch: 33.4px;
+  --c1: var(--olive); --c2: var(--lime-pale);
+
+  background: repeating-conic-gradient(var(--c1) 0 25%, var(--c2) 0 50%) 0 0 / calc(var(--cw) * 2) calc(var(--ch) * 2);
+  inset: var(--inset, auto);
+}
+
+aem-checker[cell="m"] {
+  --cw: 17.8px;
+  --ch: 53.4px;
+}
+
+aem-checker[cell="l"] {
+  --cw: 26.7px;
+  --ch: 80.2px;
+}
+
+aem-checker[tone="olive"] {
+  --c1: var(--olive);
+  --c2: var(--lime-pale);
+}
+
+aem-checker[tone="violet"] {
+  --c1: var(--violet);
+  --c2: var(--violet-pale);
+}
+
+aem-checker[tone="mauve"] {
+  --c1: var(--mauve);
+  --c2: var(--pink-pale);
+}
+
+aem-checker[tone="graphite"] {
+  --c1: #838a7b;
+  --c2: #f9fde9;
+}
+
+aem-checker[tone="plum"] {
+  --c1: var(--magenta);
+  --c2: #ffe2f7;
+}
+
+aem-checker[tone="glass"] {
+  --c1: rgb(255 255 255 / 55%); --c2: rgb(255 255 255 / 0%);
+
+  mask-image: linear-gradient(180deg, #0006 0%, #000 100%);
+}
+
+aem-checker[tone="glass-lime"] {
+  --c1: rgb(255 255 255 / 50%); --c2: rgb(214 255 30 / 35%);
+
+  mask-image: linear-gradient(180deg, #0008 0%, #000 100%);
+}
+
+/* Lightning-bolt wallpaper (deck p91). Vector pattern, olive on lime. */
+aem-bolts {
+  inset: 0; z-index: 1;
+
+  --bolt: rgb(120 136 80 / 45%);
+
+  background-color: var(--bolts-bg, transparent);
+}
+
+aem-bolts > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Giant white word wall (deck p2, p3). Filled in by JS from words="A,B,C". */
+aem-wordwall {
+  inset: -12px -60px; z-index: 1;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font: 900 var(--wall-size, 104px)/1 var(--font-display);
+  color: var(--wall-color, #fff);
+  white-space: nowrap;
+  letter-spacing: -.005em;
+  text-transform: uppercase;
+}
+aem-wordwall > div { translate: var(--shift, 0) 0; }
+
+/* A single big word behind the hero (deck p1 "ARCHITECTURE", p36 "UNSUPPORTED"). */
+aem-backtext {
+  left: 50%; top: var(--y, 50%); translate: -50% -50%;
+  z-index: 1;
+  font: 700 var(--size, 150px)/1 var(--font-display);
+  color: var(--color, #fff);
+  white-space: nowrap;
+  letter-spacing: var(--tracking, 0);
+  text-transform: uppercase;
+}
+aem-backtext[front] { z-index: 5; }
+aem-backtext[shadow] { text-shadow: 3px 6px 10px rgb(0 0 0 / 28%); }
+
+/* Soft translucent disc used as background decoration (deck p46–50). */
+aem-blob {
+  z-index: 1;
+  left: var(--x, 50%); top: var(--y, 50%); translate: -50% -50%;
+  width: var(--size, 500px); aspect-ratio: 1; border-radius: 50%;
+  background: var(--fill, rgb(184 140 190 / 50%));
+  border: 1.5px solid var(--line, rgb(240 178 242 / 90%));
+}
+
+/* ------------------------------------------------------------------ tile (app icon)
+ * <aem-tile tone="graphite|ink|silver|steel|black|white|lime|pink|periwinkle" glyph="lock|gear">
+ *   any content (icons, text, <aem-badge at="tr">)
+ * </aem-tile>
+ */
+aem-tile {
+  display: block;
+  width: var(--size, var(--tile));
+  aspect-ratio: 1;
+
+  --tile-s: var(--size, var(--tile));         /* resolved here, inherited by the parts */
+  --corner-r: calc(var(--tile-s) * .2432);
+  --tile-fill: var(--graphite);               /* set by tone="…" */
+  --tile-bg: var(--fill, var(--tile-fill));    /* inline --fill wins over the tone */
+}
+
+aem-tile > .aem-face-wrap {
+  position: absolute;
+  inset: 0;
+  filter: var(--drop);
+}
+aem-tile[flat] > .aem-face-wrap { filter: none; }
+
+aem-tile > .aem-face-wrap > .aem-face {
+  position: absolute; inset: 0;
+  border-radius: var(--corner-r);
+  /* stylelint-disable-next-line property-no-unknown -- CSS Borders 4, Chrome 139+ */
+  corner-shape: var(--corner-shape);
+  background: var(--tile-bg);
+}
+
+aem-tile > .aem-content {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  color: var(--tile-ink, #fff);
+  font: 400 calc(var(--tile-s) * .26)/1 var(--font);
+}
+aem-tile[tone="graphite"] { --tile-fill: var(--graphite); }
+aem-tile[tone="ink"]      { --tile-fill: linear-gradient(180deg, #000 0%, #141414 12%, #4a4a4a 55%, #8c8c8c 100%); }
+aem-tile[tone="silver"]   { --tile-fill: linear-gradient(180deg, #d8d8d8 0%, #c6c6c6 35%, #a9a9a9 75%, #939393 100%); }
+aem-tile[tone="steel"]    { --tile-fill: linear-gradient(180deg, #939393 0%, #7b7b7b 50%, #5d5d5d 100%); }
+aem-tile[tone="black"]    { --tile-fill: #000; }
+
+aem-tile[tone="white"] {
+  --tile-fill: #fff;
+  --tile-ink: var(--graphite);
+}
+
+aem-tile[tone="lime"] {
+  --tile-fill: var(--lime);
+  --tile-ink: var(--graphite);
+}
+
+aem-tile[tone="pink"] {
+  --tile-fill: var(--pink);
+  --tile-ink: var(--graphite);
+}
+aem-tile[tone="periwinkle"] { --tile-fill: var(--periwinkle); }
+
+aem-tile[tone="glass"] {
+  --tile-fill: linear-gradient(150deg, rgb(255 255 255 / 75%), rgb(255 255 255 / 35%));
+  --tile-ink: var(--graphite);
+}
+
+/* The "<html>" style code tiles (deck p25–27) */
+.aem-code {
+  font: 300 calc(var(--tile-s, var(--tile)) * .295)/1 var(--font);
+  color: var(--graphite);
+  letter-spacing: -.01em;
+}
+.aem-code b { font-weight: 700; }
+
+/* ------------------------------------------------------------------ card
+ * <aem-card [tone="white|glass|lime|pink|lavender"]> content </aem-card>
+ */
+aem-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--gap, 18px);
+  width: var(--w, var(--card-w));
+  height: var(--h, var(--card-h));
+  padding: var(--pad, 28px 40px);
+  border-radius: var(--r, var(--corner));
+  /* stylelint-disable-next-line property-no-unknown -- CSS Borders 4, Chrome 139+ */
+  corner-shape: var(--corner-shape);
+  background: var(--fill, #fff);
+  box-shadow: var(--card-shadow, var(--shadow));
+  color: var(--text);
+  text-align: center;
+}
+
+aem-card[tone="glass"] {
+  --fill: linear-gradient(135deg, rgb(225 250 130 / 95%) 0%, rgb(205 222 120 / 75%) 45%, rgb(150 165 120 / 55%) 100%);
+
+  border: 1.5px solid var(--lime);
+
+  --card-shadow: none;
+
+  color: #fff;
+}
+
+aem-card[tone="frost"] {
+  --fill: linear-gradient(135deg, rgb(255 255 255 / 55%), rgb(255 255 255 / 20%));
+
+  border: 1.5px solid rgb(255 255 255 / 70%);
+
+  --card-shadow: 1px 3px 12px rgb(0 0 0 / 12%);
+
+  backdrop-filter: blur(6px);
+}
+aem-card[tone="lime"]     { --fill: var(--lime); }
+aem-card[tone="pink"]     { --fill: var(--pink); }
+aem-card[tone="lavender"] { --fill: var(--lavender); }
+aem-card[flat] { --card-shadow: none; }
+
+aem-card[align="start"] {
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* typographic roles inside cards */
+.aem-title {
+  font: 400 46px/1.1 var(--font);
+  color: var(--graphite);
+  margin: 0;
+  letter-spacing: -.01em;
+}
+
+.aem-caption {
+  font: 700 34px/1.22 var(--font);
+  color: var(--graphite);
+  margin: 0;
+}
+
+/* tiny attribution / legal line, pinned bottom-right (deck p80) */
+aem-slide > .aem-fineprint {
+  inset: auto 18px 12px auto;
+  translate: none;
+  margin: 0;
+  font: 400 7px/1 var(--font);
+  color: #111;
+  white-space: nowrap;
+}
+
+.aem-small {
+  font: 700 15px/1.25 var(--font);
+  color: var(--graphite);
+  margin: 0;
+}
+
+.aem-label {
+  font: 700 22px/1.2 var(--font);
+  color: var(--graphite);
+  margin: 0;
+}
+
+.aem-mono {
+  font: 400 22px/1.2 var(--font-mono);
+  letter-spacing: .08em;
+}
+.aem-black   { font-weight: 900; }
+
+/* ------------------------------------------------------------------ text
+ * The deck is all backgrounds + hero objects; these classes add titles and
+ * copy on top of them in the same typeface (Adobe Clean).
+ * <div class="aem-text" style="--y:300px; --w:820px">
+ *   <p class="aem-kicker">…</p><h1 class="aem-h1">…</h1><p class="aem-lead">…</p>
+ * </div>
+ * Add class "on-dark" for white text, "left" for left-aligned blocks.
+ */
+.aem-text {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  width: var(--w, 860px);
+  text-align: center;
+  color: var(--ink, var(--graphite));
+}
+
+.aem-text.left {
+  align-items: flex-start;
+  text-align: left;
+}
+.aem-text.on-dark, .on-dark { color: #fff; }
+.aem-text.on-dark.shadow, .aem-text .shadow { text-shadow: 2px 4px 10px rgb(0 0 0 / 28%); }
+.aem-text > * { margin: 0; }
+
+.aem-kicker {
+  font: 700 22px/1 var(--font);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .8;
+}
+
+.aem-h1 {
+  font: 900 96px/.98 var(--font-display);
+  letter-spacing: -.012em;
+}
+
+.aem-h2 {
+  font: 700 58px/1.06 var(--font);
+  letter-spacing: -.005em;
+}
+.aem-h3     { font: 700 36px/1.15 var(--font); }
+.aem-lead   { font: 400 32px/1.28 var(--font); }
+.aem-body   { font: 400 26px/1.36 var(--font); }
+
+.aem-list {
+  font: 400 30px/1.32 var(--font);
+  padding: 0 0 0 1.05em;
+  display: flex;
+  flex-direction: column;
+  gap: .45em;
+  text-align: left;
+}
+.aem-list li::marker { color: var(--marker, var(--periwinkle)); }
+
+.aem-text code, .aem-code-inline {
+  font: 400 .9em var(--font-mono);
+  background: rgb(0 0 0 / 6%);
+  padding: .05em .3em;
+  border-radius: .25em;
+}
+
+/* ------------------------------------------------------------------ badge
+ * Round sticker that sits on the corner of a tile/card (or free on the slide).
+ * <aem-badge at="tr|tl|br|bl" tone="lime|pink|lavender|night|grey|white|glass" icon="gear-badge|calendar|…">🔑</aem-badge>
+ */
+aem-badge {
+  position: absolute;
+  display: flex; align-items: center; justify-content: center;
+  width: var(--size, var(--badge)); aspect-ratio: 1;
+
+  --badge-icon: var(--icon, 38%);              /* resolved here: --icon does not inherit */
+
+  border-radius: 50%;
+  z-index: 3;
+
+  --ring: var(--lime-line);
+
+  background: var(--fill, radial-gradient(70% 70% at 33% 25%, #e1fa82 0%, #e6fb98 30%, #f5fdd6 70%, #fbffef 100%));
+  box-shadow: inset 0 0 0 1.25px var(--ring);
+  color: var(--badge-ink, var(--lime-ink));
+  font: 700 calc(var(--size, var(--badge)) * .34)/1 var(--font);
+}
+
+aem-badge > .aem-icon {
+  width: var(--badge-icon);
+  height: var(--badge-icon);
+}
+
+aem-badge[at] {
+  left: auto;
+  top: auto;
+  translate: -50% -50%;
+}
+
+aem-badge[at="tr"] {
+  left: calc(100% - var(--inset, 4px));
+  top: calc(0% + var(--inset, 2px));
+}
+
+aem-badge[at="tl"] {
+  left: calc(0% + var(--inset, 4px));
+  top: calc(0% + var(--inset, 2px));
+}
+
+aem-badge[at="br"] {
+  left: calc(100% - var(--inset, 4px));
+  top: calc(100% - var(--inset, 2px));
+}
+
+aem-badge[at="bl"] {
+  left: calc(0% + var(--inset, 2px));
+  top: calc(100% + var(--inset, 6px));
+}
+
+aem-badge[tone="pink"] {
+  --fill: radial-gradient(70% 70% at 33% 25%, #efb3f1 0%, #f3c9f4 35%, #fae6fb 75%, #fff2ff 100%);
+  --ring: #f3c9f4; --badge-ink: #e7a6ea;
+}
+
+aem-badge[tone="lavender"] {
+  --fill: radial-gradient(80% 80% at 30% 25%, #b4b9f8 0%, #c3c7fa 50%, #d3d6fb 100%);
+  --ring: #8f95f2; --badge-ink: var(--periwinkle);
+}
+
+aem-badge[tone="night"] {
+  --fill: radial-gradient(85% 85% at 70% 15%, #56b3dd 0%, #3f7fb3 45%, #2c4a74 100%);
+  --ring: #0f1010; --badge-ink: #fff;
+}
+
+aem-badge[tone="grey"] {
+  --fill: radial-gradient(85% 85% at 70% 15%, #d8d8d8 0%, #bdbdbd 55%, #9a9a9a 100%);
+  --ring: #1a1a1a; --badge-ink: #fff;
+}
+
+aem-badge[tone="white"] {
+  --fill: #fff;
+  --ring: #e6eff9;
+  --badge-ink: var(--graphite);
+}
+
+aem-badge[tone="solid-lime"] {
+  --fill: var(--lime);
+  --ring: var(--lime);
+  --badge-ink: #111;
+}
+
+aem-badge[tone="glass"] {
+  --fill: radial-gradient(80% 80% at 30% 20%, rgb(255 255 255 / 75%), rgb(255 255 255 / 35%));
+  --ring: rgb(255 255 255 / 80%); --badge-ink: var(--graphite);
+}
+
+aem-badge[emoji] {
+  font-size: calc(var(--size, var(--badge)) * .40);
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+/* "universal ✏️ editor" sticker (deck p4, 37, 41, 70–79) */
+aem-sticker {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: var(--size, 201px); aspect-ratio: 1; border-radius: 50%;
+  z-index: 4;
+  background: var(--fill, #fff);
+  box-shadow: inset 0 0 0 var(--ring-w, 8.25px) var(--ring, #e6eff9);
+  color: var(--ink, #adb2bb);
+  font: 900 calc(var(--size, 201px) * .165)/1.02 var(--font);
+  rotate: var(--rotate, -6deg);
+  text-align: center;
+  letter-spacing: -.005em;
+}
+
+aem-sticker .l2 {
+  display: flex;
+  align-items: center;
+  gap: .12em;
+  margin-left: .3em;
+}
+aem-sticker .l2 .aem-emoji { font-size: .8em; }
+aem-sticker[at] { translate: -50% -50%; }
+
+aem-sticker[at="tr"] {
+  left: calc(100% - var(--inset, 10px));
+  top: calc(0% + var(--inset, 10px));
+}
+
+aem-sticker[at="tl"] {
+  left: calc(0% + var(--inset, 10px));
+  top: calc(0% + var(--inset, 10px));
+}
+
+aem-sticker[at="br"] {
+  left: calc(100% - var(--inset, 10px));
+  top: calc(100% - var(--inset, 10px));
+}
+
+aem-sticker[at="bl"] {
+  left: calc(0% + var(--inset, 10px));
+  top: calc(100% - var(--inset, 10px));
+}
+
+aem-sticker[tone="lime"] {
+  --fill: var(--lime);
+  --ring: var(--periwinkle);
+  --ink: var(--periwinkle);
+}
+
+aem-sticker[tone="grey"] {
+  --fill: #d5d5d5;
+  --ring: #fff;
+  --ink: var(--olive);
+}
+
+aem-sticker[tone="clear"] {
+  --fill: rgb(255 255 255 / 8%);
+  --ring: #f2eefa;
+  --ink: #fff;
+}
+
+aem-sticker[tone="pink"] {
+  --fill: #fff;
+  --ring: var(--pink);
+  --ink: #e7a6ea;
+}
+
+/* ------------------------------------------------------------------ icon */
+aem-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--size, 120px); height: var(--h, auto);
+  color: var(--color, currentColor);
+}
+
+aem-icon > svg, .aem-icon {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+aem-icon[shadow] > svg { filter: var(--drop); }
+aem-slide > aem-icon:not([style*="color"]) { color: var(--graphite); }
+
+/* logo lockups */
+aem-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--size, 300px) * .085);
+  width: var(--size, 300px);
+}
+aem-logo > .aem-icon { width: auto; }
+
+/* ------------------------------------------------------------------ browser window
+ * <aem-browser [tone="paper|site|dark"]> content </aem-browser>
+ */
+aem-browser {
+  display: flex; flex-direction: column;
+  width: var(--w, 757px); height: var(--h, 497px);
+  border-radius: var(--r, 40px) var(--r, 40px) var(--r-bottom, 32px) var(--r-bottom, 32px);
+  /* stylelint-disable-next-line property-no-unknown -- CSS Borders 4, Chrome 139+ */
+  corner-shape: var(--corner-shape);
+  overflow: hidden;
+  background: var(--frame, #e6eff9);
+  box-shadow: var(--browser-shadow, none);
+}
+
+aem-browser > .aem-bar {
+  flex: 0 0 var(--bar, 48.5px);
+  display: flex; align-items: center; gap: 6px; padding-left: 36px;
+  background: var(--bar-fill, #fff);
+}
+
+aem-browser > .aem-bar i {
+  width: 12.5px;
+  height: 12.5px;
+  border-radius: 50%;
+  display: block;
+}
+aem-browser > .aem-bar i:nth-child(1) { background: #e51208; }
+aem-browser > .aem-bar i:nth-child(2) { background: #f3d039; }
+aem-browser > .aem-bar i:nth-child(3) { background: #1aa146; }
+
+aem-browser > .aem-body {
+  position: relative; flex: 1;
+  margin: var(--body-margin, 36px 36px 0 36px);
+  border-radius: var(--body-r, 18px 18px 0 0);
+  background: var(--page, #fff);
+  overflow: hidden;
+}
+
+aem-browser[tone="site"] {
+  --frame: var(--periwinkle); --bar: 31px; --body-margin: 0; --body-r: 0; --page: var(--periwinkle);
+  --r: 30px; --r-bottom: 30px;
+  --browser-shadow: 3px 10px 26px rgb(0 0 0 / 33%);
+
+  width: var(--w, 667px); height: var(--h, 454px);
+}
+
+aem-browser[tone="site"] > .aem-bar {
+  padding-left: 25px;
+  gap: 5px;
+}
+
+aem-browser[tone="site"] > .aem-bar i {
+  width: 7px;
+  height: 7px;
+}
+
+aem-browser[tone="sheet"] > .aem-body {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 135.5px, #d0d2d1 135.5px 137px),
+    repeating-linear-gradient(180deg, transparent 0 41.5px, #d0d2d1 41.5px 43px),
+    #fff;
+}
+
+/* wireframe website inside <aem-browser tone="site"> (deck p46–50) */
+.aem-wire {
+  position: absolute;
+  inset: 0;
+}
+
+.aem-wire .nav {
+  position: absolute;
+  left: 68px;
+  top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.aem-wire .nav .logo {
+  width: 52px;
+  height: 13px;
+  border-radius: 7px;
+  background: var(--lavender-mid);
+  margin-right: 4px;
+}
+
+.aem-wire .nav .link {
+  width: 52px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--lavender-mid);
+}
+
+.aem-wire .cta-top {
+  position: absolute;
+  right: 58px;
+  top: 10px;
+  width: 44px;
+  height: 13px;
+  border-radius: 7px;
+  background: var(--lime);
+}
+
+.aem-wire .lines {
+  position: absolute;
+  left: 72px;
+  top: 87px;
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.aem-wire .lines span {
+  display: block;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--lavender-mid);
+  width: 272px;
+}
+.aem-wire .lines span:nth-child(3) { width: 220px; }
+.aem-wire .lines span:nth-child(4) { width: 133px; }
+
+.aem-wire .button {
+  position: absolute;
+  left: 72px;
+  top: 231px;
+  width: 90px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--lime);
+}
+
+.aem-wire .media {
+  position: absolute; left: 364px; top: 66px; width: 245px; height: 204px; border-radius: 12px;
+  background: var(--lavender-mid);
+  display: flex; align-items: flex-end; justify-content: center; padding: 0 14px 8px;
+}
+
+.aem-wire .media svg {
+  width: 100%;
+  height: auto;
+}
+
+.aem-wire .panel {
+  position: absolute;
+  inset: 310px 57px -20px 72px;
+  border-radius: 12px;
+  background: var(--lavender-mid);
+}
+
+.aem-wire [hl] {
+  outline: 4px solid #e05243;
+  outline-offset: 0;
+}
+
+.aem-wire [ghost] {
+  background: transparent !important;
+  outline: 3px dashed var(--lime);
+  outline-offset: -3px;
+}
+
+/* ------------------------------------------------------------------ number bubble (deck p54, p91)
+ * <aem-bubble tone="periwinkle|pink|lime" style="--size:320px">404</aem-bubble>
+ */
+aem-bubble {
+  display: flex; align-items: center; justify-content: center;
+  width: var(--size, 270px); aspect-ratio: 1; border-radius: 50%;
+  font: 900 calc(var(--size, 270px) * .29)/1 var(--font-display);
+  color: #000;
+
+  --fill: radial-gradient(75% 75% at 35% 25%, #6870ec 0%, #8b91f0 45%, #b5b9f6 80%, #c9ccf8 100%);
+  --ring: var(--periwinkle);
+
+  background: var(--fill);
+  box-shadow: inset 0 0 0 calc(var(--size, 270px) * .0125) var(--ring);
+}
+
+aem-bubble[tone="pink"] {
+  --fill: radial-gradient(75% 75% at 35% 25%, #f0b2f2 0%, #f5cdf6 45%, #fbe3fc 80%, #fff0ff 100%);
+  --ring: #efbde8;
+}
+
+aem-bubble[tone="lime"] {
+  --fill: radial-gradient(75% 75% at 35% 25%, #e1fa82 0%, #ecfcb8 45%, #f6fede 80%, #fbfff0 100%);
+  --ring: var(--lime);
+}
+
+/* ------------------------------------------------------------------ shapes
+ * <aem-shape kind="hexagon|pentagon|octagon|circle|diamond" tone="lavender|olive|…">TEXT</aem-shape>
+ */
+aem-shape {
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  width: var(--size, 520px); aspect-ratio: var(--ratio, 1);
+  font: 900 calc(var(--size, 520px) * .27)/1 var(--font-display);
+  color: var(--ink, var(--plum));
+}
+
+aem-shape > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: -1;
+}
+aem-shape[shadow] > svg { filter: var(--drop); }
+
+aem-shape .strike {
+  color: #d5d5d5;
+  text-decoration: line-through;
+  text-decoration-thickness: .08em;
+}
+
+/* Prohibition sign. <aem-no style="--size:465px"></aem-no> */
+aem-no {
+  display: block;
+  width: var(--size, 465px);
+  aspect-ratio: 1;
+  z-index: 4;
+}
+
+aem-no > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ------------------------------------------------------------------ quote (deck p34, p93) */
+aem-quote {
+  display: flex; flex-direction: column; gap: 22px;
+  width: var(--w, 800px);
+  font: italic 400 var(--size, 44px)/1.18 var(--font);
+  color: var(--ink, var(--graphite));
+  text-align: center;
+}
+aem-quote cite { font-style: italic; }
+aem-quote cite::before { content: "—"; }
+
+/* ------------------------------------------------------------------ quadrant (deck p94) */
+aem-quadrant {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  gap: 26px 42px;
+  width: var(--w, 920px); height: var(--h, 634px);
+  padding: 0;
+
+  --x: 528px; --y: 377px;
+}
+
+aem-quadrant > aem-card {
+  position: relative;
+  width: auto;
+  height: auto;
+  left: auto;
+  top: auto;
+  translate: none;
+
+  --r: 70px;
+}
+
+aem-quadrant > .aem-axis {
+  position: absolute;
+  pointer-events: none;
+}
+
+aem-quadrant > .aem-axis.y {
+  left: -55px; top: -26px; bottom: -48px; width: 20px;
+  background: linear-gradient(0deg, #fde7ff, #efb3f1);
+  clip-path: polygon(0 18px, 50% 0, 100% 18px, 100% 100%, 0 100%);
+}
+
+aem-quadrant > .aem-axis.x {
+  left: -55px; right: -18px; bottom: -48px; height: 20px;
+  background: linear-gradient(90deg, #fde7ff, #efb3f1);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
+}
+
+aem-quadrant > .aem-axis-label {
+  position: absolute;
+  font: 700 21px/1 var(--font);
+  color: var(--graphite);
+}
+
+aem-quadrant > .aem-axis-label.x {
+  bottom: -47px;
+  left: 50%;
+  translate: -50% 0;
+}
+
+aem-quadrant > .aem-axis-label.y {
+  left: -56px;
+  top: 50%;
+  translate: 0 -50%;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+}
+
+aem-quadrant .aem-title small {
+  display: block;
+  margin-top: 16px;
+  font: 700 15px/1.2 var(--font);
+}
+
+/* ------------------------------------------------------------------ AEM app icons (vector re-creations) */
+aem-appicon {
+  display: block;
+  width: var(--size, 387px);
+  aspect-ratio: 1;
+}
+
+aem-appicon > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: var(--drop);
+  overflow: visible;
+}
+aem-appicon[flat] > svg { filter: none; }
+
+/* concentric glass rings (deck p7) */
+aem-rings {
+  display: block;
+  width: var(--size, 670px);
+  aspect-ratio: 1;
+}
+
+aem-rings > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------------ utilities */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap, 24px);
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap, 16px);
+}
+
+.emoji, .aem-emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-style: normal;
+  white-space: nowrap;
+}
+.white { color: #fff; }
+.center-text { text-align: center; }

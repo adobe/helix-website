@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AEM Live slides — catalog</title>
+  <link rel="stylesheet" href="lib/aem-live.css">
+  <script type="module" src="lib/aem-live.js"></script>
+  <style>
+    body { width: auto; padding: 28px 32px 60px; background: #1f1f26; color: #eee; font-family: var(--font); }
+    h1 { font-weight: 900; margin: 0 0 4px; }
+    h2 { margin: 40px 0 6px; }
+    p.note { color: #aaa; margin: 0 0 14px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 18px; }
+    .cell { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #ccc; }
+    .cell code { color: #fff; }
+    .mini { width: 256px; height: 192px; overflow: hidden; border-radius: 6px; }
+    .mini > aem-slide { zoom: .25; }
+    .icon { width: 128px; height: 128px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 10px; color: #222; }
+    .icon svg { width: 76%; height: 76%; }
+    .kind { color: #888; }
+  </style>
+</head>
+<body>
+  <h1>Catalog</h1>
+  <p class="note">Everything below is discovered from <code>lib/aem-live.css</code> and <code>lib/icons*.js</code> at runtime, so it is always current.</p>
+
+  <h2>Backgrounds <code>&lt;aem-slide bg="…"&gt;</code></h2>
+  <div class="grid" id="bgs"></div>
+
+  <h2>Grids <code>grid="fine|medium|large" grid-tone="light|ink|glow" seams</code></h2>
+  <div class="grid" id="grids"></div>
+
+  <h2>Tiles <code>&lt;aem-tile tone="…" glyph="lock|gear"&gt;</code></h2>
+  <div class="grid" id="tiles"></div>
+
+  <h2>Badges <code>&lt;aem-badge tone="…" icon="…"&gt;</code></h2>
+  <div class="grid" id="badges"></div>
+
+  <h2>Checkers <code>&lt;aem-checker tone="…" cell="s|m|l"&gt;</code></h2>
+  <div class="grid" id="checkers"></div>
+
+  <h2>Icons <code>&lt;aem-icon name="…"&gt;</code></h2>
+  <p class="note"><b>tile-glyph</b>: use as <code>&lt;aem-tile glyph="…"&gt;</code>. <b>mono</b>: single colour, follows <code>color</code>. <b>art</b>: multi-colour, fixed. <b>custom</b>: hand-drawn in <code>lib/icons-custom.js</code>.</p>
+  <div class="grid" id="icons"></div>
+
+  <script type="module">
+    import { iconNames, getIcon, iconSVG } from './lib/aem-live.js';
+    import { CUSTOM } from './lib/icons-custom.js';
+    const tones = (re) => {
+      const out = new Set();
+      for (const sh of document.styleSheets) {
+        let rules; try { rules = sh.cssRules; } catch { continue; }
+        for (const r of rules) for (const m of (r.selectorText ?? '').matchAll(re)) out.add(m[1]);
+      }
+      return [...out];
+    };
+    const cell = (html, label) => `<div class="cell">${html}<code>${label}</code></div>`;
+    const mini = (slide, label) => cell(`<div class="mini">${slide}</div>`, label);
+    const $ = (id, html) => { document.getElementById(id).innerHTML = html; };
+
+    $('bgs', tones(/aem-slide\[bg="([^"]+)"\]/g).map((b) => mini(`<aem-slide bg="${b}"></aem-slide>`, b)).join(''));
+    $('grids', [['fine', '', 'twilight', ' seams'], ['medium', '', 'lavender', ''], ['large', '', 'night', ''], ['large', 'light', 'yellow', ''], ['large', 'ink', 'meadow', ''], ['medium', 'light', 'grey', '']]
+      .map(([g, t, b, x]) => mini(`<aem-slide bg="${b}" grid="${g}"${t ? ` grid-tone="${t}"` : ''}${x}></aem-slide>`, `bg=${b} grid=${g}${t ? ` tone=${t}` : ''}${x}`)).join(''));
+    $('tiles', tones(/aem-tile\[tone="([^"]+)"\]/g).map((t) => mini(`<aem-slide bg="${/silver|steel/.test(t) ? 'night' : 'sorbet'}"><aem-tile tone="${t}" glyph="${t === 'white' ? '' : 'lock'}"></aem-tile></aem-slide>`, t)).join(''));
+    $('badges', ['lime', ...tones(/aem-badge\[tone="([^"]+)"\]/g).filter((t) => t !== 'lime')].map((t) => mini(`<aem-slide bg="${t === 'night' ? 'night' : t === 'grey' ? 'grey' : 'lavender'}"><aem-badge tone="${t}" icon="gear-badge" style="--size:300px"></aem-badge></aem-slide>`, t)).join(''));
+    $('checkers', tones(/aem-checker\[tone="([^"]+)"\]/g).map((t) => mini(`<aem-slide bg="${t.startsWith('glass') ? 'prism' : 'white'}"><aem-checker tone="${t}" style="inset:0"></aem-checker></aem-slide>`, t)).join(''));
+    $('icons', iconNames().map((n) => {
+      const ic = getIcon(n);
+      const kind = CUSTOM[n] ? `custom ${ic.kind}` : ic.kind;
+      const svg = kind === 'tile-glyph' ? `<svg viewBox="0 0 100 100"><path fill-rule="evenodd" d="${getIcon('@squircle').d} ${ic.d}"/></svg>` : iconSVG(n);
+      return cell(`<div class="icon">${svg}</div>`, `${n} <span class="kind">${kind}${ic.src ? ` · p${ic.src}` : ''}</span>`);
+    }).join(''));
+  </script>
+</body>
+</html>

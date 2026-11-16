@@ -1,0 +1,326 @@
+{
+  "slides": [
+    {
+      "file": "slides/01-title.html",
+      "name": "01-title",
+      "title": "Title — Edge Delivery Services"
+    },
+    {
+      "file": "slides/02-agenda.html",
+      "name": "02-agenda",
+      "title": "Agenda card on dawn"
+    },
+    {
+      "file": "slides/03-byo-cdn.html",
+      "name": "03-byo-cdn",
+      "title": "Bring your own CDN — three tiles"
+    },
+    {
+      "file": "slides/04-speed.html",
+      "name": "04-speed",
+      "title": "Night — stopwatch tile with bolt badge"
+    },
+    {
+      "file": "slides/webhook-a-tile.html",
+      "name": "webhook-a-tile",
+      "title": "Webhook A — graphite webhook tile with bell badge (aem.live/developer/webhook hero)"
+    },
+    {
+      "file": "slides/webhook-b-flow.html",
+      "name": "webhook-b-flow",
+      "title": "Webhook B — published doc fires into the webhook (aem.live/developer/webhook hero)"
+    },
+    {
+      "file": "slides/webhook-c-payload.html",
+      "name": "webhook-c-payload",
+      "title": "Webhook C — JSON payload card on lime (aem.live/developer/webhook hero)"
+    }
+  ],
+  "reference": [
+    {
+      "file": "reference/p001-architecture.html",
+      "name": "p001-architecture",
+      "title": "Architecture — AEM app icon over a big word"
+    },
+    {
+      "file": "reference/p002-protocols.html",
+      "name": "p002-protocols",
+      "title": "Protocols word wall behind a black tile"
+    },
+    {
+      "file": "reference/p006-api.html",
+      "name": "p006-api",
+      "title": "API next to a database stack"
+    },
+    {
+      "file": "reference/p007-rings.html",
+      "name": "p007-rings",
+      "title": "Concentric glass rings on periwinkle"
+    },
+    {
+      "file": "reference/p008-yellow-block.html",
+      "name": "p008-yellow-block",
+      "title": "Yellow grid with a pink block badge"
+    },
+    {
+      "file": "reference/p009-twilight.html",
+      "name": "p009-twilight",
+      "title": "Empty twilight grid (title / text slide background)"
+    },
+    {
+      "file": "reference/p010-roots.html",
+      "name": "p010-roots",
+      "title": "Roots emblem on ember"
+    },
+    {
+      "file": "reference/p011-flasks.html",
+      "name": "p011-flasks",
+      "title": "Two lab flasks (experiments)"
+    },
+    {
+      "file": "reference/p012-face.html",
+      "name": "p012-face",
+      "title": "AEM face app icon"
+    },
+    {
+      "file": "reference/p013-lock-pencil.html",
+      "name": "p013-lock-pencil",
+      "title": "Lock tile with pencil badge"
+    },
+    {
+      "file": "reference/p014-lock.html",
+      "name": "p014-lock",
+      "title": "Lock tile"
+    },
+    {
+      "file": "reference/p016-lock-key.html",
+      "name": "p016-lock-key",
+      "title": "Lock tile with key badge"
+    },
+    {
+      "file": "reference/p017-night-lock-globe.html",
+      "name": "p017-night-lock-globe",
+      "title": "Night — silver lock with globe badge"
+    },
+    {
+      "file": "reference/p018-night-gear-cloud.html",
+      "name": "p018-night-gear-cloud",
+      "title": "Night — silver gear with cloud badge"
+    },
+    {
+      "file": "reference/p019-grey-lock-globe.html",
+      "name": "p019-grey-lock-globe",
+      "title": "Grey — ink lock with globe badge"
+    },
+    {
+      "file": "reference/p021-blush-lock-globe.html",
+      "name": "p021-blush-lock-globe",
+      "title": "Blush — ink lock with globe badge"
+    },
+    {
+      "file": "reference/p022-lock-cloudflare.html",
+      "name": "p022-lock-cloudflare",
+      "title": "Lavender — ink lock with Cloudflare badge"
+    },
+    {
+      "file": "reference/p023-lock-person.html",
+      "name": "p023-lock-person",
+      "title": "Lavender — ink lock with person badge"
+    },
+    {
+      "file": "reference/p025-html.html",
+      "name": "p025-html",
+      "title": "p025-html.html"
+    },
+    {
+      "file": "reference/p026-byo.html",
+      "name": "p026-byo",
+      "title": "p026-byo.html"
+    },
+    {
+      "file": "reference/p027-html-json.html",
+      "name": "p027-html-json",
+      "title": "p027-html-json.html"
+    },
+    {
+      "file": "reference/p030-face-github.html",
+      "name": "p030-face-github",
+      "title": "Night — dark AEM face with GitHub badge"
+    },
+    {
+      "file": "reference/p031-terminal.html",
+      "name": "p031-terminal",
+      "title": "Night — $ aem terminal tile"
+    },
+    {
+      "file": "reference/p032-night-lock.html",
+      "name": "p032-night-lock",
+      "title": "Night — silver lock"
+    },
+    {
+      "file": "reference/p033-glass-card.html",
+      "name": "p033-glass-card",
+      "title": "Glass card on meadow grid (text container)"
+    },
+    {
+      "file": "reference/p035-dawn.html",
+      "name": "p035-dawn",
+      "title": "Empty dawn grid (text slide background)"
+    },
+    {
+      "file": "reference/p036-unsupported.html",
+      "name": "p036-unsupported",
+      "title": "UNSUPPORTED crossed out"
+    },
+    {
+      "file": "reference/p038-telemetry.html",
+      "name": "p038-telemetry",
+      "title": "Operational telemetry gauge"
+    },
+    {
+      "file": "reference/p039-store.html",
+      "name": "p039-store",
+      "title": "Storefront"
+    },
+    {
+      "file": "reference/p046-wireframe.html",
+      "name": "p046-wireframe",
+      "title": "Website wireframe on lime with soft discs"
+    },
+    {
+      "file": "reference/p047-wireframe-ue.html",
+      "name": "p047-wireframe-ue",
+      "title": "Wireframe with Adobe tile and Universal Editor sticker"
+    },
+    {
+      "file": "reference/p050-wireframe-highlight.html",
+      "name": "p050-wireframe-highlight",
+      "title": "Wireframe with highlighted media block"
+    },
+    {
+      "file": "reference/p054-bubbles.html",
+      "name": "p054-bubbles",
+      "title": "Lighthouse 100 bubbles"
+    },
+    {
+      "file": "reference/p055-dns.html",
+      "name": "p055-dns",
+      "title": "DNS hexagon"
+    },
+    {
+      "file": "reference/p056-end-of-service.html",
+      "name": "p056-end-of-service",
+      "title": "End of service sign"
+    },
+    {
+      "file": "reference/p057-robot.html",
+      "name": "p057-robot",
+      "title": "Robot (bots, crawlers)"
+    },
+    {
+      "file": "reference/p060-map.html",
+      "name": "p060-map",
+      "title": "Folded map on iris with violet checkers"
+    },
+    {
+      "file": "reference/p062-map-unsupported.html",
+      "name": "p062-map-unsupported",
+      "title": "Map crossed out"
+    },
+    {
+      "file": "reference/p065-aws.html",
+      "name": "p065-aws",
+      "title": "AWS tile with gear badge on dawn"
+    },
+    {
+      "file": "reference/p066-fastly.html",
+      "name": "p066-fastly",
+      "title": "Fastly card with gear badge"
+    },
+    {
+      "file": "reference/p067-cloudflare.html",
+      "name": "p067-cloudflare",
+      "title": "Cloudflare card with lock badge"
+    },
+    {
+      "file": "reference/p069-environments.html",
+      "name": "p069-environments",
+      "title": "Environments vs. branches"
+    },
+    {
+      "file": "reference/p070-livecopy.html",
+      "name": "p070-livecopy",
+      "title": "MSM source → live copy"
+    },
+    {
+      "file": "reference/p080-git.html",
+      "name": "p080-git",
+      "title": "Git logo on blush"
+    },
+    {
+      "file": "reference/p083-adobe-ai.html",
+      "name": "p083-adobe-ai",
+      "title": "Adobe tile with AI emoji row"
+    },
+    {
+      "file": "reference/p090-adobe-badge.html",
+      "name": "p090-adobe-badge",
+      "title": "Adobe tile with pink gear badge"
+    },
+    {
+      "file": "reference/p091-http-codes.html",
+      "name": "p091-http-codes",
+      "title": "HTTP status code bubbles on lightning wallpaper"
+    },
+    {
+      "file": "reference/p093-quote.html",
+      "name": "p093-quote",
+      "title": "Quote on lime grid"
+    },
+    {
+      "file": "reference/p094-quadrant.html",
+      "name": "p094-quadrant",
+      "title": "Testing quadrant"
+    },
+    {
+      "file": "reference/p096-aem-live.html",
+      "name": "p096-aem-live",
+      "title": "hlx.live → aem.live pentagon"
+    },
+    {
+      "file": "reference/p097-github-emoji.html",
+      "name": "p097-github-emoji",
+      "title": "GitHub card with emoji reactions"
+    },
+    {
+      "file": "reference/p099-github-badge.html",
+      "name": "p099-github-badge",
+      "title": "GitHub tile with gear badge"
+    },
+    {
+      "file": "reference/p101-dawn-checker.html",
+      "name": "p101-dawn-checker",
+      "title": "Dawn with graphite checker band (text slide background)"
+    },
+    {
+      "file": "reference/p105-discord-thursday.html",
+      "name": "p105-discord-thursday",
+      "title": "Discord community hangout card"
+    },
+    {
+      "file": "reference/p106-discord-tuesday.html",
+      "name": "p106-discord-tuesday",
+      "title": "Discord “don’t miss” card"
+    },
+    {
+      "file": "reference/p120-gears.html",
+      "name": "p120-gears",
+      "title": "Two glass gears on twilight"
+    },
+    {
+      "file": "reference/p153-battle.html",
+      "name": "p153-battle",
+      "title": "Event card over a celebration panel"
+    }
+  ]
+}

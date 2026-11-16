@@ -1,0 +1,13 @@
+{
+  "name": "aem-live-slides",
+  "private": true,
+  "type": "module",
+  "description": "Code-only (HTML/CSS/SVG) recreation of the AEM Live Backgrounds Megadeck art style, exported to PNG with playwright-cli.",
+  "scripts": {
+    "serve": "node scripts/serve.mjs",
+    "lint": "node scripts/lint.mjs",
+    "export": "node scripts/lint.mjs && node scripts/export.mjs",
+    "export:4k": "node scripts/lint.mjs && node scripts/export.mjs --scale 4",
+    "export:reference": "node scripts/export.mjs --dir reference --out exports/reference"
+  }
+}

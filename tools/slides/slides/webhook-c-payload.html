@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Webhook C — JSON payload card on lime (aem.live/developer/webhook hero)</title>
+  <link rel="stylesheet" href="../lib/aem-live.css">
+  <script type="module" src="../lib/aem-live.js"></script>
+</head>
+<body>
+  <aem-slide bg="lime">
+    <aem-checker tone="olive" style="left:0; top:0; width:41.2%; height:100%"></aem-checker>
+    <aem-card align="start" style="--w:760px; --h:430px; --pad:40px 56px; --gap:14px; justify-content:center">
+      <p class="aem-mono" style="font-size:30px; letter-spacing:.04em; color:var(--graphite)"><b style="color:var(--periwinkle)">POST</b> /webhook</p>
+      <pre class="aem-mono" style="margin:0; font-size:42px; line-height:1.34; letter-spacing:0; color:var(--graphite)">{
+  <span style="color:var(--plum)">"org"</span>: "acme",
+  <span style="color:var(--plum)">"site"</span>: "acme-site",
+  <span style="color:var(--plum)">"nextToken"</span>: "eyJzIjox…"
+}</pre>
+      <aem-badge at="tr" icon="webhook" style="--icon:50%; --badge-ink:var(--olive)"></aem-badge>
+    </aem-card>
+  </aem-slide>
+</body>
+</html>

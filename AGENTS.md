@@ -84,6 +84,7 @@ The repository provides the basic structure, blocks, and configuration needed to
     └── delayed.js       # Delayed functionality such as martech loading
 ├── fonts/           # Web fonts
 ├── icons/           # SVG icons
+├── tools/slides/    # Hero-image / slide factory (HTML/CSS/SVG → PNG), see tools/slides/AGENTS.md and the hero-images skill
 ├── head.html        # Global HTML head content
 └── 404.html         # Custom 404 page
 ```
