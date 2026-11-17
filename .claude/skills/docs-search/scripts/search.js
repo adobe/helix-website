@@ -246,7 +246,7 @@ function searchDocuments(docs, keywords, type = 'doc') {
   const results = [];
 
   for (const doc of docs) {
-    if (/(^|[\s,])noindex($|[\s,])/i.test(doc.robots)) continue;
+    if (doc.robots?.toLowerCase().includes('noindex')) continue;
     const score = calculateScore(doc, keywords);
 
     // Only include if score >= 1 (at least one keyword match)
