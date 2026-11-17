@@ -5,11 +5,12 @@ async function fetchBlogArticleIndex() {
   const index = '/docpages-index.json';
   const resp = await fetch(index);
   const json = await resp.json();
+  const data = json.data.filter((row) => !row.robots?.toLowerCase().includes('noindex'));
   const lookup = {};
-  json.data.forEach((row) => {
+  data.forEach((row) => {
     lookup[row.path] = row;
   });
-  return { data: json.data, lookup };
+  return { data, lookup };
 }
 
 function decorateCard(hit) {

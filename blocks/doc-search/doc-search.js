@@ -54,7 +54,7 @@ export async function fetchSourceData(index, faq = '') {
     const resp = await fetch(index);
     const json = await resp.json();
     // return json.data ? json.data : [];
-    window.docs = json.data ? json.data : [];
+    window.docs = json.data ? json.data.filter((row) => !row.robots?.toLowerCase().includes('noindex')) : [];
     if (faq) {
       // eslint-disable-next-line no-use-before-define
       const faqResp = await fetchSourceDataHTML(faq);
