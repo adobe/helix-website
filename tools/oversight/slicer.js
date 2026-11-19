@@ -60,6 +60,16 @@ dataChunks.addSeries('conversions', (bundle) => (dataChunks.hasConversion(bundle
   ? bundle.weight
   : 0));
 
+// Extract redirect duration (ms) from redirect checkpoint target
+// "<count>:<duration>" or "<estimate>~<duration>"
+dataChunks.addSeries('redirectDuration', (bundle) => {
+  const evt = bundle.events.find((e) => e.checkpoint === 'redirect' && typeof e.target === 'string');
+  if (!evt) return undefined;
+  const m = evt.target.match(/^(\d+)([:~])(\d+)$/);
+  if (!m) return undefined;
+  return Number.parseInt(m[3], 10);
+});
+
 dataChunks.addSeries('organic', organic);
 /*
  * timeOnPage is the time it took to load the page,
@@ -288,6 +298,35 @@ function updateDataFacets(filterText, params, checkpoint) {
       // a bit of special handling here, so we can split the acquisition source
       if (cp === 'acquisition') {
         dataChunks.addFacet('acquisition.source', acquisitionSource);
+      }
+
+      // Special handling for redirect: split target "<count>:<duration>" or "<estimate>~<duration>"
+      if (cp === 'redirect') {
+        // Override the default redirect.target facet to group by count only
+        dataChunks.addFacet('redirect.target', (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'redirect')
+            .filter(({ target }) => typeof target === 'string' && target.length > 0)
+            .reduce((acc, { target }) => {
+              const m = target.match(/^(\d+)([:~])(\d+)$/);
+              if (m) {
+                const type = m[2] === '~' ? 'external' : 'internal';
+                acc.add(`${m[1]}:${type}`); // count + type
+              }
+              return acc;
+            }, new Set()),
+        ));
+        // Add a dedicated facet for redirect type (internal/external)
+        dataChunks.addFacet('redirect.type', (bundle) => Array.from(
+          bundle.events
+            .filter((evt) => evt.checkpoint === 'redirect')
+            .filter(({ target }) => typeof target === 'string' && target.length > 0)
+            .reduce((acc, { target }) => {
+              const m = target.match(/^(\d+)([:~])(\d+)$/);
+              if (m) acc.add(m[2] === '~' ? 'external' : 'internal');
+              return acc;
+            }, new Set()),
+        ));
       }
 
       // special handling for enter checkpoint
