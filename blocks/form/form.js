@@ -4,9 +4,9 @@ const GENERIC_ERROR = 'Sorry, we couldn’t submit the form. Please try again la
 const INVALID_ERROR = 'Please check the highlighted fields and try again.';
 
 /**
- * Returns the endpoint to POST to directly, if the submit action is an https URL
- * (or http on localhost, for a local worker). Other actions use the legacy forms service.
- * @param {string} action the submit row's Placeholder value
+ * Returns the endpoint to POST to directly, if the submit row's Action is an https URL
+ * (or http on localhost, for a local worker). Otherwise the legacy forms service is used.
+ * @param {string} action the submit row's Action value
  * @returns {string|null} the endpoint URL, or null for the legacy service
  */
 export function getEndpoint(action) {
@@ -150,7 +150,7 @@ function createButton(fd) {
       if (form.checkValidity()) {
         event.preventDefault();
         button.setAttribute('disabled', '');
-        const endpoint = getEndpoint(fd.Placeholder);
+        const endpoint = getEndpoint(fd.Action);
         if (endpoint) {
           if (!await submitToEndpoint(form, endpoint)) {
             button.removeAttribute('disabled');

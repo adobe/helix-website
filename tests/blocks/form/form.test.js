@@ -6,7 +6,7 @@ import { createForm, getEndpoint } from '../../../blocks/form/form.js';
 
 const ENDPOINT = 'http://localhost:8787/submit';
 
-const definition = (action) => ({
+const definition = (submit) => ({
   data: [
     {
       Field: 'githubProfile', Label: 'GitHub profile', Type: 'url', Mandatory: 'x', Placeholder: 'https://github.com/you',
@@ -20,7 +20,7 @@ const definition = (action) => ({
     },
     { Field: 'description', Label: 'Description', Type: 'text-area' },
     {
-      Field: 'submit', Label: 'Submit', Type: 'submit', Placeholder: action, Extra: '#thanks',
+      Field: 'submit', Label: 'Submit', Type: 'submit', Extra: '#thanks', ...submit,
     },
   ],
 });
@@ -39,10 +39,10 @@ describe('Form block', () => {
   let requests;
   let submitResponse;
 
-  async function setup(action) {
+  async function setup(submit) {
     window.fetch = async (url, opts) => {
       requests.push({ url: String(url), opts });
-      if (url === '/test/form.json') return { json: async () => definition(action) };
+      if (url === '/test/form.json') return { json: async () => definition(submit) };
       return submitResponse;
     };
     const form = await createForm(`${window.location.origin}/test/form.json`);
@@ -79,17 +79,26 @@ describe('Form block', () => {
     expect(getEndpoint(undefined)).to.be.null;
   });
 
-  it('keeps the legacy forms service for relative actions', async () => {
+  it('keeps the legacy forms service when the submit row has no Action', async () => {
     submitResponse = { ok: true, status: 200, text: async () => '' };
-    const form = await setup('/test/legacy-form');
+    const form = await setup({ Placeholder: '/test/legacy-form' });
     form.querySelector('button').click();
     await waitFor(() => window.location.hash === '#thanks');
     expect(posts()).to.have.length(1);
     expect(posts()[0].url).to.equal('https://form.aem.page/main--helix-website--adobe/test/legacy-form');
   });
 
+  it('only reads the endpoint from Action, not Placeholder', async () => {
+    submitResponse = { ok: true, status: 200, text: async () => '' };
+    const form = await setup({ Placeholder: ENDPOINT });
+    form.querySelector('button').click();
+    await waitFor(() => window.location.hash === '#thanks');
+    expect(posts()).to.have.length(1);
+    expect(posts()[0].url.startsWith('https://form.aem.page/')).to.be.true;
+  });
+
   it('posts the form data to an endpoint, then redirects', async () => {
-    const form = await setup(ENDPOINT);
+    const form = await setup({ Action: ENDPOINT });
     form.querySelector('button').click();
     await waitFor(() => window.location.hash === '#thanks');
     expect(posts()).to.have.length(1);
@@ -112,7 +121,7 @@ describe('Form block', () => {
       status: 400,
       json: async () => ({ ok: false, error: 'invalid', fields: ['title', 'nope'] }),
     };
-    const form = await setup(ENDPOINT);
+    const form = await setup({ Action: ENDPOINT });
     const button = form.querySelector('button');
     button.click();
     await waitFor(() => form.querySelector('[role="alert"]'));
@@ -134,7 +143,7 @@ describe('Form block', () => {
   [403, 429, 500].forEach((status) => {
     it(`shows a generic error on ${status} and does not redirect`, async () => {
       submitResponse = { ok: false, status, json: async () => ({ ok: false }) };
-      const form = await setup(ENDPOINT);
+      const form = await setup({ Action: ENDPOINT });
       const button = form.querySelector('button');
       button.click();
       await waitFor(() => form.querySelector('[role="alert"]'));
@@ -146,7 +155,7 @@ describe('Form block', () => {
   });
 
   it('shows a generic error when the request fails', async () => {
-    const form = await setup(ENDPOINT);
+    const form = await setup({ Action: ENDPOINT });
     window.fetch = async () => { throw new TypeError('network'); };
     form.querySelector('button').click();
     await waitFor(() => form.querySelector('[role="alert"]'));
