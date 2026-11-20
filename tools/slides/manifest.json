@@ -21,6 +21,11 @@
       "title": "Night — stopwatch tile with bolt badge"
     },
     {
+      "file": "slides/media-a-tile.html",
+      "name": "media-a-tile",
+      "title": "Media A — graphite tile with cut-out photo and bolt badge on aurora (aem.live/docs/media hero)"
+    },
+    {
       "file": "slides/webhook-a-tile.html",
       "name": "webhook-a-tile",
       "title": "Webhook A — graphite webhook tile with bell badge (aem.live/developer/webhook hero)"

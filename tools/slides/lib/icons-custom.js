@@ -71,6 +71,20 @@ export const CUSTOM = {
     kind: 'mono',
     d: 'M50 0C24 0 4 7 4 16s20 16 46 16 46-7 46-16S76 0 50 0ZM4 26v10c0 9 20 16 46 16s46-7 46-16V26c-8 7-26 12-46 12S12 33 4 26Zm0 20v10c0 9 20 16 46 16s46-7 46-16V46c-8 7-26 12-46 12S12 53 4 46Zm0 20v10c0 9 20 16 46 16s46-7 46-16V66c-8 7-26 12-46 12S12 73 4 66Zm0 20v8c0 9 20 16 46 16s46-7 46-16v-8c-8 7-26 12-46 12S12 93 4 86Z',
   },
+  // Framed photo (mountains + sun), cut out with evenodd. For media / image pages.
+  photo: {
+    viewBox: '0 0 100 80',
+    kind: 'mono',
+    rule: 'evenodd',
+    d: 'M10 0h80a10 10 0 0 1 10 10v60a10 10 0 0 1-10 10H10A10 10 0 0 1 0 70V10A10 10 0 0 1 10 0Zm2 12v44l24-26 22 24 12-12 18 18V12ZM64 26a9 9 0 1 0 18 0a9 9 0 1 0-18 0Z',
+  },
+  // Same photo as a tile-glyph: <aem-tile glyph="photo-cut"> cuts it out of the tile so the
+  // background shows through (like the deck's lock tiles). 64% of the tile, centred.
+  'photo-cut': {
+    viewBox: '0 0 100 100',
+    kind: 'tile-glyph',
+    d: 'M24.4 24.4H75.6A6.4 6.4 0 0 1 82 30.8V69.2A6.4 6.4 0 0 1 75.6 75.6H24.4A6.4 6.4 0 0 1 18 69.2V30.8A6.4 6.4 0 0 1 24.4 24.4ZM25.68 32.08V60.24L41.04 43.6 55.12 58.96 62.8 51.28 74.32 62.8V32.08ZM58.96 41.04a5.76 5.76 0 1 0 11.52 0a5.76 5.76 0 1 0-11.52 0Z',
+  },
   sparkle: {
     viewBox: '0 0 100 100',
     kind: 'mono',
