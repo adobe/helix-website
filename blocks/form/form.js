@@ -88,7 +88,7 @@ function clearErrors(form) {
  * @param {string[]} fields ids of the fields to mark invalid
  */
 function showErrors(form, message, fields = []) {
-  const invalid = fields
+  const invalid = [...new Set(fields)]
     .map((name) => [...form.elements].find((el) => el.id && el.id === name))
     .filter(Boolean);
   invalid.forEach((el) => {
@@ -98,6 +98,12 @@ function showErrors(form, message, fields = []) {
     error.textContent = 'Please check this field.';
     el.setAttribute('aria-invalid', 'true');
     el.setAttribute('aria-describedby', error.id);
+    el.addEventListener('input', () => {
+      if (!error.isConnected) return;
+      error.remove();
+      el.removeAttribute('aria-invalid');
+      el.removeAttribute('aria-describedby');
+    }, { once: true });
     el.closest('.field-wrapper').after(error);
   });
   const alert = document.createElement('div');

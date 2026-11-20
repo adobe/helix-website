@@ -25,14 +25,25 @@ const definition = (submit) => ({
   ],
 });
 
-const waitFor = async (fn) => {
-  for (let i = 0; i < 100; i += 1) {
-    if (fn()) return;
-    // eslint-disable-next-line no-await-in-loop -- polling must run sequentially
-    await new Promise((resolve) => { setTimeout(resolve, 10); });
+// Resolves on the next hash change (the success redirect goes to '#thanks').
+const nextHashChange = () => new Promise((resolve) => {
+  window.addEventListener('hashchange', resolve, { once: true });
+});
+
+// Resolves with the form's alert once it's been added.
+const nextAlert = (form) => new Promise((resolve) => {
+  const find = () => form.querySelector('[role="alert"]');
+  if (find()) {
+    resolve(find());
+    return;
   }
-  throw new Error('timed out');
-};
+  const observer = new MutationObserver(() => {
+    if (!find()) return;
+    observer.disconnect();
+    resolve(find());
+  });
+  observer.observe(form, { childList: true, subtree: true });
+});
 
 describe('Form block', () => {
   let originalFetch;
@@ -82,8 +93,9 @@ describe('Form block', () => {
   it('keeps the legacy forms service when the submit row has no Action', async () => {
     submitResponse = { ok: true, status: 200, text: async () => '' };
     const form = await setup({ Placeholder: '/test/legacy-form' });
+    const redirected = nextHashChange();
     form.querySelector('button').click();
-    await waitFor(() => window.location.hash === '#thanks');
+    await redirected;
     expect(posts()).to.have.length(1);
     expect(posts()[0].url).to.equal('https://form.aem.page/main--helix-website--adobe/test/legacy-form');
   });
@@ -91,16 +103,18 @@ describe('Form block', () => {
   it('only reads the endpoint from Action, not Placeholder', async () => {
     submitResponse = { ok: true, status: 200, text: async () => '' };
     const form = await setup({ Placeholder: ENDPOINT });
+    const redirected = nextHashChange();
     form.querySelector('button').click();
-    await waitFor(() => window.location.hash === '#thanks');
+    await redirected;
     expect(posts()).to.have.length(1);
     expect(posts()[0].url.startsWith('https://form.aem.page/')).to.be.true;
   });
 
   it('posts the form data to an endpoint, then redirects', async () => {
     const form = await setup({ Action: ENDPOINT });
+    const redirected = nextHashChange();
     form.querySelector('button').click();
-    await waitFor(() => window.location.hash === '#thanks');
+    await redirected;
     expect(posts()).to.have.length(1);
     const [post] = posts();
     expect(post.url).to.equal(ENDPOINT);
@@ -124,7 +138,7 @@ describe('Form block', () => {
     const form = await setup({ Action: ENDPOINT });
     const button = form.querySelector('button');
     button.click();
-    await waitFor(() => form.querySelector('[role="alert"]'));
+    await nextAlert(form);
     const title = form.querySelector('#title');
     expect(title.getAttribute('aria-invalid')).to.equal('true');
     expect(form.querySelector(`#${title.getAttribute('aria-describedby')}`).textContent).to.not.be.empty;
@@ -135,8 +149,9 @@ describe('Form block', () => {
 
     // a retry clears previous errors
     submitResponse = { ok: true, status: 202, json: async () => ({ ok: true }) };
+    const redirected = nextHashChange();
     button.click();
-    await waitFor(() => window.location.hash === '#thanks');
+    await redirected;
     expect(form.querySelector('[role="alert"], [aria-invalid]')).to.not.exist;
   });
 
@@ -146,7 +161,7 @@ describe('Form block', () => {
       const form = await setup({ Action: ENDPOINT });
       const button = form.querySelector('button');
       button.click();
-      await waitFor(() => form.querySelector('[role="alert"]'));
+      await nextAlert(form);
       expect(form.querySelector('[role="alert"]').textContent).to.contain('try again later');
       expect(form.querySelector('[aria-invalid]')).to.not.exist;
       expect(button.hasAttribute('disabled')).to.be.false;
@@ -158,7 +173,46 @@ describe('Form block', () => {
     const form = await setup({ Action: ENDPOINT });
     window.fetch = async () => { throw new TypeError('network'); };
     form.querySelector('button').click();
-    await waitFor(() => form.querySelector('[role="alert"]'));
+    await nextAlert(form);
     expect(window.location.hash).to.equal('');
+    expect(form.querySelector('button').hasAttribute('disabled')).to.be.false;
+  });
+
+  it('sends an unchecked checkbox as an empty string', async () => {
+    const form = await setup({ Action: ENDPOINT });
+    form.querySelector('#permission').checked = false;
+    const redirected = nextHashChange();
+    form.querySelector('button').click();
+    await redirected;
+    expect(JSON.parse(posts()[0].opts.body).data.permission).to.equal('');
+  });
+
+  it('marks a field once even if the response lists it twice', async () => {
+    submitResponse = {
+      ok: false,
+      status: 400,
+      json: async () => ({ ok: false, error: 'invalid', fields: ['title', 'title'] }),
+    };
+    const form = await setup({ Action: ENDPOINT });
+    form.querySelector('button').click();
+    await nextAlert(form);
+    expect(form.querySelectorAll('.form-field-error')).to.have.length(1);
+  });
+
+  it('clears a field error as soon as the field is edited', async () => {
+    submitResponse = {
+      ok: false,
+      status: 400,
+      json: async () => ({ ok: false, error: 'invalid', fields: ['title'] }),
+    };
+    const form = await setup({ Action: ENDPOINT });
+    form.querySelector('button').click();
+    await nextAlert(form);
+    const title = form.querySelector('#title');
+    title.value = 'Fixed';
+    title.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(title.hasAttribute('aria-invalid')).to.be.false;
+    expect(title.hasAttribute('aria-describedby')).to.be.false;
+    expect(form.querySelector('.form-field-error')).to.not.exist;
   });
 });

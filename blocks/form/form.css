@@ -119,6 +119,11 @@ main .form [aria-invalid="true"] {
   border-color: var(--color-error);
 }
 
+main .form input[type="checkbox"][aria-invalid="true"] {
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
+}
+
 main .form .form-field-error,
 main .form .form-message {
   color: var(--color-error);
@@ -128,6 +133,10 @@ main .form .form-message {
 
 main .form .form-field-error {
   margin: calc(var(--spacing-xxs) - var(--spacing-m)) 0 var(--spacing-m);
+}
+
+main .form .form-checkbox-wrapper + .form-field-error {
+  margin-top: calc(var(--spacing-xxs) - var(--spacing-xs));
 }
 
 main .form .form-message {
