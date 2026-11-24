@@ -132,6 +132,20 @@ export function restoreCrossSiteLinks(main, origin = window.location.origin) {
   });
 }
 
+export async function waitForMedia(doc, timeout = 1500) {
+  const media = [...doc.querySelectorAll('main img, main video')];
+  const loaded = Promise.all(media.map((m) => {
+    if (m.complete) return Promise.resolve();
+    m.setAttribute('loading', 'eager');
+    return new Promise((resolve) => {
+      m.addEventListener('load', resolve, { once: true });
+      m.addEventListener('error', resolve, { once: true });
+      m.addEventListener('loadedmetadata', resolve, { once: true });
+    });
+  })).then(() => doc.fonts.ready);
+  await Promise.race([loaded, new Promise((resolve) => { setTimeout(resolve, timeout); })]);
+}
+
 // as the blocks are loaded in aysnchronously, we don't have a specific timing
 // that the all blocks are loaded -> cannot use a single observer to
 // observe all blocks, so use functions here in blocks instead
