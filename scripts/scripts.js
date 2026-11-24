@@ -1047,20 +1047,11 @@ async function loadLazy(doc) {
     setTimeout(() => hashTarget.scrollIntoView({ behavior: 'smooth' }), 10);
   }
 
-  doc.addEventListener('click', async (e) => {
-    const link = e.target.closest('a[href^="#"]');
-    if (!link || link.getAttribute('href').length < 2) return;
-    let target;
-    try {
-      target = doc.querySelector(link.getAttribute('href'));
-    } catch (err) {
-      return;
-    }
+  window.addEventListener('hashchange', async () => {
+    const target = doc.getElementById(decodeURIComponent(window.location.hash.slice(1)));
     if (!target) return;
-    e.preventDefault();
     await waitForMedia();
     target.scrollIntoView({ behavior: 'smooth' });
-    window.history.pushState(null, '', link.getAttribute('href'));
   });
 
   // check to see if this is reflected in google indexed page
