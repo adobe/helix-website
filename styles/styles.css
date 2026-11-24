@@ -327,6 +327,7 @@ html[data-theme="dark"] {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-height) + var(--breadcrumb-height) + 2rem);
 }
 
 * {
@@ -497,7 +498,6 @@ h5,
 h6 {
   font-weight: 700;
   margin: 0;
-  scroll-margin: calc(var(--nav-height) + 1em);
 }
 
 h1,
@@ -1895,7 +1895,6 @@ body.skills-template main h5,
 body.skills-template main h6 {
   font-weight: 700;
   margin-top: var(--spacing-s);
-  scroll-margin: calc(var(--nav-height) + 1em + var(--breadcrumb-height));
 }
 
 /* separation for better readability in long section */

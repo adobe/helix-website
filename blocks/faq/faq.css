@@ -2,7 +2,6 @@ main .faq dt {
   margin-top: var(--spacing-m);
   font-weight: 700;
   margin-bottom: var(--spacing-xxs);
-  scroll-margin: calc(var(--nav-height) + var(--breadcrumb-height));
 }
 
 main .faq dt > a {

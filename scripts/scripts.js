@@ -1027,9 +1027,7 @@ async function loadLazy(doc) {
 
   sampleRUM('lazy');
 
-  const hashTarget = window.location.hash ? doc.querySelector(window.location.hash) : null;
-  if (hashTarget) {
-    // Wait for all images and videos to load before scrolling to hash target
+  const waitForMedia = async () => {
     const media = [...doc.querySelectorAll('main img, main video')];
     await Promise.all(media.map((m) => {
       if (m.complete) return Promise.resolve();
@@ -1040,8 +1038,30 @@ async function loadLazy(doc) {
         m.addEventListener('loadedmetadata', resolve, { once: true });
       });
     }));
+    await document.fonts.ready;
+  };
+
+  const hashTarget = window.location.hash ? doc.querySelector(window.location.hash) : null;
+  if (hashTarget) {
+    await waitForMedia();
     setTimeout(() => hashTarget.scrollIntoView({ behavior: 'smooth' }), 10);
   }
+
+  doc.addEventListener('click', async (e) => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link || link.getAttribute('href').length < 2) return;
+    let target;
+    try {
+      target = doc.querySelector(link.getAttribute('href'));
+    } catch (err) {
+      return;
+    }
+    if (!target) return;
+    e.preventDefault();
+    await waitForMedia();
+    target.scrollIntoView({ behavior: 'smooth' });
+    window.history.pushState(null, '', link.getAttribute('href'));
+  });
 
   // check to see if this is reflected in google indexed page
   document.documentElement.classList.add('index-test-scripts-js-2024-08-23');
