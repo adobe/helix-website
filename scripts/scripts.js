@@ -24,6 +24,7 @@ import {
   addInViewAnimationToSingleElement,
   addInViewAnimationToMultipleElements,
   restoreCrossSiteLinks,
+  waitForMedia,
 } from '../utils/helpers.js';
 
 // Constants here
@@ -1029,19 +1030,22 @@ async function loadLazy(doc) {
 
   const hashTarget = window.location.hash ? doc.querySelector(window.location.hash) : null;
   if (hashTarget) {
-    // Wait for all images and videos to load before scrolling to hash target
-    const media = [...doc.querySelectorAll('main img, main video')];
-    await Promise.all(media.map((m) => {
-      if (m.complete) return Promise.resolve();
-      m.setAttribute('loading', 'eager');
-      return new Promise((resolve) => {
-        m.addEventListener('load', resolve, { once: true });
-        m.addEventListener('error', resolve, { once: true });
-        m.addEventListener('loadedmetadata', resolve, { once: true });
-      });
-    }));
+    await waitForMedia(doc);
     setTimeout(() => hashTarget.scrollIntoView({ behavior: 'smooth' }), 10);
   }
+
+  window.addEventListener('hashchange', async () => {
+    let id;
+    try {
+      id = decodeURIComponent(window.location.hash.slice(1));
+    } catch {
+      return;
+    }
+    const target = doc.getElementById(id);
+    if (!target) return;
+    await waitForMedia(doc);
+    target.scrollIntoView({ behavior: 'smooth' });
+  });
 
   // check to see if this is reflected in google indexed page
   document.documentElement.classList.add('index-test-scripts-js-2024-08-23');

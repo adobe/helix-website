@@ -1,7 +1,7 @@
 /* global describe it */
 
 import { expect } from '@esm-bundle/chai';
-import { restoreCrossSiteUrl, restoreCrossSiteLinks } from '../../utils/helpers.js';
+import { restoreCrossSiteUrl, restoreCrossSiteLinks, waitForMedia } from '../../utils/helpers.js';
 
 const ORIGIN = 'https://www.aem.live';
 const restore = (href) => restoreCrossSiteUrl(new URL(href, ORIGIN), ORIGIN);
@@ -119,6 +119,18 @@ describe('restoreCrossSiteLinks', () => {
     restoreCrossSiteLinks(main, 'https://www.aem.live');
     // the links resolve against the test origin, so nothing matches the given origin
     expect(get(main, 'library').getAttribute('href')).to.equal(LIBRARY);
+    main.remove();
+  });
+});
+
+describe('waitForMedia', () => {
+  it('resolves after the timeout when media never loads', async () => {
+    const main = document.createElement('main');
+    main.innerHTML = '<video preload="none"></video>';
+    document.body.append(main);
+    const start = performance.now();
+    await waitForMedia(document, 100);
+    expect(performance.now() - start).to.be.below(1000);
     main.remove();
   });
 });
