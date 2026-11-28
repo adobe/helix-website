@@ -1,5 +1,25 @@
 import { addInViewAnimationToSingleElement } from '../../utils/helpers.js';
 
+const GENERIC_ERROR = 'Sorry, we couldn’t submit the form. Please try again later.';
+const INVALID_ERROR = 'Please check the highlighted fields and try again.';
+
+/**
+ * Returns the endpoint to POST to directly, if the submit row's Action is an https URL
+ * (or http on localhost, for a local worker). Otherwise the legacy forms service is used.
+ * @param {string} action the submit row's Action value
+ * @returns {string|null} the endpoint URL, or null for the legacy service
+ */
+export function getEndpoint(action) {
+  try {
+    const url = new URL(action);
+    if (url.protocol === 'https:') return url.href;
+    if (url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname)) return url.href;
+  } catch (e) {
+    // relative actions use the legacy forms service
+  }
+  return null;
+}
+
 function createSelect(fd) {
   const select = document.createElement('select');
   select.id = fd.Field;
@@ -49,6 +69,82 @@ async function submitForm(form) {
   return payload;
 }
 
+/**
+ * Removes error messages and invalid states from a previous submission.
+ * @param {HTMLFormElement} form the form
+ */
+function clearErrors(form) {
+  form.querySelectorAll('.form-message, .form-field-error').forEach((el) => el.remove());
+  form.querySelectorAll('[aria-invalid]').forEach((el) => {
+    el.removeAttribute('aria-invalid');
+    el.removeAttribute('aria-describedby');
+  });
+}
+
+/**
+ * Shows an alert above the submit button, and marks the given fields invalid.
+ * @param {HTMLFormElement} form the form
+ * @param {string} message the alert text when no fields are marked invalid
+ * @param {string[]} fields ids of the fields to mark invalid
+ */
+function showErrors(form, message, fields = []) {
+  const invalid = [...new Set(fields)]
+    .map((name) => [...form.elements].find((el) => el.id && el.id === name))
+    .filter(Boolean);
+  invalid.forEach((el) => {
+    const error = document.createElement('p');
+    error.className = 'form-field-error';
+    error.id = `${el.id}-error`;
+    error.textContent = 'Please check this field.';
+    el.setAttribute('aria-invalid', 'true');
+    el.setAttribute('aria-describedby', error.id);
+    el.addEventListener('input', () => {
+      if (!error.isConnected) return;
+      error.remove();
+      el.removeAttribute('aria-invalid');
+      el.removeAttribute('aria-describedby');
+    }, { once: true });
+    el.closest('.field-wrapper').after(error);
+  });
+  const alert = document.createElement('div');
+  alert.className = 'form-message';
+  alert.setAttribute('role', 'alert');
+  alert.textContent = invalid.length ? INVALID_ERROR : message;
+  form.querySelector('.form-submit-wrapper')?.before(alert);
+  if (invalid.length) invalid[0].focus();
+}
+
+/**
+ * POSTs the form data as JSON to the endpoint, showing errors if it fails.
+ * @param {HTMLFormElement} form the form
+ * @param {string} endpoint the URL to POST to
+ * @returns {Promise<boolean>} true if the submission was accepted
+ */
+async function submitToEndpoint(form, endpoint) {
+  clearErrors(form);
+  const data = {};
+  [...form.elements].forEach((fe) => {
+    if (!fe.id) return;
+    if (fe.type === 'checkbox') data[fe.id] = fe.checked ? 'Yes' : '';
+    else data[fe.id] = fe.value;
+  });
+  try {
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      cache: 'no-cache',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data }),
+    });
+    if (resp.ok) return true;
+    const body = resp.status === 400 ? await resp.json().catch(() => ({})) : {};
+    const fields = body.error === 'invalid' && Array.isArray(body.fields) ? body.fields : [];
+    showErrors(form, GENERIC_ERROR, fields);
+  } catch (e) {
+    showErrors(form, GENERIC_ERROR);
+  }
+  return false;
+}
+
 function createButton(fd) {
   const button = document.createElement('button');
   button.textContent = fd.Label;
@@ -60,7 +156,15 @@ function createButton(fd) {
       if (form.checkValidity()) {
         event.preventDefault();
         button.setAttribute('disabled', '');
-        await submitForm(form);
+        const endpoint = getEndpoint(fd.Action);
+        if (endpoint) {
+          if (!await submitToEndpoint(form, endpoint)) {
+            button.removeAttribute('disabled');
+            return;
+          }
+        } else {
+          await submitForm(form);
+        }
         const redirectTo = fd.Extra;
         window.location.href = redirectTo;
       }
